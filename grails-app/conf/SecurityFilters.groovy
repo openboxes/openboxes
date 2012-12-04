@@ -15,6 +15,9 @@ import org.pih.warehouse.core.Location
 
 class SecurityFilters {
 	
+  static ArrayList controllersWithAuthUserNotRequired = ['api','rxNorm','test']
+  static ArrayList actionsWithAuthUserNotRequired = ['test', 'login', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
+  static ArrayList actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
 	def authService 
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
@@ -57,9 +60,6 @@ class SecurityFilters {
 					return true
 				}
 								
-				String [] controllersWithAuthUserNotRequired = "api,rxNorm,test".split(",");
-				String [] actionsWithAuthUserNotRequired = "test,login,handleLogin,signup,handleSignup,json,updateAuthUserLocale".split(",");
-				String [] actionsWithLocationNotRequired = "test,login,logout,handleLogin,signup,handleSignup,chooseLocation,json,updateAuthUserLocale".split(",");
 				
 				// Not sure when this happens								
 				if (params.controller == null) {
@@ -68,12 +68,12 @@ class SecurityFilters {
 				}			
 				// When a request does not require authentication, we return true
 				// FIXME In order to start working on sync use cases, we need to authenticate  	
-				else if (Arrays.asList(controllersWithAuthUserNotRequired).contains(controllerName)) {
+				else if (controllersWithAuthUserNotRequired.contains(controllerName)) {
 					return true;
 				}
 				// When there's no authenticated user in the session and a request requires authentication 
 				// we redirect to the auth login page.  targetUri is the URI the user was trying to get to.
-				else if(!session.user && !(Arrays.asList(actionsWithAuthUserNotRequired).contains(actionName))) {
+				else if(!session.user && !(actionsWithAuthUserNotRequired.contains(actionName))) {
 					def targetUri = (request.forwardURI - request.contextPath);
 					if (request.queryString) 
 						targetUri += "?" + request.queryString
@@ -103,7 +103,7 @@ class SecurityFilters {
 				
 				// When a user has not selected a warehouse and they are requesting an action that requires one, 
 				// we redirect to the choose warehouse page.
-				if (!session.warehouse && !(Arrays.asList(actionsWithLocationNotRequired).contains(actionName))) {						
+				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName))) {						
 					//def targetUri = (request.forwardURI - request.contextPath);
 					//if (request.queryString)
 					//	targetUri += "?" + request.queryString
