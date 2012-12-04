@@ -117,10 +117,27 @@
                         </g:link>
                     </div>
                 </div>
+                <div class="linkButton">
+                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_STOCK']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.ward-stock.label')]" />
+                    </g:link>
+                </div>
 
                 <div class="linkButton">
-                    <g:link controller="requisition" action="create" class="create">
-                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot.label')]" />
+                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_NON_STOCK']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.ward-non-stock.label')]" />
+                    </g:link>
+                </div>
+
+                <div class="linkButton">
+                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_STOCK']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-stock.label')]" />
+                    </g:link>
+                </div>
+
+                <div class="linkButton">
+                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_NON_STOCK']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-non-stock.label')]" />
                     </g:link>
                 </div>
 			</div>

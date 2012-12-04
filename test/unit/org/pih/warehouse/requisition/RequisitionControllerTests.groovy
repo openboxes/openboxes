@@ -27,17 +27,17 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def location2 = new Location(id:"1235", supportedActivities: ["supplier"])
         def myLocation = new Location(id:"001", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         mockDomain(Location, [location1, location2, myLocation, location3])
-         def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
         mockDomain(Requisition, [requisition])
         controller.params.id = requisition.id
         controller.session.warehouse = myLocation
 
         def model = controller.edit()
 
-        assert model.depots[0] == location3
-        assert model.depots[1] == location1
-        assert !model.depots.contains(location2)
-        assert !model.depots.contains(myLocation)
+        assert model.locations[0] == location3
+        assert model.locations[1] == location1
+        assert !model.locations.contains(location2)
+        assert !model.locations.contains(myLocation)
     }
 
     void testEditExistingRequisition(){
@@ -46,10 +46,10 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         mockDomain(Location, [])
         controller.params.id = "1234"
         def model =  controller.edit()
-        def json = JSON.parse(model.requisition)
-        assert model.requisitionId == requisition.id
-        assert json.id == requisition.toJson().id
-        assert json.name == requisition.toJson().name
+        def editRequisition = model.requisition
+        assert model.requisition.id == editRequisition.id
+        assert editRequisition.id == requisition.id
+        assert editRequisition.name == requisition.name
     }
 
      void testEditRequisitionWhichCannotBeFound(){
@@ -166,18 +166,20 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
     def testCreate(){
       mockDomain(Location, [])
+      mockDomain(Requisition, [])
       def today = new Date().format("MM/dd/yyyy")
       def tomorrow = new Date().plus(1).format("MM/dd/yyyy")
+      controller.params.type = "WARD_STOCK"
       controller.create()
       assert renderArgs.view == "edit"
       assert renderArgs.model
-      assert renderArgs.model.depots == []
+      assert renderArgs.model.locations == []
       assert renderArgs.model.requisition
-      String requisitionString = renderArgs.model.requisition
-      def requisitionJson = JSON.parse(requisitionString)
-      assert requisitionJson.dateRequested == today
-      assert requisitionJson.status == RequisitionStatus.NEW.name()
-      assert requisitionJson.requestedDeliveryDate == tomorrow 
+      def requisition = renderArgs.model.requisition
+      assert requisition.dateRequested.format("MM/dd/yyyy") == today
+      assert requisition.type == RequisitionType.WARD_STOCK
+      assert requisition.status == RequisitionStatus.NEW
+      assert requisition.requestedDeliveryDate.format("MM/dd/yyyy") == tomorrow
 
     }
 

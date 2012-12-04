@@ -1,11 +1,12 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="grails.converters.JSON; org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionType" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="custom" />
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
-    <title><warehouse:message code="${requisitionId ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></title>
-		<content tag="pageTitle"><warehouse:message code="${requisitionId ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></content>
+    <title><warehouse:message code="${requisition?.id ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></title>
+		<content tag="pageTitle"><warehouse:message code="${requisition?.id ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></content>
     <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
@@ -22,10 +23,17 @@
     <table id="requisition-body">
       <tr class="prop">
         <td class="name">
-          <label for="origin.id"><warehouse:message code="requisition.requestingDepot.label" /></label>
+          <label for="origin.id">
+              <g:if test="${requisition.isWardRequisition()}">
+                  <warehouse:message code="requisition.requestingWard.label" />
+              </g:if>
+              <g:else>
+                  <warehouse:message code="requisition.requestingDepot.label" />
+              </g:else>
+          </label>
         </td>
     <td class="value">
-          <g:select name="origin.id" from="${depots}"
+          <g:select name="origin.id" from="${locations}"
               id = "depot"
               data-bind="value: requisition.originId"
               optionKey="id" optionValue="name" class='required' value=""
@@ -146,7 +154,7 @@
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
         <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.submit.label')}"/>
-        <g:link action="${requisitionId ? 'show': 'list'}" id="${requisitionId}">
+        <g:link action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id}">
             <input type="button" id="cancelRequisition" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
         </g:link>
 
@@ -156,7 +164,7 @@
 
 <script type="text/javascript">
     $(function () {
-        var requisitionFromServer = ${requisition};
+        var requisitionFromServer = ${requisition.toJson() as JSON};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
         var viewModel = new openboxes.requisition.EditRequisitionViewModel(requisitionData);
@@ -176,12 +184,21 @@
             viewModel.requisition.name("${warehouse.message(code: 'requisition.label')}");
 
         var updateDescription = function () {
-            var depot = $("#depot select option:selected").text() || "";
+            var depot = $("select#depot option:selected").text() || "";
             var program = $("#recipientProgram").val() || "";
             var requestedBy = $("#requestedBy").val() || "";
             var dateRequested = $("#dateRequested").val() || "";
-            var deliveryDate = $("#requestedDeliveryDate").val() || "";
-            var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}: " + depot + " - " + program + ", " + requestedBy + " - " + dateRequested + ", " + deliveryDate;
+            var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}";
+            if(depot) {
+                description += " - " + depot;
+            }
+            if(program != "") {
+                description += " - " + program;
+            }
+            if(requestedBy != "") {
+                description += " - " + requestedBy;
+            }
+            description += " - " + dateRequested;
             viewModel.requisition.name(description);
         };
 

@@ -114,7 +114,11 @@ class Location implements Comparable, java.io.Serializable {
 	}
 	
 	Boolean isWarehouse() {
-		//return locationType.id == LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID).id
-		return supports(ActivityCode.MANAGE_INVENTORY)
-	}
+        //return locationType.id == LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID).id
+        return supports(ActivityCode.MANAGE_INVENTORY)
+    }
+
+    Boolean isWard() {
+        return (locationType.name in ["PHARMACY", "WARD"])
+    }
 }

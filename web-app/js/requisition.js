@@ -39,6 +39,7 @@ openboxes.requisition.Requisition = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
+    self.type = ko.observable(attrs.type);
     self.originId= ko.observable(attrs.originId);
     self.originName = ko.observable(attrs.originName);
     self.dateRequested = ko.observable(attrs.dateRequested);

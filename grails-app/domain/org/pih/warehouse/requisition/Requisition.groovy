@@ -40,6 +40,7 @@ class Requisition implements Serializable {
 	
 
 	RequisitionStatus status;
+	RequisitionType type;
 
 	Location origin			// the vendor
 	Location destination 	// the customer location 
@@ -75,7 +76,8 @@ class Requisition implements Serializable {
 	}
 	
 	static constraints = { 
-		status(nullable:true)		
+		status(nullable:true)
+        type(nullable:true)
 		name(nullable:true)
 		description(nullable:true)
 		requestNumber(nullable:true, maxSize: 255)
@@ -114,6 +116,14 @@ class Requisition implements Serializable {
 		return (status in [RequisitionStatus.OPEN])
 	}
 
+    Boolean isWardRequisition() {
+        return (type in [RequisitionType.WARD_NON_STOCK, RequisitionType.WARD_STOCK])
+    }
+
+    Boolean isStockRequisition() {
+        return (type in [RequisitionType.WARD_STOCK, RequisitionType.DEPOT_STOCK])
+    }
+
 	Boolean isFulfilled() { 
 		return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED])
 	}
@@ -146,6 +156,7 @@ class Requisition implements Serializable {
       version: version,
       lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
       status: status?.name(),
+      type: type?.name(),
       originId: origin?.id,
       originName: origin?.name,
       destinationId: destination?.id,

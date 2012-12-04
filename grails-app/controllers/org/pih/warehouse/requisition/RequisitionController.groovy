@@ -27,21 +27,32 @@ class RequisitionController {
     }
 
     def list = {
-        def requisitions = Requisition.findAll()//Requisition.findAllByStatus(RequisitionStatus.CREATED)
+        def requisitions = Requisition.findAll()
         render(view:"list", model:[requisitions: requisitions])
     }
 
     def create = {
         def requisition = new Requisition(status: RequisitionStatus.NEW)
-        render(view:"edit", model:[requisition:requisition.toJson() as JSON, depots: getDepots(), requisitionId: null])
+        requisition.type = params.type as RequisitionType
+        def locations
+        if (requisition.isWardRequisition()) {
+            locations = getWards()
+        } else {
+            locations = getDepots()
+        }
+        render(view:"edit", model:[requisition:requisition, locations: locations])
     }
 
     def edit = {
         def requisition = Requisition.get(params.id)
         if(requisition) {
-           def depots = getDepots()
-           String jsonString = requisition.toJson() as JSON
-           return [requisition: jsonString, depots: depots, requisitionId: requisition.id];  
+            def locations
+            if (requisition.isWardRequisition()) {
+                locations = getWards()
+            } else {
+                locations = getDepots()
+            }
+           return [requisition: requisition, locations: locations];
         }else
         {
           response.sendError(404)
@@ -50,6 +61,10 @@ class RequisitionController {
 
     private List<Location> getDepots() {
         Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}.sort{ it.name }
+    }
+
+    private List<Location> getWards() {
+        Location.list().findAll {location -> location.isWard()}.sort { it.name }
     }
 
     def save = {
