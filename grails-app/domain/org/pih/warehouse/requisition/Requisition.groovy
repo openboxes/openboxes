@@ -102,8 +102,20 @@ class Requisition implements Serializable {
 		updatedBy(nullable:true)
         recipientProgram(nullable:true)
 
-	}	
-	
+	}
+
+    Boolean isWardRequisition() {
+        return (type in [RequisitionType.WARD_NON_STOCK, RequisitionType.WARD_STOCK])
+    }
+
+    Boolean isDepotRequisition() {
+        return (type in [RequisitionType.DEPOT_NON_STOCK, RequisitionType.DEPOT_STOCK])
+    }
+
+    Boolean isStockRequisition() {
+        return (type in [RequisitionType.WARD_STOCK, RequisitionType.DEPOT_STOCK])
+    }
+
 	Boolean isPending() { 
 		return isCreated() || isOpen();
 	}
@@ -115,14 +127,6 @@ class Requisition implements Serializable {
 	Boolean isOpen() { 
 		return (status in [RequisitionStatus.OPEN])
 	}
-
-    Boolean isWardRequisition() {
-        return (type in [RequisitionType.WARD_NON_STOCK, RequisitionType.WARD_STOCK])
-    }
-
-    Boolean isStockRequisition() {
-        return (type in [RequisitionType.WARD_STOCK, RequisitionType.DEPOT_STOCK])
-    }
 
 	Boolean isFulfilled() { 
 		return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED])

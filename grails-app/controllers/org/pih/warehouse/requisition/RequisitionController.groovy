@@ -36,7 +36,7 @@ class RequisitionController {
         requisition.type = params.type as RequisitionType
         def locations
         if (requisition.isWardRequisition()) {
-            locations = getWards()
+            locations = getWardsPharmacies()
         } else {
             locations = getDepots()
         }
@@ -48,7 +48,7 @@ class RequisitionController {
         if(requisition) {
             def locations
             if (requisition.isWardRequisition()) {
-                locations = getWards()
+                locations = getWardsPharmacies()
             } else {
                 locations = getDepots()
             }
@@ -63,8 +63,13 @@ class RequisitionController {
         Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}.sort{ it.name }
     }
 
-    private List<Location> getWards() {
-        Location.list().findAll {location -> location.isWard()}.sort { it.name }
+    private List<Location> getWardsPharmacies() {
+        def current = session.warehouse as Location
+        if(current?.locationGroup == null) {
+            Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
+        } else {
+            Location.list().findAll {location -> location.locationType == current.locationType}.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
+        }
     }
 
     def save = {

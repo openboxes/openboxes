@@ -1,6 +1,7 @@
 package org.pih.warehouse.requisition
 
 import grails.test.ControllerUnitTestCase
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -165,15 +166,18 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     def testCreate(){
-      mockDomain(Location, [])
+      def locationType = new LocationType(id: "loctype1", name: "WARD")
+      def location1 = new Location(id:"1234", locationType:locationType)
+      mockDomain(Location, [location1])
       mockDomain(Requisition, [])
       def today = new Date().format("MM/dd/yyyy")
       def tomorrow = new Date().plus(1).format("MM/dd/yyyy")
+      controller.session.warehouse = location1
       controller.params.type = "WARD_STOCK"
       controller.create()
       assert renderArgs.view == "edit"
       assert renderArgs.model
-      assert renderArgs.model.locations == []
+      assert renderArgs.model.locations == [location1]
       assert renderArgs.model.requisition
       def requisition = renderArgs.model.requisition
       assert requisition.dateRequested.format("MM/dd/yyyy") == today

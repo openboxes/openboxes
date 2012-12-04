@@ -40,6 +40,7 @@
               noSelection="['':'']"/>
         </td>
       </tr>
+      <g:if test="${requisition.isDepotRequisition()}">
       <tr class="prop">
         <td class="name">
           <label><warehouse:message code="requisition.program.label"/></label>
@@ -52,6 +53,7 @@
  
         </td>
       </tr>
+      </g:if>
       <tr class="prop">
         <td class="name">
           <label><warehouse:message code="requisition.requestedBy.label"/></label>
@@ -99,12 +101,14 @@
             <th class="list-header">
                 ${warehouse.message(code: 'requisitionItem.quantity.label')}
             </th>
+            <g:if test="${requisition.isDepotRequisition()}">
             <th class="center">
                 ${warehouse.message(code: 'requisitionItem.substitutable.label')}?
             </th>
             <th class="list-header">
                 ${warehouse.message(code: 'requisitionItem.recipient.label')}
             </th>
+            </g:if>
             <th class="list-header">
                 ${warehouse.message(code: 'requisitionItem.comment.label')}
             </th>
@@ -126,12 +130,14 @@
             <input type="text" class="required number quantity" size="6" 
             data-bind="value: quantity,uniqueName: true"/>
           </td>
+          <g:if test="${requisition.isDepotRequisition()}">
           <td  class="center">
             <input type="checkbox" data-bind="checked: substitutable, uniqueName: true">
           </td>
           <td  class="list-header">
             <input type="text" data-bind="value: recipient, uniqueName: true"/>
           </td>
+          </g:if>
           <td  class="list-header">
             <input type="text" data-bind="value: comment, uniqueName: true" size="50"/>
           </td>
