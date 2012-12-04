@@ -188,7 +188,7 @@
 				</div>
 			</g:isUserInRole>
 		</g:if>
-		<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">	
+		<g:if test="${(!shipmentInstance?.hasShipped()) && (shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id)}">
 			<div class="action-menu-item">		
 				<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
 				src="${createLinkTo(dir:'images/icons',file:'trash.png')}"
