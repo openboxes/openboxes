@@ -35,13 +35,19 @@
 					<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
 					&nbsp;${warehouse.message(code: 'requisition.process.label', default: 'Process requisition')}
 				</g:link>				
-			</div>		
+			</div>
+            <div class="action-menu-item">
+                <g:link controller="requisition" action="delete" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
+                    &nbsp;${warehouse.message(code: 'request.delete.label', default: 'Delete requisition')}
+                </g:link>
+            </div>
 			<div class="action-menu-item">
 				<g:link controller="requisition" action="cancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">
 					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
 					&nbsp;${warehouse.message(code: 'requisition.cancel.label', default: 'Cancel requisition')}
 				</g:link>				
 			</div>
-		</g:if>		
+		</g:if>
 	</div>
 </g:if>

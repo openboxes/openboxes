@@ -72,6 +72,8 @@ eventTestPhaseStart = {name ->
         println "${proc.in.text}"
         if (proc.exitValue() == 1) {
             event("JasminFailed", ["Tests FAILED"])
+        } else {
+            println "Tests PASSED"
         }
     }
 }

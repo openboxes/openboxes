@@ -301,28 +301,29 @@ class InventoryService implements ApplicationContextAware {
             }
         }
 
+        if(!commandInstance.searchTerms) {
+            def productGroups = getProductGroups(commandInstance);
+            productGroups.each { productGroup ->
+                def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
+                inventoryItemCommand.inventoryItems = new ArrayList();
+                productGroup.products.each { product ->
+                    inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
+                    inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
+                    inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
+                    inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
+                            quantityOnHandMap[product] ?: 0,
+                            quantityIncomingMap[product] ?: 0,
+                            quantityOutgoingMap[product] ?: 0,
+                            commandInstance.showOutOfStockProducts)
 
-        def productGroups = getProductGroups(commandInstance);
-        productGroups.each { productGroup ->
-            def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
-            inventoryItemCommand.inventoryItems = new ArrayList();
-            productGroup.products.each { product ->
-                inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
-                inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
-                inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
-                inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
-                        quantityOnHandMap[product] ?: 0,
-                        quantityIncomingMap[product] ?: 0,
-                        quantityOutgoingMap[product] ?: 0,
-                        commandInstance.showOutOfStockProducts)
-
-                // Remove all products in the product group from the main productd list
-                inventoryItemCommands.removeAll { it.product == product }
+                    // Remove all products in the product group from the main productd list
+                    inventoryItemCommands.removeAll { it.product == product }
+                }
+                inventoryItemCommands << inventoryItemCommand
             }
-            inventoryItemCommands << inventoryItemCommand
         }
-        commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
 
+        commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
         return commandInstance?.categoryToProductMap
     }
 
@@ -659,7 +660,6 @@ class InventoryService implements ApplicationContextAware {
 			
 
         products = products?.sort() { it?.name };
-        println products
         return products;
     }
 	
@@ -673,6 +673,7 @@ class InventoryService implements ApplicationContextAware {
         def products = Product.list()
         def matchCategories = getExplodedCategories(categories)
         def result = getProductsByTermsAndCategories(terms, matchCategories)
+        println(result)
         result = products.intersect(result);
 
         if (!showHiddenProducts) {
@@ -698,42 +699,48 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List<Product> getProductsByTermsAndCategories(terms, categories) {
+
         return InventoryItem.createCriteria().list() {
-            or {
+            if(categories) {
                 product {
-                    if (categories) {
-                        'in'("category", categories)
-                    }
-                    or {
-                        and {
-                            terms.each {term ->
-                                ilike("name", "%" + term + "%")
-                            }
-                        }
-                        and {
-                            terms.each { term ->
-                                ilike("manufacturer", "%" + term + "%")
-                            }
-                        }
-                        and {
-                            terms.each { term ->
-                                ilike("manufacturerCode", "%" + term + "%")
-                            }
-                        }
-                        and {
-                            terms.each { term ->
-                                ilike("productCode", "%" + term + "%")
-                            }
-                        }
-                    }
+                    inList("category", categories)
                 }
-                and {
-                    terms.each { term ->
-                        ilike("lotNumber", "%" + term + "%")
+            }
+            if (terms) {
+                or {
+                    or {
+                        terms.each {term ->
+                            ilike("lotNumber", "%" + term + "%")
+                        }
+                    }
+                    product {
+                        or {
+                            or {
+                                terms.each {term ->
+                                    ilike("name", "%" + term + "%")
+                                }
+                            }
+                            or {
+                                terms.each { term ->
+                                    ilike("manufacturer", "%" + term + "%")
+                                }
+                            }
+                            or {
+                                terms.each { term ->
+                                    ilike("manufacturerCode", "%" + term + "%")
+                                }
+                            }
+                            or {
+                                terms.each { term ->
+                                    ilike("productCode", "%" + term + "%")
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }.collect { it.product }
+
+        }.collect { it.product }.unique { it.id } as List<Product>
 	}
 	
 	/**
