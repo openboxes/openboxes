@@ -314,9 +314,10 @@ class InventoryController {
 		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
 	}
 	
+	
 	def listExpiredStock = { 
 		def warehouse = Location.get(session.warehouse.id)
-		def categorySelected = (params.category) ? Category.get(params.category as int) : null;		
+		def categorySelected = (params.category) ? Category.get(params.category) : null;		
 		def expiredStock = inventoryService.getExpiredStock(categorySelected, warehouse);
 		def categories = expiredStock?.collect { it.product.category }?.unique()
 		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
@@ -327,7 +328,7 @@ class InventoryController {
 	
 	def listExpiringStock = { 
 		def threshhold = (params.threshhold) ? params.threshhold as int : 0;
-		def category = (params.category) ? Category.get(params.category as int) : null;
+		def category = (params.category) ? Category.get(params.category) : null;
 		def location = Location.get(session.warehouse.id)		
 		def expiringStock = inventoryService.getExpiringStock(category, location, threshhold)
 		def categories = expiringStock?.collect { it?.product?.category }?.unique().sort { it.name } ;
@@ -353,7 +354,7 @@ class InventoryController {
 		categories = categories.findAll { it != null }
 		
 		// poor man's filter
-		def categorySelected = (params.category) ? Category.get(params.category as int) : null;
+		def categorySelected = (params.category) ? Category.get(params.category) : null;
 		log.debug "categorySelected: " + categorySelected
 		if (categorySelected) {
 			results['reorderProductsQuantityMap'] = results['reorderProductsQuantityMap'].findAll { it.key?.category == categorySelected }
@@ -364,7 +365,13 @@ class InventoryController {
 			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
 	}
 
-
+	def searchRecall = {
+		
+		log.info "searchRecall " + params
+		
+		
+		
+	}
 
 	
 	def showConsumption = { ConsumptionCommand command ->

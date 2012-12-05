@@ -313,7 +313,7 @@ class OrderController {
 	}
 	
 	def receive = {		
-		def orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
+		def orderCommand = orderService.getOrder(params.id, session.user.id)
 		if (!orderCommand.order) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
 			redirect(action: "list")
@@ -340,7 +340,7 @@ class OrderController {
 	}
 
 	def addOrderShipment = {  
-		def orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
+		def orderCommand = orderService.getOrder(params.id, session.user.id)
 		int index = Integer.valueOf(params?.index)
 		def orderItemToCopy = orderCommand?.orderItems[index]
 		if (orderItemToCopy) { 
