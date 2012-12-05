@@ -67,7 +67,7 @@ class CategorySelectTagLib {
 	}
 	
 	def categorySelect = { attrs ->		
-		def selectedCategory = Category.get(attrs.value as int)
+		def selectedCategory = Category.get(attrs.value)
 		def rootCategory = productService.getRootCategory();
 		def excludeSpaces = attrs?.excludeSpaces 
 		
