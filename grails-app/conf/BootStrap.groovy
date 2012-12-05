@@ -12,6 +12,8 @@ import liquibase.database.DatabaseFactory;
 import javax.sql.DataSource
 import grails.util.Environment;
 import org.pih.warehouse.product.*
+import org.pih.warehouse.requisition.*
+import org.pih.warehouse.picklist.*
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.TransactionType
@@ -131,12 +133,18 @@ class BootStrap {
     }
 
     def deleteTestFixture(List<Map<String, Object>> testData) {
+        deleteRequisitions()
         testData.each {deleteProductAndInventoryItems(it)}
         Transaction.findByComment(TestFixure).each { it.delete()}
     }
 
     def createTestFixtureIfNotExist(List<Map<String, Object>> testData) {
         testData.each{ addProductAndInventoryItemIfNotExist(it)}
+    }
+
+    private def deleteRequisitions(){
+      Picklist.list().each{ it.delete(failOnError: true, flush:true)}
+      Requisition.list().each{ it.delete(failOnError: true, flush:true)}
     }
 
     private def deleteProductAndInventoryItems(Map<String, Object> inventoryItemInfo) {
