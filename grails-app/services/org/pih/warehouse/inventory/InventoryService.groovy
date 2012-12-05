@@ -644,7 +644,8 @@ class InventoryService implements ApplicationContextAware {
             categories.add(command?.categoryInstance);
         }
 
-        List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms.split(" ")) : null);
+        List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms.split(",")) : null);
+        searchTerms.each { it.toString().trim() }
 
         log.debug("get products: " + command?.warehouseInstance)
         //def products = getProducts(commandInstance?.warehouseInstance, searchTerms, categoryFilters,
@@ -658,7 +659,6 @@ class InventoryService implements ApplicationContextAware {
 			products = getProducts(command?.warehouseInstance, searchTerms, categories, command?.showHiddenProducts);
 		}
 			
-
         products = products?.sort() { it?.name };
         return products;
     }
