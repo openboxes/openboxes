@@ -168,8 +168,6 @@
 
   </g:form>
 
-<div id="debug"></div>
-
 <script type="text/javascript">
     $(function () {
         var requisitionFromServer = ${requisition.toJson() as JSON};

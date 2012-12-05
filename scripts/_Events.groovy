@@ -62,3 +62,21 @@ eventCreateWarStart = { warName, stagingDir ->
 eventCompileStart = {
     ant.delete(dir:"${basedir}/target/geb-reports")
 }
+
+eventTestPhaseStart = {name ->
+    if (name == "unit") {
+        println "Starting Jasmine Tests"
+        def command = """./jasmine.sh"""
+        def proc = command.execute()
+        proc.waitFor()
+        println "${proc.in.text}"
+        if (proc.exitValue() == 1) {
+            event("JasminFailed", ["Tests FAILED"])
+        }
+    }
+}
+
+eventJasminFailed = { msg ->
+    println msg
+    System.exit(0)
+}

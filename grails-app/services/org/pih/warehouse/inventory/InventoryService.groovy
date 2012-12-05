@@ -659,6 +659,7 @@ class InventoryService implements ApplicationContextAware {
 			
 
         products = products?.sort() { it?.name };
+        println products
         return products;
     }
 	
@@ -671,11 +672,11 @@ class InventoryService implements ApplicationContextAware {
         // Get all products, including hidden ones
         def products = Product.list()
         def matchCategories = getExplodedCategories(categories)
-        def results = getProductsByTermsAndCategories(terms, matchCategories)
-        results = products.intersect(results);
+        def result = getProductsByTermsAndCategories(terms, matchCategories)
+        result = products.intersect(result);
 
         if (!showHiddenProducts) {
-            results.removeAll(getHiddenProducts(location))
+            result.removeAll(getHiddenProducts(location))
         }
 
         // now localize to only match products for the current locale
@@ -686,44 +687,53 @@ class InventoryService implements ApplicationContextAware {
         //   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
         // }
         // }
-        return results;
+        return result;
     }
-	
-	/**
+
+    /**
 	 * Get all products matching the given terms and categories.
 	 * 
 	 * @param terms
 	 * @param categories
 	 * @return
 	 */
-	List<Product> getProductsByTermsAndCategories(terms, categories) { 
-		return Product.createCriteria().list() {
-			or {
-				and {
-					terms.each { term ->
-						ilike("name", "%" + term + "%")
-					}
-				}
-				and {
-					terms.each { term ->
-						ilike("manufacturer", "%" + term + "%")
-					}
-				}
-				and {
-					terms.each { term ->
-						ilike("manufacturerCode", "%" + term + "%")
-					}
-				}
-				and {
-					terms.each { term ->
-						ilike("productCode", "%" + term + "%")
-					}
-				}
-			}
-			if (categories) {
-				'in'("category", categories)
-			}
-		}
+	List<Product> getProductsByTermsAndCategories(terms, categories) {
+        return InventoryItem.createCriteria().list() {
+            or {
+                product {
+                    if (categories) {
+                        'in'("category", categories)
+                    }
+                    or {
+                        and {
+                            terms.each {term ->
+                                ilike("name", "%" + term + "%")
+                            }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("manufacturer", "%" + term + "%")
+                            }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("manufacturerCode", "%" + term + "%")
+                            }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("productCode", "%" + term + "%")
+                            }
+                        }
+                    }
+                }
+                and {
+                    terms.each { term ->
+                        ilike("lotNumber", "%" + term + "%")
+                    }
+                }
+            }
+        }.collect { it.product }
 	}
 	
 	/**

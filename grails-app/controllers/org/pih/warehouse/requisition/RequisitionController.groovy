@@ -73,7 +73,6 @@ class RequisitionController {
     }
 
     def save = {
-        log.info("hello world")
         def jsonRequest = request.JSON
         def jsonResponse = []
         def requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session.warehouse.id))
