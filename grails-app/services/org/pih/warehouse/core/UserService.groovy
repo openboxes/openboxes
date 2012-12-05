@@ -19,6 +19,22 @@ class UserService {
 	User getUser(String id) { 
 		return User.get(id)
 	}
+
+  Boolean isUserAdmin(User u){
+    def user = User.get(u.id)
+    def roles = [RoleType.ROLE_ADMIN]
+		return user.roles.any { roles.contains(it.roleType)}
+  }
+  Boolean isUserManager(User u){
+    def user = User.get(u.id)
+    def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
+		return user.roles.any { roles.contains(it.roleType)}
+  }
+  Boolean canUserBrowse(User u){
+    def user = User.get(u.id)
+    def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER]
+		return user.roles.any { roles.contains(it.roleType)}
+  }
 	
 	Boolean isUserInRole(String userId, Collection roles) { 
 		User userInstance = getUser(userId)
@@ -31,9 +47,9 @@ class UserService {
 		return user.roles.any { it.roleType == RoleType.ROLE_ADMIN }
 	}
 	
-	boolean isUserInUserRole(User u) {
+	boolean isUserInBrowserRole(User u) {
 		def user = User.get(u.id)
-		return user.roles.any { it.roleType == RoleType.ROLE_USER }
+		return user.roles.any { it.roleType == RoleType.ROLE_BROWSER }
 	}
 	
 	boolean isUserInManagerRole(User u) {

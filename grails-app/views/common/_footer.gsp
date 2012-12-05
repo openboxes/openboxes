@@ -20,7 +20,7 @@
 				${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
 			</a> &nbsp;
 		</g:each>
-		<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_USER]">
+		<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_BROWSER]">
 			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', 
 				params: ['locale':'debug','targetUri':targetUri])}">
 				(<warehouse:message code="admin.debug.label"/>)

@@ -11,7 +11,6 @@ package org.pih.warehouse.core;
 
 public enum RoleType {
 
-	ROLE_USER('User'),
 	ROLE_MANAGER('Manager'),
 	ROLE_ADMIN('Admin'),
 	ROLE_BROWSER('Browser')
@@ -23,6 +22,6 @@ public enum RoleType {
 	}
 
 	static list() {
-		[ROLE_USER, ROLE_MANAGER, ROLE_ADMIN,ROLE_BROWSER]
+		[ROLE_BROWSER, ROLE_MANAGER, ROLE_ADMIN]
 	}
 }

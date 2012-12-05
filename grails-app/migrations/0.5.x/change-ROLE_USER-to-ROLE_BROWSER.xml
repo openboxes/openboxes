@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="adminuser (generated)" id="1351271143391">
+        <update tableName="role">
+            <column name="role_type" value="ROLE_BROWSER"/>
+            <where>id=3</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

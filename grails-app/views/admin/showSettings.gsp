@@ -111,7 +111,7 @@
 								</g:else>
 								&nbsp;|&nbsp;
 							</g:each>
-							<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_USER]">
+							<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_BROWSER]">
 								<g:if test="${session?.user?.locale==new Locale('debug')}">
 									Debug
 								</g:if>

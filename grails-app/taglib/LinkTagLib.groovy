@@ -13,8 +13,10 @@ class LinkTagLib extends ApplicationTagLib {
     def link = { attrs, body ->
 
       def actionName = attrs.action
+      def controllerName = attrs.controller ?: ""
       if(!SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)){  
-        if(RoleFilters.changeActions.contains(actionName) && !userService.isUserInRole(session.user.id, [RoleType.ROLE_MANAGER, RoleType.ROLE_ADMIN])){
+        def willChange = RoleFilters.changeActions.contains(actionName) || RoleFilters.changeControllers.contains(controllerName) || controllerName.contains("Workflow")
+        if(willChange && !userService.isUserManager(session.user)){
           return 
          }
       }
