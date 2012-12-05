@@ -103,20 +103,22 @@
 				</tbody>
 				<g:if test="${commandInstance?.lotNumberList}">
 					<tfoot>
-						<tr class="odd">
-							<td class="middle center">
-								<img src="${resource(dir: 'images/icons/silk', file: 'new.png')}" style="vertical-align: middle;"/>
-							</td>
-							<td colspan="4">
-								<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-								<g:textField name="lotNumber"/>
-								<g:datePicker name="expirationDate" precision="month" noSelection="['null':'']" value=""/>						
-								<button class="button">
-									<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/>
-									<warehouse:message code="default.button.save.label"/>
-								</button>						
-							</td>
-						</tr>
+            <g:isUserManager>
+              <tr class="odd">
+                <td class="middle center">
+                  <img src="${resource(dir: 'images/icons/silk', file: 'new.png')}" style="vertical-align: middle;"/>
+                </td>
+                <td colspan="4">
+                  <g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+                  <g:textField name="lotNumber"/>
+                  <g:datePicker name="expirationDate" precision="month" noSelection="['null':'']" value=""/>						
+                  <button class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/>
+                    <warehouse:message code="default.button.save.label"/>
+                  </button>						
+                </td>
+              </tr>
+            </g:isUserManager>
 						<tr>
 							<td colspan="2">
 								<label>

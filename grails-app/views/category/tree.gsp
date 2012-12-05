@@ -19,10 +19,12 @@
 			<div class="buttonBar">            	
             	<span class="linkButton">
 					<g:link class="list" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-            	</span>										    	
-            	<span class="linkButton">
-					<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-            	</span>										    	
+            	</span>	
+              <g:isUserManager>
+                <span class="linkButton">
+            <g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
+                </span>	
+              </g:isUserManager>
 			</div>						
 
             

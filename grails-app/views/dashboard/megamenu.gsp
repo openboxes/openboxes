@@ -222,61 +222,62 @@
 			</div>
 		</div>					
 	</li>
-	<li>
-		<a href="javascript:void(0)">
-			<warehouse:message code="admin.label" />
-		</a>	
-		<div>
-			<table>
-				<tr>
-					<td class="top">
-						<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
-							<span class="menu-subheading"><warehouse:message code="default.general.label"/></span>
-							<div class="buttonBar">
-								<div class="linkButton">
-									<g:link controller="admin" action="showSettings" class="list"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
-								</div>
-							</div>
-						</g:authorize>	
-					
-					</td>
-				</tr>
-				<tr>
-					<td class="top">
-						<span class="menu-subheading"><warehouse:message code="locations.label"/></span>
-						<div class="buttonBar">
-							<div class="linkButton">									
-								<g:link controller="locationGroup" action="list" class="site"><warehouse:message code="location.sites.label"/></g:link>
-							</div>
-							<div class="linkButton">									
-								<g:link controller="location" action="list" class="location"><warehouse:message code="locations.label"/></g:link>
-							</div>
-							<div class="linkButton">									
-								<g:link controller="shipper" action="list" class="shipper"><warehouse:message code="location.shippers.label"/></g:link>
-							</div>
-							<div class="linkButton">									
-								<g:link controller="locationType" action="list" class="locationType"><warehouse:message code="location.locationTypes.label"/></g:link>
-							</div>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td class="top">
-						<span class="menu-subheading"><warehouse:message code="persons.label"/></span>
-						<div class="buttonBar">
-							<div class="linkButton">									
-								<g:link controller="person" action="list" class="people"><warehouse:message code="person.list.label"/></g:link>
-							</div>
-							<div class="linkButton">									
-								<g:link controller="user" action="list" class="user"><warehouse:message code="users.label"/></g:link>
-							</div>
-						</div>		
-					</td>
-				</tr>
-			</table>
-		</div>
-	</li>
-	
+  <g:isUserAdmin>
+    <li>
+      <a href="javascript:void(0)">
+        <warehouse:message code="admin.label" />
+      </a>	
+      <div>
+        <table>
+          <tr>
+            <td class="top">
+              <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
+                <span class="menu-subheading"><warehouse:message code="default.general.label"/></span>
+                <div class="buttonBar">
+                  <div class="linkButton">
+                    <g:link controller="admin" action="showSettings" class="list"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
+                  </div>
+                </div>
+              </g:authorize>	
+            
+            </td>
+          </tr>
+          <tr>
+            <td class="top">
+              <span class="menu-subheading"><warehouse:message code="locations.label"/></span>
+              <div class="buttonBar">
+                <div class="linkButton">									
+                  <g:link controller="locationGroup" action="list" class="site"><warehouse:message code="location.sites.label"/></g:link>
+                </div>
+                <div class="linkButton">									
+                  <g:link controller="location" action="list" class="location"><warehouse:message code="locations.label"/></g:link>
+                </div>
+                <div class="linkButton">									
+                  <g:link controller="shipper" action="list" class="shipper"><warehouse:message code="location.shippers.label"/></g:link>
+                </div>
+                <div class="linkButton">									
+                  <g:link controller="locationType" action="list" class="locationType"><warehouse:message code="location.locationTypes.label"/></g:link>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="top">
+              <span class="menu-subheading"><warehouse:message code="persons.label"/></span>
+              <div class="buttonBar">
+                <div class="linkButton">									
+                  <g:link controller="person" action="list" class="people"><warehouse:message code="person.list.label"/></g:link>
+                </div>
+                <div class="linkButton">									
+                  <g:link controller="user" action="list" class="user"><warehouse:message code="users.label"/></g:link>
+                </div>
+              </div>		
+            </td>
+          </tr>
+        </table>
+      </div>
+    </li>
+  </g:isUserAdmin>	
 	
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 		<li>

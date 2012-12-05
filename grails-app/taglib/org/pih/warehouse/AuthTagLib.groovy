@@ -17,6 +17,14 @@ class AuthTagLib {
    	
 	def userService
 	
+	def isUserAdmin = { attrs, body ->		
+		if (userService.isUserAdmin(session?.user))
+			out << body()
+	}
+	def isUserManager = { attrs, body ->		
+		if (userService.isUserManager(session?.user))
+			out << body()
+	}
 	def isUserInRole = { attrs, body ->		
 		def isUserInRole = userService.isUserInRole(session?.user?.id, attrs.roles)
 		if (isUserInRole)

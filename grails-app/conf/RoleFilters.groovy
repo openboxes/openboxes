@@ -17,7 +17,8 @@ import org.pih.warehouse.core.UserService
 class RoleFilters {
   def userService
   def dependsOn = [SecurityFilters]
-    def static changeActions = ['edit', 'delete', 'create', 'add', 'process','save', 'update', 'editTransaction','importData', 'showRecordInventory', 'saveRecordInventory']
+    def static changeActions = ['edit', 'delete', 'create', 'add', 'process','save',
+    'update','importData', 'receive','showRecordInventory','withdraw', 'cancel', 'change','toggle']
     def static changeControllers = ['createProductFromTemplate', 'createProduct']
     def filters = {
         readonlyCheck(controller:'*', action:'*') {
@@ -27,7 +28,7 @@ class RoleFilters {
                   response.sendError(401)
                   return false
                 }
-                def willChange = changeActions.contains(actionName) || controllerName.contains("Workflow") || changeControllers.contains(controllerName)
+                def willChange = changeActions.any{ actionName.startsWith(it)} || controllerName.contains("Workflow") || changeControllers.contains(controllerName)
                 if(willChange && !userService.isUserManager(session.user)){
                   response.sendError(401)
                   return false

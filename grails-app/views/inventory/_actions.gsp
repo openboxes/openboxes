@@ -4,86 +4,88 @@
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>							
 	</button>
 	<div class="actions left">
-		<div class="action-menu-item left">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryAdjustedBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'box.png')}" alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryAdjusted.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">
-			<hr/>
-		</div>
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="incomingTransferBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.incomingTransfer.label"/>
-			</a>
-		</div>
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="outgoingTransferBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">
-			<a href="javascript:void(0);" class="actionButton" id="addToShipmentBtn">
-				<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" alt="${warehouse.message(code: 'inventory.addToShipment.label') }"/>
-				&nbsp;<warehouse:message code="inventory.addToShipment.label"/>
-			</a>
-		</div>		
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="addToProductGroupBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'productGroup.addProducts.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="productGroup.addProducts.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">
-			<hr/>
-		</div>
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryConsumedBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryDamagedBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" alt="${warehouse.message(code: 'inventory.inventoryDamaged.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryDamaged.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryExpiredBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'clock.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">
-			<hr/>
-		</div>
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="markAsSupported">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.markAsSupported.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="markAsNonInventoried">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.markAsNonInventoried.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="markAsNotSupported">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.markAsNotSupported.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">
-			<hr/>
-		</div>
-		
-		
+    <g:isUserManager>
+      <div class="action-menu-item left">														
+        <a href="javascript:void(0);" class="actionButton" id="inventoryAdjustedBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'box.png')}" alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.inventoryAdjusted.label"/>
+        </a>
+      </div>
+      <div class="action-menu-item">
+        <hr/>
+      </div>
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="incomingTransferBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.incomingTransfer.label"/>
+        </a>
+      </div>
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="outgoingTransferBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">
+        <a href="javascript:void(0);" class="actionButton" id="addToShipmentBtn">
+          <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" alt="${warehouse.message(code: 'inventory.addToShipment.label') }"/>
+          &nbsp;<warehouse:message code="inventory.addToShipment.label"/>
+        </a>
+      </div>		
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="addToProductGroupBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'productGroup.addProducts.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="productGroup.addProducts.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">
+        <hr/>
+      </div>
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="inventoryConsumedBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="inventoryDamagedBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" alt="${warehouse.message(code: 'inventory.inventoryDamaged.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.inventoryDamaged.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="inventoryExpiredBtn">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'clock.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">
+        <hr/>
+      </div>
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="markAsSupported">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.markAsSupported.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="markAsNonInventoried">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.markAsNonInventoried.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">														
+        <a href="javascript:void(0);" class="actionButton" id="markAsNotSupported">
+          <img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
+          &nbsp;<warehouse:message code="inventory.markAsNotSupported.label"/>
+        </a>
+      </div>	
+      <div class="action-menu-item">
+        <hr/>
+      </div>
+      
+      
+    </g:isUserManager>
 		<!-- Need to set defaults for the Transaction Report to generate a report.
 			This might cause problems with the other actions, so keep that in mind. 
 		<div class="action-menu-item">					
