@@ -15,16 +15,19 @@ class LocationTests extends GrailsUnitTestCase {
     def location1
     def location2
     def location3
+    def location4
     protected void setUp() {
         super.setUp()
 		def depot = new LocationType(name: "Depot", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
 		def supplier = new LocationType(name: "Supplier")
+		def ward = new LocationType(name: "Ward")
 		location1 = new Location(name: "Boston", locationType: depot, supportedActivities: [ActivityCode.MANAGE_INVENTORY])
 		location2 = new Location(name: "Miami", locationType: depot)
 	    location3 = new Location(name: "supplier", locationType: supplier, supportedActivities: [ActivityCode.RECEIVE_STOCK])
+	    location4 = new Location(name: "ward", locationType: ward, supportedActivities: [ActivityCode.RECEIVE_STOCK])
 
-		mockDomain(LocationType, [depot, supplier])
-		mockDomain(Location, [location1, location2, location3])
+		mockDomain(LocationType, [depot, supplier, ward])
+		mockDomain(Location, [location1, location2, location3, location4])
     }
 
     void test_supports() {
@@ -52,4 +55,9 @@ class LocationTests extends GrailsUnitTestCase {
 		println location.errors
 		assertEquals "nullable", location.errors["locationType"]
 	}
+
+    void test_isWardOrPharmacy() {
+        assert location1.isWardOrPharmacy() == false
+        assert location4.isWardOrPharmacy() == true
+    }
 }

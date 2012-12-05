@@ -118,7 +118,7 @@
          </tr>
       <thead>
       <tbody data-bind="foreach: requisition.requisitionItems">
-        <tr>
+        <tr class="requisitionItemsRow">
           <td class="list-header">
             <input type="hidden" data-bind="value: productId, uniqueName: true"/>
             <input type="text"
@@ -165,8 +165,10 @@
         </g:link>
 
     </div>
+
   </g:form>
 
+<div id="debug"></div>
 
 <script type="text/javascript">
     $(function () {
@@ -224,6 +226,7 @@
            this.value=this.value.replace(/[^\d]/,'');      
            $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
+
 
     });
 </script>

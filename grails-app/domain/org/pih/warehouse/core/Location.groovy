@@ -119,6 +119,6 @@ class Location implements Comparable, java.io.Serializable {
     }
 
     Boolean isWardOrPharmacy() {
-        return (locationType.name in ["PHARMACY", "WARD"])
+        return (locationType.name in ["Pharmacy", "Ward"])
     }
 }

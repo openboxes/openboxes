@@ -10,7 +10,14 @@ class CreateRequisitionPage extends Page {
         selectRequestingDepot { $("select[name='origin.id']") }
         autocompleteRequestedBy { $("input[name='requestedBy']") }
         firstSuggestion(wait: true){$("ul.ui-autocomplete li.ui-menu-item a").first()}
-        createRequisitionButton(to: EditRequisitionPage) { $("#save-requisition")}
+        createRequisitionButton { $("#save-requisition")}
         cancelRequisitionButton(to: ListRequisitionPage) { ${"input[name='cancelRequisition']"}}
+
+    }
+
+    def save() {
+        $("#save-requisition").click()
+        waitFor{ title == "Edit Requisition"}
+
     }
 }

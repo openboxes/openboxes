@@ -65,14 +65,15 @@ class RequisitionController {
 
     private List<Location> getWardsPharmacies() {
         def current = session.warehouse as Location
-        if(current?.locationGroup == null) {
+        if(current.locationGroup == null) {
             Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
         } else {
-            Location.list().findAll {location -> location.locationType == current.locationType}.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
+            Location.list().findAll { location -> location.locationGroup == current.locationGroup}.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
         }
     }
 
     def save = {
+        log.info("hello world")
         def jsonRequest = request.JSON
         def jsonResponse = []
         def requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session.warehouse.id))
@@ -82,6 +83,7 @@ class RequisitionController {
         else {
             jsonResponse = [success: false, errors: requisition.errors]
         }
+        log.info(jsonResponse as JSON)
         render jsonResponse as JSON
     }
 

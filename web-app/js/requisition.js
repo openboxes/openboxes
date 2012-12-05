@@ -184,8 +184,8 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
               delete pickedItem.version;
         });
         var jsonString = JSON.stringify(picklist);
-        console.log("here are the picklistItems: "  + jsonString);
-        console.log("endpoint is " + formElement.action);
+        //console.log("here are the picklistItems: "  + jsonString);
+        //console.log("endpoint is " + formElement.action);
         
         jQuery.ajax({
             url: formElement.action,
@@ -195,7 +195,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
             dataType: "json",
             async: false,
             success: function(result) {
-                console.log("result:" + JSON.stringify(result));
+                //console.log("result:" + JSON.stringify(result));
                 if(result.success){
                   self.requisition.picklist.id(result.data.id);
                   self.requisition.picklist.version(result.data.version);
@@ -236,36 +236,44 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
     var self = this;
     self.requisition = new openboxes.requisition.Requisition(requisitionData);
     self.save = function(formElement) {
+        printMessage("in save");
         var jsonString = getJsonDataFromRequisition();
-        console.log("here is the req: "  + jsonString);
-        console.log("endpoint is " + formElement.action);
-        jQuery.ajax({
-            url: formElement.action,
-            contentType: 'text/json',
-            type: "POST",
-            data: jsonString,
-            async: false,
-            dataType: "json",
-            success: function(result) {
-                console.log("result:" + JSON.stringify(result));
-                if(result.success){
-                    self.requisition.id(result.data.id);
-                    self.requisition.status(result.data.status);
-                    self.requisition.lastUpdated(result.data.lastUpdated);
-                    self.requisition.version(result.data.version);
-                    if(result.data.requisitionItems){
-                      for(var idx in result.data.requisitionItems){
-                        var localItem = self.requisition.findRequisitionItemByOrderIndex(result.data.requisitionItems[idx].orderIndex);
-                        localItem.id(result.data.requisitionItems[idx].id);
-                        localItem.version(result.data.requisitionItems[idx].version);
-                      }
+        printMessage("here is the req: "  + jsonString);
+        printMessage("endpoint is " + formElement.action);
+        try {
+            jQuery.ajax({
+                url: formElement.action,
+                contentType: 'text/json',
+                type: "POST",
+                data: jsonString,
+                async: false,
+                dataType: "json",
+                success: function(result) {
+                    printMessage("success");
+                    //console.log("result:" + JSON.stringify(result));
+                    if(result.success){
+                        self.requisition.id(result.data.id);
+                        self.requisition.status(result.data.status);
+                        self.requisition.lastUpdated(result.data.lastUpdated);
+                        self.requisition.version(result.data.version);
+                        if(result.data.requisitionItems){
+                          for(var idx in result.data.requisitionItems){
+                            var localItem = self.requisition.findRequisitionItemByOrderIndex(result.data.requisitionItems[idx].orderIndex);
+                            localItem.id(result.data.requisitionItems[idx].id);
+                            localItem.version(result.data.requisitionItems[idx].version);
+                          }
+                        }
+                        if(self.savedCallback) self.savedCallback();
                     }
-                    if(self.savedCallback) self.savedCallback();
+                },
+                error: function() {
+                    printMessage("failure");
                 }
-            }
-        });
-
-    };  
+            });
+        } catch (err) {
+            printMessage("here is the err: " + err);
+        }
+    };
 
     //private functions
     function getJsonDataFromRequisition(){
@@ -405,6 +413,9 @@ openboxes.requisition.Picklist.getNewer = function(serverData, localData){
   return localData;
 };
 
-
+window.printMessage = function(message) {
+    var html = $("<p>" + message + "</p>");
+    $("#debug").append(html);
+};
 
 

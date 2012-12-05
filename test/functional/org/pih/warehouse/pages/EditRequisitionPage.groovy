@@ -10,10 +10,15 @@ class EditRequisitionPage extends Page {
         selectRequestingDepot { $("select[name='origin.id']") }
         autocompleteRequestedBy { $("input[name='requestedBy']") }
         submitRequisitionButton(to: EditRequisitionPage) { $("#save-requisition")}
-        firstRequisitionItemProduct(wait: true) { $("input[name='ko_unique_2']")}
-        firstRequisitionItemQuantity(wait: true) { $("input[name='ko_unique_3']")}
-        secondRequisitionItemProduct(wait: true) { $("input[name='ko_unique_8']")}
-        secondRequisitionItemQuantity(wait: true) { $("input[name='ko_unique_9']")}
+
+        requisitionItemsRows(wait: true) { $("tr.requisitionItemsRow") }
+        firstItemRow(wait: true) { requisitionItemsRows.first() }
+        secondItemRow(wait: true) { requisitionItemsRows.last() }
+        firstRequisitionItemProduct(wait: true) { firstItemRow.find(".autocomplete")}
+        firstRequisitionItemQuantity(wait: true) { firstItemRow.find(".quantity")}
+        secondRequisitionItemProduct(wait: true) { secondItemRow.find(".autocomplete")}
+        secondRequisitionItemQuantity(wait: true) { secondItemRow.find(".quantity")}
+
         firstProductSuggestion(wait: true){$("#searchProduct0 li.ui-menu-item a").first()}
         secondProductSuggestion(wait: true){$("#searchProduct1 li.ui-menu-item a").first() }
         addRowButton { $("input[name='addRequisitionItemRow']") }
