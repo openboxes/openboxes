@@ -66,7 +66,7 @@ eventCompileStart = {
 eventTestPhaseStart = {name ->
     if (name == "unit") {
         println "Starting Jasmine Tests"
-        def command = """./jasmine.sh"""
+        def command = """phantomjs spec/lib/run_jasmine_test.coffee spec/TestRunner.html"""
         def proc = command.execute()
         proc.waitFor()
         println "${proc.in.text}"
