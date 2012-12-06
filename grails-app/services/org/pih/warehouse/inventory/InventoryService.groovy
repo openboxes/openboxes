@@ -707,29 +707,29 @@ class InventoryService implements ApplicationContextAware {
             }
             if (terms) {
                 or {
-                    or {
+                    and {
                         terms.each {term ->
                             ilike("lotNumber", "%" + term + "%")
                         }
                     }
                     product {
                         or {
-                            or {
+                            and {
                                 terms.each {term ->
                                     ilike("name", "%" + term + "%")
                                 }
                             }
-                            or {
+                            and {
                                 terms.each { term ->
                                     ilike("manufacturer", "%" + term + "%")
                                 }
                             }
-                            or {
+                            and {
                                 terms.each { term ->
                                     ilike("manufacturerCode", "%" + term + "%")
                                 }
                             }
-                            or {
+                            and {
                                 terms.each { term ->
                                     ilike("productCode", "%" + term + "%")
                                 }
