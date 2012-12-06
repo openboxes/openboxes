@@ -121,14 +121,14 @@
         <tr class="requisitionItemsRow">
           <td class="list-header">
             <input type="hidden" data-bind="value: productId, uniqueName: true"/>
-            <input type="text"
+            <input type="text" name="product"
               placeholder="${warehouse.message(code:'requisition.addItem.label')}"
               class="required autocomplete" 
-              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct', id:'searchProduct'+$index()}, uniqueName: true, value: productName" size="50"/>
+              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct', id:'searchProduct'+$index()}, value: productName" size="50"/>
           </td>
           <td  class="list-header">
-            <input type="text" class="required number quantity" size="6" 
-            data-bind="value: quantity,uniqueName: true"/>
+            <input name="quantity" type="text" class="required number quantity" size="6"
+            data-bind="value: quantity"/>
           </td>
           <g:if test="${requisition.isDepotRequisition()}">
           <td  class="center">
@@ -184,7 +184,23 @@
         };
         ko.applyBindings(viewModel);
 
-        $("#requisitionForm").validate({ submitHandler: viewModel.save });
+        $("#requisitionForm").validate({
+            submitHandler: viewModel.save,
+            rules:  {
+                product: {
+                    required: true
+                },
+                quantity: {
+                    required: true,
+                    min: 1
+                }
+            },
+            messages: {
+                product: {
+                    required: "This product is not supported."
+                }
+            }
+        });
 
         if (!viewModel.requisition.name())
             viewModel.requisition.name("${warehouse.message(code: 'requisition.label')}");
