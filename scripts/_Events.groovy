@@ -7,7 +7,7 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-
+import grails.util.Environment
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.test.junit4.JUnit4GrailsTestType
 import org.codehaus.groovy.grails.test.support.GrailsTestMode
@@ -23,13 +23,17 @@ def loadtestTestType = new JUnit4GrailsTestType(testTypeName, testDirectory, tes
 loadtestTests = [loadtestTestType]
  
 loadtestTestPhasePreparation = {
-    integrationTestPhasePreparation()
+       integrationTestPhasePreparation()
 }
 loadtestTestPhaseCleanUp = {
-    integrationTestPhaseCleanUp()
+      integrationTestPhaseCleanUp()
 }
 eventAllTestsStart = {
-    phasesToRun << "loadtest"
+    if(System.getProperty("grails.env") == "loadtest"){
+      phasesToRun << "loadtest"
+    }else{
+      println "********* loadtest is ignored for environment ${System.getProperty("grails.env")}."
+    }
 }
 
 private determineGitRevisionNumber = {
@@ -79,9 +83,6 @@ eventCreateWarStart = { warName, stagingDir ->
 	}
 }
 
-eventCompileStart = {
-    ant.delete(dir:"${basedir}/target/geb-reports")
-}
 
 eventTestPhaseStart = {name ->
     if (name == "unit") {
@@ -96,9 +97,12 @@ eventTestPhaseStart = {name ->
             println "Tests PASSED"
         }
     }
+    if (name == "functional"){
+       ant.delete(dir:"${basedir}/target/geb-reports")
+    }
 }
 
 eventJasminFailed = { msg ->
     println msg
-    System.exit(0)
+    System.exit(1)
 }
