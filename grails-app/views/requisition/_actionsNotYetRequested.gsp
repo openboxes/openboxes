@@ -37,6 +37,9 @@
 				</g:link>				
 			</div>
             <div class="action-menu-item">
+                <hr/>
+            </div>
+            <div class="action-menu-item">
                 <g:link controller="requisition" action="delete" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
                     &nbsp;${warehouse.message(code: 'request.delete.label', default: 'Delete requisition')}
