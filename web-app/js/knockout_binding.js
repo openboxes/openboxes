@@ -117,7 +117,8 @@ ko.bindingHandlers.autocompleteWithId = {
             change: function(event, ui) {
               if (!ui.item) {
                 $(this).prev().val(""); 
-                $(this).val("");			
+                $(this).val("");
+                $(this).valid();
               }
               $(this).prev().trigger("change");
             },

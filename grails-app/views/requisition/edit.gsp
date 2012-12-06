@@ -193,11 +193,17 @@
                 quantity: {
                     required: true,
                     min: 1
+                },
+                requestedBy: {
+                    required: true
                 }
             },
             messages: {
                 product: {
-                    required: "This product is not supported."
+                    required: "${warehouse.message(code: 'inventoryItem.productNotSupported.message')}"
+                },
+                requestedBy: {
+                    required: "${warehouse.message(code: 'person.notFound.message')}"
                 }
             }
         });
