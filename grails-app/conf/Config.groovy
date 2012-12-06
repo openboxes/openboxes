@@ -109,6 +109,11 @@ environments {
 		uiperformance.enabled = false
 		grails.mail.enabled = false
 	}
+	loadtest {  
+		grails.serverURL = "http://localhost:8080/${appName}"  
+		uiperformance.enabled = false
+		grails.mail.enabled = false
+	}
 	production {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
 		uiperformance.enabled = false

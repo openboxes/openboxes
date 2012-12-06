@@ -28,20 +28,17 @@ hibernate {
 environments {
 	development {
 		dataSource {	
-			// disable dbCreate when you create the initial database using '$ grails dev migrate'
-			//dbCreate = "update" 	
-			//dbCreate = "create-drop"			
 			url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
 	test {
 		dataSource {			
 			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-//            driverClassName = "org.hsqldb.jdbcDriver"
-//            username = "sa"
-//            password = ""
-//            dbCreate = "create-drop"
-//            url = "jdbc:hsqldb:mem:openboxes_test"
+        }
+	}
+	loadtest {
+		dataSource {			
+			url = "jdbc:mysql://localhost:3306/openboxes_loadtest?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
         }
 	}
 	production {
@@ -56,8 +53,6 @@ environments {
 	}
 	diff {
 		dataSource {
-			// Used with the 'db-diff-incremental' script
-			//dbCreate = "create-drop"
 			url = "jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}

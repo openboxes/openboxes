@@ -89,7 +89,7 @@ class BootStrap {
 		}
 		log.info("Finished running liquibase changelog(s)!")
 
-        insertTestFixture()
+    insertTestFixture()
 	}		
 		
 				
@@ -102,7 +102,7 @@ class BootStrap {
 
 
     def insertTestFixture(){
-        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
+        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST && Environment.current.name != "loadtest")
             return
 
         log.info("Setup test fixture...")
@@ -129,7 +129,25 @@ class BootStrap {
            deleteTestFixture(testData)
 
         createTestFixtureIfNotExist(testData)
+        if(Environment.current.name == "loadtest")
+          createLoadtestData()
+
         log.info("Created test fixture.")
+    }
+
+    def createLoadtestData(){
+      def medicines = Category.findByName("Medicines")
+      def numberOfProducts = Integer.parseInt(System.getenv()["load"] ?: "5000")
+      if(Product.count() >= numberOfProducts) return
+      def nameSeeds = ["foo", "jing", "moon", "mountain", "evening", "smooth", "train", "paper", "sharp","see","ocean","apple"]
+      def data = []
+      for(i in 0..numberOfProducts){
+        def nameSeed = nameSeeds[i%nameSeeds.size()]
+        data.add( ['expiration':new Date().plus(500),'quantity':(i+1)*10, 'product':  new Product(category: medicines, name: nameSeed+i, manufacturer:"ABC", productCode:"00001",manufacturerCode:"9001" )]
+)
+      }
+       createTestFixtureIfNotExist(data)
+       log.info("load test data created.")
     }
 
     def deleteTestFixture(List<Map<String, Object>> testData) {
@@ -169,22 +187,26 @@ class BootStrap {
     }
 
      private def addProductAndInventoryItemIfNotExist(Map<String, Object> inventoryItemInfo) {
-
-        def productGroup = ProductGroup.findByDescription(inventoryItemInfo.productGroup)
-        if(!productGroup){
-            productGroup = new ProductGroup(description: inventoryItemInfo.productGroup)
-            productGroup.category = inventoryItemInfo.product.category
-            productGroup.save(failOnError:true,flush:true)
+        if(inventoryItemInfo.productGroup){
+          def productGroup = ProductGroup.findByDescription(inventoryItemInfo.productGroup)
+          if(!productGroup){
+              productGroup = new ProductGroup(description: inventoryItemInfo.productGroup)
+              productGroup.category = inventoryItemInfo.product.category
+              productGroup.save(failOnError:true,flush:true)
+          }
         }
         Product product = Product.findByName(inventoryItemInfo.product.name)
 
         if(!product){
+          log.info("creating product ${inventoryItemInfo.product.name}")
            product = inventoryItemInfo.product
            product.save(failOnError:true,flush:true)
-           productGroup.addToProducts(product)
-           productGroup.save(failOnError:true,flush:true)
-           product.addToProductGroups(productGroup)
-           product.save(failOnError:true,flush:true)
+           if(inventoryItemInfo.productGroup){
+             productGroup.addToProducts(product)
+             productGroup.save(failOnError:true,flush:true)
+             product.addToProductGroups(productGroup)
+             product.save(failOnError:true,flush:true)
+           }
            addInventoryItem(product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
         }
 
