@@ -9,8 +9,28 @@
  **/
 
 import org.apache.log4j.Logger
+import org.codehaus.groovy.grails.test.junit4.JUnit4GrailsTestType
+import org.codehaus.groovy.grails.test.support.GrailsTestMode
 
 Logger log = Logger.getLogger("org.pih.warehouse._Events")
+
+/*loadtest setup*/
+def testTypeName = "loadtest"
+def testDirectory = "loadtest"
+def testMode = new GrailsTestMode(autowire: true, wrapInTransaction: true, wrapInRequestEnvironment: true)
+def loadtestTestType = new JUnit4GrailsTestType(testTypeName, testDirectory, testMode)
+ 
+loadtestTests = [loadtestTestType]
+ 
+loadtestTestPhasePreparation = {
+    integrationTestPhasePreparation()
+}
+loadtestTestPhaseCleanUp = {
+    integrationTestPhaseCleanUp()
+}
+eventAllTestsStart = {
+    phasesToRun << "loadtest"
+}
 
 private determineGitRevisionNumber = {
     String revisionNumber = 'dev'
@@ -31,7 +51,7 @@ eventWarStart = {
 }
 
 eventRunAppStart = {
-    log.info "Setting build date, build number, and revision number ..."
+  log.info "Setting build date, build number, and revision number ..."
 	String revisionNumber = determineGitRevisionNumber()
 	
 	def buildNumber = metadata.'app.buildNumber'
@@ -41,7 +61,7 @@ eventRunAppStart = {
 	metadata.'app.revisionNumber' = revisionNumber
 	metadata.'app.buildDate' = new java.text.SimpleDateFormat("dd MMM yyyy hh:mm:ss a").format(new java.util.Date());
 	metadata.'app.buildNumber' = buildNumber.toString()
-	//metadata.persist()	
+	//metadata.persist()
 }
 
 eventCreateWarStart = { warName, stagingDir ->
