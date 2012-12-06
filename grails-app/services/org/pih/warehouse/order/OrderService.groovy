@@ -81,7 +81,7 @@ class OrderService {
 	 * @param recipientId
 	 * @return	an command object based on an order with the given  
 	 */
-	OrderCommand getOrder(String id, Integer recipientId) { 
+	OrderCommand getOrder(String id, String recipientId) { 
 		def orderCommand = new OrderCommand();
 		
 		def orderInstance = Order.get(id)
