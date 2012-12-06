@@ -355,4 +355,19 @@ class InventoryServiceTests extends GroovyTestCase {
         assert results.contains(aspirinProduct)
         assert results.contains(tylenolProduct)
     }
+
+    void test_getProductsWithHiddenProducts() {
+        basicTestFixture()
+
+        def inventoryService = new InventoryService()
+        Location loc = bostonLocation
+        List terms = ["Aspirin", "1"]
+        List categories = ["Medicine"]
+
+        def results = inventoryService.getProducts(loc, terms, categories, false)
+
+        assert results.size() == 2
+        assert results.contains(aspirinProduct)
+        assert results.contains(tylenolProduct)
+    }
 }
