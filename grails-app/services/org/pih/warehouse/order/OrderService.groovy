@@ -235,8 +235,8 @@ class OrderService {
 	 * @param location
 	 * @return
 	 */
-	Map getIncomingQuantityByProduct(Location location) {
-		return getQuantityByProduct(getIncomingOrders(location))
+	Map getIncomingQuantityByProduct(Location location, List<Product> products) {
+		return getQuantityByProduct(getIncomingOrders(location), products)
 	}
 
 	/**
@@ -244,8 +244,8 @@ class OrderService {
 	 * @param location
 	 * @return
 	 */
-	Map getOutgoingQuantityByProduct(Location location) {
-		return getQuantityByProduct(getOutgoingOrders(location))
+	Map getOutgoingQuantityByProduct(Location location, List<Product> products) {
+		return getQuantityByProduct(getOutgoingOrders(location), products)
 	}
   
 	
@@ -255,16 +255,18 @@ class OrderService {
 	 * @param orders
 	 * @return
 	 */
-	Map getQuantityByProduct(def orders) {
+	Map getQuantityByProduct(def orders, List<Product> products) {
 		def quantityMap = [:]
 		orders.each { order ->
 			order.orderItems.each { orderItem ->
 				def product = orderItem.product
 				if (product) {
-					def quantity = quantityMap[product];
-					if (!quantity) quantity = 0;
-					quantity += orderItem.quantity;
-					quantityMap[product] = quantity
+                    if (products.contains(product)) {
+                        def quantity = quantityMap[product];
+                        if (!quantity) quantity = 0;
+                        quantity += orderItem.quantity;
+                        quantityMap[product] = quantity
+                    }
 				}
 			}
 		}

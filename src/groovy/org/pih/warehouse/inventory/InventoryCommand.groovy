@@ -28,7 +28,11 @@ class InventoryCommand {
 	def showOutOfStockProducts = Boolean.TRUE;			// indicates whether out of stock products for the warehouse should be included
 	def categoryToProductMap = {};						// all of the resulting ProductCommands above, organized by Category
 	Boolean searchPerformed = Boolean.FALSE
-	
+
+    def maxResults = 0
+    def offset = 0
+    def numResults = 0
+
 	// Tags
 	List tag
 	

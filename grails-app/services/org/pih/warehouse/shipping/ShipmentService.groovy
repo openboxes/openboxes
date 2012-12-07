@@ -1245,8 +1245,8 @@ class ShipmentService {
 	* @param location
 	* @return
 	*/
-   Map getIncomingQuantityByProduct(Location location) {
-	   return getQuantityByProduct(getIncomingShipments(location))
+   Map getIncomingQuantityByProduct(Location location, List<Product> products) {
+	   return getQuantityByProduct(getIncomingShipments(location), products)
    }
    
    /**
@@ -1254,8 +1254,8 @@ class ShipmentService {
    * @param location
    * @return
    */
-  Map getOutgoingQuantityByProduct(Location location) {
-	  return getQuantityByProduct(getOutgoingShipments(location))
+  Map getOutgoingQuantityByProduct(Location location, List<Product> products) {
+	  return getQuantityByProduct(getOutgoingShipments(location), products)
   }
   
   /**
@@ -1263,17 +1263,19 @@ class ShipmentService {
    * @param shipments
    * @return
    */
-   Map getQuantityByProduct(def shipments) { 	   
+   Map getQuantityByProduct(List<Shipment> shipments, List<Product> products) {
 	   def quantityMap = [:]	   
 	   shipments.each { shipment ->
 		   shipment.shipmentItems.each { shipmentItem ->
-			   def product = shipmentItem.product
-			   if (product) {
-				   def quantity = quantityMap[product];
-				   if (!quantity) quantity = 0;
-				   quantity += shipmentItem.quantity;
-				   quantityMap[product] = quantity
-			   }
+               def product = shipmentItem.product
+               if (product) {
+                   if (products.contains(product)) {
+                       def quantity = quantityMap[product];
+                       if (!quantity) quantity = 0;
+                       quantity += shipmentItem.quantity;
+                       quantityMap[product] = quantity
+                   }
+               }
 		   }
 	   }
 	   return quantityMap;

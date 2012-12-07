@@ -82,50 +82,50 @@
 																		<warehouse:message code="default.qty.label"/>
 																	</th>
 									           					</tr>
-															</thead> 
-										                
-									            			<g:if test="${commandInstance?.categoryToProductMap}">
-																<tbody> 
-																	<g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
-																		<g:set var="category" value="${entry.key }"/>
-																		<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
-																		<tr class="">
-																			<td colspan="7" style="padding:0; margin:0;">
-																				<span class="fade">
-																					<h2 style="border-top: 2px solid lightgrey;">
-																						<%-- 
-																						<g:checkBox id="${category?.id }" name="category.id" 
-																							class="checkbox" style="top:0em;" checked="${false }" 
-																								value="${category?.id }" />
-																						&nbsp;
-																						--%>
-																						<format:category category="${category }"/>
-																						(${categoryInventoryItems.size() })
-																						
-																					</h2> 
-																				</span>
-																			
-																			</td>
-																		</tr>
-																		<g:set var="counter" value="${0 }"/>
-																		
-																		<style>
-																			tr.product { }
-																			tr.productGroup {  }
-																			tr.productGroupProduct { }
-																			tr.productGroupProducts { }
-																		</style>
-																		<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
-																			<g:if test="${inventoryItem.product }">
-																				<g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product']"/>
-																			</g:if>
-																			<g:elseif test="${inventoryItem.productGroup }">
-																				<g:render template="browseProductGroup" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'productGroup']"/>
-																			</g:elseif>
-																			<g:set var="counter" value="${counter+1 }"/>
-																			
-																		</g:each>
-																	</g:each>
+															</thead>
+
+                                                            <g:if test="${commandInstance?.categoryToProductMap}">
+																<tbody>
+                                                                    <g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
+                                                                        <g:set var="category" value="${entry.key }"/>
+                                                                        <g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
+                                                                        <tr class="">
+                                                                            <td colspan="7" style="padding:0; margin:0;">
+                                                                                <span class="fade">
+                                                                                    <h2 style="border-top: 2px solid lightgrey;">
+                                                                                        <%--
+                                                                                        <g:checkBox id="${category?.id }" name="category.id"
+                                                                                            class="checkbox" style="top:0em;" checked="${false }"
+                                                                                                value="${category?.id }" />
+                                                                                        &nbsp;
+                                                                                        --%>
+                                                                                        <format:category category="${category }"/>
+                                                                                        (${categoryInventoryItems.size() })
+
+                                                                                    </h2>
+                                                                                </span>
+
+                                                                            </td>
+                                                                        </tr>
+                                                                        <g:set var="counter" value="${0 }"/>
+
+                                                                        <style>
+                                                                            tr.product { }
+                                                                            tr.productGroup {  }
+                                                                            tr.productGroupProduct { }
+                                                                            tr.productGroupProducts { }
+                                                                        </style>
+                                                                        <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
+                                                                            <g:if test="${inventoryItem.product }">
+                                                                                <g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product']"/>
+                                                                            </g:if>
+                                                                            <g:elseif test="${inventoryItem.productGroup }">
+                                                                                <g:render template="browseProductGroup" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'productGroup']"/>
+                                                                            </g:elseif>
+                                                                            <g:set var="counter" value="${counter+1 }"/>
+
+                                                                        </g:each>
+                                                                    </g:each>
 																</tbody>
 															</g:if>	    
 															<g:else>
@@ -149,14 +149,15 @@
 																	<td colspan="1" class="middle ">
 																	</td>
 																	<td colspan="3" class="right middle">
-																		<%-- 
-																		<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
-																		(<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
-																			<g:link controller="inventory" action="browse" params="['categoryId':category.id]">
-																				<format:metadata obj="${category}"/>&nbsp;
-																			</g:link>
-																		</g:each>)
-																		--%>
+                                                                        <g:paginate total="${numProducts}" params="${params}" action="browse" max="${25}" />
+                                                                        <%--
+                                                                        <warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
+                                                                        (<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
+                                                                            <g:link controller="inventory" action="browse" params="['categoryId':category.id]">
+                                                                                <format:metadata obj="${category}"/>&nbsp;
+                                                                            </g:link>
+                                                                        </g:each>)
+                                                                        --%>
 																	</td>
 																</tr>
 															</tfoot>

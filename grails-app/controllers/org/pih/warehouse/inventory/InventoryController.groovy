@@ -35,8 +35,8 @@ class InventoryController {
 	def dataSource
     def productService;	
 	def inventoryService;
-	
-	def index = { 
+
+    def index = {
 		redirect(action: "browse");
 	}
 	
@@ -49,7 +49,11 @@ class InventoryController {
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
 	def browse = { InventoryCommand cmd ->
-		log.debug("Browse inventory " + params)
+
+        if(!params.max) params.max = 25
+        if(!params.offset) params.offset = 0
+
+        log.debug("Browse inventory " + params)
 		// Get the current warehouse from either the request or the session
 		cmd.warehouseInstance = Location.get(params?.warehouse?.id) 
 		if (!cmd.warehouseInstance) {
@@ -103,14 +107,15 @@ class InventoryController {
 			session?.showNonInventoryProducts = cmd.showNonInventoryProducts
 
 		}
-		
+        cmd.maxResults = params?.max
+        cmd.offset = params?.offset
+
 		// Pass this to populate the matching inventory items
 		inventoryService.browseInventory(cmd);
 
 		def tags = productService.getAllTags()
-		
-		
-		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags ]
+
+		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags, numProducts : cmd.numResults ]
 	}
 	
 		

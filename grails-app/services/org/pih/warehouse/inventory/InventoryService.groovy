@@ -9,7 +9,8 @@
  **/
 package org.pih.warehouse.inventory;
 
-import grails.validation.ValidationException;
+import grails.validation.ValidationException
+import org.hibernate.Criteria;
 import org.pih.warehouse.product.Category;
 
 import java.text.SimpleDateFormat;
@@ -53,34 +54,12 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * @return request service
-     */
-    def getRequisitionService() {
-        return applicationContext.getBean("requisitionService")
-    }
-
-    /**
      * @return order service
      */
     def getOrderService() {
         return applicationContext.getBean("orderService")
     }
 
-    /**
-     * @return localization service
-     */
-    def getLocalizationService() {
-        return applicationContext.getBean("localizationService")
-    }
-
-    /**
-     * Gets all locations.
-     *
-     * @return
-     */
-    List<Location> getAllLocations() {
-        return Location.list()
-    }
 
     /**
      * Saves the specified warehouse
@@ -121,47 +100,6 @@ class InventoryService implements ApplicationContextAware {
             Location location = new Location()
             return location
         }
-    }
-
-    /**
-     * Saves the specified location
-     *
-     * @param location
-     */
-    //void saveLocation(Location location) {
-    //	location.save(flush:true)
-    //}
-
-    /**
-     * Gets all transactions associated with a warehouse
-     *
-     * @param warehouse
-     * @return
-     */
-    List<Transaction> getAllTransactions(Location warehouse) {
-        return Transaction.withCriteria { eq("thisLocation", warehouse) }
-    }
-
-    /**
-     * Get all consumption transactions between the given dates.
-     *
-     * @return a list of consumption transactions
-     */
-    List getConsumptionTransactions(Date startDate, Date endDate) {
-        def CONSUMPTION_TYPE = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID);
-        return Transaction.findAllByTransactionTypeAndTransactionDateBetween(CONSUMPTION_TYPE, startDate, endDate)
-    }
-
-    /**
-     * Gets the inventory associated with this warehouse;
-     * if no inventory, create a new inventory
-     *
-     * @param warehouse
-     * @return
-     */
-    Inventory getInventory(Location warehouse) {
-        Inventory inventory = Inventory.withCriteria { eq("warehouse", warehouse) }
-        return inventory ?: addInventory(warehouse)
     }
 
     /**
@@ -282,13 +220,59 @@ class InventoryService implements ApplicationContextAware {
      */
     Map getCurrentInventory(InventoryCommand commandInstance) {
 
-        // Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
-        def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory);
-        def quantityOutgoingMap = getOutgoingQuantityByProduct(commandInstance?.warehouseInstance);
-        def quantityIncomingMap = getIncomingQuantityByProduct(commandInstance?.warehouseInstance);
+        println "before getQuantityMaps: " + new Date().time
+
+        println "getCurrentInventory: " + new Date().time
 
         def inventoryItemCommands = [];
-        def products = getProducts(commandInstance)
+        List categories = new ArrayList();
+        if (commandInstance?.subcategoryInstance) {
+            categories.add(commandInstance?.subcategoryInstance);
+        }
+        else {
+            categories.add(commandInstance?.categoryInstance);
+        }
+
+        List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms?.split(" ")) : null);
+
+        log.debug("get products: " + commandInstance?.warehouseInstance)
+        log.info "command.tag  = " + commandInstance.tag
+        def products = []
+        if (commandInstance.tag) {
+            products = getProductsByTags(commandInstance.tag)
+            commandInstance.numResults = products.size()
+        } else {
+            // Get all products, including hidden ones
+            def matchCategories = getExplodedCategories(categories)
+            products = getProductsByTermsAndCategories(searchTerms, matchCategories, commandInstance?.maxResults, commandInstance?.offset)
+
+            commandInstance.numResults = products.totalCount
+            println  "command instance numResult: " + products.totalCount
+            if (!commandInstance?.showHiddenProducts) {
+                products.removeAll(getHiddenProducts(commandInstance?.warehouseInstance))
+            }
+            println "after getProductsByTermsAndCategories: " + new Date().time
+
+            // now localize to only match products for the current locale
+            // TODO: this would also have to handle the category filtering
+            //  products = products.findAll { product ->
+            //  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale
+            // return productFilters.any {
+            //   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
+            // }
+            // }
+        }
+
+        products = products?.sort() { it?.name };
+
+        println products
+
+        // Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
+        def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory, products);
+        def quantityOutgoingMap = getOutgoingQuantityByProduct(commandInstance?.warehouseInstance, products);
+        def quantityIncomingMap = getIncomingQuantityByProduct(commandInstance?.warehouseInstance, products);
+
+        println "after getProducts: " + new Date().time
         products.each { product ->
             def quantityOnHand = quantityOnHandMap[product] ?: 0
             def quantityToReceive = quantityIncomingMap[product] ?: 0
@@ -300,28 +284,30 @@ class InventoryService implements ApplicationContextAware {
                         commandInstance?.showOutOfStockProducts)
             }
         }
+        println "before getProductGroups: " + new Date().time
 
-        if(!commandInstance.searchTerms) {
-            def productGroups = getProductGroups(commandInstance);
-            productGroups.each { productGroup ->
-                def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
-                inventoryItemCommand.inventoryItems = new ArrayList();
-                productGroup.products.each { product ->
-                    inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
-                    inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
-                    inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
-                    inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
-                            quantityOnHandMap[product] ?: 0,
-                            quantityIncomingMap[product] ?: 0,
-                            quantityOutgoingMap[product] ?: 0,
-                            commandInstance.showOutOfStockProducts)
+        if(!commandInstance?.searchTerms) {
+        def productGroups = getProductGroups(commandInstance);
+        productGroups.each { productGroup ->
+            def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
+            inventoryItemCommand.inventoryItems = new ArrayList();
+            productGroup.products.each { product ->
+                inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
+                inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
+                inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
+                inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
+                        quantityOnHandMap[product] ?: 0,
+                        quantityIncomingMap[product] ?: 0,
+                        quantityOutgoingMap[product] ?: 0,
+                        commandInstance.showOutOfStockProducts)
 
-                    // Remove all products in the product group from the main productd list
-                    inventoryItemCommands.removeAll { it.product == product }
-                }
-                inventoryItemCommands << inventoryItemCommand
+                // Remove all products in the product group from the main productd list
+                inventoryItemCommands.removeAll { it.product == product }
             }
+            inventoryItemCommands << inventoryItemCommand
         }
+        }
+
 
         commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
         return commandInstance?.categoryToProductMap
@@ -496,10 +482,10 @@ class InventoryService implements ApplicationContextAware {
      * @param location
      * @return
      */
-    Map getOutgoingQuantityByProduct(Location location) {
+    Map getOutgoingQuantityByProduct(Location location, List<Product> products) {
         Map quantityByProduct = [:]
-        Map quantityShippedByProduct = getShipmentService().getOutgoingQuantityByProduct(location);
-        Map quantityOrderedByProduct = getOrderService().getOutgoingQuantityByProduct(location)
+        Map quantityShippedByProduct = getShipmentService().getOutgoingQuantityByProduct(location, products);
+        Map quantityOrderedByProduct = getOrderService().getOutgoingQuantityByProduct(location, products)
         //Map quantityRequestedByProduct = getRequisitionService().getOutgoingQuantityBgetInventoryItemsJsonByProductyProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product];
@@ -527,10 +513,10 @@ class InventoryService implements ApplicationContextAware {
      * @param location
      * @return
      */
-    Map getIncomingQuantityByProduct(Location location) {
+    Map getIncomingQuantityByProduct(Location location, List<Product> products) {
         Map quantityByProduct = [:]
-        Map quantityShippedByProduct = getShipmentService().getIncomingQuantityByProduct(location);
-        Map quantityOrderedByProduct = getOrderService().getIncomingQuantityByProduct(location)
+        Map quantityShippedByProduct = getShipmentService().getIncomingQuantityByProduct(location, products);
+        Map quantityOrderedByProduct = getOrderService().getIncomingQuantityByProduct(location, products)
         //Map quantityRequestedByProduct = getRequisitionService().getIncomingQuantityByProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product];
@@ -630,76 +616,16 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get a set of products based on the filters in the given command object.
-     *
-     * @param commandInstance
-     * @return
-     */
-    Set<Product> getProducts(InventoryCommand command) {
-        List categories = new ArrayList();
-        if (command?.subcategoryInstance) {
-            categories.add(command?.subcategoryInstance);
-        }
-        else {
-            categories.add(command?.categoryInstance);
-        }
-
-        List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms.split(" ")) : null);
-
-        log.debug("get products: " + command?.warehouseInstance)
-        //def products = getProducts(commandInstance?.warehouseInstance, searchTerms, categoryFilters,
-        //        commandInstance?.showHiddenProducts);
-
-		log.info "command.tag  = " + command.tag
-		def products = []
-		if (command.tag) {
-			products = getProductsByTags(command.tag)
-		} else {
-			products = getProducts(command?.warehouseInstance, searchTerms, categories, command?.showHiddenProducts);
-		}
-			
-        products = products?.sort() { it?.name };
-        return products;
-    }
-	
-    /**
-     * @param searchTerms
-     * @param categories
-     * @return
-     */
-    List<Product> getProducts(Location location, List terms, List categories, Boolean showHiddenProducts) {
-        // Get all products, including hidden ones
-        def products = Product.list()
-        def matchCategories = getExplodedCategories(categories)
-        def result = getProductsByTermsAndCategories(terms, matchCategories)
-        println(result)
-        result = products.intersect(result);
-
-        if (!showHiddenProducts) {
-            result.removeAll(getHiddenProducts(location))
-        }
-
-        // now localize to only match products for the current locale
-        // TODO: this would also have to handle the category filtering
-        //  products = products.findAll { product ->
-        //  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale
-        // return productFilters.any {
-        //   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
-        // }
-        // }
-        return result;
-    }
-
-    /**
 	 * Get all products matching the given terms and categories.
 	 * 
 	 * @param terms
 	 * @param categories
 	 * @return
 	 */
-	List<Product> getProductsByTermsAndCategories(terms, categories) {
-
-        return InventoryItem.createCriteria().list() {
+	List<Product> getProductsByTermsAndCategories(terms, categories, maxResult, offset) {
+        println "getProductsByTermsAndCategories: " + new Date().time
+        println Product.list()
+        def products = InventoryItem.createCriteria().list() {
             if(categories) {
                 product {
                     inList("category", categories)
@@ -738,37 +664,14 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
             }
+        }.collect { it.product }.unique { it.id }
 
-        }.collect { it.product }.unique { it.id } as List<Product>
+        println "products: " + products
+
+        return Product.createCriteria().list(max: maxResult, offset: offset) {
+            inList("id", (products.collect { it.id })?: [""])
+        }
 	}
-	
-	/**
-	 * 
-	 */
-	List<Category> getCategoriesByTerms(terms) { 
-		return Category.createCriteria().list() {
-			or {
-				terms.each { term ->
-					ilike("name", "%" + term + "%")
-				}
-			}
-		}		
-	}
-	
-	/**
-	 * Get all products that fall under the given categories.
-	 * 
-	 * @return
-	 */
-	List<Product> getProductsUnderCategories(categories) { 
-		
-		// Get all products that fall under the categories that exactly match the search terms
-		// e.g. if i search for "laptop" and Laptops is a category, we'll show all
-		// products under Laptops, whether or not the product matches "laptop"
-		
-		return getProductsByCategories(categories);
-	}
-	
 	
 	/**
 	 * Get all products that have the given tags.
@@ -812,21 +715,6 @@ class InventoryService implements ApplicationContextAware {
         return getProductsByLocationAndStatuses(location, [InventoryStatus.NOT_SUPPORTED, InventoryStatus.SUPPORTED_NON_INVENTORY])
     }
 
-    /**
-     *
-     * @param location
-     * @return
-     */
-    List getSupportedProducts(Location location) {
-        def products = []
-        products.addAll(getProductsWithoutInventoryLevel(location))
-        log.debug "Add all without inventory level " + products.size()
-        products.addAll(getProductsByLocationAndStatus(location, InventoryStatus.SUPPORTED))
-        log.debug "add all with status == supported " + products.size()
-        return products
-    }
-
-
     List getProductsWithoutInventoryLevel(Location location) {
         def session = sessionFactory.getCurrentSession()
         def query = session.createSQLQuery(
@@ -863,17 +751,6 @@ class InventoryService implements ApplicationContextAware {
                 .setParameter("inventoryId", location?.inventory?.id)
                 .list()
         return products
-    }
-
-    /**
-     * Get a map of product attribute-value pairs for the given products.
-     * If products is empty, then we return all attribute-value pairs.
-     *
-     * @return
-     */
-    Map getProductAttributes() {
-        def productAttributes = ProductAttribute.list()
-        return productAttributes.groupBy { it.attribute }
     }
 
     /**
@@ -1041,6 +918,17 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
+     * Get a map of quantities (indexed by product) for a particular inventory.
+     *
+     * @param inventoryInstance
+     * @return
+     */
+    Map<Product, Integer> getQuantityByProductMap(Inventory inventory, List<Product> products) {
+        def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products);
+        return getQuantityByProductMap(transactionEntries)
+    }
+
+    /**
      * Gets a product-to-quantity maps for all products in the selected inventory
      * whose quantity falls below a the minimum or reorder level
      * (Note that items that are below the minimum level are excluded from
@@ -1072,28 +960,6 @@ class InventoryService implements ApplicationContextAware {
         }
 
         return [minimumProductsQuantityMap: minimumProductsQuantityMap, reorderProductsQuantityMap: reorderProductsQuantityMap]
-    }
-
-    /**
-     * Gets a product-to-quantity maps for all products in the selected inventory
-     * whose quantity falls below a the minimum or reorder level
-     * (Note that items that are below the minimum level are excluded from
-     * the list of items below the reorder level)
-     *
-     * Excludes unsupported items
-     */
-    Map<String, Map<Product, Integer>> getProductsBelowMinimumAndReorderQuantities(Inventory inventoryInstance) {
-        return getProductsBelowMinimumAndReorderQuantities(inventoryInstance, false)
-    }
-
-	/**
-	 * Gets 
-	 * @param inventory
-	 * @param inventoryItem
-	 * @return
-	 */
-    Integer getAvailableQuantity(Inventory inventory, InventoryItem inventoryItem) {
-		throw new UnsupportedOperationException();
     }
 
     /**
@@ -1143,16 +1009,6 @@ class InventoryService implements ApplicationContextAware {
 
 
         return quantityOnHand;
-    }
-
-    /**
-     * Get quantity for a given product.
-     *
-     * @param product
-     * @return
-     */
-    Integer getQuantity(Product product) {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -1328,73 +1184,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get products by search terms only, matching against product name OR category name.
-     * @param searchTerms
-     * @return
-     */
-    List getProductsBySearchTerms(List searchTerms) {
-        log.debug "get products by search terms " + searchTerms;
-
-        // Get products that match the search terms by name and category
-        def products = Product.createCriteria().list() {
-            if (searchTerms) {
-                or {
-                    searchTerms.each {
-                        ilike("name", "%" + it + "%")
-                    }
-                    searchTerms.each {
-                        category {
-                            ilike("name", "%" + it + "%")
-                        }
-                    }
-                }
-            }
-        }
-
-        /*
-          if (!products) {
-              // Get products that match a category (e.g. Equipment matches all products
-              // under Equipment and its subcategories.
-              def categories = Category.withCriteria {
-                  ilike("name", searchTerms + "%");
-              }
-              def matchedCategories = getExplodedCategories(categories);
-              if (matchedCategories) {
-                  products += Product.createCriteria().list() {
-                      'in'("category", matchedCategories)
-                  }
-              }
-
-              // Get products that match inventory item by lot number or name.
-              def inventoryItems = InventoryItem.withCriteria {
-                  or {
-                      ilike("lotNumber", searchTerms + "%")
-                      //ilike("description", searchTerms + "%")
-                      product {
-                          ilike("name", searchTerms + "%")
-                      }
-                  }
-              }
-              products += inventoryItems*.product;
-          }
-          */
-        log.debug products
-
-        return products;
-    }
-
-    /**
-     * Returns a category and all of its children.
-     *
-     * @param category
-     * @return
-     List getExplodedCategories(Category category) {def categories = []
-     categories << category
-     return getExplodedCategories(categories)
-     }
-     */
-
-    /**
      * Returns a list of categories and their children, given an initial set of
      * categories.  This function should probably be recursive so that we traverse
      * the entire category tree.
@@ -1438,31 +1227,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Return a list of categories that match the given search terms and
-     * are located under any of the given categories.
-     *
-     * @param searchTerms
-     * @param categories
-     * @return
-     */
-    List getCategoriesMatchingSearchTerms(List searchTerms, Category category) {
-        log.debug("find categories matching search terms " + searchTerms + " under " + category)
-        //def categories = []
-        // Start by getting all categories that match and then iterate over
-        // each and check to see if one of its ancestors is in the given
-        // list of ancestors
-        def categoriesMatching = getCategoriesMatchingSearchTerms(searchTerms);
-        log.debug "Categories matching " + categoriesMatching;
-
-        def children = category.children.findAll { child ->
-            categoriesMatching.contains(child)
-        }
-        log.debug("Found " + children)
-        return children
-
-    }
-
-    /**
      * Get all products for the given category.
      *
      * @param category
@@ -1471,39 +1235,6 @@ class InventoryService implements ApplicationContextAware {
     List getProductsByCategory(Category category) {
         def products = Product.createCriteria().list() {
             eq("category", category)
-        }
-        return products;
-    }
-
-    /**
-     * Get all products for the given categories.
-     *
-     * @param categories
-     * @return
-     */
-    List<Product> getProductsByCategories(List categories) {
-        return Product.createCriteria().list() {
-            'in'("category", categories)
-        }
-    }
-
-    /**
-     * Returns a list of products by category.
-     *
-     * @param categories
-     * @param params
-     * @return
-     */
-    List getProductsByNestedCategories(List categories) {
-        def products = []
-
-        def matchCategories = getExplodedCategories(categories);
-
-        log.debug matchCategories
-        if (matchCategories) {
-            products = Product.createCriteria().list() {
-                'in'("category", matchCategories)
-            }
         }
         return products;
     }
@@ -1584,17 +1315,6 @@ class InventoryService implements ApplicationContextAware {
         def productsWithEmptyInventoryItem = findInventoryItemWithEmptyLotNumber()?.collect { it.product };
         def productsWithoutEmptyInventoryItem = products - productsWithEmptyInventoryItem;
         return productsWithoutEmptyInventoryItem;
-    }
-
-    /**
-     * Finds inventory item for the given product and lot number.
-     *
-     * @param product
-     * @param lotNumber
-     * @return
-     */
-    InventoryItem findInventoryItem(Product product, String lotNumber) {
-        return findInventoryItemByProductAndLotNumber(product, lotNumber);
     }
 
     /**
@@ -1705,14 +1425,24 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
+     * Get all transaction entries over list of products/inventory items.
      *
-     * @param productList
      * @param inventoryInstance
      * @return
      */
-    Map<Product, InventoryLevel> getInventoryLevels(List<Product> productList, Location location) {
-        def inventoryLevelList = getInventoryLevelsByInventory(location.inventory);
-        return inventoryLevelList.groupBy { it.product }
+    List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = criteria.list {
+            transaction {
+                eq("inventory", inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+            inventoryItem {
+                inList("product", products)
+            }
+        }
+        return transactionEntries;
     }
 
     /**
@@ -1750,24 +1480,6 @@ class InventoryService implements ApplicationContextAware {
                     eq("inventory", inventoryInstance)
                     order("transactionDate", "asc")
                     order("dateCreated", "asc")
-                }
-            }
-        }
-    }
-
-    /**
-     * Get all transaction entries for a lot number within an inventory.
-     *
-     * @param productInstance
-     * @param inventoryInstance
-     * @return
-     */
-    List getTransactionEntriesByLotNumberAndInventory(String lotNumber, Inventory inventoryInstance) {
-        return TransactionEntry.createCriteria().list() {
-            and {
-                eq("lotNumber", lotNumber)
-                transaction {
-                    eq("inventory", inventoryInstance)
                 }
             }
         }
@@ -2137,30 +1849,6 @@ class InventoryService implements ApplicationContextAware {
 
     /**
      *
-     * @return
-     */
-    def getConsumptionDateKeys() {
-        def monthsYears = Consumption.executeQuery("""select distinct
-				day(transactionDate), 
-				week(transactionDate), 
-				month(transactionDate), 
-				year(transactionDate)
-			from Consumption order by year(transactionDate) desc, month(transactionDate) desc""")
-        return monthsYears?.collect() { [day: it[0], week: it[1], month: it[2], year: it[3]] }
-    }
-
-    /**
-     *
-     * @param product
-     * @param date
-     * @return
-     */
-    def getProductQuantity(Product product, Location location, Date date) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     *
      */
     def getQuantity(Product product, Location location, Date beforeDate) {
         def quantity = 0;
@@ -2202,76 +1890,6 @@ class InventoryService implements ApplicationContextAware {
     def getCurrentQuantity(Product product, Location location, Date date) {
         return getQuantity(product, location, date ?: new Date());
     }
-
-    /**
-     * Get the initial quantity of a product for the given location and date.
-     * If the date is null, then we assume that the answer is 0.
-     *
-     * @param product
-     * @param location
-     * @param date
-     * @return
-     */
-    def getInitialQuantity(InventoryItem inventoryItem, Location location, Date date) {
-        return getQuantity(inventoryItem, location, date ?: new Date());
-    }
-
-    /**
-     *
-     * @param inventoryItem
-     * @param location
-     * @param date
-     * @return
-     */
-    def getCurrentQuantity(InventoryItem inventoryItem, Location location, Date date) {
-        return getQuantity(inventoryItem, location, date ?: new Date())
-    }
-
-    /**
-     * Get the quantity of a particular product at the given location,
-     * on the given date.
-     *
-     * @param product
-     * @param date
-     * @return
-     def getQuantity(Product product, Location location, Date date) {def quantity = 0;
-     def inventoryItems = InventoryItem.findAllByProduct(product)
-     inventoryItems.each { inventoryItem ->
-     quantity += getQuantity(inventoryItem, location, date);
-     }return quantity;
-     }
-     */
-
-    /**
-     * Get quantity for the given inventory item at the given location, on the
-     * given date.
-     *
-     * @param inventoryItem
-     * @param date
-     * @return
-     def getQuantity(InventoryItem inventoryItem, Location location, Date date) {def quantity = 0;
-
-     // Get the date of this inventory item's last 'inventory' transaction
-     def lastInventoryTransactionEntry = getPreviousInventoryTransactionEntry(inventoryItem, location, date);
-
-     // If there's no last inventory date for the item, we look for the last inventory date for the product
-     if (!lastInventoryTransactionEntry) {
-     lastInventoryTransactionEntry = getPreviousInventoryTransactionEntry(inventoryItem?.product, location, date);
-     }// Date of last inventory might be null if there's never been an inventory
-     def lastInventoryDate = lastInventoryTransactionEntry?.transaction?.transactionDate;
-     quantity = lastInventoryTransactionEntry?.quantity ?: 0
-
-     log.debug ("Starting quantity = " + quantity)
-
-     // Get all transactions for an inventory item from the last inventory
-     // date until the given date
-     def transactionEntries = getTransactionEntries(inventoryItem, location, lastInventoryDate, date)
-     adjustQuantity(quantity, transactionEntries)
-
-     log.debug ("Ending quantity = " + quantity)
-     return quantity;
-     }
-     */
 
     /**
      *
@@ -2399,35 +2017,6 @@ class InventoryService implements ApplicationContextAware {
 
     /**
      *
-     * @param inventoryItem
-     * @param startDate
-     * @param endDate
-     * @return
-     */
-    def getTransactionEntries(InventoryItem inventoryItem, Location location, Date startDate, Date endDate) {
-        def criteria = TransactionEntry.createCriteria();
-        def transactionEntries = criteria.list {
-            eq("inventoryItem", inventoryItem)
-            transaction {
-                if (startDate && endDate) {
-                    between("transactionDate", startDate, endDate)
-                }
-                else if (startDate) {
-                    ge("transactionDate", startDate)
-                }
-                else if (endDate) {
-                    le("transactionDate", endDate)
-                }
-                eq("inventory", location?.inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
-        }
-        return transactionEntries;
-    }
-
-    /**
-     *
      * @param location
      * @param category
      * @param startDate
@@ -2470,53 +2059,6 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries;
 
 
-    }
-
-    /**
-     *
-     * @param product
-     * @param location
-     * @param date
-     * @return
-     */
-    def getPreviousInventoryTransactionEntry(Product product, Location location, Date date) {
-        def transactionTypes = []
-        transactionTypes << TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntry = criteria.get {
-            inventoryItem {
-                eq("product", product)
-            }
-            transaction {
-                'in'("transactionType", transactionTypes)
-                eq("inventory", location?.inventory)
-                order('transactionDate', 'desc')
-            }
-            maxResults(1)
-        }
-        return transactionEntry;
-    }
-
-    /**
-     *
-     * @param inventoryItem
-     * @param date
-     * @return
-     */
-    def getPreviousInventoryTransactionEntry(InventoryItem inventoryItem, Location location, Date date) {
-        def transactionTypes = []
-        transactionTypes << TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntry = criteria.get {
-            eq("inventoryItem", inventoryItem)
-            transaction {
-                'in'("transactionType", transactionTypes)
-                eq("inventory", location?.inventory)
-                order('transactionDate', 'desc')
-            }
-            maxResults(1)
-        }
-        return transactionEntry
     }
 
     public void validateData(ImportDataCommand command) {

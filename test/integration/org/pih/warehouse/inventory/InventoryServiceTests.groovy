@@ -338,35 +338,19 @@ class InventoryServiceTests extends GroovyTestCase {
         assertEquals 1, results.size()
     }
 
-    void test_getProductsByTermsAndCategoriesAndLotNumberWithProductAndLotNumberSearchTerm() {
+    void test_getProductsByTermsAndCategoriesAndLotNumberWithProductSearchTerm() {
         basicTestFixture()
-        def terms = ["Aspirin","1"]
+        def terms = ["Asp", "rin"]
         def inventoryService = new InventoryService()
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null)
+        def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
         assert results.contains(aspirinProduct)
-        assert results.contains(tylenolProduct)
     }
 
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
         basicTestFixture()
         def terms = ["1"]
         def inventoryService = new InventoryService()
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null)
-        assert results.contains(aspirinProduct)
-        assert results.contains(tylenolProduct)
-    }
-
-    void test_getProductsWithHiddenProducts() {
-        basicTestFixture()
-
-        def inventoryService = new InventoryService()
-        Location loc = bostonLocation
-        List terms = ["Aspirin", "1"]
-        List categories = ["Medicine"]
-
-        def results = inventoryService.getProducts(loc, terms, categories, false)
-
-        assert results.size() == 2
+        def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
         assert results.contains(aspirinProduct)
         assert results.contains(tylenolProduct)
     }
