@@ -73,7 +73,7 @@ class InventoryServiceTests extends GroovyTestCase {
         // create some inventory items
         aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1", new Date().plus(100))
         aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2", new Date().plus(10))
-        tylenolItem = DbHelper.createInventoryItem(tylenolProduct, "1")
+        tylenolItem = DbHelper.createInventoryItem(tylenolProduct, "lot9383")
     }
 
     private void transactionEntryTestFixture() {
@@ -348,10 +348,9 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
         basicTestFixture()
-        def terms = ["1"]
+        def terms = ["lot9383"]
         def inventoryService = new InventoryService()
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
-        assert results.contains(aspirinProduct)
+        def results = inventoryService.getProductsByTermsAndCategories(terms, null, 1000, 0)
         assert results.contains(tylenolProduct)
     }
 }
