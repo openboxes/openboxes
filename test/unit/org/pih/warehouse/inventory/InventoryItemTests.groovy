@@ -4,7 +4,6 @@ import grails.test.GrailsUnitTestCase
 
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.RequisitionItem
 
 class InventoryItemTests extends GrailsUnitTestCase {
 
@@ -12,7 +11,7 @@ class InventoryItemTests extends GrailsUnitTestCase {
 		super.setUp()
 		mockDomain(Category)
 		mockDomain(Product)
-		mockDomain(InventoryItem)		
+		mockDomain(InventoryItem)
 		
 		
 	}

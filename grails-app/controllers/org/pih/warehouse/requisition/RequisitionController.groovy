@@ -27,7 +27,7 @@ class RequisitionController {
     }
 
     def list = {
-        def requisitions = Requisition.findAll()
+        def requisitions = Requisition.findAllByDestination(session.warehouse)
         render(view:"list", model:[requisitions: requisitions])
     }
 

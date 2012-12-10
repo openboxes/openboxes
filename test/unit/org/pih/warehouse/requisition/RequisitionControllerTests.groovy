@@ -266,20 +266,23 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
     void testListRequisitions() {
 
-        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
-        def requisition2 = new Requisition(id: "req2", name: "req2", recipientProgram:"abcde")
-        def requisition3 = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        def location1 = new Location(id: "loc1", name: "loc1")
+        def location2 = new Location(id: "loc2", name: "loc2")
+        mockDomain(Location, [location1, location2])
+
+        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc", destination: location1)
+        def requisition2 = new Requisition(id: "req2", name: "req2", recipientProgram:"abcde", destination: location2)
+        def requisition3 = new Requisition(id: "1234", name: "jim", recipientProgram:"abc", destination: location2)
         mockDomain(Requisition, [requisition, requisition2, requisition3])
 
+        controller.session.warehouse = location1
         controller.list()
 
         assert renderArgs.view == "list"
         assert renderArgs.model
         assert renderArgs.model.requisitions
-        assert renderArgs.model.requisitions.size() == 3
+        assert renderArgs.model.requisitions.size() == 1
         assert renderArgs.model.requisitions.any { it.id = requisition.id}
-        assert renderArgs.model.requisitions.any { it.id = requisition2.id}
-        assert renderArgs.model.requisitions.any { it.id = requisition3.id}
 
     }
 

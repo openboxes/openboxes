@@ -25,7 +25,7 @@ import org.pih.warehouse.inventory.Transaction;
  * Transaction Entries are tied to Inventory Items, and
  * these entries are used to calculate the quantity levels of inventory items
  * 
- * We may rename InventoryItem to ProductInstance, as this may 
+ * We may rename InventoryItem to ProductInstance, as this may
  * be a clearer name
  */
 class InventoryItem implements Serializable {
