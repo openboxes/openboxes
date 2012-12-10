@@ -221,7 +221,7 @@ class InventoryService implements ApplicationContextAware {
         }
 
         List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms?.split(" ")) : null);
-
+        log.info "searchTerms = " + searchTerms
         log.debug("get products: " + commandInstance?.warehouseInstance)
         log.info "command.tag  = " + commandInstance.tag
         def products = []
@@ -650,6 +650,7 @@ class InventoryService implements ApplicationContextAware {
         }.collect { it.product }.unique { it.id }
 
         return Product.createCriteria().list(max: maxResult, offset: offset) {
+            groupProperty("category")
             inList("id", (products.collect { it.id })?: [""])
         }
 	}
