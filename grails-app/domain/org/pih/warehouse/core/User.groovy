@@ -29,8 +29,8 @@ class User extends Person {
 	Boolean rememberLastLocation	// indicates whether user would like for the system to remember where they last logged into
 	byte [] photo				// profile photo
 
-
-	static hasMany = [ roles : Role ]
+  List locationRoles
+	static hasMany = [ roles : Role, locationRoles: LocationRole]
 	static mapping = {
 		table "`user`"
 		roles joinTable: [name:'user_role', column: 'role_id', key: 'user_id']
@@ -53,6 +53,18 @@ class User extends Person {
 		warehouse(nullable:true)
 	}
 
-	
+
+ def locationRolePairs(){
+   def pairs = [:]
+   locationRoles.each{
+     pairs[it.location.id] = it.role.id
+   }
+   pairs
+ }
+
+ def locationRolesDescription(){
+   def roleArray = locationRoles.collect{ "${it.location?.name}: ${it.role?.roleType?.name}"}
+   roleArray?.join(" | ")
+ }
 	
 }

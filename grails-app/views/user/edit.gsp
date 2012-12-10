@@ -1,5 +1,7 @@
-
-<%@ page import="org.pih.warehouse.core.User" %>
+<%@ page import="org.pih.warehouse.core.*" %>
+<g:set var="adminAndBrowser" value="${[Role.browser(), Role.manager()]}" />
+<g:set var="allRoles" value="${[Role.admin(), Role.browser(), Role.manager()]}" />
+<g:set var="locationRolePairs" value="${userInstance?.locationRolePairs()}" />
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -107,10 +109,37 @@
 	                                <td valign="top" class="name">
 	                                  <label for="roles"><warehouse:message code="user.roles.label" /></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
+                                  <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
 	                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}" optionKey="id" value="${userInstance?.roles}" noSelection="['null':'']" multiple="true"/>
 	                                </td>
 	                            </tr>
+                              <tr class="prop" id="locationRoles">
+	                                <td valign="top" class="name">
+	                                  <label><warehouse:message code="user.locationRoles.label" /></label>
+	                                </td>
+	                                <td valign="top" >
+                                    <table>
+                                      <thead>
+                                        <th><warehouse:message code="location.label"/></th>
+                                        <th><warehouse:message code="user.role.label"/></th>
+                                      </thead>
+                                      <tbody>
+                                        <g:each var="location" in="${locations}">
+                                          <tr>
+                                            <td>${location.name}</td>
+                                            <td> 
+                                               <g:select name="locationRolePairs.${location.id}" 
+                                                  value="${locationRolePairs[location.id]}"
+                                                  from="${adminAndBrowser}" 
+                                               optionKey="id" noSelection="['':'']"/>
+                                           </td>
+                                        </tr>
+                                        </g:each>
+                                      </tbody>
+                                    </table>
+	                                </td>
+	                            </tr>
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="rememberLastLocation"><warehouse:message code="user.rememberLastLocation.label" /></label>
@@ -145,5 +174,17 @@
 				</fieldset>
             </g:form>
         </div>
-    </body>
+   
+   <script type="text/javascript">
+    $(function(){
+      $("select[name='defaultRole']").change(function(){
+        if($(this).val() == "${Role.admin().id}")
+          $("#locationRoles").hide();
+        else
+          $("#locationRoles").show();
+      });
+     });
+   </script>
+    
+  </body>
 </html>

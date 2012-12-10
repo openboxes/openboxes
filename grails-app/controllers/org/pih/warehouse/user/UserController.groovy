@@ -11,6 +11,8 @@ package org.pih.warehouse.user;
 
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Role;
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.LocationRole;
 import org.pih.warehouse.core.RoleType;
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
@@ -172,7 +174,8 @@ class UserController {
             redirect(action: "list")
         }
         else {
-            return [userInstance: userInstance]
+            def locations = Location.AllDepotWardAndPharmacy()
+            return [userInstance: userInstance, locations: locations]
         }
     }
 	
@@ -200,53 +203,82 @@ class UserController {
      * Update a user 
      */
     def update = {
-		log.info(params)
-        def userInstance = User.get(params.id)
-        if (userInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (userInstance.version > version) {
-                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
-                    render(view: "edit", model: [userInstance: userInstance])
-                    return
-                }
-            }
+		  log.info(params)
+      def userInstance = User.get(params.id)
+      if (userInstance) {
+          if (params.version) {
+              def version = params.version.toLong()
+              if (userInstance.version > version) {
+                  userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
+                  render(view: "edit", model: [userInstance: userInstance])
+                  return
+              }
+          }
 			
-			// Password in the db is different from the one specified 
-			// so the user must have changed the password.  We need 
-			// to compare the password with confirm password before 
-			// setting the new password in the database
-			if (userInstance.password != params.password) {
-				userInstance.properties = params
-				userInstance.password = params?.password?.encodeAsPassword();
-				userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
-			}
-			else { 
-				userInstance.properties = params	
-				// Needed to bypass the password == passwordConfirm validation
-				userInstance.passwordConfirm = userInstance.password 			
-			}
-			
-			
-            if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-				
-				// if this is the current user, update reference to that user in the session
-				if (session.user.id == userInstance?.id) {
-					session.user = User.get(userInstance?.id)
-				}
-				
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
-                redirect(action: "show", id: userInstance.id)
-            }
-            else {
-                render(view: "edit", model: [userInstance: userInstance])
-            }
+        // Password in the db is different from the one specified 
+        // so the user must have changed the password.  We need 
+        // to compare the password with confirm password before 
+        // setting the new password in the database
+        if (userInstance.password != params.password) {
+          userInstance.properties = params
+          userInstance.password = params?.password?.encodeAsPassword();
+          userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
         }
+        else { 
+          userInstance.properties = params	
+          // Needed to bypass the password == passwordConfirm validation
+          userInstance.passwordConfirm = userInstance.password 			
+        }
+        
+        
+       updateRoles(userInstance, params.locationRolePairs) 
+       if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
+          // if this is the current user, update reference to that user in the session
+          if (session.user.id == userInstance?.id) {
+            session.user = User.get(userInstance?.id)
+          }
+          
+          flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+                  redirect(action: "show", id: userInstance.id)
+          }
         else {
+                  render(view: "edit", model: [userInstance: userInstance])
+        }
+      }
+      else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
-        }
+      }
     }
+
+   private void updateRoles(user, locationRolePairs){
+     println("start to update roles:${locationRolePairs}")
+     def newAndUpdatedRoles = locationRolePairs.keySet().collect{ locationId ->
+       println("roll id: '${locationRolePairs[locationId]}'")
+       if(locationRolePairs[locationId]){
+         def location = Location.get(locationId)
+         def role = Role.get(locationRolePairs[locationId])
+         def existingRole = user.locationRoles.find{it.location == location}
+         if(existingRole){
+            existingRole.role = role
+            println("**** location role updated")
+         }else{
+           def newLocationRole = new LocationRole(user: user, location:location, role: role)
+           user.addToLocationRoles(newLocationRole)
+           println("**** location role added")
+         }
+       }
+     }
+     def rolesToRemove = user.locationRoles.findAll{ oldRole ->
+        !locationRolePairs[oldRole.location.id]
+     }
+     rolesToRemove.each{ 
+       user.removeFromLocationRoles(it)       
+       println("old role removed")
+     }
+     //user.save(flush: true)
+   }
+
     
 	/**
 	 * Updates the locale of the default user

@@ -166,7 +166,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     def testCreate(){
-      def locationType = new LocationType(id: "loctype1", name: "Ward")
+      def locationType = new LocationType(id: "loctype1", name: "Ward", description: "Ward")
       def location1 = new Location(id:"1234", locationType:locationType)
       mockDomain(Location, [location1])
       mockDomain(Requisition, [])

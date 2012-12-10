@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<changeSet author="Thoughtworks (generated)" id="1355247924098-1">
+<createTable tableName="location_role">
+<column name="user_id" type="CHAR(38)"/>
+<column name="location_id" type="CHAR(38)"/>
+<column name="role_id" type="CHAR(38)"/>
+<column name="version" type="INT"/>
+<column name="id" type="CHAR(38)"/>
+<column name="location_roles_idx" type="INT"/>
+</createTable>
+</changeSet>
+<changeSet author="Thoughtworks (generated)" id="1355247924098-2">
+<addForeignKeyConstraint baseColumnNames="location_id" baseTableName="location_role" constraintName="location_role_ibfk_3" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+</changeSet>
+<changeSet author="Thoughtworks (generated)" id="1355247924098-3">
+<addForeignKeyConstraint baseColumnNames="role_id" baseTableName="location_role" constraintName="location_role_ibfk_2" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="role"/>
+</changeSet>
+<changeSet author="Thoughtworks (generated)" id="1355247924098-4">
+<addForeignKeyConstraint baseColumnNames="user_id" baseTableName="location_role" constraintName="location_role_ibfk_1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+</changeSet>
+</databaseChangeLog>

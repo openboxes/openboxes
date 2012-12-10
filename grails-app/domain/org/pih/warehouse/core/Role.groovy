@@ -27,7 +27,18 @@ class Role implements Serializable {
 	}
 	
 	
-	String toString() { return "${roleType.name}"; } 
+	String toString() { return "${roleType.name}"; }
+
+  static Role admin(){
+    Role.findByRoleType(RoleType.ROLE_ADMIN)
+  }
+
+  static Role manager(){
+    Role.findByRoleType(RoleType.ROLE_MANAGER)
+  }
+  static Role browser(){
+    Role.findByRoleType(RoleType.ROLE_BROWSER)
+  }
 	
 }
 

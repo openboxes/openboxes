@@ -74,6 +74,13 @@
 								</g:else>
 							</td>
 						</tr>
+            <tr class="prop" id="locationRoles">
+                 <td valign="top" class="name">
+                    <warehouse:message code="user.locationRoles.label" />
+                 </td>
+                 <td valign="top" >${userInstance?.locationRolesDescription()}</td>
+             </tr>
+
 						<tr class="prop">
 							<td valign="top" class="name">
 								<warehouse:message code="user.rememberLastLocation.label" />

@@ -18,9 +18,9 @@ class LocationTests extends GrailsUnitTestCase {
     def location4
     protected void setUp() {
         super.setUp()
-		def depot = new LocationType(name: "Depot", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-		def supplier = new LocationType(name: "Supplier")
-		def ward = new LocationType(name: "Ward")
+		def depot = new LocationType(name: "Depot", description: "Depot",  supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+		def supplier = new LocationType(name: "Supplier", description: "Supplier")
+		def ward = new LocationType(name: "Ward", description: "Ward" )
 		location1 = new Location(name: "Boston", locationType: depot, supportedActivities: [ActivityCode.MANAGE_INVENTORY])
 		location2 = new Location(name: "Miami", locationType: depot)
 	    location3 = new Location(name: "supplier", locationType: supplier, supportedActivities: [ActivityCode.RECEIVE_STOCK])
@@ -39,7 +39,7 @@ class LocationTests extends GrailsUnitTestCase {
     }
 
 	void test_shouldSaveLocation() {
-		def location = new Location(name: "Default location", locationType: new LocationType(name: "Depot"))
+		def location = new Location(name: "Default location", locationType: new LocationType(name: "Depot", description: "Depot"))
 		
 		if ( !location.validate() )
 				location.errors.allErrors.each { println it }
@@ -58,6 +58,16 @@ class LocationTests extends GrailsUnitTestCase {
 
     void test_isWardOrPharmacy() {
         assert location1.isWardOrPharmacy() == false
+        assert location1.isDepotWardOrPharmacy() == true
         assert location4.isWardOrPharmacy() == true
+        assert location4.isDepotWardOrPharmacy() == true
+    }
+
+    void test_AllDepotWardAndPharmacy(){
+      def locations = Location.AllDepotWardAndPharmacy()
+      assert locations.contains(location1)
+      assert locations.contains(location2)
+      assert locations.contains(location4)
+      assert locations.size() == 3
     }
 }
