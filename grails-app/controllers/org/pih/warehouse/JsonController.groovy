@@ -162,7 +162,7 @@ class JsonController {
 		def location = Location.get(session.warehouse.id);
 		if (params.term) {
 			// Improved the performance of the auto-suggest by moving 
-			def tempItems = inventoryService.findInventoryItems(params.term, params.productId)
+			def tempItems = inventoryService.findInventoryItems(params.term)
 			
 			// Get a map of quantities for all items in inventory
 			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(location?.inventory)

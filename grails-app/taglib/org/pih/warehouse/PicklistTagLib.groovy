@@ -23,7 +23,7 @@ class PicklistTagLib {
 		attrs.products = []
 		if (attrs.requisitionItem.product) {
 			attrs.product = attrs.requisitionItem.product
-			attrs.inventoryItems = inventoryService.findInventoryItemsByProduct(attrs.product)
+			attrs.inventoryItems = inventoryService.findInventoryItemsByProducts([attrs.product])
 			attrs.inventoryItems.each { 
 				it.quantityOnHand = inventoryService.getQuantity(location.inventory, it)
 				it.quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(location.inventory, it)
@@ -51,7 +51,7 @@ class PicklistTagLib {
 		if (attrs.requisitionItem.product) {
 			attrs.product = attrs.requisitionItem.product
 			println "product " + attrs.product
-			attrs.inventoryItems = inventoryService.findInventoryItemsByProduct(attrs.product)
+			attrs.inventoryItems = inventoryService.findInventoryItemsByProducts([attrs.product])
 			attrs.inventoryItem = attrs.inventoryItems.find { it.expirationDate != null }
 		}
 		else if (attrs.requisitionItem.category) {

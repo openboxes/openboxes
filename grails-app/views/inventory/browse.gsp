@@ -46,12 +46,12 @@
 															</g:if>
 															&nbsp;&rsaquo;&nbsp;
 															<g:if test="${commandInstance?.searchTerms }">
-																${commandInstance.searchTerms }															
-															</g:if>
+																${commandInstance.searchTerms }
+                                                                (${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} of ${numProducts} products)
+                                                            </g:if>
 															<g:else>
 																${warehouse.message(code: 'products.all.label') }
 															</g:else>
-															(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
 														</a>
 													</li>
 												</ul>		

@@ -155,23 +155,14 @@ class InventoryService implements ApplicationContextAware {
      * @param productId
      * @return
      */
-    List findInventoryItems(String searchTerm, String productId) {
-        searchTerm = "%" + searchTerm + "%";
-        def items = InventoryItem.withCriteria {
+    List findInventoryItems(String searchTerm) {
+        return InventoryItem.withCriteria {
             or {
-                ilike("lotNumber", searchTerm)
+                ilike("lotNumber", "%" + searchTerm + "%")
                 product {
-                    ilike("name", searchTerm)
+                    ilike("name", "%" + searchTerm + "%")
                 }
             }
-        }
-        return items;
-    }
-
-    List findInventoryItemsByProduct(Product product) {
-        return InventoryItem.withCriteria {
-            eq("product", product)
-            order("expirationDate", "asc")
         }
     }
 
