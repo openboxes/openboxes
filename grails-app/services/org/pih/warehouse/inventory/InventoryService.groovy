@@ -211,10 +211,6 @@ class InventoryService implements ApplicationContextAware {
      */
     Map getCurrentInventory(InventoryCommand commandInstance) {
 
-        println "before getQuantityMaps: " + new Date().time
-
-        println "getCurrentInventory: " + new Date().time
-
         def inventoryItemCommands = [];
         List categories = new ArrayList();
         if (commandInstance?.subcategoryInstance) {
@@ -255,8 +251,6 @@ class InventoryService implements ApplicationContextAware {
         }
 
         products = products?.sort() { it?.name };
-
-        println products
 
         // Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
         def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory, products);
@@ -614,8 +608,6 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List<Product> getProductsByTermsAndCategories(terms, categories, maxResult, offset) {
-        println "getProductsByTermsAndCategories: " + new Date().time
-        println Product.list()
         def products = InventoryItem.createCriteria().list() {
             if(categories) {
                 product {
@@ -656,8 +648,6 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }.collect { it.product }.unique { it.id }
-
-        println "products: " + products
 
         return Product.createCriteria().list(max: maxResult, offset: offset) {
             inList("id", (products.collect { it.id })?: [""])
@@ -915,6 +905,8 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     Map<Product, Integer> getQuantityByProductMap(Inventory inventory, List<Product> products) {
+        println "inventory:" + inventory
+        println "products:" + products
         def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products);
         return getQuantityByProductMap(transactionEntries)
     }
@@ -971,11 +963,9 @@ class InventoryService implements ApplicationContextAware {
 				
 			inventory = currentLocation.inventory
 		}
-        def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(inventoryItem, inventory)
+        def transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(inventory, inventoryItem)
         def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
 
-		
-		
         // inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
         //log.debug "inventoryItem -> " + inventoryItem.class
 
@@ -1038,7 +1028,7 @@ class InventoryService implements ApplicationContextAware {
         cmd.lotNumberList = getInventoryItemsByProduct(cmd?.productInstance) as List
 
         // Get transaction log for a particular product within an inventory
-        cmd.transactionEntryList = getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+        cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventoryInstance, [cmd.productInstance]);
         cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
         cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
 
@@ -1069,7 +1059,7 @@ class InventoryService implements ApplicationContextAware {
             commandInstance.recordInventoryRow = new RecordInventoryRowCommand();
 
             // get all transaction entries for this product at this inventory
-            def transactionEntryList = getTransactionEntriesByProductAndInventory(commandInstance?.productInstance, commandInstance?.inventoryInstance)
+            def transactionEntryList = getTransactionEntriesByInventoryAndProduct(commandInstance?.inventoryInstance, [commandInstance?.productInstance])
             // create a map of inventory item quantities from this
             def quantityByInventoryItemMap = getQuantityByInventoryItemMap(transactionEntryList)
 
@@ -1386,7 +1376,7 @@ class InventoryService implements ApplicationContextAware {
      */
     Set getInventoryItemsByProductAndInventory(Product productInstance, Inventory inventoryInstance) {
         def inventoryItems = [] as Set
-        def transactionEntries = getTransactionEntriesByProductAndInventory(productInstance, inventoryInstance);
+        def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventoryInstance, [productInstance]);
         transactionEntries.each {
             inventoryItems << it.inventoryItem;
         }
@@ -1415,26 +1405,6 @@ class InventoryService implements ApplicationContextAware {
 
     }
 
-    /**
-     * Get all transaction entries over list of products/inventory items.
-     *
-     * @param inventoryInstance
-     * @return
-     */
-    List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
-        def criteria = TransactionEntry.createCriteria();
-        def transactionEntries = criteria.list {
-            transaction {
-                eq("inventory", inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
-            inventoryItem {
-                inList("product", products)
-            }
-        }
-        return transactionEntries;
-    }
 
     /**
      * Get all transaction entries over all products/inventory items.
@@ -1455,25 +1425,26 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get all transaction entries for a product within an inventory.
+     * Get all transaction entries over list of products/inventory items.
      *
-     * @param productInstance
      * @param inventoryInstance
      * @return
      */
-    List getTransactionEntriesByProductAndInventory(Product productInstance, Inventory inventoryInstance) {
-        return TransactionEntry.createCriteria().list() {
-            and {
+    List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = criteria.list {
+            transaction {
+                eq("inventory", inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+            if (products) {
                 inventoryItem {
-                    eq("product.id", productInstance?.id)
-                }
-                transaction {
-                    eq("inventory", inventoryInstance)
-                    order("transactionDate", "asc")
-                    order("dateCreated", "asc")
+                    inList("product", products)
                 }
             }
         }
+        return transactionEntries;
     }
 
     /**
@@ -1482,7 +1453,7 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryItem
      * @param inventory
      */
-    List getTransactionEntriesByInventoryItemAndInventory(InventoryItem inventoryItem, Inventory inventory) {
+    List getTransactionEntriesByInventoryItemAndInventory(Inventory inventory, InventoryItem inventoryItem) {
         return TransactionEntry.createCriteria().list() {
             and {
                 eq("inventoryItem", inventoryItem)

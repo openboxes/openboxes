@@ -164,7 +164,7 @@ class InventoryItemController {
 		inventoryService.populateRecordInventoryCommand(commandInstance, params)
 		
 		def productInstance = commandInstance.productInstance;
-		def transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(productInstance, commandInstance?.inventoryInstance);
+		def transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventoryInstance, [productInstance]);
 		
 		// Get the inventory warning level for the given product and inventory 
 		commandInstance.inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, commandInstance?.inventoryInstance);
@@ -194,7 +194,7 @@ class InventoryItemController {
 
 		// Get the inventory warning level for the given product and inventory
 		cmd.inventoryLevelInstance = InventoryLevel.findByProductAndInventory(cmd?.productInstance, cmd?.inventoryInstance);
-		def transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd?.productInstance, cmd?.inventoryInstance);
+		def transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(cmd?.inventoryInstance, [cmd?.productInstance]);
 		
 		def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
 
