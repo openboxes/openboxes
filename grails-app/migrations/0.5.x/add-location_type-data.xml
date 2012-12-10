@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="Stephen (generated)" id="1354564152180-999">
+        <insert tableName="location_type">
+            <column name="id" value="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2012-12-06T00:00:00.0"/>
+            <column name="description" value="Ward"/>
+            <column name="last_updated" valueDate="2012-12-06T00:00:00.0"/>
+            <column name="name" value="Ward|fr:Ward"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="location_type">
+            <column name="id" value="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2012-12-06T00:00:00.0"/>
+            <column name="description" value="Pharmacy"/>
+            <column name="last_updated" valueDate="2012-12-06T00:00:00.0"/>
+            <column name="name" value="Pharmacy|fr:Pharmacy"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
+
