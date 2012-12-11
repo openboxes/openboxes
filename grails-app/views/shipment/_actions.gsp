@@ -70,19 +70,19 @@
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" class="middle"/>&nbsp;
 						<warehouse:message code="shipping.editPackingList.label"/></g:link>					
 				</div>
-				<div class="action-menu-item">		
-					<g:link controller="shipment" action="addDocument" id="${shipmentInstance.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.uploadADocument.label"/></g:link>
-				</div>
-				<div class="action-menu-item">
-					<g:link controller="shipment" action="addComment" id="${shipmentInstance.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.addNote.label"/></g:link>													
-				</div>
 			</g:if>		
-			<div class="action-menu-item">
-				<hr/>
-			</div>
 		</g:if>
+		<div class="action-menu-item">		
+			<g:link controller="shipment" action="addDocument" id="${shipmentInstance.id}">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.uploadADocument.label"/></g:link>
+		</div>
+		<div class="action-menu-item">
+			<g:link controller="shipment" action="addComment" id="${shipmentInstance.id}">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.addNote.label"/></g:link>													
+		</div>
+		<div class="action-menu-item">
+			<hr/>
+		</div>
 		<div class="action-menu-item">
 			<g:set var="url" value="${createLink(controller:'report',action:'showShippingReport',params:['shipment.id',shipmentInstance?.id]) }"/>
    			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:url,'shipment.id':shipmentInstance?.id]">
