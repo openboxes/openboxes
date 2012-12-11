@@ -639,6 +639,21 @@ class InventoryService implements ApplicationContextAware {
                             }
                             and {
                                 terms.each { term ->
+                                    ilike("upc", "%" + term + "%")
+                                }
+                            }
+							and {
+								terms.each { term ->
+									ilike("ndc", "%" + term + "%")
+								}
+							}
+							and {
+								terms.each { term ->
+									ilike("unitOfMeasure", "%" + term + "%")
+								}
+							}
+                            and {
+                                terms.each { term ->
                                     ilike("productCode", "%" + term + "%")
                                 }
                             }
