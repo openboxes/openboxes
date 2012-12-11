@@ -316,21 +316,22 @@
 															<span class="draggable draghandle" shipmentItem="${shipmentItem?.id }">
 																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out.png')}" class="middle"/>
 																&nbsp;
-																${shipmentItem?.quantity} ${shipmentItem?.product?.unitOfMeasure?:"each"}
+																${shipmentItem?.quantity} 
+																${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
 															</span>													
 														</td>
 														<td class="middle">
 															<div>
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.product?.id]">
-																	<format:product product="${shipmentItem?.product}"/> 
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
+																	<format:product product="${shipmentItem?.inventoryItem?.product}"/> 
 																</g:link>
 															</div>
 														</td>
 														<td class="center middle">
-															${shipmentItem?.lotNumber}
+															${shipmentItem?.inventoryItem?.lotNumber}
 														</td>
 														<td class="center middle">
-															<format:date obj="${shipmentItem?.expirationDate}" format="MMM yyyy"/>
+															<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
 															
 														</td>
 														<td class="left middle">

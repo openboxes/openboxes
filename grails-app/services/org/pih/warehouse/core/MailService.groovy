@@ -15,6 +15,7 @@ import grails.util.GrailsUtil;
 
 import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.commons.mail.EmailAttachment;
+import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail
 import org.apache.commons.mail.HtmlEmail
@@ -29,24 +30,40 @@ class MailService {
 	def prefix = "${config.grails.mail.prefix}" //[OpenBoxes
 	def from = "${config.grails.mail.from}" // openboxes@pih.org
 	def host= "${config.grails.mail.host}" // localhost
-	def bcc = "${config.grails.mail.bcc}" // chamon@pih.org,jmiranda@pih.org
 	def port = Integer.parseInt ("${config.grails.mail.port}") // 23; 	
 	
-	/**
-	 * 
-	 * @return
-	 */
-	def Collection getBccAddresses() { 
-		def bccList = []
-		def bccMap = grailsApplication.config.grails.mail.bcc;
-		if (bccMap) { 
-			bccMap.each { key, value ->
-				bccList << new InternetAddress(value)
-			}
-		}		
-		return bccList;
-	}	
 	
+	def addBccAddresses(email) { 		
+		def bccAddresses = "${grailsApplication.config.grails.mail.bcc}"
+		println "Add BCC addresses to email: " + bccAddresses
+		if (bccAddresses) {
+			bccAddresses.split(",").each {
+				try { 
+					email.addBcc(it)
+				} catch (Exception e) { 
+					println "Error adding BCC address: " + e.message
+				}
+			}
+		}
+	}
+
+	/*
+	def addCcAddresses(email) {
+		def ccAddresses = grailsApplication.config.grails.mail.cc
+		println "Add CC addresses to email: " + ccAddresses
+		if (ccAddresses && ccAddresses.size()) {
+			ccAddresses.each {
+				try { 
+					email.addCc(it)
+				} catch (Exception e) { 
+					println "Error adding CC address: " + e.message
+				}
+			}
+		}
+	}
+	*/
+
+		
 	/**
 	 * 
 	 * @return
@@ -89,6 +106,7 @@ class MailService {
 					email.addTo(it) 
 				}
 				
+				//addBccAddresses(email)
 				email.setFrom(from)
 				email.setSubject("${prefix} " + subject)
 				email.setMsg(msg)		
@@ -149,6 +167,8 @@ class MailService {
 				to.each { 
 					email.addTo(it) 
 				}
+				
+				//addBccAddresses(email)
 				email.setFrom(from)
 				email.setSubject("${prefix} " + subject)		
 				email.setHtmlMsg(body);
@@ -231,7 +251,9 @@ class MailService {
 				toList.each { to -> email.addTo(to) }
 				if (ccList) { 
 					ccList.each { cc -> email.addCc(cc) }
-				}				
+				}			
+								
+				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);
@@ -270,9 +292,7 @@ class MailService {
 			log.info "Sending HTML email '" + subject;
 			try {
 				HtmlEmail email = new HtmlEmail();
-				if (bcc) {
-					bcc.split(",").each { email.addBcc(it) }
-				}
+				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject)
 				// add more information to email
 				email.send();

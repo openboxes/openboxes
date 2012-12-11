@@ -179,22 +179,23 @@
 																<th><warehouse:message code="default.quantity.label"/></th>
 															</tr>
 															<g:set var="previousContainer"/>
-															<g:each var="item" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
-																<g:set var="isSameAsPrevious" value="${item?.container == previousContainer}"/>
+															<g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
+																<g:set var="isSameAsPrevious" value="${shipmentItem?.container == previousContainer}"/>
 																<tr class="${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
 																	<td class="right-border" style="width: 25%">																	
 																		<g:if test="${!isSameAsPrevious }">
-																			${item?.container?.name }
+																			${shipmentItem?.container?.name }
 																		</g:if>
 																	</td>
 																	<td>
-																		<format:product product="${item?.product}"/> <span class="fade">${item?.lotNumber }</span>
+																		<format:product product="${shipmentItem?.inventoryItem?.product}"/> 
+																		<span class="fade">${shipmentItem?.inventoryItem?.lotNumber }</span>
 																	</td>
 																	<td>
-																		${item?.quantity }
+																		${shipmentItem?.quantity }
 																	</td>
 																</tr>
-																<g:set var="previousContainer" value="${item?.container }"/>
+																<g:set var="previousContainer" value="${shipmentItem?.container }"/>
 															</g:each>
 														</table>	
 													</div>

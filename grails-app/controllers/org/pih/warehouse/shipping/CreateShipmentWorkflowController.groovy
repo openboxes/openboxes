@@ -12,6 +12,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.MailService;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.RoleType;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.InventoryItem;
@@ -21,10 +22,11 @@ import org.pih.warehouse.report.ReportService
 
 class CreateShipmentWorkflowController {
 	
-	MailService mailService
-	ReportService reportService
-	ShipmentService shipmentService
-	InventoryService inventoryService
+	def mailService
+	def reportService
+	def shipmentService
+	def inventoryService
+	def userService
 	
     def index = { 
 		log.info "CreateShipmentWorkflowController.index() -> " + params
@@ -381,7 +383,6 @@ class CreateShipmentWorkflowController {
 								if (recipient && recipient.email)
 									emailRecipients.add(recipient)
 							}
-							println "Recipients: " + emailRecipients
 						}
 										
 						try {
@@ -389,6 +390,7 @@ class CreateShipmentWorkflowController {
 							shipmentService.sendShipment(shipmentInstance, command.comments, session.user, session.warehouse,
 															command.actualShippingDate, command.debitStockOnSend);
 							triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
+							
 						}
 						catch (TransactionException e) {
 							command.transaction = e.transaction
@@ -899,37 +901,36 @@ class CreateShipmentWorkflowController {
 	 * @param recipients
 	 */
 	void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
-	   if (!shipmentInstance.hasErrors() && recipients) {
+		if (!recipients) recipients = new HashSet<Person>()
+		
+		// Add all admins to the email
+		def adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
+		adminList.each { adminUser -> 
+			if (adminUser?.email) {
+				log.info("Adding email " + adminUser?.email)
+				recipients.add(adminUser);	
+			}
+		}
+		
+		// add the current user to the list of email recipients
+		if (userInstance) {
+			recipients.add(userInstance)
+		}
 
-		   // add the current user to the list of email recipients
-		   if (userInstance) { 
-			   recipients.add(userInstance)
-		   }
+				
+	   if (!shipmentInstance.hasErrors()) {
 		   
 		   log.info("Create shipment flow " + createShipmentFlow)
-		   log.info("Mailing shipment emails to ${recipients.name}")
 		   def shipmentName = "${shipmentInstance.name}"
 		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
-		   // TODO: change this to create an email from a standard template (ie, an email packing list?)
-		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName])}"
+		   def shipmentDate = "${formatDate(date:shipmentInstance?.actualShippingDate, format: 'MMMMM dd yyyy')}"
+		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName, shipmentDate])}"
 		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance])
-		   def to = recipients?.collect { it?.email }?.unique()
-		   
-		   // Generate PDF based on the packing list report
-		   /*
-		   def url = "${createLink(controller:'report', action: 'showShippingReport', absolute: true)}"
-		   url += ";jsessionid=" + session.getId()
-		   url += "?print=true&orientation=portrait&format=pdf"
-		   url += "&shipment.id=" + shipmentInstance.id
-		   url += "&includeEntities=true"
-		   //def url = "http://localhost:8080/openboxes/report/showShippingReport;jsessionid=D31A0CB3B73EFF4261C53B98F7D7562A?print=true&orientation=portrait&shipment.id=ff80818135f08caa0135f08dc7140001&includeEntities=true"
-		   def baos = new ByteArrayOutputStream();
-		   reportService.generatePdf(url, baos)
-		   */
+		   def toList = recipients?.collect { it?.email }?.unique()
+		   log.info("Mailing shipment emails to ${toList} ")
+		   		  
 		   try {
-			   mailService.sendHtmlMail(subject, body.toString(), to)
-			   //mailService.sendHtmlMailWithAttachment(to, subject, body.toString(), baos.toByteArray(), "packing-list.pdf", "application/pdf")
-
+			   mailService.sendHtmlMail(subject, body.toString(), toList)
 		   } catch (Exception e) {
 			   log.error "Error triggering send shipment emails " + e.message
 		   }

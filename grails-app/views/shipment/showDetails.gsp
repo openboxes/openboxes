@@ -33,7 +33,7 @@
 									<td valign="top" class="name">
 										<label><warehouse:message code="default.status.label" /></label>
 									</td>
-									<td valign="top" id="shipmentStatus">
+									<td valign="top" id="shipmentStatus" class="value">
 										<format:metadata obj="${shipmentInstance?.status.code}"/>
 										<%-- 
 										<span>
@@ -59,7 +59,7 @@
 											<label><warehouse:message code="shipping.departing.label"/></label>
 										</g:else>
 									</td>
-									<td valign="top" >
+									<td valign="top" class="value">
 										<span class="location" id="shipmentOrigin">
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}									
 										</span>
@@ -81,8 +81,8 @@
 											<label><warehouse:message code="shipping.arriving.label" /></label>
 										</g:else>
 									</td>
-									<td>
-										<span  id="shipmentDestination">
+									<td valign="top" class="value">
+										<span id="shipmentDestination">
 											${fieldValue(bean: shipmentInstance, field: "destination.name")}
 										</span>					
 										<%-- 						
@@ -96,7 +96,6 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-
 										<label><warehouse:message
 											code="shipping.totalWeight.label" /></label>
 									</td>
@@ -111,7 +110,7 @@
 											<td valign="top" class="name">
 												<label><warehouse:message code="shipping.totalValue.label" /></label><br/>
 											</td>
-											<td valign="top" >
+											<td valign="top" class="value">
 												<g:if test="${shipmentInstance.totalValue}">
 													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
 												</g:if>
@@ -127,7 +126,7 @@
 											<td valign="top" class="name">
 												<label><warehouse:message code="shipping.statedValue.label" /></label><br/>
 											</td>
-											<td valign="top">
+											<td valign="top" class="value">
 												<g:if test="${shipmentInstance.statedValue}">
 													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
 												</g:if>
@@ -145,7 +144,7 @@
 									<td valign="top" class="name">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="comments" style="vertical-align: middle"/>
 										<label><warehouse:message code="shipping.traveler.label" /></label></td>
-									<td valign="top" >
+									<td valign="top" class="value">
 										<g:if test="${shipmentInstance?.carrier}">
 											${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
 											${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
@@ -161,7 +160,7 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comments" style="vertical-align: middle"/>
 										<label><warehouse:message code="default.comments.label" /></label><br/>
 									</td>
-									<td valign="top" class="">
+									<td valign="top" class="value">
 										<g:if test="${shipmentInstance.additionalInformation}">
 											${shipmentInstance.additionalInformation}<br/>
 										</g:if>
@@ -179,7 +178,7 @@
 									<td valign="top" class="name">
 										<label><warehouse:message code="shipping.templates.label" /></label><br/>
 									</td>
-									<td valign="top" class="">
+									<td valign="top" class="value">
 											<a href="${createLink(controller: "shipment", action: "generateDocuments", id: shipmentInstance.id)}">
 											<button><warehouse:message code="shipping.generateDocuments.label" args="[format.metadata(obj:shipmentWorkflow.shipmentType)]"/></button></a>
 									</td>
@@ -425,23 +424,23 @@
 												<tbody>
 													<tr>
 																															
-														<th><warehouse:message code="comment.sender.label"/></th>
+														<th><warehouse:message code="default.date.label"/></th>
 														<th colspan="2"><warehouse:message code="comment.label"/></th>
 														
 													</tr>
 													<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 														<tr class="${(i % 2) == 0 ? 'odd' : 'even'} newContainer" >
 															<td width="25%" class="container">
-																
-																${comment?.sender?.name} wrote:
-																
+																<label>
+																	<g:formatDate date="${comment?.dateCreated}" format="MMM dd yyyy hh:MMa"/> 
+																</label>
 															</td>
 															<td>
-																<p>
+																${comment?.sender?.name} wrote:
+																<blockquote>
 																${comment?.comment}
-																</p>
+																</blockquote>
 																<br/>																
-																<format:datetime obj="${comment?.dateCreated}"/> 
 															</td>
 															<td>
 																<g:link class="remove" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteNote.message')}')">
@@ -538,8 +537,8 @@
 														</g:if>												
 																											
 														<td class="product">
-															<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.product?.id}">
-																<format:product product="${shipmentItem?.product}"/>
+															<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
+																<format:product product="${shipmentItem?.inventoryItem?.product}"/>
 															</g:link>
 														</td>
 														<td class="center lotNumber">
@@ -550,6 +549,8 @@
 														</td>
 														<td class="center quantity">
 															<g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
+															${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+															
 														</td>
 														<g:if test="${shipmentInstance?.wasReceived()}">
 															<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
@@ -562,8 +563,9 @@
 															</td>
 															--%>
 														</g:if>														
-														<td class="center">
+														<td class="left">
 															${shipmentItem?.recipient?.name}
+															<span class="fade">${shipmentItem?.recipient?.email}</span>
 														</td>
 														<td class="left" >
 															${shipmentItem?.receiptItem?.comment}
