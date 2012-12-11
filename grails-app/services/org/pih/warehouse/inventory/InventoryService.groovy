@@ -1468,7 +1468,7 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryItem
      * @param inventory
      */
-    List getTransactionEntriesByInventoryItemAndInventory(Inventory inventory, InventoryItem inventoryItem) {
+    List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem inventoryItem) {
         return TransactionEntry.createCriteria().list() {
             and {
                 eq("inventoryItem", inventoryItem)
