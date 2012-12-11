@@ -178,8 +178,8 @@
 		
 		<script>
 			$(document).ready(function() {
-				$('.tableScroll').tableScroll({height: 400, width: '99%'});
-				
+				//$('.tableScroll').tableScroll({height: 400, width: '99%'});
+
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();
 				});
