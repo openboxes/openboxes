@@ -646,10 +646,11 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
             }
-        }.collect { it.product }.unique { it.id }.sort { it.category }
+        }.collect { it.product }.unique { it.id }
 
         return Product.createCriteria().list(max: maxResult, offset: offset) {
             inList("id", (products.collect { it.id })?: [""])
+            order("category")
         }
 	}
 	
