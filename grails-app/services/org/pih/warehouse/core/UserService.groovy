@@ -10,6 +10,8 @@
 package org.pih.warehouse.core
 
 import groovy.sql.Sql;
+import org.pih.warehouse.auth.AuthService
+
 
 class UserService {
 
@@ -23,44 +25,24 @@ class UserService {
   Boolean isUserAdmin(User u){
     def user = User.get(u.id)
     def roles = [RoleType.ROLE_ADMIN]
-		return user.roles.any { roles.contains(it.roleType)}
+		return  effectRoles(user).any { roles.contains(it.roleType)}
   }
   Boolean isUserManager(User u){
     def user = User.get(u.id)
     def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
-		return user.roles.any { roles.contains(it.roleType)}
+		return effectRoles(user).any { roles.contains(it.roleType)}
   }
   Boolean canUserBrowse(User u){
     def user = User.get(u.id)
     def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER]
-		return user.roles.any { roles.contains(it.roleType)}
+		return effectRoles(user).any { roles.contains(it.roleType)}
   }
 	
 	Boolean isUserInRole(String userId, Collection roles) { 
-		User userInstance = getUser(userId)
-		return userInstance?.roles.any { roles.contains(it.roleType) }
+		User user = getUser(userId)
+		return effectRoles(user).any { roles.contains(it.roleType) }
 	}
 	
-	
-	boolean isUserInAdminRole(User u) {
-		def user = User.get(u.id)
-		return user.roles.any { it.roleType == RoleType.ROLE_ADMIN }
-	}
-	
-	boolean isUserInBrowserRole(User u) {
-		def user = User.get(u.id)
-		return user.roles.any { it.roleType == RoleType.ROLE_BROWSER }
-	}
-	
-	boolean isUserInManagerRole(User u) {
-		def user = User.get(u.id)
-		return user.roles.any { it.roleType == RoleType.ROLE_MANAGER }
-	}
-	
-	
-	def findUsers(String term) { 
-		
-	}
 	
 	def findPersons(String terms, Map params) { 		
 		def criteria = Person.createCriteria()
@@ -109,6 +91,18 @@ class UserService {
 		}
 		return users;		
 	}
+
+  private def rolesForCurrentLocation(user){
+    def currentLocation = AuthService.currentLocation?.get()
+    if(!currentLocation) return []
+    user?.locationRoles?.findAll{it.location == currentLocation}?.collect{it.role} ?: []
+  }
+
+  private def effectRoles(user){
+    def defaultRoles = user?.roles?.collect{it} ?: []
+    defaultRoles.addAll(rolesForCurrentLocation(user))   
+    defaultRoles
+  }
 	
 
 }

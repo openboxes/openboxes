@@ -23,7 +23,7 @@ class RoleFilters {
     def filters = {
         readonlyCheck(controller:'*', action:'*') {
             before = { 
-                if(SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)) return true
+                if(SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)  || actionName == "chooseLocation") return true
                 if(!userService.canUserBrowse(session.user)){
                   response.sendError(401)
                   return false

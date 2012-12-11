@@ -252,20 +252,16 @@ class UserController {
     }
 
    private void updateRoles(user, locationRolePairs){
-     println("start to update roles:${locationRolePairs}")
      def newAndUpdatedRoles = locationRolePairs.keySet().collect{ locationId ->
-       println("roll id: '${locationRolePairs[locationId]}'")
        if(locationRolePairs[locationId]){
          def location = Location.get(locationId)
          def role = Role.get(locationRolePairs[locationId])
          def existingRole = user.locationRoles.find{it.location == location}
          if(existingRole){
             existingRole.role = role
-            println("**** location role updated")
          }else{
            def newLocationRole = new LocationRole(user: user, location:location, role: role)
            user.addToLocationRoles(newLocationRole)
-           println("**** location role added")
          }
        }
      }
@@ -274,9 +270,7 @@ class UserController {
      }
      rolesToRemove.each{ 
        user.removeFromLocationRoles(it)       
-       println("old role removed")
      }
-     //user.save(flush: true)
    }
 
     
