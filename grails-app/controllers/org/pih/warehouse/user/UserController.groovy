@@ -364,7 +364,12 @@ class UserController {
 		def userInstance = User.get(params.id);
 		if (userInstance) {
 			byte[] bytes = userInstance.photo
-			resize(bytes, response.outputStream, width, height)
+			try { 
+				resize(bytes, response.outputStream, width, height)
+			} catch (Exception e) { 
+				//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
+				response.outputStream << bytes
+			}
 		}
 		else { 
 			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
@@ -478,12 +483,18 @@ class UserController {
 		}
 	}
 		
+	static scale = { 
+		BufferedImage thumbnail = Scalr.resize(image, 150);
+	}
+	
 	static resize = { bytes, out, maxW, maxH ->
 		AWTImage ai = new ImageIcon(bytes).image
 		int width = ai.getWidth( null )
 		int height = ai.getHeight( null )
 	
-		def limits = 300..2000
+		println ("Resize ${width} x ${height} image to ${maxW} x ${maxH}")
+		
+		def limits = 0..2000
 		assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
 	
 		float aspectRatio = width / height 
@@ -501,7 +512,9 @@ class UserController {
 	
 		BufferedImage bi = new BufferedImage(dstW, dstH,   BufferedImage.TYPE_INT_RGB)
 		Graphics2D g2d = bi.createGraphics() 
+		//g2d.setComposite(AlphaComposite.Src);
 		g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
+		g2d.dispose();
 	
 		IIO.write( bi, 'JPEG', out )
 	}
