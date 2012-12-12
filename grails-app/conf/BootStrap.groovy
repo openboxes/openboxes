@@ -19,6 +19,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.ShipmentItem
@@ -107,7 +108,7 @@ class BootStrap {
 
         log.info("Setup test fixture...")
 
-
+        createSupplierLocation()
         def medicines = Category.findByName("Medicines")
         def suppliers = Category.findByName("Supplies")
 
@@ -148,6 +149,14 @@ class BootStrap {
       }
        createTestFixtureIfNotExist(data)
        log.info("load test data created.")
+    }
+
+    def createSupplierLocation(){
+      def name = "Test Supplier"
+      if(Location.findByName(name)) return
+      def locationType = LocationType.get("4")
+      def supplierLocation = new Location(name: name, locationType: locationType)
+      supplierLocation.save(flush:true, failOnError: true)
     }
 
     def deleteTestFixture(List<Map<String, Object>> testData) {

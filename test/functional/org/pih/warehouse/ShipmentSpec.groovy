@@ -140,7 +140,7 @@ class ShipmentSpec extends GebReportingSpec{
             shipmentOrigin == "Boston Headquarters"
             shipmentDestination == "Miami Warehouse"
             product == product_name
-            quantity == "200"
+            quantity == "200 each"
     }
 
     def "view pending shipments"(){

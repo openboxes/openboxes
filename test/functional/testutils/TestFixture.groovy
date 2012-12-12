@@ -32,17 +32,14 @@ class TestFixture{
     static String currentUser = null
 
 
-    static def bostonManagerLogined(){
-      currentUser = "BostonManager"
-    }
 
-    static def UserLoginedAsManagerForBoston(){
-        if(currentUser == "BostonManager") return
+    static def UserLoginedAsManagerForBoston(){//actual login as admin
+        if(currentUser == "admin") return
 
         Browser.drive {
         to LoginPage
         loginForm.with{
-            username = "manager"
+            username = "admin"
             password = "password"
         }
         submitButton.click()
@@ -51,25 +48,14 @@ class TestFixture{
 
         boston.click()
 
-        currentUser = "BostonManager"
+        currentUser = "admin"
 
         }
     }
 
     static String TestSupplierName = "Test Supplier"
-    static Location CreateSupplierIfRequired() {
-        def loc = Location.findByName(TestSupplierName)
-        if(loc) return loc
-
-
-        Browser.drive {
-            to CreateLocationPage
-            locationName.value(TestSupplierName)
-            locationType.value("4") //supplier
-            supportActivities.value("")
-            saveButton.click()
-        }
-        return Location.findByName(TestSupplierName)
+    static Location GetSupplierLocation() {
+        Location.findByName(TestSupplierName)
     }
 
     static void CreateProductInInventory(productName, quantity, expirationDate = new Date().plus(30)) {
