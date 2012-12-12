@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-class LocationRole{
+class LocationRole implements Serializable{
   String id
   Location location
   Role role
