@@ -110,7 +110,8 @@
 	                                  <label for="roles"><warehouse:message code="user.roles.label" /></label>
 	                                </td>
                                   <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
-	                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}" optionKey="id" value="${userInstance?.roles}" noSelection="['null':'']" multiple="true"/>
+                                     <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
+	                                   <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}" optionKey="id" value="${userInstance?.roles}" noSelection="${['null': noAccessLabel]}" multiple="true"/>
 	                                </td>
 	                            </tr>
                               <tr class="prop" id="locationRoles">
@@ -128,10 +129,11 @@
                                           <tr>
                                             <td>${location.name}</td>
                                             <td> 
+                                               <g:set var="defaultLabel" value="${warehouse.message(code: 'default.label')}" />
                                                <g:select name="locationRolePairs.${location.id}" 
                                                   value="${locationRolePairs[location.id]}"
                                                   from="${adminAndBrowser}" 
-                                               optionKey="id" noSelection="['':'']"/>
+                                               optionKey="id" noSelection="${['':defaultLabel]}"/>
                                            </td>
                                         </tr>
                                         </g:each>

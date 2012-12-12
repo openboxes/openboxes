@@ -66,10 +66,10 @@
 							<td valign="top" class="value">
 								<g:if test="${userInstance?.roles}">
 									${fieldValue(bean: userInstance, field: "roles")}
-								</g:if> 
+								</g:if>
 								<g:else>
 									<span class="fade">
-										<warehouse:message code="default.none.label" />
+										<warehouse:message code="no.access.label" />
 									</span>
 								</g:else>
 							</td>
