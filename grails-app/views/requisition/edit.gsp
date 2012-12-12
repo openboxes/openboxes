@@ -102,9 +102,9 @@
                 ${warehouse.message(code: 'requisitionItem.quantity.label')}
             </th>
             <g:if test="${requisition.isDepotRequisition()}">
-            <th class="center">
-                ${warehouse.message(code: 'requisitionItem.substitutable.label')}?
-            </th>
+            %{--<th class="center">--}%
+                %{--${warehouse.message(code: 'requisitionItem.substitutable.label')}?--}%
+            %{--</th>--}%
             <th class="list-header">
                 ${warehouse.message(code: 'requisitionItem.recipient.label')}
             </th>
@@ -131,9 +131,9 @@
             data-bind="value: quantity"/>
           </td>
           <g:if test="${requisition.isDepotRequisition()}">
-          <td  class="center">
-            <input type="checkbox" data-bind="checked: substitutable, uniqueName: true">
-          </td>
+          %{--<td  class="center">--}%
+            %{--<input type="checkbox" data-bind="checked: substitutable, uniqueName: true">--}%
+          %{--</td>--}%
           <td  class="list-header">
             <input type="text" data-bind="value: recipient, uniqueName: true"/>
           </td>

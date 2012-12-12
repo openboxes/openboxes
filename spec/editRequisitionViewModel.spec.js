@@ -11,10 +11,12 @@ describe("requisition view model", function(){
     var requestedDeliveryDate = "11/13/2012";
     var requestedById = "23";
     var recipientProgram = "test";
-    var requisitionItem1 = {productId:"prod1", quantity:300, version:1, 
-    comment:"my comment1", substitutable:true, recipient: "peter",orderIndex: 2};
-    var requisitionItem2 = {productId:"prod2", quantity:400, version:2,
-    comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1};
+    var requisitionItem1 = {productId:"prod1", quantity:300, version:1, comment:"my comment1",
+        //substitutable:true,
+        recipient: "peter",orderIndex: 2};
+    var requisitionItem2 = {productId:"prod2", quantity:400, version:2, comment:"my comment2",
+        //substitutable:false,
+        recipient: "tim",orderIndex: 1};
 
     var requisition = {
       originId: originId,
@@ -46,8 +48,8 @@ describe("requisition view model", function(){
     expect(jsonSent.requisitionItems[1].quantity).toEqual(400);
     expect(jsonSent.requisitionItems[0].recipient).toEqual('peter');
     expect(jsonSent.requisitionItems[1].recipient).toEqual('tim');
-    expect(jsonSent.requisitionItems[0].substitutable).toBe(true);
-    expect(jsonSent.requisitionItems[1].substitutable).toBe(false);
+    //expect(jsonSent.requisitionItems[0].substitutable).toBe(true);
+    //expect(jsonSent.requisitionItems[1].substitutable).toBe(false);
     expect(jsonSent.requisitionItems[0].comment).toEqual("my comment1");
     expect(jsonSent.requisitionItems[1].comment).toEqual("my comment2");
     expect(jsonSent.requisitionItems[0].version).not.toBeDefined();
