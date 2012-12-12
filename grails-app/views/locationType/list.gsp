@@ -22,7 +22,7 @@
 		<div class="list">
 
 			<div>
-				<span class="linkButton"> <g:link class="new" action="create">
+				<span class="linkButton"> <g:link class="new" action="create" controller="locationType">
 						<warehouse:message code="default.add.label"
 							args="[warehouse.message(code: 'locationType.label')]" />
 					</g:link>

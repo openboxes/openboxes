@@ -19,22 +19,32 @@ class RoleFilters {
   def dependsOn = [SecurityFilters]
     def static changeActions = ['edit', 'delete', 'create', 'add', 'process','save',
     'update','importData', 'receive','showRecordInventory','withdraw', 'cancel', 'change','toggle']
-    def static changeControllers = ['createProductFromTemplate', 'createProduct']
+    def static changeControllers = ['createProductFromTemplate']
+    def static adminControllers=['createProduct', 'createProductFromTemplate', 'admin']
+    def static adminActions = ['product':['create'], 'person': ['list'], 'user':['list'], 'location':['edit'], 'shipper':['create'], 'locationGroup':['create'],'locationType':['create']]
     def filters = {
         readonlyCheck(controller:'*', action:'*') {
             before = { 
                 if(SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)  || actionName == "chooseLocation") return true
-                if(!userService.canUserBrowse(session.user)){
-                  response.sendError(401)
+                def missBrowser = !userService.canUserBrowse(session.user) 
+                def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
+                def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
+                if(missBrowser || missManager || missAdmin){
+                   response.sendError(401)
                   return false
                 }
-                def willChange = changeActions.any{ actionName.startsWith(it)} || controllerName.contains("Workflow") || changeControllers.contains(controllerName)
-                if(willChange && !userService.isUserManager(session.user)){
-                  response.sendError(401)
-                  return false
-                 }
                 return true
             }
         }
     }
-}
+
+    def static Boolean needAdmin(controllerName, actionName){
+       adminControllers.contains(controllerName) || adminActions[controllerName]?.contains(actionName)
+    }
+
+     def static Boolean needManager(controllerName, actionName){
+       changeActions.any{ actionName.startsWith(it)} || controllerName.contains("Workflow") || changeControllers.contains(controllerName)
+    }
+
+
+   }

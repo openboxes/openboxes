@@ -20,10 +20,11 @@
 	            	<span class="linkButton">
 	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
 	            	</span>
-	            	<span class="linkButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
-	            	</span>
-	            	
+                <g:isUserAdmin>
+                  <span class="linkButton">
+                    <g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+                  </span>
+	              </g:isUserAdmin>	
             	</div>
             	
 	            <div class="dialog box">

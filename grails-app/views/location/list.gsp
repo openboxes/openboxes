@@ -38,9 +38,11 @@
 	            	<span class="linkButton">
 	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
 	            	</span>
-	            	<span class="linkButton">
-	            		<g:link class="new" action="edit"><warehouse:message code="default.add.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
-	            	</span>	            	
+                <g:isUserAdmin>
+                  <span class="linkButton">
+                    <g:link class="new" action="edit"><warehouse:message code="default.add.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
+                  </span>	
+                </g:isUserAdmin>
 	           	</div>
 	           	
 	            <div class="dialog box">
