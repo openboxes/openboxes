@@ -13,4 +13,12 @@ class LocationPage extends  Page{
         miami(wait:true, to: DashboardPage) { $("#warehouse-2-link")}
         tabarre(wait:true, to: DashboardPage) { $("#warehouse-3-link")}
     }
+    def chooseLocation(String location){
+      if(location == "boston")
+        boston.click()
+      else if(location == "miami")
+        miami.click()
+      else if(location == "tabarre")
+        tabarre.click()      
+    }
 }

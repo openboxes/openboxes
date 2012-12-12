@@ -30,28 +30,34 @@ class TestFixture{
     final  static  String PrintPaperA4 = "Print Paper A4"  //no expiration date
 
     static String currentUser = null
+    static String currentLocation = null
 
 
 
-    static def UserLoginedAsManagerForBoston(){//actual login as admin
-        if(currentUser == "admin") return
+    static def UserLoginedAsManagerForBoston(){
+        UserLoginedAsManagerForLocation("boston")
+    }
 
+    static def UserLoginedAsManagerForMiami(){
+      UserLoginedAsManagerForLocation("miami")
+    }
+
+     static def UserLoginedAsManagerForLocation(String location){
+       if(currentUser == "admin" && currentLocation == location) return
         Browser.drive {
-        to LoginPage
-        loginForm.with{
-            username = "admin"
-            password = "password"
-        }
-        submitButton.click()
-
-        at LocationPage
-
-        boston.click()
-
-        currentUser = "admin"
-
+          to LoginPage
+          loginForm.with{
+              username = "admin"
+              password = "password"
+          }
+          submitButton.click()
+          at LocationPage
+          chooseLocation(location)
+          currentUser = "admin"
+          currentLocation = location
         }
     }
+
 
     static String TestSupplierName = "Test Supplier"
     static Location GetSupplierLocation() {
