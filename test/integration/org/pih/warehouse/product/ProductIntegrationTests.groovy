@@ -1,4 +1,7 @@
 package org.pih.warehouse.product
+import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.*
+import testutils.DbHelper
 
 class ProductIntegrationTests extends GroovyTestCase{
     void testSaveProductProductGroup(){
@@ -32,5 +35,24 @@ class ProductIntegrationTests extends GroovyTestCase{
         def product = Product.findByName("MacBook Pro 8G")
         def groups = product.productGroups
         assert groups.any{g -> g.description == "Laptop"}
+    }
+
+    void testLatestTransactionDate(){
+      def product = DbHelper.creatProductIfNotExist("TestProductABC") 
+      Location boston =  Location.findByName("Boston Headquarters")
+      Location miami =  Location.findByName("Miami Warehouse");
+      def tenDaysAgo = new Date().minus(10)
+      def fiveDaysAgo = new Date().minus(5)
+      def sevenDaysAgo = new Date().minus(7)
+      DbHelper.recordInventory(product, boston, "tets1234234", new Date().plus(100), 300, tenDaysAgo)
+      DbHelper.recordInventory(product, boston, "tets1234234", new Date().plus(100), 300, sevenDaysAgo)
+      DbHelper.recordInventory(product, miami, "tets12323412", new Date().plus(100), 300, fiveDaysAgo)
+ 
+
+      def dateForBoston = product.latestTransactionDate(boston.id)
+      def dateForMiami = product.latestTransactionDate(miami.id)
+      assert dateForBoston.format("MM/dd/yyyy") == sevenDaysAgo.format("MM/dd/yyyy")
+      assert dateForMiami.format("MM/dd/yyyy") == fiveDaysAgo.format("MM/dd/yyyy")
+
     }
 }

@@ -15,13 +15,9 @@ import java.util.Collection;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.core.UnitOfMeasure;
-import org.pih.warehouse.core.User;
+import org.pih.warehouse.core.*;
 import org.pih.warehouse.product.Category;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.TransactionEntry;
+import org.pih.warehouse.inventory.*;
 import org.pih.warehouse.shipping.ShipmentItem;
 
 /**
@@ -165,6 +161,12 @@ class Product implements Comparable, Serializable {
 		}
 		
 	}
+
+  Date latestTransactionDate(def locationId){
+    def inventory = Location.get(locationId).inventory 
+    def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory", [product: this, inventory: inventory]).first()
+    return date
+  }
 	
 	
 	/**

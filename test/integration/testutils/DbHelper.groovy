@@ -2,11 +2,9 @@ package testutils
 
 import grails.validation.ValidationException;
 
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.*
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.*
+import org.pih.warehouse.core.*
 
 
 class DbHelper {
@@ -74,5 +72,17 @@ class DbHelper {
         item.expirationDate =  expirationDate
         item.save(flush:true)
         item
+    }
+
+    static recordInventory(Product product, Location location, String lotNumber, Date expirationDate, int quantity, Date transactionDate){
+      def transactionType =  TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+
+      def transaction = new Transaction(inventory: location.inventory, transactionType: transactionType, createdBy: User.get(2), transactionDate: transactionDate)
+      TransactionEntry transactionEntry = new TransactionEntry()
+      transactionEntry.quantity = quantity
+		  transactionEntry.inventoryItem = createInventoryItem(product, lotNumber, expirationDate)
+      transaction.addToTransactionEntries(transactionEntry)
+      transaction.save(failOnError:true, flush:true)
+
     }
 }
