@@ -56,7 +56,13 @@
 				</td>
 				<td>
 					<span class="value">
-            ${prettyDateFormat(date: productInstance?.latestInventoryDate(session.warehouse.id))}
+            <g:set var="latestInventoryDate" value="${productInstance?.latestInventoryDate(session.warehouse.id)}"/>
+            <g:if test="${latestInventoryDate}">
+              ${prettyDateFormat(date: latestInventoryDate)}
+            </g:if>
+            <g:else>
+              <warehouse:message code="default.never.label"/>
+            </g:else>
             </span>
 				</td>
 			</tr>	

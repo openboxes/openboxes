@@ -74,7 +74,7 @@ class DbHelper {
         item
     }
 
-    static recordInventory(Product product, Location location, String lotNumber, Date expirationDate, int quantity, Date transactionDate){
+    static recordProductInventory(Product product, Location location, String lotNumber, Date expirationDate, int quantity, Date transactionDate){
       def transactionType =  TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
       def transaction = new Transaction(inventory: location.inventory, transactionType: transactionType, createdBy: User.get(2), transactionDate: transactionDate)
@@ -85,6 +85,19 @@ class DbHelper {
       transaction.save(failOnError:true, flush:true)
 
     }
+    static recordInventory(Product product, Location location, String lotNumber, Date expirationDate, int quantity, Date transactionDate){
+      def transactionType =  TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+
+      def transaction = new Transaction(inventory: location.inventory, transactionType: transactionType, createdBy: User.get(2), transactionDate: transactionDate)
+      TransactionEntry transactionEntry = new TransactionEntry()
+      transactionEntry.quantity = quantity
+		  transactionEntry.inventoryItem = createInventoryItem(product, lotNumber, expirationDate)
+      transaction.addToTransactionEntries(transactionEntry)
+      transaction.save(failOnError:true, flush:true)
+
+    }
+
+    
     
     static transferStock(Product product, Location fromLocation, String lotNumber, int quantity, Date transactionDate, Location toLocation){
       def transactionType =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
