@@ -85,4 +85,20 @@ class DbHelper {
       transaction.save(failOnError:true, flush:true)
 
     }
+    
+    static transferStock(Product product, Location fromLocation, String lotNumber, int quantity, Date transactionDate, Location toLocation){
+      def transactionType =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+
+      def transaction = new Transaction(inventory: fromLocation.inventory, transactionType: transactionType, createdBy: User.get(2), transactionDate: transactionDate, destination: toLocation)
+      TransactionEntry transactionEntry = new TransactionEntry()
+      transactionEntry.quantity = quantity
+		  transactionEntry.inventoryItem = getInventoryItem(product, lotNumber)
+      transaction.addToTransactionEntries(transactionEntry)
+      transaction.save(failOnError:true, flush:true)
+
+    }
+
+    static getInventoryItem(Product product, String lotNumber){
+      return InventoryItem.findByProductAndLotNumber(product, lotNumber)
+    }
 }

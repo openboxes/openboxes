@@ -162,9 +162,9 @@ class Product implements Comparable, Serializable {
 		
 	}
 
-  Date latestTransactionDate(def locationId){
+  Date latestInventoryDate(def locationId){
     def inventory = Location.get(locationId).inventory 
-    def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory", [product: this, inventory: inventory]).first()
+    def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes:[TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]]).first()
     return date
   }
 	

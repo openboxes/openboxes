@@ -50,6 +50,16 @@
 						<b>${g.formatNumber(number: totalQuantity, format: '###,###,###') }</b></span>
 				</td>
 			</tr>	
+			<tr class="even">	
+				<td class="label left">
+					<span class="name"><warehouse:message code="product.latestInventoryDate.label"/></span>
+				</td>
+				<td>
+					<span class="value">
+            ${prettyDateFormat(date: productInstance?.latestInventoryDate(session.warehouse.id))}
+            </span>
+				</td>
+			</tr>	
 		</tbody>		
 	</table>
 	<br/>

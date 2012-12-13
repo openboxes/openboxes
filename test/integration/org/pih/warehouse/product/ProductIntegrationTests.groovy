@@ -37,20 +37,21 @@ class ProductIntegrationTests extends GroovyTestCase{
         assert groups.any{g -> g.description == "Laptop"}
     }
 
-    void testLatestTransactionDate(){
+    void testLatestInventoryDate(){
       def product = DbHelper.creatProductIfNotExist("TestProductABC") 
       Location boston =  Location.findByName("Boston Headquarters")
       Location miami =  Location.findByName("Miami Warehouse");
       def tenDaysAgo = new Date().minus(10)
       def fiveDaysAgo = new Date().minus(5)
+      def threeDaysAgo = new Date().minus(3)
       def sevenDaysAgo = new Date().minus(7)
       DbHelper.recordInventory(product, boston, "tets1234234", new Date().plus(100), 300, tenDaysAgo)
       DbHelper.recordInventory(product, boston, "tets1234234", new Date().plus(100), 300, sevenDaysAgo)
       DbHelper.recordInventory(product, miami, "tets12323412", new Date().plus(100), 300, fiveDaysAgo)
- 
+      DbHelper.transferStock(product, boston, "tets1234234", 999, threeDaysAgo, miami)
 
-      def dateForBoston = product.latestTransactionDate(boston.id)
-      def dateForMiami = product.latestTransactionDate(miami.id)
+      def dateForBoston = product.latestInventoryDate(boston.id)
+      def dateForMiami = product.latestInventoryDate(miami.id)
       assert dateForBoston.format("MM/dd/yyyy") == sevenDaysAgo.format("MM/dd/yyyy")
       assert dateForMiami.format("MM/dd/yyyy") == fiveDaysAgo.format("MM/dd/yyyy")
 
