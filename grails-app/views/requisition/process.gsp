@@ -36,7 +36,7 @@
                     
                     <div class="status right">
                       <div data-bind="css:status" class="requisition-status right"></div>
-                      <div data-bind="css: { ok: substitutable() }" class="substitution right"></div>
+                      %{--<div data-bind="css: { ok: substitutable() }" class="substitution right"></div>--}%
                     </div>
                     <div class="clear"></div>
                   </div>
