@@ -12,6 +12,7 @@ import org.pih.warehouse.pages.ProductPage
 import org.pih.warehouse.pages.SendShipmentPage
 import org.pih.warehouse.pages.ViewShipmentPage
 import org.pih.warehouse.pages.CreateLocationPage
+import org.pih.warehouse.pages.ShowStockCardPage
 import org.pih.warehouse.product.Product
 
 
@@ -64,7 +65,8 @@ class TestFixture{
         Location.findByName(TestSupplierName)
     }
 
-    static void CreateProductInInventory(productName, quantity, expirationDate = new Date().plus(30)) {
+    static String CreateProductInInventory(productName, quantity, expirationDate = new Date().plus(30)) {
+        def id
         Browser.drive {
             to ProductPage
 
@@ -83,13 +85,18 @@ class TestFixture{
             expires.click()
             datePicker.pickDate(expirationDate)
             newQuantity.click()
-            newQuantity.value(7963)
+            newQuantity.value(quantity)
 
             saveInventoryItem.click()
 
+            at ShowStockCardPage
+            assert productId 
+            id = productId
         }
+        return id
     }
 
+  
     static void CreatePendingShipment(product_name, shipment_name, quantity) {
         Browser.drive {
             to CreateEnterShipmentDetailsPage
@@ -144,6 +151,14 @@ class TestFixture{
             assert shipmentName == shipment_name && status == "Shipped"
         }
     }
+
+    static void verifyInventoryQuantityForProduct(productId, quantity){
+      Browser.drive{
+            go "${ShowStockCardPage.url}/${productId}"
+            assert $("span#totalQuantity").text().trim().replaceAll(',','') == "${quantity}"
+      }
+    }
+
 
 
 

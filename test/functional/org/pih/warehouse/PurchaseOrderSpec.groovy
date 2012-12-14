@@ -7,17 +7,19 @@ import org.pih.warehouse.pages.EnterOrderDetailsPage
 import org.pih.warehouse.pages.ReceiveEnterShipmentDetailsPage
 import org.pih.warehouse.pages.ReceiveOrderConfirmPage
 import org.pih.warehouse.pages.ReceiveOrderItemsPage
+import org.pih.warehouse.pages.ShowStockCardPage
 import testutils.TestFixture
 
 
 class PurchaseOrderSpec extends GebReportingSpec {
     def "should create a new purchase order and add items then receive the order and verify its status has changed"(){
         def productName =  "TestProd" + UUID.randomUUID().toString()[0..5]
+        def productId
         def orderDescription = "TestOrder" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             def location = TestFixture.GetSupplierLocation()
-            TestFixture.CreateProductInInventory(productName, 50)
+            productId = TestFixture.CreateProductInInventory(productName, 50)
         and:
             to EnterOrderDetailsPage
         when:
@@ -39,6 +41,7 @@ class PurchaseOrderSpec extends GebReportingSpec {
             nextButton.click()
         then:
             at OrderSummaryPage
+            report "order created"
         and:
             placeOrderButton.click()
         then:
@@ -54,9 +57,9 @@ class PurchaseOrderSpec extends GebReportingSpec {
             at ReceiveEnterShipmentDetailsPage
             shipmentType.value("2") //Sea shipment
             shippedOnDate.click()
-            datePicker.pickDate(new Date().minus(1))
+            datePicker.pickDate(new Date())
             deliveredOnDate.click()
-            datePicker.pickDate(new Date().minus(1))
+            datePicker.pickDate(new Date())
             receiveOrderNextButton.click()
         and:
             at ReceiveOrderItemsPage
@@ -79,9 +82,9 @@ class PurchaseOrderSpec extends GebReportingSpec {
             at ReceiveEnterShipmentDetailsPage
             shipmentType.value("2") //Sea shipment
             shippedOnDate.click()
-            datePicker.pickDate(new Date().minus(1))
+            datePicker.pickDate(new Date())
             deliveredOnDate.click()
-            datePicker.pickDate(new Date().minus(1))
+            datePicker.pickDate(new Date())
             receiveOrderNextButton.click()
         and:
             at ReceiveOrderItemsPage
@@ -97,8 +100,8 @@ class PurchaseOrderSpec extends GebReportingSpec {
             description == orderDescription
             productInfirstItem == productName
             quantityInfirstItem == "10"
-
-
+        and:
+            TestFixture.verifyInventoryQuantityForProduct(productId, 60)           
     }
 
 }

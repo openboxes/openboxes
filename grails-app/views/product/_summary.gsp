@@ -1,4 +1,4 @@
-<div >
+<div id="product-summary" productid="${productInstance?.id}">
 	<table style="width: 0%" id="product-summary">
 		<tbody>
 			<tr>						

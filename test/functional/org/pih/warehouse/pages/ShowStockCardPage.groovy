@@ -14,6 +14,6 @@ class ShowStockCardPage extends  Page{
         recordInventoryButton (wait:true, to: InventoryPage) { $("a[name='recordInventoryLink']") }
         totalQuantity{$("span#totalQuantity").text().trim()}
         stockProductName { $("div.title").text().trim() }
-    }
-
+        productId{$("div#product-summary").@productid}
+    }   
 }
