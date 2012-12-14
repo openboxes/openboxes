@@ -270,26 +270,24 @@ class InventoryService implements ApplicationContextAware {
         }
         println "before getProductGroups: " + new Date().time
 
-        if(!commandInstance?.searchTerms) {
-            def productGroups = getProductGroups(commandInstance);
-            productGroups.each { productGroup ->
-                def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
-                inventoryItemCommand.inventoryItems = new ArrayList();
-                productGroup.products.each { product ->
-                    inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
-                    inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
-                    inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
-                    inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
-                            quantityOnHandMap[product] ?: 0,
-                            quantityIncomingMap[product] ?: 0,
-                            quantityOutgoingMap[product] ?: 0,
-                            commandInstance.showOutOfStockProducts)
+        def productGroups = getProductGroups(commandInstance);
+        productGroups.each { productGroup ->
+            def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
+            inventoryItemCommand.inventoryItems = new ArrayList();
+            productGroup.products.each { product ->
+                inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
+                inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
+                inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
+                inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
+                        quantityOnHandMap[product] ?: 0,
+                        quantityIncomingMap[product] ?: 0,
+                        quantityOutgoingMap[product] ?: 0,
+                        commandInstance.showOutOfStockProducts)
 
-                    // Remove all products in the product group from the main productd list
-                    inventoryItemCommands.removeAll { it.product == product }
-                }
-                inventoryItemCommands << inventoryItemCommand
+                // Remove all products in the product group from the main productd list
+                inventoryItemCommands.removeAll { it.product == product }
             }
+            inventoryItemCommands << inventoryItemCommand
         }
 
 
