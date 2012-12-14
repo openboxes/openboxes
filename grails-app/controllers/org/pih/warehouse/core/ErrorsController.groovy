@@ -22,6 +22,10 @@ class ErrorsController {
 		render(view:"/errors/notFound")
 	}
 	
+	def handleUnauthorized = { 
+		render(view:"/errors/accessDenied")
+	}
+	
 	def processError = { 
 		log.info "process error " + params
 		def toList = []
