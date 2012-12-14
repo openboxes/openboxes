@@ -25,7 +25,7 @@ class RoleFilters {
     def filters = {
         readonlyCheck(controller:'*', action:'*') {
             before = { 
-                if(SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)  || actionName == "chooseLocation") return true
+                if(SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" || controllerName == "errors") return true
                 def missBrowser = !userService.canUserBrowse(session.user) 
                 def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
                 def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
