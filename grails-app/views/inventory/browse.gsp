@@ -200,8 +200,9 @@
 				//$(".megamenu").megamenu();
 				
 				$("#toggleCheckbox").click(function(event) {
-					$(".checkbox").attr("checked", $(this).attr("checked"));
-				});			
+                    var checked = ($(this).attr("checked") == 'checked');
+		            $(".checkbox").attr("checked", checked);
+				});
 				
 		    	$(".tabs").tabs(
 	    			{
