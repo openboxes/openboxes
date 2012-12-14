@@ -12,19 +12,24 @@
 
 <body>
 	<div class="body">
+	
+	
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
 			</div>
 		</g:if>
-		<div class="error">
+		<h1><warehouse:message code="errors.accessDenied.label" default="Access Denied"/></h1>
+		<div style="width: 25%;">
+			<div class="triangle-isosceles">
+				<warehouse:message code="errors.accessDenied.message" default="Apologies, but you are not authorized to view this page."/> 
+			</div>
+			<div style="padding-left: 45px;">
+				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+			</div>
 		</div>
+			
 		
-		
-		<h1>Access Denied</h1>
-		<div class="box middle center">
-			<img src="${createLinkTo(dir:'images/icons',file:'logo.png')}" class="home"/>
-		</div>
 		
 		
 		

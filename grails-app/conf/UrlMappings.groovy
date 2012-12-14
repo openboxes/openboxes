@@ -25,6 +25,7 @@ class UrlMappings {
 		//"/person/name/$q?"(controller:"test") {
 		//	action = [GET:"searchByFirstName"]
 		//}
+		"401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
 		"500"(controller:"errors", action:"handleException")
 		"/"(controller:"home", action:"index")      

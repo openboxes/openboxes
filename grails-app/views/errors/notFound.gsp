@@ -21,10 +21,11 @@
 		<h1><warehouse:message code="notFound.label" default="Page Not Found"/></h1>
 		<div style="width: 25%;">
 			<div class="triangle-isosceles">
-				Apologies, but we can't find the page you're looking for. 
+				<warehouse:message code="errors.accessDenied.message" default="Apologies, but I can't find that page."/>
+				 
 			</div>
 			<div style="padding-left: 45px;">
-				<img src="${createLinkTo(dir:'images/icons',file:'logo.png')}"/>
+				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 	</div>
