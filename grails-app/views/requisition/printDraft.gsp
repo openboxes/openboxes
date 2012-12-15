@@ -24,7 +24,7 @@
             <img id="logo" src="${createLink(controller:'location', action:'viewLogo', id:location.id)}" />                                    
         </g:if>
         <g:else>
-            <img id="logo" src="${createLinkTo(dir:"images/icons", file:"logo24.png")}" />
+            <img id="logo" src="${createLinkTo(dir:'images/', file:'hands.jpg')}" />
         </g:else>
             ${requisition?.name}
     </div>
@@ -50,12 +50,12 @@
     </table>
     <table id="requisition-items">
             <tr class="theader">
-                <td> </td>
-                <td>${warehouse.message(code: 'product.label')}</td>
-                <td>${warehouse.message(code: 'requisitionItem.quantityRequested.label')}?</td>
-                <td>${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</td>
-                <td>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</td>
-                <td>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</td>
+                <th><warehouse:message code="report.number.label"/></th>
+                <th>${warehouse.message(code: 'product.label')}</th>
+                <th>${warehouse.message(code: 'requisitionItem.quantityRequested.label')}?</th>
+                <th>${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
+                <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
+                <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
             </tr>
 
             <g:each in="${requisition?.requisitionItems}" status="i" var="requisitionItem">
@@ -64,7 +64,7 @@
                 <g:while test="${j < numInventoryItem}">
                 <tr>
                     <g:if test="${j == 0}">
-                        <td rowspan="${numInventoryItem}">${i+1}.</td>
+                        <td rowspan="${numInventoryItem}" class="center">${i+1}</td>
                         <td rowspan="${numInventoryItem}">${requisitionItem?.product?.name}</td>
                         <td rowspan="${numInventoryItem}">${requisitionItem?.quantity}</td>
                     </g:if>

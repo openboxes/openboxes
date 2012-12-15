@@ -2,13 +2,9 @@ body{
     margin: 15px;
 }
 
-td{
-    border: 1px black solid;
-    height: 30px;
-}
 
 .header{
-    float:right;
+    
     margin: 10px;
 }
 
@@ -16,6 +12,13 @@ td{
     clear: both;
     text-align: center;
     margin: 10px;
+}
+
+.odd {
+    background: #f7f7f7; !important;
+}
+.even {
+	background: #fff; !important;
 }
 
 .theader td {
@@ -27,20 +30,32 @@ td{
     height: 20px;
 }
 
-#signature-table{
+#signature-table {
+    width: 80%;
+    margin: auto;
+    margin-bottom: 20px;
+    margin-top: 50px;
+}
+#signature-table tr { border-bottom: 1px solid lightgrey; }
+
+#details-table{
     width: 60%;
     margin: auto;
-    border: 1px black solid;
     margin-bottom: 20px;
 }
+#details-table tr { border-bottom: 1px solid lightgrey;}
 
-#requisition-items{
-    border: 1px black solid;
+
+#requisition-items{    
     margin-bottom: 10px;
 }
 
+#packinglist-items tbody tr { 
+    border-bottom: 1px lightgrey solid;
+}
+
 #comment-box{
-    border: 1px black solid;
+    border: 1px solid lightgrey;
     height: 100px;
     margin-top:10px;
 }

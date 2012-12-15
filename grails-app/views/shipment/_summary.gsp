@@ -4,9 +4,7 @@
 			<tr>
 				<td>
 					<div>
-						<g:if test="${!params.execution }">
-							<g:render template="../shipment/actions" />
-						</g:if>
+						<g:render template="../shipment/actions" />
 					</div> 
 				</td>
 				<td style="width: 20px; vertical-align: middle;">				
@@ -22,7 +20,9 @@
 				<td>
 					<div>
 						<span class="title" style="vertical-align: middle">
+							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
 							${shipmentInstance?.name}
+							</g:link>
 						</span>							
 					</div>
 					<div>

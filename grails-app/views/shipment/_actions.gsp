@@ -84,16 +84,14 @@
 			<hr/>
 		</div>
 		<div class="action-menu-item">
-			<g:set var="url" value="${createLink(controller:'report',action:'showShippingReport',params:['shipment.id',shipmentInstance?.id]) }"/>
-   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:url,'shipment.id':shipmentInstance?.id]">
+   			<g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]">
 				<img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" class="middle"/>&nbsp;
 				<warehouse:message code="shipping.downloadPackingList.label"/>
 				<span class="fade">(.pdf)</span>
    			</g:link>
 		</div>		
 		<div class="action-menu-item">
-			<g:set var="url" value="${createLink(controller:'report',action:'showPaginatedPackingListReport',params:['shipment.id',shipmentInstance?.id]) }"/>
-   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:url,'shipment.id':shipmentInstance?.id]">
+   			<g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>&nbsp;
 				<warehouse:message code="shipping.downloadPackingList.label"/>
 				<span class="fade">(.pdf)</span>
@@ -105,6 +103,7 @@
 				<warehouse:message code="shipping.downloadPackingList.label"/> <span class="fade">(.xls)</span>
 			</g:link> 
 		</div>
+		
 		<div class="action-menu-item">
 			<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>&nbsp;

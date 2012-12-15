@@ -5,11 +5,14 @@
 			<tbody>			
 				<tr>
 					<td>
+						<g:render template="/requisition/actions" model="[requisition:requisition]"/>
+					</td>				
+					<td>
 						<div>
 							<span class="title">${requisition?.name}</span>
 						</div> 
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
-						    <g:render template="/requisition/actions" model="[requisition:requisition]"/> &nbsp;|&nbsp;
+						    
 							<span class="status">
 								${warehouse.message(code: 'default.status.label') }:
 								<b><format:metadata obj="${requisition?.status}"/></b>
