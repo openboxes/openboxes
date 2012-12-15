@@ -62,8 +62,16 @@ class ReportController {
 		}
 		[command : command]
 	}
-
+	
 	def showPaginatedPackingListReport = { ChecklistReportCommand command ->
+		command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) {
+			reportService.generateShippingReport(command);
+		}
+		[command : command]
+	}	
+	
+	def printShippingReport = { ChecklistReportCommand command ->
 		command.rootCategory = productService.getRootCategory();
 		if (!command?.hasErrors()) {
 			reportService.generateShippingReport(command);
@@ -71,6 +79,18 @@ class ReportController {
 		[command : command]
 	}
 	
+	def printPaginatedPackingListReport = { ChecklistReportCommand command ->
+		try {
+			command.rootCategory = productService.getRootCategory();
+			if (!command?.hasErrors()) {
+				reportService.generateShippingReport(command);
+			}
+		} catch (Exception e) {
+			log.error("error", e)
+			e.printStackTrace()
+		}
+		[command : command]
+	}
 	
 
 	def downloadTransactionReport = {		
