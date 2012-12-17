@@ -158,13 +158,14 @@ class ProductController {
 	}
 
 	def save = {
+		println "Save product: " + params
+		
 		def productInstance = new Product();
 		productInstance.properties = params
 
 		// Add tags 
 		try {
 			if (params.tagsToBeAdded) {
-				productInstance.tags.clear()
 				params.tagsToBeAdded.split(",").each { tagText ->
 					productInstance.addToTags(new Tag(tag:tagText))
 				}
@@ -198,7 +199,7 @@ class ProductController {
 		def inventoryInstance = warehouseInstance?.inventory;
 
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
+			//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
 			sendProductCreatedEmail(productInstance)
 			redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
 			//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
@@ -433,7 +434,7 @@ class ProductController {
 		}
 		catch (Exception e) {
 		   log.error("Error sending 'Product Created' email")
-			flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
+		   //flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
 		}
 	}
 
