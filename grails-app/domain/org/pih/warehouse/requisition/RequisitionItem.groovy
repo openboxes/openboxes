@@ -40,7 +40,7 @@ class RequisitionItem implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
-	static transients = [ "type", "picklistItems" ]
+	static transients = [ "type" ]
 	
 	static belongsTo = [ requisition: Requisition ]
 
@@ -73,7 +73,7 @@ class RequisitionItem implements Serializable {
         InventoryItem.findAllByProduct(product).size()
     }
 
-    def getPicklistItems() {
+    def retrievePicklistItems() {
         return PicklistItem.findAllByRequisitionItem(this)
     }
 

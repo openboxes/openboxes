@@ -60,7 +60,8 @@
 
             <g:each in="${requisition?.requisitionItems}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
-                    <g:set var="numInventoryItem" value="${requisitionItem?.picklistItems?.size() ?: 1}" />
+                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}" />
+                    <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}" />
                 </g:if>
                 <g:else>
                     <g:set var="numInventoryItem" value="${requisitionItem?.calculateNumInventoryItem() ?: 1}" />
@@ -73,9 +74,9 @@
                         <td rowspan="${numInventoryItem}">${requisitionItem?.product?.name}</td>
                         <td rowspan="${numInventoryItem}">${requisitionItem?.quantity}</td>
                     </g:if>
-                    <td>${requisitionItem?.picklistItems[j]?.quantity}</td>
-                    <td>${requisitionItem?.picklistItems[j]?.inventoryItem?.lotNumber}</td>
-                    <td>${requisitionItem?.picklistItems[j]?.inventoryItem?.expirationDate}</td>
+                    <td>${picklistItems ? picklistItems[j].quantity:""}</td>
+                    <td>${picklistItems ? picklistItems[j].inventoryItem?.lotNumber:""}</td>
+                    <td>${picklistItems ? picklistItems[j].inventoryItem?.expirationDate:""}</td>
                     <%j++%>
                 </tr>
                 </g:while>
