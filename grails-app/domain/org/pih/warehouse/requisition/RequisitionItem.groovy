@@ -40,7 +40,7 @@ class RequisitionItem implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
-	static transients = [ "type" ]
+	static transients = [ "type", "picklistItems" ]
 	
 	static belongsTo = [ requisition: Requisition ]
 
@@ -71,6 +71,10 @@ class RequisitionItem implements Serializable {
 
     def calculateNumInventoryItem(Inventory inventory) {
         InventoryItem.findAllByProduct(product).size()
+    }
+
+    def getPicklistItems() {
+        return PicklistItem.findAllByRequisitionItem(this)
     }
 
     Map toJson(){

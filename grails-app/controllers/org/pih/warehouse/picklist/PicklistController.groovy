@@ -32,10 +32,4 @@ class PicklistController {
     render jsonResponse as JSON
   }
 
-  def print = {
-
-      def requisition = Requisition.get(params?.id)
-      if (requisition) {
-      }
-  }
 }

@@ -38,20 +38,24 @@
 		<div class="action-menu-item">
 			<hr/>
 		</div>
-		<g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
-			<div class="action-menu-item">
-				<g:link controller="fulfillRequestWorkflow" action="fulfillRequest" id="${requisition?.id}">
-					<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
-					&nbsp;${warehouse.message(code: 'request.fulfill.label', default: 'Fulfill request')} 
-				</g:link>				
-			</div>		
-			<div class="action-menu-item">
-				<g:link controller="requisition" action="showPicklist" id="${requisition?.id}">
-					<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />
-					&nbsp;${warehouse.message(code: 'request.showPickList.label', default: 'Show pick list')} 
-				</g:link>				
-			</div>		
-		</g:if>
+        <div class="action-menu-item">
+            <g:link controller="fulfillRequestWorkflow" action="fulfillRequest" id="${requisition?.id}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
+                &nbsp;${warehouse.message(code: 'request.fulfill.label', default: 'Fulfill request')}
+            </g:link>
+        </div>
+        <div class="action-menu-item">
+            <g:link controller="requisition" action="process" id="${requisition?.id}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />
+                &nbsp;${warehouse.message(code: 'picklist.edit.label', default: 'Edit picklist')}
+            </g:link>
+        </div>
+        <div class="action-menu-item">
+            <g:link controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
+                <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
+                &nbsp;${warehouse.message(code: 'picklist.print.label', default: 'Print picklist')}
+            </g:link>
+        </div>
 		<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
 			<g:if test="${requisition?.status == org.pih.warehouse.requisition.RequisitionStatus.FULFILLED }">
 				<div class="action-menu-item">
@@ -59,7 +63,8 @@
 						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
 						&nbsp;${warehouse.message(code: 'request.receive.label', default: 'Receive requisition')}
 					</g:link>				
-				</div>						
+				</div>
+
 			</g:if>
 			<div class="action-menu-item">
 				<g:link controller="requisition" action="withdraw" id="${requisition?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">

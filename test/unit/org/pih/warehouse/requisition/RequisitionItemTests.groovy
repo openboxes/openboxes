@@ -93,4 +93,21 @@ class RequisitionItemTests extends GrailsUnitTestCase {
 
         assert requisitionItem.calculateNumInventoryItem() == 3
     }
+
+    void testGetPicklistItems() {
+        def requisitionItem = new RequisitionItem(id: "reqItem1")
+        def picklistItem1 = new PicklistItem(id: "pickItem1", requisitionItem: requisitionItem, quantity: 30)
+        def picklistItem2 = new PicklistItem(id: "pickItem2", requisitionItem: requisitionItem, quantity: 50)
+        def picklistItem3 = new PicklistItem(id: "pickItem3", requisitionItem: requisitionItem, quantity: 60)
+        mockDomain(RequisitionItem, [requisitionItem])
+        mockDomain(PicklistItem, [picklistItem1, picklistItem2, picklistItem3])
+
+        assert requisitionItem.picklistItems
+        def list = requisitionItem.picklistItems
+
+        assert list.contains(picklistItem1)
+        assert list.contains(picklistItem2)
+        assert list.contains(picklistItem3)
+
+    }
 }

@@ -316,7 +316,9 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     void testPrintRequisition() {
 
         def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
+        def picklist = new Picklist(id: "pick1", requisition: requisition)
         mockDomain(Requisition, [requisition])
+        mockDomain(Picklist, [picklist])
 
         def location = new Location(id: "loc1")
         mockDomain(Location, [location])
@@ -328,6 +330,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert renderArgs.view == "printDraft"
         assert renderArgs.model.location == location
         assert renderArgs.model.requisition == requisition
+        assert renderArgs.model.picklist == picklist
 
     }
 }

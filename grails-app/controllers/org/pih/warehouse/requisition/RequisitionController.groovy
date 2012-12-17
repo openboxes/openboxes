@@ -144,7 +144,8 @@ class RequisitionController {
 
     def printDraft = {
         def requisition = Requisition.get(params.id)
+        def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
-        render(view:"printDraft", model:[requisition:requisition, location:location])
+        render(view:"printDraft", model:[requisition:requisition, picklist: picklist, location:location])
     }
 }
