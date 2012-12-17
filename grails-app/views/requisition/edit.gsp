@@ -16,7 +16,7 @@
 <g:form name="requisitionForm" method="post" action="save">
   <div class="dialog box  ui-validation">
     <div id="requisition-header">
-                <div class="title" data-bind="html:requisition.name"></div>
+                <div class="title" data-bind="html: requisition.name"></div>
                 <div class="time-stamp fade" data-bind="html:requisition.lastUpdated"></div>
                 <div class="status fade" data-bind="html: requisition.status"></div>
      </div>
@@ -209,14 +209,15 @@
         });
 
         if (!viewModel.requisition.name())
-            viewModel.requisition.name("${warehouse.message(code: 'requisition.label')}");
+            viewModel.requisition.name("[" + viewModel.requisition.type() + "] " + "${warehouse.message(code: 'requisition.label')}");
 
         var updateDescription = function () {
+            var type = "[" + viewModel.requisition.type() + "] ";
             var depot = $("select#depot option:selected").text() || "";
             var program = $("#recipientProgram").val() || "";
             var requestedBy = $("#requestedBy").val() || "";
             var dateRequested = $("#dateRequested").val() || "";
-            var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}";
+            var description = type + "${warehouse.message(code: 'requisition.label', default: 'Requisition')}";
             if(depot) {
                 description += " - " + depot;
             }
