@@ -167,7 +167,9 @@ class ProductController {
 		try {
 			if (params.tagsToBeAdded) {
 				params.tagsToBeAdded.split(",").each { tagText ->
-					productInstance.addToTags(new Tag(tag:tagText))
+					Tag tag = Tag.findByTag(tagText)
+					if (!tag) tag = new Tag(tag:tagText)
+					productInstance.addToTags(tag)
 				}
 			}
 		} catch (Exception e) {
@@ -262,8 +264,10 @@ class ProductController {
 			try { 
 				if (params.tagsToBeAdded) {
 					productInstance.tags.clear()
-					params.tagsToBeAdded.split(",").each { tagText ->
-						productInstance.addToTags(new Tag(tag:tagText))
+					params.tagsToBeAdded.split(",").each { tagText ->						
+						Tag tag = Tag.findByTag(tagText)
+						if (!tag) tag = new Tag(tag:tagText)
+						productInstance.addToTags(tag)						
 					}
 				}
 			} catch (Exception e) { 
