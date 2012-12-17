@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory;
 
 import grails.validation.ValidationException
 import org.hibernate.Criteria;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.pih.warehouse.product.Category;
 
 import java.text.SimpleDateFormat;
@@ -605,62 +606,70 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List<Product> getProductsByTermsAndCategories(terms, categories, maxResult, offset) {
-        def products = InventoryItem.createCriteria().list() {
-            if(categories) {
-                product {
-                    inList("category", categories)
-                }
+		//def products = Product.executeQuery("select 
+		//"select inventory_item.lot_number from product left join inventory_item on inventory_item.product_id = product.id where product.name like '%lactomer%'"
+		
+        def products = Product.createCriteria().list() {
+			createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
+			if(categories) {
+                inList("category", categories)
             }
             if (terms) {
                 or {
-                    and {
-                        terms.each {term ->
-                            ilike("lotNumber", "%" + term + "%")
+					and {
+						terms.each {term ->
+							ilike('inventoryItems.lotNumber', "%" + term + "%")
+						}
+					}
+                    or {
+                        and {
+                            terms.each {term ->
+                                ilike("name", "%" + term + "%")
+                            }
                         }
-                    }
-                    product {
-                        or {
-                            and {
-                                terms.each {term ->
-                                    ilike("name", "%" + term + "%")
-                                }
+                        and {
+                            terms.each {term ->
+                                ilike("description", "%" + term + "%")
                             }
-                            and {
-                                terms.each { term ->
-                                    ilike("manufacturer", "%" + term + "%")
-                                }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("manufacturer", "%" + term + "%")
                             }
-                            and {
-                                terms.each { term ->
-                                    ilike("manufacturerCode", "%" + term + "%")
-                                }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("manufacturerCode", "%" + term + "%")
                             }
-                            and {
-                                terms.each { term ->
-                                    ilike("upc", "%" + term + "%")
-                                }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("upc", "%" + term + "%")
                             }
-							and {
-								terms.each { term ->
-									ilike("ndc", "%" + term + "%")
-								}
+                        }
+						and {
+							terms.each { term ->
+								ilike("ndc", "%" + term + "%")
 							}
-							and {
-								terms.each { term ->
-									ilike("unitOfMeasure", "%" + term + "%")
-								}
+						}
+						and {
+							terms.each { term ->
+								ilike("unitOfMeasure", "%" + term + "%")
 							}
-                            and {
-                                terms.each { term ->
-                                    ilike("productCode", "%" + term + "%")
-                                }
+						}
+                        and {
+                            terms.each { term ->
+                                ilike("productCode", "%" + term + "%")
                             }
                         }
                     }
                 }
             }
-        }.collect { it.product }.unique { it.id }
-
+        }.collect { it }.unique { it.id }
+	
+		println "products: " + products
+		
+		
         return Product.createCriteria().list(max: maxResult, offset: offset) {
             inList("id", (products.collect { it.id })?: [""])
             order("category")

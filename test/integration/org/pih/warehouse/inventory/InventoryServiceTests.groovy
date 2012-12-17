@@ -36,6 +36,7 @@ class InventoryServiceTests extends GroovyTestCase {
     protected def  haitiInventory
     protected def  aspirinProduct
     protected def  tylenolProduct
+	protected def  ibuprofenProduct
     protected def  aspirinItem1
     protected def  aspirinItem2
     protected def tylenolItem
@@ -69,7 +70,10 @@ class InventoryServiceTests extends GroovyTestCase {
         // create some products
         aspirinProduct = DbHelper.creatProductIfNotExist("Aspirin" + UUID.randomUUID().toString()[0..5])
         tylenolProduct = DbHelper.creatProductIfNotExist("Tylenol" + UUID.randomUUID().toString()[0..5])
-
+		ibuprofenProduct = DbHelper.creatProductIfNotExist("Ibuprofen" + UUID.randomUUID().toString()[0..5])
+		ibuprofenProduct.description = "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)"
+		ibuprofenProduct.save(flush:true);
+		
         // create some inventory items
         aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1", new Date().plus(100))
         aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2", new Date().plus(10))
@@ -346,6 +350,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert results.contains(aspirinProduct)
     }
 
+
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
         basicTestFixture()
         def terms = ["lot9383"]
@@ -353,4 +358,21 @@ class InventoryServiceTests extends GroovyTestCase {
         def results = inventoryService.getProductsByTermsAndCategories(terms, null, 1000, 0)
         assert results.contains(tylenolProduct)
     }
+
+	void test_getProductsByTermsAndCategoriesWithProductName() {
+		basicTestFixture()
+		def terms = ["Ibuprofen"]
+		def inventoryService = new InventoryService()
+		def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
+		assert results.contains(ibuprofenProduct)
+	}
+
+	void test_getProductsByTermsAndCategoriesWithDescription() {
+		basicTestFixture()
+		def terms = ["NSAID"]
+		def inventoryService = new InventoryService()
+		def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
+		assert results.contains(ibuprofenProduct)
+	}
+
 }

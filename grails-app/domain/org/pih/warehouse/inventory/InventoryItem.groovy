@@ -46,6 +46,8 @@ class InventoryItem implements Serializable {
 	
 	static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'grailsApplication']
 
+	static belongsTo = [ product : Product ]
+	
 	static mapping = {
 		id generator: 'uuid'
 	}

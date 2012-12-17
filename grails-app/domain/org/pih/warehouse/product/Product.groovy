@@ -95,7 +95,9 @@ class Product implements Comparable, Serializable {
 		tags : Tag, 
 		documents : Document, 
 		productGroups: ProductGroup, 
-		packages : ProductPackage ]	
+		packages : ProductPackage, 
+		inventoryItems : InventoryItem 
+	]	
 	
 	static mapping = {
 		id generator: 'uuid'
