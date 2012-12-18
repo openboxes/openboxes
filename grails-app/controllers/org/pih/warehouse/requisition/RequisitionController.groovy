@@ -89,7 +89,6 @@ class RequisitionController {
     def process = {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
-            requisition.status = RequisitionStatus.OPEN
             def currentInventory = Location.get(session.warehouse.id).inventory
             def picklist = Picklist.findByRequisition(requisition)?: new Picklist()
             def productInventoryItemsMap = [:]

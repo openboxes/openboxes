@@ -28,7 +28,7 @@
 			<tr>
 				<td>
 					<fieldset>
-						<g:render template="summary" model="[requestInstance:requestInstance]" />
+						<g:render template="summary" model="[requisition:requestInstance]" />
 							<g:form action="saveComment">
 								<g:hiddenField name="id" value="${commentInstance?.id}" />
 								<g:hiddenField name="request.id" value="${requestInstance?.id}" />

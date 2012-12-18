@@ -5,19 +5,10 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		
-		<g:if test="${requisition?.isOpen() }">
-			<g:render template="actionsRequested" model="[requisition:requisition]"/>
+		<g:if test="${requisition?.isPending() }">
+			<g:render template="actionsPending" model="[requisition:requisition]"/>
 		</g:if>
-		<g:elseif test="${requisition?.isCreated() }">
-			<g:render template="actionsNotYetRequested" model="[requisition:requisition]"/>
-		</g:elseif>
-		<g:elseif test="${requisition.isPending() }">
-			<g:render template="actionsRequested" model="[requisition:requisition]"/>
-		</g:elseif>
-		<g:elseif test="${requisition.isFulfilled() }">
-			<g:render template="actionsRequested" model="[requisition:requisition]"/>
-		</g:elseif>
-		<g:elseif test="${requisition.status == org.pih.warehouse.requisition.RequisitionStatus.PICKED }">
+		<g:elseif test="${requisition?.isRequested() }">
 			<g:render template="actionsRequested" model="[requisition:requisition]"/>
 		</g:elseif>
 		<g:else>

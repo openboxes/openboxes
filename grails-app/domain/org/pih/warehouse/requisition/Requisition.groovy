@@ -117,37 +117,16 @@ class Requisition implements Serializable {
     }
 
 	Boolean isPending() { 
-		return isCreated() || isOpen();
-	}
-	
-	Boolean isCreated() { 
-		return (status in [RequisitionStatus.CREATED])
-	}
-	
-	Boolean isOpen() { 
-		return (status in [RequisitionStatus.OPEN])
+		return (status in [RequisitionStatus.CREATED, RequisitionStatus.OPEN]);
 	}
 
-	Boolean isFulfilled() { 
-		return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED])
-	}
-	
-	Boolean isShipped() {
-		return (status in [RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED])
-	}
+    Boolean isOpen() {
+        return (status == RequisitionStatus.OPEN)
+    }
 
-	Boolean isReceived() {
-		return (status in [RequisitionStatus.RECEIVED])
-	}
-
-	Boolean isCanceled() {
-		return (status in [RequisitionStatus.CANCELED])
-	}
-
-	String getRequestNumber() {
-		//return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "";
-		return id
-	}
+    Boolean isRequested() {
+        return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED, RequisitionStatus.PICKED])
+    }
 	
   Map toJson(){
     [

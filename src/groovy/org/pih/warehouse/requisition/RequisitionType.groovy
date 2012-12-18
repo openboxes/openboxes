@@ -10,7 +10,7 @@
 package org.pih.warehouse.requisition
 
 public enum RequisitionType {
-    WARD_STOCK(0),
+  WARD_STOCK(0),
     WARD_NON_STOCK(1),
     DEPOT_STOCK(2),
     DEPOT_NON_STOCK(3)

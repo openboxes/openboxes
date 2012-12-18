@@ -8,14 +8,22 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 package org.pih.warehouse.picklist
+
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
+
 class PicklistService{
-  Picklist save(Map data){
+
+    Picklist save(Map data){
     def itemsData = data.picklistItems ?: []
       data.remove("picklistItems")
 
       def picklist = Picklist.get(data.id) ?: new Picklist()
       picklist.properties = data
       picklist.name = picklist.requisition.name
+
+      def requisition = Requisition.get(picklist.requisitionId)
+      requisition.status = RequisitionStatus.OPEN
 
       def picklistItems = itemsData.collect{ 
         itemData -> 
@@ -34,6 +42,7 @@ class PicklistService{
       }
       itemsToDelete.each{picklist.removeFromPicklistItems(it)}
       picklist.save(flush:true)
+      requisition.save(flush:true)
       picklist.picklistItems?.each{it.save(flush:true)}
       picklist           
     
