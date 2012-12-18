@@ -95,7 +95,7 @@
 				</tr>
 			</g:if>
 		</g:each>
-		<g:unless test="${commandInstance?.inventoryItemList }">
+		<g:if test="${!commandInstance.quantityByInventoryItemMap}">
 			<tr>
 				<td colspan="5">
 					<div class="padded center fade">
@@ -103,7 +103,7 @@
 					</div>
 				</td>
 			</tr>
-		</g:unless>				
+		</g:if>
 	</tbody>
 	<tfoot>
 		<tr class="prop" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
