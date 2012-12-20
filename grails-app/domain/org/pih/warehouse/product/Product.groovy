@@ -201,5 +201,12 @@ class Product implements Comparable, Serializable {
 		}
 		return false;
 	}
+
+    Map toJson(){
+        [
+            id: id,
+            name: name,
+        ]
+    }
 }
 

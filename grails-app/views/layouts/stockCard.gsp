@@ -2,7 +2,9 @@
 <head>
 	<meta name="layout" content="custom" />
 	<g:layoutHead />
-	<title><g:pageProperty name="page.title"/></title>	
+    <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
+    <script src="${createLinkTo(dir:'js/', file:'inventory.js')}" type="text/javascript" ></script>
+	<title><g:pageProperty name="page.title"/></title>
 	
 </head>
 <body>
