@@ -172,10 +172,10 @@ class InventoryItemController {
 		// Compute the total quantity for the given product
 		commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
-        def inventoryItems = inventoryService.getInventoryItemsWithQuantity([productInstance], commandInstance.inventoryInstance)
+        Map<Product, List<InventoryItem>> inventoryItems = inventoryService.getInventoryItemsWithQuantity([productInstance], commandInstance.inventoryInstance)
         def result = []
         inventoryItems.keySet().each { product ->
-            result = inventoryItems[product].collect { it.toJson() }
+            result = inventoryItems[product].collect { ((InventoryItem)it).toJson() }
         }
         String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
         println jsonString
