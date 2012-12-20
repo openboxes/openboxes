@@ -95,7 +95,8 @@
 				</tr>
 			</g:if>
 		</g:each>
-		<g:if test="${!commandInstance.quantityByInventoryItemMap}">
+		
+		<g:if test="${commandInstance?.totalQuantity == 0}">
 			<tr>
 				<td colspan="5">
 					<div class="padded center fade">

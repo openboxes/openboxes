@@ -47,7 +47,9 @@
 				</td>
 				<td>
 					<span class="value">
-						<b>${g.formatNumber(number: totalQuantity, format: '###,###,###') }</b></span>
+						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
+						<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+					</span>
 				</td>
 			</tr>	
 			<tr class="even">	
@@ -109,7 +111,7 @@
 					<td>
 						<g:each var="productGroup" in="${productInstance?.productGroups }">
 							<g:link controller="productGroup" action="edit" id="${productGroup.id }">
-							${productGroup?.description }
+								${productGroup?.description }
 							</g:link>
 						</g:each>			
 					</td>

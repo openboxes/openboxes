@@ -149,7 +149,6 @@
 																	<td colspan="1" class="middle ">
 																	</td>
 																	<td colspan="3" class="right middle">
-                                                                        <g:paginate total="${numProducts}" params="${params}" action="browse" max="${25}" />
                                                                         <%--
                                                                         <warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
                                                                         (<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
@@ -162,6 +161,9 @@
 																</tr>
 															</tfoot>
 														</table>
+																		<div class="paginateButtons">
+                                                                        <g:paginate total="${numProducts}" params="${params}" action="browse" max="${25}" />
+                                                                        </div>
 													</form>		
 												</div>							
 											</div>
