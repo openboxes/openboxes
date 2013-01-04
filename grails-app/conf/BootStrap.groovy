@@ -90,7 +90,7 @@ class BootStrap {
 		}
 		log.info("Finished running liquibase changelog(s)!")
 
-    insertTestFixture()
+		insertTestFixture()
 	}		
 		
 				
