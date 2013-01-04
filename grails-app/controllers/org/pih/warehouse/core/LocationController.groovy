@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.core;
 
+import grails.validation.ValidationException;
+
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.order.Order;
 import org.pih.warehouse.requisition.Requisition;
@@ -27,22 +29,21 @@ class LocationController {
 	}
 	
 	def list = {
-		def locationInstanceList = []
-		def locationInstanceTotal = 0;
+		def locations = []
+		def locationsTotal = 0;
 		
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		
 		if (params.q) {
-			locationInstanceList = Location.findAllByNameLike("%" + params.q + "%", params)
-			locationInstanceTotal = Location.countByNameLike("%" + params.q + "%", params);
+			locations = Location.findAllByNameLike("%" + params.q + "%", params)
+			locationsTotal = Location.countByNameLike("%" + params.q + "%", params);
 		}
 		else {
-			locationInstanceList = Location.list(params)
-			locationInstanceTotal = Location.count()
+			locations = Location.list(params)
+			locationsTotal = Location.count()
 		}
 
 		
-		[locationInstanceList: locationInstanceList, locationInstanceTotal: locationInstanceTotal]
+		[locationInstanceList: locations, locationInstanceTotal: locationsTotal]
 	}
 	
 	def show = { 
@@ -84,7 +85,13 @@ class LocationController {
 				locationInstance.properties = params
 						
 				if (!locationInstance.hasErrors()) {
-					inventoryService.saveLocation(locationInstance)
+					try { 
+						inventoryService.saveLocation(locationInstance)
+					} catch (ValidationException e) {
+						render(view: "edit", model: [locationInstance: locationInstance])
+						return
+					} 
+					
 					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 					redirect(action: "list", id: locationInstance.id)
 				}

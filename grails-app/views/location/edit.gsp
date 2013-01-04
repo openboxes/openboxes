@@ -35,7 +35,7 @@
 									<label for="name"><warehouse:message code="default.name.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
-									<g:textField name="name" value="${locationInstance?.name}" />
+									<g:textField name="name" value="${locationInstance?.name}" class="text" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -45,7 +45,7 @@
                                 </td>
                                 <td valign="top" class="value">
                                 	<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" 
-                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.locationType?.id}" noSelection="['':'']" />
+                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.locationType?.id}" noSelection="['null':'']" />
                                 		
                                 	
                                 </td>
@@ -55,7 +55,7 @@
 									<label for="name"><warehouse:message code="location.locationGroup.label" /></label>
                                 </td>
                                 <td valign="top" class="value">
-                                	<g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}" optionKey="id" value="${locationInstance?.locationGroup?.id}" noSelection="['':'']" />
+                                	<g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}" optionKey="id" value="${locationInstance?.locationGroup?.id}" noSelection="['null':'']" />
                                 </td>
                             </tr>	         
                             <tr class="prop">

@@ -6,15 +6,17 @@
 			style="vertical-align: middle" />
 	</button>
 	<div class="actions">
-		<div class="action-menu-item">
-       		<g:link class="list" action="list">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'table.png')}" class="middle"/>&nbsp;
-       			<warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
-       		</g:link>
-		</div>
-		<div class="action-menu-item">
-			<hr />
-		</div>
+		<g:if test="${params.action!='list'}">
+			<div class="action-menu-item">
+	       		<g:link class="list" action="list">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'table.png')}" class="middle"/>&nbsp;
+	       			<warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
+	       		</g:link>
+			</div>
+			<div class="action-menu-item">
+				<hr />
+			</div>
+		</g:if>
 		<g:if test="${params.action!='show'}">
 			<div class="action-menu-item">
 				<g:link class="edit" action="show" id="${locationInstance?.id}">

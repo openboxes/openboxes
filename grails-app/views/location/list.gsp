@@ -48,7 +48,13 @@
 	            <div class="dialog box">
 					<g:form action="list" method="get">
 						<label><warehouse:message code="location.search.label"/></label>            
-						<g:textField name="q" size="45" value="${params.q }"/>					
+						<g:textField name="q" size="45" value="${params.q }" class="text"/>		
+						
+						<%-- 
+						<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" 
+							optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${params?.locationType?.id}" noSelection="['':'']" />
+                        --%>
+                           					
 						<button type="submit"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
 							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
@@ -59,10 +65,12 @@
 	           		             
                 <table style="border: 1px solid lightgrey;">
                     <thead>
-                        <tr style="height: 100px;">                        
+                        <tr style="height: 100px;">      
+                        	<th></th>                  
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
-                            <th class="left bottom"><warehouse:message code="location.locationType.label" /></th>
+                            <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
                             <th class="left bottom"><warehouse:message code="location.locationGroup.label" /></th>
+                            <th class="left bottom"><warehouse:message code="default.color.label" /></th>
                             <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
                            	<g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
                            		<th class="bottom">
@@ -75,10 +83,16 @@
                     <g:each in="${locationInstanceList}" status="i" var="locationInstance">
 						<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
-								<g:link action="show" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
+								<g:render template="actions" model="[locationInstance:locationInstance]"/>		
+							</td>
+							<td>
+								<g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
 							</td>
                             <td class="left"><format:metadata obj="${locationInstance?.locationType}"/></td>                            
-                            <td class="left">${locationInstance?.locationGroup}</td>                            
+                            <td class="left">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>                            
+                            <td class="center">
+                            	<div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 10px;">${locationInstance?.name }</div>                            	
+                            </td>
                             <td class="left middle">
                             	<g:if test="${locationInstance.active }">
 									<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
