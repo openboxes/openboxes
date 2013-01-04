@@ -195,12 +195,12 @@ class InventoryService implements ApplicationContextAware {
         commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory();
 
         // Get current inventory for the given products
-        if (commandInstance?.categoryInstance != rootCategory || commandInstance?.searchPerformed || commandInstance.tag) {
-            getCurrentInventory(commandInstance);
-        }
-        else {
-            commandInstance?.categoryToProductMap = [:]
-        }
+        //if (commandInstance?.categoryInstance != rootCategory || commandInstance?.searchPerformed || commandInstance.tag) {
+        getCurrentInventory(commandInstance);
+        //}
+        //else {
+        //   commandInstance?.categoryToProductMap = [:]
+        //}
 
         return commandInstance;
     }
