@@ -4,7 +4,6 @@
 	<!-- Include default page title -->
 	<title><g:layoutTitle default="OpenBoxes" /></title>
 	
-	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css"/>
 	
 	<!-- Include Favicon -->
@@ -27,13 +26,7 @@
 	<g:javascript library="jquery" plugin="jquery" />
 	<jqui:resources />
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<%-- 
-	<jqui:resources />
-	<jqui:resources theme="smoothness" />
-	--%><%--  
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
-	--%>
+
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
@@ -96,7 +89,7 @@
 
 	<g:render template="/common/customCss"/>
 	
-	
+	<ga:trackPageview />
 </head>
 <body class="yui-skin-sam">
 	<g:render template="/common/customVariables"/>
