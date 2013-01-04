@@ -5,9 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
-        <title>
-        	Browse inventory
-        </title>    
+        <title>Browse inventory</title>
     </head>    
     <body>
         <div class="body">
@@ -39,25 +37,22 @@
 												<ul>
 													<li>
 														<a href="#tabs-1">
-															<format:category category="${commandInstance?.categoryInstance}"/>
-															<g:if test="${commandInstance?.subcategoryInstance && commandInstance?.subcategoryInstance != commandInstance?.categoryInstance}"> 
-																&nbsp;&rsaquo;&nbsp;
-																<format:category category="${commandInstance?.subcategoryInstance}"/>
+															<g:set var="rangeBegin" value="${params.offset }"/>
+															<g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
+															<g:set var="totalResults" value="${numProducts }"/>															
+															<g:if test="${totalResults < rangeEnd }">
+																<g:set var="rangeEnd" value="${totalResults }"/>		
 															</g:if>
-															&nbsp;&rsaquo;&nbsp;
-															<g:if test="${commandInstance?.searchTerms }">
-																${commandInstance.searchTerms }
-                                                                (${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} of ${numProducts} products)
-                                                            </g:if>
-															<g:else>
-																${warehouse.message(code: 'products.all.label') }
-															</g:else>
+															<warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
+															<g:if test="${commandInstance?.searchTerms}">
+																"${commandInstance.searchTerms }"
+															</g:if>
 														</a>
 													</li>
 												</ul>		
 												<div id="tabs-1" style="padding: 0px;">	
 										            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
-										                <table class="tableScroll" border="0"> 
+										                <table id="inventory-browser-table" class="tableScroll" border="0"> 
 															<thead> 
 									           					<tr>
 																	<th class="center middle" style="width: 1%">
@@ -69,8 +64,11 @@
 																	<th class="middle">
 																		<warehouse:message code="product.name.label"/>
 																	</th>
-																	<th class="center middle" style="width: 10%;">
+																	<th class="middle">
 																		<warehouse:message code="product.manufacturer.label"/>
+																	</th>
+																	<th class="middle">
+																		<warehouse:message code="product.manufacturerCode.label"/>
 																	</th>
 																	<th class="center" style="width: 7%;">
 																		<warehouse:message code="inventory.qtyin.label"/>
@@ -89,8 +87,8 @@
                                                                     <g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
                                                                         <g:set var="category" value="${entry.key }"/>
                                                                         <g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
-                                                                        <tr class="">
-                                                                            <td colspan="7" style="padding:0; margin:0;">
+                                                                        <tr class="category-header">
+                                                                            <td colspan="8" style="padding:0; margin:0;">
                                                                                 <span class="fade">
                                                                                     <h2 style="border-top: 2px solid lightgrey;">
                                                                                         <%--
@@ -108,13 +106,6 @@
                                                                             </td>
                                                                         </tr>
                                                                         <g:set var="counter" value="${0 }"/>
-
-                                                                        <style>
-                                                                            tr.product { }
-                                                                            tr.productGroup {  }
-                                                                            tr.productGroupProduct { }
-                                                                            tr.productGroupProducts { }
-                                                                        </style>
                                                                         <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
                                                                             <g:if test="${inventoryItem.product }">
                                                                                 <g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product']"/>
@@ -131,9 +122,9 @@
 															<g:else>
 																<tbody>
 																	<tr>
-																		<td colspan="7" class="even center">
+																		<td colspan="8" class="even center">
 																			<div class="fade padded">
-																				<g:if test="${params.searchPerformed }">
+																				<g:if test="${params.numProducts == '0' }">
 																					<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
 																				</g:if>
 																			</div>
@@ -146,24 +137,25 @@
 																	<td colspan="3" class="left middle">
 																		<g:render template="./actions" model="[]"/>
 																	</td>			
-																	<td colspan="1" class="middle ">
+																	<td colspan="2" class="middle ">
 																	</td>
-																	<td colspan="3" class="right middle">
-                                                                        <%--
-                                                                        <warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
-                                                                        (<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
-                                                                            <g:link controller="inventory" action="browse" params="['categoryId':category.id]">
-                                                                                <format:metadata obj="${category}"/>&nbsp;
-                                                                            </g:link>
-                                                                        </g:each>)
-                                                                        --%>
+																	<td colspan="3" class="right middle">                                                                   
 																	</td>
 																</tr>
 															</tfoot>
 														</table>
-																		<div class="paginateButtons">
-                                                                        <g:paginate total="${numProducts}" params="${params}" action="browse" max="${25}" />
-                                                                        </div>
+														<div class="paginateButtons">
+															<g:paginate total="${numProducts}" params="${params}"
+																action="browse" max="${params.max}" />
+																
+															<div class="right">
+															Results per page:
+															<g:link action="browse" params="[max:10]" class="${params.max == '10' ? 'currentStep' : '' }">10</g:link>
+															<g:link action="browse" params="[max:25]" class="${params.max == '25' ? 'currentStep' : '' }">25</g:link>
+															<g:link action="browse" params="[max:50]" class="${params.max == '50' ? 'currentStep' : '' }">50</g:link>
+															<g:link action="browse" params="[max:100]" class="${params.max == '100' ? 'currentStep' : '' }">100</g:link>
+															</div>
+														</div>
 													</form>		
 												</div>							
 											</div>
@@ -216,16 +208,14 @@
 				); 
 
 
-		    	$(".expandable").click(function(event) {
-					
+		    	$(".expandable").click(function(event) {					
 		    		$("#productGroupProducts-"+event.target.id).toggle();
 					
 		    	});
 				$(".collapsable").click(function(event) { 
-
 		    		$("#productGroupProducts-"+event.target.id).toggle();
 				});				
 			});	
-		</script>	
+		</script>
     </body>
 </html>

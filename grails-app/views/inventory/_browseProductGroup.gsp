@@ -29,11 +29,15 @@
 		</g:link> 
 		--%>
 	</td>
-	<td class="checkable middle center" style="width: 20%">
+	<td class="checkable middle left">
 		<span class="fade">
 			<warehouse:message code="default.various.label"/>
-		</span>
-		
+		</span>	
+	</td>
+	<td class="checkable middle left">
+		<span class="fade">
+			<warehouse:message code="default.various.label"/>
+		</span>	
 	</td>
 	<td class="checkable middle center" style="width: 7%; border-left: 1px solid lightgrey;">
 		<g:if test="${inventoryItem?.supported }">																

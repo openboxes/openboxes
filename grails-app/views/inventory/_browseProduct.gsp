@@ -8,7 +8,7 @@
 		<img src="${resource(dir: 'images/icons/inventoryStatus', file: inventoryItem?.inventoryLevel?.status?.name()?.toLowerCase() + '.png')}" 
 			alt="${inventoryItem?.inventoryLevel?.status?.name() }" title="${inventoryItem?.inventoryLevel?.status?.name() }" style="vertical-align: middle;"/>
 	</td>
-	<td class="checkable middle">
+	<td class="checkable middle">	
 		<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
 			<g:if test="${inventoryItem?.product?.name?.trim()}">
 				<format:product product="${inventoryItem?.product}"/>
@@ -16,11 +16,14 @@
 			<g:else>
 				<warehouse:message code="product.untitled.label"/>
 			</g:else>
+			
 		</g:link> 
-		<g:render template="../product/tags" model="[tags:inventoryItem?.product?.tags]"/>
 	</td>
-	<td class="checkable middle center" style="width: 20%">
+	<td class="checkable middle left">
 		<span class="fade">${inventoryItem?.product?.manufacturer }</span>
+	</td>
+	<td class="checkable middle left">
+		<span class="fade">${inventoryItem?.product?.manufacturerCode }</span>
 	</td>
 	<td class="checkable middle center" style="width: 7%; border-left: 1px solid lightgrey;">
 		<g:if test="${inventoryItem?.supported }">																
