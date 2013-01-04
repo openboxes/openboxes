@@ -1,7 +1,7 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <div id="footer">
 	<div style="line-height: 2em;">
-		&copy; 2012 <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
+		&copy; 2013 <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.version.label"/>: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp; 
 		<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;					
 		<warehouse:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;

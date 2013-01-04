@@ -18,7 +18,7 @@ class GlobalSearchTagLib {
 		attrs.id = (attrs.id) ? attrs.id : "globalSearch_" + (new Random()).nextInt()
 		attrs.name = (attrs.name) ? attrs.name : attrs.id
 		attrs.value = (attrs.value)?:"";
-		attrs.width = (attrs.width) ?: 200;
+		attrs.width = (attrs.width) ?:"";
 		attrs.minLength = (attrs.minLength) ?: 1;
 		attrs.jsonUrl = (attrs.jsonUrl) ?: "";
 		attrs.cssClass= (attrs.cssClass) ?:""

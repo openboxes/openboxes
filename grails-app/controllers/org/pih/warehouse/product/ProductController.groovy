@@ -61,6 +61,10 @@ class ProductController {
 		redirect(action: "list", params: params)
 	}
 	
+	def redirect = { 
+		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
+	}
+	
 	/** 
 	 * Perform a bulk update of 
 	 */
@@ -211,6 +215,7 @@ class ProductController {
 		}
 	}
 
+	
 	def show = {
 		def productInstance = Product.get(params.id)
 		if (!productInstance) {
@@ -221,7 +226,8 @@ class ProductController {
 			[productInstance: productInstance]
 		}
 	}
-
+	
+	
 	def edit = {
 		def productInstance = Product.get(params.id)
 		def location = Location.get(session?.warehouse?.id);

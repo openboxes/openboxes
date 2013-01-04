@@ -22,12 +22,14 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductGroup;
 import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.shipping.Container;
+import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 
 class JsonController {
 	def inventoryService
 	def productService
 	def localizationService	
+	def shipmentService
 	
 	def findTags = { 
 		println "find tags " + params
@@ -460,24 +462,57 @@ class JsonController {
     }
 
 
-  def searchPersonByName = {
+	def searchPersonByName = {
 		def items = []
-    def terms = params.term?.split(" ")
-    terms?.each{ term ->
-      def result = Person.withCriteria {
-						or {
-						  	ilike("firstName", term + "%")
-						  	ilike("lastName", term + "%")
-						  	ilike("email", term + "%")
-              }
-						}
-      items.addAll(result)
-    }
-    items.unique{ it.id }
-    def json = items.collect{
-      [id: it.id, value: it.name, label: it.name+ " " + it.email]
-    }			
+		def terms = params.term?.split(" ")
+		terms?.each{ term ->
+			def result = Person.withCriteria {
+				or {
+					ilike("firstName", term + "%")
+					ilike("lastName", term + "%")
+					ilike("email", term + "%")
+				}
+			}
+			items.addAll(result)
+		}
+		items.unique{ it.id }
+		def json = items.collect{
+			[id: it.id, value: it.name, label: it.name+ " " + it.email]
+		}
 		render json as JSON
 	}
 
+  
+	def globalSearch = {
+		def items = []
+		def terms = params.term?.split(" ")
+		terms?.each{ term ->
+			def personResults = Person.withCriteria {
+				or {
+					ilike("firstName", term + "%")
+					ilike("lastName", term + "%")
+					ilike("email", term + "%")
+				}
+			}
+			items.addAll(personResults)
+			
+			def productResults = inventoryService.getProductsByTermsAndCategories(terms, [], 25, 0)
+			items.addAll(productResults)
+			
+			def shipmentResults = Shipment.withCriteria {
+				or {
+					ilike("name", term + "%")
+				}
+			}
+			items.addAll(shipmentResults)
+		}
+		
+		items.unique{ it.id }
+		def json = items.collect{
+			def type = it.class.simpleName.toLowerCase()
+			[id: it.id, type: it.class, url: request.contextPath + "/" + type  + "/redirect/" + it.id, 
+				value: it.name  , label: it.name + " [" + type + "]" ]
+		}
+		render json as JSON
+	}
 }

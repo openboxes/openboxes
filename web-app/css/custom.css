@@ -54,7 +54,7 @@ button.action-btn, button.previous, button.next {
 	margin: 1px;
 }
 #banner { 
-	padding: 5px; 
+	padding: 0px; 
 }
 .black-top { 
 	border-top: 1px solid black;
@@ -548,13 +548,35 @@ h2 {
 	padding: 10px;
 	border-bottom: 1px solid #ddd;
 }
-.categoryHeader {	
+.category-header {	
 	font-size: 1.2em;
-	background-color: #F7F7F7;
-	padding: 5px;
-	border-top: 2px solid #ddd;
-	border-bottom: 1px solid #ddd;
+	text-align: left;
+	background-color: #f7f7f7;
+	border-top: 1px solid lightgrey;
+	vertical-align: middle;
 }
+
+
+
+tr.hasRelated { 
+	border-top: 4px solid #E5ECF9;
+	border-left: 4px solid #E5ECF9;
+	border-right: 4px solid #E5ECF9;
+	background-color: #E5ECF9;
+}
+
+tr.isRelated { 
+	border-left: 4px solid #E5ECF9;
+	border-right: 4px solid #E5ECF9;
+}
+
+
+tr.lastRelated {
+  border-bottom-color:#E5ECF9;
+  border-bottom-style:solid;
+  border-bottom-width:4px;
+}
+
 
 
 h4 { 
@@ -671,7 +693,7 @@ ul.treeList li ul li {
 	margin: 0px;
 	font-size: 1.2em;
 	border: 0px solid #000; 
-	padding: 5px 10px 10px 15px;  	
+	/*padding: 5px 10px 10px 15px;*/  	
 }
 
 
@@ -772,6 +794,7 @@ ul.treeList li ul li {
         	
 ul.megamenu {
 	padding: 0;
+	margin: 0;
 }
 
 
@@ -795,11 +818,8 @@ ul.megamenu {
 
 #header {
 	vertical-align: middle;
-	border-bottom: 0px solid black;
-	padding-bottom: 0px;
-	width:100%;
-	background:#fff;
-	height: 62px;
+	padding: 2px;
+
 }
 
 
@@ -1133,8 +1153,6 @@ img.photo_tiny {
 	background:#FFFFFF url(../images/icons/silk/magnifier.png) no-repeat 4px 4px;
 	padding:4px 4px 4px 24px;
 	border:1px solid #CCCCCC;
-	width:230px;
-	height:24px;
 }
 
 span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}

@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <!-- Block which includes the logo and login banner -->
-<div class="yui-b">
+<div id="header" class="yui-b">
 	<div class="yui-gf">				
 		<div id="banner">
 		    <div id="bannerLeft" class="yui-u first" >
@@ -162,7 +162,7 @@
 						<g:if test="${session?.warehouse}">
 							<li>&nbsp;|&nbsp;</li>							
 						    <li>
-						    	<g:globalSearch cssClass="globalSearch" name="searchTerms"></g:globalSearch>
+						    	<g:globalSearch cssClass="globalSearch" name="searchTerms" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
 						    </li>
 						</g:if>
 					</ul>

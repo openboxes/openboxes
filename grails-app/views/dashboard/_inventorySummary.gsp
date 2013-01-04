@@ -4,8 +4,6 @@
 	</div>	    			
 	<div class="widget-content">	    					    			
 		<div id="inventorysummary">	
- 			
- 			
 			<div style="padding-top:0px;">
 				<g:form method="GET" controller="inventory" action="browse">
 					<div>

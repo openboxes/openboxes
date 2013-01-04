@@ -16,6 +16,11 @@ class PersonController {
 
 	def scaffold = Person;
 	
+	def redirect = { 
+		redirect(action: "show", id: params.id)
+	}
+	
+	
 	def list = {
 		def personInstanceList = []
 		def personInstanceTotal = 0;

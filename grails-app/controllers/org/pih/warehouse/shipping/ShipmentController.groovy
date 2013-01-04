@@ -56,6 +56,10 @@ class ShipmentController {
 	def sessionFactory
 
 	
+	def redirect = {
+		redirect(controller: "shipment", action: "showDetails", id: params.id)
+	}
+	
 	def list = {
 		boolean incoming = params?.type?.toUpperCase() == "INCOMING"
 		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
