@@ -50,7 +50,7 @@ class InventoryController {
 	 */
 	def browse = { InventoryCommand cmd ->
 
-        if(!params.max) params.max = 25
+        if(!params.max) params.max = 10
         if(!params.offset) params.offset = 0
 
         log.debug("Browse inventory " + params)

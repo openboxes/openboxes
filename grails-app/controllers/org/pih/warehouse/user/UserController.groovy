@@ -36,7 +36,10 @@ class UserController {
         redirect(action: "list", params: params)
     }
 
-	
+	def redirect = {
+		redirect(controller: "user", action: "edit", id: params.id)
+	}
+
     /**
      * Show list of users
      */
@@ -89,7 +92,7 @@ class UserController {
     	log.info "create a new user based on request parameters"
         def userInstance = new User()
         userInstance.properties = params
-        return [userInstance: userInstance]
+		return [userInstance: userInstance, locations: locations]
     }
 
     /**
@@ -191,8 +194,9 @@ class UserController {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"				
 				sendUserStatusChanged(userInstance)
 			}
-			else { 
-				render(view: "edit", model: [userInstance: userInstance])
+			else {
+				def locations = Location.AllDepotWardAndPharmacy()
+				render(view: "edit", model: [userInstance: userInstance, locations: locations])
 				return;
 			}
 		}
@@ -210,7 +214,8 @@ class UserController {
               def version = params.version.toLong()
               if (userInstance.version > version) {
                   userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
-                  render(view: "edit", model: [userInstance: userInstance])
+				  def locations = Location.AllDepotWardAndPharmacy()
+				  render(view: "edit", model: [userInstance: userInstance, locations: locations])
                   return
               }
           }
@@ -242,7 +247,8 @@ class UserController {
                   redirect(action: "show", id: userInstance.id)
           }
         else {
-                  render(view: "edit", model: [userInstance: userInstance])
+			def locations = Location.AllDepotWardAndPharmacy()
+			render(view: "edit", model: [userInstance: userInstance, locations: locations])
         }
       }
       else {

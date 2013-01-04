@@ -125,8 +125,8 @@
                                         <th><warehouse:message code="user.role.label"/></th>
                                       </thead>
                                       <tbody>
-                                        <g:each var="location" in="${locations}">
-                                          <tr>
+                                        <g:each var="location" in="${locations}" status="status">
+                                          <tr class="${status % 2 ? 'even' : 'odd' }">
                                             <td>${location.name}</td>
                                             <td> 
                                                <g:set var="defaultLabel" value="${warehouse.message(code: 'default.label')}" />
