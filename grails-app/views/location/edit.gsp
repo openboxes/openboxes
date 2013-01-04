@@ -104,7 +104,7 @@
                                     	from="${org.pih.warehouse.core.Constants.COLORS}" 
                                     	value="${locationInstance?.bgColor}" />
                                     
-                                   	<span class="fade">${locationInstance?.bgColor }</span>
+                                   	<span class="fade">#${locationInstance?.bgColor }</span>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -114,13 +114,13 @@
                                 <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'fgColor', 'errors')}">
                                     <g:select name="fgColor" class="colorpicker" 
                                     	from="${org.pih.warehouse.core.Constants.COLORS}" 
-                                    	value="${locationInstance?.fgColor}" />
-                                    	
-                                   	<span class="fade">${locationInstance?.fgColor }</span>
+                                    	value="${locationInstance?.fgColor}"/>
+                                
+                                   	<span class="fade">#${locationInstance?.fgColor }</span>
                                 </td>
                             </tr>
                             
-                            <!--  
+                            <%-- 
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="parentLocation"><warehouse:message code="warehouse.parentLocation.label" default="Parent Location" /></label>
@@ -130,7 +130,7 @@
 										optionKey="id" optionValue="name" value="" noSelection="['null': '']" />							
                                 </td>
                             </tr>
-                            -->
+                            --%>
                             <tr class="prop">
                             
                             	<td valign="top" class="name">

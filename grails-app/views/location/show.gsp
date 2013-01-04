@@ -226,7 +226,7 @@
 											<label for="name"><warehouse:message code="location.locationGroup.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value">
-											${locationInstance?.locationGroup?.name?:"none" }
+											${locationInstance?.locationGroup?.name?:warehouse.message(code:'default.none.label') }
 		                                </td>
 		                            </tr>	         
 		                            <tr class="prop">
@@ -234,20 +234,23 @@
 		                                	<label for="manager"><warehouse:message code="warehouse.manager.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'manager', 'errors')}">
-											${locationInstance?.manager}
+											${locationInstance?.manager?:warehouse.message(code:'default.none.label')}
 		                                </td>
 		                            </tr>
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
-			                                <label for="manager"><warehouse:message code="warehouse.properties.label" /></label>
+			                                <label for="active"><warehouse:message code="warehouse.active.label" /></label> 
 		                                </td>
 		                                <td valign="top" class="value${hasErrors(bean: locationInstance, field: 'active', 'errors')}">
-											<div>										
-												<label><warehouse:message code="warehouse.active.label" /></label> ${locationInstance?.active}
-											</div>										
-											<div>										
-												<label><warehouse:message code="warehouse.local.label" /></label> ${locationInstance?.local}
-											</div>
+											${locationInstance?.active}
+		                                </td>
+		                            </tr>
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+			                                <label for="local"><warehouse:message code="warehouse.local.label" /></label>
+		                                </td>
+		                                <td valign="top" class="value${hasErrors(bean: locationInstance, field: 'local', 'errors')}">
+											${locationInstance?.local}
 		                                </td>
 		                            </tr>
 		                            
@@ -256,9 +259,26 @@
 											<label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value">
-		                                	<g:each var="activity" in="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}">
-												<span class="box">${format.metadata(obj:activity)}</span>
-											</g:each>
+		                                
+		                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
+	                                		<g:set var="locationActivityList" value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}"/>
+		                                	
+		                                	<table>
+			                                	<g:each var="activity" in="${activityList }" status="status">
+													<tr class="${status%2?'even':'odd' }">
+														<td>
+															<g:if test="${locationInstance?.supports(activity) }">
+																<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
+							                            	</g:if>
+							                            	<g:else>
+																<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>               	
+							                            	</g:else>
+							                            	&nbsp;
+															${format.metadata(obj:activity)}
+														</td>
+													</tr>
+												</g:each>
+											</table>
 		                                	
 		                                </td>
 		                            </tr>
@@ -292,7 +312,7 @@
 		                                </td>
 		                            </tr>
 		                            
-		                            <!--  
+		                            <%-- 
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="parentLocation"><warehouse:message code="warehouse.parentLocation.label" default="Parent Location" /></label>
@@ -302,7 +322,7 @@
 												optionKey="id" optionValue="name" value="" noSelection="['null': '']" />							
 		                                </td>
 		                            </tr>
-		                            -->
+		                            --%>
 		                            <%-- 
 		                            <tr class="prop">
 		                            
