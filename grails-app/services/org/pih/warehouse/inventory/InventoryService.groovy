@@ -2289,12 +2289,14 @@ class InventoryService implements ApplicationContextAware {
 
     public Map<String, Integer> getQuantityForProducts(Inventory inventory, ArrayList<String> productIds) {
         def ids = productIds.collect{ "'${it}'"}.join(",")
-        def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids})"
-        def transactionEntries = TransactionEntry.executeQuery(sql)
         def result =[:]
-        transactionEntries.each{ println(it)}
-        def map = getQuantityByProductMap(transactionEntries)
-        map.keySet().each{ result[it.id] = map[it] }
+		if (ids) { 
+			def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids})"        
+			def transactionEntries = TransactionEntry.executeQuery(sql)
+	        transactionEntries.each{ println(it)}
+	        def map = getQuantityByProductMap(transactionEntries)
+	        map.keySet().each{ result[it.id] = map[it] }
+		}
         result
     }
 

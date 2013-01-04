@@ -194,7 +194,15 @@ class InventoryServiceTests extends GroovyTestCase {
         assert results.keySet().size() == 1
     }
 
+	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
+		transactionEntryTestFixture()
+		def inventoryService = new InventoryService()
+		def results = inventoryService.getQuantityForProducts(bostonInventory, [])		
+		assert results == [:]
+	}
 
+	
+	
     void test_getQuantityByInventoryItemMap() {
 
         transactionEntryTestFixture()
