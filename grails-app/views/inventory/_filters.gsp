@@ -5,7 +5,6 @@
 				<tr>
 					<td>					
 						<label><warehouse:message code="inventory.filterByProduct.label"/></label>
-						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
 					</td>
 				</tr>				
 			
@@ -28,7 +27,9 @@
 				</g:else>
 				<tr>
 					<td>
-						<g:textField name="searchTerms" value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}" class="text medium" size="40"/>
+						<g:hiddenField name="max" value="${params.max?:10 }"/>
+						<g:textField name="searchTerms" 
+							value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}" class="text medium" size="40"/>
 						
 						<div style="padding: 10px;">
 							<div>

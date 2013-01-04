@@ -37,7 +37,7 @@
 												<ul>
 													<li>
 														<a href="#tabs-1">
-															<g:set var="rangeBegin" value="${params.offset }"/>
+															<g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
 															<g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
 															<g:set var="totalResults" value="${numProducts }"/>															
 															<g:if test="${totalResults < rangeEnd }">
@@ -50,7 +50,7 @@
 														</a>
 													</li>
 												</ul>		
-												<div id="tabs-1" style="padding: 0px;">	
+												<div id="tabs-1" style="padding: 0px;">													
 										            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 										                <table id="inventory-browser-table" class="tableScroll" border="0"> 
 															<thead> 
@@ -149,7 +149,7 @@
 																action="browse" max="${params.max}" />
 																
 															<div class="right">
-															Results per page:
+															<warehouse:message code="inventory.browseResultsPerPage.label"/>
 															<g:link action="browse" params="[max:10]" class="${params.max == '10' ? 'currentStep' : '' }">10</g:link>
 															<g:link action="browse" params="[max:25]" class="${params.max == '25' ? 'currentStep' : '' }">25</g:link>
 															<g:link action="browse" params="[max:50]" class="${params.max == '50' ? 'currentStep' : '' }">50</g:link>
@@ -208,7 +208,7 @@
 				); 
 
 
-		    	$(".expandable").click(function(event) {					
+		    	$(".expandable").click(function(event) {
 		    		$("#productGroupProducts-"+event.target.id).toggle();
 					
 		    	});
