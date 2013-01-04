@@ -589,12 +589,13 @@ class DocumentService {
 			//sheet.autoSizeColumn(4);
 			//sheet.autoSizeColumn(5);
 			sheet.setColumnWidth((short)0, (short) ((50 * 8) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)1, (short) ((50 * 15) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)1, (short) ((50 * 10) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)2, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)3, (short) ((50 * 2) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)4, (short) ((50 * 2) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)5, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)6, (short) ((50 * 10) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)3, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)4, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)5, (short) ((50 * 2) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)6, (short) ((50 * 5) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)7, (short) ((50 * 10) / ((double) 1 / 20)))
 			
 			// Bold font
 			Font boldFont = workbook.createFont();
@@ -610,7 +611,7 @@ class DocumentService {
 			tableHeaderCenterStyle.setBorderRight((short)1);
 			tableHeaderCenterStyle.setBorderTop((short)1);
 			tableHeaderCenterStyle.setFont(boldFont);
-
+			
 			CellStyle tableHeaderLeftStyle = workbook.createCellStyle();
 			tableHeaderLeftStyle.setBorderBottom((short)1);
 			tableHeaderLeftStyle.setBorderLeft((short)1);
@@ -637,6 +638,15 @@ class DocumentService {
 			tableDataCenterStyle.setBorderRight((short)1);
 			tableDataCenterStyle.setBorderTop((short)1);
 
+			// Align center cell style
+			CellStyle tableDataPalletStyle = workbook.createCellStyle();
+			tableDataPalletStyle.setAlignment(CellStyle.ALIGN_LEFT);
+			tableDataPalletStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			tableDataPalletStyle.setBorderBottom((short)1);
+			tableDataPalletStyle.setBorderLeft((short)1);
+			tableDataPalletStyle.setBorderRight((short)1);
+			tableDataPalletStyle.setBorderTop((short)1);
+
 			// Align left cell style
 			CellStyle tableDataLeftStyle = workbook.createCellStyle();
 			tableDataLeftStyle.setAlignment(CellStyle.ALIGN_LEFT);
@@ -646,6 +656,17 @@ class DocumentService {
 			tableDataLeftStyle.setBorderRight((short)1);
 			tableDataLeftStyle.setBorderTop((short)1);
 
+			// Align left cell style
+			CellStyle tableDataDateStyle = workbook.createCellStyle();
+			tableDataDateStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			tableDataDateStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			tableDataDateStyle.setBorderBottom((short)1);
+			tableDataDateStyle.setBorderLeft((short)1);
+			tableDataDateStyle.setBorderRight((short)1);
+			tableDataDateStyle.setBorderTop((short)1);
+			tableDataDateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
+
+			
 			// Wrap text cell style
 			CellStyle wrapTextCellStyle = workbook.createCellStyle();
 			wrapTextCellStyle.setWrapText(true);
@@ -655,7 +676,13 @@ class DocumentService {
 			dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
 			dateStyle.setAlignment(CellStyle.ALIGN_LEFT);
 			dateStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-			
+
+			// Date cell style
+			CellStyle timestampStyle = workbook.createCellStyle();
+			timestampStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy hh:mm:ss"));
+			timestampStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+			timestampStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
 			// SHIPMENT NAME
 			int counter = 0;
 			Row row = sheet.createRow((short)counter++);
@@ -663,11 +690,28 @@ class DocumentService {
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.name);
 
+			row.createCell(7).setCellValue(new Date());
+			row.getCell(7).setCellStyle(timestampStyle);
+			
 			// SHIPMENT TYPE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentType.label'));
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue("" + getFormatTagLib().metadata(obj: shipmentInstance?.shipmentType));
+
+			
+			/*
+			row = sheet.createRow((short)counter++);
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.todaysDate.label'));
+			row.getCell(0).setCellStyle(labelStyle);
+			row.createCell(1).setCellValue(new Date());
+			row.getCell(1).setCellStyle(dateStyle);
+			
+			row = sheet.createRow((short)counter++);
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'));
+			row.getCell(0).setCellStyle(labelStyle);
+			row.createCell(1).setCellValue(shipmentInstance?.id?.toUpperCase());
+			*/
 
 			/*
 			// Doesn't seem to work this way, so I'm just going to print out all reference numbers
@@ -775,18 +819,21 @@ class DocumentService {
 			
 			row.createCell(2).setCellValue("" + getMessageTagLib().message(code:'inventory.lotNumber.label'));
 			row.getCell(2).setCellStyle(tableHeaderLeftStyle);
-			
-			row.createCell(3).setCellValue("" + getMessageTagLib().message(code:'default.qty.label'));
-			row.getCell(3).setCellStyle(tableHeaderCenterStyle);
-			
-			row.createCell(4).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
+
+			row.createCell(3).setCellValue("" + getMessageTagLib().message(code:'inventoryItem.expires.label'));
+			row.getCell(3).setCellStyle(tableHeaderLeftStyle);
+						
+			row.createCell(4).setCellValue("" + getMessageTagLib().message(code:'default.qty.label'));
 			row.getCell(4).setCellStyle(tableHeaderCenterStyle);
 			
-			row.createCell(5).setCellValue("" + getMessageTagLib().message(code:'shipping.recipient.label'));
+			row.createCell(5).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
 			row.getCell(5).setCellStyle(tableHeaderCenterStyle);
 			
-			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.comments.label'));
-			row.getCell(6).setCellStyle(tableHeaderLeftStyle);
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'shipping.recipient.label'));
+			row.getCell(6).setCellStyle(tableHeaderCenterStyle);
+			
+			row.createCell(7).setCellValue("" + getMessageTagLib().message(code:'default.comments.label'));
+			row.getCell(7).setCellStyle(tableHeaderLeftStyle);
 
 			def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
 			shipmentInstance.shipmentItems.sort(). each { itemInstance ->
@@ -795,7 +842,7 @@ class DocumentService {
 				
 				if (previousContainer != itemInstance?.container?.name) { 
 					row.createCell(0).setCellValue(itemInstance?.container?.name?:getMessageTagLib().message(code:'shipping.unpacked.label').toString());
-					row.getCell(0).setCellStyle(tableDataCenterStyle);
+					row.getCell(0).setCellStyle(tableDataPalletStyle);
 					// If we're at a place in the XLS file where we want to merge cells (e.g. the packing list)
 					// Then we merge rows when the container name is different from the previous container name
 					if (row.getRowNum() > 16) { 
@@ -807,26 +854,29 @@ class DocumentService {
 				else { 
 					finalRowIndex = row.getRowNum()
 					row.createCell(0).setCellValue("");
-					row.getCell(0).setCellStyle(tableDataCenterStyle);
+					row.getCell(0).setCellStyle(tableDataPalletStyle);
 					
 				}
-				row.createCell(1).setCellValue(itemInstance?.product?.name);
+				row.createCell(1).setCellValue(itemInstance?.inventoryItem?.product?.name);
 				row.getCell(1).setCellStyle(tableDataLeftStyle);
 				
-				row.createCell(2).setCellValue(itemInstance?.lotNumber);
+				row.createCell(2).setCellValue(itemInstance?.inventoryItem?.lotNumber);
 				row.getCell(2).setCellStyle(tableDataLeftStyle);
-				
-				row.createCell(3).setCellValue(itemInstance?.quantity);
-				row.getCell(3).setCellStyle(tableDataCenterStyle)
-				
-				row.createCell(4).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
+
+				row.createCell(3).setCellValue(itemInstance?.inventoryItem?.expirationDate);
+				row.getCell(3).setCellStyle(tableDataDateStyle);
+
+				row.createCell(4).setCellValue(itemInstance?.quantity);
 				row.getCell(4).setCellStyle(tableDataCenterStyle)
 				
-				row.createCell(5).setCellValue(itemInstance?.recipient?.name);
-				row.getCell(5).setCellStyle(tableDataCenterStyle);
-
-				row.createCell(6).setCellValue("");
+				row.createCell(5).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
+				row.getCell(5).setCellStyle(tableDataCenterStyle)
+				
+				row.createCell(6).setCellValue(itemInstance?.recipient?.name);
 				row.getCell(6).setCellStyle(tableDataCenterStyle);
+
+				row.createCell(7).setCellValue("");
+				row.getCell(7).setCellStyle(tableDataCenterStyle);
 				
 				row.setHeightInPoints(30.0)
 				previousContainer = itemInstance?.container?.name
