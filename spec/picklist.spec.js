@@ -19,6 +19,16 @@ describe("picklist", function(){
         };
         expect(openboxes.requisition.Picklist.getNewer(serverData, localData)).toBe(serverData);
       });
+
+       it("server data with id is newer if local has no id", function(){
+        var serverData = {
+          id: 1
+        };
+        var localData = { };
+        expect(openboxes.requisition.Picklist.getNewer(serverData, localData)).toBe(serverData);
+      });
+
+
       
       it("local data is newer", function(){
         var serverData = {

@@ -109,6 +109,7 @@
 
         var requisitionId = viewModel.requisition.id();
         viewModel.savedCallback = function(){
+            saveToLocal();
             window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
         };
 
@@ -124,10 +125,7 @@
           heightStyle: "content"
           });
 
-        setInterval(function () {
-            viewModel.requisition.picklist.updatePickedItems();
-            openboxes.requisition.savePicklistToLocal(viewModel.requisition.picklist);
-        }, 3000);
+        setInterval(function () { saveToLocal(); }, 3000);
 
         $("#cancelRequisition").click(function() {
             if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
@@ -140,6 +138,11 @@
            this.value=this.value.replace(/[^\d]/,'');      
            $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
+
+        function saveToLocal(){
+           viewModel.requisition.picklist.updatePickedItems();
+           openboxes.requisition.savePicklistToLocal(viewModel.requisition.picklist);
+        }
 
     });
 </script>

@@ -393,6 +393,7 @@ openboxes.requisition.Requisition.getNewer = function(serverData, localData){
 
 openboxes.requisition.Picklist.getNewer = function(serverData, localData){
   if(!localData) return serverData;
+  if(serverData.id && !localData.id) return serverData;
   if(serverData.version > localData.version) return serverData;
   if(serverData.version < localData.version) return localData;
   if(!serverData.picklistItems) serverData.picklistItems = [];
