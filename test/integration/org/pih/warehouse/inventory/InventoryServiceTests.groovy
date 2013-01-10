@@ -37,6 +37,7 @@ class InventoryServiceTests extends GroovyTestCase {
     protected def  aspirinProduct
     protected def  tylenolProduct
 	protected def  ibuprofenProduct
+    protected def  advilProduct
     protected def  aspirinItem1
     protected def  aspirinItem2
     protected def tylenolItem
@@ -45,6 +46,12 @@ class InventoryServiceTests extends GroovyTestCase {
     def transaction3
     def transaction4
     def transaction5
+
+    def level1
+    def level2
+    def level3
+    def level4
+    def level5
 
     private void basicTestFixture(){
         warehouseLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
@@ -71,6 +78,7 @@ class InventoryServiceTests extends GroovyTestCase {
         aspirinProduct = DbHelper.creatProductIfNotExist("Aspirin" + UUID.randomUUID().toString()[0..5])
         tylenolProduct = DbHelper.creatProductIfNotExist("Tylenol" + UUID.randomUUID().toString()[0..5])
 		ibuprofenProduct = DbHelper.creatProductIfNotExist("Ibuprofen" + UUID.randomUUID().toString()[0..5])
+		advilProduct = DbHelper.creatProductIfNotExist("Advil" + UUID.randomUUID().toString()[0..5])
 		ibuprofenProduct.description = "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)"
 		ibuprofenProduct.save(flush:true);
 		
@@ -145,12 +153,72 @@ class InventoryServiceTests extends GroovyTestCase {
                 transactionDate: new Date(), inventory: bostonInventory, source: haitiLocation)
         transaction5 = new Transaction(transactionType: transactionType_transferOut,
                 transactionDate: new Date(), inventory: bostonInventory, destination: haitiLocation)
-
-
     }
-	
-	
-	private void productTagTestFixture() {		
+
+    private void inventoryLevelTestFixture() {
+        basicTestFixture()
+        level1 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: bostonInventory, product: aspirinProduct)
+        level2 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: bostonInventory, product: tylenolProduct)
+        level3 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: aspirinProduct)
+        level4 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: bostonInventory, product: ibuprofenProduct)
+        level5 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: haitiInventory, product: ibuprofenProduct)
+
+        bostonInventory.addToConfiguredProducts(level1)
+        bostonInventory.addToConfiguredProducts(level2)
+        bostonInventory.addToConfiguredProducts(level4)
+
+        haitiInventory.addToConfiguredProducts(level3)
+        haitiInventory.addToConfiguredProducts(level5)
+
+        bostonInventory.save(flush:true)
+        haitiInventory.save(flush:true)
+
+        level1.save(flush:true)
+        level2.save(flush:true)
+        level3.save(flush:true)
+        level4.save(flush:true)
+        level5.save(flush:true)
+    }
+
+    void test_getProductsByTermsAndCategoriesWithoutHiddenProductsNoInventoryLevelsAtCurrentInventory() {
+        inventoryLevelTestFixture()
+        def inventoryService = new InventoryService()
+        def terms = ["Tylenol"]
+        def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        assert result.contains(tylenolProduct)
+
+        terms = ["Advil"]
+        result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        assert result.contains(advilProduct)
+    }
+
+    void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsNotSupported() {
+        inventoryLevelTestFixture()
+        def inventoryService = new InventoryService()
+        def terms = ["Tylenol"]
+        def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        assert !result.contains(tylenolProduct)
+
+        terms = ["Ibuprofen"]
+        result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        assert !result.contains(ibuprofenProduct)
+    }
+
+    void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsSupported() {
+        inventoryLevelTestFixture()
+        def inventoryService = new InventoryService()
+        def terms = ["Aspirin"]
+        def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        assert result.contains(aspirinProduct)
+
+        terms = ["Ibuprofen"]
+        result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        assert !result.contains(ibuprofenProduct)
+    }
+
+
+
+    private void productTagTestFixture() {
 		basicTestFixture()
 		User user = User.get(1)
 		assertNotNull user 
@@ -354,7 +422,7 @@ class InventoryServiceTests extends GroovyTestCase {
         basicTestFixture()
         def terms = ["Asp", "rin"]
         def inventoryService = new InventoryService()
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
+        def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory,  25, 0)
         assert results.contains(aspirinProduct)
     }
 
@@ -363,7 +431,7 @@ class InventoryServiceTests extends GroovyTestCase {
         basicTestFixture()
         def terms = ["lot9383"]
         def inventoryService = new InventoryService()
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null, 1000, 0)
+        def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 1000, 0)
         assert results.contains(tylenolProduct)
     }
 
@@ -371,7 +439,7 @@ class InventoryServiceTests extends GroovyTestCase {
 		basicTestFixture()
 		def terms = ["Ibuprofen"]
 		def inventoryService = new InventoryService()
-		def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
+		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
 
@@ -379,8 +447,11 @@ class InventoryServiceTests extends GroovyTestCase {
 		basicTestFixture()
 		def terms = ["NSAID"]
 		def inventoryService = new InventoryService()
-		def results = inventoryService.getProductsByTermsAndCategories(terms, null, 25, 0)
+		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
+
+
+
 
 }

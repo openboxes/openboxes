@@ -232,7 +232,7 @@ class InventoryService implements ApplicationContextAware {
         } else {
             // Get all products, including hidden ones
             def matchCategories = getExplodedCategories(categories)
-            products = getProductsByTermsAndCategories(searchTerms, matchCategories, commandInstance?.maxResults, commandInstance?.offset)
+            products = getProductsByTermsAndCategories(searchTerms, matchCategories, commandInstance?.showHiddenProducts, commandInstance?.warehouseInstance.inventory, commandInstance?.maxResults, commandInstance?.offset)
 
             commandInstance.numResults = products.totalCount
             println  "command instance numResult: " + products.totalCount
@@ -605,14 +605,22 @@ class InventoryService implements ApplicationContextAware {
 	 * @param categories
 	 * @return
 	 */
-	List<Product> getProductsByTermsAndCategories(terms, categories, maxResult, offset) {
+	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResult, offset) {
 		//def products = Product.executeQuery("select 
 		//"select inventory_item.lot_number from product left join inventory_item on inventory_item.product_id = product.id where product.name like '%lactomer%'"
-		
+
+        def unsupportedProducts = []
+        currentInventory.configuredProducts.each { if(it.status != InventoryStatus.SUPPORTED) { unsupportedProducts.add(it.product)}}
+
         def products = Product.createCriteria().list() {
 			createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
 			if(categories) {
                 inList("category", categories)
+            }
+            if (!showHidden) {
+                not {
+                    inList("id", (unsupportedProducts.collect { it.id })?: [""])
+                }
             }
             if (terms) {
                 or {
@@ -666,10 +674,9 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }.collect { it }.unique { it.id }
-	
+
 		println "products: " + products
-		
-		
+
         return Product.createCriteria().list(max: maxResult, offset: offset) {
             inList("id", (products.collect { it.id })?: [""])
             order("category")
