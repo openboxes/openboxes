@@ -181,6 +181,7 @@ class AuthController {
 				userInstance.passwordConfirm = params.passwordConfirm;
 				//flash.message = "${warehouse.message(code: 'default.error.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
 				render(view: "signup", model: [userInstance : userInstance]);
+				return;
 			}
 		}		
 		

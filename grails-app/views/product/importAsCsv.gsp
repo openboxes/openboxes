@@ -116,8 +116,13 @@
 														<tr class="${status%2?'even':'odd' }">
 															<td>${status+1 }</td>
 															<td>
-																<g:if test="${product?.id }">															
-																	<span title="${product?.id }">${product?.id?.substring(20, 32) }</span>
+																<g:if test="${product?.id }">		
+																	<g:if test="${product?.id?.length() == 32 }">													
+																		<span title="${product?.id }">${product?.id?.substring(20, 32) }</span>
+																	</g:if>
+																	<g:else>
+																		${product?.id }
+																	</g:else>
 																</g:if>
 																<g:else>
 																	<span class="modified">${warehouse.message(code: 'default.new.label') }</span>

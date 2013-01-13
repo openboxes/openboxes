@@ -10,13 +10,16 @@
 							
 						<g:globalSearch id="dashboardSearchBox" cssClass="globalSearch" size="80"
 							name="searchTerms" value="${params?.searchTerms }" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-											
+							
+						<%-- 				
+						<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }" 
+							class="globalSearch"/>						
 						<g:hiddenField name="resetSearch" value="true"/>							
 						<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							
 						<g:hiddenField name="showHiddenProducts" value="on"/>
 						<g:hiddenField name="showOutOfStockProducts" value="on"/>
-						
-						<button type="submit" class="button icon search" name="searchPerformed" value="true">					
+						--%>
+						<button type="submit" class="button icon search">					
 							<warehouse:message code="default.search.label"/>
 						</button>
 							
