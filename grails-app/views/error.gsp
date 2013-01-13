@@ -75,10 +75,10 @@
 			<g:hiddenField id="dom" name="dom" value=""/>
 			<g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
 			<g:hiddenField name="targetUri" value="${targetUri}"/>
-			<g:hiddenField name="request.statusCode" value="${request.'javax.servlet.error.status_code'}"/>
-			<g:hiddenField name="request.errorMessage" value="${request.'javax.servlet.error.message'.encodeAsHTML()}"/>
-			<g:hiddenField name="exception.message" value="${exception.message?.encodeAsHTML()}"/>
-			<g:hiddenField name="exception.class" value="${exception.className}"/>
+			<g:hiddenField name="request.statusCode" value="${request?.'javax.servlet.error.status_code'}"/>
+			<g:hiddenField name="request.errorMessage" value="${request?.'javax.servlet.error.message'?.encodeAsHTML()}"/>
+			<g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
+			<g:hiddenField name="exception.class" value="${exception?.className}"/>
 			<g:hiddenField name="exception.date" value="${new Date() }"/>
 			<table>
 				<%-- 
@@ -107,7 +107,7 @@
 						<label><warehouse:message code="default.subject.label"/></label>
 					</td>
 					<td class="value">
-						${request.'javax.servlet.error.message'.encodeAsHTML()}
+						${request?.'javax.servlet.error.message'?.encodeAsHTML()}
 					</td>
 				</tr>
 				<tr class="prop">

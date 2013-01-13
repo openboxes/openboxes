@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title>${warehouse.message(code: 'dashboard.chooseLocation.label', default: 'Choose a warehouse to manage')}</title>
+        <title>${warehouse.message(code: 'dashboard.chooseLocation.label')}</title>
 		<style>			
 			#menu { display: none; } 
 			.page-title { display: none; } 
@@ -11,12 +11,14 @@
 			.breadcrumb { display: none; }
 			.warehouse { padding: 10px; width: 175px; background-color: #fcfcfc; color: #333 } 			
 			.warehouse a:hover { text-decoration: underline; }
+			<%--
 			<g:each var="warehouse" in="${session.loginLocations}" status="i">						
 				<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
 					#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
 					#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
 				</g:if>
-			</g:each>			
+			</g:each>
+			--%>			
 		</style>
     </head>
     <body>        
@@ -27,38 +29,117 @@
 			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 				</g:if>		
 				
-				<h1>Choose your location</h1>
-    			<div style="height: 300px; width: 600px; overflow: auto;" class="box">
-					<g:each var="warehouse" in="${session.loginLocations}" status="i">
-						<div id="warehouse-${warehouse.id}" class="warehouse button center" style="float: left; border: 1px solid lightgrey;">
-							<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
-								<g:if test="${warehouse.logo}">	
-									<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
-									<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-								</g:if>
-								<g:else>
-									<%-- 
-									<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-									--%>
-								</g:else>
-								${warehouse.name} 
-							</a> 
-							<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-								<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
-							</g:if>
-						</div>												
-					</g:each>
-					<g:unless test="${session.loginLocations }">
-						<div class="warehouse">
-							<warehouse:message code="dashboard.noWarehouse.message"/>
-						</div>
-						<div class="warehouse">		
-							<warehouse:message code="dashboard.requiredActivities.message" args="[grailsApplication.config.app.loginLocation.requiredActivities]"/>
-						</div>
-					</g:unless>							
-					
-				</div>
 				
+				<g:form controller="dashboard" action="chooseLocation">
+					<div class="box">
+						<table>
+							<tbody>
+								<tr>
+									<td class="left middle">
+					    				<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
+										<span class="title middle">
+											${warehouse.message(code: 'dashboard.chooseLocation.label')}
+										</span>		
+					    					
+					    				
+									</td>
+								</tr>
+								<tr>
+									<td>
+										
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div style="max-height: 300px; overflow: auto;">
+							<table>
+								<tbody>
+									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
+									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
+										<tr class="prop">
+											<td class="top right" width="25%">			
+												<label>${entry.key?:warehouse.message(code:'default.none.label') }</label>
+											</td>
+											<td>	
+												
+												<g:set var="locationGroup" value="${entry.key }"/>
+												<g:each var="warehouse" in="${entry.value }">
+													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
+														<g:if test="${warehouse.logo}">	
+															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
+															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+														</g:if>
+														<g:else>
+															<%-- 
+															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+															--%>
+														</g:else>
+														${warehouse.name}
+													</a> 
+													
+												</g:each>
+											</td>
+										</tr>										
+									</g:each>
+									<tr class="prop">
+										<td class="top right">
+																				
+											<label>${warehouse.message(code: 'default.others.label', default: 'Others')}</label>
+										</td>
+										<td>
+											
+												<g:each var="warehouse" in="${nullLocationGroup }">
+													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
+														<g:if test="${warehouse.logo}">	
+															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
+															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+														</g:if>
+														<g:else>
+															<%-- 
+															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+															--%>
+														</g:else>
+														${warehouse.name}
+													</a> 
+													
+												</g:each>
+										</td>										
+									</tr>
+									<g:unless test="${session.loginLocations }">
+										<div class="warehouse">
+											<warehouse:message code="dashboard.noWarehouse.message"/>
+										</div>
+										<div class="warehouse">		
+											<warehouse:message code="dashboard.requiredActivities.message" args="[grailsApplication.config.app.loginLocation.requiredActivities]"/>
+										</div>
+									</g:unless>							
+								</tbody>
+							</table>
+						</div>
+						<%-- 	
+						<table>
+							<tr>
+								<td class="left middle" colspan="2">
+									<hr/>
+								</td>
+							</tr>
+							<tr>
+								<td class="left middle" colspan="2">
+									<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/> Remember my location and log me in automatically.
+								</td>
+							</tr>	
+							<tr>
+								<td>
+									<g:if test="${session?.user?.warehouse?.id }">
+										<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
+									</g:if>												
+								
+								</td>
+							</tr>
+						</table>
+						--%>
+					</div>
+				</g:form>				
 			</div>
 		</div>
     </body>

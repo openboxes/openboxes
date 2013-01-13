@@ -19,7 +19,8 @@ class InitializationFilters {
 			before = {
 				try { 
 					Location currentLocation = Location.get(session?.warehouse?.id)
-					session.loginLocations = locationService.getLoginLocations(currentLocation)					
+					session.loginLocations = locationService.getLoginLocations(currentLocation) 			
+					session.loginLocationsMap = locationService.getLoginLocations(currentLocation).groupBy { it.locationGroup } 			
 				} catch (Exception e) { 
 					// Only happens when location service is unavailable 	
 					log.error "Error retrieving login-able locations: " + e.message

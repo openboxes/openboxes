@@ -324,11 +324,11 @@ a:hover {
 }
 
 #loginForm { 
-	width:400px;
+	width:500px;
 	position: absolute;
-	top: 10%;
+	top: 20%;
 	left: 50%;
-	margin-left: -200px;
+	margin-left: -250px;
 }
 #loginFormBox { 
 	border: 1px solid lightgrey;	
@@ -341,12 +341,11 @@ a:hover {
 }
 	
 #signupForm { 
-	width:400px;
-	height:  300px;
+	width:500px;
 	position: absolute;
 	top: 50px;
 	left: 50%;
-	margin-left: -150px;
+	margin-left: -250px;
 }
 
 
@@ -599,9 +598,16 @@ h2 {
 */
 
 
+.logo { 
+	font-size: 2em;	
+	font-weight: bold;
+}
+
+
 .title { 
 	font-size: 1.2em;	
 	font-weight: bold;
+	color: #666;
 }
 
 .buttons { 
@@ -791,7 +797,11 @@ ul.treeList li ul li {
 .megamenu a:hover { 
 	text-decoration: underline;
 }
-        	
+
+ul.megamenu a.mm-item-link:link, ul.megamenu a.mm-item-link:visited {
+	padding: 7px 15px;
+}        	
+
 ul.megamenu {
 	padding: 0;
 	margin: 0;
@@ -1402,3 +1412,20 @@ blockquote {
   border-left: 3px solid #ccc;
 } 
 
+.modified { color: red; }
+
+span.tooltip {
+      position: absolute;
+      width: 100px;
+      height: 20px;
+      line-height: 20px;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      color: rgb(113, 157, 171);
+      background: rgb(255, 255, 255);
+      border: 4px solid rgb(255, 255, 255);
+      border-radius: 5px;
+      text-shadow: rgba(0, 0, 0, 0.0980392) 1px 1px 1px;
+      box-shadow: rgba(0, 0, 0, 0.0980392) 1px 1px 2px 0px;
+}

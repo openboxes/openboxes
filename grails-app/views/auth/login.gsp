@@ -9,8 +9,8 @@
 </head>
 <body>
 	<style>
-		#hd { display: none; }  
-		#loginBox { height: 215px; }
+		
+		#hd { display: none; }
 	</style>
 	
 
@@ -39,49 +39,56 @@
 							<table>
 								<tbody>
 									<tr>
-										<td class="center middle">
-										
-											<div id="logo">
-										    	<img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>&nbsp;
-												<span class="middle title" style="font-size: 2em; color: #666; vertical-align: middle;"><warehouse:message code="default.openboxes.label"/></span>
-											</div>	
-																
+										<td class="left middle">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
+											<span class="title middle">
+												<warehouse:message code="default.login.label" default="Login"/>
+											</span>				
 										</td>
 									</tr>
 									<tr>
-										<%-- 
-										<td class="right middle">
-											<label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>
+										<td class="left middle" colspan="2">
+											<hr/>
 										</td>
-										--%>
-										<td class="center middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
+									</tr>
+									<tr>
+										<td class="right middle">
+											<%-- <label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>--%>
+										</td>
+										<td class="left middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 											<g:textField class="text" id="username" name="username" value="${userInstance?.username}" size="35" />
 										</td>
 									</tr>
 									<tr>
-										<%--
 										<td class="right middle">
-											<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label>
+											<%--<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label> --%>
 										</td>
-										 --%>
-										<td class="center middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
+										<td class="left middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 											<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" size="35" />
 										</td>
 									</tr>
 									<tr>
-										<td colspan="2" class="middle center">
-											<button type="submit" class="positive big" id="loginButton">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" class="middle"/>&nbsp;						
-												<g:message code="auth.login.label"/> &nbsp;
-											</button>												
+										<td></td>
+										<td class="middle left">
+											<button type="submit" class="button icon approve" id="loginButton">
+												
+												<g:message code="auth.login.label"/>
+											</button> 
+											<%-- 
+											&nbsp;|&nbsp;											
+											<g:link class="list" controller="auth" action="forgotPassword"><warehouse:message code="auth.forgotPassword.label" default="Forgot your password?"/></g:link>										
+											--%>
+											&nbsp; <warehouse:message code="auth.newuser.text"/> &nbsp;<g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>					
+										</td>
+									</tr>
+									<tr>
+										<td class="middle center" colspan="2">
+											
 										</td>
 									</tr>
 									
 								</tbody>
 							</table>
-						</div>
-						<div style="text-align: right">				
-							<warehouse:message code="auth.newuser.text"/> &nbsp;<g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>
 						</div>
 						
 				</div>

@@ -74,6 +74,7 @@
     <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
 	--%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="screen, projection" />
 	
   <!-- jquery validation messages -->
   <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
