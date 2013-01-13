@@ -75,10 +75,10 @@ class InventoryServiceTests extends GroovyTestCase {
         transactionType_transferOut =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) //id:9
 
         // create some products
-        aspirinProduct = DbHelper.creatProductIfNotExist("Aspirin" + UUID.randomUUID().toString()[0..5])
-        tylenolProduct = DbHelper.creatProductIfNotExist("Tylenol" + UUID.randomUUID().toString()[0..5])
-		ibuprofenProduct = DbHelper.creatProductIfNotExist("Ibuprofen" + UUID.randomUUID().toString()[0..5])
-		advilProduct = DbHelper.creatProductIfNotExist("Advil" + UUID.randomUUID().toString()[0..5])
+        aspirinProduct = DbHelper.createProductIfNotExists("Aspirin" + UUID.randomUUID().toString()[0..5])
+        tylenolProduct = DbHelper.createProductIfNotExists("Tylenol" + UUID.randomUUID().toString()[0..5])
+		ibuprofenProduct = DbHelper.createProductIfNotExists("Ibuprofen" + UUID.randomUUID().toString()[0..5])
+		advilProduct = DbHelper.createProductIfNotExists("Advil" + UUID.randomUUID().toString()[0..5])
 		ibuprofenProduct.description = "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)"
 		ibuprofenProduct.save(flush:true);
 		

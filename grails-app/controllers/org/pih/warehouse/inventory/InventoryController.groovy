@@ -113,9 +113,11 @@ class InventoryController {
 		// Pass this to populate the matching inventory items
 		inventoryService.browseInventory(cmd);
 
-		def tags = productService.getAllTags()
+		def tags = productService.getPopularTags()
 
-		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags, numProducts : cmd.numResults ]
+		def categories = productService.getTopLevelCategories()
+		
+		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags, numProducts : cmd.numResults, categories: categories ]
 	}
 	
 		

@@ -7,8 +7,7 @@
 				<div class="logo" >
 				    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 			    		<img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>
-			    		&nbsp;
-		    			<span style="font-size: 2em; vertical-align: middle;" class="title">
+		    			<span class="">
 							<warehouse:message code="default.openboxes.label"/>
 						</span>
 				    </a>
@@ -100,7 +99,7 @@
 									<a href="javascript:void(0);" class="warehouse-switch">
 										${session?.warehouse?.name }
 									</a>
-									<span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none;">
+									<span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none; padding: 10px;">
 										<g:isUserNotInRole roles="[RoleType.ROLE_ADMIN]">
 											<div class="error">
 												${warehouse.message(code:'auth.needAdminRoleToChangeLocation.message')}
@@ -109,18 +108,10 @@
 										<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
 											<div style="height: 200px; overflow: auto;">
 												<g:each var="warehouse" in="${session.loginLocations}" status="i">	
-													<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
-														<style>
-															#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
-															#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
-														</style>				
-													</g:if>					
-													<div id="warehouse-${warehouse.id }" class="warehouse button">	
-														<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-														<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}' style="display: block; padding: 0px;">
-															${warehouse.name}
-														</a> 
-													</div>												
+													<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+													<a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+														${warehouse.name}
+													</a> 
 												</g:each>																	
 												<g:unless test="${session.loginLocations }">
 													<div style="background-color: black; color: white;" class="warehouse button">

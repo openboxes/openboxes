@@ -32,14 +32,18 @@ class DbHelper {
         category
     }
 
-    static Product creatProductIfNotExist(def name) {
-        def existingOne = Product.findByName(name)
-        if (existingOne) return existingOne
-        def newOne = new Product(name: name)
-        newOne.category = createCategoryIfNotExists("Medicines")
-        newOne.save(flush: true)
-        newOne
-    }
+	static Product createProductIfNotExists(productName){
+		return DbHelper.createProductIfNotExists(productName, "Medicines")
+	}
+
+	static Product createProductIfNotExists(productName, categoryName){
+		def existingOne = Product.findByName(productName)
+		if(existingOne) return existingOne
+		def newOne = new Product(name:productName)
+		newOne.category = createCategoryIfNotExists(categoryName)
+		newOne.save(flush:true)
+		newOne
+	}
 
     static Product createProductWithGroups(def name, def groupNames) {
         Product product = Product.findByName(name)
@@ -62,7 +66,7 @@ class DbHelper {
 
         product
     }
-
+	
     static InventoryItem createInventoryItem(Product product, String lotNumber, expirationDate = new Date().plus(30)) {
         def existingOne = InventoryItem.findByProductAndLotNumber(product, lotNumber)
         if (existingOne) return existingOne
@@ -73,7 +77,7 @@ class DbHelper {
         item.save(flush: true)
         item
     }
-
+	
     static recordProductInventory(Product product, Location location, String lotNumber, Date expirationDate, int quantity, Date transactionDate) {
         def transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         if (location.inventory == null) {
@@ -121,4 +125,32 @@ class DbHelper {
     static getInventoryItem(Product product, String lotNumber) {
         return InventoryItem.findByProductAndLotNumber(product, lotNumber)
     }
+	
+	static Product createProductWithTags(name, tags){
+		Product product = Product.findByName(name)
+		if(!product){
+			product = new Product(name: name, category: createCategoryIfNotExists("Integration"))
+			product.save(failOnError:true,flush:true)
+		}
+		tags.each{ tagName ->
+			def tag = Tag.findByTag(tagName)
+			if(!tag){
+				tag = new Tag(tag: tagName)				
+				//tag.save(failOnError:true,flush:true)
+			}
+			product.addToTags(tag)
+			product.save(failOnError:true,flush:true)
+		}
+		return product
+	}
+	
+	static Tag createTag(tagName) { 
+		def tag = Tag.findByTag(tagName)
+		if (!tag) { 
+			tag = new Tag(tag: tagName)
+			tag.save(failOnError:true,flush:true)
+		}
+		return tag		
+	}
+	
 }

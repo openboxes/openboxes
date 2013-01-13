@@ -111,7 +111,7 @@ class Product implements Comparable, Serializable {
     static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
 		description(nullable:true)
-		productCode(nullable:true, maxSize: 255)
+		productCode(nullable:true, maxSize: 255, unique: false)
 		unitOfMeasure(nullable:true, maxSize: 255)
 		category(nullable:false)
 		coldChain(nullable:true)
@@ -156,7 +156,7 @@ class Product implements Comparable, Serializable {
 	
 	String tagsToString() { 
 		if (tags) { 
-			return tags.collect { it.tag }.join(",")
+			return tags.sort { it.tag }.collect { it.tag }.join(",")
 		}
 		else { 
 			return null

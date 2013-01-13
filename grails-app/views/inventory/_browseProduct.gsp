@@ -9,13 +9,17 @@
 			alt="${inventoryItem?.inventoryLevel?.status?.name() }" title="${inventoryItem?.inventoryLevel?.status?.name() }" style="vertical-align: middle;"/>
 	</td>
 	<td class="checkable middle">	
+		
 		<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-			<g:if test="${inventoryItem?.product?.name?.trim()}">
-				<format:product product="${inventoryItem?.product}"/>
-			</g:if>
-			<g:else>
-				<warehouse:message code="product.untitled.label"/>
-			</g:else>
+			<span title="${inventoryItem?.product?.description }">
+				<span class="fade">${inventoryItem?.product?.productCode }</span>
+				<g:if test="${inventoryItem?.product?.name?.trim()}">
+					<format:product product="${inventoryItem?.product}"/>
+				</g:if>
+				<g:else>
+					<warehouse:message code="product.untitled.label"/>
+				</g:else>
+			</span>
 			
 		</g:link> 
 	</td>

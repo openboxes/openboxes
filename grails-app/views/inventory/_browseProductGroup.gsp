@@ -1,4 +1,4 @@
-<tr class="${counter%2==0?'even':'odd' } ${cssClass}">
+<tr class="hasRelated ${counter%2==0?'even':'odd' } ${cssClass}" id="productGroup-${inventoryItem?.productGroup?.id }">
 	<td class="middle center">
 		<g:checkBox id="${inventoryItem?.productGroup?.id }" name="productGroup.id" 
 				class="checkbox" style="top:0em;" checked="${false }" 
@@ -13,7 +13,7 @@
 	</td>
 	<td class="middle">
 		<span id="${inventoryItem?.productGroup?.id }" class="expandable">
-		${inventoryItem?.productGroup?.description } (${inventoryItem?.productGroup?.products?.size() })		
+			${inventoryItem?.productGroup?.description } (${inventoryItem?.productGroup?.products?.size() })		
 		</span>
 		<%--
 		${inventoryItem?.productGroup?.products }
@@ -66,15 +66,9 @@
 		</g:else>
 	</td>
 </tr>
-<tr class="productGroupProducts" id="productGroupProducts-${inventoryItem?.productGroup?.id }" style="display: none;">
-	<td colspan="7">
-		<div class="box">
-			<table>
-				<g:each var="groupedInventoryItem" in="${inventoryItem?.inventoryItems }">
-					<g:set var="counter" value="${counter+1 }"/>
-					<g:render template="browseProduct" model="[counter:counter,inventoryItem:groupedInventoryItem,cssClass:'productGroupProduct']"/>
-				</g:each>
-			</table>
-		</div>
-	</td>
-</tr>
+<g:set var="items" value="${inventoryItem?.inventoryItems }"/>
+<g:each var="groupedInventoryItem" in="${inventoryItem?.inventoryItems }">
+	<g:set var="counter" value="${counter+1 }"/>	
+	<g:set var="cssClass" value="isRelated ${items?.size() == counter ? 'lastRelated' : '' }"/>
+	<g:render template="browseProduct" model="[id:productGroup?.id,counter:counter,inventoryItem:groupedInventoryItem,cssClass:cssClass]"/>
+</g:each>

@@ -13,6 +13,7 @@ import java.util.Date;
 
 import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product;
 
 class Tag implements Serializable {
 
@@ -30,9 +31,16 @@ class Tag implements Serializable {
 	User createdBy
 	User updatedBy
 	
+	static belongsTo = org.pih.warehouse.product.Product
+	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid'		
+		products joinTable: [name:'product_tag', column: 'product_id', key: 'tag_id'], cascade: 'all-delete-orphan'
 	}
+	
+	static hasMany = [
+		products : Product 
+	] 
 	
 	static constraints = {
 		tag(nullable:false, maxSize: 255)

@@ -38,7 +38,7 @@ class ProductIntegrationTests extends GroovyTestCase{
     }
 
     void testLatestInventoryDate(){
-      def product = DbHelper.creatProductIfNotExist("TestProductABC") 
+      def product = DbHelper.createProductIfNotExists("TestProductABC") 
       Location boston =  Location.findByName("Boston Headquarters")
       Location miami =  Location.findByName("Miami Warehouse");
       def tenDaysAgo = new Date().minus(10)

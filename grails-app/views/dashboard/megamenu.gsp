@@ -14,69 +14,36 @@
 			<g:link controller="inventory" action="browse">
 				<warehouse:message code="inventory.label" />&nbsp;
 			</g:link>
-			<div>							
-				<table>
-					<tr>
-						<td>
-							<div class="buttonsBar">
-								<div class="linkButton">
-									<g:link controller="inventory" action="browse" class="browse"><warehouse:message code="inventory.browse.label"/></g:link>
-								</div>							
-								<div class="linkButton">
-									<g:link controller="inventory" action="listAllTransactions" class="list"><warehouse:message code="transactions.label"/></g:link> 
-								</div>										
-								<div class="linkButton">
-									<g:link controller="inventory" action="editTransaction" class="create"><warehouse:message code="transaction.add.label"/></g:link> 				
-								</div>										
-								<div class="linkButton">
-									<g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label')]"/></g:link> 				
-								</div>
-							</div>
-							
-						</td>
-						
+			<div>
+				<div class="buttonsBar">
+					<div class="linkButton">
+						<g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]"><warehouse:message code="inventory.browse.label"/></g:link>
+					</div>							
+					<div>
+						<hr/>
+					</div>
+					<div class="linkButton">
 						<g:if test='${quickCategories }'>	
-							<td style="border-left: 1px solid lightgrey">
-								<label><warehouse:message code="inventory.browseByCategory.label" />:</label>
-								<table>
-									<tr>
-										<g:each var="quickCategory" in="${quickCategories}">
-											<td>
-												<div >
-													
-													<ul>							
-														<li>
-															<g:link controller="inventory" action="browse" params="[categoryId:quickCategory.id,resetSearch:true]">
-																<label><format:category category="${quickCategory}"/></label>
-															</g:link>
-															<ul>
-																<g:if test="${quickCategory.categories}">
-																	<g:each var="childCategory" in="${quickCategory.categories}">
-																		<li>
-																			<g:link controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
-																				<format:category category="${childCategory}"/>
-																			</g:link>
-																		</li>																				
-																	</g:each>	
-																</g:if>
-																<g:else>
-																	<li>
-																		<warehouse:message code="default.none.label"/>
-																	</li>
-																</g:else>
-															</ul>
-														</li>
-													</ul>
-												</div>
-											</td>
-										</g:each>	
-									</tr>
-								</table>
-							</td>
-						</g:if>						
-					</tr>
-				</table>				
-			</div>
+							<g:each var="quickCategory" in="${quickCategories}">
+								<div class="linkButton">
+									<g:link controller="inventory" action="browse" class="" params="[categoryId:quickCategory.id,resetSearch:true]">
+										<b><format:category category="${quickCategory}"/></b>
+									</g:link>
+								</div>
+								<g:if test="${quickCategory.categories}">
+									<g:each var="childCategory" in="${quickCategory.categories}">
+										<div class="linkButton" style="margin-left: 15px;">
+											<g:link controller="inventory" action="browse" class="" params="[categoryId:childCategory.id,resetSearch:true]">
+												<format:category category="${childCategory}"/>
+											</g:link>
+										</div>
+									</g:each>	
+								</g:if>
+							</g:each>	
+						</g:if>			
+					</div>
+				</div>			
+			</div>				
 		</li>
 	</g:authorize>
 	
@@ -116,30 +83,30 @@
                             <warehouse:message code="requisition.list.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
                         </g:link>
                     </div>
-                </div>
-                <div class="linkButton">
-                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_STOCK']">
-                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.ward-stock.label')]" />
-                    </g:link>
-                </div>
-
-                <div class="linkButton">
-                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_NON_STOCK']">
-                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.ward-non-stock.label')]" />
-                    </g:link>
-                </div>
-
-                <div class="linkButton">
-                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_STOCK']">
-                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-stock.label')]" />
-                    </g:link>
-                </div>
-
-                <div class="linkButton">
-                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_NON_STOCK']">
-                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-non-stock.label')]" />
-                    </g:link>
-                </div>
+	                <div class="linkButton">
+	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_STOCK']">
+	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.ward-stock.label')]" />
+	                    </g:link>
+	                </div>
+	
+	                <div class="linkButton">
+	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_NON_STOCK']">
+	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.ward-non-stock.label')]" />
+	                    </g:link>
+	                </div>
+	
+	                <div class="linkButton">
+	                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_STOCK']">
+	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-stock.label')]" />
+	                    </g:link>
+	                </div>
+	
+	                <div class="linkButton">
+	                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_NON_STOCK']">
+	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-non-stock.label')]" />
+	                    </g:link>
+	                </div>
+	        	</div>
 			</div>
 		</li>
 	</g:authorize>		
@@ -222,127 +189,135 @@
 			</div>
 		</div>					
 	</li>
-  <g:isUserAdmin>
-    <li>
-      <a href="javascript:void(0)">
-        <warehouse:message code="admin.label" />
-      </a>	
-      <div>
-        <table>
-          <tr>
-            <td class="top">
-              <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
-                <span class="menu-subheading"><warehouse:message code="default.general.label"/></span>
-                <div class="buttonBar">
-                  <div class="linkButton">
-                    <g:link controller="admin" action="showSettings" class="list"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
-                  </div>
-                </div>
-              </g:authorize>	
-            
-            </td>
-          </tr>
-          <tr>
-            <td class="top">
-              <span class="menu-subheading"><warehouse:message code="locations.label"/></span>
-              <div class="buttonBar">
-                <div class="linkButton">									
-                  <g:link controller="locationGroup" action="list" class="site"><warehouse:message code="location.sites.label"/></g:link>
-                </div>
-                <div class="linkButton">									
-                  <g:link controller="location" action="list" class="location"><warehouse:message code="locations.label"/></g:link>
-                </div>
-                <div class="linkButton">									
-                  <g:link controller="shipper" action="list" class="shipper"><warehouse:message code="location.shippers.label"/></g:link>
-                </div>
-                <div class="linkButton">									
-                  <g:link controller="locationType" action="list" class="locationType"><warehouse:message code="location.locationTypes.label"/></g:link>
-                </div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="top">
-              <span class="menu-subheading"><warehouse:message code="persons.label"/></span>
-              <div class="buttonBar">
-                <div class="linkButton">									
-                  <g:link controller="person" action="list" class="people"><warehouse:message code="person.list.label"/></g:link>
-                </div>
-                <div class="linkButton">									
-                  <g:link controller="user" action="list" class="user"><warehouse:message code="users.label"/></g:link>
-                </div>
-              </div>		
-            </td>
-          </tr>
-        </table>
-      </div>
-    </li>
-  </g:isUserAdmin>	
-	
-	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+	<g:isUserAdmin>
+		<li><a href="javascript:void(0)"> <warehouse:message
+					code="admin.label" />
+		</a>
+			<div>
+				<div class="buttonsBar">
+					<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+						<div class="linkButton">
+							<g:link controller="admin" action="showSettings" class="list">
+								<warehouse:message code="default.manage.label"
+									args="[warehouse.message(code:'default.settings.label')]" />
+							</g:link>
+						</div>
+					</g:authorize>
+
+					<div class="linkButton">
+						<g:link controller="locationGroup" action="list" class="site">
+							<warehouse:message code="location.sites.label" />
+						</g:link>
+					</div>
+					<div class="linkButton">
+						<g:link controller="location" action="list" class="location">
+							<warehouse:message code="locations.label" />
+						</g:link>
+					</div>
+					<div class="linkButton">
+						<g:link controller="shipper" action="list" class="shipper">
+							<warehouse:message code="location.shippers.label" />
+						</g:link>
+					</div>
+					<div class="linkButton">
+						<g:link controller="locationType" action="list"
+							class="locationType">
+							<warehouse:message code="location.locationTypes.label" />
+						</g:link>
+					</div>
+					<div class="linkButton">
+						<g:link controller="person" action="list" class="people">
+							<warehouse:message code="person.list.label" />
+						</g:link>
+					</div>					
+					<div class="linkButton">
+						<g:link controller="user" action="list" class="user">
+							<warehouse:message code="users.label" />
+						</g:link>
+					</div>
+					<div class="linkButton">
+						<g:link controller="inventory" action="listAllTransactions" class="list"><warehouse:message code="transactions.label"/></g:link> 
+					</div>										
+					<div class="linkButton">
+						<g:link controller="inventory" action="editTransaction" class="create"><warehouse:message code="transaction.add.label"/></g:link> 				
+					</div>										
+					<div class="linkButton">
+						<g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label')]"/></g:link> 				
+					</div>					
+					
+					
+				</div>
+			</div>
+		</li>
+	</g:isUserAdmin>
+
+
+	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
 		<li>
-			<g:link controller="product" action="list">
-				<warehouse:message code="products.label" />&nbsp;
-			</g:link>
-			<div>							
-				<table>
-					<tr>
-						<td>
-							<div class="buttonsBar">
-								<div class="linkButton">									
-									<g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
-								</div>
-								<div class="linkButton">									
-									<g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
-								</div>
-								<div class="linkButton">									
-									<g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
-								</div>
-								<div class="linkButton">									
-									<g:link controller="category" action="tree" class="list"><warehouse:message code="categories.label"/></g:link>
-								</div>
-								<div class="linkButton">
-									<g:link controller="unitOfMeasure" action="list" class="list"><warehouse:message code="unitOfMeasure.label"/></g:link> 				
-								</div>										
-								<div class="linkButton">
-									<g:link controller="unitOfMeasureClass" action="list" class="list"><warehouse:message code="unitOfMeasureClass.label"/></g:link> 				
-								</div>		
+			<a href="javascript:void(0)">
+				<warehouse:message code="products.label" />
+			</a>				
+			<div>				
+				<div class="buttonsBar">						
+					<div class="linkButton">									
+						<g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
+					</div>
+					<div class="linkButton">									
+						<g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
+					</div>
+					<div class="linkButton">									
+						<g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
+					</div>
+					<div class="linkButton">									
+						<g:link controller="category" action="tree" class="list"><warehouse:message code="categories.label"/></g:link>
+					</div>
+					<div class="linkButton">									
+						<g:link controller="tag" action="list" class="list"><warehouse:message code="product.tags.label"/></g:link>
+					</div>					
+					<div class="linkButton">
+						<g:link controller="unitOfMeasure" action="list" class="list"><warehouse:message code="unitOfMeasure.label"/></g:link> 				
+					</div>										
+					<div class="linkButton">
+						<g:link controller="unitOfMeasureClass" action="list" class="list"><warehouse:message code="unitOfMeasureClass.label"/></g:link> 				
+					</div>		
+					<g:isUserAdmin>
+						<div>
+							<hr/>
+						</div>
+						<div class="linkButton">
+							<g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
+						</div>
+						<div class="linkButton">
+							<g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
+						</div>
+						<div class="linkButton">
+							<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
+						</div>
+						<div>
+							<hr/>
+						</div>
+						<div class="linkButton">
+							<g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
+						</div>
+						<div class="linkButton">
+							<g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link> 
+						</div>
+					
+					</g:isUserAdmin>						
 								
-							<div>
-						</td>
-						<td>
-							<div class="buttonsBard">					
-								<div class="linkButton">
-									<g:link controller="product" action="export" class="list" params="[format:'csv']"><warehouse:message code="default.export.label" args="[warehouse.message(code:'products.label')]"/></g:link> 
-								</div>			
-								<div class="linkButton">
-									<g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
-								</div>
-								<div class="linkButton">
-									<g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
-								</div>
-								<div class="linkButton">
-									<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
-								</div>
-								
+					<g:if test="${session.lastProduct }" >
+						<div>
+							<hr/>
+						</div>
+						<div class="buttonsBar">
+							<div class="linkButton">
+								<g:link controller="inventoryItem" action="showStockCard" id="${session.lastProduct.id }" class="product">
+									${session.lastProduct.name }</g:link>						
+								<span class="fade">edited <g:formatDate date="${session.lastProduct.lastUpdated }" format="MMM dd hh:mma"/></span>					
 							</div>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<g:if test="${session.lastProduct }" >
-								<h2>Recently viewed</h2>
-								<div class="buttonsBar">
-									<div class="linkButton">
-										<g:link controller="inventoryItem" action="showStockCard" id="${session.lastProduct.id }" class="product">
-											${session.lastProduct.name }</g:link>						
-										<span class="fade">edited <g:formatDate date="${session.lastProduct.lastUpdated }" format="MMM dd hh:mma"/></span>					
-									</div>
-								</div>
-							</g:if>
-						</td>			
-					</tr>
-				</table>				
+						</div>
+					</g:if>
+				</div>
 			</div>
 		</li>
 	</g:authorize>	

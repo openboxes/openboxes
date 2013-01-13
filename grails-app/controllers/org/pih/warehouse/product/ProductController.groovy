@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/ 
 package org.pih.warehouse.product;
 
 import java.awt.Graphics2D;
@@ -17,11 +17,11 @@ import javax.swing.ImageIcon;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.groovydev.SimpleImageBuilder;
-import org.hsqldb.util.CSVWriter;
 import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.DocumentCommand;
+import org.pih.warehouse.importer.ImportDataCommand;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryLevel;
 import org.pih.warehouse.core.ApiException;
@@ -43,7 +43,6 @@ import java.net.URLEncoder;
 
 import grails.converters.JSON;
 import grails.converters.XML;
-import org.grails.plugins.csv.CSVWriter
 
 class ProductController {
 
@@ -60,11 +59,11 @@ class ProductController {
 	def index = {
 		redirect(action: "list", params: params)
 	}
-	
-	def redirect = { 
+
+	def redirect = {
 		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
 	}
-	
+
 	/** 
 	 * Perform a bulk update of 
 	 */
@@ -163,11 +162,11 @@ class ProductController {
 
 	def save = {
 		println "Save product: " + params
-		
+
 		def productInstance = new Product();
 		productInstance.properties = params
 
-		// Add tags 
+		// Add tags
 		try {
 			if (params.tagsToBeAdded) {
 				params.tagsToBeAdded.split(",").each { tagText ->
@@ -179,8 +178,8 @@ class ProductController {
 		} catch (Exception e) {
 			log.error("Error occurred: " + e.message)
 		}
-		
-		// Add attributes  
+
+		// Add attributes
 		Attribute.list().each() {
 			String attVal = params["productAttributes." + it.id + ".value"];
 			if (attVal == "_other" || attVal == null || attVal == '') {
@@ -215,7 +214,7 @@ class ProductController {
 		}
 	}
 
-	
+
 	def show = {
 		def productInstance = Product.get(params.id)
 		if (!productInstance) {
@@ -226,8 +225,8 @@ class ProductController {
 			[productInstance: productInstance]
 		}
 	}
-	
-	
+
+
 	def edit = {
 		def productInstance = Product.get(params.id)
 		def location = Location.get(session?.warehouse?.id);
@@ -236,14 +235,14 @@ class ProductController {
 			redirect(controller: "inventoryItem", action: "browse")
 		}
 		else {
-			
+
 			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
 			if (!inventoryLevelInstance) {
 				inventoryLevelInstance = new InventoryLevel();
 			}
-			
-			[productInstance: productInstance, rootCategory: productService.getRootCategory(), 
-					inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
+
+			[productInstance: productInstance, rootCategory: productService.getRootCategory(),
+				inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
 		}
 	}
 
@@ -255,7 +254,8 @@ class ProductController {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (productInstance.version > version) {
-                    productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
+					productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
+						warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
 					render(view: "edit", model: [productInstance: productInstance])
 					return
 				}
@@ -266,17 +266,17 @@ class ProductController {
 			productInstance.attributes.each() {
 				existingAtts.put(it.attribute.id, it)
 			}
-			
-			try { 
+
+			try {
 				if (params.tagsToBeAdded) {
 					productInstance.tags.clear()
-					params.tagsToBeAdded.split(",").each { tagText ->						
+					params.tagsToBeAdded.split(",").each { tagText ->
 						Tag tag = Tag.findByTag(tagText)
 						if (!tag) tag = new Tag(tag:tagText)
-						productInstance.addToTags(tag)						
+						productInstance.addToTags(tag)
 					}
 				}
-			} catch (Exception e) { 
+			} catch (Exception e) {
 				log.error("Error occurred: " + e.message)
 			}
 			Attribute.list().each() {
@@ -309,8 +309,8 @@ class ProductController {
 				productInstance.categories.removeAll(_toBeDeleted)
 			}
 
-			
-			
+
+
 			/*
 			 productInstance?.categories?.clear();		
 			 params.each {
@@ -327,17 +327,17 @@ class ProductController {
 				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 			}
 			else {
-				
+
 				def location = Location.get(session?.warehouse?.id);
 				def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
 				if (!inventoryLevelInstance) {
 					inventoryLevelInstance = new InventoryLevel();
 				}
-		
-				
-				render(view: "edit", model: [productInstance: productInstance, 
+
+
+				render(view: "edit", model: [productInstance: productInstance,
 					rootCategory: productService.getRootCategory(),
-					inventoryInstance: location.inventory, 
+					inventoryInstance: location.inventory,
 					inventoryLevelInstance:inventoryLevelInstance])
 			}
 		}
@@ -371,9 +371,9 @@ class ProductController {
 			redirect(action: "edit", id: params.id)
 		}
 	}
-	
-	
-	def removePackage = { 
+
+
+	def removePackage = {
 		def packageInstance = ProductPackage.get(params.id)
 		def productInstance = packageInstance.product
 		log.info "" + packageInstance.product
@@ -384,15 +384,15 @@ class ProductController {
 		redirect(action: "edit", id: productInstance.id)
 	}
 
-	def savePackage = { 
-		
+	def savePackage = {
+
 		println "savePackage: " + params
-		def productInstance = Product.get(params.id)		
+		def productInstance = Product.get(params.id)
 		def packageInstance = new ProductPackage(params)
 		productInstance.addToPackages(packageInstance)
-		
+
 		if (!productInstance.hasErrors() && productInstance.save(flush: true) ) {
-			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"			
+			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
 			redirect(action: "edit", id: productInstance?.id)
 		}
 		else {
@@ -401,12 +401,12 @@ class ProductController {
 			if (!inventoryLevelInstance) {
 				inventoryLevelInstance = new InventoryLevel();
 			}
-			
+
 			render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
 		}
 	}
-	
-	
+
+
 	/**
 	 * 
 	 */
@@ -428,12 +428,12 @@ class ProductController {
 	 * @param userInstance
 	 * @return
 	 */	
-   def sendProductCreatedEmail(Product product) {
+	def sendProductCreatedEmail(Product product) {
 		def adminList = []
 		try {
 			adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN).collect { it.email }
 			if (adminList) {
-			   println adminList.class
+				println adminList.class
 				def subject = "${warehouse.message(code:'email.productCreated.message',args:[product?.name,product?.createdBy?.name])}";
 				def body = "${g.render(template:'/email/productCreated',model:[product:product])}"
 				mailService.sendHtmlMail(subject, body.toString(), adminList);
@@ -443,32 +443,32 @@ class ProductController {
 			}
 		}
 		catch (Exception e) {
-		   log.error("Error sending 'Product Created' email")
-		   //flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
+			log.error("Error sending 'Product Created' email")
+			//flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
 		}
 	}
 
 
 
-	def search = { 
+	def search = {
 		log.info "search " + params
-		if (params.q) { 
+		if (params.q) {
 			def products = productService.findProducts(URLEncoder.encode(params.q))
 			[ products : products ]
 		}
 	}
-	
-	
-	def barcode = { 
+
+
+	def barcode = {
 		BarcodeFormat format = BarcodeFormat.valueOf(params.format)
 		File file = File.createTempFile("barcode-", ".png")
 		barcodeService.renderImageToFile(file, params.data, 100, 50, format)
 		response.contentType = "image/png"
 		response.outputStream << file.bytes
 		file.delete()
-	}	   
-   
-   
+	}
+
+
 	/**
 	 * Upload a document to a product.
 	 */
@@ -516,7 +516,7 @@ class ProductController {
 					log.info "Document did not save " + documentInstance.errors;
 					flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
 					redirect(controller: "product", action: "edit", id: command?.product?.id,
-							model: [productInstance: command?.product, documentInstance : documentInstance])
+					model: [productInstance: command?.product, documentInstance : documentInstance])
 					return;
 				}
 			}
@@ -531,8 +531,8 @@ class ProductController {
 		log.info ("Redirecting to appropriate show details page " + command?.product?.id)
 		redirect(controller: 'product', action: 'edit', id: command?.product?.id)
 	}
-	
-	
+
+
 	def deleteDocument = {
 		def productInstance = Product.get(params.product.id)
 		if (!productInstance) {
@@ -558,10 +558,10 @@ class ProductController {
 			}
 		}
 	}
-	
-	
-	def upnDatabase = { 
-		
+
+
+	def upnDatabase = {
+
 		def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
 		def count=0, MAXSIZE=100000
 		def rows = []
@@ -569,7 +569,7 @@ class ProductController {
 			def line = ""
 			file.withReader { reader ->
 				while ((line = reader.readLine()) != null) {
-					//rows << line[0..19].trim()					
+					//rows << line[0..19].trim()
 					rows << [
 						line: line,
 						upn: line[0..19].trim(),
@@ -591,181 +591,187 @@ class ProductController {
 						reference: line[261..280].trim(),
 						referenceQualifierCode: line[281..282].trim()
 					]
-					
+
 					//if (++count > MAXSIZE) throw new RuntimeException('File too large!')
 				}
 			}
-			
-			
+
+
 		} catch (RuntimeException e) {
 			log.error(e.message)
-			//render "error " + e.message + "<br/>" + rows			
+			//render "error " + e.message + "<br/>" + rows
 		}
 
 		[rows:rows];
 		//render rows;
-		
+
 		//assert names[0].first == 'JOHN'
 		//assert names[1].age == 456
 	}
-	
+
 	/**
-	* View user's profile photo
-	*/
-   def viewImage = {
-	   def documentInstance = Document.get(params.id);
-	   if (documentInstance) {
-		   documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
-		   /*
-		   println "resize image " + params.width + " " + params.height
-	   	   println params
-		   byte[] bytes = documentInstance.fileContents
-		   println documentInstance.contentType
-		   resize(bytes, response.outputStream, params.width as int, params.height as int)
-		   //response.outputStream << bytes
-		   */
-	   }
-	   else {
-		   "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
-	   }
-   }
-
-   
-   def viewThumbnail = {
-	   def documentInstance = Document.get(params.id);
-	   if (documentInstance) {
-		   documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
-		   //byte[] bytes = documentInstance.fileContents
-		   //resize(bytes, response.outputStream, width, height)
-	   }
-	   else {
-		   "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
-	   }
-   }
-
-   /*
-   static scale = { out, 
-	   def b = new SimpleImageBuilder()
-	   def result = b.render(width:'100px',height:'100px') {
-		  fill(color:'ffffff')
-		  def small
-		  image(file:'image.jpg') {
-			small = fit(width:100,height:100)
-		  }
-		  draw(align:'center', image:small)
-		  fit(width:50,height:50) {
-			//save(file:'thumbnail-50p.png', format:'png')
-		  }
-		  fit(width:20,height:20) {
-			//save(file:'thumbnail-20p.png', format:'png')
-		  }
-	   }
-	   
-   }   
-   */
-
-
-   def export = {
-	   def products = Product.list()
-	   
-	   println "products: " + products
-	   println "params: " + params
-	   if ( products ) {
-		  withFormat {
-			 /*
-			 json {
-				 
-				 println "json"
-				if ( params.callback ) {
-				   render(contentType: 'application/json',
-					  text: "${params.callback}(${products as JSON})")
-				} else {
-				   render products as JSON
-				}
-			 }
-			 xml {
-				 println "xml"
-				render products as XML
-			 }
+	 * View user's profile photo
+	 */
+	def viewImage = {
+		def documentInstance = Document.get(params.id);
+		if (documentInstance) {
+			documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
+			/*
+			 println "resize image " + params.width + " " + params.height
+			 println params
+			 byte[] bytes = documentInstance.fileContents
+			 println documentInstance.contentType
+			 resize(bytes, response.outputStream, params.width as int, params.height as int)
+			 //response.outputStream << bytes
 			 */
-			 csv {
-				 println "csv"
-				response.setHeader("Content-disposition",
-				   "attachment; filename=products.csv")
-				response.contentType = "text/csv"
-				
-				def sw = new StringWriter()
-				def csvWriter = new CSVWriter(sw, {
-				  "Name" { it.name }
-				  "Category" { it.category }
-				  "Description" { it.description }
-				  "Product Code" { it.productCode }
-				  "Unit of Measure" { it.unitOfMeasure }
-				  "Manufacturer" { it.manufacturer }
-				  "Manufacturer Code" { it.manufacturerCode }
-				  "Cold Chain" { it.coldChain }
-				  "UPC" { it.upc }
-				  "NDC" { it.ndc }
-				  "Date Created" { it.dateCreated }
-				  "Date Updated" { it.lastUpdated }
-				})
-				
-   
-				products.each { product ->
-					csvWriter << [
-						name: product.name,
-						category: product?.category?.name,
-						description: product?.description?:'',
-						productCode: product.productCode?:'',
-						unitOfMeasure: product.unitOfMeasure?:'',
-						manufacturer: product.manufacturer?:'',
-						manufacturerCode: product.manufacturerCode?:'',
-						coldChain: product.coldChain?:Boolean.FALSE,
-						upc: product.upc?:'',
-						ndc: product.ndc?:'',
-						dateCreated: product.dateCreated?:'',
-						lastUpdated: product.lastUpdated?:'',
-					]
-				}
-				render sw.toString()
-			 }
-		  }
-	   }
-	   else {
-		  render(text: 'No products found', status: 404)
-	   }
+		}
+		else {
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
+		}
 	}
-   	
-	
 
-   static resize = { bytes, out, maxW, maxH ->
-	   AWTImage ai = new ImageIcon(bytes).image
-	   int width = ai.getWidth( null )
-	   int height = ai.getHeight( null )
-   
-	   //def limits = 300..2000
-	   //assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
-   
-	   float aspectRatio = width / height
-	   float requiredAspectRatio = maxW / maxH
-   
-	   int dstW = 0
-	   int dstH = 0
-	   if (requiredAspectRatio < aspectRatio) {
-		   dstW = maxW
-		   dstH = Math.round( maxW / aspectRatio)
-	   } else {
-		   dstH = maxH
-		   dstW = Math.round(maxH * aspectRatio)
-	   }
-   
-	   BufferedImage bi = new BufferedImage(dstW, dstH, BufferedImage.TYPE_INT_RGB)
-	   Graphics2D g2d = bi.createGraphics()
-	   g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
-   
-	   IIO.write( bi, 'JPEG', out )
-   }
+
+	def viewThumbnail = {
+		def documentInstance = Document.get(params.id);
+		if (documentInstance) {
+			documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
+			//byte[] bytes = documentInstance.fileContents
+			//resize(bytes, response.outputStream, width, height)
+		}
+		else {
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
+		}
+	}
+
+	def exportAsCsv = {
+		def products = Product.list()
+
+		if (products) {
+			def date = new Date();
+			response.setHeader("Content-disposition",
+					"attachment; filename=products-${date.format("yyyyMMdd-hhmmss")}.csv")
+			response.contentType = "text/csv"
+			def csv = productService.exportProducts(products)
+			println "export products: " + csv
+			render csv 
+		}
+		else {
+			render(text: 'No products found', status: 404)
+		}
+	}
+
+
+	def importAsCsv = { 
+		// renders the initial form
+	}
+	
+	
+	def uploadCsv = { ImportDataCommand command ->
 		
+		log.info "uploadCsv " + params
+			
+		def columns
+		def localFile 
+		def uploadFile = command?.importFile		
+		def existingProductsMap = [:]
+		
+		if (request.method == "POST") { 
+			
+			// Step 1: Upload file 			
+			if (uploadFile && !uploadFile?.empty) {
+				try {				
+					localFile = new File("uploads/" + uploadFile?.originalFilename);
+					localFile.mkdirs()
+					uploadFile?.transferTo(localFile);
+					session.localFile = localFile
+					//render uploadFile.contentType
+					def csv = localFile.getText()
+					columns = productService.getColumns(csv)
+					println "CSV " + csv
+					def existingProducts = productService.getExistingProducts(csv)
+					existingProducts.each { product ->
+						println "Product " + product
+						existingProductsMap[product] = product
+					}				
+					println existingProductsMap
+					command.products = productService.importProducts(csv, false)
+					
+					flash.message = "Uploaded file ${uploadFile?.originalFilename}"
+					//render localFile.getText()
+					//response.outputStream << localFile.newInputStream()
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}			
+			else {
+				flash.message = "${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}"
+			}			
+		}
+		
+		render(view: 'importAsCsv', model: [command:command, columns:columns, existingProductsMap:existingProductsMap])
+	}
+	
+	def importCsv = { ImportDataCommand command ->
+		
+		log.info "import " + params
+		
+		// Step 2: Import data from file
+		def tags = []
+		def columns = []
+		def existingProductsMap = [:]
+		if (params.importNow && session.localFile) {
+			println "import now"
+			def csv = session.localFile.getText()
+			def existingProducts = productService.getExistingProducts(csv)
+			existingProducts.each { product ->
+				println "Product " + product
+				existingProductsMap[product] = product
+			}
+			columns = productService.getColumns(csv)
+			//println existingProductsMap
+			tags = params?.tagsToBeAdded?.split(",") as List
+			println "\n\nTAGS " + tags + " " + tags.class
+			command.products = productService.importProducts(csv, tags, true)			
+			//session.localFile = null
+			flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
+			
+			redirect(controller:"inventory", action:"browse",params:[tag:tags[0]])
+		}
+		render(view: 'importAsCsv', model: [command:command, tags: tags, existingProductsMap: existingProductsMap, columns:columns, productsHaveBeenImported: true])
+		
+	}
+
+
+
+
+	static resize = { bytes, out, maxW, maxH ->
+		AWTImage ai = new ImageIcon(bytes).image
+		int width = ai.getWidth( null )
+		int height = ai.getHeight( null )
+
+		//def limits = 300..2000
+		//assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
+
+		float aspectRatio = width / height
+		float requiredAspectRatio = maxW / maxH
+
+		int dstW = 0
+		int dstH = 0
+		if (requiredAspectRatio < aspectRatio) {
+			dstW = maxW
+			dstH = Math.round( maxW / aspectRatio)
+		} else {
+			dstH = maxH
+			dstW = Math.round(maxH * aspectRatio)
+		}
+
+		BufferedImage bi = new BufferedImage(dstW, dstH, BufferedImage.TYPE_INT_RGB)
+		Graphics2D g2d = bi.createGraphics()
+		g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
+
+		IIO.write( bi, 'JPEG', out )
+	}
+
 }
 
 
