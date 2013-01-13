@@ -1,7 +1,7 @@
 <div style="padding-top:0px;">
 	<g:form method="GET" controller="inventory" action="browse">
 		<div class="box">
-			<table style="width: 25%">
+			<table style="width: 35%">
 				<tr>
 					<td>					
 						<label><warehouse:message code="inventory.filterByProduct.label"/></label>
@@ -30,7 +30,6 @@
 						<g:hiddenField name="max" value="${params.max?:10 }"/>
 						<g:textField name="searchTerms" 
 							value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}" class="text medium" size="40"/>
-						
 						<div style="padding: 10px;">
 							<div>
 								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
@@ -48,27 +47,35 @@
 							</button>
 						</div>
 					</td>
-				</tr>			
+				</tr>	
+					
 				<tr class="prop">
 					<td>					
 						<label><warehouse:message code="inventory.filterByTag.label"/></label>
-						<%-- 
-						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
-						--%>
+ 						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">Clear</g:link>
 					</td>
-				</tr>			
-				<tr>
+				</tr>	
+				<tr class="">
 					<td>
-						<div class="tags">
-							<g:each in="${tags }" var="tag">
-								<span class="tag">
-									<g:link controller="inventory" action="browse" params="['tag':tag]">${tag }</g:link>
-								</span>
+						<g:if test="${tags }">			
+							<g:each in="${tags }" var="tag" status="status">
+								<g:set var="selectedTag" value="${params.tag == tag.key.tag }"/>								
+								<g:link controller="inventory" action="browse" params="['tag':tag.key.tag]">
+									<span class="tag ${selectedTag?'selected':'' }">
+										${tag.key.tag }
+										<%-- (${tag.value })--%>
+									</span>
+								</g:link>
 							</g:each>
-						</div>
+						</g:if>
+						<g:else>
+							<span class="fade">
+								${warehouse.message(code: 'default.none.label') }
+							</span>
+						</g:else>	
 					</td>
 				</tr>
-				
+						
 				<tr class="prop">
 					<td>
 						<label><warehouse:message code="inventory.filterKey.label"/></label>	

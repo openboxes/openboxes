@@ -7,16 +7,17 @@
 			<div style="padding-top:0px;">
 				<g:form method="GET" controller="inventory" action="browse">
 					<div>
-						<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }" 
-							class="globalSearch"/>						
+							
+						<g:globalSearch id="dashboardSearchBox" cssClass="globalSearch" size="80"
+							name="searchTerms" value="${params?.searchTerms }" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
+											
 						<g:hiddenField name="resetSearch" value="true"/>							
 						<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							
 						<g:hiddenField name="showHiddenProducts" value="on"/>
 						<g:hiddenField name="showOutOfStockProducts" value="on"/>
 						
-						<button type="submit" class="" name="searchPerformed" value="true">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
-							&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
+						<button type="submit" class="button icon search" name="searchPerformed" value="true">					
+							<warehouse:message code="default.search.label"/>
 						</button>
 							
 					</div>

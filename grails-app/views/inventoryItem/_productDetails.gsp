@@ -1,6 +1,23 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <div id="product-details">
+	<g:if test="${productInstance?.description }">
+		<table class="box">
+			<tbody>
+				<tr class="odd">
+					<td colspan="2">
+						<label>${warehouse.message(code: 'product.description.label') }</label>
+					</td>
+				</tr>
+				<tr class="even">	
+					<td class="label left" colspan="2" style="text-align: justify">
+						${productInstance?.description }
+					</td>
+				</tr>
+			</tbody>		
+		</table>
+		<br/>
+	</g:if>
 	<table class="box">
 		<tbody>
 			<tr class="odd">
@@ -13,7 +30,7 @@
 					<span class="name"><warehouse:message code="default.status.label"/></span>
 				</td>
 				<td>
-					<span class="value">				
+					<span class="value">	
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 							<g:if test="${totalQuantity <= 0}">
 								<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
