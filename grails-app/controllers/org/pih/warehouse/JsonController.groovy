@@ -32,8 +32,6 @@ class JsonController {
 	def shipmentService
 	
 	def findTags = { 
-		println "find tags " + params
-		
 		def searchTerm = "%" + params.term + "%";
 		def c = Tag.createCriteria()
 		def tags = c.list {
@@ -47,6 +45,48 @@ class JsonController {
 		render results as JSON;
 	}
 	
+	def findUnitOfMeasures = {
+		def searchTerm = "%" + params.term + "%";
+		def c = Product.createCriteria()
+		def unitOfMeasures = c.list {
+			projections {
+				property "unitOfMeasure"
+			}
+			ilike("unitOfMeasure", searchTerm)
+		}
+		
+		def results = unitOfMeasures.unique().collect { [ value: it, label: it ] }
+		render results as JSON;
+	}
+	
+	def findManufacturers = {
+		println "find manufactures " + params
+		def searchTerm = "%" + params.term + "%";
+		def c = Product.createCriteria()
+		def manufacturers = c.list {
+			projections {
+				property "manufacturer"
+			}
+			ilike("manufacturer", searchTerm)
+		}
+		
+		def results = manufacturers.unique().collect { [ value: it, label: it ] }
+		render results as JSON;
+	}
+
+	def findProductNames = {
+		def searchTerm = "%" + params.term + "%";
+		def c = Product.createCriteria()
+		def productNames = c.list {
+			projections {
+				property "name"
+			}
+			ilike("name", searchTerm)
+		}
+		
+		def results = productNames.unique().collect { [ value: it, label: it ] }
+		render results as JSON;
+	}
 	
 	def findPrograms = {
 		println "find programs " + params

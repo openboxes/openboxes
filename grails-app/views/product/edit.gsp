@@ -53,6 +53,28 @@
 				                <table>
 			                      <tbody>                
 									<tr class="prop">
+										<td valign="top" class="name"><label for="name"><warehouse:message
+											code="product.title.label" /></label></td>
+										<td valign="top"
+											class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
+											<%-- 
+											<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
+											--%>
+											<g:autoSuggestString id="name" name="name" size="60" class="text" 
+												jsonUrl="${request.contextPath}/json/findProductNames" value="${productInstance?.name}"
+												placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
+										</td>
+									</tr>
+									
+									<tr class="prop">
+										<td valign="top" class="name"><label for="productCode"><warehouse:message
+											code="product.productCode.label"/></label></td>
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
+											<g:textField name="productCode" value="${productInstance?.productCode}" size="60" class="medium text" 
+												placeholder="Internal product code used to identify the product"/>
+										</td>
+									</tr>	
+									<tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
 		                                </td>
@@ -64,7 +86,7 @@
 
 		                                	 <div class="category">
 												<select name="category.id">
-													<option value="null"></option>
+													<option value="null">Choose product family</option>
 													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
 												</select>	
 									       	</div>
@@ -72,19 +94,12 @@
 									</tr>
 									
 									<tr class="prop">
-										<td valign="top" class="name"><label for="name"><warehouse:message
-											code="product.title.label" /></label></td>
-										<td valign="top"
-											class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-											<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
-										</td>
-									</tr>
-									<tr class="prop">
 										<td valign="top" class="name"><label for="description"><warehouse:message
 											code="product.description.label" /></label></td>
 										<td valign="top"
 											class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
-											<g:textArea name="description" value="${productInstance?.description}" class="medium text" cols="80" rows="6"/>									
+											<g:textArea name="description" value="${productInstance?.description}" class="medium text" cols="80" rows="6"
+												placeholder="Detailed text description (optional)"/>									
 										</td>
 									</tr>
 									
@@ -147,40 +162,56 @@
 									</tr>
 									--%>
 									<tr class="prop">
-										<td valign="top" class="name"><label for="name"><warehouse:message
-											code="default.unitOfMeasure.label" /></label></td>
+										<td valign="top" class="name"><label for="unitOfMeasure"><warehouse:message
+											code="product.unitOfMeasure.label" /></label></td>
 										<td valign="top"
 											class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
+											<%-- 
 											<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" class="medium text"/>
+											--%>
+											<g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" size="30" class="text" 
+												jsonUrl="${request.contextPath}/json/findUnitOfMeasures" 
+												value="${productInstance?.unitOfMeasure}" placeholder="e.g. each, tablet, tube, vial"/>
+											
 										</td>
-									</tr>								
+									</tr>				
 									<tr class="prop">
 										<td valign="top" class="name"><label for="manufacturer"><warehouse:message
 											code="product.manufacturer.label" /></label></td>
 										<td valign="top"
 											class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-											<g:textField name="manufacturer" value="${productInstance?.manufacturer}" size="40" class="medium text"/>
+											<%-- 
+											<g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
+											--%>
+											<g:autoSuggestString id="manufacturer" name="manufacturer" size="30" class="text" 
+												jsonUrl="${request.contextPath}/json/findManufacturers" 
+												value="${productInstance?.manufacturer}"
+												placeholder="e.g. Pfizer, Beckton Dickson"/>
+											
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="product.manufacturerCode.label"/></label></td>
 										<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
-											<g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="15" class="medium text"/>
+											<g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="30" 
+												class="medium text"/>
 										</td>
-									</tr>								
+									</tr>	
+															
 									<tr class="prop">
 										<td valign="top" class="name"><label for="upc"><warehouse:message
 											code="product.upc.label" /></label></td>
 										<td valign="top" class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-											<g:textField name="upc" value="${productInstance?.upc}" size="15" class="medium text"/>
+											<g:textField name="upc" value="${productInstance?.upc}" size="30" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="ndc"><warehouse:message
 											code="product.ndc.label" /></label></td>
 										<td valign="top" class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
-											<g:textField name="ndc" value="${productInstance?.ndc}" size="15" class="medium text"/>
+											<g:textField name="ndc" value="${productInstance?.ndc}" size="30" class="medium text"
+												placeholder="e.g. 0573-0165"/>
 										</td>
 									</tr>								
 									<tr class="prop">
@@ -240,7 +271,7 @@
 										<td valign="top" class="">
 										</td>
 										<td>
-											<button type="submit" class="positive"><img
+											<button type="submit" class="button"><img
 												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
 												alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 											</button>
@@ -248,16 +279,16 @@
 											<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 											<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
 												<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-										                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+										                <button type="button" class="button"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
 											</g:if>
 											&nbsp;
 											<g:if test="${productInstance?.id }">
-												<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
+												<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="">			
 													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
 												</g:link>  
 											</g:if>
 											<g:else>
-												<g:link controller="inventory" action="browse"  class="negative">
+												<g:link controller="inventory" action="browse" class="">
 													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
 												</g:link>
 											</g:else>
@@ -284,60 +315,61 @@
 								<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
 								<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 								<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-								<fieldset>						
-									<table>
+								<table>
+									<tr class="prop">
+										<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
+										<td class="value">
+											${inventoryInstance?.warehouse?.name }
+										</td>
+									</tr>
+									<g:if test="${productInstance }">
 										<tr class="prop">
-											<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
+											<td class="name"><label><warehouse:message code="product.label"/></label></td>
 											<td class="value">
-												${inventoryInstance?.warehouse?.name }
+												<format:product product="${productInstance}" />
 											</td>
 										</tr>
-										<g:if test="${productInstance }">
-											<tr class="prop">
-												<td class="name"><label><warehouse:message code="product.label"/></label></td>
-												<td class="value">
-													<format:product product="${productInstance}" />
-												</td>
-											</tr>
-										</g:if>
-										<tr class="prop">
-											<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
-											<td class="value">
-									           	<g:select name="status" 
-					           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
-					           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
-					           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
-											</td>
-										</tr>
-										<tr class="prop">
-											<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
-											<td class="value">
-												<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="5" class="text"/>
-											</td>
-										</tr>
-										<tr class="prop">
-											<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
-											<td class="value">
-												<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="5" class="text"/>
-											</td>
-										</tr>
-										<tr class="prop">
-											<td></td>
-											<td>
-											
-												<button type="submit" class="positive"><img
-													src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-													alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
-												</button>
-												&nbsp;
-												<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
-												</g:link>  
-											
-											</td>
-										</tr>
-									</table>			
-								</fieldset>
+									</g:if>
+									<tr class="prop">
+										<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
+										<td class="value">
+								           	<g:select name="status" 
+				           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
+				           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
+				           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
+										</td>
+									</tr>
+									<tr class="prop">
+										<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
+										<td class="value">
+											<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>
+											<span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
+										<td class="value">
+											<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>
+											<span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td></td>
+										<td>
+										
+											<button type="submit" class="button"><img
+												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+												alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+											</button>
+											&nbsp;
+											<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="">			
+												${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
+											</g:link>  
+										
+										</td>
+									</tr>
+								</table>			
+								
 							</g:form>			
 						</div>
 					
@@ -404,7 +436,7 @@
 											<input name="fileContents" type="file" />
 											&nbsp;
 											<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
-											<button type="submit" class="positive"><img
+											<button type="submit" class="button"><img
 												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
 															alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
 										</td>
@@ -456,9 +488,6 @@
 												<warehouse:message code="package.description.label"/>
 											</th>
 											<th>
-												<warehouse:message code="package.quantity.label"/>
-											</th>
-											<th>
 												<warehouse:message code="package.uom.label"/>
 											</th>
 										</tr>
@@ -473,14 +502,14 @@
 															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
 															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>							
 														</button>
-														<div class="actions">
-															<div class="action-menu-item">													
+														<span class="actions">
+															<span class="action-menu-item">													
 																<g:link controller="product" action="removePackage" id="${pkg.id }" params="['product.id':productInstance.id]" class="actionBtn">	
 																	<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>
 																	&nbsp;<warehouse:message code="default.delete.label" args="[warehouse.message(code:'package.label')]"/>
 																</g:link>
-															</div>	
-														</div>
+															</span>	
+														</span>
 													</span>												
 												</td>											
 												<td>
@@ -684,9 +713,9 @@
 									</tbody>
 								</table>
 								<div class="buttons">
-									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+									<button type="submit" class="button"><img
+										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Save" /> 
+										${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;
 									

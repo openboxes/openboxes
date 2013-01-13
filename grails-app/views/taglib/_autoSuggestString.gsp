@@ -6,7 +6,7 @@
 	type="text" size="${attrs.size }" 
 	class="autocomplete ${attrs.class}" 
 	placeholder="${attrs.placeholder }"
-	name="${attrs.name}" value="${attrs.label}">
+	name="${attrs.name}" value="${attrs.value}">
 
 <script language="javascript">
 	$(document).ready(function() {
@@ -37,19 +37,15 @@
 				}
 				return false;
 			},
-			select: function(event, ui) {
+			*/
+			select: function(event, ui) {				
 				if (ui.item) { 
-					$(this).prev().val(ui.item.value);
-					$(this).val(ui.item.valueText);
+					$(this).val(ui.item.value);
+					//$(this).val(ui.item.valueText);
 				}
 				return false;
 			}
-			*/
-
-            select: function(event, ur){
-                $("#autosuggest-${attrs.id}").trigger('selected');
-                return false;
-            }
+			
 		});
 	});
 </script>
