@@ -63,6 +63,11 @@ class Category implements Comparable, Serializable {
 		return this.parentCategory == null
 	}
 	
+	static Category getRootCategory() { 
+		return Category.findByName("ROOT")
+	}
+	
+	
 	List getParents() { 
 		def parents = []
 		getAllParents(this, parents)	
