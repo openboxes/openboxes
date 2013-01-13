@@ -248,11 +248,11 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
 	
 	void test_exportProducts_shouldReturnAllProducts() { 
-		
 		def csv = productService.exportProducts()		
 		println csv
 		def lines = csv.split("\n")
-		assertEquals 36, lines.size()
+		assertNotNull lines
+		assertEquals lines[0], '"ID","Product Code","Name","Category","Description","Unit of Measure","Manufacturer","Manufacturer Code","Cold Chain","UPC","NDC","Date Created","Date Updated"'
 	}
 	
 	
