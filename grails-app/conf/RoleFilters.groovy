@@ -21,7 +21,7 @@ class RoleFilters {
     'update','importData', 'receive','showRecordInventory','withdraw', 'cancel', 'change','toggle']
     def static changeControllers = ['createProductFromTemplate']
     def static adminControllers=['createProduct', 'createProductFromTemplate', 'admin']
-    def static adminActions = ['product':['create'], 'person': ['list'], 'user':['list'], 'location':['edit'], 'shipper':['create'], 'locationGroup':['create'],'locationType':['create']]
+    def static adminActions = ['product':['create'], 'person': ['list'], 'user':['list'], 'location':['edit'], 'shipper':['create'], 'locationGroup':['create'],'locationType':['create'], '*': ['delete']]
     def filters = {
         readonlyCheck(controller:'*', action:'*') {
             before = { 
@@ -39,7 +39,7 @@ class RoleFilters {
     }
 
     def static Boolean needAdmin(controllerName, actionName){
-       adminControllers.contains(controllerName) || adminActions[controllerName]?.contains(actionName)
+       adminControllers.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any{actionName.startsWith(it)}
     }
 
      def static Boolean needManager(controllerName, actionName){
