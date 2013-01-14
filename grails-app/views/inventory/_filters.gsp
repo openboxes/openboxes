@@ -41,9 +41,8 @@
 							</div>					
 						</div>
 						<div class="right">
-							<button type="submit" class="" name="searchPerformed" value="true">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
-								&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
+							<button type="submit" class="button icon search" name="searchPerformed" value="true">
+								<warehouse:message code="default.search.label"/>
 							</button>
 						</div>
 					</td>

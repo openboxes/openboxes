@@ -32,7 +32,7 @@
 							<td>
 					         	<table>
 									<tr>
-						         		<td style="padding: 0; margin: 0; vertical-align: middle;">
+						         		<td >
 											<div class="tabs">
 												<ul>
 													<li>
@@ -40,10 +40,15 @@
 															<g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
 															<g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
 															<g:set var="totalResults" value="${numProducts }"/>															
-															<g:if test="${totalResults < rangeEnd }">
+															<g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
 																<g:set var="rangeEnd" value="${totalResults }"/>		
 															</g:if>
-															<warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
+															<g:if test="${totalResults > 0 }">
+																<warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
+															</g:if>
+															<g:else>
+																<warehouse:message code="inventory.showingNoResults.label" default="Showing 0 results"/>															
+															</g:else>
 															<g:if test="${commandInstance?.searchTerms}">
 																"${commandInstance.searchTerms }"
 															</g:if>
@@ -148,12 +153,14 @@
 															<g:paginate total="${numProducts}" params="${params}"
 																action="browse" max="${params.max}" />
 																
+																
 															<div class="right">
-															<warehouse:message code="inventory.browseResultsPerPage.label"/>
-															<g:link action="browse" params="[max:10]" class="${params.max == '10' ? 'currentStep' : '' }">10</g:link>
-															<g:link action="browse" params="[max:25]" class="${params.max == '25' ? 'currentStep' : '' }">25</g:link>
-															<g:link action="browse" params="[max:50]" class="${params.max == '50' ? 'currentStep' : '' }">50</g:link>
-															<g:link action="browse" params="[max:100]" class="${params.max == '100' ? 'currentStep' : '' }">100</g:link>
+																<warehouse:message code="inventory.browseResultsPerPage.label"/>:
+																<g:if test="${params.max != '10'}"><g:link action="browse" params="[max:10]">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+																<g:if test="${params.max != '25'}"><g:link action="browse" params="[max:25]">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
+																<g:if test="${params.max != '50'}"><g:link action="browse" params="[max:50]">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
+																<g:if test="${params.max != '100'}"><g:link action="browse" params="[max:100]">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>																
+																<g:if test="${params.max != '-1'}"><g:link action="browse" params="[max:-1]">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>																
 															</div>
 														</div>
 													</form>		
