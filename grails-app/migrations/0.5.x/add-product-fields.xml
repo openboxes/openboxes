@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jmiranda (generated)" id="1358133447150-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="brand_name" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="brand_name" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1358133447150-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="vendor" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="vendor" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1358133447150-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="vendor_code" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="vendor_code" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1358133447150-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="package_size" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="package_size" type="INT">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1358133447150-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="model_number" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="model_number" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>

@@ -18,4 +18,5 @@
     <include file="0.5.x/change-ROLE_USER-to-ROLE_BROWSER.xml"/>
     <include file="0.5.x/add-location_type-data.xml"/>
     <include file="0.5.x/add-location_role.xml"/>
+    <include file="0.5.x/add-product-fields.xml"/>
 </databaseChangeLog>

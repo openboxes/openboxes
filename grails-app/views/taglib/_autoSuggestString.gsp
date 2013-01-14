@@ -19,7 +19,7 @@
 			dataType: 'json',
 			source: function(req, add) {
   				var currentLocationId = $("#currentLocationId").val();
-				$.getJSON('${attrs.jsonUrl}', { term: req.term, warehouseId: currentLocationId }, function(data) {
+				$.getJSON('${attrs.jsonUrl}', { term: req.term, warehouseId: currentLocationId, field: '${attrs.name}' }, function(data) {
 					var items = [];
 					$.each(data, function(i, item) { items.push(item); });
 					add(items);

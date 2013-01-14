@@ -53,9 +53,23 @@ class Product implements Comparable, Serializable {
 	String upc				// Universal product code
 	String manufacturer		// Manufacturer
 	String manufacturerCode // Manufacturer product (e.g. catalog code)
+	
 	String unitOfMeasure	// each, pill, bottle, box
 	UnitOfMeasure defaultUom
-	//Integer uomQuantity 
+
+	String brandName
+	String vendor 
+	String vendorCode
+	String modelNumber
+	
+	// Almost all products will have a packageSize = 1
+	// The product package association *should* be used to represent packages. 
+	// However, there are cases (packdowns) in which we need to create the 
+	// each-level product as well as a second product to handle the package 
+	// size because the system does not currently support quantities at 
+	// multiple levels, so we'll need to convert from the EA product to the 
+	// product with a packageSize > 1.
+	Integer packageSize = 1				
 
 	// NDC attributes
 	String ndc				
@@ -119,9 +133,14 @@ class Product implements Comparable, Serializable {
 		defaultUom(nullable:true)
 		upc(nullable:true, maxSize: 255)
 		ndc(nullable:true, maxSize: 255)
+
+		packageSize(nullable:true)
+		brandName(nullable:true,maxSize:255)
+		vendor(nullable:true, maxSize: 255)
+		vendorCode(nullable:true, maxSize: 255)
+		modelNumber(nullable:true, maxSize: 255)
 		manufacturer(nullable:true, maxSize: 255)
 		manufacturerCode(nullable:true, maxSize: 255)
-		
 		//route(nullable:true)
 		//dosageForm(nullable:true)
 		
