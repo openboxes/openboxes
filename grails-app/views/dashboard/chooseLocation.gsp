@@ -29,7 +29,6 @@
 			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 				</g:if>		
 				
-				
 				<g:form controller="dashboard" action="chooseLocation">
 					<div class="box">
 						<table>
@@ -61,50 +60,53 @@
 												<label>${entry.key?:warehouse.message(code:'default.none.label') }</label>
 											</td>
 											<td>	
+												<div class="button-group">
+													<g:set var="locationGroup" value="${entry.key }"/>
+													<g:each var="warehouse" in="${entry.value }" status="status">
+														<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
+															${warehouse.name}
+														</a>
+													</g:each>
+												</div>
 												
-												<g:set var="locationGroup" value="${entry.key }"/>
-												<g:each var="warehouse" in="${entry.value }">
-													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
-														<g:if test="${warehouse.logo}">	
-															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
-															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-														</g:if>
-														<g:else>
-															<%-- 
-															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-															--%>
-														</g:else>
-														${warehouse.name}
-													</a> 
-													
-												</g:each>
 											</td>
 										</tr>										
 									</g:each>
 									<tr class="prop">
 										<td class="top right">
-																				
 											<label>${warehouse.message(code: 'default.others.label', default: 'Others')}</label>
 										</td>
 										<td>
-											
-												<g:each var="warehouse" in="${nullLocationGroup }">
+											<div class="button-group">											
+												<g:each var="warehouse" in="${nullLocationGroup }" status="status">
 													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
-														<g:if test="${warehouse.logo}">	
-															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
-															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-														</g:if>
-														<g:else>
-															<%-- 
-															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-															--%>
-														</g:else>
 														${warehouse.name}
-													</a> 
-													
+													</a>
 												</g:each>
+											</div>
 										</td>										
 									</tr>
+									<%--
+									<tr class="prop">
+										<td class="">
+										</td>
+										<td class="middle">
+											<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/> 
+											Remember my location and log me in automatically.
+											
+											${session.user.rememberLastLocation}
+											${session.user.warehouse }
+										</td>
+									</tr>	
+									<tr>
+										<td>
+											<g:if test="${session?.user?.warehouse }">
+												<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
+											</g:if>												
+										
+										</td>
+									</tr>
+									--%>
 									<g:unless test="${session.loginLocations }">
 										<div class="warehouse">
 											<warehouse:message code="dashboard.noWarehouse.message"/>
@@ -123,7 +125,7 @@
 									<hr/>
 								</td>
 							</tr>
-							<tr>
+							<tr class="prop>
 								<td class="left middle" colspan="2">
 									<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/> Remember my location and log me in automatically.
 								</td>
