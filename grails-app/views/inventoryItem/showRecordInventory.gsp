@@ -10,7 +10,7 @@
 	</content>
 
 	<content tag="content">
-		<g:render template="showRecordInventory" mode="[commandInstance:commandInstance]" />
+		<g:render template="showRecordInventory" model="[commandInstance:commandInstance, product:product]"/>
 	</content>
 </g:applyLayout>
 
