@@ -86,4 +86,7 @@ class UserServiceTests extends GrailsUnitTestCase{
       assert service.isUserAdmin(user5) == false  
       assert service.isUserAdmin(user6) == false  
   }
+  
+ 
+  
 }

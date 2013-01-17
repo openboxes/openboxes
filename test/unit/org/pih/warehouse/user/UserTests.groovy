@@ -37,7 +37,7 @@ class UserTests extends GrailsUnitTestCase {
 		assertEquals "nullable", user.errors["password"]	
 		assertEquals "nullable", user.errors["firstName"]
 		assertEquals "nullable", user.errors["lastName"]
-		assertEquals "nullable", user.errors["locale"]
+		//assertEquals "nullable", user.errors["locale"]
 	}
 
 	void testUnique_shouldFailWhenUsernameIsNotUnique() {

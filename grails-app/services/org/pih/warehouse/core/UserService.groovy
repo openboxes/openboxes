@@ -104,5 +104,20 @@ class UserService {
     defaultRoles
   }
 	
+  
+  def getAllAdminUsers() {
+	  def recipients = [] 	  
+	  def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
+	  if (roleAdmin) {
+		  def criteria = User.createCriteria()
+		  recipients = criteria.list {
+			  roles {
+				  eq("id", roleAdmin.id)
+			  }
+			  eq("active", true)
+		  }
+	  }
+	  return recipients	  
+  }
 
 }

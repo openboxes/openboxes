@@ -16,7 +16,7 @@ import org.pih.warehouse.core.Location;
 class User extends Person {
 
 	String id
-	Boolean active;				// default = false?
+	Boolean active = false;				// default = false?
 	String username;			// email or username
 	String password;			// encrypted password
 	String passwordConfirm;		// password confirm used on signup and password reset
@@ -29,7 +29,7 @@ class User extends Person {
 	Boolean rememberLastLocation	// indicates whether user would like for the system to remember where they last logged into
 	byte [] photo				// profile photo
 
-  List locationRoles
+	List locationRoles
 	static hasMany = [ roles : Role, locationRoles: LocationRole]
 	static mapping = {
 		table "`user`"
@@ -39,18 +39,19 @@ class User extends Person {
 	static transients = ["passwordConfirm"]
 	static constraints = {
 		active(nullable:true)
-		manager(nullable:true)
-		photo(nullable:true, maxSize:10485760) // 10 MBs
 		username(nullable: false, blank:false, unique: true, maxSize:255)		
 		password(nullable: false, blank: false, minSize: 6, maxSize:255, validator: {password, obj ->
 			def passwordConfirm = obj.properties['passwordConfirm']
 			if(passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
 			passwordConfirm == password ? true : ['invalid.matchingpasswords']
 		})		
-		rememberLastLocation(nullable:true)
+		locale(nullable:true)
 		lastLoginDate(nullable:true)
 		//useSavedLocation(nullable:true)
 		warehouse(nullable:true)
+		manager(nullable:true)
+		rememberLastLocation(nullable:true)
+		photo(nullable:true, maxSize:10485760) // 10 MBs
 	}
 
 
