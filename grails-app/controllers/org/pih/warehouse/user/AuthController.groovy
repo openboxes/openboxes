@@ -114,7 +114,7 @@ class AuthController {
 	 * Allows user to log out of the system
 	 */
 	def logout = { 
-		def username = session.user.username;    	
+		session.targetUri = null    	
 		session.user = null;
 		session.locale = null;
 		session.warehouse = null;
