@@ -150,7 +150,7 @@ class InventoryLevelController {
 	}
 
 	
-	def markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) { 		
+	private markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) { 		
 		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
 		// Add a new inventory level
 		if (!inventoryLevel) {

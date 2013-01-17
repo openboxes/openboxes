@@ -8,6 +8,7 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 package org.pih.warehouse
+import grails.util.Holders
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.util.LocalizationUtil
@@ -20,7 +21,7 @@ class FormatTagLib {
 	
 	static namespace = "format"
 	
-	Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+	Locale defaultLocale = new Locale(Holders.getGrailsApplication().config.locale.defaultLocale)
 	
 	/**
 	 * Formats a Date

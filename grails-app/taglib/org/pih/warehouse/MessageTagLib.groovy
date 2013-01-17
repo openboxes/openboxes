@@ -8,18 +8,19 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 package org.pih.warehouse
+import grails.util.Holders
 
 class MessageTagLib {
    
 	static namespace = "warehouse"
 	
-	Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+	Locale defaultLocale = new Locale(Holders.grailsApplication.config.locale.defaultLocale)
 	
 	def message = { attrs, body ->		
-		def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
+		def defaultTagLib = Holders.grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 		if (session.useDebugLocale) { 
 			
-			def locales = grailsApplication.config.locale.supportedLocales			
+			def locales = Holders.grailsApplication.config.locale.supportedLocales			
 			def localized = [:]
 			locales.each { 
 				def locale = new Locale(it)
