@@ -48,19 +48,26 @@ class Product implements Comparable, Serializable {
 	String description;						// Not used at the moment
 	String productCode 						// Internal product code identifier
 	Boolean coldChain = Boolean.FALSE;
-	
-	// New fields that need to be reviewed
-	String upc				// Universal product code
-	String manufacturer		// Manufacturer
-	String manufacturerCode // Manufacturer product (e.g. catalog code)
+	Category category;						// primary category
 	
 	String unitOfMeasure	// each, pill, bottle, box
 	UnitOfMeasure defaultUom
 
-	String brandName
-	String vendor 
-	String vendorCode
-	String modelNumber
+	// New fields that need to be reviewed
+	String upc				// Universal product code
+	String ndc				// National drug code
+	
+	// Manufacturer
+	String manufacturer		// Manufacturer
+	String manufacturerCode // Manufacturer's product code (e.g. catalog code)
+	String manufacturerName // Manufacturer's product name
+	String brandName		// Manufacturer's brand name
+	String modelNumber		// Manufacturer's model number
+
+	// Vendor
+	String vendor 			// Vendor
+	String vendorCode		// Vendor's product code
+	String vendorName		// Vendor's product name
 	
 	// Almost all products will have a packageSize = 1
 	// The product package association *should* be used to represent packages. 
@@ -71,8 +78,6 @@ class Product implements Comparable, Serializable {
 	// product with a packageSize > 1.
 	Integer packageSize = 1				
 
-	// NDC attributes
-	String ndc				
 	// Figure out how we want to handle multiple names 
 	/*
 	String genericName				// same as the non-proprietary name
@@ -90,7 +95,7 @@ class Product implements Comparable, Serializable {
 	//String dosageForm
 		
 	// Associations 
-	Category category;						// primary category
+					
 	List attributes = new ArrayList();		// custom attributes
 	List categories = new ArrayList();		// secondary categories
 	
@@ -138,9 +143,11 @@ class Product implements Comparable, Serializable {
 		brandName(nullable:true,maxSize:255)
 		vendor(nullable:true, maxSize: 255)
 		vendorCode(nullable:true, maxSize: 255)
+		vendorName(nullable:true, maxSize: 255)
 		modelNumber(nullable:true, maxSize: 255)
 		manufacturer(nullable:true, maxSize: 255)
 		manufacturerCode(nullable:true, maxSize: 255)
+		manufacturerName(nullable:true, maxSize: 255)
 		//route(nullable:true)
 		//dosageForm(nullable:true)
 		

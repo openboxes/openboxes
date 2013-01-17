@@ -63,5 +63,29 @@
 			</column>
 		</addColumn>
 	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1358133447150-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="manufacturer_name" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="manufacturer_name" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1358133447150-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="vendor_name" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="vendor_name" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
 
 </databaseChangeLog>

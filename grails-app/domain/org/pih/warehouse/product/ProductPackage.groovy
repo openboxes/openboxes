@@ -25,11 +25,11 @@ class ProductPackage implements Serializable {
 	}
 
 	String id
-	String name
-	String description
-	String gtin
-	Integer quantity
-	UnitOfMeasure uom
+	String name				// Name of product as it appears on the package
+	String description		// Description of the package
+	String gtin				// Global trade identification number
+	Integer quantity		// Number of units (each) in the box
+	UnitOfMeasure uom		// Unit of measure of the package (e.g. box, case, etc)
 	
 	// Auditing
 	Date dateCreated;
