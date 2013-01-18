@@ -12,22 +12,24 @@ import org.pih.warehouse.picklist.*
 import org.pih.warehouse.product.Product
 import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
-import testutils.MockBindDataMixin
 
-@Mixin(MockBindDataMixin)
 class RequisitionControllerTests extends ControllerUnitTestCase{
 
     protected void setUp(){
         super.setUp()
-        mockBindData()
     }
 
     void testEditShouldRenderDepots(){
-        def location1 = new Location(id:"1234", name: "zoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-        def location3 = new Location(id:"1236", name: "hoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-        def location2 = new Location(id:"1235", supportedActivities: ["supplier"])
-        def myLocation = new Location(id:"001", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+        def location1 = new Location(id:"1234", name: "zoom")
+        def location3 = new Location(id:"1236", name: "hoom")
+        def location2 = new Location(id:"1235")
+        def myLocation = new Location(id:"001")
         mockDomain(Location, [location1, location2, myLocation, location3])
+        location1.addToSupportedActivities(ActivityCode.MANAGE_INVENTORY);
+        location2.addToSupportedActivities("supplier");
+        location3.addToSupportedActivities(ActivityCode.MANAGE_INVENTORY);
+        myLocation.addToSupportedActivities(ActivityCode.MANAGE_INVENTORY);
+
         def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
         mockDomain(Requisition, [requisition])
         controller.params.id = requisition.id
@@ -42,8 +44,10 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     void testEditExistingRequisition(){
-        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        def requisition = new Requisition()
         mockDomain(Requisition, [requisition])
+        requisition.properties = [id: "1234", name: "jim", recipientProgram:"abc"]
+        println("requisition id:${requisition.id}")
         mockDomain(Location, [])
         controller.params.id = "1234"
         def model =  controller.edit()
@@ -64,8 +68,8 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
 
     void testSave() {
-        def requisition = new Requisition(id: "2345", lastUpdated: new Date(), status: RequisitionStatus.CREATED, version: 3)
-        def requisitionItem = new RequisitionItem(id:"3322", orderIndex: 1, version: 3)
+        def requisition = new Requisition(id: "2345", lastUpdated: new Date(), status: RequisitionStatus.CREATED)
+        def requisitionItem = new RequisitionItem(id:"3322", orderIndex: 1)
         mockDomain(Requisition, [requisition])
         mockDomain(RequisitionItem, [requisitionItem])
         requisition.addToRequisitionItems(requisitionItem)
@@ -91,11 +95,9 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert jsonResponse.data.id == requisition.id
         assert jsonResponse.data.lastUpdated
         assert jsonResponse.data.status == requisition.status.toString()
-        assert jsonResponse.data.version == requisition.version
         assert jsonResponse.data.requisitionItems.size() == 1
         assert jsonResponse.data.requisitionItems[0].id == requisitionItem.id
         assert jsonResponse.data.requisitionItems[0].orderIndex == requisitionItem.orderIndex
-        assert jsonResponse.data.requisitionItems[0].version == requisitionItem.version
 
         requisitionServiceMock.verify()
     }

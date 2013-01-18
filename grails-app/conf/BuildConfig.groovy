@@ -22,7 +22,7 @@ grails.project.dependency.resolution = {
 		// uncomment to disable ehcache
 		// excludes 'ehcache'
 	}
-	log "debug" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 	repositories {
 		grailsPlugins()
 		grailsHome()
@@ -47,14 +47,15 @@ grails.project.dependency.resolution = {
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
         compile 'org.apache.commons:commons-email:1.2'
 		compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
+
+    test "org.spockframework:spock-grails-support:0.7-groovy-2.0"
 		
-  //      test "org.codehaus.geb:geb-spock:0.6.3"
-	//	test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
-   //     test ('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
-   //     test ('org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0')  { excludes "htmlunit" }
-	//	test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
-	//	test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
-    //    test 'org.seleniumhq.selenium:selenium-support:2.25.0'
+        test "org.codehaus.geb:geb-spock:0.6.3"
+	    	test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
+        test ('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
+        test ('org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0')  { excludes "htmlunit" }
+	    	test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
+        test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 	}
 	plugins {
         runtime( ':constraints:0.6.0' )
@@ -64,11 +65,10 @@ grails.project.dependency.resolution = {
         runtime( ':jquery-validation-ui:1.1.1' ) {
             excludes ([ name: 'constraints'])
         }
-        /* spock from the grails repo doesn't work with grails 1.3
-           we've included our own build of it.
-        test(name:'spock', version:'0.6')
-        */
 
+       test(":spock:0.7") {
+        exclude "spock-grails-support"
+       }
         runtime( ':mail:1.0.1' ) { excludes 'mail', 'spring-test' }
 
         runtime( ':excel-import:0.3' ) { excludes 'poi', 'poi-contrib', 'poi-scratchpad' }
@@ -76,12 +76,12 @@ grails.project.dependency.resolution = {
         runtime (':hibernate:2.1.3') { excludes 'antlr' }
 
       //  test (name:'geb', version:'0.6.3')
+      test("org.grails.plugins:geb:0.6.0")
 
       compile(":liquibase:1.9.3.6") { 
         exclude 'data-source' 
       }
 
-      //compile ':webflow:2.0.0'
 
       compile(":grails-ui:1.2.3"){
         exclude 'yui'

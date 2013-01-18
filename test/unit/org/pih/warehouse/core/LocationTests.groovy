@@ -18,16 +18,21 @@ class LocationTests extends GrailsUnitTestCase {
     def location4
     protected void setUp() {
         super.setUp()
-		def depot = new LocationType(name: "Depot", description: "Depot",  supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+		def depot = new LocationType(name: "Depot", description: "Depot")
 		def supplier = new LocationType(name: "Supplier", description: "Supplier")
 		def ward = new LocationType(name: "Ward", description: "Ward" )
-		location1 = new Location(name: "Boston", locationType: depot, supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-		location2 = new Location(name: "Miami", locationType: depot)
-	    location3 = new Location(name: "supplier", locationType: supplier, supportedActivities: [ActivityCode.RECEIVE_STOCK])
-	    location4 = new Location(name: "ward", locationType: ward, supportedActivities: [ActivityCode.RECEIVE_STOCK])
+		location1 = new Location(name: "Boston", locationType: depot)
+    		location2 = new Location(name: "Miami", locationType: depot)
+	    location3 = new Location(name: "supplier", locationType: supplier)
+	    location4 = new Location(name: "ward", locationType: ward)
 
 		mockDomain(LocationType, [depot, supplier, ward])
 		mockDomain(Location, [location1, location2, location3, location4])
+    depot.addToSupportedActivities(ActivityCode.MANAGE_INVENTORY);
+    location1.addToSupportedActivities(ActivityCode.MANAGE_INVENTORY);
+    location3.addToSupportedActivities(ActivityCode.RECEIVE_STOCK);
+    location4.addToSupportedActivities(ActivityCode.RECEIVE_STOCK);
+
     }
 
     void test_supports() {

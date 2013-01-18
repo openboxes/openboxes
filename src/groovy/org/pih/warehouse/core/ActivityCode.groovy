@@ -23,6 +23,11 @@ public enum ActivityCode {
 	final String id
 	
 	ActivityCode(String id) { this.id = id }
+
+  public String toString()
+  { 
+    id 
+  }
 	
 	static list() {
 		[MANAGE_INVENTORY, PLACE_ORDER, PLACE_REQUEST, FULFILL_ORDER, FULFILL_REQUEST, SEND_STOCK, RECEIVE_STOCK, EXTERNAL]
