@@ -1,49 +1,78 @@
 
 <table>
 	<tr>
-		<td style="width: 50%;">
+		<td style="width: 75%;" style="padding:0; margin: 0">
 			<g:set var="selectedProducts" value="${attrs.value }"/>
 			
-			<h2>Selected (${selectedProducts.size() })</h2>
-			<div class="box" style="overflow: auto; height: 233px;">
+			
+			<div class="box">
+				<h2>Selected (${selectedProducts.size() })</h2>
 				<table id="selectedProducts" class="products">
 					<thead>
 						<tr class="">
-							<th class="middle center"><input type="checkbox" class="checkAll" checked="checked"> </th>
+							<th class="middle center"><input type="checkbox" class="checkAll" > </th>
 							<th><warehouse:message code="products.label"/></th>
+							<th><warehouse:message code="product.manufacturer.label"/></th>
+							<th><warehouse:message code="product.vendor.label"/></th>
 						</tr>
 					</thead>
 					<tbody>
 						<g:each var="product" in="${selectedProducts }" status="i">
 							<tr class="prop ${i%2?'even':'odd' }">
-								<td width="1%">
-									<g:checkBox name="${attrs.name }" value="${product.id }" class="selectedProduct"
-										checked="${attrs.value.contains(product) }"></g:checkBox>
+								<td width="1%" style="padding: 0; margin: 0;" class="middle center">
+									<g:hiddenField name="${attrs.name }" value="${product.id }"></g:hiddenField>
+										
+										
+									<g:checkBox name="delete-product.id" value="${product?.id }" class="selectedProduct" checked="false"/>
 								</td>
 								<td>
-									${product.name } <span class="fade">${product.manufacturer }</span>
+									${product.name } ${product.unitOfMeasure }
+								</td>
+								<td>
+									 ${product.manufacturer }
+									<g:if test="${product?.manufacturerCode }">
+										<span class="fade">#${product?.manufacturerCode }</span> 
+									</g:if>
+								</td>
+								<td>
+									${product.vendor } 
+									<g:if test="${product?.vendorCode }">
+										<span class="fade">#${product?.vendorCode }</span> 
+									</g:if>
 								</td>
 							</tr>
 						</g:each>
 					</tbody>
 				</table>
+				
+				
 			</div>
 		</td>
+		<td class="center middle">
+			<div>
+				<g:actionSubmit class="button" controller="productGroup" action="addProductsToProductGroup"
+					value="${warehouse.message(code: 'default.button.addSelected.label', default: '<')}" />		
+			</div>
+			<br/>	
+			<div>
+				<g:actionSubmit class="button" controller="productGroup" action="removeProductsFromProductGroup"
+						value="${warehouse.message(code: 'default.button.removeSelected.label', default: '>')}" />
+			</div>
+		</td>
+
 	
 		<td>
 		
 			<g:set var="availableProducts" value="${attrs.products.findAll { !attrs.value.contains(it) }}"/>
 			
-			<h2>Available (${availableProducts.size() })</h2>
-			<div class="box" style="overflow: auto; height: 233px;">
+			
+			<div class="box">
+				<h2>Available (${availableProducts.size() })</h2>
 				<table id="availableProducts" class="products">				
 					<thead>
 						<tr class="">
-							<th class="middle center">
-								<input type="checkbox" class="checkAll" />
-							</th>
-							<th class="middle">
-								<g:textField id="productFilter" name="productFilter" value="" size="40" 
+							<th class="middle" colspan="2">
+								<g:textField id="productFilter" name="productFilter" value="" size="50" 
 									class="medium text"/>
 							</th>
 						</tr>
@@ -51,21 +80,30 @@
 					<tbody>
 						<g:each var="product" in="${availableProducts }" status="i">
 							<tr class="prop ${i%2?'odd':'even' }">
-								<td width="1%">
+								<td width="1%" class="middle center">
 									<%-- 
 									<g:link action="addProducts" id="${productGroupInstance?.id }" params="['product.id':product.id ]">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
 									</g:link>
 									--%>
 									<g:checkBox class="availableProduct" 
-										name="${attrs.name }" value="${product.id }" 
+										name="add-product.id" value="${product.id }" 
 										checked="${attrs.value.contains(product) }"></g:checkBox>
 								</td>
 								<td>
 									${product.name }
-									<span class="fade">
-										${product.manufacturer }
-									</span>
+									<div>
+									${product.manufacturer }									
+									<g:if test="${product?.manufacturerCode }">
+										<span class="fade">#${product?.manufacturerCode }</span> 
+									</g:if>
+									</div>
+									<div>
+									${product.vendor } 
+									<g:if test="${product?.vendorCode }">
+										<span class="fade">#${product?.vendorCode }</span> 
+									</g:if>
+									</div>
 								</td>
 							</tr>
 						</g:each>

@@ -46,15 +46,10 @@
 			</div>
 		</g:hasErrors>
 
-		<div class="buttonBar">            	
-           	<span class="linkButton">
-           		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-           	</span>
-           	<span class="linkButton">
-           		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-           	</span>
-       	</div>
-
+		<div class="buttonBar">
+			<g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+	        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+		</div>
 		<g:form action="save" method="post">
 			<fieldset>
 				<div class="dialog">
@@ -65,19 +60,9 @@
 						<tbody>
 
 							<tr class="prop">
-								<td valign="top" class="name"><label for="description"><warehouse:message
-											code="productGroup.description.label" default="Description" /></label>
-								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">
-									<g:textField name="description" class="text"
-										value="${productGroupInstance?.description}" size="60" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label for="category"><warehouse:message
+								<td valign="middle" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
-								<td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
+								<td valign="middle" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
 									<%-- Show category if coming from Inventory Browser --%>									
 									<g:if test="${productGroupInstance?.category }">
 							        	<format:category category="${productGroupInstance?.category }"/>
@@ -91,6 +76,30 @@
 									
 								</td>
 							</tr>
+							<tr class="prop">
+								<td valign="middle" class="name"><label for="description"><warehouse:message
+											code="productGroup.name.label" default="Generic product" /></label>
+								</td>
+								<td valign="middle"
+									class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">
+									
+									<g:if test="${productGroups }">	
+										<div>										
+											<g:select name="id" from="${productGroups }" 
+												optionKey="id" optionValue="description" value="${productGroupInstance?.id }" noSelection="['null':'']"/>
+										</div>
+									</g:if>
+									<g:else>
+										<div>
+											<g:textField name="description" class="text"
+												value="${productGroupInstance?.description}" size="60" />
+										</div>
+									</g:else>
+										
+									
+								</td>
+							</tr>
+							
 							<g:if test="${productGroupInstance?.products }">
 								<tr class="prop">
 									<td valign="top" class="name">
@@ -99,12 +108,37 @@
 									</td>
 									<td class="value ${hasErrors(bean: productGroupInstance, field: 'products', 'errors')}">
 										<table>
-											<g:each var="product" in="${productGroupInstance?.products }">
-												<tr>
-													<td>
-														<g:hiddenField name="product.id" value="${product.id }"/>
-														${product?.name }
+											<g:each var="product" in="${productGroupInstance?.products }" status="status">
+												<tr class="${status%2?'even':'odd' }">
+													<td class="middle" width="1%">
+														<g:checkBox id="productId" name="product.id" value="${product?.id }"/>
 													</td>
+													<td class="checkable middle">
+														<span class="fade">${product?.productCode }</span>	
+													</td>
+													<td class="checkable middle">			
+														<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory" style="z-index: 999">
+															<span title="${product?.description }">				
+																<g:if test="${product?.name?.trim()}">
+																	${product?.name}
+																</g:if>
+																<g:else>
+																	<warehouse:message code="product.untitled.label"/>
+																</g:else>
+															</span>
+														</g:link> 
+													</td>
+													<td class="checkable middle left">
+														<span class="fade">${product?.manufacturer }</span>
+													</td>
+													<td class="checkable middle left">
+														<span class="fade">${product?.brandName}</span>	
+													</td>
+													<td class="checkable middle left">
+														<span class="fade">${product?.manufacturerCode }</span>
+													</td>
+													
+													
 												</tr>																					
 											</g:each>
 										</table>

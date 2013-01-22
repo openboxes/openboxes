@@ -12,26 +12,6 @@
 <content tag="pageTitle"> <warehouse:message
 	code="default.edit.label" args="[entityName]" /></content>
 
-<style type="text/css">
-.CheckBoxList {
-	height: 300px;
-	overflow: auto;
-	overflow-x: hidden;
-	border: 0px solid #000;
-	list-style-type: none;
-	margin: 0;
-	padding: 0px
-}
-
-.CheckBoxList li {
-	padding: 2px;
-}
-
-.CheckBoxList input {
-	padding-right: 5px;
-}
-</style>
-
 </head>
 <body>
 	<div class="body">
@@ -54,12 +34,8 @@
            	</span>
 		</div>
 		<g:form method="post" action="update">
-		
-		
-			<fieldset>
 				<g:hiddenField name="id" value="${productGroupInstance?.id}" />
-				<g:hiddenField name="version"
-					value="${productGroupInstance?.version}" />
+				<g:hiddenField name="version" value="${productGroupInstance?.version}" />
 				<div class="dialog">
 					
 				
@@ -77,24 +53,7 @@
 								</td>
 							</tr>
 
-							<%-- 
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="dateCreated"><warehouse:message code="productGroup.dateCreated.label" default="Date Created" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'dateCreated', 'errors')}">
-	                                    <g:datePicker name="dateCreated" precision="minute" value="${productGroupInstance?.dateCreated}"  />
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="lastUpdated"><warehouse:message code="productGroup.lastUpdated.label" default="Last Updated" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'lastUpdated', 'errors')}">
-	                                    <g:datePicker name="lastUpdated" precision="minute" value="${productGroupInstance?.lastUpdated}"  />
-	                                </td>
-	                            </tr>
-	                        	--%>
+
 							<tr class="prop">
 								<td valign="top" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
@@ -109,6 +68,22 @@
 
 								</td>									
 							</tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="dateCreated"><warehouse:message code="productGroup.dateCreated.label" default="Date Created" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'dateCreated', 'errors')}">
+                                   ${productGroupInstance?.dateCreated} 
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="lastUpdated"><warehouse:message code="productGroup.lastUpdated.label" default="Last Updated" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'lastUpdated', 'errors')}">
+                                    ${productGroupInstance?.lastUpdated}
+                                </td>
+                            </tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label for="products"><warehouse:message
 											code="productGroup.products.label" default="Products" /></label></td>
@@ -151,7 +126,6 @@
 						</tbody>
 					</table>
 				</div>
-			</fieldset>
 		</g:form>
 	</div>
 <script>

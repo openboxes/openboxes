@@ -31,10 +31,13 @@ class ProductGroupController {
     }
 
     def save = {
-        def productGroupInstance = new ProductGroup(params)
+		println "Save " + params
+		def productGroupInstance = ProductGroup.get(params.id)
+		if (!productGroupInstance) { 
+			productGroupInstance = new ProductGroup(params)
+		}
 		//productGroupInstance.products = productService.getProducts(params['product.id'])
-		def products = productService.getProducts(params['product.id'])
-		println "Products: " + products
+		def products = productService.getProducts(params['product.id'])		
 		products.each { product ->
 			productGroupInstance.addToProducts(product)
         }
@@ -142,15 +145,17 @@ class ProductGroupController {
 			}
 			
 			//productGroupInstance.products = productService.getProducts(params['product.id'])
-			
+			/*
 			def products = productService.getProducts(params['product.id'])
 			println "Products: " + products
 			products.each { product ->
 				productGroupInstance.addToProducts(product)
-			}
+			}*/
+			
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
-                redirect(action: "edit", id: productGroupInstance.id)
+                //redirect(action: "edit", id: productGroupInstance.id)
+				redirect(controller: "inventory", action: "browse")
             }
             else {
                 render(view: "edit", model: [productGroupInstance: productGroupInstance])
@@ -158,7 +163,7 @@ class ProductGroupController {
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
-            redirect(action: "list")
+            redirect(controller: "inventory", action: "browse")
         }
     }
 
@@ -181,10 +186,14 @@ class ProductGroupController {
         }
     }
 	
+	/**
+	 * From the inventory browser.
+	 */
 	def addToProductGroup = { 
 		def productGroupInstance = new ProductGroup()
 		productGroupInstance.properties = params
 		productGroupInstance.products = productService.getProducts(params['product.id'])
+		
 		
 		def categories = productGroupInstance.products.collect { 
 			it.category
@@ -199,8 +208,36 @@ class ProductGroupController {
 		}
 		productGroupInstance.category = categories.get(0)
 		
-
-		render(view: "create", model: [productGroupInstance: productGroupInstance])
+		def productGroups = ProductGroup.findAllByCategory(productGroupInstance.category)
+		
+		render(view: "create", model: [productGroupInstance: productGroupInstance, productGroups : productGroups])
 	}
 	
+	/**
+	 * From the edit produt group page.
+	 */
+	
+	def removeProductsFromProductGroup = { 
+		println params
+		
+		def productGroupInstance = ProductGroup.get(params.id)
+		def products = productService.getProducts(params['delete-product.id'])
+		products.each { product ->
+			productGroupInstance.removeFromProducts(product)
+		}
+		
+		render(view: "edit", model: [productGroupInstance: productGroupInstance])
+	}
+	def addProductsToProductGroup = {
+		println params
+		
+		def productGroupInstance = ProductGroup.get(params.id)
+		def products = productService.getProducts(params['add-product.id'])
+		products.each { product ->
+			productGroupInstance.addToProducts(product)
+		}
+		
+		render(view: "edit", model: [productGroupInstance: productGroupInstance])
+	}
+
 }

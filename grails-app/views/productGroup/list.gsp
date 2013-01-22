@@ -16,14 +16,11 @@
             </g:if>
             
             
+			         	
 			<div class="buttonBar">            	
-            	<span class="linkButton">
-            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-            	</span>
-            	<span class="linkButton">
-            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-            	</span>
-           	</div>
+           		<g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+           		<g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            </div>
             
             <div class="list">
                 <table>
@@ -47,7 +44,7 @@
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                             <td>
 	                            <g:link action="edit" id="${productGroupInstance.id}">
-    	                        	${fieldValue(bean: productGroupInstance, field: "description")}
+    	                        	${fieldValue(bean: productGroupInstance, field: "description")?:productGroupInstance?.id}
     	                  		</g:link>
     	                  	</td>
                             <td>${productGroupInstance.category}</td>
