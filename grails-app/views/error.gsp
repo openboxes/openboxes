@@ -29,15 +29,15 @@
 
   <body>
   
-  	<div class="center error" style="padding: 10px;">
+  	<div class="" style="padding: 10px;">
 		<button class="open-dialog">
-			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bug_add.png')}" style="vertical-align: middle" />&nbsp;
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bug.png')}" style="vertical-align: middle" />&nbsp;
 			<warehouse:message code="default.reportAsBug.label"/>
 			&nbsp;
 		</button>
 		&nbsp;
 		<button class="go-back">
-			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_go.png')}" style="vertical-align: middle" />&nbsp;
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle" />&nbsp;
 			<warehouse:message code="default.ignoreError.label"/>
 			&nbsp;
 		</button>	
@@ -107,7 +107,12 @@
 						<label><warehouse:message code="default.subject.label"/></label>
 					</td>
 					<td class="value">
-						${request?.'javax.servlet.error.message'?.encodeAsHTML()}
+						<g:if test="${request?.'javax.servlet.error.message'}">						 
+							${request?.'javax.servlet.error.message'?.encodeAsHTML()}
+						</g:if>
+						<g:else>
+							${exception.message?.encodeAsHTML()}
+						</g:else>
 					</td>
 				</tr>
 				<tr class="prop">
@@ -138,9 +143,9 @@
 						<label><warehouse:message code="default.stepsToReproduce.label"/></label>
 					</td>
 					<td class="value">
-						<g:textArea name="comments" cols="60" rows="5"></g:textArea>
+						<g:textArea name="comments" cols="60" rows="5" placeholder="${warehouse.message(code:'default.stepsToReproduceHint.label')}"></g:textArea>
 						<span class="fade">
-							<warehouse:message code="default.stepsToReproduceHint.label"/>
+							
 						</span>
 					</td>
 				</tr>

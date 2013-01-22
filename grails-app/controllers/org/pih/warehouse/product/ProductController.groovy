@@ -432,7 +432,6 @@ class ProductController {
 		try {
 			adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN).collect { it.email }
 			if (adminList) {
-				println adminList.class
 				def subject = "${warehouse.message(code:'email.productCreated.message',args:[product?.name,product?.createdBy?.name])}";
 				def body = "${g.render(template:'/email/productCreated',model:[product:product])}"
 				mailService.sendHtmlMail(subject, body.toString(), adminList);

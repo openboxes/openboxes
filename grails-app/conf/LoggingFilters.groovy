@@ -17,16 +17,17 @@ class LoggingFilters {
 				String sessionId = session?.user?.username//RequestContextHolder.getRequestAttributes()?.getSessionId()
 				//log.info "SessionID " + sessionId
 				MDC.put('sessionId', session?.user?.username?:"anonymous")
-				MDC.put('ipAddress', request.getRemoteAddr())
-				//request.getRemoteAddr()
-				//request.getHeader("X-Forwarded-For")
-				//request.getHeader("Client-IP")
+				MDC.put('remoteAddr', request?.getRemoteAddr()?:"unknown")
+				MDC.put('forwardedFor', request?.getHeader("X-Forward-For")?:"unknown")
+				MDC.put('clientIp', request?.getHeader("Client-IP")?:"unknown")
 			}
 			after = {
 			}
 			afterView = {
 				MDC.remove('sessionId')
-				MDC.remove('ipAddress')
+				MDC.remove('remoteAddr')
+				MDC.remove('forwardedFor')
+				MDC.remove('clientIp')
 			}
 		}
 	}

@@ -30,13 +30,15 @@ grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
+
+// Default mail settings 
 grails { 
 	mail { 		
 		// By default we enable email.  You can enable/disable email using environment settings below or in your 
 		// ${user.home}/openboxes-config.properties file 
 		enabled = true			
 		from = "openboxes@pih.org"
-		prefix = "[OpenBoxes]"
+		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
 		host = "localhost"
 		port = "25"
 	}
@@ -150,18 +152,12 @@ log4j = {
 	
 	// Example of changing the log pattern for the default console    
 	appenders {
-		//console name:'stdout', layout:pattern(conversionPattern: '%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n')
-		//console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')
-		//console name:'stdout', layout:pattern(conversionPattern: '%p %X{sessionId} %d{ISO8601} [%c{1}] %m%n')
-
-		//println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
+		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
 		//println "mail.error.server: '${mail.error.server}'"
 		//println "mail.error.username: '${mail.error.username}'"
 		//println "mail.error.password: '${mail.error.password}'"
-
-        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
-	       
-			
+		
+        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {		
 	        def smtpAppender
 
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication 
@@ -170,11 +166,11 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " %m (alternate)",
+					subject: mail.error.subject + "%d{[MMM-dd-yyyy HH:mm:ss.SSS]} %m",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					layout: pattern(conversionPattern:
-					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]}[%t]%nUser: %X{sessionId}%nClass: %c%nMessage: %m%n'))
+						'%d{[MMM-dd-yyyy HH:mm:ss.SSS]}[%t]%n%X{sessionId}%n%X{remoteAddr}%n%X{forwardedFor}%n%X{clientIp}%n%c%n%m%n'))
 			}
 			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
 			else if ("dynamic".equals(mail.error.appender)) { 
@@ -182,14 +178,14 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " %m (dynamic)",
+					subject: mail.error.subject + "%d{[MMM-dd-yyyy HH:mm:ss.SSS]} %m",
 					threshold: Level.ERROR,				
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
 					//SMTPPassword: mail.error.password,
-					//SMTPDebug: mail.error.debug,
+					SMTPDebug: mail.error.debug,
 					layout: pattern(conversionPattern:
-					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]}[%t] %nUser: %X{sessionId}%nClass: %c%nMessage: %m%n'))
+						'%d{[MMM-dd-yyyy HH:mm:ss.SSS]}[%t]%n%X{sessionId}%n%X{remoteAddr}%n%X{forwardedFor}%n%X{clientIp}%n%c%n%m%n'))
 			}			
 			// Default SMTP error appender does not allow configurable subject line 
 			else { 				
@@ -197,35 +193,32 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " %m (default)",
+					subject: mail.error.subject + " Error",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
-					//SMTPDebug: mail.error.debug,
+					SMTPDebug: mail.error.debug,
 					//SMTPPassword: mail.error.password,
 					layout: pattern(conversionPattern:
-					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
-				
+						'%d{[MMM-dd-yyyy HH:mm:ss.SSS]}%n[%t]%n%-5p%n%X{sessionId}%n%X{remoteAddr}%n%X{forwardedFor}%n%X{clientIp}%n%c%n%C%n%m%n'))
 			} 
 			if (mail.error.server) smtpAppender.SMTPHost = mail.error.server
 			if (mail.error.username) smtpAppender.SMTPUsername = mail.error.username
 			if (mail.error.password) smtpAppender.SMTPPassword = mail.error.password
-			if (mail.error.debug) smtpAppender.SMTPDebug = mail.error.debug
+			//if (mail.error.debug) smtpAppender.SMTPDebug = mail.error.debug
 			
-			println smtpAppender.class.name
+			println "Using " + mail.error.appender + " SMTP appender " + smtpAppender.class.name
         	appender smtpAppender
 
-            def asyncAppender = new AsyncAppender(
-                    name: 'async',
-                    bufferSize: 500,
-            )
+            def asyncAppender = new AsyncAppender(name: 'async', bufferSize: 500)
             asyncAppender.addAppender(smtpAppender)
             appender asyncAppender
         }
+		
 	}
 	
 	root {
-		error 'async'
+		error 'stdout', 'smtp'
 		additivity = false
 	}
 
@@ -372,5 +365,15 @@ grails.gorm.default.mapping = {
 // default and supported locales
 locale.defaultLocale = 'en'
 locale.supportedLocales = ['en','fr','es']
+
+/**
+ * Grails doc configuration
+ */
+grails.doc.title = "OpenBoxes"
+grails.doc.subtitle = ""
+grails.doc.authors = "Justin Miranda"
+grails.doc.license = "Eclipse Public License - Version 1.0"
+grails.doc.copyright = ""
+grails.doc.footer = ""
 
 
