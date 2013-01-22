@@ -31,6 +31,10 @@ class InventoryItemController {
 	def requisitionService;
 	def orderService;
 	
+	
+	def index = { 
+		redirect(controller: "inventory", action: "browse")
+	}
 	/**
 	 * 
 	 */
@@ -187,7 +191,6 @@ class InventoryItemController {
 		log.info ("Before saving record inventory " + params)
 		inventoryService.saveRecordInventoryCommand(cmd, params)
 		if (!cmd.hasErrors()) { 
-			log.info ("No errors, show stock card")				
 			redirect(action: "showStockCard", params: ['product.id':cmd.productInstance.id])
 			return;
 		}
