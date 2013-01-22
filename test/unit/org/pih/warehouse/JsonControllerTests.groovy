@@ -4,6 +4,7 @@ import grails.test.ControllerUnitTestCase
 import org.pih.warehouse.product.*
 import grails.converters.JSON
 import org.pih.warehouse.requisition.RequisitionService
+import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.core.*
 
@@ -92,5 +93,27 @@ class JsonControllerTests extends ControllerUnitTestCase {
         assert jsonResult[5].group == group1.description
 
     }
-
+	
+	// No signature of method: static org.pih.warehouse.core.Person.withCriteria() is applicable for argument types:
+	/*
+	def test_globalSearch() { 
+		def location = new Location(name: "Boston")
+		mockDomain(Shipment, [new Shipment(name: "Test Shipment")])
+		mockDomain(Product, [new Product(name: "Test Product")])
+		def inventoryServiceMock = mockFor(InventoryService)
+		inventoryServiceMock.demand.getProductsByTermsAndCategories{ terms, categories, includeHidden, inventory, max, offset -> 
+			return Product.list() 
+		}
+		//inventoryServiceMock.demand.getQuantityForProducts{inventory, prodcutIds -> quantities}
+		controller.inventoryService =  inventoryServiceMock.createMock()
+		//controller.productService = productServiceMock.createMock()
+		controller.session.warehouse = location
+		controller.params.term = "test"
+		controller.globalSearch()
+		def jsonResponse = controller.response.contentAsString
+		println jsonResponse
+		def jsonResult = JSON.parse(jsonResponse)
+	}
+	*/
+	
 }

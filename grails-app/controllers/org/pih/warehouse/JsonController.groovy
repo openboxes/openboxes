@@ -15,6 +15,7 @@ import grails.converters.*;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.Tag;
+import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
@@ -500,6 +501,8 @@ class JsonController {
 		def items = []
 		def terms = params.term?.split(" ")
 		terms?.each{ term ->
+			
+			// Get all products that match terms
 			def personResults = Person.withCriteria {
 				or {
 					ilike("firstName", term + "%")
@@ -509,9 +512,21 @@ class JsonController {
 			}
 			items.addAll(personResults)
 			
-			def productResults = inventoryService.getProductsByTermsAndCategories(terms, [], 25, 0)
+			
+			// Get all inventory items that match terms
+			//def inventoryItemResults = InventoryItem.withCriteria { 
+			//	or { 
+			//		ilike("lotNumber", term + "%")
+			//	}
+			//}
+			//items.addAll(inventoryItemResults)
+			
+			// Get all products that match terms
+			def inventory = Location.get(session.warehouse.id).inventory
+			def productResults = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
 			items.addAll(productResults)
 			
+			// Get all shipments that match terms
 			def shipmentResults = Shipment.withCriteria {
 				or {
 					ilike("name", term + "%")
