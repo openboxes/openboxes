@@ -31,16 +31,16 @@ class Tag implements Serializable {
 	User createdBy
 	User updatedBy
 	
-	static belongsTo = org.pih.warehouse.product.Product
+	static belongsTo = Product
 	
 	static mapping = {
 		id generator: 'uuid'		
-		products joinTable: [name:'product_tag', column: 'product_id', key: 'tag_id'], cascade: 'all-delete-orphan'
+		products joinTable: [name:'product_tag', column: 'product_id', key: 'tag_id']
+		//products joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id']
+		//products joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id']
 	}
 	
-	static hasMany = [
-		products : Product 
-	] 
+	static hasMany = [products : Product] 
 	
 	static constraints = {
 		tag(nullable:false, maxSize: 255)

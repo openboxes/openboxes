@@ -92,6 +92,9 @@ class TagController {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
             try {
+				tagInstance.products.each { product ->
+					tagInstance.removeFromProducts(product)
+				}
                 tagInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
                 redirect(action: "list")
