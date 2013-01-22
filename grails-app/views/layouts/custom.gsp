@@ -11,13 +11,13 @@
 	
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there is a slight distinction between these two ... need to figure out what that distinction is -->
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection, print" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection, print" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection, print" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection, print" />	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection, print" />	
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection, print" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="screen, projection, print" />
 
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -128,14 +128,14 @@
 						</a>
 					</li>
 		    	</g:if>
-				<%-- 
 				<g:if test="${controllerName }">
 					<li>
 						<g:link controller="${controllerName }" action="index">
-							<warehouse:message code="${controllerName + '.' + actionName + '.label'}" />
+							<warehouse:message code="${controllerName + '.label'}" />
 						</g:link>
 					</li>
 				</g:if>
+				<%-- 
 				<g:if test="${actionName }">
 					<li>
 						<a href="">
@@ -176,7 +176,18 @@
     		--%>
   	
    		</div>
+   		<%-- 
+		<g:if test="${session?.warehouse}">
+			<div style="width:100%;">
+				<div class="box" style="width: 100%; text-align: center;">
+					<g:globalSearch cssClass="globalSearch" width="300" name="searchTerms" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
+				</div>
+			</div>
+		</g:if>   		
+   		--%>
   	</g:if>
+	
+
   	<%-- 
   	<div class="page-actions">
   		${g.pageProperty(name: 'page.actions')}
@@ -213,7 +224,20 @@
 	</div>
 	<script type="text/javascript">
 
+	
 		$(function() { 		
+
+			/*
+			$(document).keypress(function(e) {
+				alert(e.which);
+				if(e.which >=48 && e.which <=57) {
+					// enter pressed
+					$("#globalSearch").focus();
+				}
+			});
+			*/
+
+					
 		
 			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 		
@@ -225,7 +249,7 @@
 				});
 			</g:if>
 
-			<%-- Automatic status message updater because it's not an ideal solution and isn't currently used --%> 
+			<%-- Automatic status message updater because it's not an ideal solution and isn't currently used 
 			<g:if test="${new Boolean(grailsApplication.config.grails.statusUpdate.enabled?:'true') }">
 				<g:if test="${session.user && session.warehouse}">
 				
@@ -253,13 +277,15 @@
 					);
 				</g:if>
 			</g:if>
+			--%> 
 			
 			$(".warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 
 					autoOpen: true, 
 					modal: true, 
-					width: '500'
+					width: 600,
+					height: 400
 				});
 			});
 
@@ -279,7 +305,6 @@
 				timeout: 100,   // number = milliseconds delay before onMouseOut
 				out: hideActions       // function = onMouseOut callback (required)
 			});  
-
 			
 			// Create an action button that toggles the action menu on click
 			//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
@@ -325,9 +350,7 @@
 		<script type="text/javascript">
 		  var uvOptions = {};
 		  (function() {
-
             $.fn.watermark = $.fn.watermark || function(text,options){} //for headless driver stub the problematic watermark
-
 		    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
 		    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/gMxKSy5iKCBPkbBzs8Q.js';
 		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);

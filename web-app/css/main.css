@@ -180,17 +180,23 @@ input:focus, select:focus, textarea:focus {
 }
 
 
+.linkButton a.report_low {
+    background: url(../images/icons/silk/chart_bar.png) center left no-repeat;
+}
+.linkButton a.report_reorder {
+    background: url(../images/icons/silk/arrow_refresh.png) center left no-repeat;
+}
 .linkButton a.report_expiring {
-    background: url(../images/icons/silk/chart_pie.png) center left no-repeat;
+    background: url(../images/icons/silk/clock.png) center left no-repeat;
 }
 .linkButton a.report_expired {
-    background: url(../images/icons/silk/chart_pie.png) center left no-repeat;
+    background: url(../images/icons/silk/clock_red.png) center left no-repeat;
 }
 .linkButton a.report_consumption {
-    background: url(../images/icons/silk/chart_pie.png) center left no-repeat;
+    background: url(../images/icons/silk/package_white.png) center left no-repeat;
 }
 .linkButton a.report_transactions {
-    background: url(../images/icons/silk/chart_pie.png) center left no-repeat;
+    background: url(../images/icons/silk/calendar_view_day.png) center left no-repeat;
 }
 .linkButton a.report_shipping {
     background: url(../images/icons/silk/lorry.png) center left no-repeat;
@@ -201,7 +207,18 @@ input:focus, select:focus, textarea:focus {
 .linkButton a.settings {
     background: url(../images/icons/silk/cog.png) center left no-repeat;
 }
-
+.linkButton a.supported {
+    background: url(../images/icons/silk/accept.png) center left no-repeat;
+}
+.linkButton a.formulary {
+    background: url(../images/icons/silk/pill.png) center left no-repeat;
+}
+.linkButton a.stocked {
+    background: url(../images/icons/silk/tick.png) center left no-repeat;
+}
+.linkButton a.notSupported {
+    background: url(../images/icons/silk/decline.png) center left no-repeat;
+}
 
 
 /* MESSAGES AND ERRORS */
@@ -554,7 +571,9 @@ th.desc a {
 .linkButton a.export {
     background: url(../images/icons/silk/arrow_down.png) center left no-repeat;
 }
-
-
-
-
+.linkButton a.indent {
+    background: url(../images/icons/indent.gif) center left no-repeat;
+}
+.linkButton a.outline {
+    background: url(../images/icons/silk/chart_organization.png) center left no-repeat;
+}

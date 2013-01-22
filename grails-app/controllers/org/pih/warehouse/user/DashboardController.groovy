@@ -46,7 +46,7 @@ class DashboardController {
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		
 		def activityList = []
-		def shipments = Product.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
+		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
 			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-7, 'origin':location, 'destination':location] );
 		shipments.each { 
 			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
@@ -60,16 +60,45 @@ class DashboardController {
 				lastUpdated: it.lastUpdated, 
 				shipment: it)
 		}
-		
+		//order by e.createdDate desc
+		//[max:params.max.toInteger(), offset:params.offset.toInteger ()]
+		def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-7])
+		shippedShipments.each {
+			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+			def activityType = "dashboard.activity.shipped.label"
+			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
+			activityList << new DashboardActivityCommand(
+				type: "arrow_right",
+				label: activityType,
+				url: link,
+				dateCreated: it.dateCreated,
+				lastUpdated: it.lastUpdated,
+				shipment: it)
+		}
+		def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-7])
+		receivedShipment.each {
+			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+			def activityType = "dashboard.activity.received.label"
+			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
+			activityList << new DashboardActivityCommand(
+				type: "arrow_left",
+				label: activityType,
+				url: link,
+				dateCreated: it.dateCreated,
+				lastUpdated: it.lastUpdated,
+				shipment: it)
+		}
+
 		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-7] );
 		products.each { 
 			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
+			def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
 			activityType = "${warehouse.message(code: activityType)}"
-			
+			def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
 			activityList << new DashboardActivityCommand(
 				type: "package",
-				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType])}",
+				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType, username])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
@@ -83,12 +112,14 @@ class DashboardController {
 			
 			transactions.each { 
 				def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
+				def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
 				def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
 				activityType = "${warehouse.message(code: activityType)}"
 				def label = LocalizationUtil.getLocalizedString(it)
+				def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
 				activityList << new DashboardActivityCommand(
 					type: "table",
-					label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType])}",
+					label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
 					url: link,
 					dateCreated: it.dateCreated,
 					lastUpdated: it.lastUpdated,
@@ -113,6 +144,8 @@ class DashboardController {
 		}
 		
 		activityList = activityList.sort { it.lastUpdated }.reverse()
+		//activityList = activityList.groupBy { it.lastUpdated }
+		
 		
 		def outgoingOrders = orderService.getOutgoingOrders(location)
 		def incomingOrders = orderService.getIncomingOrders(location)
@@ -151,7 +184,16 @@ class DashboardController {
 		def incomingRequests = Requisition.findAllByDestination(session?.warehouse).groupBy{it.status}.sort()
 		def outgoingRequests = Requisition.findAllByOrigin(session?.warehouse).groupBy{it.status}.sort()
 		
-		[incomingShipments: incomingShipments,
+		def c = Product.createCriteria()
+		def categories = c.list { 
+			projections { 
+				distinct 'category'
+			}
+		}
+		categories = categories.groupBy { it.parentCategory } 
+		[
+			categories: categories,
+			incomingShipments: incomingShipments,
 			outgoingShipments: outgoingShipments,
 			incomingOrders: incomingOrders,
 			incomingRequests: incomingRequests,
@@ -187,10 +229,11 @@ class DashboardController {
 		redirect(controller:'dashboard', action:'index')
 	}
 	
-	def chooseLocation = {
-					
-		def warehouse = null;
+	def chooseLocation = {			
 		
+		log.info params
+		def warehouse = null;
+			
 		// If the user has selected a new location from the topnav bar, we need 
 		// to retrieve the location to make sure it exists
 		if (params.id != 'null') {			
@@ -209,7 +252,7 @@ class DashboardController {
 			// Save the warehouse selection for "last logged into" information
 			if (session.user) { 
 				def userInstance = User.get(session.user.id);
-				//userInstance.warehouse = warehouse;
+				userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
 				userInstance.lastLoginDate = new Date();
 				if (userInstance.rememberLastLocation) { 
 					userInstance.warehouse = warehouse 
