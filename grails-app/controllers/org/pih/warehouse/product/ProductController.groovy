@@ -41,7 +41,6 @@ import java.io.ByteArrayOutputStream;
 import com.google.zxing.BarcodeFormat;
 import java.net.URLEncoder;
 
-import grails.converters.JSON;
 import grails.converters.XML;
 
 class ProductController {
@@ -474,56 +473,97 @@ class ProductController {
 	 */
 	def upload = { DocumentCommand command ->
 		log.info "Uploading document: " + params
-		def file = command.fileContents;
-
+		
 		// HACK - for some reason the Product in document command is not getting bound
 		command.product = Product.get(params.product.id)
-
-		log.info "multipart file: " + file?.originalFilename + " " + file?.contentType + " " + file?.size + " "
-		log.info "product " + command.product
-		// file must not be empty and must be less than 10MB
-		// FIXME The size limit needs to go somewhere
-		if (!file || file?.isEmpty()) {
-			flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
-		}
-		else if (file.size < 10*1024*1000) {
-			log.info "Creating new document ";
+		
+		
+		
+		if (params.url) { 		
+			println "URL: " + params.url
+			def filename = params.url.tokenize("/")[-1]
+			println "Filename: " + filename	
+			def fileOutputStream = new FileOutputStream(filename)
+			println "FileOutputStream: " + fileOutputStream
+			def out = new BufferedOutputStream(fileOutputStream)
+			out << new URL(params.url).openStream()			
+			out.close()
+			
+			File file = new File(filename)
+			println "Path: " + file.absolutePath
+			
 			Document documentInstance = new Document(
-					size: file.size,
-					name: file.originalFilename,
-					filename: file.originalFilename,
-					fileContents: file.bytes,
-					contentType: file.contentType,
-					documentNumber: command.documentNumber,
-					documentType:  command.documentType)
+				size: file.size(),
+				name: file.name,
+				filename: file.name,
+				fileContents: file.bytes,
+				contentType: "image")
+			
+			if (documentInstance.validate() && !documentInstance.hasErrors()) {
+				log.info "Saving document " + documentInstance;
+				command.product.addToDocuments(documentInstance).save(flush:true)
+				flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
+			}
+			// If there are errors, we need to redisplay the document form
+			else {
+				log.info "Document did not save " + documentInstance.errors;
+				flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
+				redirect(controller: "product", action: "edit", id: command?.product?.id,
+				model: [productInstance: command?.product, documentInstance : documentInstance])
+				return;
+			}
 
-			if (!command?.product) {
-				log.info "Cannot add document " + documentInstance + "  because product does not exist";
-				flash.message = "${warehouse.message(code: 'document.productDoesNotExist.message')}"
-				redirect(controller: "product", action: "list")
-				return
+		}
+		else { 
+			def file = command.fileContents;
+			println "File: " + file
+			log.info "multipart class: " + file?.class?.name
+			log.info "multipart file: " + file?.originalFilename + " " + file?.contentType + " " + file?.size + " "
+			log.info "product " + command.product
+			// file must not be empty and must be less than 10MB
+			// FIXME The size limit needs to go somewhere
+			if (!file || file?.isEmpty()) {
+				flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
+			}
+			else if (file.size < 10*1024*1000) {
+				log.info "Creating new document ";
+				Document documentInstance = new Document(
+						size: file.size,
+						name: file.originalFilename,
+						filename: file.originalFilename,
+						fileContents: file.bytes,
+						contentType: file.contentType,
+						documentNumber: command.documentNumber,
+						documentType:  command.documentType)
+	
+				if (!command?.product) {
+					log.info "Cannot add document " + documentInstance + "  because product does not exist";
+					flash.message = "${warehouse.message(code: 'document.productDoesNotExist.message')}"
+					redirect(controller: "product", action: "list")
+					return
+				}
+				else {
+	
+					// Check to see if there are any errors
+					if (documentInstance.validate() && !documentInstance.hasErrors()) {
+						log.info "Saving document " + documentInstance;
+						command.product.addToDocuments(documentInstance).save(flush:true)
+						flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
+					}
+					// If there are errors, we need to redisplay the document form
+					else {
+						log.info "Document did not save " + documentInstance.errors;
+						flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
+						redirect(controller: "product", action: "edit", id: command?.product?.id,
+						model: [productInstance: command?.product, documentInstance : documentInstance])
+						return;
+					}
+				}
 			}
 			else {
-
-				// Check to see if there are any errors
-				if (documentInstance.validate() && !documentInstance.hasErrors()) {
-					log.info "Saving document " + documentInstance;
-					command.product.addToDocuments(documentInstance).save(flush:true)
-					flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
-				}
-				// If there are errors, we need to redisplay the document form
-				else {
-					log.info "Document did not save " + documentInstance.errors;
-					flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
-					redirect(controller: "product", action: "edit", id: command?.product?.id,
-					model: [productInstance: command?.product, documentInstance : documentInstance])
-					return;
-				}
+				log.info "Document is too large"
+				flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
 			}
-		}
-		else {
-			log.info "Document is too large"
-			flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
 		}
 
 		// This is, admittedly, a hack but I wanted to avoid having to add this code to each of
@@ -642,6 +682,28 @@ class ProductController {
 			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
 		}
 	}
+	
+	
+	def exportProducts = { 
+		println params
+		def productIds = params.list('product.id')
+		
+		println "Product IDs: " + productIds
+		def products = productService.getProducts(productIds.toArray())
+		if (products) { 
+			def date = new Date();
+			response.setHeader("Content-disposition",
+					"attachment; filename=products-${date.format("yyyyMMdd-hhmmss")}.csv")
+			response.contentType = "text/csv"
+			def csv = productService.exportProducts(products)
+			println "export products: " + csv
+			render csv
+		}
+		else { 
+			render(text: 'No products found', status: 404)			
+		}
+		
+	}
 
 	def exportAsCsv = {
 		def products = Product.list()
@@ -672,13 +734,20 @@ class ProductController {
 			
 		def columns
 		def localFile 
-		def uploadFile = command?.importFile		
+		def uploadFile = command?.importFile	
+			
 		def existingProductsMap = [:]
+		def tag = ""
 		
 		if (request.method == "POST") { 
 			
 			// Step 1: Upload file 			
 			if (uploadFile && !uploadFile?.empty) {
+				
+				def contentTypes = ['application/vnd.ms-excel','text/plain','text/csv','text/tsv']
+				println "Content type: " + uploadFile.contentType
+				println "Validate: " + contentTypes.contains(uploadFile.contentType)
+				
 				try {				
 					localFile = new File("uploads/" + uploadFile?.originalFilename);
 					localFile.mkdirs()
@@ -688,27 +757,36 @@ class ProductController {
 					def csv = localFile.getText()
 					columns = productService.getColumns(csv)
 					println "CSV " + csv
-					def existingProducts = productService.getExistingProducts(csv)
-					existingProducts.each { product ->
-						println "Product " + product
-						existingProductsMap[product] = product
-					}				
-					println existingProductsMap
+					def existingProducts = productService.getExistingProducts(csv)					
+					existingProducts.each { product ->						
+						existingProductsMap[product.id] = product.discard()
+					}
+					
+					tag = command?.importFile?.originalFilename
+					def lastPeriodPos = tag.lastIndexOf('.');
+					println lastPeriodPos
+					if (lastPeriodPos > 0) tag = tag.substring(0, lastPeriodPos)
+					println tag
+					
 					command.products = productService.importProducts(csv, false)
 					
 					flash.message = "Uploaded file ${uploadFile?.originalFilename}"
 					//render localFile.getText()
 					//response.outputStream << localFile.newInputStream()
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+				} catch (RuntimeException e) {
+					flash.message = e.message
+				
+				} catch (Exception e) { 
+					flash.message = e.message
+				
+				}				
 			}			
 			else {
 				flash.message = "${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}"
 			}			
 		}
 		
-		render(view: 'importAsCsv', model: [command:command, columns:columns, existingProductsMap:existingProductsMap])
+		render(view: 'importAsCsv', model: [command:command, columns:columns, existingProductsMap:existingProductsMap, tag: tag])
 	}
 	
 	def importCsv = { ImportDataCommand command ->
@@ -723,9 +801,8 @@ class ProductController {
 			println "import now"
 			def csv = session.localFile.getText()
 			def existingProducts = productService.getExistingProducts(csv)
-			existingProducts.each { product ->
-				println "Product " + product
-				existingProductsMap[product] = product
+			existingProducts.each { product ->				
+				existingProductsMap[product.id] = product.discard()
 			}
 			columns = productService.getColumns(csv)
 			//println existingProductsMap

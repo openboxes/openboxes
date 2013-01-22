@@ -77,52 +77,40 @@
 										</span>
 									</td>
 								</tr>
-								<tr class="prop">
-									<td class="name">
-										<label><warehouse:message code="import.filename.label" default="Filename"/></label>
-									</td>								
-									<td class="value">
-										${command?.importFile?.originalFilename }
-									</td>
-								</tr>
-								<tr class="prop">
-									<td class="name">
-										<label><warehouse:message code="import.numOfRecords.label" default="# of Records"/></label>
-									</td>								
-									<td class="value">
-										${command?.products?.size() } ${warehouse.message(code:'import.products.label', default: 'products') }
-									</td>
-								</tr>
-								<tr class="prop">
-									<td class="name">
-										<label>${warehouse.message(code:'products.label')}</label>
-									</td>
-									<td class="value">
-										<div style="max-height: 300px; overflow: auto;">
+								<tr class="prop">									
+									<td class="value" colspan="2">
+										<div>
+											<button class="button expandCollapse">Expand/Collapse</button>
+										</div>
+										<div id="preview" style="max-height: 100px; overflow-y: auto;">
 											<table>		
 												<thead>
 													<tr>
 														<th>#</th>
 														<g:each var="column" in="${columns }">
-															<th><warehouse:message code="import.${column.value}.label" default="${column }"/></th>
+															<th>${column?.replace("\"", "") }</th>
 														</g:each>
-														<th><warehouse:message code="default.actions.label"/></th>
 													</tr>							
 												</thead>
 												<tbody>							
 													<g:each var="product" in="${command?.products }" status="status">
-														<g:set var="existingProduct" value="${existingProductsMap[product] }"/>	
+														<g:set var="existingProduct" value="${existingProductsMap[product.id] }"/>	
 														<g:set var="maxLength" value="${product?.description?.length() }"/>
 														<tr class="${status%2?'even':'odd' }">
-															<td>${status+1 }</td>
 															<td>
-																<g:if test="${product?.id }">		
-																	<g:if test="${product?.id?.length() == 32 }">													
-																		<span title="${product?.id }">${product?.id?.substring(20, 32) }</span>
-																	</g:if>
-																	<g:else>
-																		${product?.id }
-																	</g:else>
+																${status+1 }
+															</td>
+															<td>
+															
+																<g:if test="${product?.id }">
+																	<g:link controller="inventoryItem" action="showStockCard" id="${product.id }">		
+																		<g:if test="${product?.id?.length() == 32 }">													
+																			<span title="${product?.id }">${product?.id?.substring(20, 32) }</span>
+																		</g:if>
+																		<g:else>
+																			${product?.id }
+																		</g:else>
+																	</g:link>
 																</g:if>
 																<g:else>
 																	<span class="modified">${warehouse.message(code: 'default.new.label') }</span>
@@ -141,33 +129,34 @@
 																</g:if>
 																<g:else>
 																	${product?.description }
-																</g:else>					
+																</g:else>		
 															</td>				
 															<td class="${product?.unitOfMeasure!=existingProduct?.unitOfMeasure?'modified':'' }">${product?.unitOfMeasure }</td>
 															<td class="${product?.manufacturer!=existingProduct?.manufacturer?'modified':'' }">${product?.manufacturer }</td>
+															<td class="${product?.brandName!=existingProduct?.brandName?'modified':'' }">${product?.brandName }</td>
 															<td class="${product?.manufacturerCode!=existingProduct?.manufacturerCode?'modified':'' }">${product?.manufacturerCode }</td>
+															<td class="${product?.manufacturerName!=existingProduct?.manufacturerName?'modified':'' }">${product?.manufacturerName }</td>
+															<td class="${product?.vendor!=existingProduct?.vendor?'modified':'' }">${product?.vendor }</td>
+															<td class="${product?.vendorCode!=existingProduct?.vendorCode?'modified':'' }">${product?.vendorCode }</td>
+															<td class="${product?.vendorName!=existingProduct?.vendorName?'modified':'' }">${product?.vendorName }</td>
 															<td class="${product?.coldChain!=existingProduct?.coldChain?'modified':'' }">${product?.coldChain }</td>
 															<td class="${product?.upc!=existingProduct?.upc?'modified':'' }">${product?.upc }</td>
 															<td class="${product?.ndc!=existingProduct?.ndc?'modified':'' }">${product?.ndc }</td>
 															<td class="fade">${product?.dateCreated }</td>
 															<td class="fade">${product?.lastUpdated }</td>
-															<td>
-																<g:if test="${product?.id }">
-																	<g:link controller="inventoryItem" action="showStockCard" id="${product.id }">
-																		<warehouse:message code="product.import.stockCard.label" default="Stock card &rsaquo;"/>
-																	</g:link>
-																</g:if>
-															</td>
 														</tr>
 														<g:if test="${product.hasErrors() }">
-														<tr>
-															<td colspan="13"><div class="errors"><g:renderErrors bean="${product}" as="list" /></div></td>
-														</tr>
+															<tr>
+																<td colspan="20"><div class="errors"><g:renderErrors bean="${product}" as="list" /></div></td>
+															</tr>
 														</g:if>
 													</g:each>
 												</tbody>
 											</table>	
-										</div>																			
+										</div>		
+										<div>
+											<button class="button expandCollapse">Expand/Collapse</button>
+										</div>																											
 									</td>
 								</tr>		
 							</tbody>
@@ -186,11 +175,54 @@
 									</td>
 								</tr>
 								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="import.filename.label" default="Filename"/></label>
+									</td>								
+									<td class="value">
+										${command?.importFile?.originalFilename }
+									</td>
+								</tr>
+								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="import.contentType.label" default="Content Type"/></label>
+									</td>								
+									<td class="value">
+										${command?.importFile?.contentType }
+									</td>
+								</tr>
+								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="import.size.label" default="Size"/></label>
+									</td>								
+									<td class="value">
+										<g:formatNumber number="${(command?.importFile?.size / 1000) }" format="#,###.#"/> kB
+									</td>
+								</tr>
+								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="import.numOfRecords.label" default="# of Records"/></label>
+									</td>								
+									<td class="value">
+										<g:set var="totalProducts" value="${command?.products?.size()?:0 }"/> 
+										<g:set var="existingProducts" value="${existingProductsMap?.keySet()?.size()?:0}"/>
+										<g:set var="newProducts" value="${totalProducts - existingProducts }"/>
+										
+										<ul>
+											<li>${totalProducts } ${warehouse.message(code:'import.importedProducts.label', default: 'imported products') }</li>
+											<li>${existingProducts } ${warehouse.message(code:'import.existingProducts.label', default: 'updates to existing products') }</li>
+											<li>${newProducts } ${warehouse.message(code:'import.newProducts.label', default: 'new products to be created') }</li>
+										</ul>
+										
+										
+									</td>
+								</tr>
+								
+								<tr class="prop">
 									<td valign="top" class="name">
 										<label for="tags"><warehouse:message code="product.tags.label" /></label>
 	                                </td>
 									<td valign="top" class="value">									
-								       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="imported"/>
+								       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${tag },${g:formatDate(date:new Date(),format:'dd-MMM-yyhh:mm:ss') }"/>
 										<script>
 											$(function() { 
 												$('#tags1').tagsInput({
@@ -210,6 +242,10 @@
 										<button type="submit" class="button">
 											<%-- <img src="${createLinkTo(dir:'images/skin',file:'database_save.png')}" alt="upload" />--%> 
 											${warehouse.message(code: 'default.button.import.label', default: 'Import')}</button>
+										&nbsp;
+										<a href="${createLink(controller: "product", action: "importAsCsv")}" >
+											<warehouse:message code="default.button.cancel.label"/>
+										</a>												
 									</td>
 								</tr>
 							</tbody>
@@ -218,6 +254,29 @@
 				</g:form>
 			</g:if>
 		</div>
+			
+		<script type="text/javascript">
+			$(function() { 	
+				//$(window).height();
+				$('.expandCollapse').click(function(event) { 
+					event.stopPropagation();
+					event.preventDefault();
+					//alert('test');
+					var overflow = $("#preview").css('overflowY')
+					
+					if (overflow == 'visible') { 
+						$('#preview').css('overflowY', 'auto');
+						$('#preview').css('max-height', '100px');
+					}
+					if (overflow == 'auto'){ 
+						$('#preview').css('overflowY', 'visible');
+						$('#preview').css('max-height', '');
+					}						
+				});
+			});
+		</script>
+
+		
 			
 	</body>
 </html>

@@ -32,7 +32,7 @@
 	                                  <label for="tag"><warehouse:message code="tag.tag.label" default="Tag" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'tag', 'errors')}">
-	                                    <g:textArea name="tag" cols="40" rows="5" value="${tagInstance?.tag}" />
+	                                    <g:textField name="tag" cols="40" rows="5" value="${tagInstance?.tag}" class="text" size="60" />
 	                                </td>
 	                            </tr>
 	                        
@@ -77,7 +77,7 @@
 	                                  <label for="products"><warehouse:message code="tag.products.label" default="Products" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'products', 'errors')}">
-	                                    
+                                    	${tagInstance?.products }
 	                                </td>
 	                            </tr>
 	                        	                        

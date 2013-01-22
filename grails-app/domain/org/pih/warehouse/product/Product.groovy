@@ -41,7 +41,7 @@ class Product implements Comparable, Serializable {
 	def beforeUpdate ={
 		updatedBy = AuthService.currentUser.get()
 	}
-
+		
 	// Base product information 
 	String id	
 	String name;							// Specific description for the product
@@ -56,6 +56,7 @@ class Product implements Comparable, Serializable {
 	// New fields that need to be reviewed
 	String upc				// Universal product code
 	String ndc				// National drug code
+	
 	
 	// Manufacturer
 	String manufacturer		// Manufacturer
@@ -120,7 +121,7 @@ class Product implements Comparable, Serializable {
 	
 	static mapping = {
 		id generator: 'uuid'
-		tags joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id'], cascade: 'all-delete-orphan'
+		tags joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id']
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']
 		documents joinTable: [name:'product_document', column: 'document_id', key: 'product_id']

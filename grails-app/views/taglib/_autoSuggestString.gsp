@@ -10,9 +10,6 @@
 
 <script language="javascript">
 	$(document).ready(function() {
-		//$("#autosuggest-${attrs.id}").click(function() { $(this).trigger("focus"); });
-		//$("#autosuggest-${attrs.id}").blur(function() { return false; });
-		//$("#label-${attrs.id}").click(function() { return false; });
 		$("#autosuggest-${attrs.id}").autocomplete({
 			delay: ${attrs.delay?:300},
 			minLength: ${attrs.minLength?:1},
@@ -38,11 +35,23 @@
 				return false;
 			},
 			*/
-			select: function(event, ui) {				
-				if (ui.item) { 
-					$(this).val(ui.item.value);
-					//$(this).val(ui.item.valueText);
+			select: function(event, ui) {	
+				var continueWithUpdate = true;
+				var promptOnMatch = "${attrs.promptOnMatch}";
+				
+				if (promptOnMatch) { 
+					var name = "${attrs.name}";
+					var value = ui.item.value;
+					
+					var promptMessage = "${warehouse.message(code:'default.promptOnMatch.message', default: 'Are you sure?')}"
+					promptMessage = promptMessage.replace(/(\{\{0\}\}|\{0\})/g, function(m){ return m == '{0}' ? name : m});
+					promptMessage = promptMessage.replace(/(\{\{1\}\}|\{1\})/g, function(m){ return m == '{1}' ? value : m});
+					
+					continueWithUpdate = confirm(promptMessage);
 				}
+				if (ui.item && continueWithUpdate) { 
+					$(this).val(ui.item.value);					
+				}			
 				return false;
 			}
 			

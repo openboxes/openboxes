@@ -11,9 +11,20 @@ package org.pih.warehouse.core
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 
 class Constants {
+	
+	
+	static final controllersWithAuthUserNotRequired = ['api','rxNorm','test']
+	static final actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
+	static final actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
+	static final changeActions = ['edit', 'delete', 'create', 'add', 'process','save', 'update','importData', 'receive','showRecordInventory','withdraw', 'cancel', 'change','toggle']
+	static final changeControllers = ['createProductFromTemplate']
+	static final adminControllers=['createProduct', 'createProductFromTemplate', 'admin']
+	static final adminActions = ['product':['create'], 'person': ['list'], 'user':['list'], 'location':['edit'], 'shipper':['create'], 'locationGroup':['create'],'locationType':['create'], '*': ['delete']]
+	
 	
 	static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
 	static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss z"
@@ -34,6 +45,8 @@ class Constants {
 	                        
 	static final ArrayList COLORS = ['FFFFFF','FFDFDF','FFBFBF','FF9F9F','FF7F7F','FF5F5F','FF3F3F','FF1F1F','FF0000','DF1F00','C33B00','A75700','8B7300','6F8F00','53AB00','37C700','1BE300','00FF00','00DF1F','00C33B','00A757','008B73','006F8F','0053AB','0037C7','001BE3','0000FF','0000df','0000c3','0000a7','00008b','00006f','000053','000037','00001b','000000' ];
 	      
+	static final ArrayList EXPORT_PRODUCT_COLUMNS = ["ID","SKU","Name","Category","Description","Unit of Measure","Manufacturer","Brand","Manufacturer Code","Manufacturer Name","Vendor","Vendor Code","Vendor Name","Cold Chain","UPC","NDC","Date Created","Date Updated"];
+	
 	// these are direct references to transaction types by primary key
 	static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
 	static final String ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID = "3"
@@ -51,5 +64,8 @@ class Constants {
 	
 	// direct references to containers by primary key
 	static final String BOX_CONTAINER_TYPE_ID = "4"	
+	
+	// 
+	static final String RANDOM_IDENTIFIER_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVXYZ"
 	
 }

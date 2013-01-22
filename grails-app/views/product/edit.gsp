@@ -6,7 +6,7 @@
         <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
         
         <g:if test="${productInstance?.id}">
-	        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
+	        <title>${productInstance?.name }</title>
 		</g:if>
 		<g:else>
 	        <title><warehouse:message code="product.add.label" /></title>	
@@ -67,14 +67,6 @@
 									</tr>
 									
 									<tr class="prop">
-										<td valign="top" class="name"><label for="productCode"><warehouse:message
-											code="product.productCode.label"/></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
-											<g:textField name="productCode" value="${productInstance?.productCode}" size="60" class="medium text" 
-												placeholder="Internal product code used to identify the product"/>
-										</td>
-									</tr>	
-									<tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
 		                                </td>
@@ -129,27 +121,7 @@
 										</td>
 									</tr>
 									--%>
-									<tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="product.tags.label" /></label>
-		                                </td>
-										<td valign="top" class="value">									
-									       	<%-- 
-									       	<g:render template="tags" model="['productInstance':productInstance]" />
-									       	--%>
-									       	
-									       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
-											<script>
-												$(function() { 
-													$('#tags1').tagsInput({
-														'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
-														'width': 'auto',
-														'removeWithBackspace' : true,
-													}); 
-												});
-											</script>
-										</td>
-									</tr>
+									
 										
 									<%-- 
 									<tr class="prop">
@@ -181,29 +153,69 @@
 											<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
 										</td>
 									</tr>
+									<tr>
+										<td colspan="2">
+											<h3><warehouse:message
+											code="product.tags.label" /></h3>
+										</td>
+									</tr>										
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                  <label for="categories"><warehouse:message code="product.tags.label" /></label>
+		                                </td>
+										<td valign="top" class="value">									
+									       	<%-- 
+									       	<g:render template="tags" model="['productInstance':productInstance]" />
+									       	--%>
+									       	
+									       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
+											<script>
+												$(function() { 
+													$('#tags1').tagsInput({
+														'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
+														'width': 'auto',
+														'removeWithBackspace' : true,
+													}); 
+												});
+											</script>
+										</td>
+									</tr>									
+									<tr>
+										<td colspan="2">
+											<h3><warehouse:message
+											code="product.identifiers.label" /></h3>
+										</td>
+									</tr>									
+									<tr class="prop">
+										<td valign="top" class="name"><label for="productCode"><warehouse:message
+											code="product.productCode.label"/></label></td>
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
+											<g:textField name="productCode" value="${productInstance?.productCode}" size="50" class="medium text" 
+												placeholder="${warehouse.message(code:'product.productCode.placeholder') }"/>
+										</td>
+									</tr>	
 									
 									<tr class="prop">
-										<td valign="top" class="name"><label for="brandName"><warehouse:message
-											code="product.brandName.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
-											<g:autoSuggestString id="brandName" name="brandName" size="30" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.brandName}"
-												placeholder="e.g. Advil, Tylenol"/>
+										<td valign="top" class="name"><label for="upc"><warehouse:message
+											code="product.upc.label" /></label></td>
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
+											<g:textField name="upc" value="${productInstance?.upc}" size="50" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
-										<td valign="top" class="name"><label for="modelNumber"><warehouse:message
-											code="product.modelNumber.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
-											<g:autoSuggestString id="brandName" name="modelNumber" size="30" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.modelNumber}"
-												placeholder="e.g. Usually only pertains to equipment "/>
+										<td valign="top" class="name"><label for="ndc"><warehouse:message
+											code="product.ndc.label" /></label></td>
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
+											<g:textField name="ndc" value="${productInstance?.ndc}" size="50" class="medium text"
+												placeholder="e.g. 0573-0165"/>
 										</td>
-									</tr>								
+									</tr>													
+									<tr>
+										<td colspan="2">
+											<h3><warehouse:message
+											code="product.manufacturer.label" /></h3>
+										</td>
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="manufacturer"><warehouse:message
 											code="product.manufacturer.label" /></label></td>
@@ -212,30 +224,61 @@
 											<%-- 
 											<g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
 											--%>
-											<g:autoSuggestString id="manufacturer" name="manufacturer" size="30" class="text" 
+											<g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text" 
 												jsonUrl="${request.contextPath}/json/autoSuggest" 
 												value="${productInstance?.manufacturer}"
 												placeholder="e.g. Pfizer, Beckton Dickson"/>
 											
+										</td>
+									</tr>		
+									<tr class="prop">
+										<td valign="top" class="name"><label for="brandName"><warehouse:message
+											code="product.brandName.label" /></label></td>
+										<td valign="top"
+											class="${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
+											<g:autoSuggestString id="brandName" name="brandName" size="50" class="text" 
+												jsonUrl="${request.contextPath}/json/autoSuggest" 
+												value="${productInstance?.brandName}"
+												placeholder="e.g. Advil, Tylenol"/>
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="manufacturerCode"><warehouse:message
 											code="product.manufacturerCode.label"/></label></td>
 										<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
-											<g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="30" class="text" 
+											<g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="50" class="text" 
 												jsonUrl="${request.contextPath}/json/autoSuggest" 
 												value="${productInstance?.manufacturerCode}"
 												placeholder=""/>
 												
 										</td>
 									</tr>	
+									
+															
+									<tr class="prop">
+										<td valign="top" class="name"><label for="modelNumber"><warehouse:message
+											code="product.modelNumber.label" /></label></td>
+										<td valign="top"
+											class="${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
+											<g:autoSuggestString id="modelNumber" name="modelNumber" size="50" class="text" 
+												jsonUrl="${request.contextPath}/json/autoSuggest" 
+												value="${productInstance?.modelNumber}" promptOnMatch="true"
+												placeholder="e.g. Usually only pertains to equipment "/>
+										</td>
+									</tr>								
+									<tr>
+										<td colspan="2">
+											<h3><warehouse:message
+											code="product.vendor.label" /></h3>
+										</td>
+									</tr>
+									
 									<tr class="prop">
 										<td valign="top" class="name"><label for="vendor"><warehouse:message
 											code="product.vendor.label" /></label></td>
 										<td valign="top"
 											class="${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
-											<g:autoSuggestString id="vendor" name="vendor" size="30" class="text" 
+											<g:autoSuggestString id="vendor" name="vendor" size="50" class="text" 
 												jsonUrl="${request.contextPath}/json/autoSuggest" 
 												value="${productInstance?.vendor}"
 												placeholder="e.g. IDA, IMRES, McKesson"/>
@@ -246,28 +289,14 @@
 										<td valign="top" class="name"><label for="vendorCode"><warehouse:message
 											code="product.vendorCode.label"/></label></td>
 										<td valign="top" class="${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
-											<g:autoSuggestString id="vendorCode" name="vendorCode" size="30" class="text" 
+											<g:autoSuggestString id="vendorCode" name="vendorCode" size="50" class="text" 
 												jsonUrl="${request.contextPath}/json/autoSuggest" 
 												value="${productInstance?.vendorCode}"
 												placeholder=""/>
 										</td>
 									</tr>	
 															
-									<tr class="prop">
-										<td valign="top" class="name"><label for="upc"><warehouse:message
-											code="product.upc.label" /></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-											<g:textField name="upc" value="${productInstance?.upc}" size="30" class="medium text"/>
-										</td>
-									</tr>								
-									<tr class="prop">
-										<td valign="top" class="name"><label for="ndc"><warehouse:message
-											code="product.ndc.label" /></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
-											<g:textField name="ndc" value="${productInstance?.ndc}" size="30" class="medium text"
-												placeholder="e.g. 0573-0165"/>
-										</td>
-									</tr>									
+														
 									 
 									<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 										<tr class="prop">
@@ -301,18 +330,7 @@
 										</tr>
 									</g:each>
 									
-									<script type="text/javascript">
-										$(document).ready(function() {
-											$(".attributeValueSelector").change(function(event) {
-												if ($(this).val() == '_other') {
-													$(this).parent().find(".otherAttributeValue").show();
-												}
-												else {
-													$(this).parent().find(".otherAttributeValue").val('').hide();
-												}
-											});
-										});
-									</script>
+									
 												
 									<tr class="prop">
 										<td valign="top" class="">
@@ -321,11 +339,10 @@
 											<button type="submit" class="button icon approve">
 												${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 											</button>
-											&nbsp;
-											<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 											<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
-												<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-										                <button type="button" class="button"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+												<g:link class="button icon trash" action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
+										  			${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+									  			</g:link>
 											</g:if>
 											&nbsp;
 											<g:if test="${productInstance?.id }">
@@ -424,12 +441,36 @@
 								<g:hiddenField name="document.id" value="${documentInstance?.id}" />
 								<table>
 									<tr class="prop">
+										<td valign="top" class="name"><label><warehouse:message
+											code="document.selectUrl.label" default="Select URL" /></label>
+										</td>
+										<td valign="top" class="value">
+											<g:textField name="url" value="${params.url }" placeholder="http://www.example.com/images/image.gif" class="text medium" size="80"/>
+											&nbsp;
+											<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+											<button type="submit" class="button icon approve">
+												${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
+										</td>
+									</tr>						
+									<tr class="prop">
+										<td valign="top" class="name"><label><warehouse:message
+											code="document.selectFile.label" /></label>
+										</td>
+										<td valign="top" class="value">
+											<input name="fileContents" type="file" />
+											&nbsp;
+											<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+											<button type="submit" class="button icon approve">
+												${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
+										</td>
+									</tr>						
+									<tr class="prop">
 										<td valign="top" class="name"><label for="documents"><warehouse:message
 													code="documents.label" /></label></td>
 										<td valign="top"
 											class="value">
 											
-											<table>
+											<table class="box">
 												<thead>
 													<tr>
 														<th>
@@ -439,13 +480,24 @@
 															<warehouse:message code="document.filename.label"/>
 														</th>
 														<th>
+															<warehouse:message code="document.extension.label"/>
+														</th>
+														<th>
 															<warehouse:message code="document.contentType.label"/>
+														</th>
+														<th>
+															<warehouse:message code="default.dateCreated.label"/>
+														</th>
+														<th>
+															<warehouse:message code="default.lastUpdated.label"/>
+														</th>
+														<th>
 														</th>
 													</tr>
 												</thead>
 												<tbody>
-													<g:each var="document" in="${productInstance?.documents }">
-														<tr>
+													<g:each var="document" in="${productInstance?.documents }" status="i">
+														<tr class="prop ${i%2?'even':'odd' }" >
 															<td>
 																<g:link action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 																	<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
@@ -455,8 +507,21 @@
 																${document.filename }
 															</td>	
 															<td>
+																${document.extension }
+															</td>
+															<td>
 																${document.contentType }
 															</td>	
+															<td>
+																${document.dateCreated }
+															</td>
+															<td>
+																${document.lastUpdated }
+															</td>
+															<td>
+																<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
+																	class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />
+															</td>
 														</tr>						
 													</g:each>
 													<g:unless test="${productInstance?.documents }">
@@ -472,19 +537,6 @@
 											</table>
 										</td>
 									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><warehouse:message
-											code="document.selectFile.label" /></label>
-										</td>
-										<td valign="top" class="value">
-											<input name="fileContents" type="file" />
-											&nbsp;
-											<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
-											<button type="submit" class="button"><img
-												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
-															alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
-										</td>
-									</tr>						
 								</table>
 							</g:uploadForm>
 						</div>
@@ -526,13 +578,13 @@
 												<warehouse:message code="default.actions.label"/>
 											</th>
 											<th>
-												<warehouse:message code="package.gtin.label"/>
+												<warehouse:message code="package.uom.label"/>
 											</th>
 											<th>
 												<warehouse:message code="package.description.label"/>
 											</th>
 											<th>
-												<warehouse:message code="package.uom.label"/>
+												<warehouse:message code="package.gtin.label"/>
 											</th>
 										</tr>
 									</thead>
@@ -557,18 +609,15 @@
 													</span>												
 												</td>											
 												<td>
+													${pkg.uom.name }
+												</td>
+												<td>
+													${pkg.uom.code }/${pkg.quantity }
+												</td>
+												<td>
 													${pkg.gtin }
 												</td>
-												<td>
-													${pkg.uom } / ${pkg.quantity } ${warehouse.message(code: 'default.units.label') }
-												</td>
 												
-												<td>
-													<g:formatNumber number="${pkg.quantity}" format="###,##0" />
-												</td>
-												<td>
-													${pkg.uom }
-												</td>
 											</tr>
 										</g:each>
 										<g:unless test="${productInstance?.packages }">
@@ -588,6 +637,14 @@
 							<g:form controller="unitOfMeasureClass" action="save" method="post">
 
 								<table>
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="name">Name on package</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+											<g:textField name="name" size="10" class="medium text" />
+		                                </td>
+		                            </tr>
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
 		                                    <label for="code">Type</label>
@@ -725,7 +782,7 @@
 													<g:select name="uom.id" from="${org.pih.warehouse.core.UnitOfMeasure.list() }" optionValue="name" optionKey="id" value="${pacakageInstance?.uom }" noSelection="['null':'']"></g:select>
 													= 
 													<g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
-												${productInstance?.unitOfMeasure }	
+													${productInstance?.unitOfMeasure?:warehouse.message(code: 'default.each.label') }	
 												</div>
 											</td>
 										</tr>		
@@ -757,8 +814,7 @@
 									</tbody>
 								</table>
 								<div class="buttons">
-									<button type="submit" class="button"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Save" /> 
+									<button type="submit" class="button icon approve"> 
 										${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;
@@ -775,8 +831,11 @@
 		</div>
 		<g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
 	
+	
 		<script type="text/javascript">
 	    	$(document).ready(function() {
+	    	
+	    	
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -796,6 +855,16 @@
 					var id = $(this).attr("dialog-id");
 					$("#"+id).dialog('close');
 				});
+
+				$(".attributeValueSelector").change(function(event) {
+					if ($(this).val() == '_other') {
+						$(this).parent().find(".otherAttributeValue").show();
+					}
+					else {
+						$(this).parent().find(".otherAttributeValue").val('').hide();
+					}
+				});
+
 				
 			});
 		</script> 				

@@ -14,12 +14,15 @@ import java.io.ExpiringCache.Entry;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import grails.validation.ValidationException;
 import groovy.xml.Namespace;
 
+import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.importer.ImportDataCommand;
 import org.pih.warehouse.core.ApiException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.SessionFactory;
 
@@ -302,11 +305,13 @@ class ProductService {
 		List quickCategories = new ArrayList();
 		String quickCategoryConfig = grailsApplication.config.inventoryBrowser.quickCategories;
 
+		/*
 		Category.findAll().each {
 			if (it.parentCategory == null && !quickCategories.contains(it)) {
 				quickCategories.add(it);
 			}
 		}
+		*/
 
 		if (quickCategoryConfig) {
 			quickCategoryConfig.split(",").each {
@@ -394,25 +399,23 @@ class ProductService {
 	}
 
 	/**
-	 * 
 	 * @param data
 	 * @return
 	 */
 	public String getDelimiter(String data) {
 		// Check to make sure the format is comma-separated
-		def rows = data.split("\n")
+		def lines = data.split("\n")
 		def delimiters = [",", "\t", ";"]
 		for (def delimiter : delimiters) {
-			def columns = rows[0].split(delimiter)
-			if (columns.size() == 13) {
+			def columns = lines[0].split(delimiter)
+			if (columns.size() == Constants.EXPORT_PRODUCT_COLUMNS.size()) {
 				return delimiter
 			}
 		}			
-		throw new RuntimeException("Invalid format")
+		throw new RuntimeException("File must contain the following columns:" + Constants.EXPORT_PRODUCT_COLUMNS)
 	}
 	
 	/**
-	 * 
 	 * @param csv
 	 * @return
 	 */
@@ -422,7 +425,6 @@ class ProductService {
 	}
 	
 	/**
-	 * 
 	 * @param csv
 	 * @param delimiter
 	 * @return
@@ -431,8 +433,8 @@ class ProductService {
 		// Check to make sure the format is comma-separated
 		def lines = csv.split("\n")
 		def columns = lines[0].split(delimiter)
-		if (columns.size() != 13) {
-			throw new RuntimeException("Invalid format")
+		if (columns.size() != Constants.EXPORT_PRODUCT_COLUMNS.size()) {
+			throw new RuntimeException("File must contain the following columns:" + Constants.EXPORT_PRODUCT_COLUMNS)
 		}
 		return columns;
 	}
@@ -460,8 +462,9 @@ class ProductService {
 		// Iterate over each line and either update an existing product or create a new product
 		csv.toCsvReader(['skipLines':1, 'separatorChar':delimiter]).eachLine { tokens ->
 			//def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
-			def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
+			def product = Product.findById(tokens[0])
 			if (product) { 
+				println "EXISTING PRODUCT " + product?.id + " " + product.description
 				product = Product.get(product.id)
 				products << product
 			}
@@ -525,13 +528,16 @@ class ProductService {
 		// Check to make sure the format is comma-separated
 		def lines = csv.split("\n")
 		def columns = lines[0].split(delimiter)
-		if (columns.size() != 13) {
+		if (columns.size() != Constants.EXPORT_PRODUCT_COLUMNS.size()) {
 			throw new RuntimeException("Invalid format")
 		}
+		
+		def rowCount = 1;
 
 		// Iterate over each line and either update an existing product or create a new product
 		csv.toCsvReader(['skipLines':1, 'separatorChar':delimiter]).eachLine { tokens ->
 			
+			rowCount++
 			println "Processing line: " + tokens
 			def productId = tokens[0]
 			def productCode = tokens[1]
@@ -540,19 +546,24 @@ class ProductService {
 			def description = tokens[4]
 			def unitOfMeasure = tokens[5]
 			def manufacturer = tokens[6]
-			def manufacturerCode = tokens[7]
-			def coldChain = Boolean.valueOf(tokens[8])
-			def upc = tokens[9]
-			def ndc = tokens[10]
+			def brandName = tokens[7]
+			def manufacturerCode = tokens[8]
+			def manufacturerName = tokens[9]
+			def vendor = tokens[10]
+			def vendorCode = tokens[11]
+			def vendorName = tokens[12]
+			def coldChain = Boolean.valueOf(tokens[13])
+			def upc = tokens[14]
+			def ndc = tokens[15]
 			//def dateCreated = tokens[11]?Date.parse("dd/MMM/yyyy hh:mm:ss", tokens[11]):null
 			//def dateUpdated = tokens[12]?Date.parse("dd/MMM/yyyy hh:mm:ss", tokens[12]):null
 
 			if (!productName) {
-				throw new RuntimeException("Product name cannot be empty")
+				throw new RuntimeException("Product name cannot be empty at row " + rowCount)
 			}
 
 			def category = findOrCreateCategory(categoryName)
-			def product = Product.findByIdOrProductCode(productId, productCode)			
+			def product = Product.findById(productId)			
 			// Update existing product
 			if (product) {
 				println ("Found existing product " + product.name + " " + product.id + " " + product.productCode + " " + product.isAttached())
@@ -577,6 +588,12 @@ class ProductService {
 				product.unitOfMeasure = unitOfMeasure
 				product.manufacturer = manufacturer
 				product.manufacturerCode = manufacturerCode
+				product.manufacturerName = manufacturerName
+				product.brandName = brandName
+				product.vendor = vendor
+				product.vendorCode = vendorCode
+				product.vendorName = vendorName
+				
 				product.upc = upc
 				product.ndc = ndc
 				product.coldChain = coldChain
@@ -591,7 +608,8 @@ class ProductService {
 			else {
 				product = new Product(name: productName, category: category, description: description,
 					productCode: productCode, upc: upc, ndc: ndc, coldChain: coldChain,
-					unitOfMeasure: unitOfMeasure, manufacturer: manufacturer, manufacturerCode: manufacturerCode)
+					unitOfMeasure: unitOfMeasure, manufacturer: manufacturer, manufacturerCode: manufacturerCode, brandName: brandName,
+					manufacturerName: manufacturerName, vendor: vendor, vendorCode: vendorCode, vendorName: vendorName)
 				
 				println "Create new product for " + productName + " " + product.isAttached()
 				
@@ -602,11 +620,25 @@ class ProductService {
 				
 		if (saveToDatabase) { 
 			println "Products to be saved to the database: " + products
-			products.each { product ->				
-				addTagsToProduct(product, tags)
+			products.each { product ->		
+				
 				println "Product: " + product.name + " " + product.id + " " + product.productCode
 				println "Product tags: " + product.tags
 				println "Product productGroup: " + product.productGroups
+
+				if(!product.productGroups) {
+					ProductGroup productGroup = ProductGroup.findByDescription(product.name)
+					if (!productGroup) {  
+						println "Creating new product group " + product.name
+						productGroup = new ProductGroup(name: product.name, description: product.name, category: product.category)
+						if (!productGroup.save(flush:true)) {
+							throw new ValidationException("Could not create generic product '" + product.name + "'", productGroup.errors)
+						}
+					}
+					product.addToProductGroups(productGroup)
+				}
+				
+				addTagsToProduct(product, tags)
 				product.save(flush:true, failOnError:true)
 			}
 		}
@@ -636,13 +668,18 @@ class ProductService {
 		
 		def csvWriter = new CSVWriter(sw, {
 			"ID" { it.id }
-			"Product Code" { it.productCode }
+			"SKU" { it.productCode }
 			"Name" { it.name }
 			"Category" { it.category }
 			"Description" { it.description }
 			"Unit of Measure" { it.unitOfMeasure }
 			"Manufacturer" { it.manufacturer }
+			"Brand" { it.brandName }
 			"Manufacturer Code" { it.manufacturerCode }
+			"Manufacturer Name" { it.manufacturerName }			
+			"Vendor" { it.vendor }
+			"Vendor Code" { it.vendorCode }
+			"Vendor Name" { it.vendorName }
 			"Cold Chain" { it.coldChain }
 			"UPC" { it.upc }
 			"NDC" { it.ndc }
@@ -651,7 +688,7 @@ class ProductService {
 		})
 		
 		products.each { product ->
-			csvWriter << [
+			def row =  [
 				id: product?.id,
 				productCode: product.productCode?:'',
 				name: product.name,
@@ -659,13 +696,24 @@ class ProductService {
 				description: product?.description?:'',
 				unitOfMeasure: product.unitOfMeasure?:'',
 				manufacturer: product.manufacturer?:'',
+				brandName: product.brandName?:'',
 				manufacturerCode: product.manufacturerCode?:'',
+				manufacturerName: product.manufacturerName?:'',
+				vendor: product.vendor?:'',
+				vendorCode: product.vendorCode?:'',
+				vendorName: product.vendorName?:'',
 				coldChain: product.coldChain?:Boolean.FALSE,
 				upc: product.upc?:'',
 				ndc: product.ndc?:'',
 				dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
 				lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
 			]
+			// We just want to make sure that these match because we use the same format to
+			// FIXME It would be better if we could drive the export off of this array of columns,
+			// but I'm not sure how.  It's possible that the constant could be a map of column
+			// names to closures (that might work)
+			assert row.keySet().size() == Constants.EXPORT_PRODUCT_COLUMNS.size()
+			csvWriter << row
 		}
 		return sw.toString()
 	}
@@ -723,7 +771,12 @@ class ProductService {
 		return popularTags		
 	}
 	
-	
+	/**
+	 * 
+	 * @param product
+	 * @param tags
+	 * @return
+	 */
 	def addTagsToProduct(product, tags) { 
 		if (tags) {
 			tags.each { tagName ->
@@ -736,7 +789,30 @@ class ProductService {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param product
+	 * @param tag
+	 * @return
+	 */
+	def deleteTag(product, tag) { 
+		product.removeFromTags(tag)
+		tag.delete();
+	}
+	
+	
+	/**
+	 * 
+	 */
+	def generateRandomIdentifier(length) {		
+		return RandomStringUtils.random(length, Constants.RANDOM_IDENTIFIER_CHARACTERS)
+	} 
 
-
+	
+	def downloadDocument(url) { 
+		
+		
+	}
 
 }
