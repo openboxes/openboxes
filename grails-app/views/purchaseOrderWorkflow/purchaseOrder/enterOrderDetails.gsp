@@ -40,7 +40,7 @@
 								<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
-									<input type="text" name='description' value="${order?.description?.encodeAsHTML()}" size="30"/>
+									<input type="text" name='description' value="${order?.description?.encodeAsHTML()}" size="60" class="text"/>
 								</td>
 							</tr>
 							<tr class='prop'>

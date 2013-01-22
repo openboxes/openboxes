@@ -103,19 +103,19 @@
 														<td valign='top' class='name'><label for='product'><warehouse:message code="product.label"/>:</label></td>
 														<td valign='top' class='value' nowrap="nowrap">
 															<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
-																width="200" valueId="${orderItem?.product?.id }" valueName="${orderItem?.product?.name }"/>															
+																width="200" valueId="${orderItem?.product?.id }" valueName="${orderItem?.product?.name }" styleClass="text"/>															
 														</td>
 													</tr>
 													<tr class='prop'>
 														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
 														<td valign='top' class='value'>
-															<input type="text" id=quantity name='quantity' value="${orderItem?.quantity }" size="5" />
+															<input type="text" id=quantity name='quantity' value="${orderItem?.quantity }" size="10" class="text" />
 														</td>
 													</tr>
 													<tr class='prop'>
 														<td valign='top' class='name'><label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label></td>
 														<td valign='top' class='value'>
-															<input type="text" id="unitPrice" name='unitPrice' value="${orderItem?.unitPrice }" size="5" />
+															<input type="text" id="unitPrice" name='unitPrice' value="${orderItem?.unitPrice }" size="10" class="text" />
 														</td>
 													</tr>
 													<tr>
