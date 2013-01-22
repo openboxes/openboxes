@@ -69,135 +69,185 @@ class LocationController {
 	}
 	
 	def update = {
-			def locationInstance = inventoryService.getLocation(params.id)
-			
+		def locationInstance = inventoryService.getLocation(params.id)
+
+		if (locationInstance) {
+			if (params.version) {
+				def version = params.version.toLong()
+				if (locationInstance.version > version) {
+
+					locationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
+						warehouse.message(code: 'location.label', default: 'Location')] as Object[], "Another user has updated this Location while you were editing")
+					render(view: "edit", model: [locationInstance: locationInstance])
+					return
+				}
+			}
+
+			locationInstance.properties = params
+
+			if (!locationInstance.hasErrors()) {
+				try {
+					inventoryService.saveLocation(locationInstance)
+					session.warehouse = locationInstance
+					
+				} catch (ValidationException e) {
+					render(view: "edit", model: [locationInstance: locationInstance])
+					return
+				}
+
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
+				redirect(action: "list", id: locationInstance.id)
+			}
+			else {
+				render(view: "edit", model: [locationInstance: locationInstance])
+			}
+		}
+		else {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+			redirect(action: "list")
+		}
+	}
+	
+	def delete = {
+		def locationInstance = Location.get(params.id)
+		if (locationInstance) {
+			try {
+				locationInstance.delete(flush: true)
+
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+				redirect(action: "list")
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+				redirect(action: "edit", id: params.id)
+			}
+		}
+		else {
+			flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+			redirect(action: "edit", id: params.id)
+		}
+	}
+		
+		
+	/**
+	 * Render location logo
+	 */
+	def viewLogo = {
+		def warehouseInstance = Location.get(params.id);
+		if (warehouseInstance) {
+			if (warehouseInstance.logo) {
+				response.outputStream << warehouseInstance.logo
+			}
+		}
+	}
+	   
+		   
+	def renderLogo = {
+		def location = Location.get(params.id)
+		if (location?.logo) {
+			response.setContentLength(location.logo.length)
+			response.outputStream.write(location.logo)
+		} else {
+			// Sends 404 error if no photo
+			response.sendError(404)
+		}
+	}
+
+
+	def uploadLogo = {
+		def locationInstance = Location.get(params.id);
+
+		if (request.method == "POST") {
 			if (locationInstance) {
-				if (params.version) {
-					def version = params.version.toLong()
-					if (locationInstance.version > version) {
-						
-						locationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'location.label', default: 'Location')] as Object[], "Another user has updated this Location while you were editing")
-						render(view: "edit", model: [locationInstance: locationInstance])
+				def logo = request.getFile("logo");
+
+				// List of OK mime-types
+				def okcontents = [
+					'image/png',
+					'image/jpeg',
+					'image/gif'
+				]
+
+				if (! okcontents.contains(logo.getContentType())) {
+					log.info "Photo is not correct type"
+					flash.message = "Photo must be one of: ${okcontents}"
+					render(view: "uploadLogo", model: [locationInstance: locationInstance])
+					return;
+				}
+
+				if (!logo?.empty && logo.size < 1024*1000) { // not empty AND less than 1MB
+					locationInstance.logo = logo.bytes;
+					if (!locationInstance.hasErrors()) {
+						inventoryService.saveLocation(locationInstance)
+						session.warehouse = locationInstance
+						flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), locationInstance.id])}"
+					}
+					else {
+						// there were errors, the logo was not saved
+						flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'user.label'), locationInstance.id])}"
+						render(view: "uploadPhoto", model: [locationInstance: locationInstance])
 						return
 					}
 				}
-				
-				locationInstance.properties = params
-						
-				if (!locationInstance.hasErrors()) {
-					try { 
-						inventoryService.saveLocation(locationInstance)
-					} catch (ValidationException e) {
-						render(view: "edit", model: [locationInstance: locationInstance])
-						return
-					} 
-					
-					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
-					redirect(action: "list", id: locationInstance.id)
-				}
 				else {
-					render(view: "edit", model: [locationInstance: locationInstance])
+					flash.message = "${warehouse.message(code: 'user.photoTooLarge.message', args: [warehouse.message(code: 'location.label'), locationInstance.id])}"
 				}
+
+				redirect(action: "show", id: locationInstance.id)
 			}
 			else {
-				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-				redirect(action: "list")
+				"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 			}
 		}
+		[locationInstance:locationInstance]
+	}
 	
-		def delete = {
-			def locationInstance = Location.get(params.id)
-	        if (locationInstance) {	        	
-		          try {
-		            locationInstance.delete(flush: true)
-		            
-		            flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-		            redirect(action: "list")
-			      }
-			      catch (org.springframework.dao.DataIntegrityViolationException e) {
-		            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-		            redirect(action: "edit", id: params.id)
-			      }
-	        }
-	        else {
-	            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-	            redirect(action: "edit", id: params.id)
-	        }
+	def deleteLogo = { 
+		def location = Location.get(params.id)
+		if (location) { 
+			location.logo = []
+			location.save(flush:true)
+			flash.message = "Logo has been deleted"
 		}
-		
-		
-		/**
-		* View warehouse logo
-		*/
-	   def viewLogo = {
-		   def warehouseInstance = Location.get(params.id);
-		   if (warehouseInstance) {
-			   byte[] logo = warehouseInstance.logo
-			   if (logo) {
-				   response.outputStream << logo
-			   }
-		   }
-	   }
-   
-   
-	   def uploadLogo = {		   
-		   def warehouseInstance = Location.get(params.id);
-		   if (warehouseInstance) {
-			   def logo = request.getFile("logo");
-			   if (!logo?.empty && logo.size < 1024*1000) { // not empty AND less than 1MB
-				   warehouseInstance.logo = logo.bytes;
-				   if (!warehouseInstance.hasErrors()) {
-					   inventoryService.save(warehouseInstance)
-					   flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), warehouseInstance.id])}"
-				   }
-				   else {
-					   // there were errors, the photo was not saved
-				   }
-			   }
-			   redirect(action: "show", id: warehouseInstance.id)
-		   }
-		   else {
-			   "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
-		   }
-	   }
-	
-	   
-	   def deleteTransaction = { 
-		   def transaction = Transaction.get(params.id)
-		   transaction.delete();
-		   flash.message = "Transaction deleted"
-		   redirect(action: "show", id: params.location.id);
-	   }
-	   def deleteShipment = {
-		   def shipment = Shipment.get(params.id)
-		   shipment.delete();
-		   flash.message = "Shipment deleted"
-		   redirect(action: "show", id: params.location.id);
-	   }
-	   def deleteOrder = {
-		   def order = Order.get(params.id)
-		   order.delete();
-		   flash.message = "Order deleted"
-		   redirect(action: "show", id: params.location.id);
-	   }
-	   def deleteRequest = {
-		   def requestInstance = Requisition.get(params.id)
-		   requestInstance.delete();
-		   flash.message = "Request deleted"
-		   redirect(action: "show", id: params.location.id);
-	   }
-	   def deleteEvent = {
-		   def event = Event.get(params.id)
-		   event.delete();
-		   flash.message = "Event deleted"
-		   redirect(action: "show", id: params.location.id);
-	   }
-	   def deleteUser = {
-		   def user = User.get(params.id)
-		   user.delete();
-		   flash.message = "User deleted"
-		   redirect(action: "show", id: params.location.id);
-	   }
+		redirect(action: "uploadLogo", id: params.id);
+	}
+	   	   
+	def deleteTransaction = {
+		def transaction = Transaction.get(params.id)
+		transaction.delete();
+		flash.message = "Transaction deleted"
+		redirect(action: "show", id: params.location.id);
+	}
+	def deleteShipment = {
+		def shipment = Shipment.get(params.id)
+		shipment.delete();
+		flash.message = "Shipment deleted"
+		redirect(action: "show", id: params.location.id);
+	}
+	def deleteOrder = {
+		def order = Order.get(params.id)
+		order.delete();
+		flash.message = "Order deleted"
+		redirect(action: "show", id: params.location.id);
+	}
+	def deleteRequest = {
+		def requestInstance = Requisition.get(params.id)
+		requestInstance.delete();
+		flash.message = "Request deleted"
+		redirect(action: "show", id: params.location.id);
+	}
+	def deleteEvent = {
+		def event = Event.get(params.id)
+		event.delete();
+		flash.message = "Event deleted"
+		redirect(action: "show", id: params.location.id);
+	}
+	def deleteUser = {
+		def user = User.get(params.id)
+		user.delete();
+		flash.message = "User deleted"
+		redirect(action: "show", id: params.location.id);
+	}
 
 
 }

@@ -33,14 +33,12 @@
 				</g:link>
 			</div>
 		</g:if>
-		<%-- 
 		<div class="action-menu-item">
-			<g:link controller="location" action="addPhoto" id="${locationInstance?.id }">
+			<g:link controller="location" action="uploadLogo" id="${locationInstance?.id }">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'photo_add.png')}" class="middle"/>&nbsp;
-				<warehouse:message code="location.addPhoto.label" />
+				<warehouse:message code="location.uploadLogo.label" />
 			</g:link>
 		</div>
-		--%>
 		<div class="action-menu-item">
 			<g:link class="delete" action="delete" id="${locationInstance?.id}"
 				onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">

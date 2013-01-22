@@ -99,12 +99,14 @@
                                   <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'bgColor', 'errors')}">
-                                    
+									<g:textField name="bgColor" value="${locationInstance?.bgColor}" class="text" size="10"/>
+									<%--                                    
                                     <g:select name="bgColor" class="colorpicker" 
                                     	from="${org.pih.warehouse.core.Constants.COLORS}" 
                                     	value="${locationInstance?.bgColor}" />
                                     
                                    	<span class="fade">#${locationInstance?.bgColor }</span>
+                                   	 --%>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -112,11 +114,14 @@
                                   <label for="fgColor"><warehouse:message code="warehouse.fgColor.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'fgColor', 'errors')}">
+									<g:textField name="fgColor" value="${locationInstance?.fgColor}" class="text" size="10"/>
+                                    <%-- 
                                     <g:select name="fgColor" class="colorpicker" 
                                     	from="${org.pih.warehouse.core.Constants.COLORS}" 
                                     	value="${locationInstance?.fgColor}"/>
                                 
                                    	<span class="fade">#${locationInstance?.fgColor }</span>
+                                   	--%>
                                 </td>
                             </tr>
                             
@@ -138,8 +143,7 @@
                             	</td>
                             	<td class="value">
 									<div class="buttons left">
-					                   <button type="submit">								
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
+					                   <button type="submit" class="button icon approve">								
 											<warehouse:message code="default.button.save.label"/>
 										</button>
 										&nbsp;
@@ -173,7 +177,7 @@
 					}
 				}
 			}						
-	    
+	    	/*
 	        $(document).ready(function() {
 	            $('#bgColor').colorpicker({
 	                size: 20,
@@ -188,6 +192,7 @@
 	            });
 			
 	        });
+	        */
 	    </script>        
     </body>
 </html>

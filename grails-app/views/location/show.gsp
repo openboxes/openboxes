@@ -282,32 +282,54 @@
 		                                	
 		                                </td>
 		                            </tr>
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                  <label for="bgColor"><warehouse:message code="warehouse.logo.label"/></label>
+		                                </td>
+		                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'logo', 'errors')}">
+		                              		      
+											<g:if test="${locationInstance?.logo }">
+												<img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:locationInstance.id)}" style="vertical-align: bottom" />		            				
+											</g:if>				                                   
+		                                   	
+		                                </td>
+		                            </tr>		                            
+		                            
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>
 		                                </td>
 		                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'bgColor', 'errors')}">
-		                                    <span class="fade">${locationInstance?.bgColor }</span>
-		                                    <span style="float: left">
-		                                    	<g:select name="bgColor" class="colorpicker" 
-			                                    	from="${org.pih.warehouse.core.Constants.COLORS}" 
-			                                    	value="${locationInstance?.bgColor}" />
-		                                   </span>
+		                                
+		                                	<table>
+		                                		<tr>
+		                                			<td>
+					                                    <span class="fade">${locationInstance?.bgColor }</span>
+		                                			</td>
+		                                				                                			
+		                                		</tr>
+		                                	</table>
 			                                   
 		                                   	
 		                                </td>
 		                            </tr>
+		                            
+		                            
+					                            
+		                            
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="fgColor"><warehouse:message code="warehouse.fgColor.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'fgColor', 'errors')}">
-		                                    <span class="fade">${locationInstance?.fgColor }</span>
-		                                    <span style="float: left">
-			                                    <g:select name="fgColor" class="colorpicker" 
-			                                    	from="${org.pih.warehouse.core.Constants.COLORS}" 
-			                                    	value="${locationInstance?.fgColor}" />
-		                                    </span>
+											<table>
+		                                		<tr>
+		                                			<td>
+					                                    <span class="fade">${locationInstance?.fgColor }</span>
+		                                			</td>
+		                                			
+		                                		</tr>
+		                                	</table>		                                    
 		                                   	
 		                                </td>
 		                            </tr>

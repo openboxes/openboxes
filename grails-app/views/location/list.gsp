@@ -55,9 +55,8 @@
 							optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${params?.locationType?.id}" noSelection="['':'']" />
                         --%>
                            					
-						<button type="submit"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
-							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
+						<button type="submit" class="button icon search">
+							${warehouse.message(code: 'default.button.find.label')}
 						</button>		          
 					</g:form>
 				</div> 				
@@ -91,7 +90,9 @@
                             <td class="left"><format:metadata obj="${locationInstance?.locationType}"/></td>                            
                             <td class="left">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>                            
                             <td class="center">
-                            	<div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 10px;">${locationInstance?.name }</div>                            	
+                            	<div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
+                            		${locationInstance?.name } (fg: ${locationInstance?.fgColor }, bg: ${locationInstance?.bgColor })
+                            	</div>                            	
                             </td>
                             <td class="left middle">
                             	<g:if test="${locationInstance.active }">
