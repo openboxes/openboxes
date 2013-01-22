@@ -174,7 +174,7 @@ log4j = {
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					layout: pattern(conversionPattern:
-					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]}[%t] %nUser: %X{sessionId}%nClass: %c%nMessage: %m%n'))
+					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]}[%t]%nUser: %X{sessionId}%nClass: %c%nMessage: %m%n'))
 			}
 			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
 			else if ("dynamic".equals(mail.error.appender)) { 
@@ -197,7 +197,7 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " An error occurred ${new Date()} (default)",
+					subject: mail.error.subject + " %m (default)",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
