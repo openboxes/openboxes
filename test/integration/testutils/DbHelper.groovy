@@ -3,6 +3,11 @@ package testutils
 import grails.validation.ValidationException;
 
 import org.pih.warehouse.product.*
+import org.pih.warehouse.shipping.Container;
+import org.pih.warehouse.shipping.ContainerType;
+import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.ShipmentItem;
+import org.pih.warehouse.shipping.ShipmentType;
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.core.*
 
@@ -151,6 +156,66 @@ class DbHelper {
 			tag.save(failOnError:true,flush:true)
 		}
 		return tag		
+	}
+	
+	static Person createPerson(firstName, lastName, email) { 
+		Person person = Person.findByEmail(email)
+		if (!person) {
+			person = new Person(firstName: firstName, lastName: lastName, email: email)
+			person.save(failOnError:true, flush:true)
+		}
+		return person
+	}
+	
+	
+	static User createAdmin(firstName, lastName, email, username, password, active) { 
+		User user = User.findByUsernameOrEmail(username, email)
+		if (!user) {
+			user = new User(firstName: firstName, lastName: lastName, email: email, username: username, password: password, active: active)
+			
+			Role admin = Role.findByRoleType(RoleType.ROLE_ADMIN)
+			assert admin
+			user.addToRoles(admin)
+			
+			user.save(failOnError:true, flush:true)
+		}
+		return user
+	}
+	
+	static Shipment createShipment(name, shipmentType, origin, destination) { 
+		Shipment shipment = Shipment.findByName(name)
+		if (!shipment) {  
+			shipment = new Shipment()
+			shipment.name = name
+			shipment.expectedDeliveryDate = new Date();
+			shipment.expectedShippingDate = new Date();
+			shipment.shipmentType = ShipmentType.findByName(shipmentType);
+			shipment.origin = Location.findByName(origin)
+			shipment.destination = Location.findByName(destination)
+			shipment.save(failOnError:true, flush: true)
+		}
+		return shipment	
+	}
+	
+	
+	static Container createPallet(shipment, name) { 
+		ContainerType pallet = ContainerType.findByName("Pallet")
+		Container container = new Container(name: name, containerType: pallet)		
+		shipment.addToContainers(container)
+		shipment.save(flush:true)
+		return container
+	}
+	
+	
+	static ShipmentItem createShipmentItem(shipment, pallet, product, lotNumber, quantity) { 
+		InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
+		ShipmentItem shipmentItem = new ShipmentItem()
+		shipmentItem.container = pallet
+		shipmentItem.inventoryItem = inventoryItem
+		shipmentItem.quantity = quantity
+		shipment.addToShipmentItems(shipmentItem)
+		shipment.save(flush:true)
+		return shipmentItem
 	}
 	
 }
