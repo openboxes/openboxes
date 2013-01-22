@@ -1,7 +1,46 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
+
 <div id="product-details">
+	<g:if test="${productInstance?.images}">	
+		<table class="box">
+			<tbody>			
+			
+				<tr class="odd">
+					<td class="odd" colspan="2">
+						<label><warehouse:message code="product.images.label"/></label>
+					</td>
+				</tr>				
+				<tr class="prop">
+					<td colspan="2" class="center middle">
+						<g:each var="document" in="${productInstance?.images}" status="i">
+							<div style="float: left;">
+								<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
+									<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
+										class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
+	          							
+								</a>
+								<br/>
+								${document.name }
+							</div>	
+							
+							<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
+								<div >
+									<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
+			           							class="middle image" style="border: 1px solid lightgrey" />
+								</div>
+								<br/>
+								<g:link controller="document" action="download" class="button icon arrowdown" id="${document.id}">Download</g:link>
+							</div>					
+						</g:each>
+					</td>			
+				</tr>													
+			</tbody>		
+		</table>
+	</g:if>
+
 	<g:if test="${productInstance?.description }">
+		<br/>
 		<table class="box">
 			<tbody>
 				<tr class="odd">
@@ -9,15 +48,45 @@
 						<label>${warehouse.message(code: 'product.description.label') }</label>
 					</td>
 				</tr>
-				<tr class="even">	
-					<td class="label left" colspan="2" style="text-align: justify">
+				<tr class="prop">	
+					<td class="value" colspan="2" style="text-align: justify">
 						${productInstance?.description }
 					</td>
 				</tr>
 			</tbody>		
 		</table>
-		<br/>
 	</g:if>
+	<g:if test="${productInstance?.tags }">
+		<br/>
+		<table class="box">
+			<tbody>
+				<tr class="odd">
+					<td colspan="2">
+						<label>${warehouse.message(code: 'product.tags.label') }</label>
+					</td>
+				</tr>
+				<tr class="prop">	
+					<td class="value" colspan="2" style="text-align: justify">
+						<div class="tags">
+						<g:each var="tag" in="${productInstance?.tags}">
+							<span class="tag">
+								<g:link controller="inventory" action="browse" params="['tag':tag.tag]">
+									${tag.tag }
+								</g:link>
+							</span>
+						</g:each>
+					</div>	
+					</td>
+				</tr>
+			</tbody>		
+		</table>
+	</g:if>
+	<br/>
+					
+	
+
+	<g:set var="latestInventoryDate"
+		value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
 	<table class="box">
 		<tbody>
 			<tr class="odd">
@@ -25,15 +94,20 @@
 					<label>${warehouse.message(code: 'product.status.label') }</label>
 				</td>
 			</tr>
-			<tr class="even">	
-				<td class="label left">
-					<span class="name"><warehouse:message code="default.status.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="default.status.label"/></label>
 				</td>
-				<td>
-					<span class="value">	
+				<td class="value">
+					<span class="">	
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 							<g:if test="${totalQuantity <= 0}">
-								<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
+								<g:if test="${latestInventoryDate}">
+									<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
+								</g:if>
+								<g:else>
+									<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
+								</g:else>
 							</g:if>
 							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
 								<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
@@ -58,33 +132,119 @@
 					</span>
 				</td>
 			</tr>				
-			<tr class="even">	
-				<td class="label left">
-					<span class="name"><warehouse:message code="product.onHandQuantity.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.onHandQuantity.label"/></label>
 				</td>
-				<td>
-					<span class="value">
+				<td class="value">
+					<span class="">
 						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
-						<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						<g:if test="${productInstance?.unitOfMeasure }">
+							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						</g:if>
+						<g:else>
+							${warehouse.message(code:'default.each.label') }
+						</g:else>
 					</span>
 				</td>
 			</tr>	
-			<tr class="even">	
-				<td class="label left">
-					<span class="name"><warehouse:message code="product.latestInventoryDate.label"/></span>
+			
+			<tr class="prop">
+				<td class="label">
+					<label><warehouse:message code="product.minLevel.label"/></label>
 				</td>
-				<td>
-					<span class="value">
-            <g:set var="latestInventoryDate" value="${productInstance?.latestInventoryDate(session.warehouse.id)}"/>
-            <g:if test="${latestInventoryDate}">
-              ${prettyDateFormat(date: latestInventoryDate)}
-            </g:if>
-            <g:else>
-              <warehouse:message code="default.never.label"/>
-            </g:else>
-            </span>
+				<td class="value">
+					<g:if test="${inventoryLevelInstance?.minQuantity}">
+						${inventoryLevelInstance?.minQuantity?:'' }
+						<g:if test="${productInstance?.unitOfMeasure }">
+							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						</g:if>
+						<g:else>
+							${warehouse.message(code:'default.each.label') }
+						</g:else>
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>				
+			</tr>
+			<tr class="prop">
+				<td class="label">
+					<label><warehouse:message code="product.reorderLevel.label"/></label>
+				</td>
+				<td class="value">
+					
+					<g:if test="${inventoryLevelInstance?.reorderQuantity}">
+						${inventoryLevelInstance?.reorderQuantity?:'' }
+						<g:if test="${productInstance?.unitOfMeasure }">
+							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						</g:if>
+						<g:else>
+							${warehouse.message(code:'default.each.label') }
+						</g:else>
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>
+			</tr>				
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.latestInventoryDate.label"/></label>
+				</td>
+				<td class="value">
+					<span class=""> 						
+						<g:if test="${latestInventoryDate}">
+							${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
+							<span class="fade">${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }</span>
+						</g:if> 
+						<g:else>
+							<span class="fade"><warehouse:message code="default.never.label" /></span>
+						</g:else>
+				</span></td>
+			</tr>	
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.createdBy.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
 				</td>
 			</tr>	
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.modifiedBy.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+				</td>
+			</tr>				
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.createdOn.label"/></label>
+				</td>
+				<td class="value">
+					${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
+					<br/>
+					<span class="fade">${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm:ss a')}</span>
+					 
+				</td>
+			</tr>			
+
+			
+				
+			<tr class="prop">	
+				<td class="label"  >
+					<label><warehouse:message code="product.modifiedOn.label"/></label>
+				</td>
+				<td class="value">
+					
+					${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
+					<br/>
+					<span class="fade">${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm:ss a')}</span>
+				</td>
+			</tr>			
+			
 		</tbody>		
 	</table>
 	<br/>
@@ -95,12 +255,12 @@
 					<label>${warehouse.message(code: 'product.details.label') }</label>
 				</td>
 			</tr>
-			<tr class="even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="category.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="category.label"/></label>
 				</td>
-				<td id="product-category">
-					<span class="value">
+				<td class="value" id="productCategory">
+					<span class="">
 						<g:if test="${productInstance?.category?.name }">
 							<g:link controller="inventory" action="browse" params="[subcategoryId:productInstance?.category?.id,showHiddenProducts:'on',showOutOfStockProducts:'on',searchPerformed:true]">
 								<format:category category="${productInstance?.category}"/>
@@ -121,11 +281,11 @@
 				</td>
 			</tr>
 			<g:if test="${productInstance?.productGroups }">
-				<tr class="even">	
+				<tr class="prop">	
 					<td class="label left">
-						<span class="name"><warehouse:message code="productGroup.label"/></span>
+						<label><warehouse:message code="productGroup.label"/></label>
 					</td>
-					<td>
+					<td class="value">
 						<g:each var="productGroup" in="${productInstance?.productGroups }">
 							<g:link controller="productGroup" action="edit" id="${productGroup.id }">
 								${productGroup?.description }
@@ -134,12 +294,12 @@
 					</td>
 				</tr>
 			</g:if>
-			<tr class="even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.units.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.units.label"/></label>
 				</td>
-				<td id="unitOfMeasure">
-					<span class="value">
+				<td class="value" id="unitOfMeasure">
+					<span class="">
 						<g:if test="${productInstance?.unitOfMeasure }">
 							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 						</g:if>
@@ -150,12 +310,12 @@
 				</td>
 			</tr>
 			
-			<tr class="even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.manufacturer.label"/></label>
 				</td>
-				<td id="manufacturer">
-					<span class="value">
+				<td class="value" id="manufacturer">
+					<span class="">
 						<g:if test="${productInstance?.manufacturer }">
 							${productInstance?.manufacturer }
 						</g:if>
@@ -166,12 +326,12 @@
 				</td>
 			</tr>
 			
-			<tr class="even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.manufacturerCode.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.manufacturerCode.label"/></label>
 				</td>
-				<td id="manufacturerCode">
-					<span class="value">
+				<td class="value" id="manufacturerCode">
+					<span class="">
 						<g:if test="${productInstance?.manufacturerCode }">
 							${productInstance?.manufacturerCode }
 						</g:if>
@@ -181,13 +341,61 @@
 					</span>
 				</td>
 			</tr>
-			<g:if test="${productInstance?.upc }">
-				<tr class="even">	
-					<td class="left label">
-						<span class="name"><warehouse:message code="product.upc.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.vendor.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">
+						<g:if test="${productInstance?.vendor }">
+							${productInstance?.vendor }
+						</g:if>
+						<g:else>
+							<span class="fade"><warehouse:message code="default.none.label"/></span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
+			
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.vendorCode.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">
+						<g:if test="${productInstance?.vendorCode }">
+							${productInstance?.vendorCode }
+						</g:if>
+						<g:else>
+							<span class="fade"><warehouse:message code="default.none.label"/></span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
+			<g:if test="${productInstance?.modelNumber }">
+				<tr class="prop">	
+					<td class="label">
+						<label><warehouse:message code="product.modelNumber.label"/></label>
 					</td>
-					<td>
-						<span class="value">
+					<td class="value">
+						<span class="">
+							<g:if test="${productInstance?.modelNumber }">
+								${productInstance?.modelNumber }
+							</g:if>
+							<g:else>
+								<span class="fade"><warehouse:message code="default.none.label"/></span>
+							</g:else>
+						</span>
+					</td>
+				</tr>
+			</g:if>			
+			<g:if test="${productInstance?.upc }">
+				<tr class="prop">	
+					<td class="label">
+						<label><warehouse:message code="product.upc.label"/></label>
+					</td>
+					<td class="value">
+						<span class="">
 							<g:if test="${productInstance?.upc }">
 								${productInstance?.upc }
 							</g:if>
@@ -199,12 +407,12 @@
 				</tr>
 			</g:if>			
 			<g:if test="${productInstance?.ndc }">
-				<tr class="even">	
-					<td class="left label">
-						<span class="name"><warehouse:message code="product.ndc.label"/></span>
+				<tr class="prop">	
+					<td class="label">
+						<label><warehouse:message code="product.ndc.label"/></label>
 					</td>
-					<td>
-						<span class="value">
+					<td class="value">
+						<span class="">
 							<g:if test="${productInstance?.ndc }">
 								${productInstance?.ndc }
 							</g:if>
@@ -215,104 +423,58 @@
 					</td>
 				</tr>
 			</g:if>			
-			<tr class="even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.coldChain.label"/></span>
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.coldChain.label"/></label>
 				</td>
-				<td>
-					<span class="value">${productInstance?.coldChain ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
+				<td class="value">
+					<span class="">${productInstance?.coldChain ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
 				</td>
 			</tr>
+			
 			<g:set var="status" value="${0 }"/>
 			<g:each var="productAttribute" in="${productInstance?.attributes}">
-				<tr class="even">
+				<tr class="prop">
 					<td class="label left">
-						<span class="name"><format:metadata obj="${productAttribute?.attribute}"/></span>
+						<label><format:metadata obj="${productAttribute?.attribute}"/></label>
 					</td>
 					<td>
-						<span class="value">${productAttribute.value }</span>
+						<span class="">${productAttribute.value }</span>
 					</td>
 				</tr>													
 			</g:each>
-			
-			<%-- 
-			<tr class="odd">
-				<td class="label left">
-					<span class="name"><warehouse:message code="product.minLevel.label"/></span>
-				</td>
-				<td>
-					<span id="minQuantityTextValue" class="value" >
-						<span id="minQuantityValue">
-							<g:if test="${inventoryLevelInstance?.minQuantity}">
-								${inventoryLevelInstance?.minQuantity?:'' }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.na.label"/></span>
-							</g:else>
-						</span>
-						&nbsp;
-					</span>
-				</td>				
-			</tr>
-			<tr class="even">
-				<td class="label left">
-					<span class="name"><warehouse:message code="product.reorderLevel.label"/></span>
-				</td>
-				<td class="value left">
-					<span id="reorderQuantityTextValue" class="value">
-						<span id="reorderQuantityValue">
-							<g:if test="${inventoryLevelInstance?.reorderQuantity}">
-								${inventoryLevelInstance?.reorderQuantity?:'' }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.na.label"/></span>
-							</g:else>
-						</span>
-					</span>
-				</td>
-			</tr>		
-			--%>
 		</tbody>
 	</table>
-	<g:if test="${productInstance?.images}">
+	<g:if test="${productInstance?.packages }">		
 		<br/>
 		<table class="box">
-			<tbody>			
-			
-				<tr class="odd prop">
-					<td class="label left" colspan="2">
-						<span class="name">
-							<label><warehouse:message code="product.images.label"/></label>
-						</span>
+			<tbody>				
+				<tr class="odd">
+					<td colspan="2">
+						<label>${warehouse.message(code: 'product.packaging.label') }</label>
 					</td>
-				</tr>
-				
-				<tr class="even">
-					<td colspan="2" class="center middle">
-						<g:each var="document" in="${productInstance?.images}" status="i">
-							<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
-								<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
-									class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
-							</a>
-							
-							<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
-								<div>
-									<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
-			           							class="middle image" style="border: 1px solid lightgrey" />
-								</div>
-								<g:link controller="document" action="download" id="${document.id}">Download</g:link>
-							</div>						
-						</g:each>
-					</td>			
-				</tr>													
-			</tbody>		
+				</tr>			
+				<g:each var="productPackage" in="${productInstance?.packages?.sort { it.quantity }}">
+					<tr class="prop">	
+						<td class="label">
+							<label>${productPackage?.uom }</label>
+						</td>
+						<td class="value">
+							<span class="">
+								${productPackage?.uom?.code }/${productPackage?.quantity }
+							</span>
+						</td>
+					</tr>			
+				</g:each>	
+			</tbody>
 		</table>
 	</g:if>
+	
 		
 </div>
 <script>
 	function openDialog(dialogId, imgId) { 
-		$(dialogId).dialog({autoOpen: true, modal: true, width: 500, height: 360});
+		$(dialogId).dialog({autoOpen: true, modal: true, width: 600, height: 400});
 	}
 </script>
 

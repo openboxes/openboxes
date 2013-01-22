@@ -7,8 +7,8 @@
 
 		<div class="form-content box">
 			
-			<div class="middle left" style="padding: 10px 0 10px 0;">
-				<label><warehouse:message code="inventory.inventoryDate.label"/></label>													
+			<div class="middle left" style="padding: 0px 0 20px 0;">
+				<span class="title"><warehouse:message code="inventory.inventoryDate.label"/>:</span>													
 				<g:jqueryDatePicker 
 					id="transactionDate" 
 					name="transactionDate"
@@ -17,10 +17,7 @@
 					showTrigger="false" />						
 					
 					
-							<button class="addAnother" >
-								<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>
-								<warehouse:message code="inventory.addInventoryItem.label"/>							
-							</button>					
+								
 			</div>
 			<table id="inventoryItemsTable">
 				<thead>					
@@ -77,13 +74,23 @@
 					</g:else>
 					
 				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="4"></td>
+						<td class="center">
+							<button id="addRow" class="button icon add" >
+								<warehouse:message code="inventory.addInventoryItem.label"/>							
+							</button>					
+						</td>
+					</tr>
+				</tfoot>
 			</table>
 			
 			
 		</div>												
 		<div class="center buttons">		
-			<button name="save" type="submit" class="positive" id="saveInventoryItem">
-				<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
+			<button name="save" type="submit" class="button icon approve" id="saveInventoryItem">
+				<warehouse:message code="default.button.save.label"/>&nbsp;
 			</button>
 			&nbsp;
 			<g:link controller="inventoryItem" action="showStockCard" 
@@ -158,7 +165,7 @@
 	$(document).ready(function() {
 		addRow();
 		//$('.addAnother').focus();		
-		$('.addAnother').livequery(function() { 
+		$('#addRow').livequery(function() { 
 			$(this).click(function(event) { 
 				event.preventDefault();
 				addRow();
@@ -266,8 +273,7 @@
 
 	</td>	
 	<td class="center">
-		<button onclick="removeRow({{= getIndex()}});">
-			<img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}"/>
+		<button onclick="removeRow({{= getIndex()}});" class="button icon trash">
 			${warehouse.message(code: 'default.button.delete.label')}&nbsp;
 		</button>
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />

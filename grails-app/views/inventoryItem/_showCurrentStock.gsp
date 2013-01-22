@@ -109,7 +109,6 @@
 	<tfoot>
 		<tr class="prop" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
 			<td colspan="3" class="left">
-				<label><warehouse:message code="inventory.onHandQuantity.label" default="On-hand quantity"/></label>
 			</td>
 			<td class="center">
 				<span style="font-size: 1em;"> 

@@ -1,4 +1,4 @@
-<div style="padding-top:0px;">
+<div>
 	<g:form method="GET" controller="inventory" action="browse">
 		<div class="box">
 			<table style="width: 35%">
@@ -59,7 +59,7 @@
 						<g:if test="${tags }">			
 							<g:each in="${tags }" var="tag" status="status">
 								<g:set var="selectedTag" value="${params.tag == tag.key.tag }"/>								
-								<g:link controller="inventory" action="browse" params="['tag':tag.key.tag]">
+								<g:link controller="inventory" action="browse" params="['tag':tag.key.tag,'max':params.max]">
 									<span class="tag ${selectedTag?'selected':'' }">
 										${tag.key.tag }
 										<%-- (${tag.value })--%>
@@ -74,28 +74,35 @@
 						</g:else>	
 					</td>
 				</tr>
-						
+				<%-- 	
 				<tr class="prop">
 					<td>
 						<label><warehouse:message code="inventory.filterKey.label"/></label>	
-						<div style="padding: 10px;">						
-							<div>
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
-								&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
+						<div style="padding: 10px;" class="buttonsBar">						
+							<div class="linkButton">
+								<a href="?status=${org.pih.warehouse.inventory.InventoryStatus.SUPPORTED}" class="supported">								
+									<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
+								</a>
 							</div>
-							<div>
-		
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
-								&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
+							<div class="linkButton">
+								<a href="?status=${org.pih.warehouse.inventory.InventoryStatus.FORMULARY}" class="formulary">									
+									<warehouse:message code="enum.InventoryStatus.FORMULARY"/>																	
+								</a>
 							</div>
-							<div>
-							
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
-								&nbsp;<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>																	
+							<div class="linkButton">
+								<a href="?status=${org.pih.warehouse.inventory.InventoryStatus.STOCK}" class="stocked">									
+									<warehouse:message code="enum.InventoryStatus.STOCK"/>																	
+								</a>
+							</div>
+							<div class="linkButton">
+								<a href="?status=${org.pih.warehouse.inventory.InventoryStatus.NOT_SUPPORTED}" class="notSupported">									
+									<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>																	
+								</a>
 							</div>
 						</div>
 					</td>
 				</tr>
+				--%>
 			</table>
 		</div>
 	</g:form>

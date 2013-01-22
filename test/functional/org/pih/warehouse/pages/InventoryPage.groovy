@@ -10,7 +10,7 @@ class InventoryPage extends Page{
     static at = { title == "Record inventory"}
     static content ={
         productName { $("div.title").text().trim() }
-        productCategory {$("#product-category").text().trim()}
+        productCategory {$("#productCategory").text().trim()}
         unitOfMeasure {$("#unitOfMeasure").text().trim()}
         manufacturer {$("#manufacturer").text().trim()}
         manufacturerCode {$("#manufacturerCode").text().trim()}

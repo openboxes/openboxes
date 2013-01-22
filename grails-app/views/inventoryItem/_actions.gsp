@@ -73,7 +73,7 @@
 			</div>
 			<div class="action-menu-item">				
 				<g:link controller="inventory" action="browse" params="['resetSearch':'true']">
-					<img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}"/>&nbsp;
+					<img src="${resource(dir: 'images/icons', file: 'indent.gif')}"/>&nbsp;
 					<warehouse:message code="inventory.browse.label"/>
 				</g:link>
 			</div>	

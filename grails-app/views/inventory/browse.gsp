@@ -29,10 +29,10 @@
 							<td style="width: 250px;">
 			       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 							</td>
-							<td>
+							<td style="padding:0;margin:0">
 					         	<table>
 									<tr>
-						         		<td >
+						         		<td style="padding:0;margin:0">
 											<div class="tabs">
 												<ul>
 													<li>
@@ -60,17 +60,23 @@
 										                <table id="inventory-browser-table" class="tableScroll" border="0"> 
 															<thead> 
 									           					<tr>
+									           						<th style="width: 50px;" class="middle">
+									           						
+									           						</th>
 																	<th class="center middle" style="width: 1%">
 																		<input type="checkbox" id="toggleCheckbox">	
 																	</th>
 																	<th class="middle" style="width: 1%">
-																		
+																		<warehouse:message code="product.productCode.label"/>
 																	</th>
 																	<th class="middle">
 																		<warehouse:message code="product.name.label"/>
 																	</th>
 																	<th class="middle">
 																		<warehouse:message code="product.manufacturer.label"/>
+																	</th>
+																	<th class="middle">
+																		<warehouse:message code="product.brandName.label"/>
 																	</th>
 																	<th class="middle">
 																		<warehouse:message code="product.manufacturerCode.label"/>
@@ -93,7 +99,7 @@
                                                                         <g:set var="category" value="${entry.key }"/>
                                                                         <g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
                                                                         <tr class="category-header">
-                                                                            <td colspan="8" style="padding:0; margin:0;">
+                                                                            <td colspan="10" style="padding:0; margin:0;">
                                                                                 <span class="fade">
                                                                                     <h2 style="border-top: 2px solid lightgrey;">
                                                                                         <%--
@@ -127,7 +133,7 @@
 															<g:else>
 																<tbody>
 																	<tr>
-																		<td colspan="8" class="even center">
+																		<td colspan="10" class="even center">
 																			<div class="fade padded">
 																				<g:if test="${params.numProducts == '0' }">
 																					<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
@@ -139,10 +145,10 @@
 															</g:else>
 															<tfoot>
 																<tr>
-																	<td colspan="3" class="left middle">
+																	<td colspan="4" class="left middle">
 																		<g:render template="./actions" model="[]"/>
 																	</td>			
-																	<td colspan="2" class="middle ">
+																	<td colspan="3" class="middle ">
 																	</td>
 																	<td colspan="3" class="right middle">                                                                   
 																	</td>
@@ -214,14 +220,22 @@
 	    			}
 				); 
 
-
+		    	$(".isRelated").hide();
 		    	$(".expandable").click(function(event) {
-		    		$("#productGroupProducts-"+event.target.id).toggle();
+			    	//$("#productGroup-"+event.target.id).css('background-color', '#E5ECF9');
+			    	var isVisible = $(".productGroup-"+event.target.id).is(":visible");
+			    	if (isVisible) { 
+				    	$("#productGroup-"+event.target.id).removeClass("showRelated");
+				    	$("#productGroup-"+event.target.id).addClass("hideRelated");
+				    }
+			    	else { 
+				    	$("#productGroup-"+event.target.id).addClass("showRelated");
+				    	$("#productGroup-"+event.target.id).removeClass("hideRelated");
+			    	}
+			    	//$("#productGroup-"+event.target.id).removeClass("hideRelated");
+		    		$(".productGroup-"+event.target.id).toggle();
 					
 		    	});
-				$(".collapsable").click(function(event) { 
-		    		$("#productGroupProducts-"+event.target.id).toggle();
-				});				
 			});	
 		</script>
     </body>

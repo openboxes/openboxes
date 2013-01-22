@@ -29,12 +29,15 @@
 			</div>
 		</g:hasErrors>
 		
-		<g:render template="../product/summary" model="[productInstance:commandInstance?.productInstance]"/>
+		<g:render template="../product/summary" model="[productInstance:commandInstance?.productInstance,
+			inventoryInstance:commandInstance?.inventoryInstance,
+			inventoryLevelInstance: commandInstance?.inventoryLevelInstance,
+			totalQuantity: commandInstance?.totalQuantity]"/>
 
 		<div class="dialog">		
 			<table>				
 				<tr>
-					<td style="width: 250px;">
+					<td style="width: 25%;">
 						<g:render template="productDetails" 
 							model="[productInstance:commandInstance?.productInstance, 
 								inventoryInstance:commandInstance?.inventoryInstance, 

@@ -1,30 +1,66 @@
 <tr class="${counter%2==0?'even':'odd' } ${cssClass}">
+	<td>
+		<div class="action-menu hover">
+			<button class="action-btn">
+				<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}"
+					style="vertical-align: middle" /> <img
+					src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
+					style="vertical-align: middle" />
+			</button>
+			<div class="actions left">
+				<div class="action-menu-item">
+					<g:link controller="inventoryItem" action="showStockCard" params="['product.id': inventoryItem?.product?.id]">
+						<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>&nbsp;
+						<warehouse:message code="inventory.showStockCard.label"/>
+					</g:link>
+				</div>
+				<div class="action-menu-item">
+					<g:link controller="product" action="edit" id="${inventoryItem?.product?.id }">
+						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+						<warehouse:message code="product.edit.label"/>
+					</g:link>
+				</div>
+				<div class="action-menu-item">
+					<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': inventoryItem?.product?.id, 'disableFilter':true]">
+						<img src="${resource(dir: 'images/icons/silk', file: 'calendar.png')}"/>&nbsp;
+						<warehouse:message code="inventory.showTransactionLog.label"/>
+					</g:link>
+				</div>
+			</div>
+		</div>	
+	</td>
 	<td class="middle center">
 		<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 
 			class="checkbox" style="top:0em;" checked="${false }" 
 				value="${inventoryItem?.product?.id }" />
 	</td>	
+		<%-- 
 	<td class="checkable center middle">
 		<img src="${resource(dir: 'images/icons/inventoryStatus', file: inventoryItem?.inventoryLevel?.status?.name()?.toLowerCase() + '.png')}" 
 			alt="${inventoryItem?.inventoryLevel?.status?.name() }" title="${inventoryItem?.inventoryLevel?.status?.name() }" style="vertical-align: middle;"/>
-	</td>
-	<td class="checkable middle">	
 		
+	</td>
+		--%>
+	<td class="checkable middle">
+		<span class="fade">${inventoryItem?.product?.productCode }</span>	
+	</td>
+	<td class="checkable middle">			
 		<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-			<span title="${inventoryItem?.product?.description }">
-				<span class="fade">${inventoryItem?.product?.productCode }</span>
+			<span title="${inventoryItem?.product?.description }">				
 				<g:if test="${inventoryItem?.product?.name?.trim()}">
-					<format:product product="${inventoryItem?.product}"/>
+					${inventoryItem?.product?.name}
 				</g:if>
 				<g:else>
 					<warehouse:message code="product.untitled.label"/>
 				</g:else>
 			</span>
-			
 		</g:link> 
 	</td>
 	<td class="checkable middle left">
 		<span class="fade">${inventoryItem?.product?.manufacturer }</span>
+	</td>
+	<td class="checkable middle left">
+		<span class="fade">${inventoryItem?.product?.brandName}</span>	
 	</td>
 	<td class="checkable middle left">
 		<span class="fade">${inventoryItem?.product?.manufacturerCode }</span>
