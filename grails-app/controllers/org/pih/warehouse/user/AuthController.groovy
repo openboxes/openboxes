@@ -118,7 +118,7 @@ class AuthController {
 		session.user = null;
 		session.locale = null;
 		session.warehouse = null;
-		flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message', args: [username])}"	
+		flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"	
 		redirect(action:'login')
 	}    
 
