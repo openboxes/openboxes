@@ -119,7 +119,7 @@ class ShipmentItem implements Comparable, Serializable {
 	int compareTo(obj) { 
 		def sortOrder = 
 			container?.sortOrder <=> obj?.container?.sortOrder ?:
-				inventoryItem?.product?.name <=> obj?.inventoryItem?.product.name ?:
+				inventoryItem?.product?.name <=> obj?.inventoryItem?.product?.name ?:
 					inventoryItem?.lotNumber <=> obj?.inventoryItem?.lotNumber ?:
 						product?.name <=> obj?.product.name ?: 
 							lotNumber <=> obj?.lotNumber ?:
