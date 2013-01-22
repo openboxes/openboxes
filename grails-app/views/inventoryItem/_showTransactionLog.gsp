@@ -146,7 +146,6 @@
 						</td>
 					</tr>
 				</table>
-			</div>
 		</g:form>
 	</div>
 </div>

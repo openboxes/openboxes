@@ -81,10 +81,6 @@
 			</tbody>		
 		</table>
 	</g:if>
-	<br/>
-					
-	
-
 	<g:set var="latestInventoryDate"
 		value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
 	<table class="box">
@@ -203,51 +199,8 @@
 						</g:else>
 				</span></td>
 			</tr>	
-			<tr class="prop">	
-				<td class="label">
-					<label><warehouse:message code="product.createdBy.label"/></label>
-				</td>
-				<td class="value">
-					<span class="">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
-				</td>
-			</tr>	
-			<tr class="prop">	
-				<td class="label">
-					<label><warehouse:message code="product.modifiedBy.label"/></label>
-				</td>
-				<td class="value">
-					<span class="">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
-				</td>
-			</tr>				
-			<tr class="prop">	
-				<td class="label">
-					<label><warehouse:message code="product.createdOn.label"/></label>
-				</td>
-				<td class="value">
-					${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
-					<br/>
-					<span class="fade">${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm:ss a')}</span>
-					 
-				</td>
-			</tr>			
-
-			
-				
-			<tr class="prop">	
-				<td class="label"  >
-					<label><warehouse:message code="product.modifiedOn.label"/></label>
-				</td>
-				<td class="value">
-					
-					${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
-					<br/>
-					<span class="fade">${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm:ss a')}</span>
-				</td>
-			</tr>			
-			
-		</tbody>		
-	</table>
-	<br/>
+		</tbody>
+	</table>			
 	<table class="box">
 		<tbody>				
 			<tr class="odd">
@@ -325,7 +278,36 @@
 					</span>
 				</td>
 			</tr>
-			
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.brandName.label"/></label>
+				</td>
+				<td class="value" id="brandName">
+					<span class="">
+						<g:if test="${productInstance?.brandName }">
+							${productInstance?.brandName }
+						</g:if>
+						<g:else>
+							<span class="fade"><warehouse:message code="default.none.label"/></span>
+						</g:else>
+					</span>
+				</td>
+			</tr>			
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.modelNumber.label"/></label>
+				</td>
+				<td class="value" id="modelNumber">
+					<span class="">
+						<g:if test="${productInstance?.modelNumber }">
+							${productInstance?.modelNumber }
+						</g:if>
+						<g:else>
+							<span class="fade"><warehouse:message code="default.none.label"/></span>
+						</g:else>
+					</span>
+				</td>
+			</tr>			
 			<tr class="prop">	
 				<td class="label">
 					<label><warehouse:message code="product.manufacturerCode.label"/></label>
@@ -446,7 +428,6 @@
 		</tbody>
 	</table>
 	<g:if test="${productInstance?.packages }">		
-		<br/>
 		<table class="box">
 			<tbody>				
 				<tr class="odd">
@@ -469,6 +450,59 @@
 			</tbody>
 		</table>
 	</g:if>
+	<table class="box">
+		<tbody>
+			<tr class="odd">
+				<td colspan="2">
+					<label>${warehouse.message(code: 'default.auditing.label') }</label>
+				</td>
+			</tr>
+			
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.createdBy.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+				</td>
+			</tr>	
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.modifiedBy.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+				</td>
+			</tr>				
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.createdOn.label"/></label>
+				</td>
+				<td class="value">
+					${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
+					<br/>
+					<span class="fade">${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm:ss a')}</span>
+					 
+				</td>
+			</tr>			
+
+			
+				
+			<tr class="prop">	
+				<td class="label"  >
+					<label><warehouse:message code="product.modifiedOn.label"/></label>
+				</td>
+				<td class="value">
+					
+					${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
+					<br/>
+					<span class="fade">${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm:ss a')}</span>
+				</td>
+			</tr>			
+			
+		</tbody>		
+	</table>
+	<br/>	
 	
 		
 </div>
