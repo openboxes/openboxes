@@ -24,3 +24,4 @@ out/
 *.swp
 tags
 *.swo
+/uploads
