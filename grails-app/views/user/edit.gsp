@@ -114,6 +114,17 @@
 	                                   <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}" optionKey="id" value="${userInstance?.roles}" noSelection="${['null': noAccessLabel]}" multiple="true"/>
 	                                </td>
 	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
+										<g:select name="warehouse.id" from="${org.pih.warehouse.core.Location.list()?.sort()}" optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']"/>
+	                                    <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}" />
+	                                    <span class="middle"><warehouse:message code="user.rememberLastLocation.label" /></span>
+										
+	                                </td>
+	                            </tr>	                   	                            
                               <tr class="prop" id="locationRoles">
 	                                <td valign="top" class="name">
 	                                  <label><warehouse:message code="user.locationRoles.label" /></label>
@@ -121,8 +132,10 @@
 	                                <td valign="top" >
                                     <table>
                                       <thead>
+                                      	<tr>
                                         <th><warehouse:message code="location.label"/></th>
                                         <th><warehouse:message code="user.role.label"/></th>
+                                        </tr>
                                       </thead>
                                       <tbody>
                                         <g:each var="location" in="${locations}" status="status">
@@ -142,22 +155,7 @@
 	                                </td>
 	                            </tr>
 
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="rememberLastLocation"><warehouse:message code="user.rememberLastLocation.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'rememberLastLocation', 'errors')}">
-	                                    <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}" />
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="email"><warehouse:message code="warehouse.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
-										<g:select name="warehouse.id" from="${org.pih.warehouse.core.Location.list()?.sort()}" optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']"/>
-	                                </td>
-	                            </tr>	                            	                            
+	                                     	                            
 								<tr class="prop">
 									<td valign="top" class="name">
 				

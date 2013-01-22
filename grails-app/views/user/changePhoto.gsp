@@ -6,10 +6,7 @@
 <meta name="layout" content="custom" />
 <g:set var="entityName"
 	value="${warehouse.message(code: 'user.label', default: 'User')}" />
-<title><warehouse:message code="default.show.label"
-		args="[entityName]" /></title>
-<content tag="pageTitle">
-<warehouse:message code="default.show.label" args="[entityName]" /></content>
+<title><warehouse:message code="default.show.label" args="[entityName]" /></title>
 
 </head>
 <body>
