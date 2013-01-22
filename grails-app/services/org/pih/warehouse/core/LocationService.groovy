@@ -47,6 +47,11 @@ class LocationService {
 		return locations
 	}
 	
+	
+	Map getLoginLocationsMap(Location currentLocation) { 
+		return getLoginLocations(currentLocation).groupBy { it.locationGroup }
+	}
+	
 	List getDepots() {
 		return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
 	}

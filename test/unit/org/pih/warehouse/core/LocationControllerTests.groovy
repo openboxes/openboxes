@@ -18,32 +18,29 @@ class LocationControllerTests extends ControllerUnitTestCase {
 
 	protected void setUp() {
 		super.setUp()
+		def depot = new LocationType(name: "Depot")
+		mockDomain(Location, [
+			new Location(id: "1", name: "Boston", locationType: depot ),
+			new Location(id: "2", name: "Miami", locationType: depot)
+		])
 	}
 
 	protected void tearDown() {
 		super.tearDown()
 	}
 
-	void testIndex() {
+	void test_index_shouldRedirectToList() {
 		controller.index()
 		assertEquals "list", controller.redirectArgs["action"]
 	}
 
-	void testList() {
-		mockDomain(Location, [
-			new Location(id: 1, name: "Boston" ),
-			new Location(id: 2, name: "Miami")
-		])
+	void test_list_shouldListAllLocations() {
 		def model = controller.list()
 		assertEquals 2, model["locationInstanceList"].size()
 		assertEquals 2, model["locationInstanceTotal"]
 	}
 
-	void testListWithQuery() {
-		mockDomain(Location, [
-			new Location(id: 1, name: "Boston" ),
-			new Location(id: 2, name: "Miami")
-		])
+	void test_list_shouldListLocationsMatchingQuery() {
 		this.controller.params.q = "Bos"
 		def model = controller.list()
 		assertEquals 1, model["locationInstanceList"].size()
@@ -51,31 +48,30 @@ class LocationControllerTests extends ControllerUnitTestCase {
 	}
 
 
-	void testShow() {
-		def depot = new LocationType(name: "Depot")
-		mockDomain(Location, [
-			new Location(id: "1", name: "Boston", locationType: depot ),
-			new Location(id: "2", name: "Miami", locationType: depot)
-		])
-
+	void test_show_shouldIncludeLocationInModel() {
 		// Mock the inventory service.
 		//def location = new Location(id: 1, name: "Boston", locationType: depot)
 		//assertTrue location.validate()
-
 		def inventoryControl = mockFor(InventoryService)
 		inventoryControl.demand.getLocation(1..1) { locationId -> Location.get(locationId) }
 
 		// 	Initialise the service and test the target method.
 		this.controller.inventoryService = inventoryControl.createMock()
-
 		this.controller.params.id = "1"
-
 		def model = this.controller.show()
-
-		
 		assertEquals "Boston", model["locationInstance"]?.name
 		
 	}
+	
+	/*
+	void test_uploadLogo_shouldDoSomething() { 
+		this.controller.params.id = "1"
+		def model = this.controller.uploadLogo()
+		
+		
+		println model 		
+	}	
+	*/
 
 
 }
