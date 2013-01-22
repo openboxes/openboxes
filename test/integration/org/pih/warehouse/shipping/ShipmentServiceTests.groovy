@@ -24,6 +24,8 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 
+import testutils.DbHelper;
+
 class ShipmentServiceTests extends GroovyTestCase {
 
 	def shipmentService;
@@ -148,7 +150,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 		assertEquals shipment2, pallet1.shipment
 				
 		// Assertion fails because the moveContainer method simply changes the 
-		// ShipmentItem.container and Container.parentContainer references 
+		// ShipmentItem.container and "Ground"Container.parentContainer references 
 		//def testShipment1 = Shipment.findByName("New Shipment 1")
 		//assertEquals 0, testShipment1.containers.size()
 		
@@ -333,7 +335,38 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   assertEquals "Should be equal to 0", 0, Container.findByName("Pallet 1")?.getShipmentItems()?.size()?:0
 	   assertEquals "Should be equal to 1", shipmentItemCount-1, ShipmentItem.count()
    }
-      
+     
+   /*
+   void test_findShipmentItems() { 
+	   def product = DbHelper.createProductIfNotExists("Ibuprofen, 200 mg, tablet", "Medicines")
+	   def shipment = DbHelper.createShipment("New Shipment", "Sea")
+	   def inventoryItem = DbHelper.createInventoryItem(product, "ABC-1234", new Date()+365)
+	   def pallet1 = DbHelper.createPallet(shipment, "Pallet 1")
+	   def shipmentItem = DbHelper.createShipmentItem(shipment, pallet1, product, "ABC-1234", 100)
+	   
+	   def shipmentItemLookup = shipmentService.findShipmentItem(shipment, container, product, lotNumber)
+	   assertNotNull shipmentItemLookup
+	   assertNotNull shipmentItemLookup.inventoryItem
+	   assertNotNull shipmentItemLookup.inventoryItem  
+   }
+   */
+   
+    
+   /*
+   void test_addToShipment_shouldSetInventoryItem() { 
+	   ItemListCommand itemListCommand = new ItemListCommand();
+	   ItemCommand itemCommand1 = new ItemCommand();
+	   ItemCommand itemCommand2 = new ItemCommand();
+	   ItemCommand itemCommand3 = new ItemCommand();
+	   
+	   itemListCommand.items = []
+	   itemListCommand.items.add(itemCommand1)
+	   itemListCommand.items.add(itemCommand2)
+	   
+	   def addedAtLeastOne = shipmentService.addToShipment(itemListCommand)
+	   assertTrue(addedAtLeastOne)
+   }
+   */   
  
    	
    void printShipment(text, shipment) { 

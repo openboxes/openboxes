@@ -6,10 +6,10 @@
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 	</button>
 	<div class="actions">
-		<g:if test="${shipmentInstance?.origin?.id == session.warehouse.id}">
+		<g:if test="${shipmentInstance?.destination?.id == session.warehouse.id}">
 			<div class="action-menu-item">
 				<g:link controller="shipment" action="list" params="[type: 'incoming']">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" class="middle" />&nbsp;
+					<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />&nbsp;
 					<warehouse:message code="shipping.listIncoming.label"/>
 				</g:link>
 			</div>
@@ -17,7 +17,7 @@
 		<g:else>
 			<div class="action-menu-item">
 				<g:link controller="shipment" action="list">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" class="middle" />&nbsp;
+					<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />&nbsp;
 					<warehouse:message code="shipping.listOutgoing.label"/>
 				</g:link>
 			</div>
@@ -40,7 +40,9 @@
 				<div class="action-menu-item">
 					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle" />&nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
+						<g:if test="${request.request.requestURL.toString().contains('createShipment')}">
+							<warehouse:message code="shipping.editShipment.label"/>
+						</g:if>
 						<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
 					</g:link>
 				</div>
@@ -52,22 +54,20 @@
 			<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">				
 				<div class="action-menu-item">
 					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle" />&nbsp; 
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" class="middle" />&nbsp; 
 						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
 						<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
 					</g:link>
 				</div>
-				<%-- 
 				<div class="action-menu-item">
-					<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" class="middle"/>&nbsp;
-						<warehouse:message code="shipping.viewPackingList.label"/>
+					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterTrackingDetails" id="${shipmentInstance.id}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>&nbsp;
+						<warehouse:message code="shipping.enterTrackingDetails.label"/>
 					</g:link>		
 				</div>
-				--%>
 				<div class="action-menu-item">
 					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails"  id="${shipmentInstance?.id }" params="[skipTo:'Packing']">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" class="middle"/>&nbsp;
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" class="middle"/>&nbsp;
 						<warehouse:message code="shipping.editPackingList.label"/></g:link>					
 				</div>
 			</g:if>		

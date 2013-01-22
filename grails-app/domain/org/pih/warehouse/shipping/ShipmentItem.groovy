@@ -113,14 +113,18 @@ class ShipmentItem implements Comparable, Serializable {
 	/**
 	 * Sorts shipping items by associated product name, then lot number, then quantity,
 	 * and finally by id. 
+	 * 
+	 * FIXME Need to get rid of the product and lot number comparison
 	 */
 	int compareTo(obj) { 
 		def sortOrder = 
 			container?.sortOrder <=> obj?.container?.sortOrder ?:
-				product?.name <=> obj?.product.name ?: 
-					lotNumber <=> obj?.lotNumber ?:
-						quantity <=> obj?.quantity ?:
-							id <=> obj?.id
+				inventoryItem?.product?.name <=> obj?.inventoryItem?.product.name ?:
+					inventoryItem?.lotNumber <=> obj?.inventoryItem?.lotNumber ?:
+						product?.name <=> obj?.product.name ?: 
+							lotNumber <=> obj?.lotNumber ?:
+								quantity <=> obj?.quantity ?:
+									id <=> obj?.id
 		return sortOrder;
 		/*
 		if (!product?.name && obj?.product?.name) {
@@ -165,8 +169,9 @@ class ShipmentItem implements Comparable, Serializable {
 	ShipmentItem cloneShipmentItem() {
 		return new ShipmentItem(
 			lotNumber: this.lotNumber, 
-			expirationDate: this.expirationDate,
+			expirationDate: this.expirationDate,			
 			product: this.product,
+			inventoryItem: this.inventoryItem,
 			quantity: this.quantity,				
 			recipient: this.recipient,
 			donor: this.donor,

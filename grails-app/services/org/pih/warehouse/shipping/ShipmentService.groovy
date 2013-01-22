@@ -775,6 +775,11 @@ class ShipmentService {
 		return shipmentItem;
 	}
 
+	
+	ShipmentItem findShipmentItem(Shipment shipment, Container container, InventoryItem inventoryItem) { 
+		return shipment.shipmentItems.find { it.container == container && it.inventoryItem == inventoryItem } 
+	}
+	
     ShipmentItem findShipmentItem(Shipment shipment,
                                   Container container,
                                   Product product,
@@ -1162,7 +1167,7 @@ class ShipmentService {
 		
 		command.items.each {
 			// Check if shipment item already exists
-			def shipmentItem = findShipmentItem(it.shipment, it.container, it.product, it.lotNumber)
+			def shipmentItem = findShipmentItem(it.shipment, it.container, it.inventoryItem)			
 
 			// Only add a shipment item for rows that have a quantity greater than 0
 			if (it.quantity > 0) {
@@ -1174,7 +1179,7 @@ class ShipmentService {
 				
 				// If the shipment item already exists, we just add to the quantity 
 				if (shipmentItem) {
-					log.info "Found existing shipment item ..." + shipmentItem.id
+					log.info "Found existing shipment item ..." + shipmentItem.id					
 					shipmentItem.quantity += it.quantity;
 					try { 
 						validateShipmentItem(shipmentItem); 
@@ -1185,7 +1190,9 @@ class ShipmentService {
 				}
 				else {
 					log.info("Creating new shipment item ...");
-					shipmentItem = new ShipmentItem(shipment: it.shipment, container: it.container, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
+					def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+					shipmentItem = new ShipmentItem(shipment: it.shipment, container: it.container, 
+						inventoryItem: it.inventoryItem, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
 					addToShipmentItems(shipmentItem, it.shipment);
 				}
 				atLeastOneUpdate = true;
@@ -1345,7 +1352,8 @@ class ShipmentService {
         containerIdToQuantityMap.each { String containerId, int quantity ->
             def container = Container.get(containerId)
 
-            def existingItem = findShipmentItem(itemToMove.shipment,
+            def existingItem = findShipmentItem(
+					itemToMove.shipment,
                     container,
                     itemToMove.product,
                     itemToMove.lotNumber,

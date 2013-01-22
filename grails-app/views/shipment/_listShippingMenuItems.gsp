@@ -20,15 +20,23 @@
 	<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
 		<div class="action-menu-item">
 			<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"
 				alt="Edit shipment" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.editShipment.label"/></g:link>
 		</div>
 	</g:if>
 	<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
 		<div class="action-menu-item">															
+			<g:link controller="createShipmentWorkflow" action="createShipment" event="enterTrackingDetails" id="${shipmentInstance?.id }" params="[skipTo:'Tracking']">													
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" 
+					class="middle"/>&nbsp;<warehouse:message code="shipping.enterTrackingDetails.label"/>
+			</g:link>
+		</div>
+	</g:if>
+	<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
+		<div class="action-menu-item">															
 			<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" id="${shipmentInstance?.id }" params="[skipTo:'Packing']">													
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" 
-					alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.editPackingList.label"/>
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" 
+					class="middle"/>&nbsp;<warehouse:message code="shipping.editPackingList.label"/>
 			</g:link>
 		</div>
 	</g:if>

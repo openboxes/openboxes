@@ -88,7 +88,8 @@
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><format:metadata obj="${referenceNumberType}" /></label></td>
 									<td valign="top" style="width: 30%;">
-										<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" size="10" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
+										<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" 
+											size="20" class="text" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
 									</td>
 								</tr>
 							</g:each>
@@ -100,7 +101,8 @@
 									<td valign="top"
 										class=" ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
 										nowrap="nowrap">
-											<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" size="10"/> 
+											<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" 
+												class="text" size="10"/> 
 											<span class="fade"><warehouse:message code="shipping.statedValueExplanation.message"/></span>
 									</td>
 								</tr>	
@@ -112,7 +114,8 @@
 									<td valign="top"
 										class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 										nowrap="nowrap">
-											<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/> 
+											<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" 
+											 	class="text" size="10"/> 
 											<span class="fade"><warehouse:message code="shipping.totalValueExplanation.message"/></span>
 									</td>
 								</tr>	

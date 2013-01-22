@@ -27,10 +27,8 @@
 			</div>
 		</g:hasErrors>
 
-		<div class="dialog">			
+		<div class="dialog" >			
 			<g:form action="addToShipmentPost">
-
-				<fieldset>
 				
 					<%-- 
 					<div class="action-menu" style="padding: 10px;">
@@ -48,7 +46,7 @@
 						</div>
 					</div>					
 					--%>
-					<table>
+					<table class="box">
 					
 						<tr class="prop">
 							<td class="name">
@@ -89,7 +87,7 @@
 												
 													<tr class="${rowStatus++%2?'even':'odd' } prop">
 														<g:if test="${j==0 }">
-															<td rowspan="${items.size() }">
+															<td rowspan="${items.size() }" class="name" style="border-right: 1px solid lightgrey;">
 																<g:link controller="inventoryItem" action="showStockCard" id="${product?.id }" target="_blank">
 																	<label><format:product product="${product}"/></label>
 																</g:link>
@@ -97,6 +95,7 @@
 														</g:if>
 														<td>
 															${item?.lotNumber }
+															<g:hiddenField name="items[${listStatus }].inventoryItem.id" value="${item?.inventoryItem?.id }"/>
 															<g:hiddenField name="items[${listStatus }].lotNumber" value="${item?.lotNumber }"/>
 															<g:hiddenField name="items[${listStatus }].product.id" value="${item?.product?.id }"/>
 														</td>
@@ -122,8 +121,8 @@
 														</td>
 														<td class="center middle" style="border-left: 1px solid lightgrey; padding: 0">
 															<g:if test="${item?.quantityOnHand > 0 }">
-																<g:textField name="items[${listStatus }].quantity" size="1" style="text-align: center;" 
-																	value="${item?.quantity }" autocomplete="off"/>
+																<g:textField name="items[${listStatus }].quantity" size="10" style="text-align: center;" 
+																	value="${item?.quantity }" autocomplete="off" class="text"/>
 															</g:if>
 															<g:else>
 																0
@@ -190,7 +189,7 @@
 												<tr class="${rowStatus++%2?'even':'odd' } prop">
 													<td colspan="6">
 														<h2>
-														<format:product product="${product}"/>
+															<format:product product="${product}"/>
 														</h2>
 													</td>				
 													<td style="border-left: 1px solid lightgrey;" colspan="1">
@@ -203,13 +202,13 @@
 									<tfoot>
 										<tr>
 											<td colspan="7" style="border-top: 1px solid lightgrey;">
-												<div class="right">
-													<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}"><warehouse:message code="default.button.cancel.label"/></g:link>
+												<div class="center">
+													<button type="submit" class="button icon add">
+														<warehouse:message code="shipping.addItems.label"/>
+													</button>
 													&nbsp;
-													<button type="submit"><img
-														src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"
-														class="middle btn" alt="save" />&nbsp;<warehouse:message code="shipping.addItems.label"/></button>
-												</div>				
+													<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}"><warehouse:message code="default.button.cancel.label"/></g:link>
+												</div>																
 											</td>
 										</tr>
 									</tfoot>	
@@ -217,8 +216,7 @@
 							</td>
 						</tr>						
 					</table>								
-													
-				</fieldset>
+					
 			</g:form>
 		</div>
 	</div>

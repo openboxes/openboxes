@@ -103,8 +103,8 @@ class Shipment implements Comparable, Serializable {
 		containers sort: 'sortOrder', order: 'asc'
 		//shipmentItems sort: 'lotNumber', order: 'asc'
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
-        outgoingTransactions cascade: "all-delete-orphan"
-        incomingTransactions cascade: "all-delete-orphan"
+        //outgoingTransactions cascade: "all-delete-orphan"
+        //incomingTransactions cascade: "all-delete-orphan"
 	}
 
 	// Constraints

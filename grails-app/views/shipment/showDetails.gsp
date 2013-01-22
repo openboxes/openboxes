@@ -188,7 +188,23 @@
 								</tr>
 							</g:if>							
 
-							<g:if test="${shipmentInstance?.incomingTransactions }">
+							
+							<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}" status="i">
+								<tr class="prop">								
+									<!-- list all the reference numbers valid for this workflow -->
+									<td valign="top" class="name">
+										<label>
+											<format:metadata obj="${referenceNumberType}"/>
+										</label>
+									</td>
+									<td valign="top" class="value">
+										<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
+											${it.identifier }
+										</g:findAll>	
+									</td>
+								</tr>
+							</g:each>
+<g:if test="${shipmentInstance?.incomingTransactions }">
 								<tr class="prop">
 									<td valign="top" class="name"><label>
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
@@ -211,7 +227,8 @@
 															</g:link>
 														</td>
 														<td>
-															<format:datetime obj="${transaction?.transactionDate }"/>
+															<g:formatDate date="${transaction?.transactionDate}" format="dd-MMM-yyyy hh:mm a"/> 		
+															<%--<format:datetime obj="${transaction?.transactionDate }"/> --%>
 														</td>
 													</tr>
 												</g:each>
@@ -243,7 +260,8 @@
 															</g:link>
 														</td>
 														<td>
-															<format:datetime obj="${transaction?.transactionDate }"/>
+															<g:formatDate date="${transaction?.transactionDate}" format="dd-MMM-yyyy hh:mm a"/> 		
+															<%--<format:datetime obj="${transaction?.transactionDate }"/>--%>
 														</td>
 													</tr>
 												</g:each>
@@ -252,22 +270,6 @@
 									</td>										
 								</tr>							
 							</g:if>
-							<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}" status="i">
-								<tr class="prop">								
-									<!-- list all the reference numbers valid for this workflow -->
-									<td valign="top" class="name">
-										<label>
-											<format:metadata obj="${referenceNumberType}"/>
-										</label>
-									</td>
-									<td valign="top" class="value">
-										<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
-											${it.identifier }
-										</g:findAll>	
-									</td>
-								</tr>
-							</g:each>
-
 							<%--
 							<tr class="prop">
 								<td valign="top" class="name"><label>
@@ -481,7 +483,7 @@
 																${event?.eventLocation?.name}
 															</td>
 															<td>																			
-																<format:date obj="${event.eventDate}"/> &nbsp; 																			
+																<g:formatDate date="${event.eventDate}" format="dd-MMM-yyyy hh:mm a"/> 																			
 															</td>
 															<td style="text-align: right">
 																<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">

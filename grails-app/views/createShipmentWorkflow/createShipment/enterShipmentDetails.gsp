@@ -55,7 +55,7 @@
 										<label for='name'><warehouse:message code="shipping.name.label"/></label>
 									</td>
 									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
-										<input type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="40"/>
+										<input type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="60" class="text"/>
 									</td>
 								</tr>  
 								<tr class="prop">
