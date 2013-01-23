@@ -29,15 +29,29 @@ class LocationController {
 	}
 	
 	def list = {
+		println params
+		
 		def locations = []
 		def locationsTotal = 0;
+		def locationType = LocationType.get(params["locationType.id"])
 		
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		if (params.q) {
-			locations = Location.findAllByNameLike("%" + params.q + "%", params)
-			locationsTotal = Location.countByNameLike("%" + params.q + "%", params);
+		if (params.q && locationType) {
+			def terms = "%" + params.q + "%"
+			locations = Location.findAllByNameLikeAndLocationType(terms, locationType, params)
+			locationsTotal = Location.countByNameLikeAndLocationType(terms, locationType, params);
+		}
+		else if (locationType) { 
+			locations = Location.findAllByLocationType(locationType, params)
+			locationsTotal = Location.countByLocationType(locationType, params);
+		}
+		else if (params.q) { 
+			def terms = "%" + params.q + "%"
+			locations = Location.findAllByNameLike(terms, params)
+			locationsTotal = Location.countByNameLike(terms, params);
 		}
 		else {
+			println "4"
 			locations = Location.list(params)
 			locationsTotal = Location.count()
 		}

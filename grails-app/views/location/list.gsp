@@ -50,10 +50,8 @@
 						<label><warehouse:message code="location.search.label"/></label>            
 						<g:textField name="q" size="45" value="${params.q }" class="text"/>		
 						
-						<%-- 
 						<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" 
 							optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${params?.locationType?.id}" noSelection="['':'']" />
-                        --%>
                            					
 						<button type="submit" class="button icon search">
 							${warehouse.message(code: 'default.button.find.label')}

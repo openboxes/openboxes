@@ -18,11 +18,20 @@ class LocationControllerTests extends ControllerUnitTestCase {
 
 	protected void setUp() {
 		super.setUp()
-		def depot = new LocationType(name: "Depot")
+		def depot = new LocationType(id: "1", name: "Depot")
+		def ward = new LocationType(id: "2", name: "Ward")
+		
 		mockDomain(Location, [
 			new Location(id: "1", name: "Boston", locationType: depot ),
-			new Location(id: "2", name: "Miami", locationType: depot)
+			new Location(id: "2", name: "Miami", locationType: depot),
+			new Location(id: "3", name: "Mirebalais", locationType: depot),
+			new Location(id: "4", name: "Mirebalais > Pediatrics", locationType: ward)
 		])
+		mockDomain(LocationType, [depot, ward])
+		
+		
+		depot = LocationType.get("1")
+		assertNotNull depot
 	}
 
 	protected void tearDown() {
@@ -36,8 +45,8 @@ class LocationControllerTests extends ControllerUnitTestCase {
 
 	void test_list_shouldListAllLocations() {
 		def model = controller.list()
-		assertEquals 2, model["locationInstanceList"].size()
-		assertEquals 2, model["locationInstanceTotal"]
+		assertEquals 4, model["locationInstanceList"].size()
+		assertEquals 4, model["locationInstanceTotal"]
 	}
 
 	void test_list_shouldListLocationsMatchingQuery() {
@@ -47,7 +56,26 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		assertEquals 1, model["locationInstanceTotal"]
 	}
 
+	/*
+	void test_list_shouldListLocationsMatchingLocationType() { 
+		this.controller.params["locationType"] = "1"
+		def model = controller.list()
+		assertEquals 3, model["locationInstanceList"].size()
+		assertEquals 3, model["locationInstanceTotal"]
 
+		this.controller.params["locationType"] = "2"
+		model = controller.list()
+		assertEquals 1, model["locationInstanceList"].size()
+		assertEquals 1, model["locationInstanceTotal"]
+
+		this.controller.params["q"] = "Bos"
+		this.controller.params["locationType"] = "1"
+		model = controller.list()
+		assertEquals 1, model["locationInstanceList"].size()
+		assertEquals 1, model["locationInstanceTotal"]
+	}
+	*/
+		
 	void test_show_shouldIncludeLocationInModel() {
 		// Mock the inventory service.
 		//def location = new Location(id: 1, name: "Boston", locationType: depot)
