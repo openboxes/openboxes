@@ -51,7 +51,6 @@ class LocationController {
 			locationsTotal = Location.countByNameLike(terms, params);
 		}
 		else {
-			println "4"
 			locations = Location.list(params)
 			locationsTotal = Location.count()
 		}
