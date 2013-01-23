@@ -40,7 +40,6 @@
 	</g:if>
 
 	<g:if test="${productInstance?.description }">
-		<br/>
 		<table class="box">
 			<tbody>
 				<tr class="odd">
@@ -127,63 +126,7 @@
 					
 					</span>
 				</td>
-			</tr>				
-			<tr class="prop">	
-				<td class="label">
-					<label><warehouse:message code="product.onHandQuantity.label"/></label>
-				</td>
-				<td class="value">
-					<span class="">
-						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
-						<g:if test="${productInstance?.unitOfMeasure }">
-							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-						</g:if>
-						<g:else>
-							${warehouse.message(code:'default.each.label') }
-						</g:else>
-					</span>
-				</td>
-			</tr>	
-			
-			<tr class="prop">
-				<td class="label">
-					<label><warehouse:message code="product.minLevel.label"/></label>
-				</td>
-				<td class="value">
-					<g:if test="${inventoryLevelInstance?.minQuantity}">
-						${inventoryLevelInstance?.minQuantity?:'' }
-						<g:if test="${productInstance?.unitOfMeasure }">
-							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-						</g:if>
-						<g:else>
-							${warehouse.message(code:'default.each.label') }
-						</g:else>
-					</g:if>
-					<g:else>
-						<span class="fade"><warehouse:message code="default.na.label"/></span>
-					</g:else>
-				</td>				
-			</tr>
-			<tr class="prop">
-				<td class="label">
-					<label><warehouse:message code="product.reorderLevel.label"/></label>
-				</td>
-				<td class="value">
-					
-					<g:if test="${inventoryLevelInstance?.reorderQuantity}">
-						${inventoryLevelInstance?.reorderQuantity?:'' }
-						<g:if test="${productInstance?.unitOfMeasure }">
-							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-						</g:if>
-						<g:else>
-							${warehouse.message(code:'default.each.label') }
-						</g:else>
-					</g:if>
-					<g:else>
-						<span class="fade"><warehouse:message code="default.na.label"/></span>
-					</g:else>
-				</td>
-			</tr>				
+			</tr>			
 			<tr class="prop">	
 				<td class="label">
 					<label><warehouse:message code="product.latestInventoryDate.label"/></label>
@@ -198,7 +141,91 @@
 							<span class="fade"><warehouse:message code="default.never.label" /></span>
 						</g:else>
 				</span></td>
+			</tr>					
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.onHandQuantity.label"/></label>
+				</td>
+				<td class="value">
+					<span class="">
+						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
+						<span class="fade">
+							<g:if test="${productInstance?.unitOfMeasure }">
+								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+							</g:if>
+							<g:else>
+								${warehouse.message(code:'default.each.label') }
+							</g:else>
+						</span>
+					</span>
+				</td>
 			</tr>	
+			
+			<tr class="prop">
+				<td class="label">
+					<label><warehouse:message code="inventoryLevel.minQuantity.label"/></label>
+				</td>
+				<td class="value">
+					<g:if test="${inventoryLevelInstance?.minQuantity}">
+						${inventoryLevelInstance?.minQuantity?:'' }
+						<span class="fade">
+							<g:if test="${productInstance?.unitOfMeasure }">
+								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+							</g:if>
+							<g:else>
+								${warehouse.message(code:'default.each.label') }
+							</g:else>
+						</span>
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>				
+			</tr>
+			<tr class="prop">
+				<td class="label">
+					<label><warehouse:message code="inventoryLevel.maxQuantity.label"/></label>
+				</td>
+				<td class="value">
+					<g:if test="${inventoryLevelInstance?.maxQuantity}">
+						${inventoryLevelInstance?.maxQuantity?:'' }
+						<span class="fade">
+							<g:if test="${productInstance?.unitOfMeasure }">
+								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+							</g:if>
+							<g:else>
+								${warehouse.message(code:'default.each.label') }
+							</g:else>
+						</span>
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>				
+			</tr>
+			<tr class="prop">
+				<td class="label">
+					<label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label>
+				</td>
+				<td class="value">
+					
+					<g:if test="${inventoryLevelInstance?.reorderQuantity}">
+						${inventoryLevelInstance?.reorderQuantity?:'' }
+						<span class="fade">
+							<g:if test="${productInstance?.unitOfMeasure }">
+								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+							</g:if>
+							<g:else>
+								${warehouse.message(code:'default.each.label') }
+							</g:else>
+						</span>
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>
+			</tr>				
+			
 		</tbody>
 	</table>			
 	<table class="box">

@@ -79,6 +79,15 @@
 							<g:set var="styleClass" value="color: red;"/>																	
 						</g:if>
 						<span style="${styleClass}">${g.formatNumber(number: itemQuantity, format: '###,###,###') }</span>
+						<span class="fade">
+							<g:if test="${productInstance?.unitOfMeasure }">
+								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+							</g:if>
+							<g:else>
+								${warehouse.message(code:'default.each.label') }
+							</g:else>
+						</span>								
+								
 													
 					</td>
 					<g:hasErrors bean="${flash.itemInstance}">
@@ -117,6 +126,14 @@
 						<g:set var="styleClass" value="color: red;"/>																	
 					</g:if>														
 					<span style="${styleClass }" id="totalQuantity">${g.formatNumber(number: commandInstance.totalQuantity, format: '###,###,###') }</span>
+					<span class="fade">
+						<g:if test="${productInstance?.unitOfMeasure }">
+							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						</g:if>
+						<g:else>
+							${warehouse.message(code:'default.each.label') }
+						</g:else>
+					</span>					
 				</span>
 			</td>
 			<g:hasErrors bean="${flash.itemInstance}">
