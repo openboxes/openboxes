@@ -63,7 +63,7 @@
 										</th>
 										<th style="text-align: center">
 											${warehouse.message(code: 'transaction.quantityChange.label')}
-										</th>
+										</th>										
 									</tr>
 			
 								</thead>
@@ -87,8 +87,8 @@
 										<g:set var="totalQuantityChange" value="${0 }"/>		
 										<g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate}.reverse() }" status="status">
 											<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
-												<td style="width: 10%; nowrap="nowrap">	
-														<format:date obj="${transaction?.transactionDate}"/>																
+												<td style="width: 10%;" nowrap="nowrap">	
+													<format:date obj="${transaction?.transactionDate}"/>																
 												</td>
 												<td>
 													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
@@ -125,7 +125,7 @@
 													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 														${quantityChange }
 													</span>
-												</td>
+												</td>												
 											</tr>
 										</g:each>
 										<%-- 
