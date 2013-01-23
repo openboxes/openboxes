@@ -403,7 +403,15 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
+										<td class="name"><label><warehouse:message code="inventoryLevel.binLocation.label"/></label></td>
+										<td class="value">
+											<g:textField name="binLocation" value="${inventoryLevelInstance?.binLocation }" size="20" class="text"/>
+										</td>
+									</tr>
+									
+									
+									<tr class="prop">
+										<td class="name"><label><warehouse:message code="inventoryLevel.minQuantity.label"/></label></td>
 										<td class="value">
 											<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>
 											<span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
@@ -413,6 +421,13 @@
 										<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
 										<td class="value">
 											<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>
+											<span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td class="name"><label><warehouse:message code="inventoryLevel.maxQuantity.label"/></label></td>
+										<td class="value">
+											<g:textField name="maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="10" class="text"/>
 											<span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
 										</td>
 									</tr>

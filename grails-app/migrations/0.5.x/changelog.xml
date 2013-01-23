@@ -19,4 +19,6 @@
     <include file="0.5.x/add-location_type-data.xml"/>
     <include file="0.5.x/add-location_role.xml"/>
     <include file="0.5.x/add-product-fields.xml"/>
+    <include file="0.5.x/add-inventory-level-max-quantity.xml"/>
+    <include file="0.5.x/add-inventory-level-bin-location.xml"/>
 </databaseChangeLog>

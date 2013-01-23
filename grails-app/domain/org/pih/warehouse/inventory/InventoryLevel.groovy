@@ -23,7 +23,9 @@ class InventoryLevel {
 	Integer reorderQuantity;		// Should reorder product when quantity falls below this value
 	//Integer lowQuantity;			// Should alert user when quantity is below this value (emergency)
 	//Integer idealQuantity;			// Should warn user when the quantity is below this value
-	//Integer maxQuantity;			// Should warn user when quantity is above this value
+	Integer maxQuantity;			// Should warn user when quantity is above this value
+	String binLocation
+	
 	
 	// Auditing
 	Date dateCreated;
@@ -43,6 +45,7 @@ class InventoryLevel {
 		reorderQuantity(nullable:true, range: 0..2147483646)
 		//lowQuantity(nullable:true)
 		//idealQuantity(nullable:true)
-		//maxQuantity(nullable:true)
+		maxQuantity(nullable:true, range: 0..2147483646)
+		binLocation(nullable:true)
 	}
 }

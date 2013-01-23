@@ -14,9 +14,12 @@ import org.pih.warehouse.shipping.ShipmentStatusCode;
 
 public enum InventoryStatus {
 
+	INACTIVE(0),
 	SUPPORTED(1),
 	SUPPORTED_NON_INVENTORY(2),
-	NOT_SUPPORTED(3)
+	NOT_SUPPORTED(3),
+	STOCK(4),
+	FORMULARY(5)
 	
 	int sortOrder
 
@@ -27,7 +30,7 @@ public enum InventoryStatus {
 	}
 	
 	static list() {
-		[ SUPPORTED, SUPPORTED_NON_INVENTORY, NOT_SUPPORTED ]
+		[ INACTIVE, SUPPORTED, SUPPORTED_NON_INVENTORY, NOT_SUPPORTED, STOCK, FORMULARY ]
 	}
 	
 	String toString() { return name() }
