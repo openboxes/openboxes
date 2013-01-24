@@ -171,6 +171,10 @@ class ProductGroupController {
         def productGroupInstance = ProductGroup.get(params.id)
         if (productGroupInstance) {
             try {
+				// Remove all products from the product group before deleting the product group 
+				productGroupInstance.products.each { product ->
+					productGroupInstance.removeFromProducts(product)
+				}
                 productGroupInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
                 redirect(action: "list")
