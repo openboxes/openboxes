@@ -50,7 +50,9 @@ grails.project.dependency.resolution = {
         test ('org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0')  { excludes "htmlunit" }
 		test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
-        test 'org.seleniumhq.selenium:selenium-support:2.25.0'
+        test 'org.seleniumhq.selenium:selenium-support:2.25.0'	
+		test 'dumbster:dumbster:1.6'
+	
 	}
 	plugins {
         runtime( ':constraints:0.6.0' )

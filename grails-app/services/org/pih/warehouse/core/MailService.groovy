@@ -65,7 +65,6 @@ class MailService {
 
 		
 	/**
-	 * 
 	 * @return
 	 */
 	def isMailEnabled() {  
@@ -77,31 +76,34 @@ class MailService {
 	}
 	
 	/**
-	 * 
 	 * @param subject
 	 * @param msg
 	 * @param to
 	 * @return
 	 */
 	def sendMail(String subject, String msg, String to) {
-		sendMail(subject, msg, [to])
+		sendMail(subject, msg, [to], null)
 	}
 	
 	/**
-	 * 
 	 * @param subject
 	 * @param msg
 	 * @param to
 	 * @return
 	 */
-	def sendMail(String subject, String msg, Collection to) {
+	def sendMail(String subject, String msg, Collection to, Integer port) {
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
 		if (isMailEnabled()) { 			
 			log.info "Sending text email '" + subject + "' to " + to; 
 			try { 
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
+				email.setCharset("UTF-8");
 				email.setHostName(host)				
+				
+				// override port
+				if (port) email.setSmtpPort(port)
+				
 				to.each { 
 					email.addTo(it) 
 				}
@@ -130,7 +132,7 @@ class MailService {
 	 */	
 	def sendHtmlMail(String subject, String htmlMessage, String [] to) { 
 		log.debug "Sending email to array " + to
-		sendHtmlMail(subject, htmlMessage, to)
+		sendHtmlMail(subject, htmlMessage, to, null)
 		
 	}
 	
@@ -144,18 +146,21 @@ class MailService {
 	 */
 	def sendHtmlMail(String subject, String htmlMessage, String to) {
 		log.debug "Sending email to '" + to + "'"
-		sendHtmlMail(subject, htmlMessage, [to])
+		sendHtmlMail(subject, htmlMessage, [to], null)
 	}
 	
-	
+	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) { 
+		log.debug "Sending email to '" + to + "'"
+		sendHtmlMail(subject, htmlMessage, [to], port)
+
+	}
 	/**
-	 * 
 	 * @param subject
 	 * @param body
 	 * @param to
 	 * @return
 	 */
-	def sendHtmlMail(String subject, String body, Collection to) { 	
+	def sendHtmlMail(String subject, String body, Collection to, Integer port) { 	
 		log.debug "Sending email to " + to
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
 		if (isMailEnabled()) { 		
@@ -163,6 +168,7 @@ class MailService {
 			try { 			
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
+				email.setCharset("UTF-8");
 				email.setHostName(host)
 				to.each { 
 					email.addTo(it) 
@@ -170,6 +176,7 @@ class MailService {
 				
 				//addBccAddresses(email)
 				email.setFrom(from)
+				if (port) email.setSmtpPort(port)
 				email.setSubject("${prefix} " + subject)		
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);
@@ -195,7 +202,7 @@ class MailService {
 	def sendHtmlMailWithAttachment(String to, String subject, String body, byte [] bytes, String name, String mimeType) {
 		def toList = new ArrayList();
 		toList.add(to)
-		sendHtmlMailWithAttachment(toList, subject, body, bytes, name, mimeType)
+		sendHtmlMailWithAttachment(toList, subject, body, bytes, name, mimeType, null)
 	}
 
 	/**
@@ -209,7 +216,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) { 
-		sendHtmlMailWithAttachment(userInstance?.email, subject, body, bytes, name, mimeType)
+		sendHtmlMailWithAttachment(userInstance?.email, subject, body, bytes, name, mimeType, null)
 	}	
 
 	/**
@@ -223,7 +230,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) {
-		sendHtmlMailWithAttachment(toList, [], subject, body, bytes, name, mimeType)		
+		sendHtmlMailWithAttachment(toList, [], subject, body, bytes, name, mimeType, null)		
 	}
 		
 	
@@ -238,7 +245,7 @@ class MailService {
 	 * @param mimeType
 	 * @return
 	 */
-	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) { 
+	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType, Integer port) { 
 		log.info ("Sending email with attachment " + toList)
 		
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
@@ -246,7 +253,11 @@ class MailService {
 			try {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
+				email.setCharset("UTF-8");
 				email.setHostName(host);
+				
+				// Override smtp port
+				if (port) email.setSmtpPort(port)
 				email.setFrom(from);
 				toList.each { to -> email.addTo(to) }
 				if (ccList) { 
@@ -292,6 +303,7 @@ class MailService {
 			log.info "Sending HTML email '" + subject;
 			try {
 				HtmlEmail email = new HtmlEmail();
+				email.setCharset("UTF-8");
 				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject)
 				// add more information to email
