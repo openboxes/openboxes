@@ -159,18 +159,26 @@ log4j = {
 		
         if (Boolean.parseBoolean(grails.mail.enabled.toString())) {		
 	        def smtpAppender
-
+			def conversionPattern = "Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
+				"%-5p%n" +
+				"Thread: [%t]%n" +
+				"Username: %X{username}%n" +
+				"Location: %X{location}%n" +
+				"IP Address: %X{ipAddress}  (whatismyipaddress.com/ip/%X{ipAddress})%n" +
+				"Request URI: %X{requestUri}%n" +
+				"Query String: %X{queryString}%n" +
+				"%c%n" +
+				"%C%nStacktrace:%n%m%n"
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication 
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
 				smtpAppender = new AlternateSMTPAppender(
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + "%d{[MMM-dd-yyyy HH:mm:ss.SSS]} %m",
+					subject: mail.error.subject + " %m",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
-					layout: pattern(conversionPattern:
-						'%d{[MMM-dd-yyyy HH:mm:ss.SSS]}[%t]%n%X{sessionId}%n%X{remoteAddr}%n%X{forwardedFor}%n%X{clientIp}%n%c%n%m%n'))
+					layout: pattern(conversionPattern: conversionPattern))
 			}
 			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
 			else if ("dynamic".equals(mail.error.appender)) { 
@@ -178,14 +186,13 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + "%d{[MMM-dd-yyyy HH:mm:ss.SSS]} %m",
+					subject: mail.error.subject + " %m",
 					threshold: Level.ERROR,				
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
 					//SMTPPassword: mail.error.password,
 					SMTPDebug: mail.error.debug,
-					layout: pattern(conversionPattern:
-						'%d{[MMM-dd-yyyy HH:mm:ss.SSS]}[%t]%n%X{sessionId}%n%X{remoteAddr}%n%X{forwardedFor}%n%X{clientIp}%n%c%n%m%n'))
+					layout: pattern(conversionPattern: conversionPattern))
 			}			
 			// Default SMTP error appender does not allow configurable subject line 
 			else { 				
@@ -193,15 +200,16 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " Error",
+					subject: mail.error.subject + " Error Occurred",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
 					SMTPDebug: mail.error.debug,
 					//SMTPPassword: mail.error.password,
-					layout: pattern(conversionPattern:
-						'%d{[MMM-dd-yyyy HH:mm:ss.SSS]}%n[%t]%n%-5p%n%X{sessionId}%n%X{remoteAddr}%n%X{forwardedFor}%n%X{clientIp}%n%c%n%C%n%m%n'))
+					layout: pattern(conversionPattern: conversionPattern))
 			} 
+			
+			// These are common attributes for each of the appenders
 			if (mail.error.server) smtpAppender.SMTPHost = mail.error.server
 			if (mail.error.username) smtpAppender.SMTPUsername = mail.error.username
 			if (mail.error.password) smtpAppender.SMTPPassword = mail.error.password

@@ -14,20 +14,24 @@ class LoggingFilters {
 	def filters = {
 		all(controller:'*', action:'*') {
 			before = {
+				
 				String sessionId = session?.user?.username//RequestContextHolder.getRequestAttributes()?.getSessionId()
 				//log.info "SessionID " + sessionId
-				MDC.put('sessionId', session?.user?.username?:"anonymous")
-				MDC.put('remoteAddr', request?.getRemoteAddr()?:"unknown")
-				MDC.put('forwardedFor', request?.getHeader("X-Forward-For")?:"unknown")
-				MDC.put('clientIp', request?.getHeader("Client-IP")?:"unknown")
+				MDC.put('username', session?.user?.username?:"Anonymous")
+				MDC.put('location', session?.warehouse?.name?:"No location")
+				MDC.put('ipAddress', request?.remoteAddr?:"No IP address")
+				MDC.put('requestUri', request?.queryString?:"No request URI")
+				MDC.put('queryString', request?.queryString?:"No query string")
 			}
 			after = {
 			}
 			afterView = {
-				MDC.remove('sessionId')
-				MDC.remove('remoteAddr')
-				MDC.remove('forwardedFor')
-				MDC.remove('clientIp')
+				MDC.remove('username')
+				MDC.remove('location')
+				MDC.remove('ipAddress')
+				MDC.remove('requestUri')
+				MDC.remove('queryString')
+				//MDC.remove('params')
 			}
 		}
 	}
