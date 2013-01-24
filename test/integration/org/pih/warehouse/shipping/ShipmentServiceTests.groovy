@@ -11,7 +11,7 @@ package org.pih.warehouse.shipping;
 
 import static org.junit.Assert.*;
 
-import grails.converters.deep.JSON;
+import grails.converters.JSON;
 import grails.test.*
 import grails.validation.ValidationException;
 
