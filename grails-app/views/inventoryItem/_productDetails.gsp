@@ -124,21 +124,7 @@
 					</span>
 				</td>
 			</tr>			
-			<tr class="prop">	
-				<td class="label">
-					<label><warehouse:message code="product.latestInventoryDate.label"/></label>
-				</td>
-				<td class="value">
-					<span class=""> 						
-						<g:if test="${latestInventoryDate}">
-							${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
-							<span class="fade">${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }</span>
-						</g:if> 
-						<g:else>
-							<span class="fade"><warehouse:message code="default.never.label" /></span>
-						</g:else>
-				</span></td>
-			</tr>					
+				
 			<tr class="prop">	
 				<td class="label">
 					<label><warehouse:message code="product.onHandQuantity.label"/></label>
@@ -159,17 +145,14 @@
 					</g:if>
 					<g:else>
 						<table>
-							<g:each var="productPackage" in="${productInstance?.packages?.sort { it?.uom?.sortOrder} }">
-								<tr>
-									<td>
-										<g:if test="${productPackage?.uom?.code != 'EA' }">~</g:if>
-									</td>
-										
+							<g:each var="productPackage" in="${productInstance?.packages }">
+								<tr>										
 									<td class="right">
 										<span class="">${productPackage?.uom?.code }/${productPackage.quantity }</span>
 									</td>
 									<td class="right">
 										<g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
+										<g:if test="${productPackage?.uom?.code != 'EA' }">~</g:if>
 										${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
 									</td>
 								</tr>
@@ -178,7 +161,21 @@
 					</g:else>
 				</td>
 			</tr>	
-			
+			<tr class="prop">	
+				<td class="label">
+					<label><warehouse:message code="product.latestInventoryDate.label"/></label>
+				</td>
+				<td class="value">
+					<span class=""> 						
+						<g:if test="${latestInventoryDate}">
+							${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
+							<span class="fade">${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }</span>
+						</g:if> 
+						<g:else>
+							<span class="fade"><warehouse:message code="default.never.label" /></span>
+						</g:else>
+				</span></td>
+			</tr>				
 			<tr class="prop">
 				<td class="label">
 					<label><warehouse:message code="inventoryLevel.minQuantity.label"/></label>
