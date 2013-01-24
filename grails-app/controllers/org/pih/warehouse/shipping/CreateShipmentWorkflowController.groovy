@@ -921,11 +921,12 @@ class CreateShipmentWorkflowController {
 	   if (!shipmentInstance.hasErrors()) {
 		   
 		   log.info("Create shipment flow " + createShipmentFlow)
+		   if (!userInstance) userInstance = User.get(session.user.id)
 		   def shipmentName = "${shipmentInstance.name}"
 		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
 		   def shipmentDate = "${formatDate(date:shipmentInstance?.actualShippingDate, format: 'MMMMM dd yyyy')}"
 		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName, shipmentDate])}"
-		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance])
+		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
 		   def toList = recipients?.collect { it?.email }?.unique()
 		   log.info("Mailing shipment emails to ${toList} ")
 		   		  

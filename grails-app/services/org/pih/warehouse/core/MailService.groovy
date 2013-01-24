@@ -152,8 +152,13 @@ class MailService {
 	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) { 
 		log.debug "Sending email to '" + to + "'"
 		sendHtmlMail(subject, htmlMessage, [to], port)
-
 	}
+	
+	
+	def sendHtmlMail(String subject, String body, Collection to) {
+		sendHtmlMail(subject, body, to, null)
+	}
+	
 	/**
 	 * @param subject
 	 * @param body
