@@ -30,7 +30,7 @@
 	            <div class="dialog box">
 					<g:form action="list" method="get">
 						<label><warehouse:message code="product.search.label"/></label>            
-						<g:textField name="q" size="45" value="${params.q }"/>					
+						<g:textField name="q" size="60" value="${params.q }" class="text"/>					
 						<button type="submit"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
 							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
@@ -41,20 +41,36 @@
             
                 <table>
                     <thead>
-                        <tr>                        
+                        <tr>
+                        	<th></th>                        
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                            <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" />
                             <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" />  
                             <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" />  
-                            <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" />
+                            <g:sortableColumn property="vendor" title="${warehouse.message(code: 'product.manufacturer.label')}" />  
+                            <g:sortableColumn property="vendorCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" />  
+                            <g:sortableColumn property="createdBy" title="${warehouse.message(code: 'default.createdBy.label')}" />
+                            <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" />
+                            <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'default.dateCreated.label')}" />
+                            <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" />
                         </tr>
                     </thead>
                     <tbody>
 	                    <g:each in="${productInstanceList}" status="i" var="productInstance">
 	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 								<td align="center">
+									<span title="${productInstance?.description }">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'information.png')}" class="middle" alt="Information" />
+									</span>
+								
+								</td>
+								<td align="center">
 									<g:link action="edit" id="${productInstance.id}">
 										<format:product product="${productInstance}"/>
 									</g:link>
+								</td>
+								<td align="center">
+									<format:category category="${productInstance?.category }"/>
 								</td>
 								<td align="center">
 									${productInstance?.manufacturer }
@@ -63,7 +79,22 @@
 									${productInstance?.manufacturerCode }
 								</td>
 								<td align="center">
-									<format:category category="${productInstance?.category }"/>
+									${productInstance?.vendor }
+								</td>
+								<td align="center">
+									${productInstance?.vendorCode }
+								</td>
+								<td align="center">
+									${productInstance?.createdBy }
+								</td>
+								<td align="center">
+									${productInstance?.updatedBy }
+								</td>
+								<td align="center">
+									${productInstance?.dateCreated }
+								</td>
+								<td align="center">
+									${productInstance?.lastUpdated }
 								</td>
 	                        </tr>
 	                    </g:each>

@@ -79,7 +79,7 @@
 							<g:set var="styleClass" value="color: red;"/>																	
 						</g:if>
 						<span style="${styleClass}">${g.formatNumber(number: itemQuantity, format: '###,###,###') }</span>
-						<span class="fade">
+						<span class="">
 							<g:if test="${productInstance?.unitOfMeasure }">
 								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 							</g:if>
@@ -126,7 +126,7 @@
 						<g:set var="styleClass" value="color: red;"/>																	
 					</g:if>														
 					<span style="${styleClass }" id="totalQuantity">${g.formatNumber(number: commandInstance.totalQuantity, format: '###,###,###') }</span>
-					<span class="fade">
+					<span class="">
 						<g:if test="${productInstance?.unitOfMeasure }">
 							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 						</g:if>

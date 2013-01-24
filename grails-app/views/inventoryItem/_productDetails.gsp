@@ -1,6 +1,4 @@
-
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-
 <div id="product-details">
 	<g:if test="${productInstance?.images}">	
 		<table class="box">
@@ -56,7 +54,6 @@
 		</table>
 	</g:if>
 	<g:if test="${productInstance?.tags }">
-		<br/>
 		<table class="box">
 			<tbody>
 				<tr class="odd">
@@ -147,17 +144,38 @@
 					<label><warehouse:message code="product.onHandQuantity.label"/></label>
 				</td>
 				<td class="value">
-					<span class="">
-						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
-						<span class="fade">
-							<g:if test="${productInstance?.unitOfMeasure }">
-								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-							</g:if>
-							<g:else>
-								${warehouse.message(code:'default.each.label') }
-							</g:else>
-						</span>
-					</span>
+					<g:if test="${!productInstance?.packages }">
+						<div class="">
+							${g.formatNumber(number: totalQuantity, format: '###,###,###') }
+							<span class="">
+								<g:if test="${productInstance?.unitOfMeasure }">
+									<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+								</g:if>
+								<g:else>
+									${warehouse.message(code:'default.each.label') }
+								</g:else>
+							</span>
+						</div>
+					</g:if>
+					<g:else>
+						<table>
+							<g:each var="productPackage" in="${productInstance?.packages?.sort { it?.uom?.sortOrder} }">
+								<tr>
+									<td>
+										<g:if test="${productPackage?.uom?.code != 'EA' }">~</g:if>
+									</td>
+										
+									<td class="right">
+										<span class="">${productPackage?.uom?.code }/${productPackage.quantity }</span>
+									</td>
+									<td class="right">
+										<g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
+										${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
+									</td>
+								</tr>
+							</g:each>
+						</table>
+					</g:else>
 				</td>
 			</tr>	
 			
@@ -168,7 +186,7 @@
 				<td class="value">
 					<g:if test="${inventoryLevelInstance?.minQuantity}">
 						${inventoryLevelInstance?.minQuantity?:'' }
-						<span class="fade">
+						<span class="">
 							<g:if test="${productInstance?.unitOfMeasure }">
 								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 							</g:if>
@@ -184,12 +202,26 @@
 			</tr>
 			<tr class="prop">
 				<td class="label">
+					<label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
+				</td>
+				<td class="value">
+					<g:if test="${inventoryLevelInstance?.binLocation}">
+						${inventoryLevelInstance?.binLocation?:'' }
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>				
+			</tr>			
+			
+			<tr class="prop">
+				<td class="label">
 					<label><warehouse:message code="inventoryLevel.maxQuantity.label"/></label>
 				</td>
 				<td class="value">
 					<g:if test="${inventoryLevelInstance?.maxQuantity}">
 						${inventoryLevelInstance?.maxQuantity?:'' }
-						<span class="fade">
+						<span class="">
 							<g:if test="${productInstance?.unitOfMeasure }">
 								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 							</g:if>
@@ -211,7 +243,7 @@
 					
 					<g:if test="${inventoryLevelInstance?.reorderQuantity}">
 						${inventoryLevelInstance?.reorderQuantity?:'' }
-						<span class="fade">
+						<span class="">
 							<g:if test="${productInstance?.unitOfMeasure }">
 								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 							</g:if>
