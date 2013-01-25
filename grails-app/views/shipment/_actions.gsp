@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <!-- Only allow the originating warehouse to edit the shipment -->
-<span id="shipment-action-menu" class="action-menu" >
+<div id="shipment-action-menu" class="action-menu" >
 	<button class="action-btn">
 		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
@@ -192,4 +192,4 @@
 			</div>
 		</g:if>
 	</div>
-</span>
+</div>

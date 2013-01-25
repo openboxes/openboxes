@@ -51,6 +51,7 @@ button.action-btn, button.previous, button.next {
 }
 
 .action-btn { 
+	width: 39px;
 	margin: 1px;
 }
 #banner { 
@@ -1455,5 +1456,3 @@ span.tooltip {
       text-shadow: rgba(0, 0, 0, 0.0980392) 1px 1px 1px;
       box-shadow: rgba(0, 0, 0, 0.0980392) 1px 1px 2px 0px;
 }
-
-

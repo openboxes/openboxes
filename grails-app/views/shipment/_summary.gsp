@@ -7,7 +7,7 @@
 						<g:render template="../shipment/actions" />
 					</div> 
 				</td>
-				<td style="width: 20px; vertical-align: middle;">				
+				<td style="width: 25px; " class="top center">				
 					<g:if test="${shipmentInstance?.shipmentType }">
 						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />					
@@ -21,7 +21,7 @@
 					<div>
 						<span class="title" style="vertical-align: middle">
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
-							${shipmentInstance?.name}
+								${shipmentInstance?.name}
 							</g:link>
 						</span>							
 					</div>
