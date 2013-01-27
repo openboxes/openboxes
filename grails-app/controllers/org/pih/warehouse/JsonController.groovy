@@ -32,7 +32,17 @@ class JsonController {
 	def localizationService	
 	def shipmentService
 	
+	def findTags = {
+		def searchTerm = "%" + params.term + "%";
+		def c = Tag.createCriteria()
+		def tags = c.list {
+			projections { property "tag" }
+			ilike("tag", searchTerm)
+		}
 
+		def results = tags.unique().collect { [ value: it, label: it ] }
+		render results as JSON;
+	}
 
 	def autoSuggest = {		
 		println params
