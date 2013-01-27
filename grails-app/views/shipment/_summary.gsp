@@ -1,13 +1,13 @@
 
-	<table style="width: 0%" id="shipmentSummary">
+	<table id="shipmentSummary">
 		<tbody>			
 			<tr>
-				<td>
+				<td width="1%">
 					<div>
 						<g:render template="../shipment/actions" />
 					</div> 
 				</td>
-				<td style="width: 25px; " class="top center">				
+				<td style="width: 1%" class="top center">				
 					<g:if test="${shipmentInstance?.shipmentType }">
 						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />					
@@ -20,11 +20,13 @@
 				<td>
 					<div>
 						<span class="title" style="vertical-align: middle">
+							${shipmentInstance?.shipmentNumber}
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
 								${shipmentInstance?.name}
 							</g:link>
 						</span>							
 					</div>
+				
 					<div>
 						<g:if test="${shipmentInstance?.shipmentType }">
 							<span class="shipmentType">
@@ -85,16 +87,11 @@
 				</td>	
 									
 				<td style="text-align: right;">
-					<div class="fade" style="font-weight: bold; font-size:1.5em;">
-						<%-- 
-						<img src="${createLinkTo(dir:'images/icons/eventStatus',file: shipmentInstance?.status?.name?.toLowerCase() + '.png')}"
-								alt="${shipmentInstance?.status?.name}" style="vertical-align: middle"/>							
+					<div class="title">
 						${shipmentInstance?.status?.name}
-								--%>
 					</div>
-					
-					
 				</td>
+				
 			</tr>
 		</tbody>
 	</table>

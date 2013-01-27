@@ -30,7 +30,7 @@
 	    			
 	    			<tbody>
 						<tr class="even">
-							<td class="center">
+							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry.png')}" class="middle"/>
 							</td>
 							<td>
@@ -45,7 +45,7 @@
 							</td>
 						</tr>	
 						<tr class="odd prop">
-							<td class="center">
+							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_start.png')}" class="middle"/>
 							</td>
 						

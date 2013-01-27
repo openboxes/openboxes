@@ -5,6 +5,8 @@
         <title>${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</content>
+	    <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+		
     </head>
     <body>        
 		<div class="body">		
@@ -36,6 +38,7 @@
 				</table>
 	    	</div>
 		</div>
+		
     </body>
 </html>
 

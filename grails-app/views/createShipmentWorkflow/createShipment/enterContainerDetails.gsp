@@ -329,7 +329,7 @@
 														</td>
 														<td class="left middle">
 															<span class="draggable draghandle" shipmentItem="${shipmentItem?.id }">
-																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out.png')}" class="middle"/>
+																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
 																&nbsp;
 																${shipmentItem?.quantity} 
 																${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}

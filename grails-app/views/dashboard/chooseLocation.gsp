@@ -53,9 +53,10 @@
 						<div style="max-height: 300px; overflow: auto;">
 							<table>
 								<tbody>
+									<g:set var="count" value="${0 }"/>
 									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
 									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
-										<tr class="prop">
+										<tr class="${count++%2?'even':'odd' }">
 											<td class="top right" width="25%">			
 												<label>${entry.key?:warehouse.message(code:'default.none.label') }</label>
 											</td>
@@ -63,7 +64,7 @@
 												<div class="button-group">
 													<g:set var="locationGroup" value="${entry.key }"/>
 													<g:each var="warehouse" in="${entry.value }" status="status">
-														<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
+														<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button">
 															${warehouse.name}
 														</a>
 													</g:each>
@@ -72,14 +73,14 @@
 											</td>
 										</tr>										
 									</g:each>
-									<tr class="prop">
+									<tr class="${count++%2?'even':'odd' }">
 										<td class="top right">
 											<label>${warehouse.message(code: 'default.others.label', default: 'Others')}</label>
 										</td>
 										<td>
 											<div class="button-group">											
 												<g:each var="warehouse" in="${nullLocationGroup }" status="status">
-													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
+													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button">
 														${warehouse.name}
 													</a>
 												</g:each>

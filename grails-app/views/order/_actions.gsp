@@ -1,7 +1,6 @@
 <g:if test="${orderInstance?.id }">
 	<span id="shipment-action-menu" class="action-menu">
 		<button class="action-btn">
-			<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		

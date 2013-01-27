@@ -1,6 +1,9 @@
-<fieldset>
+
 	<div id="showLotNumbers" class="list">	
-		<g:form controller="inventoryItem" action="create">	
+			<g:form controller="inventoryItem" action="create">	
+						
+			
+		
 			<table>
 				<thead>
 					<tr class="odd">
@@ -36,10 +39,9 @@
 							.selected-row { background-color: lightyellow; } 
 						</style>			
 						<tr class="${styleClass} prop">
-							<td class="middle center" nowrap="nowrap">
+							<td class="middle center" nowrap="nowrap" style="width: 1%;">
 								<div class="action-menu">
 									<button class="action-btn">
-										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
 										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 									</button>
 									<div class="actions left">
@@ -66,7 +68,9 @@
 								<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
 								</g:link>
 								<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
+									<span class="lotNumber">
 									${itemInstance?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.message"/></span>' }							
+									</span>
 								</g:link>
 							</td>														
 							<td class="top">
@@ -100,25 +104,32 @@
 						</tr>
 												
 					</g:each>
+						<g:isUserManager>
+							<tr>
+								<td>	
+									
+								</td>
+								<td>
+									<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+									<g:textField name="lotNumber" class="text" />
+								</td>
+								<td>
+									<g:set var="yearStart" value="${new Date().format('yyyy')as int}"/>
+									<g:set var="yearEnd" value="${2020}"/>
+									<g:datePicker name="expirationDate" precision="month" noSelection="['null':'']" value=""
+										years="${yearStart..yearEnd }"/>						
+								</td>
+								<td class="center">
+									<button class="button icon add">
+										<warehouse:message code="default.button.add.label"/>
+									</button>						
+								</td>
+							</tr>
+						</g:isUserManager>						
+					
 				</tbody>
 				<g:if test="${commandInstance?.lotNumberList}">
 					<tfoot>
-            <g:isUserManager>
-              <tr class="odd">
-                <td class="middle center">
-                  <img src="${resource(dir: 'images/icons/silk', file: 'new.png')}" style="vertical-align: middle;"/>
-                </td>
-                <td colspan="4">
-                  <g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-                  <g:textField name="lotNumber"/>
-                  <g:datePicker name="expirationDate" precision="month" noSelection="['null':'']" value=""/>						
-                  <button class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/>
-                    <warehouse:message code="default.button.save.label"/>
-                  </button>						
-                </td>
-              </tr>
-            </g:isUserManager>
 						<tr>
 							<td colspan="2">
 								<label>
@@ -143,14 +154,15 @@
 						</tr>
 					</tfoot>
 				</g:if>
-			</table>			
-		</g:form>		
+			</table>		
+		</g:form>	
+				
 	</div>	
-</fieldset>
+
 
 <div class="list">
 	<g:if test="${transactionEntries }">
-		<h4>${warehouse.message(code: 'inventory.lotNumber.label') } ${inventoryItem?.lotNumber} &rsaquo; ${warehouse.message(code: 'transaction.transactionEntries.label') }</h4>
+		<h3>${warehouse.message(code: 'transaction.transactionEntries.label') } &rsaquo; <span class="lotNumber">${inventoryItem?.lotNumber}</span></h3>
 		<div>
 			<table>
 				<tbody>
@@ -161,10 +173,16 @@
 									<thead>
 										<tr>
 											<th>
-												${warehouse.message(code: 'transaction.transactionType.label') }
+												${warehouse.message(code: 'transaction.transactionDate.label') }
 											</th>
 											<th>
-												${warehouse.message(code: 'transaction.transactionDate.label') }
+												${warehouse.message(code: 'default.time.label') }
+											</th>
+											<th>
+												${warehouse.message(code: 'transaction.transactionNumber.label') }
+											</th>
+											<th>
+												${warehouse.message(code: 'transaction.transactionType.label') }
 											</th>
 											<th>
 												${warehouse.message(code: 'default.quantity.label') }
@@ -178,18 +196,24 @@
 										<g:each var="transactionEntry" in="${transactionEntries }" status="j">
 											<tr class="${j%2?'even':'odd' }">
 												<td>
-													<format:date obj="${transactionEntry.transaction?.transactionDate}"/>
+													<g:formatDate obj="${transactionEntry.transaction?.transactionDate}" format="MMMMM dd yyyy"/>
+												</td>
+												<td>
+													<g:formatDate date="${transactionEntry.transaction?.transactionDate}" format="hh:mm:ss"/>
 												</td>
 												<td>
 													<g:link controller="inventory" action="editTransaction" id="${transactionEntry?.transaction?.id }">
-														<format:metadata obj="${transactionEntry.transaction?.transactionType }"/>
+														${transactionEntry?.transaction?.transactionNumber?:transactionEntry?.transaction?.id }
 													</g:link>
+												</td>
+												<td>
+													<format:metadata obj="${transactionEntry.transaction?.transactionType }"/>												
 												</td>
 												<td>
 													${transactionEntry?.quantity }
 												</td>						
 												<td>
-													${transactionEntry?.transaction?.dateCreated }
+													<format:datetime obj="${transactionEntry?.transaction?.dateCreated }"/>
 												</td>						
 											</tr>
 										</g:each>

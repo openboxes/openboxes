@@ -6,6 +6,9 @@
 					${warehouse.message(code: 'default.actions.label')}
 				</th>
 				<th>
+					${warehouse.message(code: 'shipping.shipmentNumber.label')}
+				</th>
+				<th>
 					${warehouse.message(code: 'shipping.shipmentType.label')}
 				</th>
 				<th>
@@ -35,11 +38,15 @@
 		<tbody>
 			<tr class="odd">
 				<td></td>
-				<td colspan="2"><g:select name="shipmentType" class="filter"
+				<td></td>
+				<td colspan="1"><g:select name="shipmentType" class="filter"
 						from="${org.pih.warehouse.shipping.ShipmentType.list()}"
 						optionKey="id" optionValue="${{format.metadata(obj:it)}}"
 						value="${shipmentType}"
 						noSelection="['':warehouse.message(code:'default.all.label')]" />
+				</td>
+				<td>
+			
 				</td>
 				<td><g:if test="${incoming}">
 						<g:select name="origin" class="filter"
@@ -93,8 +100,6 @@
 							<div class="action-menu">
 								<button class="action-btn">
 									<img
-										src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
-									<img
 										src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 								</button>
 								<div class="actions" style="position: absolute; display: none;">
@@ -102,6 +107,9 @@
 										model="[shipmentInstance:shipmentInstance]" />
 								</div>
 							</div>
+						</td>
+						<td class="center">
+							${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 						</td>
 						<td class="left"><img
 							src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"

@@ -1,13 +1,5 @@
 <%@page import="org.pih.warehouse.core.ActivityCode"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
-<style>
-	
-	.menu-subheading { 
-		font-weight: bold;
-		padding-bottom: 5px;
-		display: block;
-	}
-</style>
 <ul class="megamenu">
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 	
