@@ -36,7 +36,7 @@ import org.pih.warehouse.core.Constants
  *  
  */
 class Transaction implements Comparable, Serializable {
-
+	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
 	}
@@ -50,9 +50,9 @@ class Transaction implements Comparable, Serializable {
 	Date transactionDate	    		// Date entered into the warehouse
 	Shipment outgoingShipment			// Outgoing shipment associated with a transfer out transasction
 	Shipment incomingShipment			// Incoming shipment associated with a transfer in transasction
+	String transactionNumber
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
 	String comment
-	
 	
 	// Auditing fields
 	Boolean confirmed = Boolean.FALSE;	// Transactions need to be confirmed by a supervisor
@@ -71,6 +71,7 @@ class Transaction implements Comparable, Serializable {
 
 	static mapping = { 
 		id generator: 'uuid'
+		cache true
 	}
 	
 	// Transient attributs
@@ -79,6 +80,7 @@ class Transaction implements Comparable, Serializable {
     // Constraints 
     static constraints = {
 	    transactionType(nullable:false)
+	    transactionNumber(nullable:true, unique: true)
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
 		outgoingShipment(nullable:true)
@@ -106,10 +108,11 @@ class Transaction implements Comparable, Serializable {
 							return true 
 						})
     }
-	
+	/*
 	String transactionNumber() {
 		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new transaction)";
 	}
+	*/
 		
     
     /**
