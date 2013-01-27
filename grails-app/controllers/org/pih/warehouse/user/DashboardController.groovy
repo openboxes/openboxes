@@ -32,6 +32,23 @@ class DashboardController {
 	def productService 
     
 	
+	def globalSearch = { 
+		
+		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
+		if (transaction) { 
+			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
+		}
+		
+		def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
+		if (product) {
+			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
+		}
+
+		redirect(controller: "inventory", action: "browse", params:params)
+			
+	}
+	
+	
 	def index = {
 		if (!session.warehouse) {		
 			log.info "Location not selected, redirect to chooseLocation"	
@@ -68,7 +85,7 @@ class DashboardController {
 			def activityType = "dashboard.activity.shipped.label"
 			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
 			activityList << new DashboardActivityCommand(
-				type: "arrow_right",
+				type: "lorry_go",
 				label: activityType,
 				url: link,
 				dateCreated: it.dateCreated,
@@ -81,7 +98,7 @@ class DashboardController {
 			def activityType = "dashboard.activity.received.label"
 			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
 			activityList << new DashboardActivityCommand(
-				type: "arrow_left",
+				type: "lorry_stop",
 				label: activityType,
 				url: link,
 				dateCreated: it.dateCreated,
@@ -118,7 +135,7 @@ class DashboardController {
 				def label = LocalizationUtil.getLocalizedString(it)
 				def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
 				activityList << new DashboardActivityCommand(
-					type: "table",
+					type: "arrow_switch_bluegreen",
 					label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
 					url: link,
 					dateCreated: it.dateCreated,

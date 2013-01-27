@@ -1,5 +1,5 @@
 <span>
-	<g:form method="GET" controller="inventory" action="browse" style="display: inline;">
+	<g:form method="GET" controller="dashboard" action="globalSearch" style="display: inline;">
 		<g:textField id="${attrs.id}" name="searchTerms" class="${attrs.cssClass}" type="text" size="${attrs.size}"
 			value="${attrs.value}" style="width: ${attrs.width}px; display: ${attrs.display};"/> 	
 		<g:hiddenField name="resetSearch" value="${true }"/>							
