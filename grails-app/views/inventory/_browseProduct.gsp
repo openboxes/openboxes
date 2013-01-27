@@ -1,9 +1,21 @@
 <tr class="${counter%2==0?'even':'odd' } ${cssClass}">
 	<td>
+		<g:if test="${inventoryItem?.product?.images }">
+			<div class="nailthumb-container">
+				<g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
+				<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" />		
+			</div>
+		</g:if>
+		<g:else>
+			<div class="nailthumb-container">
+				<img src="${resource(dir: 'images', file: 'default-product.png')}" />		
+			</div>
+		</g:else>
+	</td>
+	<td>
 		<div class="action-menu hover">
 			<button class="action-btn">
-				<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}"
-					style="vertical-align: middle" /> <img
+				<img
 					src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
 					style="vertical-align: middle" />
 			</button>
@@ -46,7 +58,7 @@
 	</td>
 	<td class="checkable middle">			
 		<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-			<span title="${inventoryItem?.product?.description }">				
+			<span title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">				
 				<g:if test="${inventoryItem?.product?.name?.trim()}">
 					${inventoryItem?.product?.name}
 				</g:if>
@@ -54,7 +66,7 @@
 					<warehouse:message code="product.untitled.label"/>
 				</g:else>
 			</span>
-		</g:link> 
+		</g:link>	
 	</td>
 	<td class="checkable middle left">
 		<span class="fade">${inventoryItem?.product?.manufacturer }</span>

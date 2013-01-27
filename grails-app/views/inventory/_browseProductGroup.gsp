@@ -1,4 +1,9 @@
 <tr class="hasRelated ${counter%2==0?'even':'odd' } ${cssClass}" id="productGroup-${inventoryItem?.productGroup?.id }">
+	<td>
+		<div class="nailthumb-container">
+			<img src="${resource(dir: 'images', file: 'default-product.png')}" />		
+		</div>
+	</td>
 	<%-- 
 	<td class="middle center">
 		<g:checkBox id="${inventoryItem?.productGroup?.id }" name="productGroup.id" 
@@ -13,8 +18,7 @@
 		--%>
 		<span class="action-menu">
 			<button class="action-btn">
-				<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}"
-					style="vertical-align: middle" /> <img
+				<img
 					src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
 					style="vertical-align: middle" />
 			</button>

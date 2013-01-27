@@ -6,6 +6,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title>Browse inventory</title>
+		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.popover',file:'jquery.popover.css')}" type="text/css" media="screen, projection" />    
+		<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+    	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     </head>    
     <body>
         <div class="body">
@@ -30,6 +33,7 @@
 			       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 							</td>
 							<td style="padding:0;margin:0">
+														
 					         	<table>
 									<tr>
 						         		<td style="padding:0;margin:0">
@@ -60,6 +64,9 @@
 										                <table id="inventory-browser-table" class="tableScroll" border="0"> 
 															<thead> 
 									           					<tr>
+									           						<th>
+									           						
+									           						</th>
 									           						<th style="width: 50px;" class="middle">
 									           						
 									           						</th>
@@ -99,7 +106,7 @@
                                                                         <g:set var="category" value="${entry.key }"/>
                                                                         <g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
                                                                         <tr class="category-header">
-                                                                            <td colspan="10" style="padding:0; margin:0;">
+                                                                            <td colspan="11" style="padding:0; margin:0;">
                                                                                 <span class="fade">
                                                                                     <h2 style="border-top: 2px solid lightgrey;">
                                                                                         <%--
@@ -145,6 +152,9 @@
 															</g:else>
 															<tfoot>
 																<tr>
+																	<td>
+																	
+																	</td>
 																	<td colspan="4" class="left middle">
 																		<g:render template="./actions" model="[]"/>
 																	</td>			
@@ -181,12 +191,9 @@
 				</div>
 			</div>
 		</div>
-		
-		
 		<script>
 			$(document).ready(function() {
 				//$('.tableScroll').tableScroll({height: 400, width: '99%'});
-
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();
 				});
@@ -236,6 +243,12 @@
 		    		$(".productGroup-"+event.target.id).toggle();
 					
 		    	});
+
+		    	$('.nailthumb-container').nailthumb({
+					width : 20,
+					height : 20
+				});
+		    	
 			});	
 		</script>
     </body>
