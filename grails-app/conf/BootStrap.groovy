@@ -7,27 +7,35 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-import liquibase.Liquibase;
-import liquibase.database.DatabaseFactory;
+import grails.util.Environment
+
 import javax.sql.DataSource
-import grails.util.Environment;
-import org.pih.warehouse.product.*
-import org.pih.warehouse.requisition.*
-import org.pih.warehouse.picklist.*
-import org.pih.warehouse.inventory.TransactionEntry
+
+import liquibase.Liquibase
+import liquibase.database.DatabaseFactory
+
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.picklist.*
+import org.pih.warehouse.product.*
+import org.pih.warehouse.requisition.*
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 
 
 class BootStrap {
 
+	def shipmentService
+	def productService
+	
 	DataSource dataSource;
 	
 	def init = { servletContext ->
@@ -91,6 +99,12 @@ class BootStrap {
 		log.info("Finished running liquibase changelog(s)!")
 
 		insertTestFixture()
+		
+		assignProductIdentifiers()
+		assignShipmentIdentifiers()
+		assignOrderIdentifiers()
+		assignRequisitionIdentifiers()
+		assignTransactionIdentifiers()
 	}		
 		
 				
@@ -222,6 +236,57 @@ class BootStrap {
 
 
     }
+	 
+	void assignShipmentIdentifiers() { 		
+		def shipments = Shipment.findAll("from Shipment as s where shipmentNumber is null or shipmentNumber = ''")
+		shipments.each { shipment ->
+			shipment.shipmentNumber = productService.generateIdentifier("NNNLLL")
+			shipment.save()
+		}
+		
+		//def shipments = Shipment.list()
+		//shipments.each { 
+		//	shipment.shipmentNumber
+		//} 
+		
+	}
+	
+	void assignRequisitionIdentifiers() {	
+		def requisitions = Requisition.findAll("from Requisition as r where requestNumber is null or requestNumber = ''")
+		requisitions.each { requisition ->
+			requisition.requestNumber = productService.generateIdentifier("NNNLLL")
+			requisition.save()
+		}
+
+	}
+	
+	void assignOrderIdentifiers() {
+		def orders = Order.findAll("from Order as o where orderNumber is null or orderNumber = ''")
+		orders.each { order ->
+			order.orderNumber = productService.generateIdentifier("NNNLLL")
+			order.save()
+		}
+	}
+	void assignTransactionIdentifiers() {
+		def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
+		transactions.each { transaction ->
+			transaction.transactionNumber = productService.generateIdentifier("AAA-AAA-AAA")
+			transaction.save()
+		}
+
+	}
+
+	void assignProductIdentifiers() {
+		try { 
+			def products = Product.findAll("from Product as p where productCode is null or productCode = ''")			
+			products.each { product -> 
+				product.productCode = productService.generateIdentifier("LLNN")
+				product.save()			
+			}
+		} catch(Exception e) { 
+			log.error("Unable to assign product identifier ", e)
+		}
+	}
 
 
     private def addInventoryItem(product, expirationDate, quantity){
