@@ -5,19 +5,17 @@
 		<div id="banner">
 		    <div id="bannerLeft" class="yui-u first" >
 				<div class="logo" >					
-					<g:if test="${session?.warehouse?.logo }">
-						<a class="home" href="${createLink(uri: '/dashboard/index')}">	
+					<a class="home" href="${createLink(uri: '/dashboard/index')}">	
+						<g:if test="${session?.warehouse?.logo }">
 							<img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
-						</a>						
-					</g:if>
-					<g:else>
-					    <a class="home" href="${createLink(uri: '/dashboard/index')}">						    	
+						</g:if>
+						<g:else>
 				    		<img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="top"/>
 			    			<span class="top">
 								<warehouse:message code="default.openboxes.label"/>
 							</span>
-					    </a>
-					</g:else>
+						</g:else>
+					</a>
 				</div>
 		    </div>
 		    
@@ -86,28 +84,39 @@
 													</g:isUserNotInRole>
 													<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
 														<div style="height: 300px; overflow: auto;">
-															<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
-															<g:each var="entry" in="${session.loginLocationsMap}" status="i">																
-																<h3>${entry.key }</h3>
-																<div class="button-group">
-																<g:each var="warehouse" in="${entry.value }">
-																	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-																	<a class="button icon pin" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-																		${warehouse.name}
-																	</a> 
-																</g:each>
-																</div>
-															</g:each>		
-															
-															<h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-															<div class="button-group">											
-																<g:each var="warehouse" in="${nullLocationGroup }" status="status">
-																	<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button icon pin">
-																		${warehouse.name}
-																	</a>
-																</g:each>
-															</div>															
-																														
+															<table>
+																<g:set var="count" value="${0 }"/>
+																<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
+																<g:each var="entry" in="${session.loginLocationsMap}" status="i">
+																	<tr class="${count++%2?'even':'odd' }">																
+																		<td><h3>${entry.key }</h3></td>
+																		<td>
+																			<div class="button-group">
+																				<g:each var="warehouse" in="${entry.value }">
+																					<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+																					<a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+																						${warehouse.name}
+																					</a> 
+																				</g:each>
+																			</div>
+																		</td>
+																	</tr>
+																</g:each>		
+																	<tr class="${count++%2?'even':'odd' }">																
+																		<td>
+																			<h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
+																		</td>
+																		<td>
+																			<div class="button-group">											
+																				<g:each var="warehouse" in="${nullLocationGroup }" status="status">
+																					<a class="button" id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}'>
+																						${warehouse.name}
+																					</a>
+																				</g:each>
+																			</div>
+																		</td>															
+																	</tr>
+																</table>		
 															<%-- 
 															<div class="prop">
 																<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/> 

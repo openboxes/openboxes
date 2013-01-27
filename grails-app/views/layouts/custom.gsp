@@ -11,14 +11,17 @@
 	
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there is a slight distinction between these two ... need to figure out what that distinction is -->
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection, print" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection, print" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection, print" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection, print" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection, print" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection, print" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="screen, projection, print" />
-
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="all" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="all" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="all" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="all" />	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="all" />	
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
+	<!--  
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="all" />
+	--> 
+	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 
@@ -27,40 +30,9 @@
 	<jqui:resources />
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 
-	<!-- Include other plugins -->
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.cookie/', file:'jquery.cookie.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.tmpl/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
-
-    <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> <!--headless driver throw error when using watermark-->
-	</g:if>
-    <g:else>
-        <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
-    </g:else>
-
-	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
-	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>	
-	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.expand/', file:'expand.js')}" type="text/javascript" ></script>
-	
-	<!-- File upload 
-	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.fileupload.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.iframe-transport.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.fileupload/vendor/', file:'jquery.ui.widget.js')}" type="text/javascript" ></script>
-	-->
-	<script src="http://jquery-option-tree.googlecode.com/files/jquery.optionTree.js" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.mcdropdown/', file:'jquery.mcdropdown.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
 
   		
- 	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
+ 	<!-- Include Jquery Validation and Jquery Validation UI plugins --> 
  	<jqval:resources />       
     <jqvalui:resources />
 
@@ -73,8 +45,8 @@
     <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
     <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
 	--%>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="all" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 	
   <!-- jquery validation messages -->
   <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
@@ -222,6 +194,37 @@
 	<div id="ft" role="contentinfo">
 		<g:render template="/common/footer" />
 	</div>
+	
+	<!-- Include other plugins -->
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.cookie/', file:'jquery.cookie.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.tmpl/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>	
+    <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> 
+    	<!--headless driver throw error when using watermark-->
+	</g:if>
+    <g:else>
+        <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+    </g:else>
+	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>	
+	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
+	<!-- 
+	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
+	<script src="${createLinkTo(dir:'js/jquery.expand/', file:'expand.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.fileupload.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.iframe-transport.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.fileupload/vendor/', file:'jquery.ui.widget.js')}" type="text/javascript" ></script>
+	<script src="http://jquery-option-tree.googlecode.com/files/jquery.optionTree.js" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.mcdropdown/', file:'jquery.mcdropdown.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
+	-->	
+	
 	<script type="text/javascript">
 
 	
@@ -236,9 +239,6 @@
 				}
 			});
 			*/
-
-					
-		
 			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 		
 			<g:if test="${session.useDebugLocale}">
