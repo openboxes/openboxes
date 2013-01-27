@@ -145,18 +145,20 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMail(String subject, String htmlMessage, String to) {
-		log.debug "Sending email to '" + to + "'"
-		sendHtmlMail(subject, htmlMessage, [to], null)
+		sendHtmlMail(subject, htmlMessage, [to], null, false)
 	}
 	
 	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) { 
-		log.debug "Sending email to '" + to + "'"
-		sendHtmlMail(subject, htmlMessage, [to], port)
+		sendHtmlMail(subject, htmlMessage, [to], port, false)
 	}
-	
+
+	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port, Boolean override) {
+		sendHtmlMail(subject, htmlMessage, [to], port, override)
+	}
+
 	
 	def sendHtmlMail(String subject, String body, Collection to) {
-		sendHtmlMail(subject, body, to, null)
+		sendHtmlMail(subject, body, to, null, false)
 	}
 	
 	/**
@@ -165,10 +167,10 @@ class MailService {
 	 * @param to
 	 * @return
 	 */
-	def sendHtmlMail(String subject, String body, Collection to, Integer port) { 	
+	def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) { 	
 		log.debug "Sending email to " + to
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
-		if (isMailEnabled()) { 		
+		if (isMailEnabled() || override) { 		
 			log.info "Sending html email '" + subject + "' to " + to; 
 			try { 			
 				// Create the email message

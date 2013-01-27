@@ -16,7 +16,7 @@ class MailServiceTests extends GroovyTestCase{
 		def body = "The Véhicule shipment 'Soduim Chloride 0,9% for Boucan Carre' has been shipped on January 23 2013."
 				
 		//mailService.sendMail("[Text]" + subject, body, "justin.miranda@gmail.com")
-		mailService.sendHtmlMail("[Html]" + subject, body, "jmiranda@pih.org", 2525)
+		mailService.sendHtmlMail("[Html]" + subject, body, "jmiranda@pih.org", 2525, true)
 
 		server.stop()
 		
