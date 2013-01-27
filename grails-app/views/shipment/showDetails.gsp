@@ -26,7 +26,7 @@
 			
 		<div class="dialog">
 			<g:render template="summary"/>						
-			<div id="details" class="box">
+			<div id="details">
 				<table>
 					<tbody>
 						<tr class="prop">

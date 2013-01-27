@@ -44,7 +44,7 @@
                                     <label for="username"><warehouse:message code="user.username.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-                                    <g:textField name="username" value="${userInstance?.username}" />
+                                    <g:textField name="username" value="${userInstance?.username}" class="text"/>
                                 </td>
                             </tr>
                         
@@ -53,7 +53,7 @@
                                     <label for="name"><warehouse:message code="user.firstName.label"/></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
-                                    <g:textField name="firstName" value="${userInstance?.firstName}" />
+                                    <g:textField name="firstName" value="${userInstance?.firstName}" class="text"/>
                                 </td>
                             </tr>
 
@@ -62,7 +62,7 @@
                                     <label for="name"><warehouse:message code="user.lastName.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
-                                    <g:textField name="lastName" value="${userInstance?.lastName}" />
+                                    <g:textField name="lastName" value="${userInstance?.lastName}" class="text" />
                                 </td>
                             </tr>
                         
@@ -71,7 +71,7 @@
                                     <label for="password"><warehouse:message code="user.password.label"/></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-                                    <g:passwordField name="password" value="${userInstance?.password}" />
+                                    <g:passwordField name="password" value="${userInstance?.password}" class="text" />
                                 </td>
                             </tr>
 			    
@@ -80,7 +80,7 @@
                                   <label for="email"><warehouse:message code="user.email.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
-                                    <g:textField name="email" value="${userInstance?.email}" />
+                                    <g:textField name="email" value="${userInstance?.email}" class="text" />
                                 </td>
                             </tr>
                             
