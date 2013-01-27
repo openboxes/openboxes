@@ -50,6 +50,7 @@ class InventoryItem implements Serializable {
 	
 	static mapping = {
 		id generator: 'uuid'
+		cache true
 	}
 	
 	// Notice the unique constraint on lotNumber/product

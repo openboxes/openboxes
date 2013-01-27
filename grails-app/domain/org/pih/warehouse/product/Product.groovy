@@ -35,10 +35,11 @@ import org.pih.warehouse.shipping.ShipmentItem;
  */
 class Product implements Comparable, Serializable {
 	
+	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
 	}
-	def beforeUpdate ={
+	def beforeUpdate = {
 		updatedBy = AuthService.currentUser.get()
 	}
 		
@@ -48,6 +49,11 @@ class Product implements Comparable, Serializable {
 	String description;						// Not used at the moment
 	String productCode 						// Internal product code identifier
 	Boolean coldChain = Boolean.FALSE;
+	//Boolean hazardous = Boolean.FALSE
+	//Boolean serialized = Boolean.FALSE
+	//Boolean lotControl = Boolean.TRUE
+	
+	
 	Category category;						// primary category
 	
 	String unitOfMeasure	// each, pill, bottle, box
@@ -121,6 +127,7 @@ class Product implements Comparable, Serializable {
 	
 	static mapping = {
 		id generator: 'uuid'
+		cache true
 		tags joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id']
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']

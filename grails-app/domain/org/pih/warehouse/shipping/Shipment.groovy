@@ -26,6 +26,14 @@ import java.io.Serializable;
 
 class Shipment implements Comparable, Serializable {
 	
+	def beforeInsert = {
+		//createdBy = AuthService.currentUser.get()
+	}
+	def beforeUpdate ={
+		//updatedBy = AuthService.currentUser.get()
+	}
+	
+	
 	String id
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
@@ -91,6 +99,7 @@ class Shipment implements Comparable, Serializable {
 
 	static mapping = {
 		id generator: 'uuid'
+		cache true
 		additionalInformation type: "text"
 		events cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
@@ -185,9 +194,9 @@ class Shipment implements Comparable, Serializable {
 		return shipmentItems.findAll { !it.container }  
 	}
 	
-	String getShipmentNumber() {
-		return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
-	}
+	//String getShipmentNumber() {
+	//	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
+	//}
 
 
 	Map<String, List<Container>> getContainersByType() { 

@@ -23,8 +23,6 @@ import org.pih.warehouse.fulfillment.Fulfillment;
 
 class Requisition implements Serializable {
 
-
-	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
 	}

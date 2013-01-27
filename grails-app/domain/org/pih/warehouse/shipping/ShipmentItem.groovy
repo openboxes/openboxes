@@ -50,6 +50,7 @@ class ShipmentItem implements Comparable, Serializable {
 	
 	static mapping = {
 		id generator: 'uuid'
+		cache true
 	}
 	
 	//static belongsTo = [ container : Container ] // + shipment : Shipment

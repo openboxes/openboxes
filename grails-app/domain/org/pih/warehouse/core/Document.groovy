@@ -38,6 +38,7 @@ class Document implements Serializable {
 	//static belongsTo = [ shipment : Shipment ];
 	static mapping = {
 		id generator: 'uuid'
+		cache true
 	}
 	
 	static transients = ["size"]
