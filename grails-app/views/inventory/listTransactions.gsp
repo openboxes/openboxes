@@ -20,7 +20,9 @@
                     <thead>
                         <tr class="even">   
 							<th><warehouse:message code="default.actions.label"/></th>
+							<th><warehouse:message code="transaction.transactionNumber.label"/></th>
 							<th><warehouse:message code="default.date.label"/></th>
+							<th><warehouse:message code="default.time.label"/></th>
 							<th><warehouse:message code="transaction.type.label"/></th>
 							<th><warehouse:message code="inventory.label"/></th>
 							<th class="center">
@@ -30,10 +32,21 @@
 							<th class="center">
 								<warehouse:message code="default.createdBy.label"/>
 							</th>
+							<th class="center">
+								<warehouse:message code="default.updatedBy.label"/>
+							</th>
+							<th class="center">
+								<warehouse:message code="default.dateCreated.label"/>
+							</th>
+							<th class="center">
+								<warehouse:message code="default.lastUpdated.label"/>
+							</th>
                         </tr>
                     </thead>
        	           	<tbody>			
                         <tr class="odd">                        
+                        	<td></td>
+                        	<td></td>
                         	<td></td>
                         	<td></td>
 							<td>
@@ -59,6 +72,9 @@
 							<td></td>
                         	<td></td>	
                         	<td></td>						
+                        	<td></td>	
+                        	<td></td>						
+                        	<td></td>	
                         </tr>
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
 							<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">            
@@ -66,9 +82,8 @@
 									
 									<!-- Action menu -->
 									<div>
-										<span class="action-menu">
+										<div class="action-menu">
 											<button class="action-btn">
-												<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
 												<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 											</button>
 											<div class="actions">
@@ -83,7 +98,7 @@
 													--%>
 												</div>
 											</div>
-										</span>				
+										</div>				
 									</div>												
 								
 									<%-- 
@@ -96,15 +111,19 @@
 									--%>
 								</td>
 								<td>
+									<g:link action="showTransaction" id="${transactionInstance?.id }">
+										<span class="transactionNumber">${transactionInstance?.transactionNumber?:transactionInstance?.id}</span>
+									</g:link>
+								</td>
+								<td>
 									${formatDate(date: transactionInstance?.transactionDate, format: 'dd-MMM-yyyy') }
 								</td>
 								<td>
-									<g:link action="showTransaction" id="${transactionInstance?.id }">
-										<span class="${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-											<format:metadata obj="${transactionInstance?.transactionType}"/>
-											(${transactionInstance?.transactionEntries?.size() } items)
-										</span>
-									</g:link>
+									${formatDate(date: transactionInstance?.transactionDate, format: 'hh:mm:ssa') }
+								</td>
+								<td>
+									<format:metadata obj="${transactionInstance?.transactionType}"/>
+									(${transactionInstance?.transactionEntries?.size() } items)
 								</td>
 								<td>
 									${transactionInstance?.inventory }
@@ -115,6 +134,15 @@
 								</td>
 								<td class="center">
 									${transactionInstance?.createdBy?.name }
+								</td>
+								<td class="center">
+									${transactionInstance?.updatedBy?.name }
+								</td>
+								<td class="center">
+									${transactionInstance?.dateCreated }
+								</td>
+								<td class="center">
+									${transactionInstance?.lastUpdated }
 								</td>
 							</tr>
 						</g:each>

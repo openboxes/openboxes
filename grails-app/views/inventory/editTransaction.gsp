@@ -25,13 +25,7 @@
             </g:hasErrors>    
 
 			<div class="dialog" >
-				
-				<div class="summary" style="padding: 10px;">
-					<!-- Action menu -->
-					<g:render template="../transaction/actions"/>
-					&nbsp;
-					<g:render template="../transaction/summary"/>
-				</div>					
+				<g:render template="../transaction/summary"/>
 				<div class="tabs">
 				
 					<ul>
@@ -49,7 +43,7 @@
 										</td>
 										<td class="value">
 											<g:if test="${transactionInstance?.id }">
-												${transactionInstance?.transactionNumber() }
+												${transactionInstance?.transactionNumber }
 											</g:if>
 											<g:else>
 												<span class="fade">

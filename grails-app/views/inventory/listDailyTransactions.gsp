@@ -111,7 +111,7 @@
 												<tr class="${counter++%2?'odd':'even' }">
 													<td>
 														<g:link controller="inventory" action="showTransaction" id="${transaction.id }">
-														${transaction?.transactionNumber() }
+														${transaction?.transactionNumber }
 														</g:link>
 													</td>
 										      		<td>

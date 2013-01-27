@@ -36,19 +36,7 @@
             </g:hasErrors>    
 
 			<div class="dialog">
-			
-								
-				<table class="summary">
-					<tr>
-						<td class="left middle" style="width: 50px;">
-							<!-- Action menu -->
-							<g:render template="../transaction/actions"/>
-						</td>
-						<td class="middle">
-							<g:render template="../transaction/summary"/>
-						</td>
-					</tr>
-				</table>
+				<g:render template="../transaction/summary"/>
 									
 				<div class="tabs">
 					<ul>
@@ -64,6 +52,19 @@
 						
 						
 						<table>
+							<tr class="prop">
+								<td class="name">
+									<label><warehouse:message code="transaction.transactionNumber.label"/></label>
+								</td>
+								<td>
+									<span class="transactionNumber">
+										<g:if test="${transactionInstance?.transactionNumber }">
+											${transactionInstance?.transactionNumber }
+										</g:if>
+										<g:else><span class="fade"><warehouse:message code="transaction.new.label"/></span></g:else>
+									</span>
+								</td>
+							</tr>
 							<tr class="prop">
 								<td class="name">
 									<label><warehouse:message code="transaction.type.label"/></label>
@@ -107,28 +108,13 @@
 									</td>										
 								</tr>
 							</g:if>
-							
-							
-							<tr class="prop">
-								<td class="name">
-									<label><warehouse:message code="transaction.transactionNumber.label"/></label>
-								</td>
-								<td>
-									<span class="value">
-										<g:if test="${transactionInstance?.transactionNumber() }">
-											${transactionInstance?.transactionNumber() }
-										</g:if>
-										<g:else><span class="fade"><warehouse:message code="transaction.new.label"/></span></g:else>
-									</span>
-								</td>
-							</tr>
 							<tr class="prop">
 								<td class="name">
 									<label><warehouse:message code="transaction.date.label"/></label>
 								</td>
 								<td>
 									<span class="value">
-										<format:date obj="${transactionInstance?.transactionDate}"/>
+										<format:datetime obj="${transactionInstance?.transactionDate}"/>
 									</span>
 								</td>										
 							</tr>

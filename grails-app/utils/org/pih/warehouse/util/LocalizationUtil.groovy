@@ -32,7 +32,7 @@ public class LocalizationUtil {
 			//label += (source) ? " - " + localizationService.formatMetadata(source) : ""
 			label += (transaction?.transactionDate) ? " - " + localizationService.formatDate(transaction?.transactionDate) : ""
 		} else { 
-			label += transaction?.transactionNumber()
+			label += transaction?.transactionNumber
 		}
 		return label
 	}
