@@ -51,7 +51,7 @@
 			                <g:hiddenField name="version" value="${productInstance?.version}" />
 			            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
 				                <table>
-			                      <tbody>                
+			                      <tbody>               
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="product.title.label" /></label></td>
@@ -495,9 +495,6 @@
 															<warehouse:message code="document.filename.label"/>
 														</th>
 														<th>
-															<warehouse:message code="document.extension.label"/>
-														</th>
-														<th>
 															<warehouse:message code="document.contentType.label"/>
 														</th>
 														<th>
@@ -521,9 +518,6 @@
 															<td>
 																${document.filename }
 															</td>	
-															<td>
-																${document.extension }
-															</td>
 															<td>
 																${document.contentType }
 															</td>	
@@ -574,7 +568,7 @@
 									<%--
 									<g:link class="create" controller="productPackage" action="create">Add product package</g:link>							
 									 --%>
-									<a href="javascript:void(0);" class="open-dialog create" dialog-id="package-dialog"><warehouse:message code="package.add.label"/></a>
+									<a href="javascript:void(0);" class="open-dialog create" dialog-id="createProductPackage"><warehouse:message code="package.add.label"/></a>
 								</span>
 				            	<span class="linkButton">											
 									<a href="javascript:void(0);" class="open-dialog create" dialog-id="uom-dialog">Add UoM</a>
@@ -593,6 +587,9 @@
 												<warehouse:message code="default.actions.label"/>
 											</th>
 											<th>
+												<warehouse:message code="package.name.label"/>
+											</th>
+											<th>
 												<warehouse:message code="package.uom.label"/>
 											</th>
 											<th>
@@ -608,21 +605,30 @@
 											<tr>
 												<td>
 												
-													<span class="action-menu">
+													<div class="action-menu">
 														<button class="action-btn">
-															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
 															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>							
 														</button>
-														<span class="actions">
-															<span class="action-menu-item">													
+														<div class="actions">
+															<div class="action-menu-item">								
+															
+																<a href="javascript:void(0);" class="open-dialog create" dialog-id="editProductPackage-${pkg?.id }">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"/>&nbsp;
+																	<warehouse:message code="default.edit.label" args="[warehouse.message(code:'package.label')]"/>
+																</a>					
+															</div>	
+															<div class="action-menu-item">													
 																<g:link controller="product" action="removePackage" id="${pkg.id }" params="['product.id':productInstance.id]" class="actionBtn">	
-																	<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>
-																	&nbsp;<warehouse:message code="default.delete.label" args="[warehouse.message(code:'package.label')]"/>
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>&nbsp;
+																	<warehouse:message code="default.delete.label" args="[warehouse.message(code:'package.label')]"/>
 																</g:link>
-															</span>	
-														</span>
-													</span>												
+															</div>	
+														</div>
+													</div>												
 												</td>											
+												<td>
+													${pkg.name }
+												</td>
 												<td>
 													${pkg.uom.name }
 												</td>
@@ -654,7 +660,7 @@
 								<table>
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
-		                                    <label for="name">Name on package</label>
+		                                    <label for="name">Name</label>
 		                                </td>
 		                                <td valign="top" class="value ">
 											<g:textField name="name" size="10" class="medium text" />
@@ -749,97 +755,12 @@
 				                </div>   		                      	
 		                	</g:form>				
 						</div>
-							
-						<div id="package-dialog" class="dialog hidden" title="${warehouse.message(code:'package.add.label') }">
-							<g:form controller="product" action="savePackage" method="post">
-								<g:hiddenField name="id" value="${productInstance?.id}"/>							
-								<table>
-									<tbody>						
-										<g:if test="${productInstance }">
-											<tr class="prop">
-												<td class="name"><label><warehouse:message code="product.label"/></label></td>
-												<td class="value">
-													<format:product product="${productInstance}" />
-												</td>
-											</tr>
-										</g:if>
-										<tr class="prop">
-											<td class="name">
-												<label>
-													<warehouse:message code="package.gtin.label"/>
-												</label>
-											</td>
-											<td class="value">
-												<g:textField name="gtin" value="${packageInstance?.gtin }" class="medium text"/>
-											</td>
-										</tr>		
-										<%-- 
-										<tr class="prop">
-											<td class="name">
-												<label>
-													<warehouse:message code="package.quantity.label"/>
-												</label>
-											</td>
-											<td class="value">
-												<g:textField name="quantity" value="${packageInstance?.quantity }" size="5" class="medium text"/>
-											</td>
-										</tr>
-										--%>	
-										<tr class="prop">
-											<td class="name">
-												<label>
-													<warehouse:message code="package.uom.label"/>
-												</label>
-											</td>
-											<td class="value middle">
-												<div class="middle">
-													1 
-													<g:select name="uom.id" from="${org.pih.warehouse.core.UnitOfMeasure.list() }" optionValue="name" optionKey="id" value="${pacakageInstance?.uom }" noSelection="['null':'']"></g:select>
-													= 
-													<g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
-													${productInstance?.unitOfMeasure?:warehouse.message(code: 'default.each.label') }	
-												</div>
-											</td>
-										</tr>		
-										<%-- 										
-										<tr class="prop">
-											<td class="name">
-												<label>
-													<warehouse:message code="package.name.label"/>
-												</label>
-											</td>
-											<td class="value">
-												<g:textField name="name" value="${packageInstance?.name }" class="medium text"/>
-											</td>
-										</tr>	
-										<tr class="prop">
-											<td class="name">
-												<label>
-													<warehouse:message code="package.description.label"/>
-												</label>
-											</td>
-											<td class="value">
-												<g:textField name="description" value="${packageInstance?.description }" class="medium text"/>
-											</td>
-										</tr>	
-										--%>
-										
-										
-																														
-									</tbody>
-								</table>
-								<div class="buttons">
-									<button type="submit" class="button icon approve"> 
-										${warehouse.message(code: 'default.button.save.label', default: 'Save')}
-									</button>
-									&nbsp;
-									
-									<a href="#" class="close-dialog" dialog-id="package-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
-									
-												
-								</div>
-							</g:form>
-						</div>						
+						
+						<g:each var="packageInstance" in="${productInstance.packages }">
+							<g:set var="dialogId" value="${'editProductPackage-' + packageInstance.id}"/>
+							<g:render template="productPackageDialog" model="[dialogId:dialogId,productInstance:productInstance,packageInstance:packageInstance]"/>
+						</g:each>		
+						<g:render template="productPackageDialog" model="[dialogId:'createProductPackage',productInstance:productInstance,packageInstance:packageInstance]"/>
 					</g:if>			
 				</div>	
 			</div>

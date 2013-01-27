@@ -1,4 +1,24 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
+<style>
+.nailthumb-container {
+    width: 100%;
+    overflow: hidden;
+}
+.galleryItem {
+    color: #797478;
+    font: 10px/1.5 Verdana, Helvetica, sans-serif;
+    float: left;
+    margin: 2px;
+} 
+ 
+.galleryItem img {
+    max-width: 100%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+</style>
+
 <div id="product-details">
 	<g:if test="${productInstance?.images}">	
 		<table class="box">
@@ -7,36 +27,66 @@
 				<tr class="odd">
 					<td class="odd" colspan="2">
 						<label><warehouse:message code="product.images.label"/></label>
+						<g:link controller="product" action="edit" id="${productInstance?.id }" fragment="tabs-documents"> 
+							<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+						</g:link>						
+									
 					</td>
 				</tr>				
 				<tr class="prop">
 					<td colspan="2" class="center middle">
+						<div class="nailthumb-container">
+							<g:each var="document" in="${productInstance?.images}" status="i">
+								<div class="galleryItem">
+									<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
+										<img src="${createLink(controller:'product', action:'renderImage', id:document.id)}" title="${warehouse.message(code:'default.clickToZoom.label', default:'Click to zoom')}" style="display:none;" />		
+									</a>
+							    </div>
+							</g:each>
+						</div>
 						<g:each var="document" in="${productInstance?.images}" status="i">
-							<div style="float: left;">
-								<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
-									<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
-										class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
-	          							
-								</a>
-								<br/>
-								${document.name }
-							</div>	
-							
 							<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
-								<div >
+								<div>
 									<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
-			           							class="middle image" style="border: 1px solid lightgrey" />
+	           							class="middle image" style="border: 1px solid lightgrey" />
 								</div>
 								<br/>
 								<g:link controller="document" action="download" class="button icon arrowdown" id="${document.id}">Download</g:link>
-							</div>					
-						</g:each>
+								&nbsp;
+								<a class="close-dialog" href="javascript:closeDialog('#dialog-${document.id }','#img-${document.id }');">
+									${warehouse.message(code:'default.button.cancel.label') }
+								</a>
+							</div>
+						</g:each>						
 					</td>			
 				</tr>													
 			</tbody>		
 		</table>
 	</g:if>
-
+	<g:if test="${productInstance?.productCode }">
+		<table class="box">	
+			<tr class="odd">
+				<td colspan="2">
+					<label>${warehouse.message(code: 'product.productCode.label') }</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="value" colspan="2">
+					<div class="center">					
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,format:'CODE_39']) }" class="top"/>						
+						<%-- 					
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,width:250,height:100,format:'CODE_39']) }"/><br/>
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,width:250,height:100,format:'CODE_128']) }"/><br/>
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,width:250,height:100,format:'EAN_13']) }"/><br/>
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,width:250,height:100,format:'EAN_8']) }"/><br/>
+						--%>
+						<div class="productCode">${productInstance?.productCode }</div>
+					</div>		
+				</td>
+			</tr>
+		</table>
+	</g:if>
+	
 	<g:if test="${productInstance?.description }">
 		<table class="box">
 			<tbody>
@@ -130,37 +180,33 @@
 					<label><warehouse:message code="product.onHandQuantity.label"/></label>
 				</td>
 				<td class="value">
-					<g:if test="${!productInstance?.packages }">
-						<div class="">
-							${g.formatNumber(number: totalQuantity, format: '###,###,###') }
-							<span class="">
-								<g:if test="${productInstance?.unitOfMeasure }">
-									<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-								</g:if>
-								<g:else>
-									${warehouse.message(code:'default.each.label') }
-								</g:else>
-							</span>
-						</div>
-					</g:if>
-					<g:else>
-						<table>
-							<g:each var="productPackage" in="${productInstance?.packages }">
-								<tr>										
-									<td class="right">
-										<span class="">${productPackage?.uom?.code }/${productPackage.quantity }</span>
-									</td>
-									<td class="right">
-										<g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
-										<g:if test="${productPackage?.uom?.code != 'EA' }">~</g:if>
-										${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
-									</td>
-								</tr>
-							</g:each>
-						</table>
-					</g:else>
+					
+						<label>${g.formatNumber(number: totalQuantity, format: '###,###,###') }</label>
+						<g:if test="${productInstance?.unitOfMeasure }">
+							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						</g:if>
+						<g:else>
+							${warehouse.message(code:'default.each.label') }
+						</g:else>								
 				</td>
-			</tr>	
+			</tr>				
+			<g:if test="${productInstance?.packages }">		
+				<g:each var="productPackage" in="${productInstance?.packages }">
+					<g:if test="${productPackage?.uom?.code != 'EA' }">
+						<tr class="prop">										
+							<td class="label">
+							</td>
+							<td class="value">
+								<span class="fade">
+									<g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
+									~${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
+									${productPackage?.uom?.code }/${productPackage.quantity }
+								</span>
+							</td>
+						</tr>
+					</g:if>
+				</g:each>
+			</g:if>
 			<tr class="prop">	
 				<td class="label">
 					<label><warehouse:message code="product.latestInventoryDate.label"/></label>
@@ -197,19 +243,7 @@
 					</g:else>
 				</td>				
 			</tr>
-			<tr class="prop">
-				<td class="label">
-					<label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
-				</td>
-				<td class="value">
-					<g:if test="${inventoryLevelInstance?.binLocation}">
-						${inventoryLevelInstance?.binLocation?:'' }
-					</g:if>
-					<g:else>
-						<span class="fade"><warehouse:message code="default.na.label"/></span>
-					</g:else>
-				</td>				
-			</tr>			
+			
 			
 			<tr class="prop">
 				<td class="label">
@@ -253,7 +287,20 @@
 						<span class="fade"><warehouse:message code="default.na.label"/></span>
 					</g:else>
 				</td>
-			</tr>				
+			</tr>	
+			<tr class="prop">
+				<td class="label">
+					<label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
+				</td>
+				<td class="value">
+					<g:if test="${inventoryLevelInstance?.binLocation}">
+						${inventoryLevelInstance?.binLocation?:'' }
+					</g:if>
+					<g:else>
+						<span class="fade"><warehouse:message code="default.na.label"/></span>
+					</g:else>
+				</td>				
+			</tr>									
 			
 		</tbody>
 	</table>			
@@ -519,7 +566,7 @@
 					<label><warehouse:message code="product.createdBy.label"/></label>
 				</td>
 				<td class="value">
-					<span class="">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+					<span class="fade">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
 				</td>
 			</tr>	
 			<tr class="prop">	
@@ -527,7 +574,7 @@
 					<label><warehouse:message code="product.modifiedBy.label"/></label>
 				</td>
 				<td class="value">
-					<span class="">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+					<span class="fade">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
 				</td>
 			</tr>				
 			<tr class="prop">	
@@ -535,9 +582,10 @@
 					<label><warehouse:message code="product.createdOn.label"/></label>
 				</td>
 				<td class="value">
-					${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
-					<br/>
-					<span class="fade">${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm:ss a')}</span>
+					<span class="fade">
+						${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
+						${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm a')}
+					</span>
 					 
 				</td>
 			</tr>			
@@ -549,10 +597,10 @@
 					<label><warehouse:message code="product.modifiedOn.label"/></label>
 				</td>
 				<td class="value">
-					
-					${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
-					<br/>
-					<span class="fade">${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm:ss a')}</span>
+					<span class="fade">
+						${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
+						${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm a')}
+					</span>
 				</td>
 			</tr>			
 			
@@ -565,6 +613,9 @@
 <script>
 	function openDialog(dialogId, imgId) { 
 		$(dialogId).dialog({autoOpen: true, modal: true, width: 600, height: 400});
+	}
+	function closeDialog(dialogId, imgId) { 
+		$(dialogId).dialog('close');
 	}
 </script>
 

@@ -19,6 +19,4 @@
 			background-position: center right;
 			/*padding-left: 20px;*/
 		}
-
-		
 	</style>

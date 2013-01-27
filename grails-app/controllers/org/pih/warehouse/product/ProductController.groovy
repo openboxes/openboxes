@@ -386,9 +386,16 @@ class ProductController {
 	def savePackage = {
 
 		println "savePackage: " + params
-		def productInstance = Product.get(params.id)
-		def packageInstance = new ProductPackage(params)
-		productInstance.addToPackages(packageInstance)
+		def productInstance = Product.get(params.product.id)
+		
+		def packageInstance = ProductPackage.get(params.id) 
+		if (!packageInstance) { 
+			packageInstance = new ProductPackage(params)
+			productInstance.addToPackages(packageInstance)
+		}
+		else { 
+			packageInstance.properties = params
+		}			
 
 		if (!productInstance.hasErrors() && productInstance.save(flush: true) ) {
 			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
@@ -460,7 +467,7 @@ class ProductController {
 	def barcode = {
 		BarcodeFormat format = BarcodeFormat.valueOf(params.format)
 		File file = File.createTempFile("barcode-", ".png")
-		barcodeService.renderImageToFile(file, params.data, 100, 50, format)
+		barcodeService.renderImageToFile(file, params.data, (params.width?:125) as int, (params.height?:50) as int, format)
 		response.contentType = "image/png"
 		response.outputStream << file.bytes
 		file.delete()
@@ -648,6 +655,17 @@ class ProductController {
 		//assert names[1].age == 456
 	}
 
+	
+	def renderImage = { 
+		def documentInstance = Document.get(params.id);
+		if (documentInstance) {		
+			response.outputStream << documentInstance.fileContents
+		}
+		else { 
+			response.sendError(404)
+		}
+	}
+	
 	/**
 	 * View user's profile photo
 	 */
@@ -665,7 +683,8 @@ class ProductController {
 			 */
 		}
 		else {
-			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
+			//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
+			response.sendError(404)
 		}
 	}
 
@@ -678,7 +697,8 @@ class ProductController {
 			//resize(bytes, response.outputStream, width, height)
 		}
 		else {
-			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
+			//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
+			response.sendError(404)
 		}
 	}
 	
@@ -699,7 +719,9 @@ class ProductController {
 			render csv
 		}
 		else { 
-			render(text: 'No products found', status: 404)			
+			//render(text: 'No products found', status: 404)
+			response.sendError(404)
+						
 		}
 		
 	}
