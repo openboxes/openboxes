@@ -1,5 +1,6 @@
 package org.pih.warehouse.product
 
+import org.apache.commons.lang.StringUtils;
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -395,19 +396,53 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 
 	
-	void test_generateRandomIdentifier() { 		
-		def identifier = productService.generateRandomIdentifier(4)
-		println identifier
+	void test_generateIdentifier() { 		
+		def identifier = productService.generateIdentifier(4)
 		assertNotNull identifier
 		assertEquals 4, identifier.length()
 	}
+
+	void test_generateIdentifier_shouldReturnFormattedIdentifier() {
+		def identifier = productService.generateIdentifier("LLL-NNN-AAA-NNN")
+		assertNotNull identifier
+		assertEquals 15, identifier.length()
+		assertTrue StringUtils.isAlpha(identifier[0])
+		assertTrue StringUtils.isAlpha(identifier[1])
+		assertTrue StringUtils.isAlpha(identifier[2])
+		assertEquals "-", identifier[3]
+		assertTrue StringUtils.isNumeric(identifier[4])
+		assertTrue StringUtils.isNumeric(identifier[5])
+		assertTrue StringUtils.isNumeric(identifier[6])
+		assertEquals "-", identifier[7]
+		assertTrue StringUtils.isAlphanumeric(identifier[8])
+		assertTrue StringUtils.isAlphanumeric(identifier[9])
+		assertTrue StringUtils.isAlphanumeric(identifier[10])
+		assertEquals "-", identifier[11]
+		assertTrue StringUtils.isNumeric(identifier[12])
+		assertTrue StringUtils.isNumeric(identifier[13])
+		assertTrue StringUtils.isNumeric(identifier[14])
+	}
+
+	void test_generateIdentifier_shouldFailOnEmptyString() {
+		def message = shouldFail(IllegalArgumentException) { 
+			def identifier = productService.generateIdentifier("")
+		}
+		//assertEquals "Format string must be specified", message	
+	}
+
+	void test_generateIdentifier_shouldFailOnNull() {
+		def message = shouldFail(IllegalArgumentException) {
+			def identifier = productService.generateIdentifier(null)
+		}
+		//assertEquals "Format string must be specified", message
+	}
 	
 	/*
-	void test_generateRandomIdentifier_shouldNotCollide() { 
+	void test_generateIdentifier_shouldNotCollide() { 
 		def identifierMap = [:]
 		
 		for (int i = 0; i<100; i++) { 
-			def identifier = productService.generateRandomIdentifier(4)
+			def identifier = productService.generateIdentifier(4)
 			println identifier	
 		}
 	}
