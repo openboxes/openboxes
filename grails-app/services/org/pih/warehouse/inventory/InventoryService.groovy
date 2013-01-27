@@ -2331,5 +2331,18 @@ class InventoryService implements ApplicationContextAware {
         }
         result
     }
+	
+	
+	public String generateTransactionNumber() { 
+		// 
+		def identifier = productService.generateIdentifier("AAA-AAA-AAA")
+		
+		
+		return identifier
+	}
+	
+	
+	
+	
 
 }
