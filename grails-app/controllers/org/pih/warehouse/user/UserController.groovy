@@ -92,7 +92,8 @@ class UserController {
     	log.info "create a new user based on request parameters"
         def userInstance = new User()
         userInstance.properties = params
-		return [userInstance: userInstance, locations: locations]
+		
+		return [userInstance: userInstance]
     }
 
     /**
