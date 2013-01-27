@@ -36,9 +36,9 @@
 
 	                    	<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">
 								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+									<td valign="top" class="name"><label><warehouse:message
 										code="shipping.traveler.label" /></label></td>
-									<td valign="top" style="width: 30%;">
+									<td valign="top">
 										<g:autoSuggest id="carrier" name="carrier" jsonUrl="${request.contextPath }/json/findPersonByName" 
 											width="300"
 											valueId="${shipmentInstance?.carrier?.id}" 
@@ -53,9 +53,9 @@
 							</g:if>	
 							<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
 								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+									<td valign="top" class="name"><label><warehouse:message
 										code="shipping.freightForwarder.label" /></label></td>
-									<td valign="top" style="width: 30%;">
+									<td valign="top" class="value">
 									
 										<g:selectShipper id="shipperInput" 
 											name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
@@ -68,9 +68,9 @@
 							</g:if>
 							<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
 								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+									<td valign="top" class="name"><label><warehouse:message
 										code="shipping.recipient.label" /></label></td>
-									<td valign="top" style="width: 30%;">
+									<td valign="top" class="value">
 										<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
 											width="300"
 											valueId="${shipmentInstance?.recipient?.id}" 
@@ -86,8 +86,8 @@
 							<!-- list all the reference numbers valid for this workflow -->
 							<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
 								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><format:metadata obj="${referenceNumberType}" /></label></td>
-									<td valign="top" style="width: 30%;">
+									<td valign="top" class="name"><label><format:metadata obj="${referenceNumberType}" /></label></td>
+									<td valign="top" class="value">
 										<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" 
 											size="20" class="text" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
 									</td>
@@ -99,7 +99,7 @@
 									<td valign="top" class="name"><label><warehouse:message
 										code="shipping.statedValue.label" /></label></td>
 									<td valign="top"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
 										nowrap="nowrap">
 											<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" 
 												class="text" size="10"/> 
@@ -112,7 +112,7 @@
 									<td valign="top" class="name"><label><warehouse:message
 										code="shipping.totalValue.label" /></label></td>
 									<td valign="top"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 										nowrap="nowrap">
 											<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" 
 											 	class="text" size="10"/> 
@@ -122,9 +122,9 @@
 							</g:if>			
 							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
 								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+									<td valign="top" class="name"><label><warehouse:message
 										code="default.comments.label"/></label></td>
-									<td valign="top" style="width: 30%;">
+									<td valign="top">
 										<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="80" rows="3"/>
 									</td>
 								</tr>	

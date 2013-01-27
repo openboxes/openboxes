@@ -96,7 +96,7 @@
 											<warehouse:message code="shipping.expectedShippingDate.label" />:
 										</label>
 									</td>
-									<td class="">
+									<td class="value">
 										<format:date obj="${shipmentInstance?.expectedShippingDate}"
 											format="dd/MMM/yyyy"/>
 									</td>
@@ -108,7 +108,7 @@
 										</label>
 									</td>
 									<td valign="middle"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
 										nowrap="nowrap">
 										<g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
 											value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>										
@@ -175,24 +175,34 @@
 														<table>
 															<tr>
 																<th><warehouse:message code="container.label"/></th>
-																<th><warehouse:message code="default.item.label"/></th>
+																<th><warehouse:message code="product.label"/></th>
+																<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+																<th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
 																<th><warehouse:message code="default.quantity.label"/></th>
 															</tr>
 															<g:set var="previousContainer"/>
 															<g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
 																<g:set var="isSameAsPrevious" value="${shipmentItem?.container == previousContainer}"/>
 																<tr class="${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
-																	<td class="right-border" style="width: 25%">																	
+																	<td class="right-border">																	
 																		<g:if test="${!isSameAsPrevious }">
 																			${shipmentItem?.container?.name }
 																		</g:if>
 																	</td>
 																	<td>
 																		<format:product product="${shipmentItem?.inventoryItem?.product}"/> 
-																		<span class="fade">${shipmentItem?.inventoryItem?.lotNumber }</span>
+																	</td>
+																	<td>
+																		<span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>																	
+																	</td>
+																	<td>
+																		<span class="expirationDate">
+																			<g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="MMMMM yyyy"/>
+																		</span>																	
 																	</td>
 																	<td>
 																		${shipmentItem?.quantity }
+																		${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
 																	</td>
 																</tr>
 																<g:set var="previousContainer" value="${shipmentItem?.container }"/>
@@ -204,7 +214,7 @@
 													<warehouse:message code="shipping.willNotBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
 												</div>
 											</g:if>
-											<br/>
+											
 										</td>
 									</tr>
 								</g:if>
