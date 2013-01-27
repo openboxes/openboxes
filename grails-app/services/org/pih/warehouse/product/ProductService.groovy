@@ -22,7 +22,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.importer.ImportDataCommand;
 import org.pih.warehouse.core.ApiException;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.SessionFactory;
 
