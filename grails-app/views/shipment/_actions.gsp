@@ -2,7 +2,6 @@
 <!-- Only allow the originating warehouse to edit the shipment -->
 <div id="shipment-action-menu" class="action-menu" >
 	<button class="action-btn">
-		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 	</button>
 	<div class="actions">

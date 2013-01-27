@@ -1,6 +1,5 @@
 	<span class="action-menu">
 		<button class="action-btn">
-			<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" class="middle"/>
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" class="middle"/>
 		</button>
 		<div class="actions">

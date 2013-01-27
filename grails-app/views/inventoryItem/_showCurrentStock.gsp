@@ -30,7 +30,6 @@
 						<div class="action-menu">
               <g:isUserManager>
                 <button class="action-btn">
-                  <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
                   <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
                 </button>
                 <div class="actions">
@@ -61,7 +60,10 @@
 						</div>
 					</td>															
 					<td class="top">
-						${itemInstance?.lotNumber ?: '<span class="fade"><warehouse:message code="default.none.label"/></span>' }
+					
+						<span class="lotNumber">
+							${itemInstance?.lotNumber ?: '<span class="fade"><warehouse:message code="default.none.label"/></span>' }
+						</span>
 						<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
 						</g:link>
 					</td>														

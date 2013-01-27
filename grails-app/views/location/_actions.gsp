@@ -1,7 +1,6 @@
 <span class="action-menu">
 	<button class="action-btn">
-		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}"
-			style="vertical-align: middle" /> <img
+		<img
 			src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
 			style="vertical-align: middle" />
 	</button>

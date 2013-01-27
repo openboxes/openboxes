@@ -1,6 +1,5 @@
 <span class="action-menu">
 	<button name="actionButtonDropDown" class="action-btn" id="product-action">
-		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 	</button>
 	<div class="actions">
@@ -14,7 +13,7 @@
 			<hr/>
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="product" action="edit" id="${productInstance?.id }" fragment="tabs-details"> 
+			<g:link controller="product" action="edit" id="${productInstance?.id }"> 
 				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 				<warehouse:message code="product.edit.label"/>
 			</g:link>
@@ -94,6 +93,15 @@
 						code="productGroup.addProducts.label" />
 				</a>
 			</div>
+			<div class="action-menu-item"> 
+			
+				<a href="#" id="linkProductToProductGroup" class="open-dialog">
+					Link to product group
+				</a>
+				
+			
+			</div>
+			
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryConsumedBtn"> <img
@@ -151,7 +159,51 @@
 <g:form id="inventoryActionForm" name="inventoryActionForm" controller="inventory" action="createTransaction" method="POST">
 	<g:hiddenField name="product.id" value="${productInstance?.id }"/>
 </g:form>
+<div class="dialog-form" id="dialog-linkProductToProductGroup">
+	<g:form controller="product" action="saveGenericProduct" method="post">
+		<table>
+			<tbody>
 
+				<tr class="prop">
+					<td valign="middle" class="name"><label for="category"><warehouse:message
+								code="productGroup.category.label" default="Category" /></label></td>
+					<td valign="middle" class="value ${hasErrors(bean: product, field: 'category', 'errors')}">
+
+						${productInstance?.category }							
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="middle" class="name"><label for="description"><warehouse:message
+								code="productGroup.name.label" default="Generic product" /></label>
+					</td>
+					<td valign="middle"
+						class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">							
+						<g:if test="${productGroups }">	
+							<div>										
+								<g:select name="id" from="${productGroups }" 
+									optionKey="id" optionValue="description" value="${productGroupInstance?.id }" noSelection="['null':'']"/>
+							</div>
+						</g:if>
+						<g:else>
+							<div>
+								<g:textField name="description" class="text" size="60" value="${productInstance?.name }"/>
+							</div>
+						</g:else>
+							
+						
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="top center" colspan="2">
+						<g:submitButton name="create" class="button icon save"
+							value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+						<a href="javascript:void(-1);" class="close-dialog" id="linkProductToProductGroup">Cancel</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</g:form>
+</div>
 
 <script>
 	$(document).ready(function() {		
@@ -193,5 +245,16 @@
 			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsNonInventoried").submit();
 		});
 
+		$(".dialog-form").dialog({ autoOpen: false, modal: true, width: '800px', top: 10});	
+
+		$(".open-dialog").click(function() { 
+			var id = $(this).attr("id");
+			$("#dialog-" + id).dialog('open');
+		});
+		$(".close-dialog").click(function() { 
+			var id = $(this).attr("id");
+			$("#dialog-" + id).dialog('close');
+		});
+		
 	});
 </script>
