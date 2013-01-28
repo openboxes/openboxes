@@ -101,7 +101,9 @@ class LocationController {
 			if (!locationInstance.hasErrors()) {
 				try {
 					inventoryService.saveLocation(locationInstance)
-					session.warehouse = locationInstance
+					if (locationInstance?.id == session?.warehouse?.id) {
+						session.warehouse = locationInstance
+					}
 					
 				} catch (ValidationException e) {
 					render(view: "edit", model: [locationInstance: locationInstance])
