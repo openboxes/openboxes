@@ -19,9 +19,12 @@ import org.pih.warehouse.core.User;
 
 import testutils.DbHelper
 
-
+import org.junit.Test
 
 class InventoryServiceTests extends GroovyTestCase {
+	
+	def inventoryService
+	
     protected def transactionType_consumptionDebit
     protected def  transactionType_inventory
     protected def  transactionType_productInventory
@@ -52,7 +55,8 @@ class InventoryServiceTests extends GroovyTestCase {
     def level3
     def level4
     def level5
-
+	def level6
+	
     private void basicTestFixture(){
         warehouseLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
         supplierLocationType = LocationType.get(Constants.SUPPLIER_LOCATION_TYPE_ID)
@@ -81,6 +85,16 @@ class InventoryServiceTests extends GroovyTestCase {
 		advilProduct = DbHelper.createProductIfNotExists("Advil" + UUID.randomUUID().toString()[0..5])
 		ibuprofenProduct.description = "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)"
 		ibuprofenProduct.save(flush:true);
+				
+		tylenolProduct.brandName = "TYLENOL®"
+		tylenolProduct.manufacturer = "McNeil Consumer Healthcare"
+		tylenolProduct.manufacturerName = "Tylenol Extra Strength Acetaminophen 500 Mg 325 Caplets"
+		tylenolProduct.manufacturerCode = "TYL325"
+		tylenolProduct.vendor = "IDA"
+		tylenolProduct.vendorCode = "025200"
+		tylenolProduct.vendorName = "Acetaminophen 325 mg, film coated"
+		tylenolProduct.save(flush:true);
+		
 		
         // create some inventory items
         aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1", new Date().plus(100))
@@ -162,14 +176,15 @@ class InventoryServiceTests extends GroovyTestCase {
         level3 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: aspirinProduct)
         level4 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: bostonInventory, product: ibuprofenProduct)
         level5 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: haitiInventory, product: ibuprofenProduct)
-
+		level6 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: tylenolProduct)
+		
         bostonInventory.addToConfiguredProducts(level1)
         bostonInventory.addToConfiguredProducts(level2)
         bostonInventory.addToConfiguredProducts(level4)
-
         haitiInventory.addToConfiguredProducts(level3)
         haitiInventory.addToConfiguredProducts(level5)
-
+		haitiInventory.addToConfiguredProducts(level6)
+		
         bostonInventory.save(flush:true)
         haitiInventory.save(flush:true)
 
@@ -178,6 +193,7 @@ class InventoryServiceTests extends GroovyTestCase {
         level3.save(flush:true)
         level4.save(flush:true)
         level5.save(flush:true)
+        level6.save(flush:true)
     }
 
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsNoInventoryLevelsAtCurrentInventory() {
@@ -216,7 +232,48 @@ class InventoryServiceTests extends GroovyTestCase {
         assert !result.contains(ibuprofenProduct)
     }
 
+	@Test
+	void getProductsByTermsAndCategories_shouldFindByBrand() {
+		inventoryLevelTestFixture()
+		def terms = ["TYLENOL®"]
+		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		println result
+		assert result.contains(tylenolProduct)		
+	}
 
+	@Test
+	void getProductsByTermsAndCategories_shouldFindByManufacturer() { 		
+		inventoryLevelTestFixture()
+		def terms = ["McNeil"]
+		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		println result
+		assert result.contains(tylenolProduct)		
+		
+		terms = ["TYL325"]
+		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		println result
+		assert result.contains(tylenolProduct)
+	}
+
+	@Test
+	void getProductsByTermsAndCategories_shouldFindByVendor() {
+		inventoryLevelTestFixture()
+		def terms = ["IDA"]
+		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		println result
+		assert result.contains(tylenolProduct)
+		
+		terms = ["025200"]
+		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		println result
+		assert result.contains(tylenolProduct)
+		
+		terms = ["Extra Strength"]
+		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		println result
+		assert result.contains(tylenolProduct)
+		
+	}
 
     private void productTagTestFixture() {
 		basicTestFixture()

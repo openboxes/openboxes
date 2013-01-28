@@ -610,7 +610,7 @@ class InventoryService implements ApplicationContextAware {
 		//"select inventory_item.lot_number from product left join inventory_item on inventory_item.product_id = product.id where product.name like '%lactomer%'"
         def unsupportedProducts = []
         if(!showHidden) {
-            currentInventory.configuredProducts.each { if(it.status != InventoryStatus.SUPPORTED) { unsupportedProducts.add(it.product)}}
+            currentInventory?.configuredProducts?.each { if(it.status != InventoryStatus.SUPPORTED) { unsupportedProducts.add(it.product)}}
         }
 
         def products = Product.createCriteria().list() {
@@ -641,6 +641,11 @@ class InventoryService implements ApplicationContextAware {
                                 ilike("description", "%" + term + "%")
                             }
                         }
+						and {
+							terms.each { term ->
+								ilike("brandName", "%" + term + "%")
+							}
+						}
                         and {
                             terms.each { term ->
                                 ilike("manufacturer", "%" + term + "%")
@@ -651,6 +656,26 @@ class InventoryService implements ApplicationContextAware {
                                 ilike("manufacturerCode", "%" + term + "%")
                             }
                         }
+                        and {
+                            terms.each { term ->
+                                ilike("manufacturerName", "%" + term + "%")
+                            }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("vendor", "%" + term + "%")
+                            }
+                        }
+                        and {
+                            terms.each { term ->
+                                ilike("vendorCode", "%" + term + "%")
+                            }
+                        }
+						and {
+							terms.each { term ->
+								ilike("vendorName", "%" + term + "%")
+							}
+						}
                         and {
                             terms.each { term ->
                                 ilike("upc", "%" + term + "%")
