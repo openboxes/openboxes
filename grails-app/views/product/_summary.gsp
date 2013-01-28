@@ -22,11 +22,11 @@
 						</g:if>
 					</div>				
 					<div id="product-header">
-			            <h3 class="product-title title">
+			            <div id="product-title" class="title">
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
-			                ${productInstance?.manufacturerName?:productInstance?.vendorName?:productInstance?.name }		
+			                	${productInstance?.manufacturerName?:productInstance?.vendorName?:productInstance?.name }		
 			                </g:link>				
-			            </h3>
+			            </div>
 		                <div>		
 			                <span class="product-generic" style="text-transform:uppercase;">			
 			                	<g:if test="${productInstance?.productGroups }">
@@ -47,8 +47,7 @@
         			
 				</td>
 				<td class="right">
-        			<div class="product-status title">
-        			
+        			<div id="product-status" class="title">        			
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 							<g:if test="${totalQuantity <= 0}">
 								<g:if test="${latestInventoryDate}">

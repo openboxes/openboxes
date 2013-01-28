@@ -6,10 +6,10 @@
 					${warehouse.message(code: 'default.actions.label')}
 				</th>
 				<th>
-					${warehouse.message(code: 'shipping.shipmentNumber.label')}
+					${warehouse.message(code: 'shipping.shipmentType.label')}
 				</th>
 				<th>
-					${warehouse.message(code: 'shipping.shipmentType.label')}
+					${warehouse.message(code: 'shipping.shipmentNumber.label')}
 				</th>
 				<th>
 					${warehouse.message(code: 'shipping.shipment.label')}
@@ -38,16 +38,14 @@
 		<tbody>
 			<tr class="odd">
 				<td></td>
-				<td></td>
 				<td colspan="1"><g:select name="shipmentType" class="filter"
 						from="${org.pih.warehouse.shipping.ShipmentType.list()}"
 						optionKey="id" optionValue="${{format.metadata(obj:it)}}"
 						value="${shipmentType}"
 						noSelection="['':warehouse.message(code:'default.all.label')]" />
 				</td>
-				<td>
-			
-				</td>
+				<td></td>
+				<td></td>
 				<td><g:if test="${incoming}">
 						<g:select name="origin" class="filter"
 							from="${org.pih.warehouse.core.Location.list().sort()}"
@@ -108,13 +106,15 @@
 								</div>
 							</div>
 						</td>
-						<td class="center">
-							${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
-						</td>
 						<td class="left"><img
 							src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
-							style="vertical-align: middle; width: 24px; height: 24px;" /></td>
+							style="vertical-align: middle; width: 24px; height: 24px;" />
+						</td>
+						<td class="left">
+							${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
+						</td>
+							
 						<td class="left shipment-name"><g:link action="showDetails"
 								id="${shipmentInstance.id}">
 								${fieldValue(bean: shipmentInstance, field: "name")}

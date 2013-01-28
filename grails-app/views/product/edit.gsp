@@ -253,6 +253,17 @@
 												
 										</td>
 									</tr>	
+									<tr class="prop">
+										<td valign="top" class="name"><label for="manufacturerName"><warehouse:message
+											code="product.manufacturerName.label"/></label></td>
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
+											<g:autoSuggestString id="manufacturerName" name="manufacturerName" size="50" class="text" 
+												jsonUrl="${request.contextPath}/json/autoSuggest" 
+												value="${productInstance?.manufacturerName}"
+												placeholder=""/>
+												
+										</td>
+									</tr>	
 									
 															
 									<tr class="prop">
@@ -295,6 +306,17 @@
 												placeholder=""/>
 										</td>
 									</tr>	
+									<tr class="prop">
+										<td valign="top" class="name"><label for="vendorName"><warehouse:message
+											code="product.vendorName.label"/></label></td>
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
+											<g:autoSuggestString id="vendorName" name="vendorName" size="50" class="text" 
+												jsonUrl="${request.contextPath}/json/autoSuggest" 
+												value="${productInstance?.vendorName}"
+												placeholder=""/>
+												
+										</td>
+									</tr>													
 															
 														
 									 
