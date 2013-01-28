@@ -19,7 +19,7 @@ driver = {
 	def env = System.getenv()
 
 	if(env["headless"] == 'false'){
-		return new   FirefoxDriver()
+		return new FirefoxDriver()
 	}
 	def capabilities = DesiredCapabilities.firefox()
 	capabilities.javascriptEnabled = true

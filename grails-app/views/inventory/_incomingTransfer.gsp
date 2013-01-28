@@ -46,7 +46,7 @@
 				</td>
 				<td style="padding: 0px;">
 					<div class="transactionEntries">
-						<table id="incomingTransfer" ><!-- class="tableScroll" -->
+						<table id="incomingTransfer" >
 							<thead>
 								<tr class="odd">
 									<th class="left">
@@ -277,11 +277,8 @@
 
 		/**
 		 * Initialize the table used to hold all transaction entries
-		 */			
-		//$('.tableScroll').tableScroll({height:300});
+		 */					
 		alternateRowColors("#incomingTransfer");
-		//numberRows("#myTable");
-
 
 		/**
 		 * Delete a row from the table.

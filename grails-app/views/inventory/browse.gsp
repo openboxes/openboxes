@@ -61,7 +61,7 @@
 												</ul>		
 												<div id="tabs-1" style="padding: 0px;">													
 										            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
-										                <table id="inventory-browser-table" class="tableScroll" border="0"> 
+										                <table id="inventory-browser-table" border="0"> 
 															<thead> 
 									           					<tr>
 									           						<th>
@@ -193,7 +193,6 @@
 		</div>
 		<script>
 			$(document).ready(function() {
-				//$('.tableScroll').tableScroll({height: 400, width: '99%'});
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();
 				});

@@ -146,8 +146,6 @@
 </div>
 <script>
 	$(document).ready(function() {
-		//$('.tableScroll').tableScroll({height:300, width: 800});
-
 		alternateRowColors("#outgoingTransfer");
 
 		/**
