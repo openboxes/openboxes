@@ -113,7 +113,7 @@ class Product implements Comparable, Serializable {
 	User updatedBy
 	
 		
-	static transients = ["rootCategory", "images"];
+	static transients = ["rootCategory", "images", "genericProduct", "thumbnail"];
 	
 	static hasMany = [ 
 		categories : Category, 
@@ -179,6 +179,14 @@ class Product implements Comparable, Serializable {
 		return documents?.findAll { it.contentType.startsWith("image") }
 	}
 	
+	Document getThumbnail() { 
+		return this?.images?this.images?.sort()?.first():null
+	}
+
+	ProductGroup getGenericProduct() { 
+		return this?.productGroups?this?.productGroups?.sort()?.first():null
+	}
+		
 	String toString() { return "$name"; }
 	
 	/**

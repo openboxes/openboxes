@@ -152,6 +152,9 @@ button.action-btn, button.previous, button.next {
 }
 
 /* Action Menu Items */
+.actions .action-menu-info a:hover { 
+	cursor: pointer;
+}
 .actions .action-menu-item { 
 	border: 0px solid black;
 	margin: 0px;

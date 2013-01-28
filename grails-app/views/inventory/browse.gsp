@@ -67,9 +67,9 @@
 									           						<th>
 									           						
 									           						</th>
-									           						<th style="width: 50px;" class="middle">
-									           						
-									           						</th>
+									           						<td class="middle">
+										           						<g:render template="./actions" model="[]"/>
+									           						</td>
 																	<th class="center middle" style="width: 1%">
 																		<input type="checkbox" id="toggleCheckbox">	
 																	</th>
@@ -150,20 +150,6 @@
 																	</tr>
 																</tbody>
 															</g:else>
-															<tfoot>
-																<tr>
-																	<td>
-																	
-																	</td>
-																	<td colspan="4" class="left middle">
-																		<g:render template="./actions" model="[]"/>
-																	</td>			
-																	<td colspan="3" class="middle ">
-																	</td>
-																	<td colspan="3" class="right middle">                                                                   
-																	</td>
-																</tr>
-															</tfoot>
 														</table>
 														<div class="paginateButtons">
 															<g:paginate total="${numProducts}" params="${params}"
@@ -243,10 +229,8 @@
 					
 		    	});
 
-		    	$('.nailthumb-container').nailthumb({
-					width : 20,
-					height : 20
-				});
+		    	$('.nailthumb-container').nailthumb({ width : 20, height : 20 });
+		    	$('.nailthumb-container-100').nailthumb({ width : 100, height : 100 });
 		    	
 			});	
 		</script>

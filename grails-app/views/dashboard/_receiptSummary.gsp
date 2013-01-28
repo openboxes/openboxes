@@ -4,10 +4,7 @@
 
 <div class="widget-small">
 	<div class="widget-header">
-		<h2><warehouse:message code="receiving.label"/>
-		&rsaquo;
-		<span class="fade">${session.warehouse.name}</span>
-		</h2>
+		<h2><warehouse:message code="receiving.label"/></h2>
 	</div>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">

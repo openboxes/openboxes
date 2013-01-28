@@ -19,20 +19,22 @@
 	    		
 	    		<table>
 	    			<tr>
-	    				<td>
+	    				<td colspan="2">
 							<g:render template="inventorySummary"/>
-							
-							<g:render template="shipmentSummary"/>
-							<g:render template="receiptSummary"/>
-							
-							<%-- 
-							<g:render template="orderSummary"/>
-							--%>
-						</td>
-						<td width="40%">
+						<td>
+						<td rowspan="2" width="40%">
 							<g:if test='${activityList }'>
 								<g:render template="activitySummary"/>
 							</g:if>						
+						
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<g:render template="shipmentSummary"/>
+						</td>
+						<td>
+							<g:render template="receiptSummary"/>
 						</td>
 					</tr>
 				</table>

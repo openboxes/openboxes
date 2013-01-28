@@ -23,7 +23,7 @@
 					</tr>
 					<g:set var="status" value="${0 }"/>
 		 			<g:each var="activity" in="${activityList }" status="i">
-		 				<tr class="${status++%2?'odd':'even' } prop">
+		 				<tr class="${status++%2?'even':'odd' } prop">
 		 					<td class="center top">
 		 						<%--
 			 					<div class="nailthumb-container">
