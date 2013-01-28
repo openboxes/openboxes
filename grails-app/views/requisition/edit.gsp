@@ -34,10 +34,10 @@
         </td>
     <td class="value">
           <g:select name="origin.id" from="${locations}"
-              id = "depot"
+              id="depot"
               data-bind="value: requisition.originId"
               optionKey="id" optionValue="name" class='required' value=""
-              noSelection="['':'']"/>
+              noSelection="['null':'']"/>
         </td>
       </tr>
       <g:if test="${requisition.isDepotRequisition()}">
@@ -170,6 +170,13 @@
 
 <script type="text/javascript">
     $(function () {
+
+		var requisitionTypes = new Object();
+		requisitionTypes['WARD_STOCK'] = 'Stock';
+		requisitionTypes['WARD_NON_STOCK'] = 'Non Stock'; 
+		requisitionTypes['DEPOT_STOCK'] = 'Depot'; 
+		requisitionTypes['DEPOT_NON_STOCK'] = 'Depot'; 
+        
         var requisitionFromServer = ${requisition.toJson() as JSON};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
@@ -209,10 +216,10 @@
         });
 
         if (!viewModel.requisition.name())
-            viewModel.requisition.name("[" + viewModel.requisition.type() + "] " + "${warehouse.message(code: 'requisition.label')}");
+            viewModel.requisition.name("" + requisitionTypes[viewModel.requisition.type()] + " " + "${warehouse.message(code: 'requisition.label')}");
 
         var updateDescription = function () {
-            var type = "[" + viewModel.requisition.type() + "] ";
+            var type = requisitionTypes[viewModel.requisition.type()] + " ";
             var depot = $("select#depot option:selected").text() || "";
             var program = $("#recipientProgram").val() || "";
             var requestedBy = $("#requestedBy").val() || "";
