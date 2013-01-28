@@ -65,11 +65,14 @@ class RequisitionController {
 
     private List<Location> getWardsPharmacies() {
         def current = session.warehouse as Location
-        if(current.locationGroup == null) {
-            Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
+		def locations = []		
+        if(current.locationGroup == null) {			
+            locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
         } else {
-            Location.list().findAll { location -> location.locationGroup == current.locationGroup}.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
-        }
+            locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
+        }		
+		
+		return locations
     }
 
     def save = {
