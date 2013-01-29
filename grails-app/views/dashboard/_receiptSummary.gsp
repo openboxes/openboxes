@@ -12,21 +12,39 @@
 				<div style="text-align: left; padding: 10px;" class="fade">
 					(<warehouse:message code="shipping.noRecent.label"/>)
 				</div>
+				
 			</g:if>	    		
 			<g:else>	
 			
   				<g:set var="pending" value="${ShipmentStatusCode.PENDING}"/>
   				<g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
   				<g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
+  				
+				<g:set var="shipmentsPending" value="${incomingShipmentsByStatus[pending] }"/>			
 				<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>			
   				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
-				<g:set var="incomingShipmentsTotal" value="${shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
+				<g:set var="incomingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
 
 					
 	    		<table>
 	    			
 	    			<tbody>
 						<tr class="even">
+							<td class="center" style="width: 1%">
+								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>						
+							</td>
+							<td>
+								<g:link controller="shipment" action="list" params="['type':'incoming','status':pending]">
+									${warehouse.message(code: 'dashboard.incoming.pending.label', args: [session.warehouse.name]) }							
+								</g:link>
+							</td>
+							<td class="right">
+								<g:link controller="shipment" action="list" params="['type':'incoming','status':pending]">
+									${shipmentsPending.objectList.size}
+								</g:link>
+							</td>
+						</tr>				
+						<tr class="odd">
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>						
 							</td>
@@ -41,9 +59,9 @@
 								</g:link>
 							</td>
 						</tr>				
-						<tr class="odd prop">
+						<tr class="even">
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>						
+								<img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>						
 							</td>
 						
 							<td>
@@ -60,10 +78,7 @@
 			    	</tbody>
 			    	<tfoot>
 						<tr class="even prop" style="height: 30px;">
-							<th>
-							
-							</th>
-							<th>
+							<th colspan="2">
 								<warehouse:message code="default.total.label"/>
 							</th>
 							<th class="right">

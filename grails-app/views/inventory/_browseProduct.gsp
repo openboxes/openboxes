@@ -86,7 +86,7 @@
 										<warehouse:message code="product.edit.label"/>
 									</g:link>
 									<g:link class="button" controller="inventoryItem" action="showTransactionLog" params="['product.id': inventoryItem?.product?.id, 'disableFilter':true]">
-										<img src="${resource(dir: 'images/icons/silk', file: 'calendar.png')}"/>
+										<img src="${resource(dir: 'images/icons/silk', file: 'chart_bar.png')}"/>
 										<warehouse:message code="inventory.showTransactionLog.label"/>
 									</g:link>
 								</div>

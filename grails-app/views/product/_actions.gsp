@@ -13,15 +13,15 @@
 			<hr/>
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="product" action="edit" id="${productInstance?.id }"> 
-				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-				<warehouse:message code="product.edit.label"/>
-			</g:link>
-		</div>
-		<div class="action-menu-item">
 			<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
 				<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>&nbsp;
 				<warehouse:message code="inventory.showStockCard.label"/>
+			</g:link>
+		</div>
+		<div class="action-menu-item">
+			<g:link controller="product" action="edit" id="${productInstance?.id }"> 
+				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+				<warehouse:message code="product.edit.label"/>
 			</g:link>
 		</div>
 		<div class="action-menu-item">

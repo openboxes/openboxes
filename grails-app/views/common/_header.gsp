@@ -65,13 +65,11 @@
 										</li>
 										--%>
 										<g:if test="${session?.warehouse}">
-											<%-- 
 											<li class="action-menu-item">
 												<g:link  controller="dashboard" action="index" style="color: #666;">
 													<warehouse:message code="dashboard.label"/>
 												</g:link>	
 											</li>
-											--%>																	
 											<li class="action-menu-item">
 												<a href="javascript:void(0);" class="warehouse-switch" style="color: #666">
 													Change location

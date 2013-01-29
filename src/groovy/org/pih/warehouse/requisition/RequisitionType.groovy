@@ -13,8 +13,10 @@ public enum RequisitionType {
 	WARD_STOCK(0),
 	WARD_NON_STOCK(1),
 	DEPOT_STOCK(2),
-	DEPOT_NON_STOCK(3)
-
+	DEPOT_NON_STOCK(3),
+	DEPOT_TO_DEPOT(4),
+	WARD_ADHOC(5)
+	
 	int sortOrder
 
 	RequisitionType(int sortOrder) {
@@ -31,6 +33,8 @@ public enum RequisitionType {
 		[
 			WARD_STOCK,
 			WARD_NON_STOCK,
+			WARD_ADHOC,
+			DEPOT_TO_DEPOT,
 			DEPOT_STOCK,
 			DEPOT_NON_STOCK
 		]
