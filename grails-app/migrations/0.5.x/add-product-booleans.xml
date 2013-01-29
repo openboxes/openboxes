@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="jmiranda (generated)" id="1359439555236-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="active" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="active" type="BIT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359439555236-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="controlled_substance" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="controlled_substance" type="BIT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359439555236-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="essential" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="essential" type="BIT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359439555236-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="hazardous_material" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="hazardous_material" type="BIT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359439555236-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="lot_control" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="lot_control" type="BIT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359439555236-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="serialized" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product">
+			<column name="serialized" type="BIT" />
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

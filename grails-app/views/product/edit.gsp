@@ -147,10 +147,65 @@
 										</td>
 									</tr>				
 									<tr class="prop">
-										<td valign="top" class="name"><label for="coldChain"><warehouse:message
-											code="product.coldChain.label" /></label></td>
+										<td valign="top" class="name"></td>
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'active', 'errors')}">
+											<g:checkBox name="active" value="${productInstance?.active}" />
+											<label for="active"><warehouse:message
+											code="product.active.label" /></label>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+										</td>
 										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
 											<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
+											<label for="coldChain"><warehouse:message
+												code="product.coldChain.label" /></label>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+										</td>
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')}">
+											<g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
+											<label for="controlledSubstance"><warehouse:message 
+												code="product.controlledSubstance.label" /></label>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+										</td>
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
+											<g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
+											<label for="hazardousMaterial"><warehouse:message
+												code="product.hazardousMaterial.label" /></label>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+										</td>
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
+											<g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
+											<label for="lotControl"><warehouse:message
+												code="product.lotControl.label" /></label>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+										</td>
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'serialized', 'errors')}">
+											<g:checkBox name="serialized" value="${productInstance?.serialized}" />
+											<label for="serialized"><warehouse:message
+												code="product.serialized.label" /></label>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+										</td>
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
+											<g:checkBox name="essential" value="${productInstance?.essential}" />
+											<label for="essential"><warehouse:message
+												code="product.essential.label" /></label>
 										</td>
 									</tr>
 									<tr>

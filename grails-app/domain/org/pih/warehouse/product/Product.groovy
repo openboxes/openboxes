@@ -45,33 +45,100 @@ class Product implements Comparable, Serializable {
 		
 	// Base product information 
 	String id	
-	String name;							// Specific description for the product
-	String description;						// Not used at the moment
-	String productCode 						// Internal product code identifier
+	
+	// Specific description for the product
+	String name					
+	
+	// Details product description
+	String description
+	
+	// Internal product code identifier (or SKU)
+	// http://en.wikipedia.org/wiki/Stock_keeping_unit
+	String productCode 						
+	
+	
+	// Controlled Substances
+	// http://en.wikipedia.org/wiki/Controlled_Substances_Act
+	// http://bfa.sdsu.edu/ehs/deapp1.htm
+	Boolean controlledSubstance = Boolean.FALSE
+	//ControlledSubstanceClass controlledSubstanceClass
+	// SCHEDULE_I
+	// SCHEDULE_II
+	// SCHEDULE_III
+	// SCHEDULE_IV
+	// SCHEDULE_V
+	
+	// Hazardous Materia
+	Boolean hazardousMaterial = Boolean.FALSE		
+	// http://www.fmcsa.dot.gov/facts-research/research-technology/visorcards/yellowcard.pdf
+	// HazardousMaterialClass hazardousMaterialClass
+	// CLASS_1_EXPLOSIVES
+	// CLASS_2_GASES
+	// CLASS_3_FLAMMABLE_LIQUIDS
+	// CLASS_4_FLAMMABLE_SOLIDS
+	// CLASS_5_OXIDIZERS_AND_ORGANIC_PEROXIDES
+	// CLASS_6_TOXIC_MATERIALS_AND_INFECTIOUS_SUBSTANCES
+	// CLASS_7_RADIOACTIVE_MATERIALS
+	// CLASS_8_CORROSIVE_MATERIALS
+	// CLASS_9_MISCELLANEOUS
+	// DANGEROUS	
+	
+	// Indicates whether the product is active.  Setting a product as inactive is the same 
+	// as removing from the database (it cannot be used if it is active).  However, we do 
+	// not want to delete the product because it may be referenced in existing transactions
+	// shipments, requisitions, inventory items, etc. 
+	Boolean active = Boolean.TRUE
+	
+	// Indicates whether the product requires temperature-controlled supply chain
+	// http://en.wikipedia.org/wiki/Cold_chain
 	Boolean coldChain = Boolean.FALSE;
-	//Boolean hazardous = Boolean.FALSE
-	//Boolean serialized = Boolean.FALSE
-	//Boolean lotControl = Boolean.TRUE
 	
+	// Allows tracking of inventory by serial number (includes products such as computers and electronics).
+	// A serialized product has a qty = 1 per serial number
+	Boolean serialized = Boolean.FALSE
 	
-	Category category;						// primary category
-	
-	String unitOfMeasure	// each, pill, bottle, box
-	UnitOfMeasure defaultUom
+	// Allows tracking of inventory by lot or batch number (primary medicines and medical suppies)
+	// http://docs.oracle.com/cd/A60725_05/html/comnls/us/inv/lotcntrl.htm
+	Boolean lotControl = Boolean.TRUE		
 
-	// New fields that need to be reviewed
-	String upc				// Universal product code
-	String ndc				// National drug code
+	// Used to indicate that the product is an essential med (as defined by the WHO, MSPP, or PIH).	
+	// WHO Model Lists of Essential Medicines - http://www.who.int/medicines/publications/essentialmedicines/en/
+	Boolean essential = Boolean.TRUE		
+	
+	// primary category
+	Category category;						
+	
+	// For better or worse, unit of measure and dosage form are used somewhat interchangeably 
+	// (e.g. each, tablet, pill, bottle, box)
+	// http://help.sap.com/saphelp_45b/helpdata/en/c6/f83bb94afa11d182b90000e829fbfe/content.htm
+	String unitOfMeasure	
+	
+	// The default unit of measure used for this product
+	// Not used at the moment, but this should actually be separated into multiple field 
+	// stockkeeping UoM, purchasing UoM, shipping UoM, dispensing UoM, requisition UoM, 
+	// issuing UoM, and reporting UoM. 
+	UnitOfMeasure defaultUom
+	// UnitOfMeasure shippingUom
+	// UnitOfMeasure UoM
+	// UnitOfMeasure issuingUom
+
+	// Universal product code
+	// http://en.wikipedia.org/wiki/Universal_Product_Code
+	String upc				
+	
+	// National drug code
+	// http://en.wikipedia.org/wiki/National_Drug_Code
+	String ndc				
 	
 	
-	// Manufacturer
+	// Manufacturer details
 	String manufacturer		// Manufacturer
 	String manufacturerCode // Manufacturer's product code (e.g. catalog code)
 	String manufacturerName // Manufacturer's product name
 	String brandName		// Manufacturer's brand name
 	String modelNumber		// Manufacturer's model number
 
-	// Vendor
+	// Vendor details
 	String vendor 			// Vendor
 	String vendorCode		// Vendor's product code
 	String vendorName		// Vendor's product name
@@ -103,8 +170,11 @@ class Product implements Comparable, Serializable {
 		
 	// Associations 
 					
-	List attributes = new ArrayList();		// custom attributes
-	List categories = new ArrayList();		// secondary categories
+	// Custom product attributes
+	List attributes = new ArrayList();		
+	
+	// Secondary categories (currently not used)
+	List categories = new ArrayList();		
 	
 	// Auditing
 	Date dateCreated;
