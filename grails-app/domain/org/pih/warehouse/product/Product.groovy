@@ -211,7 +211,15 @@ class Product implements Comparable, Serializable {
 		productCode(nullable:true, maxSize: 255, unique: false)
 		unitOfMeasure(nullable:true, maxSize: 255)
 		category(nullable:false)
+		
+		active(nullable:true)
 		coldChain(nullable:true)
+		controlledSubstance(nullable:true)
+		hazardousMaterial(nullable:true)
+		serialized(nullable:true)
+		lotControl(nullable:true)
+		essential(nullable:true)
+		
 		
 		defaultUom(nullable:true)
 		upc(nullable:true, maxSize: 255)
