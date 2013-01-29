@@ -20,7 +20,7 @@ class FulfillmentItem implements Serializable {
 	// Attributes
 	Integer quantity
 	InventoryItem inventoryItem
-	RequisitionItem requestItem
+	RequisitionItem requisitionItem
 	
 	// Audit fields
 	Date dateCreated
