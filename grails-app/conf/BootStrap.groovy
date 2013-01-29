@@ -240,48 +240,55 @@ class BootStrap {
 	void assignShipmentIdentifiers() { 		
 		def shipments = Shipment.findAll("from Shipment as s where shipmentNumber is null or shipmentNumber = ''")
 		shipments.each { shipment ->
+			println "Assigning identifier to " + shipment.id + " " + shipment.name
 			shipment.shipmentNumber = productService.generateIdentifier("NNNLLL")
-			shipment.save()
+			if (!shipment.save(flush:true)) { 
+				println shipment.errors
+			}
 		}
-		
-		//def shipments = Shipment.list()
-		//shipments.each { 
-		//	shipment.shipmentNumber
-		//} 
-		
 	}
 	
 	void assignRequisitionIdentifiers() {	
 		def requisitions = Requisition.findAll("from Requisition as r where requestNumber is null or requestNumber = ''")
 		requisitions.each { requisition ->
+			println "Assigning identifier to " + requisition.id + " " + requisition.name
 			requisition.requestNumber = productService.generateIdentifier("NNNLLL")
-			requisition.save()
+			if (!requisition.save(flush:true)) { 
+				println requisition.errors
+			}
 		}
-
 	}
 	
 	void assignOrderIdentifiers() {
 		def orders = Order.findAll("from Order as o where orderNumber is null or orderNumber = ''")
 		orders.each { order ->
+			println "Assigning identifier to " + order.id + " " + order.name
 			order.orderNumber = productService.generateIdentifier("NNNLLL")
-			order.save()
+			if (!order.save(flush:true)) { 
+				println order.errors
+			}
 		}
 	}
 	void assignTransactionIdentifiers() {
 		def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
 		transactions.each { transaction ->
+			println "Assigning identifier to " + transaction.id 
 			transaction.transactionNumber = productService.generateIdentifier("AAA-AAA-AAA")
-			transaction.save()
+			if (!transaction.save(flush:true)) { 
+				println transaction.errors
+			}
 		}
-
 	}
 
 	void assignProductIdentifiers() {
 		try { 
 			def products = Product.findAll("from Product as p where productCode is null or productCode = ''")			
 			products.each { product -> 
+				println "Assigning identifier to " + product.id + " " + product.name
 				product.productCode = productService.generateIdentifier("LLNN")
-				product.save()			
+				if (!product.save(flush:true)) { 
+					println product.errors
+				}
 			}
 		} catch(Exception e) { 
 			log.error("Unable to assign product identifier ", e)
