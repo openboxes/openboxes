@@ -9,23 +9,52 @@
  **/ 
 
 import org.openqa.selenium.firefox.FirefoxDriver
-
+import org.openqa.selenium.chrome.ChromeDriver
 
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
+//driver = {
+//	def env = System.getenv()
 
+//	if(env["headless"] == 'false'){
+//		return new FirefoxDriver()
+//	}
+//	def capabilities = DesiredCapabilities.firefox()
+//	capabilities.javascriptEnabled = true
+//	return new HtmlUnitDriver(capabilities)
+//}
+
+// Use htmlunit as the default
+// See: http://code.google.com/p/selenium/wiki/HtmlUnitDriver
 driver = {
-	def env = System.getenv()
-
-	if(env["headless"] == 'false'){
-		return new FirefoxDriver()
-	}
+	//def driver = new HtmlUnitDriver()
+	//driver.javascriptEnabled = true
+	//driver
 	def capabilities = DesiredCapabilities.firefox()
 	capabilities.javascriptEnabled = true
-	return  new HtmlUnitDriver(capabilities)
+	return new HtmlUnitDriver(capabilities)
 }
 
+environments {
+	// run as “grails -Dgeb.env=chrome test-app”
+	// See: http://code.google.com/p/selenium/wiki/ChromeDriver
+	chrome {
+		driver = { new ChromeDriver() }
+	}
+	// run as “grails -Dgeb.env=firefox test-app”
+	// See: http://code.google.com/p/selenium/wiki/FirefoxDriver
+	firefox {
+		driver = { new FirefoxDriver() }
+	}
+
+}
+
+
+//waiting {
+//	timeout = 25
+//	retryInterval = 0.5
+//}
 
 reportsDir = "target/geb-reports"
 autoClearCookies = false
