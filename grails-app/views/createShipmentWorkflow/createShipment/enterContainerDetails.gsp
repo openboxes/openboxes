@@ -105,7 +105,6 @@
 				<table>
 			 		<tbody>		
 			 			<tr>
-			 			
 				 			<td colspan="2">
 				 				<g:render template="shipmentButtons"/>				 						 				
 					 			<g:render template="containerButtons" model="[container:selectedContainer]"/>	
@@ -113,13 +112,23 @@
 			 			</tr>
 			 		
 				 		<tr class="">
-					 		<%-- Display the pallets & boxes in this shipment --%> 
+					 		<%-- 
+					 		
+					 				Display the pallets & boxes in this shipment 
+					 		
+					 		--%> 
 							<g:if test="${containerList }">
 					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey; padding: 0px;">
 									<div class="box" >
 										<g:set var="count" value="${0 }"/>	
 										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
 											<thead>
+												<tr>
+													<td colspan="5" class="center">
+														<div class="title"><warehouse:message code="containers.label"/></div>
+													</td>										
+												</tr>
+											
 												<tr class="">													
 													<th class="left middle">
 														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
@@ -135,15 +144,18 @@
 														</g:link>
 													</th>
 												</tr>															
-											
 											</thead>
 											<tbody>
-												<!-- UNPACKED ITEMS -->				
+												<!-- 
+												
+													UNPACKED ITEMS 
+												
+												-->				
 												<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 												<tr class="droppable ${count++%2==0?'odd':'even' } ${styleClass }" container="null">
 													<td class="left">
 														<span class="action-menu" >
-															<button class="action-btn">
+															<button id="unpackedItemsActionBtn" class="action-btn">
 																<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 															</button>
 															<div class="actions left">
@@ -171,14 +183,18 @@
 													</td> 
 												</tr>		
 												
-												<!-- ALL OTHER PALLETS -->													
+												<!-- 
+												
+													ALL OTHER PALLETS, CRATES, BOXES 
+													
+												-->													
 												<g:if test="${shipmentInstance?.containers }">
 													<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
 														<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 														<tr id="container_${containerInstance?.id }" class="droppable ${styleClass } ${count++%2==0?'odd':'even' } connectable" container="${containerInstance?.id }">
 															<td class="left">
 																<span class="action-menu">
-																	<button class="action-btn">
+																	<button id="containerActionBtn-${containerInstance?.id }" class="action-btn">
 																		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 																	</button>
 																	<div class="actions left">
@@ -210,7 +226,7 @@
 															<tr id="container_${containerInstance?.id }" class="${styleClass } ${count++%2==0?'odd':'even' }">
 																<td class="left">									
 																	<span class="action-menu" >
-																		<button class="action-btn">
+																		<button id="childContainerActionBtn-${childContainerInstance?.id }" class="action-btn">
 																			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 																		</button>
 																		<div class="actions" style="position: absolute; z-index: 1; display: none;">
@@ -248,14 +264,19 @@
 					 			</td>
 							</g:if>
 				 			
-				 			<%-- Display the contents of the currently selected container --%>			 			
+				 			<%-- 
+
+		 							Display the contents of the currently selected container 
+
+				 			--%>			 			
 				 			<td valign="top" style="padding: 0px;">		
 								<div class="box">
 									<table style="border: 0px solid lightgrey">
+										
 										<tr>
-											<td style="width: 20px;">
-												<span class="action-menu" >
-													<button class="action-btn">
+											<td class="left" style="width:1%;">
+												<div class="action-menu" >
+													<button id="selectedContainerActionBtn" class="action-btn">
 														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 													</button>
 													<div class="actions">
@@ -263,9 +284,9 @@
 														<g:render template="shipmentMenuItems" />													
 														
 													</div>
-												</span>	
+												</div>	
 											</td>
-											<td class="middle">
+											<td class="middle left">
 												
 												<span class="middle title">
 													<warehouse:message code="containers.label"/>
@@ -292,10 +313,9 @@
 										</tr>
 									</table>									
 								
-									<table  >
+									<table>
 										<thead>
 											<tr>
-												<th class="middle"></th>
 												<th class="middle"><warehouse:message code="default.actions.label"/></th>
 												<th class="left middle"><warehouse:message code="default.qty.label"/></th>
 												<th class="middle"><warehouse:message code="default.item.label"/></th>
@@ -310,17 +330,16 @@
 												<g:set var="count" value="${0 }"/>
 												<g:each var="shipmentItem" in="${shipmentItems?.sort()}">		
 													<tr id="shipmentItemRow-${shipmentItem?.id }" class="${(count++%2)?'odd':'even' }">
-														<td class="middle center" width="1%">
-														</td>
-														<td nowrap="nowrap" width="3%">
-															<span class="action-menu">
-																<button class="action-btn">
+														
+														<td nowrap="nowrap" class="left">
+															<div class="action-menu">
+																<button id="shipmentItemActionBtn-${shipmentItem?.id }" class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 																</button>
 																<div class="actions">
 																	<g:render template="itemMenuItems" model="[itemInstance:shipmentItem]"/>
 																</div>
-															</span>		
+															</div>		
 															<%-- 						
 															<span id="${shipmentItem?.id }" class="draggable">
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" class="middle"/>
@@ -343,10 +362,12 @@
 															</div>
 														</td>
 														<td class="center middle">
+															<div class="lotNumber">
 															${shipmentItem?.inventoryItem?.lotNumber}
+															</div>
 														</td>
 														<td class="center middle">
-															<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+															<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="MMMMM yyyy"/>
 															
 														</td>
 														<td class="left middle">
