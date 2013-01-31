@@ -113,6 +113,11 @@
                         </g:link>
                     </div>
 	                <div class="megaButton">
+	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_NON_STOCK']">
+	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
+	                    </g:link>
+	                </div>
+	                <div class="megaButton">
 	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
 	                    </g:link>
@@ -120,12 +125,6 @@
 	                <div class="megaButton">
 	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_ADHOC']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
-	                    </g:link>
-	                </div>
-	
-	                <div class="megaButton">
-	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_NON_STOCK']">
-	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
 	                    </g:link>
 	                </div>
 	                <div class="megaButton">
