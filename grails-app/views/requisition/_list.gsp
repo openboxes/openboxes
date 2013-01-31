@@ -7,6 +7,13 @@
 			<g:sortableColumn property="status"
 				title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
 				
+			<g:sortableColumn property="type"
+				title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
+				
+			<g:sortableColumn property="requestNumber"
+				title="${warehouse.message(code: 'requisition.requestNumber.label', default: 'Request number')}" />
+				
+				
 			<g:sortableColumn property="description"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
 			<th>
@@ -37,7 +44,13 @@
 					<format:metadata obj="${requisition?.status}"/>
 				</td>
 				<td>
-					<g:link action="show" id="${requisition.id}">
+					<format:metadata obj="${requisition?.type}"/>
+				</td>
+				<td>
+					${requisition.requestNumber }
+				</td>
+				<td>
+					<g:link action="show" id="${requisition.id}">						
 						${fieldValue(bean: requisition, field: "name")}
 					</g:link>
 				</td>
