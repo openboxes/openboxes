@@ -219,17 +219,7 @@
 	
 	<script type="text/javascript">
 		$(function() { 		
-
-			console.log($("body,html"));
-			console.log($.type("body,html"));
-			console.log(document.activeElement);
-			console.log($.type(document.activeElement));
-			console.log($("body").first() == document.activeElement);
-			console.log($("body").hasFocus)
-			if (!document.activeElement || $("body") == document.activeElement) {
-				$("#globalSearch").focus();
-			}
-			
+						
 			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 		
 			<g:if test="${session.useDebugLocale}">
