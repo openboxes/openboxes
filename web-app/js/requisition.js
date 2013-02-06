@@ -19,6 +19,7 @@ openboxes.requisition.PicklistItem = function(attrs){
     self.requisitionItemId = ko.observable(attrs.requisitionItemId);
     self.inventoryItemId = ko.observable(attrs.inventoryItemId);
     self.lotNumber = ko.observable(attrs.lotNumber);
+    self.unitOfMeasure = ko.observable(attrs.unitOfMeasure);
     self.expirationDate = ko.observable(formatDate(attrs.expirationDate));
     self.quantityOnHand = ko.observable(attrs.quantityOnHand);
     self.quantityATP = ko.observable(attrs.quantityATP);
@@ -127,6 +128,7 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.productName = ko.observable(attrs.productName);
     self.quantity =  ko.observable(attrs.quantity);
     self.comment = ko.observable(attrs.comment);
+    self.unitOfMeasure = ko.observable(attrs.unitOfMeasure)
     //self.substitutable =  ko.observable(attrs.substitutable);
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
@@ -370,6 +372,7 @@ openboxes.expireFromLocal = function() {
 };
 
 openboxes.requisition.Requisition.getNewer = function(serverData, localData){
+  localData = null;
   if(!localData) return serverData;
   if(serverData.version > localData.version) return serverData;
   if(serverData.version < localData.version) return localData;

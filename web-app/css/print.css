@@ -31,12 +31,21 @@ body{
 }
 
 #signature-table {
-    width: 80%;
+    width: 60%;
     margin: auto;
     margin-bottom: 20px;
-    margin-top: 50px;
+    margin-top: 20px;
 }
 #signature-table tr { border-bottom: 1px solid lightgrey; }
+
+.signature-table {
+    width: 90%;
+    margin: auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.signature-table tr, .signature-table td { border: 1px solid lightgrey; }
+
 
 #details-table{
     width: 60%;
@@ -61,5 +70,6 @@ body{
 }
 
 @media print {
- #print-button { display:none; }
+	#print-button { display:none; }
+	#print-header { display: none; }
 }

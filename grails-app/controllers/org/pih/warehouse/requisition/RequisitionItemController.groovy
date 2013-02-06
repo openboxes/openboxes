@@ -106,4 +106,42 @@ class RequisitionItemController {
             redirect(action: "list")
         }
     }
+	
+	def cancel = {
+		log.info "Cancel requisition item " + params
+		
+		def requisitionItem = RequisitionItem.get(params.id)
+		if (requisitionItem) {
+			requisitionItem.properties = params
+			//requisitionItem.quantityCanceled = requisitionItem.calculateQuantityRemaining()
+			requisitionItem.save(flush:true)
+			redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id, , params:['requisitionItem.id':requisitionItem.id])	
+		}
+		else { 
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+			redirect(controller: "requisition", action: "list")
+
+		}
+    }
+
+	
+	def uncancel = {
+		def requisitionItem = RequisitionItem.get(params.id)
+		if (requisitionItem) {
+			requisitionItem.quantityCanceled = 0 
+			requisitionItem.cancelComments = null
+			requisitionItem.cancelReasonCode = null
+			requisitionItem.save(flush:true)
+			redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id, params:['requisitionItem.id':requisitionItem.id])
+		}
+		else {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+			redirect(controller: "requisition", action: "list")
+
+		}
+	}
+	
+	
+	
+
 }

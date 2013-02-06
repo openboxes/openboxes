@@ -14,6 +14,7 @@ import java.util.Date;
 import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.User
@@ -50,6 +51,7 @@ class Transaction implements Comparable, Serializable {
 	Date transactionDate	    		// Date entered into the warehouse
 	Shipment outgoingShipment			// Outgoing shipment associated with a transfer out transasction
 	Shipment incomingShipment			// Incoming shipment associated with a transfer in transasction
+	Requisition requisition				// associated requisition
 	String transactionNumber
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
 	String comment
@@ -85,6 +87,7 @@ class Transaction implements Comparable, Serializable {
 		updatedBy(nullable:true)
 		outgoingShipment(nullable:true)
 		incomingShipment(nullable:true)
+		requisition(nullable:true)
 		confirmed(nullable:true)
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)

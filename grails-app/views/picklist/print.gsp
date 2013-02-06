@@ -13,16 +13,18 @@
 <body>
 	<h2 id="print-header">
 		<img id="logo" src="${createLinkTo(dir:'images/', file:'hands.jpg')}" />
-		${requisition?.name}
+		<warehouse:message code="picklist.print.label"/>
 		<span style="float: right;">
 		    <button type="button" id="print-button" onclick="window.print()">
 		        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
 		        ${warehouse.message(code:"default.print.label")}
 		    </button>
+		    &nbsp;
+		    <a href="javascript:window.close();">Close</a>
 		</span>
     </h2>
     <div class="clear"></div>
-    <div  style="float: left;">
+    <div  style="float: right;">
   
 	    <div class="header">
 	        <label><warehouse:message code="requisition.ward.label"/>:</label> ${requisition.origin?.name}
@@ -36,20 +38,30 @@
         
         
     </div>
-    <div class="requisition-number" style="float: right; text-align: center; margin: 5px;" >
-    	<g:if test="${requisition.requestNumber }">
-	    	<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:200,height:60,format:'CODE_128']) }"/>
-	    	<br/>
-	    	
-	    	${requisition?.requestNumber }
-    	</g:if>
-    </div>
     
     <div class="clear"></div>
     
-    <table id="signature-table">
+    <div class="requisition-header cf-header" style="margin-bottom: 20px;">
+	    <div class="print-logo nailthumb-container-100" style="float: left; left: 100px;">
+	   		<img src="${createLinkTo(dir:'images/', file:'hands.jpg')}"/>
+	    </div>
+	    <div class="requisition-number" style="float: left; text-align: center; margin: 5px; width: 890px;" >
+		   	<h4>${session.warehouse?.name } <warehouse:message code="picklist.label"/></h4>
+		   	<h4>${requisition?.name }</h4>
+		   	<%-- 
+		    <img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:200,height:30,format:'CODE_128']) }"/>
+	    	<g:if test="${requisition.requestNumber }">	    	
+		    	<h3>${requisition?.requestNumber }</h3>
+	    	</g:if>
+		   	--%>
+	    </div>
+	</div>    
+    <div class="clear"></div>
+    
+    
+    <table class="signature-table">
         <tr class="theader">
-            <td></td>
+            <td width="25%"></td>
             <td><warehouse:message code="default.name.label"/></td>
             <td><warehouse:message code="default.signature.label"/></td>
             <td><warehouse:message code="default.date.label"/></td>
@@ -66,19 +78,24 @@
             <td></td>
             <td></td>
         </tr>
+		<tr>
+            <td><label><warehouse:message code="requisition.verifiedBy.label"/></label></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>        
     </table>
     <div class="clear"></div>
     <table id="requisition-items">
             <tr class="theader">
                 <th><warehouse:message code="report.number.label"/></th>
-                <th></th>
-                <th></th>
                 <th class="center">${warehouse.message(code: 'product.productCode.label')}</th>
+                <th></th>
                 <th>${warehouse.message(code: 'product.label')}</th>
-                <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
-                <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
+                <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
+                <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
             </tr>
 
@@ -95,7 +112,7 @@
 	                <tr class="prop">
                         <td class="center">${i+1}</td>
                         <td>
-	                        <img src="${createLink(controller:'product',action:'barcode',params:[data:requisitionItem?.product?.productCode,width:100,height:60,format:'CODE_128']) }"/>
+	                        <img src="${createLink(controller:'product',action:'barcode',params:[data:requisitionItem?.product?.productCode,width:100,height:30,format:'CODE_128']) }"/>
                         </td>
                         <td>
 							<g:if test="${requisitionItem?.product?.images }">
@@ -110,22 +127,29 @@
 								</div>
 							</g:else>                        
                         </td>
-                        <td>
-                        	${requisitionItem?.product?.productCode}
-                        </td>
                         <td>${requisitionItem?.product?.name}</td>
-	                    <td>${picklistItems[j]?.inventoryItem?.lotNumber}</td>
-	                    <td><g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/></td>
                         <td class="center border-right">
                         	${requisitionItem?.quantity?:0}
                         	${requisitionItem?.product?.unitOfMeasure?:"EA"}
                         </td>
                         <td class="center">
-                        	${requisitionItem?.product?.getInventoryLevel(session.warehouse.id)?.binLocation?:"N/A"}
+                        	${requisitionItem?.product?.getInventoryLevel(session.warehouse.id)?.binLocation}
                         </td>
+	                    <td>
+	                    	<g:if test="${picklistItems }">
+	                    	<span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
+	                    	</g:if>
+	                    </td>
+	                    <td>
+	                    	<g:if test="${picklistItems }">
+	                    	<g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+	                    	</g:if>
+	                    </td>
 	                    <td class="center">
-	                    	${picklistItems[j]?.quantity?:0}
-                        	${requisitionItem?.product?.unitOfMeasure?:"EA"}
+	                    	<g:if test="${picklistItems }">
+		                    	${picklistItems[j]?.quantity?:0}
+	                        	${requisitionItem?.product?.unitOfMeasure?:"EA"}
+	                        	</g:if>
 	                    </td>
 	                    <%j++%>
 	                </tr>
@@ -139,7 +163,7 @@
     </div>
 <script>
 	$(document).ready(function() {
-		$('.nailthumb-container').nailthumb({ width : 60, height : 60 });
+		$('.nailthumb-container').nailthumb({ width : 100, height : 60 });
     	$('.nailthumb-container-100').nailthumb({ width : 100, height : 100 });    	
 	});	
 </script>				    

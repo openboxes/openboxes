@@ -6,7 +6,7 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- * */
+ */
 package org.pih.warehouse.picklist
 
 import org.pih.warehouse.core.Location
@@ -17,19 +17,27 @@ import org.pih.warehouse.requisition.*
 
 class PicklistController {
 
-  def picklistService
-  
-  def save = {
-    def jsonRequest = request.JSON
-    def jsonResponse = []
-    def picklist = picklistService.save(jsonRequest)
-    if (!picklist.hasErrors()) {
-        jsonResponse = [success: true, data: picklist.toJson()]
-    }
-    else {
-        jsonResponse = [success: false, errors: picklist.errors]
-    }
-    render jsonResponse as JSON
-  }
+	def picklistService
 
+	def save = {
+		def jsonRequest = request.JSON
+		def jsonResponse = []
+		def picklist = picklistService.save(jsonRequest)
+		if (!picklist.hasErrors()) {
+			jsonResponse = [success: true, data: picklist.toJson()]
+		}
+		else {
+			jsonResponse = [success: false, errors: picklist.errors]
+		}
+		render jsonResponse as JSON
+	}
+	
+	
+	def print = {
+		def requisition = Requisition.get(params.id)
+		def picklist = Picklist.findByRequisition(requisition)
+		def location = Location.get(session.warehouse.id)
+		[requisition:requisition, picklist: picklist, location:location]
+	}
+	
 }

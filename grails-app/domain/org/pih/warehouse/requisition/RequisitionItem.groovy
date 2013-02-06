@@ -28,6 +28,9 @@ class RequisitionItem implements Serializable {
     Category category
     ProductGroup productGroup
 	Integer quantity 
+	Integer quantityCanceled
+	String cancelReasonCode
+	String cancelComments
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
@@ -57,6 +60,9 @@ class RequisitionItem implements Serializable {
         inventoryItem(nullable:true)
         requestedBy(nullable:true)
         quantity(nullable:false, min:1)
+		quantityCanceled(nullable:true)
+		cancelReasonCode(nullable:true)
+		cancelComments(nullable:true)
         unitPrice(nullable:true)
         substitutable(nullable:false)
         comment(nullable:true)
@@ -65,10 +71,14 @@ class RequisitionItem implements Serializable {
 	}
 
     def calculateQuantityPicked() {
-        def totalPicked = PicklistItem.findAllByRequisitionItem(this).sum{it.quantity}
-        totalPicked
+        def quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum{it.quantity}		
+		return quantityPicked?:0
     }
 
+	def calculateQuantityRemaining() {
+		return quantity - (calculateQuantityPicked() + (quantityCanceled?:0))
+	}
+	
     def calculateNumInventoryItem(Inventory inventory) {
         InventoryItem.findAllByProduct(product).size()
     }
@@ -83,6 +93,7 @@ class RequisitionItem implements Serializable {
         version: version,
         productId: product?.id,
         productName: product?.name,
+		unitOfMeasure: product?.unitOfMeasure?:"EA",
         quantity:quantity,
         comment: comment,
         recipient: recipient,

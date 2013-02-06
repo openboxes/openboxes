@@ -5,8 +5,6 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition').toLowerCase()}" />
         <title><warehouse:message code="default.view.label" args="[entityName]" /></title>
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -16,117 +14,92 @@
             <div class="dialog">
             
                 <g:render template="summary" model="[requisition:requisition]"/>
-                <div id="tabs-details">
-                    <table>
-                        <tbody>
-                            <tr class='prop'>
-                                <td valign='top' class='name'>
-                                    <label for='source'><warehouse:message code="requisition.status.label"/></label>
-                                </td>
-                                <td valign='top' class='value'>
-                                    ${requisition?.status?.encodeAsHTML()}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for='description'><warehouse:message code="default.description.label" default="Description" /></label>
-                                </td>
-
-                                <td valign="top" class="value">${fieldValue(bean: requestInstance, field: "name")}</td>
-
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name'><label for='source'><warehouse:message code="requisition.requestFrom.label"/></label></td>
-                                <td valign='top' class='value'>
-                                    ${requisition?.origin?.name?.encodeAsHTML()}
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name'><label for="destination"><warehouse:message code="requisition.requestFor.label"/></label></td>
-                                <td valign='top' class='value'>
-                                    ${requisition?.destination?.name?.encodeAsHTML()}
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name'><label for="recipientProgram"><warehouse:message code="requisition.recipientProgram.label"/></label></td>
-                                <td valign='top' class='value'>
-                                    ${requisition?.recipientProgram }
-                                </td>
-                            </tr>
-
-                            <tr class='prop'>
-                                <td valign='top' class='name'><label for="recipient"><warehouse:message code="requisition.recipient.label"/></label></td>
-                                <td valign='top' class='value'>
-                                    ${requisition?.recipient?.name}
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name'><label for='requestedBy'><warehouse:message code="requisition.requestedBy.label"/></label></td>
-                                <td valign='top'class='value'>
-                                    ${requisition?.requestedBy?.name }
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td> </td>
-                            </tr>
-                            <tr class="prop">
-                                <td colspan="2">
-                                    <table>
-                                        <thead>
-                                            <tr class="odd">
-                                                <th><warehouse:message code="default.type.label"/></th>
-                                                <th><warehouse:message code="product.label"/></th>
-                                                <th><warehouse:message code="requisition.quantity.label"/></th>
-                                                <th><warehouse:message code="picklist.quantity.label"/></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        <g:if test="${requisition?.requisitionItems?.size() == 0}">
-                                            <tr class="prop odd">
-                                                <td colspan="4" class="center">
-                                                    <warehouse:message code="requisition.noRequisitionItems.message"/>
-                                                </td>
-                                            </tr>
-                                        </g:if>
-                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
-                                            <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                                                <td>
-                                                    <g:if test="${requisitionItem?.product }">
-                                                        <warehouse:message code="product.label"/>
-                                                    </g:if>
-                                                    <g:elseif test="${requisitionItem?.productGroup }">
-                                                        <warehouse:message code="productGroup.label"/>
-                                                    </g:elseif>
-                                                    <g:elseif test="${requisitionItem?.category }">
-                                                        <warehouse:message code="category.label"/>
-                                                    </g:elseif>
-                                                    <g:else>
-                                                        <warehouse:message code="default.unclassified.label"/>
-                                                    </g:else>
-                                                </td>
-                                                <td class="product">
-                                                    <format:metadata obj="${requisitionItem?.product?.name}"/>
-                                                </td>
-                                                <td class="quantity">
-                                                    ${requisitionItem?.quantity}
-                                                </td>
-                                                <td class="quantityPicked">
-                                                    ${requisitionItem?.calculateQuantityPicked()?:0}
-                                                </td>
-                                            </tr>
-                                        </g:each>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
+                
+                
+				<div class="yui-gc">
+					<div class="yui-u first">
+		                
+                
+		                <div id="tabs-details" class="box">
+		
+							<table class="requisition">
+								<thead>
+									<tr class="odd">
+										<th><warehouse:message code="product.label" /></th>
+										<th class="right"><warehouse:message code="requisition.quantity.label" /></th>
+										<th class="right"><warehouse:message code="picklist.quantity.label" /></th>
+										<th class="right"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
+										<th class="right"><warehouse:message code="requisition.quantityRemaining.label" /></th>
+										<th><warehouse:message code="product.uom.label" /></th>
+										<th><warehouse:message code="requisition.progressBar.label" /></th>
+										<th><warehouse:message code="requisition.progressPercentage.label" /></th>
+									</tr>
+								</thead>
+								<tbody>
+									<g:if test="${requisition?.requisitionItems?.size() == 0}">
+										<tr class="prop odd">
+											<td colspan="4" class="center"><warehouse:message
+													code="requisition.noRequisitionItems.message" /></td>
+										</tr>
+									</g:if>
+									<g:each var="requisitionItem"
+										in="${requisition?.requisitionItems}" status="i">
+										<g:set var="quantityRemaining"
+											value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
+										<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+											<td class="product">
+												<g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id }">
+												<format:metadata
+													obj="${requisitionItem?.product?.name}" /></g:link></td>
+											<td class="quantity right">
+												${requisitionItem?.quantity} 
+											</td>
+											<td class="quantityPicked right">
+												${requisitionItem?.calculateQuantityPicked()?:0}
+											</td>
+											<td class="quantityCanceled right">
+												${requisitionItem?.quantityCanceled?:0}
+											</td>
+											<td class="quantityRemaining right">
+												${quantityRemaining } 
+											</td>
+											<td>
+												${requisitionItem?.product.unitOfMeasure?:"EA" }
+											</td>
+											<td>
+												<g:set var="value" value="${((requisitionItem?.calculateQuantityPicked()?:0)+(requisitionItem?.quantityCanceled?:0))/(requisitionItem?.quantity?:1) * 100 }" />
+												<div id="progressbar-${requisitionItem?.id }" class="progressbar" style="width: 100px;"></div>
+												<script type="text/javascript">
+													    $(function() {
+													    	$( "#progressbar-${requisitionItem?.id }" ).progressbar({value: ${value}});
+													    });
+											    </script>								
+											</td>
+											<td>
+												${value }%
+											</td>
+			
+										</tr>
+									</g:each>
+								</tbody>
+							</table>
+						</div>
+						<div class="clear"></div>	
+						<div class="buttons">
+							<div class="left">
+								<g:link controller="requisition" action="list" class="button">
+									<warehouse:message code="default.button.back.label"/>	
+								</g:link>
+							</div>
+							<div class="right">
+								<g:link controller="requisition" action="edit" id="${requisition.id }" class="button">
+									<warehouse:message code="default.button.continue.label"/>	
+								</g:link>
+							</div>
+						</div>				
+					</div>
+				</div>
             </div>
         </div>
-    <script type="text/javascript">
-
-    </script>
     </body>
 </html>

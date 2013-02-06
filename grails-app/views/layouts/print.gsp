@@ -19,6 +19,7 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" media="print, screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="print, screen, projection" />
+	<g:javascript library="jquery" plugin="jquery" />
 	<g:layoutHead />
 	<g:render template="/common/customCss"/>
 	<style>

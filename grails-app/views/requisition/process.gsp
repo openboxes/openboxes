@@ -36,7 +36,7 @@
 				controller="picklist">
 				<div class="dialog">
 					<ul id="accordion"
-						data-bind="foreach: requisition.requisitionItems">
+						data-bind="foreach: requisition.requisitionItems">						
 						<li>
 							<div class="accordion-header">
 								<div data-bind="text: $index()+1" class="row-index"></div>
@@ -63,7 +63,7 @@
 								</div>
 								<div class="clear"></div>
 							</div>
-							<div class="accordion-content">
+							<div class="accordion-content" style="display: none; width: 100%">
 								<div class="requisitionItemPicklist">
 									<div class="picklist-header">
 										<div class="product-name">
@@ -84,7 +84,7 @@
 										<div class="clear"></div>
 									</div>
 									<div class="picklist-items ui-validation-items"
-										data-bind="foreach: picklistItems">
+										data-bind="foreach: picklistItems()">
 										<div data-bind="css: { 'odd': ($index() % 2 == 1) }"
 											class="picking-item">
 											<div class="product-name picklist-field"
@@ -96,11 +96,17 @@
 												data-bind="text: quantityOnHand"></div>
 											<div class="quantity-picked">
 												<input data-bind="value: quantity" type="text"
-													class="number"></input>
+													class="number text"></input>
 											</div>
 											<div class="clear"></div>
 										</div>
 									</div>
+									<div data-bind="if: picklistItems().length == 0">
+										<div class="error">
+											<warehouse:message code="requisition.picklistItems.message" default="No picklist items available"></warehouse:message>	
+										</div>
+									</div>
+									
 								</div>
 							</div>
 						</li>
@@ -150,8 +156,9 @@
 	</div>
 
 	<script type="text/javascript">
+	
     $(function(){
-        var viewModel;
+    	var viewModel;
         var data = ${data};
         var picklistFromServer = data.picklist;
         var picklistFromLocal = openboxes.requisition.getPicklistFromLocal(data.requisition.id); 

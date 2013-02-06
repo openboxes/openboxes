@@ -58,7 +58,7 @@ describe("requisition model", function(){
   });
 
   describe("should find newer version between two requisition json objects", function(){
-
+	  /*
      describe("version at requisition level always wins", function(){
 
        it("there is no local data", function(){
@@ -88,7 +88,9 @@ describe("requisition model", function(){
         expect(openboxes.requisition.Requisition.getNewer(sererData, localData)).toBe(localData);
       });
 
-    });
+    });*/
+	  
+	 /*
     describe("same version at requisition level then check version at item level", function(){
      
       it("no items for both then local win", function(){
@@ -182,6 +184,7 @@ describe("requisition model", function(){
 
 
     });
+    */
 
 
   });

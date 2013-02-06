@@ -256,7 +256,7 @@ class JsonController {
 					def quantity = quantitiesByInventoryItem[item]
 					quantity = (quantity) ?: 0
 					
-					def localizedName = localizationService.getLocalizedString(it.product.name)
+					def localizedName = localizationService.getLocalizedString(item.product.name)
 					
 					[
 						id: item.id,

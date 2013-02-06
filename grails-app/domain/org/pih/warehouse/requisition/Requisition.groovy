@@ -64,13 +64,13 @@ class Requisition implements Serializable {
 	
 	// Removed comments, documents, events for the time being.
 	//static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
-	static hasMany = [ requisitionItems: RequisitionItem ]
+	static hasMany = [ requisitionItems: RequisitionItem, events : Event ]
 	static mapping = {
 		id generator: 'uuid'
 		requisitionItems cascade: "all-delete-orphan", sort: "id"
 //		comments cascade: "all-delete-orphan"
 //		documents cascade: "all-delete-orphan"
-//		events cascade: "all-delete-orphan"
+		events cascade: "all-delete-orphan"
 	}
 	
 	static constraints = { 
@@ -83,14 +83,14 @@ class Requisition implements Serializable {
 		destination(nullable:false)
 		recipient(nullable:true)
 		requestedBy(nullable:false)
-		dateRequested(nullable:false,
-                validator: { value -> value <= new Date()})
-        requestedDeliveryDate(nullable:false,
-                validator: { value ->
-                    def tomorrow = new Date().plus(1)
-                    tomorrow.clearTime()
-                    return value >= tomorrow
-                })
+		dateRequested(nullable:false)
+                //validator: { value -> value <= new Date()})
+        requestedDeliveryDate(nullable:false)
+                //validator: { value ->
+                //    def tomorrow = new Date().plus(1)
+                //    tomorrow.clearTime()
+                //    return value >= tomorrow
+                //})
 		fulfillment(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)

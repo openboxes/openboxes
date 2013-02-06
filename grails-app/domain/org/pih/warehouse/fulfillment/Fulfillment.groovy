@@ -29,7 +29,7 @@ class Fulfillment implements Serializable {
 	Date lastUpdated
 
 	// Bi-directional Associations	
-	static belongsTo = [ request : Requisition ]
+	static belongsTo = [ requisition : Requisition ]
 	
 	// One-to-many associations 
 	static hasMany = [ fulfillmentItems : FulfillmentItem ]
@@ -42,7 +42,7 @@ class Fulfillment implements Serializable {
 	// Constraints
     static constraints = {
 		status(nullable:true)
-		request(nullable:false)
+		requisition(nullable:false)
 		fulfilledBy(nullable:true)
 		dateFulfilled(nullable:true)
     }

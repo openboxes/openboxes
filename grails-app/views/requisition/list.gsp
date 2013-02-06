@@ -14,36 +14,44 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-			<g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
-			<g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
-			<div class="tabs">
-				<ul>
-					<g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
-						<li>
-							<a href="#${format.metadata(obj: status) }">
-								<format:metadata obj="${status }"/>
-								<span class="fade">(${requisitionMap[status]?.size()?:0})</span>
-							</a>
-						</li>
-					</g:each>
-				</ul>		
-				<g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
-					<div id="${format.metadata(obj: status) }">	            	
-						<g:render template="list" model="[requisitions:requisitionMap[status]]"/>
-					</div>
-				</g:each>
-			</div>			
-			
+            
+            <div class="yui-gf">
+				<div class="yui-u first">
+				
+				
+				</div>
+				<div class="yui-u">
+					<g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
+					<g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
+					<div class="tabs">
+						<ul>
+							<g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
+								<li>
+									<a href="#${format.metadata(obj: status) }">
+										<format:metadata obj="${status }"/>
+										<span class="fade">(${requisitionMap[status]?.size()?:0})</span>
+									</a>
+								</li>
+							</g:each>
+						</ul>		
+						<g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
+							<div id="${format.metadata(obj: status) }">	            	
+								<g:render template="list" model="[requisitions:requisitionMap[status]]"/>
+							</div>
+						</g:each>
+					</div>			
+				</div>
+			</div>		
         </div>
         
 		<script type="text/javascript">
 			$(function() { 
 		    	$(".tabs").tabs(
 	    			{
-	    				//cookie: {
+	    				cookie: {
 	    					// store cookie for a day, without, it would be a session cookie
-	    				//	expires: 1
-	    				//}
+	    					expires: 1
+	    				}
 	    			}
 				); 
 				

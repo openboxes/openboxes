@@ -18,7 +18,15 @@ import org.pih.warehouse.core.User;
 
 import org.pih.warehouse.requisition.Requisition;
 
-
+/**
+ * Represents a plan of action for issuing items from inventory.  The 
+ * picklist could be generated automatically via an automated algorithm
+ * (e.g. FEFO, FIFO) or by hand.
+ * 
+ * 
+ * @author jmiranda
+ *
+ */
 class Picklist implements Serializable {
 	
 	def beforeInsert = {

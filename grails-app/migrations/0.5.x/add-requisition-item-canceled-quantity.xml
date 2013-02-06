@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="jmiranda (generated)" id="1359787826281-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="requisition_item" columnName="quantity_canceled" />
+			</not>
+		</preConditions>
+		<addColumn tableName="requisition_item">
+			<column name="quantity_canceled" type="INT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359787826281-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="requisition_item" columnName="cancel_reason_code" />
+			</not>
+		</preConditions>
+		<addColumn tableName="requisition_item">
+			<column name="cancel_reason_code" type="VARCHAR(255)" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1359787826281-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="requisition_item" columnName="cancel_comments" />
+			</not>
+		</preConditions>
+		<addColumn tableName="requisition_item">
+			<column name="cancel_comments" type="VARCHAR(255)" />
+		</addColumn>
+	</changeSet>
+	
+	
+</databaseChangeLog>

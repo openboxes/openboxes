@@ -21,6 +21,10 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         super.setUp()
         mockBindData()
     }
+	
+	protected void tearDown() {
+		super.tearDown()
+	}
 
     void testEditShouldRenderDepots(){
         def location1 = new Location(id:"1234", name: "zoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
@@ -182,7 +186,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       def requisition = renderArgs.model.requisition
       assert requisition.dateRequested.format("MM/dd/yyyy") == today
       assert requisition.type == RequisitionType.WARD_STOCK
-      assert requisition.status == RequisitionStatus.NEW
+      assert requisition.status == RequisitionStatus.CREATED
       assert requisition.requestedDeliveryDate.format("MM/dd/yyyy") == tomorrow
 
     }
@@ -314,23 +318,20 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     void testPrintRequisition() {
-
-        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
+		def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
         def picklist = new Picklist(id: "pick1", requisition: requisition)
         mockDomain(Requisition, [requisition])
         mockDomain(Picklist, [picklist])
 
-        def location = new Location(id: "loc1")
+        def location = new Location(id: "loc1", name: "Location 1")
         mockDomain(Location, [location])
-
         controller.params.id = "req1"
         controller.session.warehouse = location
-        controller.printDraft()
-
-        assert renderArgs.view == "printDraft"
-        assert renderArgs.model.location == location
-        assert renderArgs.model.requisition == requisition
-        assert renderArgs.model.picklist == picklist
+		def model = controller.printDraft()
+		
+        assert model.location == location
+        assert model.requisition == requisition
+        assert model.picklist == picklist
 
     }
 }

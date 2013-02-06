@@ -23,4 +23,6 @@
     <include file="0.5.x/add-inventory-level-bin-location.xml"/>
     <include file="0.5.x/add-transaction-number.xml"/>
     <include file="0.5.x/add-product-booleans.xml"/>
+    <include file="0.5.x/add-requisition-item-canceled-quantity.xml"/>
+    <include file="0.5.x/add-requisition-to-transaction.xml"/>
 </databaseChangeLog>

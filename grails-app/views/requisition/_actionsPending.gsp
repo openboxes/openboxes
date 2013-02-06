@@ -31,9 +31,24 @@
 		</div>
 		<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
 			<div class="action-menu-item">
+				<hr/>
+			</div>
+			<div class="action-menu-item">
 				<g:link controller="requisition" name="processRequisition" action="process" id="${requisition?.id}">
-					<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
+					<img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" />
 					&nbsp;${warehouse.message(code: 'requisition.process.label', default: 'Process requisition')}
+				</g:link>				
+			</div>
+			<div class="action-menu-item">
+				<g:link controller="requisition" action="confirm" id="${requisition?.id}">
+					<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
+					&nbsp;${warehouse.message(code: 'requisition.confirm.label', default: 'Confirm requisition')}
+				</g:link>				
+			</div>
+			<div class="action-menu-item">
+				<g:link controller="requisition" action="issue" id="${requisition?.id}">
+					<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
+					&nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue stock')}
 				</g:link>				
 			</div>
 			<div class="action-menu-item">

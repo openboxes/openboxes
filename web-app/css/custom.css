@@ -18,6 +18,8 @@ label.error {
 	position: relative; left: -16px; top: -1px;
 }
 .buttons { 
+	padding-top: 10px; 
+	border-top: 3px solid lightgrey;
 	text-align: center; 
 	padding: 10px; 
 }
@@ -129,7 +131,12 @@ button.action-btn, button.previous, button.next {
 .end { 
 	border-left: 3px solid lightgrey;
 }
-
+.border-right { 
+	border-right: 3px solid lightgrey;	
+}
+.border-left { 
+	border-left: 3px solid lightgrey;
+}
 
 
 .debit { 
@@ -266,7 +273,7 @@ h3 {
 	/*color: #008000;*//*green */
 } 
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
-.ui-accordion .ui-accordion-content { padding: 0; margin: 0; }
+
 .body { 
 	/*margin-right: 5px;*/
 	/*padding: 0px 0 10px 0;*/
@@ -1219,7 +1226,7 @@ div.clear {
 #requisition-header{
     padding: 0.5em;
     margin-left: 0.5em;
-    margin-bottom: 2.0em
+    /*margin-bottom: 2.0em*/
 }
 
 #requisition-header .title {
@@ -1279,9 +1286,9 @@ div.clear {
 
 
 /*process requisition item */
-
+.ui-accordion .ui-accordion-content { padding: 0; margin: 0; }
 .accordion-header {
-    padding: 8px;
+    padding: 10px;
     background: #FCFCFC;
     color: #1C94C4;
 }
@@ -1324,10 +1331,12 @@ div.clear {
     float: left;
 }
 
+/*
 .requisition-status {
     width: 16px;
     height: 16px;
 }
+*/
 
 .substitution {
     width: 16px;
@@ -1355,9 +1364,9 @@ div.clear {
 }
 
 .accordion-content .requisitionItemPicklist {
-  width: 80%;
+  /*width: 80%;*/
   padding: 5px;
-  border: 1px solid #eeeeee;
+  /*border: 1px solid #eeeeee;*/
   margin: 5px;
 }
 
@@ -1396,17 +1405,20 @@ div.clear {
 }
 
 .accordion-content .quantity-picked input{
-    width: 50;
+    
     text-align: center;
     float: center;
 }
 
 #picklist{
-    width: 80%;
+	width: 100%;
+}
+
+#picked-item-list {
+    margin-top: 2em;
 }
 
 #requisition-status-key{
-    width: 15%;
     margin-top: 2em;
 }
 
@@ -1435,10 +1447,10 @@ fieldset legend{
 }
 
 blockquote {
-  font: 14px/22px normal helvetica, sans-serif;
+  /*font: 14px/22px normal helvetica, sans-serif;*/
   margin-top: 10px;
   margin-bottom: 10px;
-  margin-left: 50px;
+  margin-left: 10px;
   padding-left: 15px;
   border-left: 3px solid #ccc;
 } 
@@ -1468,3 +1480,26 @@ blockquote {
 	user-select: none;
 }
 
+#requisition-items tbody > tr:nth-child(odd)        { background-color: #f7f7f7; }
+#requisition-items tbody > tr:nth-child(even)        { background-color: #fff; }
+#requisition-items td { padding: 2px; maring: 0}
+
+.requisition { border-collapse: collapse; }
+.requisition td, .requisition th { padding: 10px; border: 1px solid lightgrey; }
+
+.disabled { 
+	pointer-events: none;
+	cursor: default;
+	
+}
+
+a.button:link, a.button:visited {
+	color: black;
+    /*color: blue;*/
+    /*font-weight: bold;*/
+    /*font-size: 0.9em;*/ /* removed because it's distracting */
+    /*text-decoration: underline;*/
+   	text-decoration: none;	/* removed because we want to see underline */
+}
+a.button:hover { color: white; }
+.status { text-transform: uppercase; }

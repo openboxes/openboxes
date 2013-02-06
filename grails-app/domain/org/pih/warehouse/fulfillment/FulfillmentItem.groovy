@@ -34,15 +34,17 @@ class FulfillmentItem implements Serializable {
 	static belongsTo = [ fulfillment : Fulfillment ]
 	
 	// One-to-many associations
-	static hasMany = [ shipmentItems : ShipmentItem ]
+	//static hasMany = [ shipmentItems : ShipmentItem ]
 		
     static constraints = {
-		requestItem(nullable:true)
+		requisitionItem(nullable:true)
 		inventoryItem(nullable:true)
 		quantity(nullable:true)
     }
 	
+	/*
 	Integer quantityPacked() { 
 		return shipmentItems?.sum { it.quantity }
 	}
+	*/
 }
