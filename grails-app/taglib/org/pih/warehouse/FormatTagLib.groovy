@@ -116,7 +116,13 @@ class FormatTagLib {
 			Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			
 			// default format is to display the localized name of the catergory
-			out << LocalizationUtil.getLocalizedString(attrs?.category?.name?.encodeAsHTML(), locale)
+			def value = LocalizationUtil.getLocalizedString(attrs?.category?.name?.encodeAsHTML(), locale)			
+			if (attrs.shorten) { 
+				if (value.length() > 35) { 
+					value = value.substring(0, 35) + "..."
+				}
+			}			
+			out << value
 		}
 		// TODO: add more formats
 	}
