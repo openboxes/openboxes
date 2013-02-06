@@ -17,6 +17,8 @@ import org.pih.warehouse.requisition.*
 
 class PicklistController {
 
+	def scaffold = true
+	
 	def picklistService
 
 	def save = {

@@ -94,7 +94,7 @@ class RequisitionController {
 		def requisition = Requisition.get(params?.id)
 		if (requisition) {
 			def currentInventory = Location.get(session.warehouse.id).inventory
-			def picklist = Picklist.findByRequisition(requisition)?: new Picklist()
+			def picklist = Picklist.findByRequisition(requisition)
 			def productInventoryItemsMap = [:]
 			def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
 			productInventoryItems.keySet().each { product ->
@@ -137,7 +137,16 @@ class RequisitionController {
 			requisition.save(flush:true)
 						
 			def currentInventory = Location.get(session.warehouse.id).inventory
-			def picklist = Picklist.findByRequisition(requisition)?: new Picklist()
+			def picklist = Picklist.findByRequisition(requisition)
+
+			if (!picklist) {
+				picklist = new Picklist();
+				picklist.requisition = requisition
+				if (!picklist.save(flush:true)) {
+					throw new ValidationException("Unable to create new picklist", picklist.errors)
+				}
+			}
+			
 			def productInventoryItemsMap = [:]
 			def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
 			productInventoryItems.keySet().each { product ->
@@ -300,14 +309,14 @@ class RequisitionController {
 		def requisitionItem = Requisition.get(params.requisitionItem.id)
 		def picklist = Picklist.findByRequisition(requisition)
 
-		if (!picklist) { 
+		
+		if (!picklist) {
 			picklist = new Picklist();
 			picklist.requisition = requisition
-			if (!picklist.save(flush:true)) { 
+			if (!picklist.save(flush:true)) {
 				throw new ValidationException("Unable to create new picklist", picklist.errors)
 			}
 		}
-		
 		def tmpPicklist = new Picklist()
 		bindData(tmpPicklist, params)
 		//bindData(picklistItems, params.picklistItems)
