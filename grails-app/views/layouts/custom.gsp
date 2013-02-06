@@ -4,7 +4,8 @@
 	<!-- Include default page title -->
 	<title><g:layoutTitle default="OpenBoxes" /></title>
 	
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css"/>
+	<!-- YUI -->
+	<yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
 	
 	<!-- Include Favicon -->
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
@@ -30,7 +31,7 @@
 	<jqui:resources />
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 
-
+	
   		
  	<!-- Include Jquery Validation and Jquery Validation UI plugins --> 
  	<jqval:resources />       
@@ -125,6 +126,8 @@
 
     		</ul>
     		
+    		
+    		
     		<%-- 				    
 		    	<g:link controller="dashboard" action="index">
 			    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
@@ -213,32 +216,20 @@
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>	
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
-	<!-- 
-	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
-	<script src="${createLinkTo(dir:'js/jquery.expand/', file:'expand.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.fileupload.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.iframe-transport.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.fileupload/vendor/', file:'jquery.ui.widget.js')}" type="text/javascript" ></script>
-	<script src="http://jquery-option-tree.googlecode.com/files/jquery.optionTree.js" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.mcdropdown/', file:'jquery.mcdropdown.js')}" type="text/javascript" ></script>
-	-->	
 	
 	<script type="text/javascript">
-
-	
 		$(function() { 		
 
-			/*
-			$(document).keypress(function(e) {
-				alert(e.which);
-				if(e.which >=48 && e.which <=57) {
-					// enter pressed
-					$("#globalSearch").focus();
-				}
-			});
-			*/
+			console.log($("body,html"));
+			console.log($.type("body,html"));
+			console.log(document.activeElement);
+			console.log($.type(document.activeElement));
+			console.log($("body").first() == document.activeElement);
+			console.log($("body").hasFocus)
+			if (!document.activeElement || $("body") == document.activeElement) {
+				$("#globalSearch").focus();
+			}
+			
 			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 		
 			<g:if test="${session.useDebugLocale}">
@@ -270,7 +261,7 @@
 							if (remoteData != '') {
 								for (var i = 0; i < remoteData.length; i++) {
 									$('#status').text(remoteData[i].comment);
-								}
+								}	
 								$('#status').addClass("notice");						
 							}
 						}
@@ -288,7 +279,8 @@
 					height: 400
 				});
 			});
-
+			
+			
 			function showActions() {
 				//$(this).children(".actions").show();
 			}

@@ -38,10 +38,13 @@
 								<td>
 									<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
 									<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-									${recordInventoryRow?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.label"/></span>' }
+									<span class="lotNumber">
+										${recordInventoryRow?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.label"/></span>' }
+									</span>
 								</td>
 								<td>
-									<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+									<g:hiddenField name="recordInventoryRows[${status}].expirationDate" 
+										value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
 									<g:if test="${recordInventoryRow?.expirationDate}">
 										<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
 									</g:if>
@@ -51,10 +54,15 @@
 								</td>
 								<td class="middle center">
 									${recordInventoryRow?.oldQuantity }	
-									<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
+									<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" 
+										value="${recordInventoryRow?.oldQuantity }"/>
 								</td>	
 								<td class="middle center">
-									<g:textField id="newQuantity-${status }" class="newQuantity text center" name="recordInventoryRows[${status }].newQuantity" size="8" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+									<g:textField id="newQuantity-${status }" class="newQuantity text" 
+										name="recordInventoryRows[${status }].newQuantity" size="8" 
+										value="${recordInventoryRow?.newQuantity }" />
+									
+									${commandInstance?.productInstance?.unitOfMeasure?:"EA" }
 								</td>
 								<td class="middle left">
 								</td>
@@ -98,6 +106,8 @@
 		
 		</div>
 		
+		
+		
 	</g:form>
 </div>
 
@@ -107,7 +117,15 @@
 
 	// We need to do this in order to make sure the index for new items is correct
 	<g:each var="row" in="${commandInstance?.recordInventoryRows}" status="status">
-		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', ExpirationDate: '${row.expirationDate?:warehouse.message(code: 'default.never.label')}', Qty: 0 };	
+		var existingInventoryItem = { 
+				Id: '${row.id}', 
+				Type: '', 
+				ProductId: '', 
+				UnitOfMeasure: '${commandInstance?.productInstance?.unitOfMeasure?:"EA"}',
+				LotNumber: '${row.lotNumber}', 
+				ExpirationDate: '${row.expirationDate?:warehouse.message(code: 'default.never.label')}', 
+				Qty: 0 
+			};	
 		inventory.InventoryItems.push(existingInventoryItem);
 	</g:each>
 
@@ -150,7 +168,7 @@
 
 	function addRow() { 
 
-		var inventoryItem = {Qty: 0};
+		var inventoryItem = {Qty: 0, UnitOfMeasure: '${commandInstance?.productInstance?.unitOfMeasure?:"EA"}'};
 		// Add to the array of new inventory items
 		inventory.InventoryItems.push(inventoryItem);
 
@@ -159,11 +177,14 @@
 		// Add a new row to the table
 		$("#newRowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
 
+		//$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
 		$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
 	}
 
 	$(document).ready(function() {
 		addRow();
+
+		
 		//$('.addAnother').focus();		
 		$('#addRow').livequery(function() { 
 			$(this).click(function(event) { 
@@ -173,8 +194,30 @@
 			});
 		});
 
-		$('.lotNumber').livequery(function() {
+		$("#selectedText").click(function(){
+			$(this).select();
+		});
+		/*		
+		$("input.newQuantity").livequery(function() { 
+			$(this).click(function(event) { 
+				//event.preventDefault();
+				this.select();
+				//$(this).select();
+			});
+			//$(this).select();
+			
+		});
+		*/
+		$(".newQuantity").click(function() { $(this).select(); });
+		/*
+		$('.newQuantity').livequery(function() {
+			$(this).focus(function(event){
+				$("input:text").focus(function() { $(this).select(); } );
+			});
+		});
+		*/
 
+		$('.lotNumberSuggest').livequery(function() {
 			$(this).autocomplete( {
 				source: function(req, add){
 					$.getJSON('${request.contextPath }/json/findLotsByName', req, function(data) {
@@ -194,7 +237,6 @@
 		        close: function(even, ui) { 
 				},
 				select: function(event, ui) {
-
 					var id = $(this).parent().parent().find('.id');
 					var lotNumber = $(this).parent().parent().find('.lotNumber');
 					var lotNumberValue = $(this).parent().parent().find('.lotNumberValue');
@@ -228,6 +270,7 @@
 				changeYear: true,
 				buttonImage: '${request.contextPath }/images/icons/silk/calendar.png'
 			});								
+			//$(this).datepicker()
 		});
 		
 		// Bind the click event to the up buttons and call the change quantity function
@@ -240,7 +283,65 @@
 			$(this).click(buttonDownMouseHandler);
 		});
 
-		
+		function getMonth(monthAbbr) { 
+			var monthNumbersByName = [];
+			monthNumbersByName['Jan'] = 1;
+			monthNumbersByName['Feb'] = 2;	 
+			monthNumbersByName['Mar'] = 3;	 
+			monthNumbersByName['Apr'] = 4;	 
+			monthNumbersByName['May'] = 5;	 
+			monthNumbersByName['Jun'] = 6;	 
+			monthNumbersByName['Jul'] = 7;	 
+			monthNumbersByName['Aug'] = 8;	 
+			monthNumbersByName['Sep'] = 9;	 
+			monthNumbersByName['Oct'] = 10;	 
+			monthNumbersByName['Nov'] = 11;	 
+			monthNumbersByName['Dec'] = 12;	 
+			return monthNumbersByName[monthAbbr];
+		}
+
+		$(".expirationDate").livequery(function() { 
+			$(this).datepicker().keydown(function (e) {
+				var code = e.keyCode || e.which;
+				//   TAB: 9
+				//  LEFT: 37
+				//    UP: 38
+				// RIGHT: 39
+				//  DOWN: 40
+				//console.log(code);
+
+				
+				// If key is not TAB
+				if (code != '9') {
+					// And arrow keys used "for performance on other keys"
+					if (code == '37' || code == '38' || code == '39' || code == '40') {
+					// Get current date
+					var parts = $(this).val().split(" ");
+					console.log(parts);
+					var day = parts[0];
+					var month = getMonth(parts[1])-1;
+					var year = parts[2];
+					var currentDate = new Date(year, month, day);
+					// Show next/previous day/week 
+					switch (code) {
+						// LEFT, -1 day
+						case 37: currentDate.setDate(currentDate.getDate() - 1); break;
+						// UP, -1 week
+						case 38: currentDate.setDate(currentDate.getDate() - 7); break;
+						// RIGHT, +1 day
+						case 39: currentDate.setDate(currentDate.getDate() + 1); break;
+						// DOWN, +1 week
+						case 40: currentDate.setDate(currentDate.getDate() + 7); break;
+					}
+					// If result is ok then write it
+					if (currentDate != null) { 
+						$(this).datepicker("setDate", currentDate); }
+					} else { 
+						return false; 
+					} // If other keys pressed.. return false
+				}
+			});
+		});
 	});
 
 </script>
@@ -248,7 +349,7 @@
 <script id="newRowTemplate" type="x-jquery-tmpl">
 <tr id="row-{{= getIndex()}}" class="{{= getClass()}}">	
 	<td>
-		<g:textField id="lotNumber-{{= getIndex()}}" class="text" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="25" /><br/>
+		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber text" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="25" /><br/>
 	</td>
 	<td>
 		<style>
@@ -264,16 +365,18 @@
 		
 	</td>
 	<td style="text-align: center; vertical-align: middle;">
-		{{= Qty}}
-		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity" name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
+		{{= Qty}} {{= UnitOfMeasure}}
+		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity" 
+			name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
 	</td>	
 	<td style="text-align: center; vertical-align: middle;">
 		<g:textField  
-			id="newQuantity-{{= getIndex()}}" class="newQuantity center text" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="8" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
-
+			id="newQuantity-{{= getIndex()}}" class="newQuantity text" name="recordInventoryRows[{{= getIndex()}}].newQuantity" 
+				size="8" value="{{= Qty}}" />
+			{{= UnitOfMeasure}}
 	</td>	
 	<td class="center">
-		<button onclick="removeRow({{= getIndex()}});" class="button icon trash">
+		<button onclick="removeRow({{= getIndex()}});" class="button icon trash" tabIndex="-1">
 			${warehouse.message(code: 'default.button.delete.label')}&nbsp;
 		</button>
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />

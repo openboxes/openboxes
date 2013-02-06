@@ -44,11 +44,6 @@
 										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" class="middle"/>
 									</span>
 									<ul class="actions" style="text-align:left;">
-										<li class="action-menu-item">
-											<g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">												
-												<warehouse:message code="myProfile.label" default="My profile"/>
-											</g:link>
-										</li>
 										<%-- 
 										<li class="action-menu-item">
 											<g:link controller="inventory" action="browse" params="['resetSearch':'true']" style="color: #666;">												
@@ -64,12 +59,17 @@
 											
 										</li>
 										--%>
+										<li class="action-menu-item">
+											<g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">												
+												<warehouse:message code="myProfile.label" default="My profile"/>
+											</g:link>
+										</li>
+										<li class="action-menu-item">
+											<g:link  controller="dashboard" action="index" style="color: #666;">
+												<warehouse:message code="dashboard.label"/>
+											</g:link>	
+										</li>
 										<g:if test="${session?.warehouse}">
-											<li class="action-menu-item">
-												<g:link  controller="dashboard" action="index" style="color: #666;">
-													<warehouse:message code="dashboard.label"/>
-												</g:link>	
-											</li>
 											<li class="action-menu-item">
 												<a href="javascript:void(0);" class="warehouse-switch" style="color: #666">
 													Change location
@@ -134,9 +134,13 @@
 												</span>
 											</li>
 										</g:if>
-																					
 										<li class="action-menu-item">
-											<g:link class="list" controller="auth" action="logout" style="color:#666"><warehouse:message code="default.logout.label"/></g:link>
+											<hr/>
+										</li>										
+										<li class="action-menu-item">
+											<g:link class="list" controller="auth" action="logout" style="color:#666">
+												<warehouse:message code="default.logout.label"/>
+											</g:link>
 										</li>					
 											
 										<!-- 

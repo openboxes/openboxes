@@ -20,7 +20,7 @@ class AutoSuggestSearchableTagLib {
 		def styleClass = attrs.styleClass
 		def valueId = (attrs.valueId)?:"";
 		def valueName = (attrs.valueName)?:"";
-		def width = (attrs.width) ?: 200;
+		def width = (attrs.width) ?: '200px';
 		def minLength = (attrs.minLength) ?: 1;
 		def jsonUrl = (attrs.jsonUrl) ?: "";
 
@@ -43,12 +43,12 @@ class AutoSuggestSearchableTagLib {
 				</style>
 				
 				<input id="${id}-suggest" type="text" name="${name}.name" 
-					value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};" class="${styleClass}"> 	
+					value="${valueName}" style="width: ${width}; display: ${suggestDisplay};" class="${styleClass}"> 	
 				
 				<script>
 					\$(document).ready(function() {
 				      	\$("#${id}-suggest").autocomplete({
-				            width: ${width},
+				            width: '${width}',
 				            minLength: ${minLength},
 				            dataType: 'json',
 				            highlight: true,

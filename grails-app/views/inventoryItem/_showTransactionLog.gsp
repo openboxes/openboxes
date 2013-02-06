@@ -108,6 +108,9 @@
 															${transaction.outgoingShipment?.name }
 														</g:link>
 													</g:elseif>
+													<g:else>
+														<span class="fade">${warehouse.message(code:'default.none.label') }</span>
+													</g:else>
 												</td>
 												<td>
 													<g:if test="${transaction?.source }">

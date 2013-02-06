@@ -35,21 +35,19 @@
 			totalQuantity: commandInstance?.totalQuantity]"/>
 
 		<div class="dialog">		
-			<table>				
-				<tr>
-					<td style="width: 25%;">
-						<g:render template="productDetails" 
-							model="[productInstance:commandInstance?.productInstance, 
-								inventoryInstance:commandInstance?.inventoryInstance, 
-								inventoryLevelInstance: commandInstance?.inventoryLevelInstance, 
-								totalQuantity: commandInstance?.totalQuantity]"/>
-					</td>
-					<td>
-						<g:pageProperty name="page.content"/>	
-					</td>
-				</tr>
-			</table>
-
+		
+		
+		<div class="yui-gf"> 
+	    	<div class="yui-u first"> 		
+				<g:render template="productDetails" 
+					model="[productInstance:commandInstance?.productInstance, 
+						inventoryInstance:commandInstance?.inventoryInstance, 
+						inventoryLevelInstance: commandInstance?.inventoryLevelInstance, 
+						totalQuantity: commandInstance?.totalQuantity]"/>
+			</div>
+			<div class="yui-u">
+				<g:pageProperty name="page.content"/>	
+			</div>
 		</div>
 	</div>
 	<script>
