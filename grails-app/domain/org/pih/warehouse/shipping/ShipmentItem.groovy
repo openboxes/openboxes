@@ -25,6 +25,7 @@ class ShipmentItem implements Comparable, Serializable {
 	//}
 
 	String id
+	//String description		// Item description (for one-off items)
 	String lotNumber			// Loose coupling to the inventory lot 
 	Date expirationDate			
 	Product product		    	// Specific product that we're tracking

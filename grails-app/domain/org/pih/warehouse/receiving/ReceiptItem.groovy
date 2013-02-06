@@ -28,11 +28,16 @@ class ReceiptItem implements Comparable, Serializable {
 	Integer quantityShipped				// Quantity that was shipped
 	Integer quantityReceived			// Quantity could be a class on its own
 	
+	//Integer quantityAccepted
+	//Integer quantityRejected
+	//String rejectionReason
+	//String description				// Item description (for one-off items)
+	String comment 						// Comment about the item quality
+	
 	ShipmentItem shipmentItem
 	InventoryItem inventoryItem
 		
 	Person recipient 					// Recipient of an item	
-	String comment 						// Comment about the item quality 
 	
 	Date dateCreated;
 	Date lastUpdated;
