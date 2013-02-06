@@ -49,15 +49,7 @@
 											</g:else>
 										</td>
 									</tr>
-								</g:if>
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='name'><warehouse:message code="shipping.shipmentNumber.label"/></label>
-									</td>
-									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'shipmentNumber','errors')}'>
-										<input type="text" name='shipmentNumber' value="${shipmentInstance?.shipmentNumber?.encodeAsHTML()}" size="60" class="text"/>
-									</td>
-								</tr>  
+								</g:if>								
 								<tr class='prop'>
 									<td valign='top' class='name'>
 										<label for='name'><warehouse:message code="shipping.name.label"/></label>
