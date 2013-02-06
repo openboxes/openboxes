@@ -21,6 +21,7 @@ import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.importer.ImportDataCommand;
+import org.pih.warehouse.inventory.InventoryLevel;
 import org.pih.warehouse.core.ApiException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.grails.plugins.csv.CSVWriter
@@ -802,8 +803,13 @@ class ProductService {
 	
 	
 	
-
-	
+	/**
+	 * Generate a product identifier.
+	 * @return
+	 */
+	def generateProductIdentifier() { 
+		return generateIdentifier("LLNN")
+	}
 	
 	/**
 	 * 
@@ -862,6 +868,113 @@ class ProductService {
 	
 	def downloadDocument(url) { 
 		// move code from ProductController		
+	}
+	
+	/**
+	 * Saves the given product 
+	 * @param product
+	 * @return
+	 */
+	def saveProduct(Product product, String tagsToBeSaved) { 
+		def productInstance = Product.get(params.id)		
+		if (productInstance) {
+			
+			// Handle tags
+			try {
+				if (tagsToBeSaved) {
+					productInstance.tags.clear()
+					tagsToBeSaved.split(",").each { tagText ->
+						Tag tag = Tag.findByTag(tagText)
+						if (!tag) tag = new Tag(tag:tagText)
+						productInstance.addToTags(tag)
+					}
+				}
+			} catch (Exception e) {
+				log.error("Error occurred: " + e.message)
+				throw new ValidationException(productInstance.errors)
+			}
+			
+			// Handle attributes
+			/*
+			Map existingAtts = new HashMap();
+			productInstance.attributes.each() {
+				existingAtts.put(it.attribute.id, it)
+			}
+			Attribute.list().each() {
+				String attVal = params["productAttributes." + it.id + ".value"]
+				if (attVal == "_other" || attVal == null || attVal == '') {
+					attVal = params["productAttributes." + it.id + ".otherValue"]
+				}
+				ProductAttribute existing = existingAtts.get(it.id)
+				if (attVal != null && attVal != '') {
+					if (!existing) {
+						existing = new ProductAttribute(["attribute":it])
+						productInstance.attributes.add(existing)
+					}
+					existing.value = attVal;
+				}
+				else {
+					productInstance.attributes.remove(existing)
+				}
+			}
+			*/
+
+			/*
+			log.info("Categories " + productInstance?.categories);
+
+			// find the phones that are marked for deletion
+			def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
+
+			log.info("toBeDeleted: " + _toBeDeleted )
+
+			// if there are phones to be deleted remove them all
+			if (_toBeDeleted) {
+				productInstance.categories.removeAll(_toBeDeleted)
+			}
+			*/
+			
+			if (!productInstance.validate()) {
+				throw new ValidationException("Product is not valid", productInstance.errors)
+			}
+
+			productInstance.save(flush: true)
+		}
+	}
+	
+	
+	
+	def findSimilarProducts(Product product) { 
+		
+		
+		def similarProducts = []
+		/*
+		def productsInSameProductGroup = ProductGroup.findByProduct(product).products
+		if (productsInSameProductGroup) {
+			similarProducts.addAll(productsInSameProductGroup)
+		}
+		*/;
+		/*
+		def productsInSameCategory = Product.findByCategory(product.category)
+		if (productsInSameCategory) { 
+			similarProducts.addAll(productsInSameCategory)
+		}*/
+		def searchTerms = product.name.split(",")
+		if (searchTerms) { 
+			similarProducts.addAll(Product.findAllByNameLike("%" + searchTerms[0] +"%"))
+		}
+		/*
+		if (!similarProducts) { 
+			searchTerms = product.name.split(" ")
+			searchTerms.each {
+				similarProducts.addAll(Product.findAllByNameLike("%" + it +"%"))
+			}
+		}
+		*/
+		similarProducts.unique()
+
+		similarProducts.remove(product)
+		
+		return similarProducts
 	}
 
 }

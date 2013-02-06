@@ -38,25 +38,23 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
     protected void setUp() {
         super.setUp()
 
-        productA = new Product(id: "productIdA")
+        productA = new Product(id: "productIdA", name: "Product A")
 
         shipment = new Shipment(id: "shipmentId")
         mockDomain(Shipment, [shipment]);
 
-        containerOne = new Container(id : 'containerOneId')
-        shipment.addToContainers(containerOne)
-
-        containerTwo = new Container(id : 'containerTwoId')
-        shipment.addToContainers(containerTwo)
-
-        containerThree = new Container(id : 'containerThreeId')
-        shipment.addToContainers(containerThree)
-
+        containerOne = new Container(id : 'containerOneId', name: "Container One")
+        containerTwo = new Container(id : 'containerTwoId', name: "Container Two")        
+        containerThree = new Container(id : 'containerThreeId', name: "Container Three")
         mockDomain(Container, [containerOne, containerTwo, containerThree]);
-
+		
+        shipment.addToContainers(containerOne)
+		shipment.addToContainers(containerTwo)
+		shipment.addToContainers(containerThree)
+		
         inventoryItemProductALotABC = new InventoryItem(product: productA, lotNumber: 'ABC',  expirationDate: oneYearFromNow);
         inventoryItemProductALotDEF = new InventoryItem(product: productA, lotNumber: 'DEF',  expirationDate: twoYearsFromNow);
-
+		mockDomain(InventoryItem, [inventoryItemProductALotABC, inventoryItemProductALotDEF]);
 
         shipmentItemContainerOneProductALotABC = new ShipmentItem(id: 'containerOneProductALotABC',
                                             shipment : shipment,
@@ -102,18 +100,34 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
     }
 
     public void test_moveItem_shouldMoveWithNoDestination() {
-        def quantityInContainerOne = shipmentItemContainerOneProductALotABC.quantity
+        
+		assert 1, Product.count()
+		assert 1, Shipment.count()
+		assert 3, Container.count()
+		assert 2, InventoryItem.count()
+		
+		def quantityInContainerOne = shipmentItemContainerOneProductALotABC.quantity
 
         def service = new ShipmentService()
         def returnValue = service.moveItem(shipmentItemContainerOneProductALotABC, [:]);
 
+		
+		
         assertTrue("moveItem should return true", returnValue)
 
+		shipment.shipmentItems.each { 
+			println "all items: " + it?.container?.id + " " + it?.product?.id + " " + it?.inventoryItem?.id + " " + it.quantity
+		}
+		
         Set<ShipmentItem> matchingItems = shipment.shipmentItems.findAll {
-            it.product == productA &&
-            it.inventoryItem == inventoryItemProductALotABC
+            it?.product?.id == productA?.id &&
+            it?.inventoryItem?.id == inventoryItemProductALotABC?.id
         }
 
+		matchingItems.each {
+			println "matching items: " + it?.container?.id + " " + it?.product?.id + " " + it?.inventoryItem?.id + " " + it.quantity
+		}
+		
         assertEquals(1, matchingItems.findAll { it.container == containerOne }.size())
 
         def containerOneItem = matchingItems.find { it.container == containerOne }

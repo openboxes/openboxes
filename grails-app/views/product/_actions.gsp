@@ -18,12 +18,14 @@
 				<warehouse:message code="inventory.showStockCard.label"/>
 			</g:link>
 		</div>
+		<g:isUserAdmin>
 		<div class="action-menu-item">
 			<g:link controller="product" action="edit" id="${productInstance?.id }"> 
 				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 				<warehouse:message code="product.edit.label"/>
 			</g:link>
 		</div>
+		</g:isUserAdmin>
 		<div class="action-menu-item">
 			<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': productInstance?.id, 'disableFilter':true]">
 				<img src="${resource(dir: 'images/icons/silk', file: 'calendar.png')}"/>&nbsp;
@@ -93,6 +95,7 @@
 						code="productGroup.addProducts.label" />
 				</a>
 			</div>
+			<%-- 
 			<div class="action-menu-item"> 
 			
 				<a href="#" id="linkProductToProductGroup" class="open-dialog">
@@ -101,7 +104,7 @@
 				
 			
 			</div>
-			
+			--%>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryConsumedBtn"> <img
@@ -150,9 +153,16 @@
 						code="inventory.markAsNotSupported.label" />
 				</a>
 			</div>
-
-
 		</g:isUserManager>		
+		<g:isUserAdmin>		
+			<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
+				<div class="action-menu-item">
+					<g:link class="button icon trash" action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
+			  			${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+		  			</g:link>
+				</div>
+			</g:if>		
+		</g:isUserAdmin>
 		
 	</div>
 </span>

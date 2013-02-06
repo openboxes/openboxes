@@ -1,4 +1,4 @@
-<div class="widget-large">
+<div class="widget-large box">
 	<div class="widget-header">
 		<h2><warehouse:message code="inventory.label" args="[session.warehouse.name]"/></h2>
 	</div>	    			
@@ -9,7 +9,10 @@
 					<div>
 							
 						<g:globalSearch id="dashboardSearchBox" cssClass="globalSearch" size="80"
-							name="searchTerms" value="${params?.searchTerms }" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
+							name="searchTerms" 
+							value="${params?.searchTerms }" 
+							placehoder="${warehouse.message(code:'inventory.filterByKeyword.label')}"
+							jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
 							
 						<%-- 				
 						<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }" 
@@ -28,10 +31,4 @@
 			</div>
 		</div>
 	</div>
-</div>
-	<script>
-		$(document).ready(function() {
-			$("#dashboardSearchBox").watermark("${warehouse.message(code:'inventory.filterByKeyword.label')}");
-		});
-	</script>
-	
+</div>	

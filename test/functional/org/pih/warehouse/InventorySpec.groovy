@@ -16,13 +16,13 @@ class InventorySpec extends GebReportingSpec {
             to ExpiringStockPage
         when:
             at ExpiringStockPage
-            threshhold.value("one week")
+            threshold.value("one week")
             filter.click()
         then:
             expiringStockList.contains(TestFixture.Advil200mg)
             !expiringStockList.contains(TestFixture.Tylenol325mg)
         when:
-            threshhold.value("six months")
+            threshold.value("six months")
             filter.click()
         then:
             expiringStockList.contains(TestFixture.Advil200mg)

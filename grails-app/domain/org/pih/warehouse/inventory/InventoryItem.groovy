@@ -72,7 +72,25 @@ class InventoryItem implements Serializable {
         ]
     }
 
-	
+	@Override
 	String toString() { return "${lotNumber}:${expirationDate}"; }
+	
+	@Override
+	int hashCode() {
+		if (this.id != null) {
+			return this.id.hashCode();
+		}
+		return super.hashCode();
+	}
+
+	@Override
+	boolean equals(Object o) {
+		if (o instanceof InventoryItem) {
+			InventoryItem that = (InventoryItem)o;
+			return this.id == that.id;
+		}
+		return false;
+	}
+	
 	
 }

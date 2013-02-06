@@ -28,7 +28,8 @@ import org.pih.warehouse.inventory.Transaction;
 class DashboardController {
 
 	def orderService
-	def shipmentService;
+	def shipmentService
+	def inventoryService
 	def productService 
     
 	
@@ -37,11 +38,25 @@ class DashboardController {
 		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
 		if (transaction) { 
 			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
+			return;
 		}
 		
 		def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
 		if (product) {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
+			return;
+		}
+		
+		def requisition = Requisition.findByRequestNumber(params.searchTerms)
+		if (requisition) {
+			redirect(controller: "requisition", action: "show", id: requisition.id)
+			return;
+		}
+		
+		def shipment = Shipment.findByShipmentNumber(params.searchTerms)
+		if (shipment) {
+			redirect(controller: "shipment", action: "showDetails", id: shipment.id)
+			return;
 		}
 
 		redirect(controller: "inventory", action: "browse", params:params)
@@ -65,6 +80,15 @@ class DashboardController {
 		def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		
+		def expiredStock = inventoryService.getExpiredStock(null, location)
+		def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
+		def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
+		def expiringStockWithin180Days = inventoryService.getExpiringStock(null, location, 180)
+		def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
+		def lowStock = inventoryService.getLowStock(location)
+		def reorderStock = inventoryService.getReorderStock(location)
+		
+				
 		def activityList = []
 		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
 			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location], [max: 10] );
@@ -181,6 +205,13 @@ class DashboardController {
 			allIncomingShipments : allIncomingShipments,
 			outgoingOrders : outgoingOrders,
 			incomingOrders : incomingOrders,
+			expiredStock : expiredStock,
+			expiringStockWithin30Days : expiringStockWithin30Days,
+			expiringStockWithin90Days : expiringStockWithin90Days,
+			expiringStockWithin180Days : expiringStockWithin180Days,
+			expiringStockWithin365Days : expiringStockWithin365Days,
+			lowStock: lowStock,
+			reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
 			outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),

@@ -321,6 +321,17 @@ class InventoryController {
 		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
 	}
 	
+	/*
+	def listLowStock = { 
+		
+		def warehouse = Location.get(session.warehouse.id)
+		def categorySelected = (params.category) ? Category.get(params.category) : null;
+		def lowStock = inventoryService.getLowStock(warehouse);
+		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+
+		[inventoryItems:lowStock, quantityMap:quantityMap]
+	}
+	*/
 	
 	def listExpiredStock = { 
 		def warehouse = Location.get(session.warehouse.id)
@@ -334,15 +345,15 @@ class InventoryController {
 	
 	
 	def listExpiringStock = { 
-		def threshhold = (params.threshhold) ? params.threshhold as int : 0;
+		def threshold = (params.threshold) ? params.threshold as int : 0;
 		def category = (params.category) ? Category.get(params.category) : null;
 		def location = Location.get(session.warehouse.id)		
-		def expiringStock = inventoryService.getExpiringStock(category, location, threshhold)
+		def expiringStock = inventoryService.getExpiringStock(category, location, threshold)
 		def categories = expiringStock?.collect { it?.product?.category }?.unique().sort { it.name } ;
 		def quantityMap = inventoryService.getQuantityForInventory(location.inventory)
 		
 		[inventoryItems:expiringStock, quantityMap:quantityMap, categories:categories, 
-			categorySelected:category, threshholdSelected:threshhold ]
+			categorySelected:category, thresholdSelected:threshold ]
 	}
 	
 	def listLowStock = {
@@ -372,6 +383,34 @@ class InventoryController {
 			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
 	}
 
+	def listReorderStock = {
+		def warehouse = Location.get(session.warehouse.id)
+		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
+		
+		Map inventoryLevelByProduct = new HashMap();
+		inventoryService.getInventoryLevelsByInventory(warehouse.inventory).each {
+			inventoryLevelByProduct.put(it.product, it);
+		}
+		
+		// Set of categories that we can filter by
+		def categories = [] as Set
+		categories.addAll(results['reorderProductsQuantityMap']?.keySet().collect { it.category })
+		categories.addAll(results['minimumProductsQuantityMap']?.keySet().collect { it.category })
+		categories = categories.findAll { it != null }
+		
+		// poor man's filter
+		def categorySelected = (params.category) ? Category.get(params.category) : null;
+		log.debug "categorySelected: " + categorySelected
+		if (categorySelected) {
+			results['reorderProductsQuantityMap'] = results['reorderProductsQuantityMap'].findAll { it.key?.category == categorySelected }
+			results['minimumProductsQuantityMap'] = results['minimumProductsQuantityMap'].findAll { it.key?.category == categorySelected }
+		}
+		
+		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'],
+			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
+	}
+	
+	
 	def searchRecall = {
 		
 		log.info "searchRecall " + params

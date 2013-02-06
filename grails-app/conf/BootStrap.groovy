@@ -242,7 +242,7 @@ class BootStrap {
 		shipments.each { shipment ->
 			println "Assigning identifier to " + shipment.id + " " + shipment.name
 			shipment.shipmentNumber = productService.generateIdentifier("NNNLLL")
-			if (!shipment.save(flush:true)) { 
+			if (!shipment.save(flush:true,validate:false)) { 
 				println shipment.errors
 			}
 		}
@@ -253,7 +253,7 @@ class BootStrap {
 		requisitions.each { requisition ->
 			println "Assigning identifier to " + requisition.id + " " + requisition.name
 			requisition.requestNumber = productService.generateIdentifier("NNNLLL")
-			if (!requisition.save(flush:true)) { 
+			if (!requisition.save(flush:true,validate:false)) { 
 				println requisition.errors
 			}
 		}
@@ -264,7 +264,7 @@ class BootStrap {
 		orders.each { order ->
 			println "Assigning identifier to " + order.id + " " + order.name
 			order.orderNumber = productService.generateIdentifier("NNNLLL")
-			if (!order.save(flush:true)) { 
+			if (!order.save(flush:true,validate:false)) { 
 				println order.errors
 			}
 		}
@@ -274,7 +274,7 @@ class BootStrap {
 		transactions.each { transaction ->
 			println "Assigning identifier to " + transaction.id 
 			transaction.transactionNumber = productService.generateIdentifier("AAA-AAA-AAA")
-			if (!transaction.save(flush:true)) { 
+			if (!transaction.save(flush:true,validate:false)) { 
 				println transaction.errors
 			}
 		}
@@ -286,7 +286,7 @@ class BootStrap {
 			products.each { product -> 
 				println "Assigning identifier to " + product.id + " " + product.name
 				product.productCode = productService.generateIdentifier("LLNN")
-				if (!product.save(flush:true)) { 
+				if (!product.save(flush:true,validate:false)) { 
 					println product.errors
 				}
 			}

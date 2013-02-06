@@ -9,7 +9,7 @@ class ExpiringStockPage extends Page {
     static at = { title == "Expiring stock"}
     static content = {
         category { $("select", name:"category") }
-        threshhold { $("select", name:"threshhold") }
+        threshold { $("select", name:"threshold") }
         filter { $("button", name:"filter") }
         expiringStockList { $("form#inventoryActionForm td.checkable")*.text() }
     }

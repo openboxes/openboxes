@@ -6,6 +6,7 @@
 				<td class="top" style="width: 1%;">
 					<g:render template="../product/actions" model="[productInstance:productInstance]" />
 				</td>
+				
 				<g:if test="${productInstance?.coldChain }">
 					<td style="width: 1%;" class="top">				
 						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}" 
@@ -36,16 +37,9 @@
 		                    		${productInstance?.name }
 		                    	</g:else>
 		                    </span>							
-		                    
 	                    </div>
-	                    <%-- 
-			            <div class="stocked">
-			            	<warehouse:message code="enum.InventoryStatus.${inventoryLevelInstance?.status}"/>
-			            </div>
-			            --%>
         			</div>
-        			
-				</td>
+        		</td>
 				<td class="right">
         			<div id="product-status" class="title">        			
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">

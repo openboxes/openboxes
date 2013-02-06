@@ -31,11 +31,11 @@
 															noSelection="['':'--All--']" />   
 										</td>
 										<td>
-							           		<g:select name="threshhold"
+							           		<g:select name="threshold"
 															from="['1':'one week', '14':'two weeks', '30':'one month', 
 																'60':'two months', '90':'three months',
 																'180': 'six months', '365':'one year']"
-															optionKey="key" optionValue="value" value="${threshholdSelected}" 
+															optionKey="key" optionValue="value" value="${thresholdSelected}" 
 															noSelection="['':'--All--']" />  
 							           	</td>
 							           	<td>	

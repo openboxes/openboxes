@@ -15,7 +15,7 @@
 
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
 		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
-
+		
     </head>    
     <body>        
         <div class="body">
@@ -33,7 +33,7 @@
 			</g:if>
 			
 			<div style="padding: 10px">
-				<div class="tabs">
+				<div class="tabs">					
 					<ul>
 						<li><a href="#tabs-details"><warehouse:message code="product.details.label"/></a></li>
 						<%-- Only show these tabs if the product has been created --%>
@@ -41,402 +41,403 @@
 							<li><a href="#tabs-packages"><warehouse:message code="packages.label"/></a></li>
 							<li><a href="#tabs-status"><warehouse:message code="product.status.label"/></a></li>						
 							<li><a href="#tabs-documents"><warehouse:message code="product.documents.label"/></a></li>
+							
 						</g:if>
-					</ul>		
+					</ul>	
 					<div id="tabs-details" style="padding: 10px;">	
+					
 						<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
 			            <g:form action="${formAction}" method="post">
-							<g:hiddenField name="action" value="save"/>                					
-			                <g:hiddenField name="id" value="${productInstance?.id}" />
-			                <g:hiddenField name="version" value="${productInstance?.version}" />
-			            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
-				                <table>
-			                      <tbody>               
-									<tr class="prop">
-										<td valign="top" class="name"><label for="name"><warehouse:message
-											code="product.title.label" /></label></td>
-										<td valign="top"
-											class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-											<%-- 
-											<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
-											--%>
-											<g:autoSuggestString id="name" name="name" size="60" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name}"
-												placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
-										</td>
-									</tr>
-									
-									<tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
-		                                </td>
-		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-											<%-- 
-											<g:selectCategoryMcDropdown id="category" name="category.id" 
-												value="${productInstance?.category?.id}"/>									
-											--%>
-
-		                                	 <div class="category">
-												<select name="category.id">
-													<option value="null">Choose product family</option>
-													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
-												</select>	
-									       	</div>
-									   </td>
-									</tr>
-									
-									<tr class="prop">
-										<td valign="top" class="name"><label for="description"><warehouse:message
-											code="product.description.label" /></label></td>
-										<td valign="top"
-											class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
-											<g:textArea name="description" value="${productInstance?.description}" class="medium text" cols="80" rows="6"
-												placeholder="Detailed text description (optional)"/>									
-										</td>
-									</tr>
-									
-									<%-- 
-									<tr class="prop">
-										<td valign="top" class="name"></td>
-										<td valign="top" class="value">
-											<g:autoSuggest_v2 id="product" 
-												name="product" 
-												jsonUrl="${request.contextPath }/json/findProductByName" 
-												styleClass="medium text"
-												size="60"
-												valueId="${productInstance?.id }" 
-												valueName="${productInstance?.name }"/>		
-										</td>
-									</tr>
-									--%>							
-									
-												
-									<%-- 
-									<tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="product.otherCategories.label" /></label>
-		                                </td>
-										<td valign="top" class="value">									
-									       	<g:render template="categories" model="['productInstance':productInstance]" />
-										</td>
-									</tr>
-									--%>
-									
+							<div class="yui-g">
+		
+								<div class="yui-u first">
+									<g:hiddenField name="action" value="save"/>                					
+					                <g:hiddenField name="id" value="${productInstance?.id}" />
+					                <g:hiddenField name="version" value="${productInstance?.version}" />
+					            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
+					                <table>
+										<tbody>
 										
-									<%-- 
-									<tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="categories.label" /></label>
-		                                </td>
-		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-											<g:chooseCategory name="category.id" product="${productInstance}"/>
-										</td>
-									</tr>
-									--%>
-									<tr class="prop">
-										<td valign="top" class="name"><label for="unitOfMeasure"><warehouse:message
-											code="product.unitOfMeasure.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
-											<%-- 
-											<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" class="medium text"/>
-											--%>
-											<g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" size="30" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.unitOfMeasure}" placeholder="e.g. each, tablet, tube, vial"/>											
-										</td>
-									</tr>				
-									<tr class="prop">
-										<td valign="top" class="name"></td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'active', 'errors')}">
-											<g:checkBox name="active" value="${productInstance?.active}" />
-											<label for="active"><warehouse:message
-											code="product.active.label" /></label>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name">
-										</td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
-											<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
-											<label for="coldChain"><warehouse:message
-												code="product.coldChain.label" /></label>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name">
-										</td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')}">
-											<g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
-											<label for="controlledSubstance"><warehouse:message 
-												code="product.controlledSubstance.label" /></label>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name">
-										</td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
-											<g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
-											<label for="hazardousMaterial"><warehouse:message
-												code="product.hazardousMaterial.label" /></label>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name">
-										</td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
-											<g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
-											<label for="lotControl"><warehouse:message
-												code="product.lotControl.label" /></label>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name">
-										</td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'serialized', 'errors')}">
-											<g:checkBox name="serialized" value="${productInstance?.serialized}" />
-											<label for="serialized"><warehouse:message
-												code="product.serialized.label" /></label>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name">
-										</td>
-										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
-											<g:checkBox name="essential" value="${productInstance?.essential}" />
-											<label for="essential"><warehouse:message
-												code="product.essential.label" /></label>
-										</td>
-									</tr>
-									<tr>
-										<td colspan="2">
-											<h3><warehouse:message
-											code="product.tags.label" /></h3>
-										</td>
-									</tr>										
-									<tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="product.tags.label" /></label>
-		                                </td>
-										<td valign="top" class="value">									
-									       	<%-- 
-									       	<g:render template="tags" model="['productInstance':productInstance]" />
-									       	--%>
-									       	
-									       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
-											<script>
-												$(function() { 
-													$('#tags1').tagsInput({
-														'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
-														'width': 'auto',
-														'removeWithBackspace' : true,
-													}); 
-												});
-											</script>
-										</td>
-									</tr>									
-									<tr>
-										<td colspan="2">
-											<h3><warehouse:message
-											code="product.identifiers.label" /></h3>
-										</td>
-									</tr>									
-									<tr class="prop">
-										<td valign="top" class="name"><label for="productCode"><warehouse:message
-											code="product.productCode.label"/></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
-											<g:textField name="productCode" value="${productInstance?.productCode}" size="50" class="medium text" 
-												placeholder="${warehouse.message(code:'product.productCode.placeholder') }"/>
-										</td>
-									</tr>	
-									
-									<tr class="prop">
-										<td valign="top" class="name"><label for="upc"><warehouse:message
-											code="product.upc.label" /></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-											<g:textField name="upc" value="${productInstance?.upc}" size="50" class="medium text"/>
-										</td>
-									</tr>								
-									<tr class="prop">
-										<td valign="top" class="name"><label for="ndc"><warehouse:message
-											code="product.ndc.label" /></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
-											<g:textField name="ndc" value="${productInstance?.ndc}" size="50" class="medium text"
-												placeholder="e.g. 0573-0165"/>
-										</td>
-									</tr>													
-									<tr>
-										<td colspan="2">
-											<h3><warehouse:message
-											code="product.manufacturer.label" /></h3>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label for="manufacturer"><warehouse:message
-											code="product.manufacturer.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-											<%-- 
-											<g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
-											--%>
-											<g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.manufacturer}"
-												placeholder="e.g. Pfizer, Beckton Dickson"/>
+										
+											<tr class="prop">
+												<td valign="top" class="name"><label for="name"><warehouse:message
+													code="product.title.label" /></label></td>
+												<td valign="top"
+													class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
+													<%-- 
+													<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
+													--%>
+													<g:autoSuggestString id="name" name="name" size="60" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name}"
+														placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
+												</td>
+											</tr>
 											
-										</td>
-									</tr>		
-									<tr class="prop">
-										<td valign="top" class="name"><label for="brandName"><warehouse:message
-											code="product.brandName.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
-											<g:autoSuggestString id="brandName" name="brandName" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.brandName}"
-												placeholder="e.g. Advil, Tylenol"/>
-										</td>
-									</tr>								
-									<tr class="prop">
-										<td valign="top" class="name"><label for="manufacturerCode"><warehouse:message
-											code="product.manufacturerCode.label"/></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
-											<g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.manufacturerCode}"
-												placeholder=""/>
-												
-										</td>
-									</tr>	
-									<tr class="prop">
-										<td valign="top" class="name"><label for="manufacturerName"><warehouse:message
-											code="product.manufacturerName.label"/></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
-											<g:autoSuggestString id="manufacturerName" name="manufacturerName" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.manufacturerName}"
-												placeholder=""/>
-												
-										</td>
-									</tr>	
-									
-															
-									<tr class="prop">
-										<td valign="top" class="name"><label for="modelNumber"><warehouse:message
-											code="product.modelNumber.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
-											<g:autoSuggestString id="modelNumber" name="modelNumber" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.modelNumber}" promptOnMatch="true"
-												placeholder="e.g. Usually only pertains to equipment "/>
-										</td>
-									</tr>								
-									<tr>
-										<td colspan="2">
-											<h3><warehouse:message
-											code="product.vendor.label" /></h3>
-										</td>
-									</tr>
-									
-									<tr class="prop">
-										<td valign="top" class="name"><label for="vendor"><warehouse:message
-											code="product.vendor.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
-											<g:autoSuggestString id="vendor" name="vendor" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.vendor}"
-												placeholder="e.g. IDA, IMRES, McKesson"/>
+											<tr class="prop">
+				                                <td valign="top" class="name">
+				                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
+				                                </td>
+				                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
+													<%-- 
+													<g:selectCategoryMcDropdown id="category" name="category.id" 
+														value="${productInstance?.category?.id}"/>									
+													--%>
+		
+				                                	 <div class="category">
+														<select name="category.id">
+															<option value="null">Choose product family</option>
+															<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
+														</select>	
+											       	</div>
+											   </td>
+											</tr>
 											
-										</td>
-									</tr>								
-									<tr class="prop">
-										<td valign="top" class="name"><label for="vendorCode"><warehouse:message
-											code="product.vendorCode.label"/></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
-											<g:autoSuggestString id="vendorCode" name="vendorCode" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.vendorCode}"
-												placeholder=""/>
-										</td>
-									</tr>	
-									<tr class="prop">
-										<td valign="top" class="name"><label for="vendorName"><warehouse:message
-											code="product.vendorName.label"/></label></td>
-										<td valign="top" class="${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
-											<g:autoSuggestString id="vendorName" name="vendorName" size="50" class="text" 
-												jsonUrl="${request.contextPath}/json/autoSuggest" 
-												value="${productInstance?.vendorName}"
-												placeholder=""/>
-												
-										</td>
-									</tr>													
-															
+											<tr class="prop">
+												<td valign="top" class="name"><label for="unitOfMeasure"><warehouse:message
+													code="product.unitOfMeasure.label" /></label></td>
+												<td valign="top"
+													class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
+													<%-- 
+													<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" class="medium text"/>
+													--%>
+													<g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" size="30" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.unitOfMeasure}" placeholder="e.g. each, tablet, tube, vial"/>											
+												</td>
+											</tr>														
+											
+											<tr class="prop">
+												<td valign="top" class="name"><label for="description"><warehouse:message
+													code="product.description.label" /></label></td>
+												<td valign="top"
+													class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
+													<g:textArea name="description" value="${productInstance?.description}" class="medium text" 
+														cols="60" rows="6"
+														placeholder="Detailed text description (optional)" style="width:100%"/>									
+												</td>
+											</tr>
+											
+											
+											
+											<%-- 
+											<tr class="prop">
+												<td valign="top" class="name"></td>
+												<td valign="top" class="value">
+													<g:autoSuggest_v2 id="product" 
+														name="product" 
+														jsonUrl="${request.contextPath }/json/findProductByName" 
+														styleClass="medium text"
+														size="60"
+														valueId="${productInstance?.id }" 
+														valueName="${productInstance?.name }"/>		
+												</td>
+											</tr>
+											--%>							
+											
 														
-									 
-									<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
-										<tr class="prop">
-											<td valign="top" class="name">
-												<label for="attributes"><format:metadata obj="${attribute}"/></label>
-											</td>
-											<td valign="top" class="value">
-												<g:set var="attributeFound" value="f"/>
-												<g:if test="${attribute.options}">
-													<select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector">
-														<option value=""></option>
-														<g:each var="option" in="${attribute.options}" status="optionStatus">
-															<g:set var="selectedText" value=""/>
-															<g:if test="${productInstance?.attributes[status]?.value == option}">
-																<g:set var="selectedText" value=" selected"/>
-																<g:set var="attributeFound" value="t"/>
-															</g:if>
-															<option value="${option}"${selectedText}>${option}</option>
-														</g:each>
-														<g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
-														<g:if test="${attribute.allowOther || otherAttVal}">
-															<option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
-																<g:message code="product.attribute.value.other" default="Other..." />
-															</option>
-														</g:if>
-													</select>
-												</g:if>
-												<g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
-												<g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
-											</td>
-										</tr>
-									</g:each>
-									
-									
+											<%-- 
+											<tr class="prop">
+				                                <td valign="top" class="name">
+				                                  <label for="categories"><warehouse:message code="product.otherCategories.label" /></label>
+				                                </td>
+												<td valign="top" class="value">									
+											       	<g:render template="categories" model="['productInstance':productInstance]" />
+												</td>
+											</tr>
+											--%>
+											
 												
-									<tr class="prop">
-										<td valign="top" class="">
-										</td>
-										<td>
-											<button type="submit" class="button icon approve">
-												${warehouse.message(code: 'default.button.save.label', default: 'Save')}
-											</button>
-											<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
-												<g:link class="button icon trash" action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-										  			${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
-									  			</g:link>
-											</g:if>
-											&nbsp;
-											<g:if test="${productInstance?.id }">
-												<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="">			
-													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-												</g:link>  
-											</g:if>
-											<g:else>
-												<g:link controller="inventory" action="browse" class="">
-													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-												</g:link>
-											</g:else>
-										</td>
-									</tr>
-						
-								</tbody>
-							</table>
+											<%-- 
+											<tr class="prop">
+				                                <td valign="top" class="name">
+				                                  <label for="categories"><warehouse:message code="categories.label" /></label>
+				                                </td>
+				                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
+													<g:chooseCategory name="category.id" product="${productInstance}"/>
+												</td>
+											</tr>
+											--%>
+												
+											
+											<tr class="prop">
+				                                <td valign="top" class="name">
+				                                  <label for="categories"><warehouse:message code="product.tags.label" /></label>
+				                                </td>
+												<td valign="top" class="value">									
+											       	<%-- 
+											       	<g:render template="tags" model="['productInstance':productInstance]" />
+											       	--%>
+											       	
+											       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" 
+											       		value="${productInstance?.tagsToString() }"/>
+													<script>
+														$(function() { 
+															$('#tags1').tagsInput({
+																'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
+																'width': 'auto',
+																'height': '20px',
+																'removeWithBackspace' : true,
+															}); 
+														});
+													</script>
+												</td>
+											</tr>
+											
+											<tr class="prop">
+												<td valign="top" class="name">
+													<label><warehouse:message code="product.properties.label" default="Properties"/></label>
+												</td>
+												<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
+													<g:checkBox name="active" value="${productInstance?.active}" />
+													<label for="active"><warehouse:message
+													code="product.active.label" /></label>
+													<g:checkBox name="essential" value="${productInstance?.essential}" />
+													<label for="essential"><warehouse:message
+														code="product.essential.label" /></label>
+												</td>
+											</tr>														
+										
+											<tr class="prop">
+												<td valign="top" class="name">
+													<label><warehouse:message code="product.handlingRequirements.label" default="Handling requirements"></warehouse:message></label>
+												</td>
+												<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')} ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')} ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
+													<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
+													<label for="coldChain"><warehouse:message
+														code="product.coldChain.label" /></label>
+													<g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
+													<label for="controlledSubstance"><warehouse:message 
+														code="product.controlledSubstance.label" /></label>
+													
+													<g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
+													<label for="hazardousMaterial"><warehouse:message
+														code="product.hazardousMaterial.label" /></label>
+														
+												</td>
+											</tr>
+											<tr class="prop">
+												<td valign="top" class="name">
+													<label><warehouse:message code="product.inventoryControl.label" default="Inventory control"></warehouse:message></label>
+												</td>
+												<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
+													<g:checkBox name="serialized" value="${productInstance?.serialized}" />
+													<label for="serialized"><warehouse:message
+														code="product.serialized.label" /></label>
+													<g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
+													<label for="lotControl"><warehouse:message
+														code="product.lotControl.label" /></label>
+												</td>
+											</tr>											
+											<%-- 
+											<tr class="prop">
+												<td valign="top" class="name"><label for="name"><warehouse:message
+													code="product.genericName.label" /></label></td>
+												<td valign="top"
+													class="value ${hasErrors(bean: productInstance, field: 'genericProducts', 'errors')}">
+													<ul>
+														<g:each var="productGroup" in="${productInstance?.productGroups }">
+															<li>
+																${productGroup.description }  
+																<g:link controller="productGroup" action="edit" id="${productGroup.id }">
+																	<warehouse:message code="default.button.edit.label"/>
+																</g:link>
+															</li>															
+														</g:each>
+													</ul>
+												</td>
+											</tr>
+											--%>
+											
+											
+										</tbody>
+									</table>
+									
+								</div>
+								<div class="yui-u">
+									<table>	
+										<tbody>			
+										
+											
+											<tr class="prop">
+												<td valign="top" class="name"><label for="productCode"><warehouse:message
+													code="product.productCode.label"/></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
+													<g:textField name="productCode" value="${productInstance?.productCode}" size="50" class="medium text" 
+														placeholder="${warehouse.message(code:'product.productCode.placeholder') }"/>
+												</td>
+											</tr>	
+											<tr class="prop">
+												<td valign="top" class="name"><label for="upc"><warehouse:message
+													code="product.upc.label" /></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
+													<g:textField name="upc" value="${productInstance?.upc}" size="50" class="medium text"/>
+												</td>
+											</tr>								
+											<tr class="prop">
+												<td valign="top" class="name"><label for="ndc"><warehouse:message
+													code="product.ndc.label" /></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
+													<g:textField name="ndc" value="${productInstance?.ndc}" size="50" class="medium text"
+														placeholder="e.g. 0573-0165"/>
+												</td>
+											</tr>													
+											<tr class="prop">
+												<td valign="top" class="name"><label for="brandName"><warehouse:message
+													code="product.brandName.label" /></label></td>
+												<td valign="top"
+													class="${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
+													<g:autoSuggestString id="brandName" name="brandName" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.brandName}"
+														placeholder="e.g. Advil, Tylenol"/>
+												</td>
+											</tr>								
+											<tr class="prop">
+												<td valign="top" class="name"><label for="manufacturer"><warehouse:message
+													code="product.manufacturer.label" /></label></td>
+												<td valign="top"
+													class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
+													<%-- 
+													<g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
+													--%>
+													<g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.manufacturer}"
+														placeholder="e.g. Pfizer, Beckton Dickson"/>
+													
+												</td>
+											</tr>		
+											<tr class="prop">
+												<td valign="top" class="name"><label for="manufacturerCode"><warehouse:message
+													code="product.manufacturerCode.label"/></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
+													<g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.manufacturerCode}"
+														placeholder=""/>
+														
+												</td>
+											</tr>	
+											<tr class="prop">
+												<td valign="top" class="name"><label for="manufacturerName"><warehouse:message
+													code="product.manufacturerName.label"/></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
+													<g:autoSuggestString id="manufacturerName" name="manufacturerName" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.manufacturerName}"
+														placeholder=""/>
+														
+												</td>
+											</tr>	
+											
+																	
+											<tr class="prop">
+												<td valign="top" class="name"><label for="modelNumber"><warehouse:message
+													code="product.modelNumber.label" /></label></td>
+												<td valign="top"
+													class="${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
+													<g:autoSuggestString id="modelNumber" name="modelNumber" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.modelNumber}" promptOnMatch="true"
+														placeholder="e.g. Usually only pertains to equipment "/>
+												</td>
+											</tr>								
+											<tr class="prop">
+												<td valign="top" class="name"><label for="vendor"><warehouse:message
+													code="product.vendor.label" /></label></td>
+												<td valign="top"
+													class="${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
+													<g:autoSuggestString id="vendor" name="vendor" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.vendor}"
+														placeholder="e.g. IDA, IMRES, McKesson"/>
+													
+												</td>
+											</tr>								
+											<tr class="prop">
+												<td valign="top" class="name"><label for="vendorCode"><warehouse:message
+													code="product.vendorCode.label"/></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
+													<g:autoSuggestString id="vendorCode" name="vendorCode" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.vendorCode}"
+														placeholder=""/>
+												</td>
+											</tr>	
+											<tr class="prop">
+												<td valign="top" class="name"><label for="vendorName"><warehouse:message
+													code="product.vendorName.label"/></label></td>
+												<td valign="top" class="${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
+													<g:autoSuggestString id="vendorName" name="vendorName" size="50" class="text" 
+														jsonUrl="${request.contextPath}/json/autoSuggest" 
+														value="${productInstance?.vendorName}"
+														placeholder=""/>
+														
+												</td>
+											</tr>													
+																	
+																
+											 
+											<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
+												<tr class="prop">
+													<td valign="top" class="name">
+														<label for="attributes"><format:metadata obj="${attribute}"/></label>
+													</td>
+													<td valign="top" class="value">
+														<g:set var="attributeFound" value="f"/>
+														<g:if test="${attribute.options}">
+															<select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector">
+																<option value=""></option>
+																<g:each var="option" in="${attribute.options}" status="optionStatus">
+																	<g:set var="selectedText" value=""/>
+																	<g:if test="${productInstance?.attributes[status]?.value == option}">
+																		<g:set var="selectedText" value=" selected"/>
+																		<g:set var="attributeFound" value="t"/>
+																	</g:if>
+																	<option value="${option}"${selectedText}>${option}</option>
+																</g:each>
+																<g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
+																<g:if test="${attribute.allowOther || otherAttVal}">
+																	<option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
+																		<g:message code="product.attribute.value.other" default="Other..." />
+																	</option>
+																</g:if>
+															</select>
+														</g:if>
+														<g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
+														<g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+													</td>
+												</tr>
+											</g:each>
+										</tbody>
+									</table>								
+								
+								</div>
+							</div>
+							<div class="center buttons">
+								<button type="submit" class="button icon approve">
+									${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+								</button>
+								<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
+									<g:link class="button icon trash" action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
+							  			${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+						  			</g:link>
+								</g:if>
+								&nbsp;
+								<g:if test="${productInstance?.id }">
+									<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="">			
+										${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+									</g:link>  
+								</g:if>
+								<g:else>
+									<g:link controller="inventory" action="browse" class="">
+										${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+									</g:link>
+								</g:else>
+			
+							</div>
+							
+							
 						</g:form>
 					</div>
 					<%-- Only show these tabs if the product has been created --%>

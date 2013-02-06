@@ -2,7 +2,7 @@
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode"%>
 
 
-<div class="widget-small">
+<div class="widget-small box">
 	<div class="widget-header">
 		<h2><warehouse:message code="receiving.label"/></h2>
 	</div>

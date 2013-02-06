@@ -73,7 +73,7 @@
 			<tr>
 				<td class="value" colspan="2">
 					<div class="center">					
-						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,format:'CODE_39']) }" class="top"/>						
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,format:'CODE_39',width:200,height:20]) }" class="top"/>						
 						<%-- 					
 						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,width:250,height:100,format:'CODE_39']) }"/><br/>
 						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,width:250,height:100,format:'CODE_128']) }"/><br/>
@@ -181,7 +181,7 @@
 				</td>
 				<td class="value">
 					
-						<label>${g.formatNumber(number: totalQuantity, format: '###,###,###') }</label>
+						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
 						<g:if test="${productInstance?.unitOfMeasure }">
 							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
 						</g:if>
@@ -199,8 +199,8 @@
 							<td class="value">
 								<span class="fade">
 									<g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
-									~${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
-									${productPackage?.uom?.code }/${productPackage.quantity }
+									${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
+									x ${productPackage?.uom?.code }/${productPackage.quantity }
 								</span>
 							</td>
 						</tr>
@@ -311,6 +311,16 @@
 					<label>${warehouse.message(code: 'product.details.label') }</label>
 				</td>
 			</tr>
+			
+			
+			<tr class="prop">
+				<td class="label">
+					<label>${warehouse.message(code: 'product.productCode.label') }</label>
+				</td>
+				<td>
+					${productInstance?.productCode }
+				</td>
+			</tr>			
 			<tr class="prop">	
 				<td class="label">
 					<label><warehouse:message code="category.label"/></label>

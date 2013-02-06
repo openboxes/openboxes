@@ -183,7 +183,7 @@ class Product implements Comparable, Serializable {
 	User updatedBy
 	
 		
-	static transients = ["rootCategory", "images", "genericProduct", "thumbnail"];
+	static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation"];
 	
 	static hasMany = [ 
 		categories : Category, 
@@ -265,6 +265,12 @@ class Product implements Comparable, Serializable {
 		return this?.productGroups?this?.productGroups?.sort()?.first():null
 	}
 		
+	InventoryLevel getInventoryLevel(locationId) {		
+		def location = Location.get(locationId)		
+		return InventoryLevel.findByProductAndInventory(this, location.inventory)
+	} 
+	
+	
 	String toString() { return "$name"; }
 	
 	/**

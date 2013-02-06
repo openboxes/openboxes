@@ -42,6 +42,7 @@ import com.google.zxing.BarcodeFormat;
 import java.net.URLEncoder;
 
 import grails.converters.XML;
+import grails.validation.ValidationException;
 
 class ProductController {
 
@@ -164,7 +165,9 @@ class ProductController {
 
 		def productInstance = new Product();
 		productInstance.properties = params
-
+		if (!productInstance.productCode) { 
+			productInstance.productCode = productService.generateProductIdentifier();
+		}
 		// Add tags
 		try {
 			if (params.tagsToBeAdded) {
@@ -261,6 +264,20 @@ class ProductController {
 			}
 			productInstance.properties = params
 
+			if (!productInstance.productCode) {
+				productInstance.productCode = productService.generateProductIdentifier();
+			}
+			/*
+			try {
+				productService.saveProduct(productInstance)
+			}
+			catch (ValidationException e) {
+				productInstance = Product.read(params.id)
+				productInstance.errors = e.errors
+				render view: "edit", model: [productInstance:productInstance]
+			}
+			*/
+			
 			Map existingAtts = new HashMap();
 			productInstance.attributes.each() {
 				existingAtts.put(it.attribute.id, it)

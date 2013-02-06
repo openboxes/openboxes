@@ -5,8 +5,12 @@ import org.pih.warehouse.modules.AddItemToShipmentModule
 import org.pih.warehouse.modules.AddIncomingItemToShipmentModule
 import org.pih.warehouse.modules.AddContainerToShipmentModule
 import testutils.TestFixture
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
+
 
 class EditPackingListPage extends Page{
+	
     static url = TestFixture.baseUrl + "/createShipmentWorkflow/createShipment"
     static at = { title == "Add shipment items"}
     static content = {
@@ -21,6 +25,8 @@ class EditPackingListPage extends Page{
         addContainerToShipment{module AddContainerToShipmentModule}
     }
 
+	
+	
     def addItem(product_name, quantity){
         addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
         waitFor{$("ul.ui-autocomplete li.ui-menu-item a")}.first().text().contains(product_name) == true
@@ -64,7 +70,8 @@ class EditPackingListPage extends Page{
     }
 
     def clickPackingAction(){
-        waitFor{$("button.action-btn")}.click() //do not put into content because it will show/hide multiple times
+        waitFor{$("button.action-btn")}.click() //do not put into content because it will show/hide multiple times		
+		//waitFor{$("#unpackedItemsActionBtn")}.click()
     }
 
 

@@ -20,6 +20,7 @@ import org.pih.warehouse.importer.ImportDataCommand;
 import org.pih.warehouse.importer.ImporterUtil;
 
 
+import org.pih.warehouse.picklist.Picklist;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
@@ -574,30 +575,45 @@ class InventoryService implements ApplicationContextAware {
      * Get all inventory items that are expiring within the given threshold.
      *
      * @param category the category filter
-     * @param threshhold the threshhold filter
+     * @param threshold the threshold filter
      * @return a list of inventory items
      */
-    List getExpiringStock(Category category, Location location, Integer threshhold) {
+    List getExpiringStock(Category category, Location location, Integer threshold) {
+		
         def today = new Date();
 
         // Get all stock expiring ever (we'll filter later)
         def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc']);
-
-
         def quantityMap = getQuantityForInventory(location.inventory)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
-
         if (category) {
             expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
         }
-
-        if (threshhold) {
-            expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshhold) }
+		
+        if (threshold) {
+            expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
         }
 
         return expiringStock
     }
 
+	
+	List getLowStock(Location location) { 
+		def quantityMap = getQuantityForInventory(location.inventory)
+		def lowStock = quantityMap.findAll { it.value <= 0 }  
+		
+		return lowStock.keySet() as List
+	}
+	
+	List getReorderStock(Location location) { 
+		def quantityMap = getQuantityForInventory(location.inventory)
+		def reorderStock = quantityMap.findAll { it.value <= it?.key?.product?.getInventoryLevel(location?.id)?.reorderQuantity }
+		
+		return reorderStock.keySet() as List
+
+	}
+	
+	
     /**
 	 * Get all products matching the given terms and categories.
 	 * 
@@ -700,8 +716,6 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }.collect { it }.unique { it.id }
-
-		println "products: " + products
 
         return Product.createCriteria().list(max: maxResult, offset: offset) {
             inList("id", (products.collect { it.id })?: [""])
@@ -990,15 +1004,33 @@ class InventoryService implements ApplicationContextAware {
                 if (quantity <= level.minQuantity) {
                     minimumProductsQuantityMap[level.product] = quantity
                 }
+				else if (quantity <= 0) { 
+					minimumProductsQuantityMap[level.product] = quantity
+				}
                 else if (quantity <= level.reorderQuantity) {
                     reorderProductsQuantityMap[level.product] = quantity
                 }
             }
-
         }
-
         return [minimumProductsQuantityMap: minimumProductsQuantityMap, reorderProductsQuantityMap: reorderProductsQuantityMap]
     }
+
+	Location getCurrentLocation() { 
+		def currentLocation = AuthService?.currentLocation?.get()
+		if (!currentLocation?.inventory)
+			throw new Exception("Inventory not found")
+		return currentLocation
+	}
+		
+	/**
+	 * Gets the current quantity of the given inventory item.
+	 * @param inventoryItem
+	 * @return
+	 */
+	Integer getQuantity(InventoryItem inventoryItem) { 
+		def currentLocation = getCurrentLocation()
+		return getQuantity(currentLocation.inventory, inventoryItem)
+	}
 
     /**
      * Gets the quantity of a specific inventory item at a specific inventory
@@ -1032,6 +1064,12 @@ class InventoryService implements ApplicationContextAware {
         return quantity ?: 0;
     }
 
+	
+	Integer getQuantityAvailableToPromise(InventoryItem inventoryItem) {
+		def currentLocation = getCurrentLocation()
+		return getQuantityAvailableToPromise(currentLocation.inventory, inventoryItem)
+	}
+	
     Integer getQuantityAvailableToPromise(Inventory inventory, InventoryItem inventoryItem) {
         def quantityOnHand = getQuantity(inventory, inventoryItem)
         /*
@@ -2334,13 +2372,16 @@ class InventoryService implements ApplicationContextAware {
     }
 
     public Map<Product, List<InventoryItem>> getInventoryItemsWithQuantity(List<Product> products, Inventory inventory) {
-        def transactionEntries = TransactionEntry.createCriteria().list() {
+        
+		def transactionEntries = TransactionEntry.createCriteria().list() {
             transaction {
                 eq("inventory", inventory)
             }
-            inventoryItem {
-                'in'("product", products)
-            }
+			if (products) { 
+	            inventoryItem {
+	                'in'("product", products)
+	            }
+			}
         }
         def map = getQuantityByProductAndInventoryItemMap(transactionEntries)
         def result = [:]
@@ -2358,16 +2399,22 @@ class InventoryService implements ApplicationContextAware {
     }
 	
 	
+	/**
+	 * @param product
+	 * @return
+	 */
+	//public Integer getQuantityAvailableToPromise(Product product) {}
+	//public Integer getQuantityOnHand(Product product) {}	
+	//public Integer getQuantityAvailableToPromise(InventoryItem inventoryItem) {}
+	//public Integer getQuantityOnHand(InventoryItem inventoryItem) {}
+	
+	
+	/**
+	 * @return	a unique identifier to be assigned to a transaction
+	 */
 	public String generateTransactionNumber() { 
-		// 
-		def identifier = productService.generateIdentifier("AAA-AAA-AAA")
-		
-		
-		return identifier
+		return productService.generateIdentifier("AAA-AAA-AAA")
 	}
-	
-	
-	
-	
-
+		
 }
+
