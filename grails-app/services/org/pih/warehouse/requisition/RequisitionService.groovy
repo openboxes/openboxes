@@ -100,6 +100,7 @@ class RequisitionService {
 
 		def requisition = Requisition.get(data.id?.toString()) ?: new Requisition(status: RequisitionStatus.CREATED)
 		requisition.properties = data
+		requisition.requestNumber = productService.generateIdentifier("NNNLLL")
 
 		def requisitionItems = itemsData.collect{  itemData ->
 			def requisitionItem = requisition.requisitionItems?.find{i -> itemData.id  && i.id == itemData.id }
