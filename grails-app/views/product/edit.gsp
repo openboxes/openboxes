@@ -476,7 +476,7 @@
 										<td class="value">
 								           	<g:select name="status" 
 				           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
-				           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
+				           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance?.status}" 
 				           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
 										</td>
 									</tr>
