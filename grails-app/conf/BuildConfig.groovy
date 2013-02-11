@@ -72,7 +72,8 @@ grails.project.dependency.resolution = {
         runtime( ':excel-import:0.3' ) { excludes 'poi', 'poi-contrib', 'poi-scratchpad' }
 
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
-
+		
+		runtime ':quartz2:0.2.2'
 		//runtime ':quartz:1.0-RC4'
 		//compile ':quartz:1.0-RC4'
 		
