@@ -1,4 +1,4 @@
-<div class="widget-large box">
+<div class="widget-large">
 	<div class="widget-header">
 		<h2><warehouse:message code="inventory.label" args="[session.warehouse.name]"/></h2>
 	</div>	    			

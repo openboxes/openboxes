@@ -80,13 +80,13 @@ class DashboardController {
 		def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		
-		def expiredStock = inventoryService.getExpiredStock(null, location)
+		//def expiredStock = inventoryService.getExpiredStock(null, location)
 		def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
 		def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
 		def expiringStockWithin180Days = inventoryService.getExpiringStock(null, location, 180)
 		def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
-		def lowStock = inventoryService.getLowStock(location)
-		def reorderStock = inventoryService.getReorderStock(location)
+		//def lowStock = inventoryService.getLowStock(location)
+		//def reorderStock = inventoryService.getReorderStock(location)
 		
 				
 		def activityList = []
@@ -205,13 +205,13 @@ class DashboardController {
 			allIncomingShipments : allIncomingShipments,
 			outgoingOrders : outgoingOrders,
 			incomingOrders : incomingOrders,
-			expiredStock : expiredStock,
+			//expiredStock : expiredStock,
 			expiringStockWithin30Days : expiringStockWithin30Days,
 			expiringStockWithin90Days : expiringStockWithin90Days,
 			expiringStockWithin180Days : expiringStockWithin180Days,
 			expiringStockWithin365Days : expiringStockWithin365Days,
-			lowStock: lowStock,
-			reorderStock: reorderStock,
+			//lowStock: lowStock,
+			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
 			outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),

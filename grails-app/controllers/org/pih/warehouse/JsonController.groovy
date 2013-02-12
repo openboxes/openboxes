@@ -32,6 +32,31 @@ class JsonController {
 	def localizationService	
 	def shipmentService
 	
+	
+	def getLowStockCount = { 
+		println "low stock count " + params
+		def location = Location.get(params?.location?.id)
+		def results = inventoryService.getLowStock(location)
+		println results
+		render ((results)?results.size():"ERROR")
+	}
+
+	def getReorderStockCount = {
+		println "reorder stock count " + params
+		def location = Location.get(params?.location?.id)
+		def results = inventoryService.getReorderStock(location)
+		println results
+		render ((results)?results.size():"ERROR")
+	}
+
+	def getExpiredStockCount = {
+		println "expired stock count " + params
+		def location = Location.get(params?.location?.id)
+		def results = inventoryService.getExpiredStock(null, location)
+		
+		println results
+		render ((results)?results.size():"ERROR")
+	}
 	def findTags = {
 		def searchTerm = "%" + params.term + "%";
 		def c = Tag.createCriteria()
@@ -553,4 +578,5 @@ class JsonController {
 		}
 		render json as JSON
 	}
+	
 }
