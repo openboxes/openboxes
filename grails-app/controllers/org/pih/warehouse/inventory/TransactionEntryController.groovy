@@ -26,7 +26,7 @@ class TransactionEntryController {
 		redirect(action: "list")
 	}
 	
-
+	/*
 	def edit = {
 		def transactionEntryInstance = TransactionEntry.get(params.id)
 		log.info "get transaction entry " + transactionEntryInstance
@@ -36,5 +36,5 @@ class TransactionEntryController {
 			return;
 		}
 		[transactionEntryInstance: transactionEntryInstance]
-	}
+	}*/
 }
