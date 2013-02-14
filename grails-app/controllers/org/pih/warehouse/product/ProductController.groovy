@@ -14,35 +14,22 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.groovydev.SimpleImageBuilder;
-import org.junit.runner.Request;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.DocumentCommand;
-import org.pih.warehouse.importer.ImportDataCommand;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.InventoryLevel;
-import org.pih.warehouse.core.ApiException;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.DocumentType;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.RoleType;
-import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.core.User;
-import org.springframework.web.multipart.MultipartFile;
+import java.awt.Graphics2D
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
-import javax.swing.ImageIcon
-import javax.imageio.ImageIO as IIO
-import java.awt.Graphics2D
-import java.io.ByteArrayOutputStream;
-import com.google.zxing.BarcodeFormat;
-import java.net.URLEncoder;
 
-import grails.converters.XML;
-import grails.validation.ValidationException;
+import javax.imageio.ImageIO as IIO
+import javax.swing.ImageIcon
+
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
+
+import com.google.zxing.BarcodeFormat
 
 class ProductController {
 

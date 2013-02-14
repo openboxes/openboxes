@@ -119,11 +119,6 @@ class Order implements Serializable {
 		return (status == OrderStatus.RECEIVED)
 	}
 	
-	
-	String getOrderNumber() {
-		return (id) ? "V" + String.valueOf(id).padLeft(6, "0")  : "(New Request)";
-	}
-	
 	def shipments() { 
 		return orderItems.collect { it.shipments() }.flatten().unique() { it?.id }
 	}

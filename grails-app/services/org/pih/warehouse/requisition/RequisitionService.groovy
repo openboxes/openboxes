@@ -27,6 +27,8 @@ class RequisitionService {
 
 	boolean transactional = true
 
+	def identifierService
+	def productService
 	def shipmentService;
 	def inventoryService;
 
@@ -100,8 +102,10 @@ class RequisitionService {
 
 		def requisition = Requisition.get(data.id?.toString()) ?: new Requisition(status: RequisitionStatus.CREATED)
 		requisition.properties = data
-		requisition.requestNumber = productService.generateIdentifier("NNNLLL")
-
+		if (!requisition.requestNumber) { 
+			requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+		}
+		
 		def requisitionItems = itemsData.collect{  itemData ->
 			def requisitionItem = requisition.requisitionItems?.find{i -> itemData.id  && i.id == itemData.id }
 			if(requisitionItem) {

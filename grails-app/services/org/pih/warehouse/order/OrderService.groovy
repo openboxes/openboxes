@@ -31,7 +31,9 @@ class OrderService {
 
 	boolean transactional = true
 	
+	def productService
 	def shipmentService;
+	def identifierService
 	
 	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
@@ -189,6 +191,10 @@ class OrderService {
 		// update the status of the order before saving
 		order.updateStatus()
 		
+		if (!order.orderNumber) {
+			order.orderNumber = identifierService.generateOrderIdentifier()
+		}
+
 		if (!order.hasErrors() && order.save()) {
 			return order;
 		}

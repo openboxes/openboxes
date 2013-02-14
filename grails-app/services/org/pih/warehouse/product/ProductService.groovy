@@ -10,28 +10,18 @@
 package org.pih.warehouse.product
 
 
-import java.io.ExpiringCache.Entry;
-import java.text.SimpleDateFormat;
-import java.util.List;
+import grails.validation.ValidationException
+import groovy.xml.Namespace
 
-import grails.validation.ValidationException;
-import groovy.xml.Namespace;
+import java.text.SimpleDateFormat
 
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.importer.ImportDataCommand;
-import org.pih.warehouse.inventory.InventoryLevel;
-import org.pih.warehouse.core.ApiException;
-import org.apache.commons.lang.RandomStringUtils;
 import org.grails.plugins.csv.CSVWriter
-import org.hibernate.SessionFactory;
-
-
+import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.importer.ImportDataCommand
 
 /**
- * Keys
- * 
  * @author jmiranda
  *
  */
@@ -39,7 +29,8 @@ class ProductService {
 
 	def sessionFactory 
 	def grailsApplication
-
+	def identifierService
+	
 	/**
 	 * 	
 	 * @param query
@@ -808,62 +799,10 @@ class ProductService {
 	 * @return
 	 */
 	def generateProductIdentifier() { 
-		return generateIdentifier("LLNN")
+		return identifierService.generateProductIdentifier()
 	}
 	
-	/**
-	 * 
-	 * A: alphabetic
-	 * L: letter
-	 * N: numeric
-	 * D: digit
-	 * 0-9: digit 
-	 * 
-	 * @param format
-	 * @return
-	 */
-	def generateIdentifier(String format) { 
-		if (!format || format.isEmpty()) { 
-			println "format must be specified"
-			throw new IllegalArgumentException("Format pattern string must be specified")
-		}
-		
-		String identifier = ""
-		for (int i = 0; i < format.length(); i++) { 
-			switch(format[i]) { 
-				case 'N': 
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS)
-					break;
-				case 'D':
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS)
-					break;
-				case 'L': 
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS)
-					break;				
-				case 'A': 
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS)				
-					break;
-				default:
-					identifier += format[i]
-					//throw new IllegalArgumentException("Unsupported format symbol: " + format[i])
-				
-			}					
-		}
-		println "generateIdentifier(" + format + "): " + identifier
-		
-		return identifier
-	}
 	
-	/**
-	 * Generate a random identifier of given length using alphanumeric characters.
-	 * 
-	 * @param length
-	 */
-	def generateIdentifier(int length) {
-		String identifier = RandomStringUtils.random(length, Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS)
-		println "generateIdentifier(" + length + "): " + identifier 
-		return identifier
-	}
 		
 	
 	def downloadDocument(url) { 

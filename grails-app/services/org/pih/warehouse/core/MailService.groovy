@@ -239,7 +239,21 @@ class MailService {
 	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) {
 		sendHtmlMailWithAttachment(toList, [], subject, body, bytes, name, mimeType, null)		
 	}
-		
+
+	/**
+	 * 
+	 * @param toList
+	 * @param ccList
+	 * @param subject
+	 * @param body
+	 * @param bytes
+	 * @param name
+	 * @param mimeType
+	 * @return
+	 */
+	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) {
+		sendHtmlMailWithAttachment(toList, ccList, subject, body, bytes, name, mimeType, null)
+	}
 	
 	/**
 	 * 

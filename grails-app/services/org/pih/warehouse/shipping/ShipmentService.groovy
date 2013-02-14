@@ -36,7 +36,9 @@ class ShipmentService {
 
 	def mailService;
 	def sessionFactory;
+	def productService
 	def inventoryService;
+	def identifierService
 	boolean transactional = true
    
 	
@@ -416,6 +418,9 @@ class ShipmentService {
 	 * @param shipment
 	 */
 	void saveShipment(Shipment shipment) {
+		if (!shipment.shipmentNumber) { 
+			shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+		}
 		shipment.save(flush:true, failOnError:true)
 	}
 	
