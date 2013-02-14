@@ -239,10 +239,14 @@ class BootStrap {
 	void assignShipmentIdentifiers() { 		
 		def shipments = Shipment.findAll("from Shipment as s where shipmentNumber is null or shipmentNumber = ''")
 		shipments.each { shipment ->
-			println "Assigning identifier to " + shipment.id + " " + shipment.name
-			shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
-			if (!shipment.save(flush:true,validate:false)) { 
-				println shipment.errors
+			println "Assigning identifier to shipment " + shipment.id + " " + shipment.name
+			try { 
+				shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+				if (!shipment.save(flush:true,validate:false)) { 
+					println shipment.errors
+				}
+			} catch (Exception e) { 
+				println "Unable to assign shipment identifier: " + e.message
 			}
 		}
 	}
@@ -250,10 +254,14 @@ class BootStrap {
 	void assignRequisitionIdentifiers() {	
 		def requisitions = Requisition.findAll("from Requisition as r where requestNumber is null or requestNumber = ''")
 		requisitions.each { requisition ->
-			println "Assigning identifier to " + requisition.id + " " + requisition.name
-			requisition.requestNumber = identifierService.generateRequisitionIdentifier()
-			if (!requisition.save(flush:true,validate:false)) { 
-				println requisition.errors
+			try { 
+				println "Assigning identifier to requisition " + requisition.id + " " + requisition.name
+				requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+				if (!requisition.save(flush:true,validate:false)) { 
+					println requisition.errors
+				}
+			} catch (Exception e) { 
+				println("Unable to assign requisition identifier: " + e.message)
 			}
 		}
 	}
@@ -261,36 +269,44 @@ class BootStrap {
 	void assignOrderIdentifiers() {
 		def orders = Order.findAll("from Order as o where orderNumber is null or orderNumber = ''")
 		orders.each { order ->
-			println "Assigning identifier to " + order.id + " " + order.name
-			order.orderNumber = identifierService.generateOrderIdentifier()
-			if (!order.save(flush:true,validate:false)) { 
-				println order.errors
+			try { 
+				println "Assigning identifier to order " + order.id + " " + order.name
+				order.orderNumber = identifierService.generateOrderIdentifier()
+				if (!order.save(flush:true,validate:false)) { 
+					println order.errors
+				}
+			} catch(Exception e) {
+				println("Unable to assign order identifier: " + e.message)
 			}
 		}
 	}
 	void assignTransactionIdentifiers() {
 		def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
 		transactions.each { transaction ->
-			println "Assigning identifier to " + transaction.id 
-			transaction.transactionNumber = identifierService.generateTransactionIdentifier()
-			if (!transaction.save(flush:true,validate:false)) { 
-				println transaction.errors
+			try { 
+				println "Assigning identifier to transaction " + transaction.id 
+				transaction.transactionNumber = identifierService.generateTransactionIdentifier()
+				if (!transaction.save(flush:true,validate:false)) { 
+					println transaction.errors
+				}				
+			} catch(Exception e) {
+				println("Unable to assign transaction identifier: " + e.message)
 			}
 		}
 	}
 
 	void assignProductIdentifiers() {
-		try { 
-			def products = Product.findAll("from Product as p where productCode is null or productCode = ''")			
-			products.each { product -> 
-				println "Assigning identifier to " + product.id + " " + product.name
+		def products = Product.findAll("from Product as p where productCode is null or productCode = ''")			
+		products.each { product -> 
+			try {				
+				println "Assigning identifier to product " + product.id + " " + product.name
 				product.productCode = identifierService.generateProductIdentifier()
 				if (!product.save(flush:true,validate:false)) { 
 					println product.errors
 				}
+			} catch(Exception e) { 
+				println("Unable to assign product identifier: " + e.message)
 			}
-		} catch(Exception e) { 
-			log.error("Unable to assign product identifier ", e)
 		}
 	}
 
