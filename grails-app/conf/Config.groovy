@@ -117,7 +117,12 @@ environments {
 		grails.mail.enabled = false
 	}
 	production {  
-		grails.serverURL = "http://localhost:8080/${appName}"  
+		grails.serverURL = "http://localhost:8080/${appName}"
+		uiperformance.enabled = false
+		grails.mail.enabled = true
+	}
+	staging {  
+		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
 		grails.mail.enabled = true
 	}
@@ -143,6 +148,10 @@ environments {
 // log4j configuration
 log4j = {
 	
+	// Used to debug hibernate/SQL queries
+	//trace 'org.hibernate.type'
+	//debug 'org.hibernate.SQL'
+	
 	System.setProperty 'mail.smtp.port', mail.error.port.toString()
     System.setProperty 'mail.smtp.connectiontimeout', "5000"
     System.setProperty 'mail.smtp.timeout', "5000"
@@ -157,6 +166,7 @@ log4j = {
 		//println "mail.error.username: '${mail.error.username}'"
 		//println "mail.error.password: '${mail.error.password}'"
 		
+		// Only enable SMTP appender when mail is enabled 
         if (Boolean.parseBoolean(grails.mail.enabled.toString())) {		
 	        def smtpAppender
 			def conversionPattern = "Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
@@ -223,7 +233,7 @@ log4j = {
             appender asyncAppender
         }
 		
-	}
+    }
 	
 	root {
 		error 'stdout', 'smtp'
