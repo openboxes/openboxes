@@ -9,7 +9,16 @@ import grails.test.GrailsUnitTestCase
 
 
 class RequisitionServiceTests extends GrailsUnitTestCase {
+
+	def requisitionService = new RequisitionService()
+	
+	
+	protected void tearDown() {
+		super.tearDown()
+	}	
+	
 	void testCreateNewRequisition(){
+		requisitionService.identifierService = [generateRequisitionIdentifier: { -> return "ABC-123" }]
 		mockDomain(Requisition, [])
 		mockDomain(RequisitionItem, [])
 		Product product1 = new Product(id:"prod1")
@@ -31,9 +40,9 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 			dateRequested: today, requestedDeliveryDate: tomorrow,
 			name: "testRequisition",
 			requisitionItems: items]
-		def service = new RequisitionService()
+		//def service = new RequisitionService()
 
-		def requisition = service.saveRequisition(data, boston)
+		def requisition = requisitionService.saveRequisition(data, boston)
 
 		def requisitionPersisted = Requisition.findByName("testRequisition")
 
@@ -51,6 +60,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 
 
 	void testUpdateRequisition(){
+		requisitionService.identifierService = [generateRequisitionIdentifier: { -> return "ABC-123" }]
+		
 		Product product1 = new Product(id:"prod1")
 		Product product2 = new Product(id:"prod2")
 		mockDomain(Product, [product1, product2])
@@ -82,8 +93,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 			name: "testRequisition",
 			requisitionItems: items]
 
-		def service = new RequisitionService()
-		def requisition = service.saveRequisition(data, boston)
+		//def service = new RequisitionService()
+		def requisition = requisitionService.saveRequisition(data, boston)
 		def requisitionPersisted = Requisition.findByName(data.name)
 		assert requisitionPersisted
 		assert requisition == requisitionPersisted
@@ -100,7 +111,10 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		assert requisition.requisitionItems.any{ item -> item.product == product2 && item.quantity == 400 && item.orderIndex == 1}
 	}
 
+	
 	void testDeleteRequisitionItems(){
+		requisitionService.identifierService = [generateRequisitionIdentifier: { -> return "ABC-123" }]
+
 		Product product1 = new Product(id:"prod1", name: "prodName1")
 		Product product2 = new Product(id:"prod2", name: "prodName2")
 		mockDomain(Product, [product1, product2])
@@ -130,8 +144,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 			name: "testRequisition",
 			requisitionItems: items]
 
-		def service = new RequisitionService()
-		def requisition = service.saveRequisition(data, boston)
+		//def service = new RequisitionService()
+		def requisition = requisitionService.saveRequisition(data, boston)
 		def requisitionPersisted = Requisition.findByName(data.name)
 		assert requisitionPersisted
 
@@ -166,8 +180,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 			requisitionItem2
 		])
 
-		def service = new RequisitionService()
-		service.deleteRequisition(requisition)
+		//def service = new RequisitionService()
+		requisitionService.deleteRequisition(requisition)
 		def requisitionFromDb = Requisition.get(requisition.id)
 		assert !requisitionFromDb
 
@@ -184,8 +198,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		description: "oldDescription")
 		mockDomain(Requisition, [requisition])
 
-		def service = new RequisitionService()
-		service.cancelRequisition(requisition)
+		//def service = new RequisitionService()
+		requisitionService.cancelRequisition(requisition)
 		def requisitionFromDb = Requisition.get(requisition.id)
 
 		assert requisitionFromDb.status == RequisitionStatus.CANCELED
