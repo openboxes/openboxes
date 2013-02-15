@@ -48,15 +48,16 @@ private determineGitRevisionNumber = {
 }
 
 eventWarStart = {
-	log.info "Copying liquibase changelogs ..."
-	ant.copy(todir:"${basedir}/target/classes", failonerror:true, overwrite:true) {
-		fileset(dir:"${basedir}/grails-app/migrations", includes:"**/*")
-	}
+	//log.info "Copying liquibase changelogs ..."
+	//ant.copy(todir:"${basedir}/target/classes", failonerror:true, overwrite:true) {
+	//	fileset(dir:"${basedir}/grails-app/migrations", includes:"**/*")
+	//}
+	
 }
 
 eventRunAppStart = {
-  log.info "Setting build date, build number, and revision number ..."
-	String revisionNumber = determineGitRevisionNumber()
+	log.info "Setting build date, build number, and revision number ..."
+  	def revisionNumber = determineGitRevisionNumber()
 	
 	def buildNumber = metadata.'app.buildNumber'
 	if (!buildNumber) buildNumber = 1
@@ -69,13 +70,19 @@ eventRunAppStart = {
 }
 
 eventCreateWarStart = { warName, stagingDir ->
-	log.info "Setting build date, build number, and revision number ..."
+	log.info "Copying liquibase changelogs from ${basedir}/grails-app/migrations ..."
+	ant.copy(todir:"${stagingDir}/WEB-INF/classes", failonerror:true, overwrite:true) {
+		fileset(dir:"${basedir}/grails-app/migrations", includes:"**/*")
+	}
 
+	log.info "Setting build date, build number, and revision number ..."
+	def revisionNumber = determineGitRevisionNumber()
 	def buildNumber = System.getProperty("build.number", metadata.'app.buildNumber')
+	
 	log.info("Setting BUILD_NUMBER to " + buildNumber)
 
-    String revisionNumber = determineGitRevisionNumber()
 
+	log.info "Setting build properties ${stagingDir}/WEB-INF/classes/application.properties"
     ant.propertyfile(file:"${stagingDir}/WEB-INF/classes/application.properties") {
 		entry(key:"app.buildNumber", value:buildNumber)
 		entry(key:"app.revisionNumber", value:revisionNumber)
