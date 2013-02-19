@@ -39,7 +39,7 @@ eventAllTestsStart = {
 private determineGitRevisionNumber = {
     String revisionNumber = 'dev'
     try {
-        revisionNumber = 'git describe --match v*'.execute().text.trim()
+        revisionNumber = 'git describe --match v* --always'.execute().text.trim()
     } catch (Exception e) {
         log.error 'Error executing git describe ', e
     }
