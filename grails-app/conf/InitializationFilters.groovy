@@ -18,25 +18,27 @@ class InitializationFilters {
 		sessionCheck(controller:'*', action:'*') {
 			before = {
 				try { 
-					Location currentLocation = Location.get(session?.warehouse?.id)
-					session.loginLocations = locationService.getLoginLocations(currentLocation) 			
-					session.loginLocationsMap = locationService.getLoginLocationsMap(currentLocation)			
-				} catch (Exception e) { 
-					// Only happens when location service is unavailable 	
-					log.error "Error retrieving login-able locations: " + e.message
-					//session.loginLocations = []
-				}
-				
-				// Make sure all session variables are initialized
-				if (!session.rootCategory) { 
-					session.rootCategory = productService.getRootCategory()
-				} 
-				
-				if (!session.inventoryCategoryFilters)
-					session.inventoryCategoryFilters = []; 
+					// Make sure all session variables are initialized
+					if (!session.warehouse) { 
+						Location currentLocation = Location.get(session?.warehouse?.id)
+						session.loginLocations = locationService.getLoginLocations(currentLocation) 			
+						session.loginLocationsMap = locationService.getLoginLocationsMap(currentLocation)			
+					}
 					
-				if (!session.productCategoryFilters)
-					session.productCategoryFilters = [];
+					if (!session.rootCategory) { 
+						session.rootCategory = productService.getRootCategory()
+					} 
+					if (!session.inventoryCategoryFilters) { 
+						session.inventoryCategoryFilters = [];
+					}
+					if (!session.productCategoryFilters) {
+						session.productCategoryFilters = [];
+					}
+					
+				} catch (Exception e) { 
+					log.error "Unable to initialize session variables: " + e.message, e
+				}				
+									
 
 			}
 		}
