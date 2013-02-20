@@ -39,11 +39,11 @@ class RoleFilters {
     }
 
     def static Boolean needAdmin(controllerName, actionName){
-       adminControllers.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any{actionName.startsWith(it)}
+       adminControllers?.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any{actionName?.startsWith(it)}
     }
 
      def static Boolean needManager(controllerName, actionName){
-       changeActions.any{ actionName.startsWith(it)} || controllerName.contains("Workflow") || changeControllers.contains(controllerName)
+       changeActions.any{ actionName?.startsWith(it)} || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName)
     }
 
 
