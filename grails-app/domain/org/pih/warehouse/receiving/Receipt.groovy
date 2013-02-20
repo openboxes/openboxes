@@ -24,8 +24,8 @@ class Receipt implements Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 
-	static belongsTo = [ shipment : Shipment ]
 	static hasMany = [ receiptItems : ReceiptItem ]
+	static belongsTo = [ shipment : Shipment ]
 	
 	static mapping = {
 		id generator: 'uuid'

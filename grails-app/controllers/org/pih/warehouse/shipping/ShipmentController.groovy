@@ -513,82 +513,11 @@ class ShipmentController {
 		}
 	}
 	
-	def saveItem = {     		
-		log.info params;    	
-		def shipment = Shipment.get(params.id);		
-		def container = Container.get(params.container.id);
-		def product = Product.get(params.selectedItem.id)
-		def recipient = Person.get(params.recipient.id);		
-		def quantity = (params.quantity) ? Integer.parseInt(params.quantity.trim()) : 1;
-		def shipmentItem = null;
-		
-		// Create a new unverified product
-		if (!product) { 			
-			product = new Product(name: params.selectedItem.name);			
-			if (!product.hasErrors() && product.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), product.id])}"
-				//redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
-			}
-			else {
-				// Encountered an error with saving the product
-				redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
-				return;
-			}
-		}	
-		
-		// Add item to container if product doesn't already exist
-		if (container) { 
-			def oldQuantity = 0;
-			def newQuantity = 0;
-			boolean found = false;
-			container.shipmentItems.each { 
-				if (it.product == product) { 
-					oldQuantity = it.quantity;					
-					it.quantity += quantity;
-					newQuantity = it.quantity;
-					it.save();
-					found = true;
-				}
-			}			
-			if (!found) { 			
-				shipmentItem = new ShipmentItem(product: product, 
-				quantity: quantity, 
-				recipient: recipient,
-				container: containerInstance);
-				
-				//container.addToShipmentItems(shipmentItem).save(flush:true);
-				container.addToShipmentItems(shipmentItem).save(flush:true);
-			}
-			else { 
-				flash.message = "${warehouse.message(code: 'shipping.modifiedQuantityOfExistingShipment.message', args: [format.product(product:product), oldQuantity, newQuantity])}"
-			}
-		}
-		
-		redirect action: "editContents", id: shipment?.id, params: ["container.id": container?.id];
-	}    
+	  
 	
 	
 	
-	def addContainer = { 		
-		log.debug params 		
-		def shipment = Shipment.get(params.shipmentId);   	
-		def containerType = ContainerType.get(params.containerTypeId);    	
-		def containerName = (params.name) ? params.name : containerType.name + " " + (shipment.getContainers().size() + 1);
-		def container = new Container(name: containerName, weight: params.weight, weightUnits: params.weightUnits, containerType: containerType);
-		shipment.addToContainers(container);
-		redirect(action: 'editContents', id: params.shipmentId)
-	}
 	
-	/*
-	 def editContainer = {
-	 def container = Shipment.get(params.containerId);
-	 def containerType = ContainerType.get(params.containerTypeId);
-	 def containerName = (params.name) ? params.name : containerType.name + " " + shipment.getContainers().size()
-	 def container = new Container(name: containerName, weight: params.weight, units: params.weightUnits, containerType: containerType);
-	 container.save(flush:true);
-	 flash.message = "Added a new piece to the shipment";
-	 redirect(action: 'show', id: params.shipmentId)
-	 }*/
 	
 	
 	def editContainer = {		
@@ -711,16 +640,6 @@ class ShipmentController {
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
-
-	/*
-	def saveDocument = { 
-		
-		log.info params 
-	
-		render(view: )	
-	}
-	*/
-	
 	
 	
 	def addComment = {

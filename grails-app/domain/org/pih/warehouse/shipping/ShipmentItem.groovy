@@ -67,6 +67,20 @@ class ShipmentItem implements Comparable, Serializable {
 		donor(nullable:true)
 	}
     
+	/**
+	 * @return	the lot number of the inventory item (or the lot number of the shipment item for backwards compatibility)
+	 */
+	def getLotNumber() { 
+		return inventoryItem?.lotNumber?:lotNumber
+	}
+	
+	/**
+	 * @return	the expiration date of the inventory item (or the expiration date of the shipment item for backwards compatibility)
+	 */
+	def getExpirationDate() { 
+		return inventoryItem?.expirationDate?:expirationDate
+	}
+	
 
 	def orderItems() {
 		return orderShipments.collect{it.orderItem}

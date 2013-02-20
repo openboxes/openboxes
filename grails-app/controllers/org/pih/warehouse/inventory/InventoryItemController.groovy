@@ -469,10 +469,11 @@ class InventoryItemController {
 		
 		def shipmentItem = new ShipmentItem(
 			product: productInstance,
+			lotNumber: inventoryItem.lotNumber?:'',
+			expirationDate: inventoryItem?.expirationDate,
 			inventoryItem: inventoryItem,
 			quantity: params.quantity,
 			recipient: personInstance,
-			lotNumber: inventoryItem.lotNumber?:'',
 			shipment: shipmentInstance,
 			container: containerInstance);
 		

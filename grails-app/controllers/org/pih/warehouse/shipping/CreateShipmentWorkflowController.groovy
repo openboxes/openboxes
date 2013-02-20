@@ -734,7 +734,13 @@ class CreateShipmentWorkflowController {
 					
 					// Create a new shipment item
 					// FIXME product: product, lotNumber: params.lotNumber
-					def shipmentItem = new ShipmentItem(shipment: shipment, container: container, inventoryItem: inventoryItem)
+					def shipmentItem = new ShipmentItem(
+						shipment: shipment, 
+						//product: inventoryItem?.product, 
+						//lotNumber: inventoryItem?.lotNumber,
+						//expirationDate: inventoryItem?.expirationDate,
+						container: container, 
+						inventoryItem: inventoryItem)
 					
 					// FIXME Property [shipment] of class [class org.pih.warehouse.shipping.ShipmentItem] cannot be null
 					//shipmentItem.shipment = flow.shipmentInstance
