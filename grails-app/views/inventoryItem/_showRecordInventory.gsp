@@ -71,7 +71,7 @@
 					</g:if>
 					<g:else>
 						<tr id="emptyRow" class="odd">
-							<td colspan="5" style="text-align: center;">
+							<td colspan="5" class="center">
 								<div class="fade">
 									<warehouse:message code="inventory.addNewInventoryItem.message"/>
 																
@@ -84,8 +84,8 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="4"></td>
-						<td class="center">
+						
+						<td class="left" colspan="5">
 							<button id="addRow" class="button icon add" >
 								<warehouse:message code="inventory.addInventoryItem.label"/>							
 							</button>					
