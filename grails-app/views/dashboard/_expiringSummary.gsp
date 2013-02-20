@@ -16,7 +16,7 @@
 									Items that will expire within 30 days
 								</g:link>
 							</td>
-							<td>
+							<td class="right">
 								${expiringStockWithin30Days?.size() }
 							</td>
 						</tr>
@@ -29,7 +29,7 @@
 									Items that will expire within 90 days
 								</g:link>
 							</td>
-							<td>
+							<td class="right">
 								${expiringStockWithin90Days?.size() }
 							
 							</td>
@@ -43,7 +43,7 @@
 									Items that will expire within 180 days
 								</g:link>
 							</td>
-							<td>
+							<td class="right">
 								${expiringStockWithin180Days?.size() }
 							</td>
 						</tr>
@@ -56,7 +56,7 @@
 									Items that will expire within 365 days
 								</g:link>
 							</td>
-							<td>
+							<td class="right">
 								${expiringStockWithin365Days?.size() }
 							</td>
 						</tr>

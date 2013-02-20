@@ -39,8 +39,6 @@
 										<span class="title middle">
 											${warehouse.message(code: 'dashboard.chooseLocation.label')}
 										</span>		
-					    					
-					    				
 									</td>
 								</tr>
 								<tr>
@@ -50,7 +48,7 @@
 								</tr>
 							</tbody>
 						</table>
-						<div style="max-height: 300px; overflow: auto;">
+						<div id="chooseLocationSelect">
 							<table>
 								<tbody>
 									<g:set var="count" value="${0 }"/>
@@ -60,6 +58,8 @@
 											<td class="top left" >			
 												<label>${entry.key?:warehouse.message(code:'default.none.label') }</label>
 											</td>
+										</tr>
+										<tr class="${count++%2?'even':'odd' }">
 											<td>	
 												<div class="button-group">
 													<g:set var="locationGroup" value="${entry.key }"/>
@@ -77,6 +77,8 @@
 										<td class="top left">
 											<label>${warehouse.message(code: 'default.others.label', default: 'Others')}</label>
 										</td>
+									</tr>
+									<tr class="${count++%2?'even':'odd' }">
 										<td>
 											<div class="button-group">											
 												<g:each var="warehouse" in="${nullLocationGroup }" status="status">
