@@ -5,95 +5,126 @@
 		<g:hiddenField name="inventoryInstance.id" value="${commandInstance?.inventoryInstance?.id}"/>
 
 
-		<div class="form-content box">
+		<div >
 			
-			<div class="middle left" style="padding: 0px 0 20px 0;">
-				<span class="title"><warehouse:message code="inventory.inventoryDate.label"/>:</span>													
-				<g:jqueryDatePicker 
-					id="transactionDate" 
-					name="transactionDate"
-					value="${commandInstance?.transactionDate}" 
-					format="MM/dd/yyyy"
-					showTrigger="false" />						
+			<div class="box">
+			
+				<table>
+					<tr class="prop">
+						<td class="name">
+							<label><warehouse:message code="user.label"/></label>
+						</td>
+						<td class="value">
+							${session.user.name }
+						</td>
 					
+					</tr>
+					<tr class="prop">
+						<td class="name">
+							<label><warehouse:message code="location.label"/></label>
+						</td>
+						<td class="value">
+							${session.warehouse.name }
+						</td>
 					
-								
-			</div>
-			<table id="inventoryItemsTable">
-				<thead>					
-					<tr>	
-						<th><warehouse:message code="default.lotSerialNo.label"/></th>
-						<th><warehouse:message code="default.expires.label"/></th>
-						<th class="center"><warehouse:message code="inventory.oldQty.label"/></th>
-						<th class="center"><warehouse:message code="inventory.newQty.label"/></th>
-						<th class="center"><warehouse:message code="default.actions.label"/></th>
-					</tr>											
-				</thead>									
-				<tbody>												
-					<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
-					<g:if test="${inventoryItems }">											
-						<g:each var="recordInventoryRow" in="${inventoryItems?.sort { it.expirationDate }?.sort { it.lotNumber } }" status="status">
-							<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
-							<tr class="${styleClass} ${status%2==0?'odd':'even'}">
-								<td>
-									<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
-									<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-									<span class="lotNumber">
-										${recordInventoryRow?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.label"/></span>' }
-									</span>
-								</td>
-								<td>
-									<g:hiddenField name="recordInventoryRows[${status}].expirationDate" 
-										value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
-									<g:if test="${recordInventoryRow?.expirationDate}">
-										<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
-									</g:if>
-									<g:else>
-										<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
-									</g:else>
-								</td>
-								<td class="middle center">
-									${recordInventoryRow?.oldQuantity }	
-									<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" 
-										value="${recordInventoryRow?.oldQuantity }"/>
-								</td>	
-								<td class="middle center">
-									<g:textField id="newQuantity-${status }" class="newQuantity text" 
-										name="recordInventoryRows[${status }].newQuantity" size="8" 
-										value="${recordInventoryRow?.newQuantity }" />
-									
-									${commandInstance?.productInstance?.unitOfMeasure?:"EA" }
-								</td>
-								<td class="middle left">
-								</td>
-							</tr>
-						</g:each>
-					</g:if>
-					<g:else>
-						<tr id="emptyRow" class="odd">
-							<td colspan="5" class="center">
-								<div class="fade">
-									<warehouse:message code="inventory.addNewInventoryItem.message"/>
-																
-								</div>
-							</td>
-						</tr>
+					</tr>
+					<tr class="prop">
+						<td class="name">
+							<label><warehouse:message code="inventory.inventoryDate.label"/></label>
+						</td>
+						<td class="value">
+							<g:jqueryDatePicker 
+								id="transactionDate" 
+								name="transactionDate"
+								value="${commandInstance?.transactionDate}" 
+								format="MM/dd/yyyy"
+								showTrigger="false" />						
 						
-					</g:else>
-					
-				</tbody>
-				<tfoot>
-					<tr>
-						
-						<td class="left" colspan="5">
-							<button id="addRow" class="button icon add" >
-								<warehouse:message code="inventory.addInventoryItem.label"/>							
-							</button>					
 						</td>
 					</tr>
-				</tfoot>
-			</table>
+				
+				</table>
+			</div>
 			
+			<br/>
+
+			
+			<div class="box">
+				<table id="inventoryItemsTable">
+					<thead>					
+						<tr>	
+							<th><warehouse:message code="default.lotSerialNo.label"/></th>
+							<th><warehouse:message code="default.expires.label"/></th>
+							<th class="center"><warehouse:message code="inventory.oldQty.label"/></th>
+							<th class="center"><warehouse:message code="inventory.newQty.label"/></th>
+							<th class="center"><warehouse:message code="default.actions.label"/></th>
+						</tr>											
+					</thead>									
+					<tbody>												
+						<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
+						<g:if test="${inventoryItems }">											
+							<g:each var="recordInventoryRow" in="${inventoryItems?.sort { it.expirationDate }?.sort { it.lotNumber } }" status="status">
+								<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
+								<tr class="${styleClass} ${status%2==0?'odd':'even'}">
+									<td>
+										<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
+										<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
+										<span class="lotNumber">
+											${recordInventoryRow?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.label"/></span>' }
+										</span>
+									</td>
+									<td>
+										<g:hiddenField name="recordInventoryRows[${status}].expirationDate" 
+											value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+										<g:if test="${recordInventoryRow?.expirationDate}">
+											<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
+										</g:if>
+										<g:else>
+											<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
+										</g:else>
+									</td>
+									<td class="middle center">
+										${recordInventoryRow?.oldQuantity }	
+										<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" 
+											value="${recordInventoryRow?.oldQuantity }"/>
+									</td>	
+									<td class="middle center">
+										<g:textField id="newQuantity-${status }" class="newQuantity text" 
+											name="recordInventoryRows[${status }].newQuantity" size="8" 
+											value="${recordInventoryRow?.newQuantity }" />
+										
+										${commandInstance?.productInstance?.unitOfMeasure?:"EA" }
+									</td>
+									<td class="middle left">
+									</td>
+								</tr>
+							</g:each>
+						</g:if>
+						<g:else>
+							<tr id="emptyRow" class="odd">
+								<td colspan="5" class="center">
+									<div class="fade">
+										<warehouse:message code="inventory.addNewInventoryItem.message"/>
+																	
+									</div>
+								</td>
+							</tr>
+							
+						</g:else>
+						
+					</tbody>
+					<tfoot>
+						<tr>
+							
+							<td class="left" colspan="5">
+								<button id="addRow" class="button icon add" >
+									<warehouse:message code="inventory.addInventoryItem.label"/>							
+								</button>					
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
 			
 		</div>												
 		<div class="center buttons">		

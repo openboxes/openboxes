@@ -1,4 +1,4 @@
-<table class="summary">
+<table class="summary" border="0">
 	<tr>
 		<td class="top" style="width:1%">
 			<g:render template="../transaction/actions"/>
@@ -12,11 +12,9 @@
 			</div>
 		
 		</td>
-		<td class="right">
-			<div class="center">
-				<img src="${createLink(controller:'product',action:'barcode',params:[data:transactionInstance?.transactionNumber,format:'CODE_128']) }"/>
-				<div class="transactionNumber">${transactionInstance?.transactionNumber }</div>
-			</div>
+		<td class="right" style="width: 1%">
+			<img src="${createLink(controller:'product',action:'barcode',params:[data:transactionInstance?.transactionNumber,format:'CODE_128',height: 20]) }"/>
+			<div class="transactionNumber center">${transactionInstance?.transactionNumber }</div>
 		</td>
 	</tr>
 </table>

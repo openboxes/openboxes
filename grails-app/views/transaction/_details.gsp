@@ -1,4 +1,3 @@
-<h4 class="left">Transaction Details</h4>
 <div class="box">
 	<table>
 		<tr class="prop">

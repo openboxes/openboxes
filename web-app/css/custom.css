@@ -340,6 +340,10 @@ a:hover {
 	left: 50%;
 	margin-left: -250px;
 }
+#chooseLocationSelect {
+	max-height: 400px; 
+	overflow: auto;
+}
 
 #loginForm { 
 	width:500px;
@@ -1503,3 +1507,17 @@ a.button:link, a.button:visited {
 }
 a.button:hover { color: white; }
 .status { text-transform: uppercase; }
+
+.criteria {
+    border: 1px solid #b2d1ff;
+    background: #f0f8ff;
+    margin: 10px;
+    padding: 4px;
+    text-align: center;
+    color: #006dba;
+    font-weight: normal;
+    font-size: 14px;
+}
+.criteria input.apply {
+    background: #b2d1ff;
+}

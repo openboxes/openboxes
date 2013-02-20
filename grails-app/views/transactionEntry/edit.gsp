@@ -25,9 +25,6 @@
 						<g:render template="../transaction/details" model="[transactionInstance:transactionEntryInstance?.transaction]"/>
 					</div>
 					<div class="yui-u">						
-						<h4 class="left">Transaction Details</h4>
-						
-						
 						<g:form method="post" >
 			            	<div class="box">
 				                <g:hiddenField name="id" value="${transactionEntryInstance?.id}" />
@@ -40,10 +37,11 @@
 				                                  <label for="transaction"><warehouse:message code="transactionEntry.transaction.label" default="Transaction" /></label>
 				                                </td>
 				                                <td valign="top" class="value ${hasErrors(bean: transactionEntryInstance, field: 'transaction', 'errors')}">
-				                                    <g:select name="transaction.id" 
-				                                    	from="${org.pih.warehouse.inventory.Transaction.list()}" 
-				                                    	optionKey="id" optionValue="${{ it.transactionNumber }}" 
-				                                    	value="${transactionEntryInstance?.transaction?.id}"  />
+				                                   	<g:hiddenField name='transaction.id' value='${transactionEntryInstance?.transaction?.id }'/>
+				                                   	
+				                                   	
+				                                   	${transactionEntryInstance?.transaction?.transactionNumber }
+				                                   
 				                                </td>
 				                            </tr>
 				                        
@@ -80,9 +78,14 @@
 			                            	<tr class="prop">
 					                        	<td valign="top"></td>
 					                        	<td valign="top">                        	
-									                <div class="buttons">
-									                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-									                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+									                <div class="">
+									                    <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+									                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+									                	&nbsp;
+									                	<g:link controller='inventory' action='showTransaction' id='${transactionEntryInstance?.transaction?.id }'>			
+															${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+														</g:link>
+									                
 									                </div>
 					    						</td>                    	
 				                        	</tr>	                        
