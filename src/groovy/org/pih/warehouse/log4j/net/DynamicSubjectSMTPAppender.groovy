@@ -30,13 +30,11 @@ public class DynamicSubjectSMTPAppender extends SMTPAppender {
 			//ThreadGroupRenderer stackTraceRenderer = new ThreadGroupRenderer();
 			//println("First 100 Chars of Stack Trace: " + stackTraceRenderer.(cb.get(cb.length()-1).getMessage()).substring(0,99));
 			int length = cb.length()
-			println "length: " + length
 			def message = cb.get(length-1).getMessage()
-			println "message: " + message
+			
 			StringBuffer sbuf = new StringBuffer();
 			String t = layout.getHeader();
-			if (t != null)
-			sbuf.append(t);
+			if (t != null) sbuf.append(t);
 			int len = cb.length();
 			for (int i = 0; i < len; i++) {
 				// sbuf.append(MimeUtility.encodeText(layout.format(cb.get())));
@@ -45,8 +43,10 @@ public class DynamicSubjectSMTPAppender extends SMTPAppender {
 				// setting the subject
 				if (i==0) {
 					Layout subjectLayout = new PatternLayout(getSubject());
-					msg.setSubject(MimeUtility.encodeText
-					(subjectLayout.format(event), "UTF-8", null));
+					String subject = MimeUtility.encodeText(subjectLayout.format(event), "UTF-8", null)
+					// Remove newlines from subject
+					if (subject != null) subject = subject.replace("\n", "")
+					msg.setSubject(subject);
 				}
 
 				sbuf.append(layout.format(event));
@@ -61,8 +61,7 @@ public class DynamicSubjectSMTPAppender extends SMTPAppender {
 				}
 			}
 			t = layout.getFooter();
-			if (t != null)
-			sbuf.append(t);
+			if (t != null) sbuf.append(t);
 			part.setContent(sbuf.toString(), layout.getContentType());
 
 			Multipart mp = new MimeMultipart();
