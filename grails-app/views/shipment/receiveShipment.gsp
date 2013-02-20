@@ -5,11 +5,6 @@
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><warehouse:message code="shipping.receiveShipment.label"/></title>
-	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle"><warehouse:message code="shipping.receiveShipment.label"/></content>
-	<style>
-		.top { border-top: 2px solid lightgrey; }
-	</style>
 </head>
 
 <body>
