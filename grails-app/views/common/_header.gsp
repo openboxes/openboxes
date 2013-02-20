@@ -41,7 +41,7 @@
 							<li>
 								<span class="action-menu" >
 									<span class="action-btn middle">		
-										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" class="middle"/>
+										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" class="middle"/>
 									</span>
 									<ul class="actions" style="text-align:left;">
 										<%-- 
@@ -60,19 +60,22 @@
 										</li>
 										--%>
 										<li class="action-menu-item">
-											<g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">												
+											<g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">	
+												<img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" class="middle"/>											
 												<warehouse:message code="myProfile.label" default="My profile"/>
 											</g:link>
 										</li>
 										<li class="action-menu-item">
 											<g:link  controller="dashboard" action="index" style="color: #666;">
-												<warehouse:message code="dashboard.label"/>
+												<img src="${resource(dir: 'images/icons/silk', file: 'application_view_tile.png')}" class="middle"/>
+												<warehouse:message code="dashboard.label" default="Dashboard"/>
 											</g:link>	
 										</li>
 										<g:if test="${session?.warehouse}">
 											<li class="action-menu-item">
 												<a href="javascript:void(0);" class="warehouse-switch" style="color: #666">
-													Change location
+													<img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" class="middle"/>
+													<warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
 												</a>
 												<span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none; padding: 10px;">
 													<g:isUserNotInRole roles="[RoleType.ROLE_ADMIN]">
@@ -84,7 +87,7 @@
 														<div style="height: 300px; overflow: auto;">
 															<table>
 																<g:set var="count" value="${0 }"/>
-																<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
+																<g:set var="nullLocationGroup" value="${session?.loginLocationsMap?.remove(null) }"/> 
 																<g:each var="entry" in="${session.loginLocationsMap}" status="i">
 																	<tr class="${count++%2?'even':'odd' }">																
 																		<td><h3>${entry.key }</h3></td>
@@ -139,6 +142,7 @@
 										</li>										
 										<li class="action-menu-item">
 											<g:link class="list" controller="auth" action="logout" style="color:#666">
+												<img src="${resource(dir: 'images/icons/silk', file: 'door.png')}" class="middle"/>
 												<warehouse:message code="default.logout.label"/>
 											</g:link>
 										</li>					
@@ -155,12 +159,11 @@
 							</span>
 						</li>
 						<li>
-							<g:globalSearch id="globalSearch" cssClass="globalSearch" width="300" name="searchTerms" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>						
+							<g:globalSearch id="globalSearch" cssClass="globalSearch" width="300" name="searchTerms" 
+								jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>						
 						</li>	
-							
-						
 					</ul>
-				</div>					
+				</div>				
 		    </div>
 		</div>
 	</div>

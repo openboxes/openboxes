@@ -25,10 +25,8 @@
 					});
 	      		},
 	      		select: function(event, ui) {
-		      		console.log(event);
-		      		console.log(ui);
 		      		window.location = ui.item.url;
-			      		return false;
+		      		return false;
 			  	}
       		});
       	});		
