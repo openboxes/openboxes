@@ -169,16 +169,15 @@ log4j = {
 		// Only enable SMTP appender when mail is enabled 
         if (Boolean.parseBoolean(grails.mail.enabled.toString())) {		
 	        def smtpAppender
-			def conversionPattern = "Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
-				"%-5p%n" +
+			def conversionPattern = 
+				"Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
 				"Thread: [%t]%n" +
 				"Username: %X{username}%n" +
 				"Location: %X{location}%n" +
-				"IP Address: %X{ipAddress}  (whatismyipaddress.com/ip/%X{ipAddress})%n" +
+				"IP Address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
-				"Query String: %X{queryString}%n" +
-				"%c%n" +
-				"%C%nStacktrace:%n%m%n"
+				"Query String: %X{queryString}%n%n" +
+				"Stacktrace:%n%m%n"
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication 
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
 				smtpAppender = new AlternateSMTPAppender(
@@ -393,5 +392,3 @@ grails.doc.authors = "Justin Miranda"
 grails.doc.license = "Eclipse Public License - Version 1.0"
 grails.doc.copyright = ""
 grails.doc.footer = ""
-
-

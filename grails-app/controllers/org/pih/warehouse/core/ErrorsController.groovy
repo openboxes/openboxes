@@ -26,23 +26,23 @@ class ErrorsController {
 		render(view:"/errors/accessDenied")
 	}
 	
-	def processError = { 
-		log.info "process error " + params
+	def processError = { 		
 		def toList = []
-
-		def adminUsers = userService.findUsersByRoleType(RoleType.ROLE_ADMIN);	
-		adminUsers.each { admin ->
-			toList << admin?.email
-		}
+		def ccList = []
+		
+		toList.add("justin.miranda@gmail.com")
+		//toList.add("emr-requests@pih.org")
+		//ccList.add("jmiranda@pih.org")
 		
 		def reportedBy = User.findByUsername(params.reportedBy)
 		if (params.ccMe && reportedBy) { 
-			toList << reportedBy?.email
+			ccList << reportedBy?.email
 		}		
 		
-		def subject = "${warehouse.message(code: 'email.errorReportSubject.message')}"
+		def dom = params.remove("dom")
+		def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
 		def body = "${g.render(template:'/email/errorReport', params:params)}"
-		mailService.sendHtmlMailWithAttachment(toList, [], subject, body.toString(), params?.dom?.bytes, "error.html","text/html");
+		mailService.sendHtmlMailWithAttachment(toList, ccList, subject, body.toString(), dom?.bytes, "error.html","text/html");
 		flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [toList])}"
 		redirect(controller: "dashboard", action: "index")
 	}

@@ -288,7 +288,7 @@ class MailService {
 				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
-				email.setTextMsg(subject);
+				//email.setTextMsg(subject);
 			  
 				// Create the attachment
 				//EmailAttachment attachment = new EmailAttachment();

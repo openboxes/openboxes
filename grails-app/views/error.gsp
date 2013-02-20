@@ -69,8 +69,8 @@
 	      <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
 	    </div>
 	</g:if>
-	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-	<div class="dialog" title="Error Report">
+	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
+	<div id="error-dialog" class="dialog" title="Error Report">
 		<g:form controller="errors" action="processError">
 			<g:hiddenField id="dom" name="dom" value=""/>
 			<g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
@@ -80,6 +80,14 @@
 			<g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
 			<g:hiddenField name="exception.class" value="${exception?.className}"/>
 			<g:hiddenField name="exception.date" value="${new Date() }"/>
+			<g:set var="absoluteTargetUri" value="${g.createLinkTo(url: targetUri, absolute: true) }"/>
+			<g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
+			
+			
+			<g:set var="summary" value="${exception.className?.replace('Controller','').replace('Service', '')} | ${exception?.message?.encodeAsHTML()} (${exception?.cause?.class?.name})"/>
+			
+			
+			
 			<table>
 				<%-- 
 				<tr class="prop">
@@ -104,27 +112,65 @@
 				--%>
 				<tr class="prop">
 					<td class="name">
-						<label><warehouse:message code="default.subject.label"/></label>
-					</td>
-					<td class="value">
-						<g:if test="${request?.'javax.servlet.error.message'}">						 
-							${request?.'javax.servlet.error.message'?.encodeAsHTML()}
-						</g:if>
-						<g:else>
-							${exception.message?.encodeAsHTML()}
-						</g:else>
-					</td>
-				</tr>
-				<tr class="prop">
-					<td class="name">
 						<label><warehouse:message code="default.reportedBy.label"/></label>
 					</td>
 					<td class="value">
 						${session?.user?.name }
-						&nbsp;
 						<span class="fade">${session?.user?.email }</span>
 					</td>
 				</tr>
+				<%-- 
+				<tr class="prop">
+					<td class="name"> 
+						<label><warehouse:message code="error.class.label"/></label>
+					</td>
+					<td>
+						${exception?.className}:${exception.lineNumber }				
+					</td>
+				</tr>
+				--%>		
+				<tr class="prop">
+					<td class="name">
+						<label><warehouse:message code="error.summary.label"/></label>
+					</td>
+					<td class="value">
+						<%-- 
+						<g:if test="${request?.'javax.servlet.error.message'}">						 
+							${request?.'javax.servlet.error.message'?.encodeAsHTML()}
+						</g:if>
+						<g:else>
+							${exception?.message?.encodeAsHTML()}
+						</g:else>
+						--%>
+						<g:textField name="summary" class="text" size="60" 
+							value="${summary }"
+							placeholder="${warehouse.message(code:'error.summary.message') }"/>
+					</td>
+				</tr>
+				
+				
+				<tr class="prop">
+					<td class="name">
+						<label><warehouse:message code="error.details.label"/></label>
+					</td>
+					<td class="value">
+						<g:textArea name="comments" cols="60" rows="5" 
+							placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>						
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label>Stacktrace</label>			
+					
+					</td>
+					<td>
+						<g:if test="${exception}">	    
+							<g:textArea name="stacktrace" cols="120" rows="10" readonly="readonly"><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}</g:each></g:textArea>
+						</g:if>
+					</td>
+				</tr>
+				
+				
 				<tr class="prop">
 				
 					<td class="name">
@@ -139,22 +185,11 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td class="name">
-						<label><warehouse:message code="default.stepsToReproduce.label"/></label>
-					</td>
-					<td class="value">
-						<g:textArea name="comments" cols="60" rows="5" placeholder="${warehouse.message(code:'default.stepsToReproduceHint.label')}"></g:textArea>
-						<span class="fade">
-							
-						</span>
-					</td>
-				</tr>
-				<tr class="prop">
 					<td class="name"></td>			
 					<td class="value">
 						<button>							
 							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'email_go.png')}" style="vertical-align: middle" />
-							<warehouse:message code="default.submitBugReport.label"/>
+							<warehouse:message code="default.button.submit.label"/>
 						</button>	
 						&nbsp;
 						<button class="close-dialog">
@@ -178,15 +213,15 @@
 			dom = "<html>" + dom + "</html>"
 			$("#dom").val(dom);
 			
-			$(".dialog").dialog({ 
+			$("#error-dialog").dialog({ 
 				autoOpen: true, 
 				modal: true, 
-				width: 600
+				width: '1000px'
 			});
 		});
 		$(".close-dialog").click(function(event) {
 			event.preventDefault(); 
-			$(".dialog").dialog("close"); 
+			$("#error-dialog").dialog("close"); 
 		});
 
 	</script>
