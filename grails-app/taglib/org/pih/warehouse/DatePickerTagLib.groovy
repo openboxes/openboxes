@@ -41,7 +41,7 @@ class DatePickerTagLib {
         def minDate = attrs.minDate ? "new Date('${attrs.minDate}')": null
         def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')": null
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
-		
+		def showHint = attrs.showHint ?: false;
 		
 		if (value) { 
 			if (value instanceof Date) {
@@ -104,7 +104,6 @@ class DatePickerTagLib {
 				});
 			</script>
 		</span>
-		<span class="fade">${warehouse.message(code:'datepicker.hint.label')}</span>
 		""";
 
 		if (showTrigger) {
