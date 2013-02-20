@@ -104,6 +104,7 @@ class DatePickerTagLib {
 				});
 			</script>
 		</span>
+		<span class="fade">${warehouse.message(code:'datepicker.hint.label')}</span>
 		""";
 
 		if (showTrigger) {
