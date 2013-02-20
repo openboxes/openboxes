@@ -34,7 +34,7 @@ class Receipt implements Serializable {
 	// Constraints
 	static constraints = {
 		expectedDeliveryDate(nullable:true)
-		actualDeliveryDate(nullable:true, 
+		actualDeliveryDate(nullable:false, 
 			// can't be delivered in the future
 			// can't be delivered before it is shipped!
 			validator: { value, obj-> 
