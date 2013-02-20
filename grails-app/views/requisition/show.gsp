@@ -38,7 +38,7 @@
 								<tbody>
 									<g:if test="${requisition?.requisitionItems?.size() == 0}">
 										<tr class="prop odd">
-											<td colspan="4" class="center"><warehouse:message
+											<td colspan="8" class="center"><warehouse:message
 													code="requisition.noRequisitionItems.message" /></td>
 										</tr>
 									</g:if>

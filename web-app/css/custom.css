@@ -1507,17 +1507,3 @@ a.button:link, a.button:visited {
 }
 a.button:hover { color: white; }
 .status { text-transform: uppercase; }
-
-.criteria {
-    border: 1px solid #b2d1ff;
-    background: #f0f8ff;
-    margin: 10px;
-    padding: 4px;
-    text-align: center;
-    color: #006dba;
-    font-weight: normal;
-    font-size: 14px;
-}
-.criteria input.apply {
-    background: #b2d1ff;
-}

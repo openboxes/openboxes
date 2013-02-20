@@ -19,8 +19,8 @@
 				<tr>
 					<td>
 						<div class="title" id="description">
-							${requisition?.requestNumber } - 
 							${requisition?.name }
+							<b>${requisition?.requestNumber }</b>
 						</div> 
 						<div class="status">	
 							<span class="title">${requisition?.status }</span>
