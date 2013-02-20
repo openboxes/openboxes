@@ -50,7 +50,7 @@
 	                                  <label for="minQuantity"><warehouse:message code="inventoryLevel.minQuantity.label" default="Min Quantity" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'minQuantity', 'errors')}">
-	                                    <g:select name="minQuantity" from="${0..2147483646}" value="${fieldValue(bean: inventoryLevelInstance, field: 'minQuantity')}" noSelection="['': '']" />
+	                                    <g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>	                                    
 	                                </td>
 	                            </tr>
 	                        
@@ -58,8 +58,8 @@
 	                                <td valign="top" class="name">
 	                                  <label for="reorderQuantity"><warehouse:message code="inventoryLevel.reorderQuantity.label" default="Reorder Quantity" /></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'reorderQuantity', 'errors')}">
-	                                    <g:select name="reorderQuantity" from="${0..2147483646}" value="${fieldValue(bean: inventoryLevelInstance, field: 'reorderQuantity')}" noSelection="['': '']" />
+	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'reorderQuantity', 'errors')}">	                                    
+	                                    <g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>
 	                                </td>
 	                            </tr>
 	                        
