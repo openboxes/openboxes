@@ -27,6 +27,9 @@ class LocationGroup implements Serializable {
 		id generator: 'uuid'
 	}
 	
+	static hasMany = [ locations : Location ]
+
+	
 	static constraints = { 
 		name(nullable:true, maxSize: 255)
 		dateCreated(display:false)

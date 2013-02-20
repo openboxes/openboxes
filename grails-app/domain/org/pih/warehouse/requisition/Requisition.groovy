@@ -35,8 +35,6 @@ class Requisition implements Serializable {
 	String description 		// a user-defined, searchable name for the order 
 	String requestNumber 	// an auto-generated reference number
 	
-	
-
 	RequisitionStatus status;
 	RequisitionType type;
 
@@ -64,7 +62,7 @@ class Requisition implements Serializable {
 	
 	// Removed comments, documents, events for the time being.
 	//static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
-	static hasMany = [ requisitionItems: RequisitionItem, events : Event ]
+	static hasMany = [ requisitionItems: RequisitionItem ]
 	static mapping = {
 		id generator: 'uuid'
 		requisitionItems cascade: "all-delete-orphan", sort: "id"
@@ -123,7 +121,7 @@ class Requisition implements Serializable {
     }
 
     Boolean isRequested() {
-        return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED, RequisitionStatus.PICKED])
+        return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.ISSUED, RequisitionStatus.RECEIVED, RequisitionStatus.PICKED])
     }
 	
   Map toJson(){
