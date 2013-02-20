@@ -2,7 +2,7 @@
 	
 	
 	<div id="itemSearchForm" >
-		<h2><warehouse:message code="shipping.itemSearch.label"/>:</h2>
+		<h4><warehouse:message code="shipping.itemSearch.label"/></h4>
 		<div style="text-align: left;">
 			<table>
 				<tbody>
@@ -21,15 +21,15 @@
 	<div id="itemFoundForm" style="display: none">
 		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemFound"/>
 		<g:form name="editItemFound" action="createShipment">
-			<h2><warehouse:message code="shipping.enterQuantityAndRecipient.label"/></h2>  
+			<h3>
+				<warehouse:message code="shipping.enterQuantityAndRecipient.label"/>
+			</h3>  
 			<table>
 				<tbody>
 					<g:render template="itemFoundFields" model="['containerId':addItemToContainerId]"/>		
 				</tbody>
 			</table>
 		</g:form>
-		<hr/>
-		<button class="show-search-form">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>	
 	</div>							
 				
 					
@@ -47,8 +47,7 @@
 		$("#dlgAddItem").dialog({ 
 			autoOpen: true, 
 			modal: true, 
-			width: 600,
-			height: 400, 
+			width: 600,			
 			open: function() { }
 		});				
 		
@@ -56,6 +55,7 @@
 			$("#itemSearchForm").show();
 			$("#itemFoundForm").hide();
 			$("[name='searchable.name']").val('');
+			$("[name='searchable.name']").focus();
 			// To prevent button from submitting form
 			event.preventDefault();
 		});

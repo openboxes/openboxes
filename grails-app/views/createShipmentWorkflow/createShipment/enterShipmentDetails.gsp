@@ -21,7 +21,7 @@
 	 		</g:if>
 			
 			
-           	<g:form action="createShipment" method="post">
+           	<g:form action="createShipment" method="post" autocomplete="off">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				
 					<g:render template="../shipment/summary" />	
@@ -67,7 +67,7 @@
 											value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : params.type == 'OUTGOING' ? session.warehouse.id : ''}" 
 											noSelection="['null':'']" />							
 											
-										<g:link action="createShipment" event="addLocation" params="[target:'origin']">
+										<g:link action="createShipment" event="addLocation" params="[target:'origin']" tabIndex="-1">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>	
 										</g:link>		
 									</td>
@@ -78,8 +78,8 @@
 										<g:selectShipmentDestination class="comboBox" name="destination.id" 
 											optionKey="id" value="${shipmentInstance?.destination?.id ? shipmentInstance?.destination?.id : (params.type == 'INCOMING') ? session.warehouse.id : ''}" 
 											noSelection="['null':'']" />	
-										<g:link action="createShipment" event="addLocation" params="[target:'origin']">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>	
+										<g:link action="createShipment" event="addLocation" params="[target:'origin']" tabIndex="-1">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle" />	
 										</g:link>		
 									</td>
 								</tr>
@@ -94,7 +94,7 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="shipping.expectedShippingDate.label"/></td>
 									<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"> 
-										<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
+										<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate" 
 											value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>							
 									
 									</td>

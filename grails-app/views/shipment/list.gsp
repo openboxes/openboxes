@@ -35,7 +35,11 @@
 					</g:each>
 				</div>
 	            
-	           
+	            <g:if test="${shipments.size()==0}">
+					<div class=""><warehouse:message
+							code="shipping.noShipmentsMatchingConditions.message" />
+					</div>
+				</g:if>
 			</g:form>
 			
         </div>		
@@ -60,13 +64,12 @@
 	    				}
 	    			}
 				); 
+
+		    	var index = $('.tabs li a').index($('a[href="#add"]').get(0));
+		    	$('.tabs').tabs({selected: index});
 				
 			});
         </script>
-	<script type="text/javascript">
-    	$(document).ready(function() {
-	    });
-	</script>        
         
     </body>
 </html>

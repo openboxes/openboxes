@@ -40,21 +40,21 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="" size="10" /> 
+						<g:textField id="quantity" name="quantity" value="" size="10" class="text"/> 
 					</td>
 				</tr>  	        
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label" /></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-							width="200" valueId="" valueName=""/>	
+							width="200" valueId="" valueName="" styleClass="text"/>	
 					</td>
 				</tr>				
 				
 				<tr>
-					<td></td>
-					<td>
-						<div class="buttons left">
+					
+					<td colspan="2">
+						<div class="buttons center">
 							<g:if test="${itemToEdit}">
 								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
 								<%-- 
@@ -68,6 +68,7 @@
 								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('.ui-dialog-titlebar-close').click();"><warehouse:message code="default.button.cancel.label"/></button>
+							<button class="show-search-form">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>
 						</div>
 					</td>
 				</tr>

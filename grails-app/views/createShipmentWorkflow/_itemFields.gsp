@@ -59,6 +59,7 @@
 								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
 							</div>
 						</g:if>
+						<button class="show-search-form">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>
 					</td>
 				</tr>
 				

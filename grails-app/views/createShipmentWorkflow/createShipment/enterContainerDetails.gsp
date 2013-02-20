@@ -371,7 +371,7 @@
 															
 														</td>
 														<td class="left middle">
-															${shipmentItem?.recipient?.name}
+															${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}
 														</td>
 													</tr>
 												</g:each>
