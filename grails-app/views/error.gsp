@@ -154,7 +154,7 @@
 						<label><warehouse:message code="error.details.label"/></label>
 					</td>
 					<td class="value">
-						<g:textArea name="comments" cols="60" rows="5" 
+						<g:textArea id="comments" name="comments" cols="120" rows="5" 
 							placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>						
 					</td>
 				</tr>
@@ -218,6 +218,10 @@
 				modal: true, 
 				width: '1000px'
 			});
+
+			$("#comments").focus();
+
+			
 		});
 		$(".close-dialog").click(function(event) {
 			event.preventDefault(); 
