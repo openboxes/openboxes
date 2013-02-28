@@ -1,3 +1,4 @@
+<%@ page import="java.util.Locale" %>
 <?xml version="1.0" encoding="UTF-8"?>
 <html>
 <head>
@@ -66,6 +67,7 @@
 	<ga:trackPageview />
 </head>
 <body class="yui-skin-sam">
+
 	<g:render template="/common/customVariables"/>
 	
 	<%-- 
@@ -92,11 +94,13 @@
    				<li>
 					<g:link controller="dashboard" action="index">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
+						<span><warehouse:message code="default.home.label" default="Home"/></span>
 					</g:link>
 				</li>
 				<g:if test="${session?.user && session?.warehouse}">
 					<li>
 						<a href="javascript:void(0);" class="warehouse-switch">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="map"/>
 							${session?.warehouse?.name }
 						</a>
 					</li>
@@ -117,8 +121,7 @@
 		    		</li>
 	    		</g:if>
 	    		--%>
-
-	    		<g:if test="${g.layoutTitle() }">
+	    		<g:if test="${g.layoutTitle() && !actionName.equals('index') && !actionName.contains('list') }">
 		    		<li>
 		    			<a href="#">${g.layoutTitle()}</a>
 		    		</li>
@@ -192,6 +195,44 @@
 	      	</div>
 		</div>
 	</div>
+	
+	<div id="localization-dialog" class="dialog" style="display: none;">
+		
+		<g:form controller="localization" action="save">
+		
+			
+		
+			<g:each var="localized" in="${request.localized }">
+				<table id="localization-table-${localized?.key?.replace(".", "-") }" class="localization-table" style="display: none;">
+					<tr class="${localized.key }">
+						<td>						
+							<label>${localized.key }</label>
+						</td>
+					<tr>
+					<g:each var="value" in="${localized.value }">
+						<tr class="prop">
+							<td class="name">						
+								${value.key }
+							</td>
+							<td class="value">	
+								<g:textArea name="${localized.key }_${value.key }" 
+									value="${value.value }" class="text" cols="60" rows="3"/> 
+							</td>		
+						</tr>						
+					</g:each>
+					<tr>
+						<td colspan="2">
+							<div class="buttons">
+								<button class="button">
+									<warehouse:message code="default.button.save.label"></warehouse:message>
+								</button>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</g:each>
+		</g:form>	
+	</div>
 
 	<!-- YUI "footer" block that includes footer information -->
 	<div id="ft" role="contentinfo">
@@ -207,6 +248,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>	
+	<script src="${createLinkTo(dir:'js/spin/', file:'spin.js')}" type="text/javascript" ></script>
     <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> 
     	<!--headless driver throw error when using watermark-->
 	</g:if>
@@ -221,11 +263,30 @@
 		$(function() { 		
 						
 			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
-		
+			$("#localization-dialog").dialog({ autoOpen: false, modal: true, width: '800px' });	
+
+			
+			/*
+			$(".open-dialog").click(function() { 
+				var id = $(this).attr("id");
+				$("#dialog-" + id).dialog('open');
+			});
+			$(".close-dialog").click(function() { 
+				var id = $(this).attr("id");
+				$("#dialog-" + id).dialog('close');
+			});
+			*/
+			
 			<g:if test="${session.useDebugLocale}">
-				$('.copy').click(function(event) {				
-					var copyText = $(this).siblings('.text').text();				
-					alert(copyText);
+				$('.copy').click(function(event) {
+					var id = $(this).attr("id");
+					$("table.localization-table").hide();					
+					var copyText = $(this).siblings('.text').text();			
+					//alert(copyText);
+					var idWithDashes = id.toString().replace(/\./g, '-');
+					console.log(idWithDashes);
+					$("table#localization-table-" + idWithDashes).toggle();
+					$("#localization-dialog").dialog('open');
 					event.preventDefault();
 				});
 			</g:if>
@@ -298,7 +359,7 @@
 			*/
 			/*			
 			$(".action-btn").button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} });
-			*/
+			*/			
 			$(".action-btn").click(function(event) {
 				//show the menu directly over the placeholder
 				var actions = $(this).parent().children(".actions");
@@ -328,6 +389,8 @@
     </script>    
     
     <%-- Disable feedback widget if grails.feedback.enabled is set to false --%>   
+    
+	<%-- 
     <g:if test="${new Boolean(grailsApplication.config.grails.feedback.enabled?:'true') }">
 		<script type="text/javascript">
 		  var uvOptions = {};
@@ -339,5 +402,6 @@
 		  })();
 		</script>    
 	</g:if>
+	--%>
 </body>
 </html>

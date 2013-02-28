@@ -175,7 +175,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       mockDomain(Location, [location1])
       mockDomain(Requisition, [])
       def today = new Date().format("MM/dd/yyyy")
-      def tomorrow = new Date().plus(1).format("MM/dd/yyyy")
+      //def tomorrow = new Date().plus(1).format("MM/dd/yyyy")
       controller.session.warehouse = location1
       controller.params.type = "WARD_STOCK"
       controller.create()
@@ -187,7 +187,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       assert requisition.dateRequested.format("MM/dd/yyyy") == today
       assert requisition.type == RequisitionType.WARD_STOCK
       assert requisition.status == RequisitionStatus.CREATED
-      assert requisition.requestedDeliveryDate.format("MM/dd/yyyy") == tomorrow
+      assert requisition.requestedDeliveryDate.format("MM/dd/yyyy") == today
 
     }
 

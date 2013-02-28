@@ -135,29 +135,49 @@
 		<span class="fade">${inventoryItem?.product?.manufacturerCode }</span>
 	</td>
 	<td class="checkable top center" style="width: 7%; border-left: 1px solid lightgrey;">
-		<g:if test="${inventoryItem?.supported }">																
-			<g:formatNumber number="${inventoryItem?.quantityToReceive?:0}"/>
+	
+		<g:if test="${!showQuantity }">
+			
 		</g:if>
+		<g:elseif test="${inventoryItem?.supported && showQuantity }">																
+			<%-- <g:formatNumber number="${inventoryItem?.quantityToReceive?:0}"/>--%>
+			<div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+		</g:elseif>
 		<g:else>
 			<span class="fade"><warehouse:message code="default.na.label"/></span>																
 		</g:else>
 	</td>
 	<td class="checkable top center" style="width: 7%; border-right: 1px solid lightgrey;">
-		<g:if test="${inventoryItem?.supported }">																
-			<g:formatNumber number="${inventoryItem?.quantityToShip?:0}"/>
+		<g:if test="${!showQuantity }">
+			
 		</g:if>
+		<g:elseif test="${inventoryItem?.supported && showQuantity}">																
+			<%-- <g:formatNumber number="${inventoryItem?.quantityToShip?:0}"/>--%>
+			<div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+		</g:elseif>
 		<g:else>
 			<span class="fade"><warehouse:message code="default.na.label"/></span>																
 		</g:else>
 	</td>
 	<td class="checkable top center" style="width: 7%;">
-		<g:if test="${inventoryItem?.supported }">																
+	
+		<g:if test="${!showQuantity }">
 			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-				<g:formatNumber number="${inventoryItem?.quantityOnHand?:0}"/>
+				<warehouse:message code="default.clickToView.label"/>
 			</g:link>
 		</g:if>
+		<g:elseif test="${inventoryItem?.supported && showQuantity}">																
+			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+				<%-- <g:formatNumber number="${inventoryItem?.quantityOnHand?:0}"/>--%>
+				<div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+			</g:link>
+		</g:elseif>
 		<g:else>
 			<span class="fade"><warehouse:message code="default.na.label"/></span>																
 		</g:else>
+		
+		<%-- 
+		<div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"></div>
+		--%>
 	</td>
 </tr>

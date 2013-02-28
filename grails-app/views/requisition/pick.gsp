@@ -8,6 +8,7 @@
 <title><warehouse:message code="requisition.process.label" /></title>
 <style>
 	tr.selected { background-color: #E5ECF9; }
+	tr * { background: transparent; }
 </style>
 
 </head>
@@ -31,9 +32,9 @@
 							<g:link controller="requisitionItem" action="substitute" class="button">Substitute</g:link>
 							<g:link controller="requisitionItem" action="cancel" class="button">Cancel remaining</g:link>
 							--%>
-							<div class="box">
-								<h2>Requested items</h2>				
-								<table>
+							<div>
+											
+								<table class="requisition">
 									<tr>
 										<th>
 										
@@ -41,23 +42,29 @@
 										<th>
 											${warehouse.message(code: 'product.label')}
 										</th>
+										<th>
+											${warehouse.message(code: 'product.unitOfMeasure.label')}
+										</th>
 										<th class="center">
 											${warehouse.message(code: 'requisitionItem.quantityRequested.label')}
 										</th>
-										<th class="center">
+										<th class="center success">
 											${warehouse.message(code: 'requisitionItem.quantityPicked.label')}
 										</th>
-										<th class="center">
+										<th class="center error">
 											${warehouse.message(code: 'requisitionItem.quantityCanceled.label')}
 										</th>		
-										<th class="center">
+										<th class="center notice">
 											${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}
 										</th>
 										<th>
 											${warehouse.message(code: 'requisitionItem.status.label')}
 										</th>
 										<th>
-										
+											%
+										</th>
+										<th>
+											${warehouse.message(code: 'default.actions.label')}
 										</th>
 									</tr>
 									<g:each var="${requisitionItem }" in="${requisition?.requisitionItems }" status="i">
@@ -69,21 +76,31 @@
 											</td>
 											--%>
 											<td>
-												${i+1 }
+												<g:if test="${selected }">
+													<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" />
+												</g:if>
+												<g:else>
+													${i+1 }
+												</g:else>
 											</td>
 											<td>
+												<g:link controller="requisition" action="pick" id="${requisition.id }" params="['requisitionItem.id':requisitionItem?.id]">
 												${requisitionItem?.product?.name }
+												</g:link>
+											</td>
+											<td>
+												${requisitionItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
 											</td>
 											<td class="center">
 												${requisitionItem?.quantity?:0 }
 											</td>
-											<td class="center">
+											<td class="center success">
 												${requisitionItem?.calculateQuantityPicked()?:0 }									
 											</td>
-											<td class="center">
+											<td class="center error">
 												${requisitionItem?.quantityCanceled?:0}									
 											</td>
-											<td class="center">
+											<td class="center notice">
 												${requisitionItem?.calculateQuantityRemaining()?:0 }						
 											</td>
 											<td>
@@ -94,6 +111,9 @@
 													    	$( "#progressbar-${requisitionItem?.id }" ).progressbar({value: ${value}});
 													    });
 											    </script>
+											</td>
+											<td>
+												${value }%
 											</td>
 											<td>
 												<g:link class="button" controller="requisition" action="pick" id="${requisition.id }" params="['requisitionItem.id':requisitionItem?.id]">
@@ -125,24 +145,39 @@
 
 				
 				<div class="buttons">
-					<div class="left">
-						<g:link controller="requisition" action="edit" id="${requisition.id }" class="button">
+					<div class="right">
+						<g:link controller="requisition" action="review" id="${requisition.id }" class="button">
 							<warehouse:message code="default.button.back.label"/>	
 						</g:link>
-					</div>
-					<div class="right">
+
 						<g:link controller="requisition" action="picked" id="${requisition.id }" class="button">
-							<warehouse:message code="default.button.continue.label"/>	
+							<warehouse:message code="default.button.next.label"/>	
 						</g:link>
 					</div>
 				</div>				
 				
 			</div>
 			<div class="yui-u">
-				<div class="box" >
-					<h2>${selectedRequisitionItem.product.name } </h2>	
+				<div class="box" >				
+					<div style="padding:5px;">
+						<h3 style="display: inline">${selectedRequisitionItem.product.name } </h3>
+						<div class="button-group right middle">
+							<g:link controller="requisition" action="pickPreviousItem" id="${selectedRequisitionItem?.requisition?.id }"
+								params="['requisitionItem.id':selectedRequisitionItem?.id]"  
+								class="button icon arrowleft"></g:link>
+							<g:link controller="requisition" action="pickNextItem" id="${selectedRequisitionItem?.requisition?.id }"
+								params="['requisitionItem.id':selectedRequisitionItem?.id]" 
+								class="button icon arrowright"></g:link>
+							
+							
+						</div>	
+					</div>				
+					<hr />
+					
+					
+					
 					<table class="requisition requisition-details">
-						<tr class="prop">
+						<tr>
 							<td>
 								<label>Quantity requested</label>					
 								<p>${selectedRequisitionItem.quantity?:0 } 
@@ -158,7 +193,7 @@
 								<p>${selectedRequisitionItem.quantityCanceled?:0 } 
 								${selectedRequisitionItem?.product?.unitOfMeasure?:"EA"}</p>
 							</td>
-							<td>
+							<td class="notice">
 								<label>Quantity remaining</label>							
 								<p>${selectedRequisitionItem.calculateQuantityRemaining()?:0 } 
 								${selectedRequisitionItem?.product?.unitOfMeasure?:"EA"}</p>
@@ -175,8 +210,6 @@
 							<li><a href="#tabs-cancel"><warehouse:message code="requisitionItem.cancel.label" default="Cancel"/></a></li>							
 						</ul>	
 						<div id="tabs-picked">
-							
-							<h2>Picked items</h2>	
 							<table>
 								<tr>
 									<th>${warehouse.message(code:'inventoryLevel.binLocation.label') }</th>
@@ -234,9 +267,7 @@
 							</table>					
 						</div>
 						<div id="tabs-available">
-						
 							<g:set var="inventoryItemMap" value="${selectedRequisitionItem?.retrievePicklistItems().groupBy { it.inventoryItem } }"/>				
-							<h2>Available items</h2>
 							<g:form action="addToPicklistItems">
 								<g:hiddenField name="id" value="${requisition?.id }"/>
 								<g:hiddenField name="requisitionItem.id" value="${selectedRequisitionItem?.id }"/>
@@ -315,87 +346,7 @@
 								</table>	
 							</g:form>
 						</div>
-						<div id="tabs-substitute">
-							<%--
-							<h2><warehouse:message code="requisition.substituteSimilarProduct.label" default="Substitute a similar product"/></h2>						
-							<g:form action="requisition" action="substitute">
-							
-								<g:hiddenField name="id" value="${requisition?.id }"/>
-								<g:hiddenField name="requisitionItem.id" value="${selectedRequisitionItem?.id }"/>
-							
-							
-								<g:set var="status" value="${0 }"/>
-								
-								<table>
-									<thead>
-										<tr>
-											<th>
-											
-											</th>
-											<th>
-												Item
-											</th>
-											<th>
-												Quantity
-											</th>
-										</tr>
-									</thead>
-									<g:if test="${similarProducts }">
-										<g:each var="similarProduct" in="${similarProducts }">		
-											<g:if test="${similarProductInventoryItems }">					
-												<g:set var="similarProductInventoryItems" value="${similarProductInventoryItems[similarProduct] }"/>
-												<g:each var="inventoryItem" in="${similarProductInventoryItems}">
-													<tr class="${status++%2?'odd':'even' }">
-														<td>
-															<g:radio name="inventoryItem.id" value="${inventoryItem?.id }"/>
-														</td>
-														<td>
-															<label>${similarProduct?.name }</label> <br/>
-															Lot Number: <span class="lotNumber">${inventoryItem?.lotNumber }</span><br/>
-															Expires: <g:formatDate date="${inventoryItem?.expirationDate }" format="MMMMM yyyy"/><br/>
-															QOH: ${inventoryItem?.quantity } ${similarProduct?.unitOfMeasure?:"EA" }<br/>
-															ATP: ${inventoryItem?.quantity } ${similarProduct?.unitOfMeasure?:"EA" }<br/>
-														</td>
-														<td>
-															<g:textField name="quantitySubstitute" value="" class="text" size="6"/>
-															${similarProduct?.unitOfMeasure?:"EA" }
-															<button class="button">
-																<warehouse:message code="default.button.add.label"/>
-															</button>
-														</td>
-													</tr>																				
-												</g:each>
-											</g:if>
-											<g:unless test="${similarProductInventoryItems }">
-												<tr>
-													<td>
-													
-													</td>
-													<td>
-														<label>${similarProduct?.name }</label> <br/>
-														${warehouse.message(code: 'requisition.noInventoryItems.label', default: 'No inventory items available') }															
-													</td>
-													<td>
-														0 
-													</td>
-												</tr>
-											</g:unless>
-										</g:each>
-									</g:if>	
-									<g:unless test="${similarProducts }">
-										<tr>
-											<td colspan="3" class="center">
-												<warehouse:message code="requisition.noSubstitutes.label" default="No substitutes available"/>
-											
-											</td>
-										</tr>									
-									
-									</g:unless>									
-								</table>
-							</g:form>
-							--%>
-						
-							<h2><warehouse:message code="requisition.findSubstitute.label" default="Find a substitution"/></h2>						
+						<div id="tabs-substitute">							
 							<g:form action="requisition" action="substitute">
 								<g:autoSuggestSearchable id="searchable" name="searchable" width="100%"
 									jsonUrl="${request.contextPath }/json/findInventoryItems" styleClass="text"/>
@@ -459,7 +410,6 @@
 								<g:hiddenField name="id" value="${selectedRequisitionItem?.id }"/>							
 								<g:hiddenField name="requisition.id" value="${requisition?.id }"/>
 
-								<h2>Cancel remaining quantity</h2>
 								<table>
 									<tbody>
 										<tr>
@@ -531,8 +481,6 @@
 				</div>					
 			</div>
 		</div>
-		
-		
 	    	
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -572,27 +520,27 @@
         });
 
 		
-		$("#searchable-suggest").autocomplete({
-			select: function(event, ui) {
-				console.log(ui.item);
-				$("#substitutionItemDetails").show();
-				
-				var expirationDate = new Date(ui.item.expirationDate)
-				var expirationDateString = expirationDate.getMonth()+1 + "/" + expirationDate.getDate() + "/" + expirationDate.getFullYear()
-				$("#productId").val(ui.item.productId);
-				$("#productName").text(ui.item.productName);
-				$("#inventoryItemId").val(ui.item.id);
-				$("#lotNumber").val(ui.item.lotNumber);
-				
-				$("#lotNumberText").text(ui.item.lotNumber);
-				$("#expirationDateText").text(expirationDateString);
-				$("#maxQuantityText").text(ui.item.quantity);
-				//$("#quantity").val(ui.item.quantity);
-				$("#quantity").focus();
-				$(this).val('');
-			    return false;
-			}
-		});
+	$("#searchable-suggest").autocomplete({
+		select: function(event, ui) {
+			console.log(ui.item);
+			$("#substitutionItemDetails").show();
+			
+			var expirationDate = new Date(ui.item.expirationDate)
+			var expirationDateString = expirationDate.getMonth()+1 + "/" + expirationDate.getDate() + "/" + expirationDate.getFullYear()
+			$("#productId").val(ui.item.productId);
+			$("#productName").text(ui.item.productName);
+			$("#inventoryItemId").val(ui.item.id);
+			$("#lotNumber").val(ui.item.lotNumber);
+			
+			$("#lotNumberText").text(ui.item.lotNumber);
+			$("#expirationDateText").text(expirationDateString);
+			$("#maxQuantityText").text(ui.item.quantity);
+			//$("#quantity").val(ui.item.quantity);
+			$("#quantity").focus();
+			$(this).val('');
+		    return false;
+		}
+	});
 
     });
 </script>

@@ -23,7 +23,7 @@ class PicklistService{
       picklist.name = picklist.requisition.name
 
       def requisition = Requisition.get(picklist.requisition.id)
-      requisition.status = RequisitionStatus.OPEN
+      requisition.status = RequisitionStatus.CREATED
 
       def picklistItems = itemsData.collect{ 
         itemData -> 

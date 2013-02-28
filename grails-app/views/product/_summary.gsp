@@ -14,22 +14,24 @@
 					</td>
 				</g:if>									
 				<td class="top">
-					<div>
-						<g:if test="${productInstance?.manufacturer }">
-							<span class="manufacturer">${productInstance?.manufacturer }</span> 
-						</g:if>
-						<g:if test="${productInstance?.manufacturerCode }">
-							<span class="manufacturerCode">Mfr# ${productInstance?.manufacturerCode }</span>
-						</g:if>
-					</div>				
-					<div id="product-header">
+								
+					<div id="product-header" style="float: left;">
+						<div>
+							<g:if test="${productInstance?.manufacturer }">
+								<span class="manufacturer">${productInstance?.manufacturer }</span> 
+							</g:if>
+							<g:if test="${productInstance?.manufacturerCode }">
+								<span class="manufacturerCode">Mfr# ${productInstance?.manufacturerCode }</span>
+							</g:if>
+						</div>	
 			            <div id="product-title" class="title">
+			            	${productInstance?.productCode }
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
-			                	${productInstance?.manufacturerName?:productInstance?.vendorName?:productInstance?.name }		
+			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
 			                </g:link>				
 			            </div>
 		                <div>		
-			                <span class="product-generic" style="text-transform:uppercase;">			
+			                <span class="product-generic fade" style="text-transform:uppercase;">			
 			                	<g:if test="${productInstance?.productGroups }">
 		                    		${productInstance?.productGroups?.sort().first()}
 		                    	</g:if>
@@ -38,7 +40,16 @@
 		                    	</g:else>
 		                    </span>							
 	                    </div>
+	                   
         			</div>
+        			 <div id="product-tags" style="float: left; margin-left: 50px;">
+	        				<g:each var="tag" in="${productInstance?.tags }">
+	        					<g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
+		        					<span class="tag">${tag.tag }</span>
+	        					</g:link>
+	        				</g:each>
+        			</div>
+        			<div class="clear"></div>
         		</td>
 				<td class="right">
         			<div id="product-status" class="title">        			

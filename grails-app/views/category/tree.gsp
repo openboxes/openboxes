@@ -55,9 +55,28 @@
 			           								<label><warehouse:message code="default.name.label"/></label>
 												</td>
 												<td class="value">
-							           				<g:textField name="name" value="${categoryInstance?.name }"/>
+							           				<g:textField name="name" value="${categoryInstance?.name }" class="text" size="60"/>
 				           						</td>
 				           					</tr>
+				           					<tr class="prop even">
+			           							<td class="name">
+			           								<label><warehouse:message code="category.isRoot.label" default="Is root node?"/></label>
+												</td>
+												<td class="value">
+							           				<g:checkBox name="isRoot" value="${categoryInstance?.isRoot }"/>
+							           				
+				           						</td>
+				           					</tr>
+				           					<tr class="prop even">
+			           							<td class="name">
+			           								<label><warehouse:message code="default.sortOrder.label" default="Sort order"/></label>
+												</td>
+												<td class="value">
+							           				<g:textField name="sortOrder" value="${categoryInstance?.sortOrder }" class="text" size="10"/>
+							           				
+				           						</td>
+				           					</tr>
+				           					
 				           					<tr class="prop odd">
 				           						<td class="name">
 				           							<label><warehouse:message code="category.children.label"/></label>

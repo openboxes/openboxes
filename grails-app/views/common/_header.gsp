@@ -25,11 +25,21 @@
 					    <g:if test="${session.user}">
 					    	<g:if test="${session?.warehouse}">
 								<li>
+									
 									<g:link class="middle" controller="user" action="show" id="${session.user.id}">
-										<img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" class="middle"/>
-										<span class="middle">${session?.user?.name}</span> 
+										<span class="middle">Welcome,</span> <span class="middle">${session?.user?.name}</span> 
 									</g:link>
 								</li>
+								<li>
+									<span class="middle">|</span>
+								</li>
+								<li>
+									<a href="javascript:void(0);" class="warehouse-switch middle">
+										
+										<span class="middle">${session?.warehouse?.name }</span>										
+									</a>
+								</li>
+								
 							</g:if>
 							<g:else>
 								<li>								
@@ -87,10 +97,18 @@
 														<div style="height: 300px; overflow: auto;">
 															<table>
 																<g:set var="count" value="${0 }"/>
-																<g:set var="nullLocationGroup" value="${session?.loginLocationsMap?.remove(null) }"/> 
 																<g:each var="entry" in="${session.loginLocationsMap}" status="i">
-																	<tr class="${count++%2?'even':'odd' }">																
-																		<td><h3>${entry.key }</h3></td>
+																	<tr class="odd">																
+																		<td>
+																			<g:if test="${!entry?.key }">																		
+																				<label>${warehouse.message(code: 'default.others.label', default: 'Others')}</label>
+																			</g:if>
+																			<g:else>																			
+																				<label>${entry.key }</label>
+																			</g:else>
+																		</td>
+																	</tr>
+																	<tr>
 																		<td>
 																			<div class="button-group">
 																				<g:each var="warehouse" in="${entry.value }">
@@ -103,21 +121,7 @@
 																		</td>
 																	</tr>
 																</g:each>		
-																	<tr class="${count++%2?'even':'odd' }">																
-																		<td>
-																			<h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-																		</td>
-																		<td>
-																			<div class="button-group">											
-																				<g:each var="warehouse" in="${nullLocationGroup }" status="status">
-																					<a class="button" id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}'>
-																						${warehouse.name}
-																					</a>
-																				</g:each>
-																			</div>
-																		</td>															
-																	</tr>
-																</table>		
+															</table>		
 															<%-- 
 															<div class="prop">
 																<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/> 
@@ -127,7 +131,7 @@
 																${session.user.warehouse }
 															</div>
 															--%>
-															<g:unless test="${session.loginLocations }">
+															<g:unless test="${!session.loginLocations }">
 																<div style="background-color: black; color: white;" class="warehouse button">
 																	<warehouse:message code="dashboard.noWarehouse.message"/>
 																</div>

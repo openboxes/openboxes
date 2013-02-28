@@ -46,7 +46,7 @@
 							<div class="box">
 								<table id="prodEntryTable">
 									<thead>
-										<tr class="prop">
+										<tr class="prop first">
 											<th></th>
 											<th><warehouse:message code="product.label"/></th>
 											<th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
@@ -65,7 +65,7 @@
 													<tr class="${status%2?'odd':'even' }">
 														<td>
 															<g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id}">
-																edit
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
 															</g:link>
 														
 														</td>
@@ -100,6 +100,7 @@
 													</tr>
 												</g:if>
 											</g:each>
+											<%-- 
 											<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
 												<tr>
 													<td>
@@ -107,7 +108,7 @@
 													</td>
 												</tr>
 											</g:if>
-											
+											--%>
 										</g:if>
 										<g:else>
 											<tr>

@@ -5,63 +5,51 @@
 	<div class="widget-content" style="padding:0; margin:0">	    					    			
 		<div id="alertSummary">	
 
-	    		<table>
-	    			<tbody>
-						<tr class="even">
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
-							</td>
-							<td>
-								<g:link controller="inventory" action="listExpiringStock" params="[threshold:30]">
-									Items that will expire within 30 days
-								</g:link>
-							</td>
-							<td class="right">
-								${expiringStockWithin30Days?.size() }
-							</td>
-						</tr>
-						<tr class="odd">
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
-							</td>
-							<td>
-								<g:link controller="inventory" action="listExpiringStock" params="[threshold:90]">
-									Items that will expire within 90 days
-								</g:link>
-							</td>
-							<td class="right">
-								${expiringStockWithin90Days?.size() }
+    		<table>
+    			<tbody>
+					<tr class="even">
+						<td class="center" style="width: 1%">
+							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
+						</td>
+						<td>
+							<g:link controller="inventory" action="listExpiringStock" params="[threshold:30]">
+								Items that will expire within 30 days
+							</g:link>
+						</td>
+						<td class="right">
+							<div id="expiringIn30DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+						</td>
+					</tr>
+					<tr class="odd">
+						<td class="center" style="width: 1%">
+							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
+						</td>
+						<td>
+							<g:link controller="inventory" action="listExpiringStock" params="[threshold:90]">
+								Items that will expire within 90 days
+							</g:link>
+						</td>
+						<td class="right">
+							<div id="expiringIn90DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+						
+						</td>
+					</tr>
+					<tr class="even">
+						<td class="center" style="width: 1%">
+							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
+						</td>
+						<td>
+							<g:link controller="inventory" action="listExpiringStock" params="[threshold:180]">
+								Items that will expire within 180 days
+							</g:link>
+						</td>
+						<td class="right">
+							<div id="expiringIn180DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 							
-							</td>
-						</tr>
-						<tr class="even">
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
-							</td>
-							<td>
-								<g:link controller="inventory" action="listExpiringStock" params="[threshold:180]">
-									Items that will expire within 180 days
-								</g:link>
-							</td>
-							<td class="right">
-								${expiringStockWithin180Days?.size() }
-							</td>
-						</tr>
-						<tr class="odd">
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
-							</td>
-							<td>
-								<g:link controller="inventory" action="listExpiringStock" params="[threshold:365]">
-									Items that will expire within 365 days
-								</g:link>
-							</td>
-							<td class="right">
-								${expiringStockWithin365Days?.size() }
-							</td>
-						</tr>
-					</tbody>
-				</table>
+						</td>
+					</tr>						
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>

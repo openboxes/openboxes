@@ -33,30 +33,62 @@ class JsonController {
 	def shipmentService
 	
 	
+	def getQuantityToReceive = {
+		def product = Product.get(params?.product?.id)
+		def location = Location.get(params?.location?.id)
+		def quantityToReceive = inventoryService.getQuantityToReceive(location, product)
+		println "quantityToReceive(" + params + "): " + quantityToReceive
+		render (quantityToReceive?:"0")
+	}
+
+	def getQuantityToShip = {
+		def product = Product.get(params?.product?.id)
+		def location = Location.get(params?.location?.id)
+		def quantityToShip = inventoryService.getQuantityToShip(location, product)
+		println "quantityToShip(" + params + "): " + quantityToShip
+		render (quantityToShip?:"0")
+	}
+
+	
+	def getQuantityOnHand = { 
+		def product = Product.get(params?.product?.id)
+		def location = Location.get(params?.location?.id)
+		def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
+		println "quantityOnHand(" + params + "): " + quantityOnHand
+		render (quantityOnHand?:"0")
+	}
+	
+	
 	def getLowStockCount = { 
 		println "low stock count " + params
 		def location = Location.get(params?.location?.id)
-		def results = inventoryService.getLowStock(location)
-		println results
-		render ((results)?results.size():"ERROR")
+		def results = inventoryService.getLowStock(location)		
+		render ((results)?results.size():"N/A")
 	}
 
 	def getReorderStockCount = {
 		println "reorder stock count " + params
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getReorderStock(location)
-		println results
-		render ((results)?results.size():"ERROR")
+		println "reorder: " + results
+		render ((results)?results.size():"N/A")
 	}
 
+	def getExpiringStockCount = {
+		println "expired stock count " + params
+		def daysUntilExpiry = Integer.valueOf(params.daysUntilExpiry)
+		def location = Location.get(params?.location?.id)
+		def results = inventoryService.getExpiringStock(null, location, daysUntilExpiry)
+		render ((results)?results.size():"N/A")
+	}
+	
 	def getExpiredStockCount = {
 		println "expired stock count " + params
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiredStock(null, location)
-		
-		println results
-		render ((results)?results.size():"ERROR")
+		render ((results)?results.size():"N/A")
 	}
+
 	def findTags = {
 		def searchTerm = "%" + params.term + "%";
 		def c = Tag.createCriteria()
@@ -70,7 +102,7 @@ class JsonController {
 	}
 
 	def autoSuggest = {		
-		println params
+		println "autoSuggest: " + params
 		def searchTerm = "%" + params.term + "%";
 		def c = Product.createCriteria()
 		def results = c.list {
@@ -130,7 +162,7 @@ class JsonController {
 	}
 	
 	def findRxNormDisplayNames = { 
-		println params
+		println "findRxNormDisplayNames: " + params
 		def results = []
 		try {
 			def url = new URL("http://rxnav.nlm.nih.gov/REST/displaynames")
@@ -256,7 +288,6 @@ class JsonController {
 
 	def findLotsByName = { 
 		log.info params
-
 		// Constrain by product id if the productId param is passed in		
 		def items = new TreeSet();
 		if (params.term) {
@@ -498,13 +529,16 @@ class JsonController {
       def location = Location.get(session.warehouse.id);
       def products = productService.searchProductAndProductGroup(params.term)
       def productIds = products.collect{ it[0]}
-      def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
+      //def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
+	  // To reference quantities ...
+	  // quantities[productData[0]] 
       def result = []  
       
       products.each{ productData ->
-        if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
-          result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
-        result.add([id: productData[0], value: productData[1], type:"Product", quantity: quantities[productData[0]], group: productData[2] ?: ""])
+		  println "productData " + productData
+		  //if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
+		  //result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
+		  result.add([id: productData[0], value: productData[2] + " - " + productData[1], type:"Product", quantity: null, group: ""])
       }
       //println result
       render result.sort{"${it.group}${it.value}"} as JSON
@@ -538,6 +572,7 @@ class JsonController {
 		terms?.each{ term ->
 			
 			// Get all products that match terms
+			/*
 			def personResults = Person.withCriteria {
 				or {
 					ilike("firstName", term + "%")
@@ -546,7 +581,7 @@ class JsonController {
 				}
 			}
 			items.addAll(personResults)
-			
+			*/
 			
 			// Get all inventory items that match terms
 			//def inventoryItemResults = InventoryItem.withCriteria { 
@@ -562,19 +597,21 @@ class JsonController {
 			items.addAll(productResults)
 			
 			// Get all shipments that match terms
+			/*
 			def shipmentResults = Shipment.withCriteria {
 				or {
 					ilike("name", term + "%")
 				}
 			}
 			items.addAll(shipmentResults)
+			*/
 		}
 		
 		items.unique{ it.id }
 		def json = items.collect{
 			def type = it.class.simpleName.toLowerCase()
 			[id: it.id, type: it.class, url: request.contextPath + "/" + type  + "/redirect/" + it.id, 
-				value: it.name  , label: it.name + " [" + type + "]" ]
+				value: it.name  , label: it.name ]
 		}
 		render json as JSON
 	}

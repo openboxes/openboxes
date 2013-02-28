@@ -15,7 +15,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             
-            <div class="yui-gc">
+            <div class="yui-ga">
 				<div class="yui-u first">
 					<g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
 					<g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>

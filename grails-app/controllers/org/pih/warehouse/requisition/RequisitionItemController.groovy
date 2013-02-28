@@ -9,9 +9,14 @@
 **/ 
 package org.pih.warehouse.requisition
 
+import org.pih.warehouse.core.Location;
+
 class RequisitionItemController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	def requisitionService
+	def inventoryService
+	
+    //static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
         redirect(action: "list", params: params)
@@ -61,6 +66,22 @@ class RequisitionItemController {
         }
     }
 
+	def change = { 
+		def location = Location.get(session.warehouse.id)
+		def requisitionItemInstance = RequisitionItem.get(params.id)
+		def quantityOnHand = inventoryService.getQuantityOnHand(location, requisitionItemInstance?.product)?:0
+		def quantityOutgoing = inventoryService.getQuantityToShip(location, requisitionItemInstance?.product)?:0
+		def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
+		
+		if (!requisitionItemInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [requisitionItemInstance: requisitionItemInstance, quantityOnHand: quantityOnHand, quantityAvailableToPromise: quantityAvailableToPromise]
+		}
+	}
+	
     def update = {
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (requisitionItemInstance) {
@@ -76,7 +97,8 @@ class RequisitionItemController {
             requisitionItemInstance.properties = params
             if (!requisitionItemInstance.hasErrors() && requisitionItemInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), requisitionItemInstance.id])}"
-                redirect(action: "list", id: requisitionItemInstance.id)
+                //redirect(action: "list", id: requisitionItemInstance.id)
+				redirect(controller: "requisition", action: "review", id: requisitionItemInstance?.requisition?.id)
             }
             else {
                 render(view: "edit", model: [requisitionItemInstance: requisitionItemInstance])
@@ -84,26 +106,40 @@ class RequisitionItemController {
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            redirect(action: "list")
+            //redirect(action: "list")
+			redirect(controller: "requisition", action: "review", id: requisitionItemInstance?.requisition?.id)
         }
     }
 
     def delete = {
+		
+		println "Delete requisition item " + params
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (requisitionItemInstance) {
             try {
-                requisitionItemInstance.delete(flush: true)
+				def requisition = requisitionItemInstance.requisition
+				
+				if (requisitionItemInstance.parentRequisitionItem) { 
+					requisitionItemInstance.parentRequisitionItem.removeFromRequisitionItems(requisitionItemInstance)
+				}
+				
+    			requisition.removeFromRequisitionItems(requisitionItemInstance)
+	            requisitionItemInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-                redirect(action: "list")
-            }
+                //redirect(action: "list")
+				redirect(controller: "requisition", action: "review", id: requisition?.id)
+			}
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-                redirect(action: "list", id: params.id)
+                //redirect(action: "list", id: params.id)
+				redirect(controller: "requisition", action: "review", id: requisition?.id)
+				
             }
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            redirect(action: "list")
+            //redirect(action: "list")
+			redirect(controller: "requisition", action: "review", id: rrequisition?.id)
         }
     }
 	

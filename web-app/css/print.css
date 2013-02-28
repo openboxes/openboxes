@@ -1,7 +1,12 @@
 body{
     margin: 15px;
 }
-
+h1 { font-size: 44px; }
+/*h2 { font-size: 37px; }*/
+h3 { font-size: 27px; }
+h4 { font-size: 23px; }
+h5 { font-size: 17px; }
+h6 { font-size: 14px; }
 
 .header{
     

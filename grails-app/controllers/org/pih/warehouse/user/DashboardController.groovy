@@ -31,7 +31,13 @@ class DashboardController {
 	def shipmentService
 	def inventoryService
 	def productService 
-    
+	def sessionFactory
+	
+	def showCacheStatistics = {
+		def statistics = sessionFactory.statistics
+		log.info(statistics)
+		render statistics
+	}
 	
 	def globalSearch = { 
 		
@@ -73,22 +79,22 @@ class DashboardController {
 		
 		
 		Location location = Location.get(session?.warehouse?.id);
-		
-		def daysToInclude = params.daysToInclude?:3
-		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id)
-		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id)
-		def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
-		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
+		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
+		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
+		//def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
+		//def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		
 		//def expiredStock = inventoryService.getExpiredStock(null, location)
-		def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
-		def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
-		def expiringStockWithin180Days = inventoryService.getExpiringStock(null, location, 180)
-		def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
+		//def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
+		//def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
+		//def expiringStockWithin180Days = inventoryService.getExpiringStock(null, location, 180)
+		//def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
 		//def lowStock = inventoryService.getLowStock(location)
 		//def reorderStock = inventoryService.getReorderStock(location)
 		
 				
+		// Days to include for activity list
+		def daysToInclude = params.daysToInclude?:3
 		def activityList = []
 		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
 			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location], [max: 10] );
@@ -196,27 +202,27 @@ class DashboardController {
 		endIndex -= 1
 		activityList = activityList[startIndex..endIndex]
 		
-		def outgoingOrders = orderService.getOutgoingOrders(location)
-		def incomingOrders = orderService.getIncomingOrders(location)
+		//def outgoingOrders = orderService.getOutgoingOrders(location)
+		//def incomingOrders = orderService.getIncomingOrders(location)
 		
-		[ 	outgoingShipments : recentOutgoingShipments, 
-			incomingShipments : recentIncomingShipments,
-			allOutgoingShipments : allOutgoingShipments,
-			allIncomingShipments : allIncomingShipments,
-			outgoingOrders : outgoingOrders,
-			incomingOrders : incomingOrders,
+		[ 	//outgoingShipments : recentOutgoingShipments, 
+			//incomingShipments : recentIncomingShipments,
+			//allOutgoingShipments : allOutgoingShipments,
+			//allIncomingShipments : allIncomingShipments,
+			//outgoingOrders : outgoingOrders,
+			//incomingOrders : incomingOrders,
 			//expiredStock : expiredStock,
-			expiringStockWithin30Days : expiringStockWithin30Days,
-			expiringStockWithin90Days : expiringStockWithin90Days,
-			expiringStockWithin180Days : expiringStockWithin180Days,
-			expiringStockWithin365Days : expiringStockWithin365Days,
+			//expiringStockWithin30Days : expiringStockWithin30Days,
+			//expiringStockWithin90Days : expiringStockWithin90Days,
+			//expiringStockWithin180Days : expiringStockWithin180Days,
+			//expiringStockWithin365Days : expiringStockWithin365Days,
 			//lowStock: lowStock,
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
-			outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
-			incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
-			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(allOutgoingShipments),
-			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(allIncomingShipments),
+			//outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
+			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
+			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
+			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentIncomingShipments),
 			activityList : activityList,
 			activityListTotal : activityListTotal,
 			startIndex: startIndex,
@@ -250,7 +256,8 @@ class DashboardController {
 				distinct 'category'
 			}
 		}
-		categories = categories.groupBy { it.parentCategory } 
+		
+		categories = categories.groupBy { it?.parentCategory } 
 		[
 			categories: categories,
 			incomingShipments: incomingShipments,
@@ -258,7 +265,9 @@ class DashboardController {
 			incomingOrders: incomingOrders,
 			incomingRequests: incomingRequests,
 			outgoingRequests: outgoingRequests,
-			quickCategories:productService.getQuickCategories()]
+			quickCategories:productService.getQuickCategories(),
+			tags:productService.getAllTags()
+			]
 
 		
 	}

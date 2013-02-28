@@ -58,11 +58,12 @@
 	   		<img src="${createLinkTo(dir:'images/', file:'hands.jpg')}"/>
 	    </div>
 	    <div class="requisition-number" style="float: left; text-align: center; margin: 5px; width: 890px;" >
-		   	<h4>${session.warehouse?.name } <warehouse:message code="requisition.deliveryNote.label"/></h4>
-		   	<h4>${requisition?.name }</h4>
+	    	<h1><warehouse:message code="requisition.deliveryNote.label"/></h1>
+		   	<h4>${session.warehouse?.name }</h4>
+		   	<%--<h4>${requisition?.name }</h4> --%>
 		    <img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:200,height:30,format:'CODE_128']) }"/>
 	    	<g:if test="${requisition.requestNumber }">	    	
-		    	<h3>${requisition?.requestNumber }</h3>
+		    	<h6>${requisition?.requestNumber }</h6>
 	    	</g:if>
 		   	
 	    </div>
@@ -90,7 +91,10 @@
 	                <tr class="prop">
                         <td class="center">${i+1}</td>
                         <td class="center">
+                        	${requisitionItem?.product?.productCode }
+                        	<%--
 	                        <img src="${createLink(controller:'product',action:'barcode',params:[data:requisitionItem?.product?.productCode,width:100,height:60,format:'CODE_128']) }"/>
+	                         --%>
                         </td>
                         <td class="center top">
 	                        <label>${requisitionItem?.product?.productCode }</label>

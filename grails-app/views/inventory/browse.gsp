@@ -11,6 +11,8 @@
     	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     </head>    
     <body>
+    
+    	
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -27,19 +29,31 @@
 	        	<g:set var="varStatus" value="${0}"/>
 	        	<g:set var="totalProducts" value="${0}"/> 							        	
         	
-	            <div class="yui-gf">
+	            <div class="yui-gd">
 					<div class="yui-u first">
 	       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 
 					</div>
 					<div class="yui-u">
+									
+						<g:set var="showQuantity" value="${(params.max as int) <= 25}"/>	
+
+						<g:if test="${!showQuantity }">
+							<div class="notice">
+								<warehouse:message code="inventory.tooManyProducts.message"></warehouse:message>
+								
+							</div>
+						</g:if>
 						<div class="tabs">
+						
+		
 							<ul>
 								<li>
 									<a href="#tabs-1">
 										<g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
 										<g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
-										<g:set var="totalResults" value="${numProducts }"/>															
+										<g:set var="totalResults" value="${numProducts }"/>	
+																				
 										<g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
 											<g:set var="rangeEnd" value="${totalResults }"/>		
 										</g:if>
@@ -55,7 +69,10 @@
 									</a>
 								</li>
 							</ul>		
-							<div id="tabs-1" style="padding: 0px;">													
+							<div id="tabs-1" style="padding: 0px;">			
+								
+							
+    											
 					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 					                <table id="inventory-browser-table" border="0"> 
 										<thead> 
@@ -96,7 +113,7 @@
 				           					</tr>
 										</thead>
 
-                                              <g:if test="${commandInstance?.categoryToProductMap}">
+                                        <g:if test="${commandInstance?.categoryToProductMap}">
 											<tbody>
                                                    <g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
                                                        <g:set var="category" value="${entry.key }"/>
@@ -122,11 +139,13 @@
                                                        <g:set var="counter" value="${0 }"/>
                                                        <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
                                                            <g:if test="${inventoryItem.product }">
-                                                               <g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product']"/>
+                                                               <g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]"/>
                                                            </g:if>
+                                                           <%-- 
                                                            <g:elseif test="${inventoryItem.productGroup }">
                                                                <g:render template="browseProductGroup" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'productGroup']"/>
                                                            </g:elseif>
+                                                           --%>
                                                            <g:set var="counter" value="${counter+1 }"/>
 
                                                        </g:each>
@@ -148,8 +167,8 @@
 										</g:else>
 									</table>
 									<div class="paginateButtons">
-										<g:paginate total="${numProducts}" params="${params}"
-											action="browse" max="${params.max}" />
+										<g:paginate total="${numProducts}"
+											action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 											
 											
 										<div class="right">
@@ -165,7 +184,7 @@
 							</div>							
 						</div>
 					</div>
-				</div>
+				</div>    	
 			</div>
 		</div>
 		<script>
@@ -222,7 +241,31 @@
 
 		    	$('.nailthumb-container').nailthumb({ width : 20, height : 20 });
 		    	$('.nailthumb-container-100').nailthumb({ width : 100, height : 100 });
-		    	
+
+
+		    	function refreshQuantity() {
+			    	$.each($(".quantityOnHand"), function(index, value) {
+						//$(this).html('Loading ...');
+						var productId = $(this).attr("data-product-id");
+						$(this).load('${request.contextPath}/json/getQuantityOnHand?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+			    	});
+
+			    	$.each($(".quantityToShip"), function(index, value) {
+						//$(this).html('Loading ...');
+						var productId = $(this).attr("data-product-id");
+						$(this).load('${request.contextPath}/json/getQuantityToShip?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+			    	});
+
+			    	$.each($(".quantityToReceive"), function(index, value) {
+						//$(this).html('Loading ...');
+						var productId = $(this).attr("data-product-id");
+						$(this).load('${request.contextPath}/json/getQuantityToReceive?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+			    	});			    	
+		    	}
+				<g:if test="${showQuantity}">
+					refreshQuantity();
+				</g:if>
+			    
 			});	
 		</script>
     </body>

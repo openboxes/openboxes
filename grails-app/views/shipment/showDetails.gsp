@@ -33,6 +33,73 @@
 	
 				<!-- the first child of a Grid needs the "first" class -->
 				<div class="yui-u first">
+				
+				
+<div id="events" class="box">
+						<h4>
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'date.png')}" alt="event" style="vertical-align: middle"/>
+							<label><warehouse:message code="shipping.tracking.label"/></label>
+						</h4>									
+						<table>	
+							<tbody>
+								<tr>
+									<th><warehouse:message code="default.date.label"/></th>
+									<th><warehouse:message code="default.time.label"/></th>
+									<th><warehouse:message code="location.label"/></th>
+									<th><warehouse:message code="default.event.label"/></th>
+									<th></th>
+								</tr>
+								<g:set var="i" value="${0 }"/>
+								<g:each in="${shipmentInstance.events}" var="event">
+									<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
+										<td>																			
+											<g:formatDate date="${event.eventDate}" format="MMMMM dd, yyyy"/> 																			
+										</td>
+										<td>
+											<g:formatDate date="${event.eventDate}" format="hh:mm a"/>
+										</td>											
+										
+										<td>																
+											<format:metadata obj="${event?.eventType}"/>
+										</td>
+										<td>
+											${event?.eventLocation?.name}
+										</td>
+										<td style="text-align: right">
+											<g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.SHIPPED }">
+											
+											</g:if>
+											<g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.RECEIVED }">
+											
+											</g:if>
+											
+											<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
+											</g:link>
+										</td>
+									</tr>
+								</g:each>
+								<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
+									<td>																			
+										<g:formatDate date="${shipmentInstance?.dateCreated}" format="MMMMM dd, yyyy"/>																		
+									</td>
+									<td>
+										<g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mm a"/>
+									</td>
+									<td>																
+										<warehouse:message code="default.created.label"/>
+									</td>
+									<td>
+										${shipmentInstance?.origin?.name}
+									</td>
+									<td style="text-align: right">
+										
+									</td>
+								</tr>
+								
+							</tbody>								
+						</table>
+					</div>				
 					<div id="details" class="box">
 						<h4>										
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="Details" style="vertical-align: middle"/>
@@ -249,71 +316,7 @@
 							</tbody>
 						</table>
 					</div>					
-					<div id="events" class="box">
-						<h4>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'date.png')}" alt="event" style="vertical-align: middle"/>
-							<label><warehouse:message code="shipping.tracking.label"/></label>
-						</h4>									
-						<table>	
-							<tbody>
-								<tr>
-									<th><warehouse:message code="default.date.label"/></th>
-									<th><warehouse:message code="default.time.label"/></th>
-									<th><warehouse:message code="location.label"/></th>
-									<th><warehouse:message code="default.event.label"/></th>
-									<th></th>
-								</tr>
-								<g:set var="i" value="${0 }"/>
-								<g:each in="${shipmentInstance.events}" var="event">
-									<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
-										<td>																			
-											<g:formatDate date="${event.eventDate}" format="MMMMM dd, yyyy"/> 																			
-										</td>
-										<td>
-											<g:formatDate date="${event.eventDate}" format="hh:mm a"/>
-										</td>											
-										
-										<td>																
-											<format:metadata obj="${event?.eventType}"/>
-										</td>
-										<td>
-											${event?.eventLocation?.name}
-										</td>
-										<td style="text-align: right">
-											<g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.SHIPPED }">
-											
-											</g:if>
-											<g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.RECEIVED }">
-											
-											</g:if>
-											
-											<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
-											</g:link>
-										</td>
-									</tr>
-								</g:each>
-								<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
-									<td>																			
-										<g:formatDate date="${shipmentInstance?.dateCreated}" format="MMMMM dd, yyyy"/>																		
-									</td>
-									<td>
-										<g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mm a"/>
-									</td>
-									<td>																
-										<warehouse:message code="default.created.label"/>
-									</td>
-									<td>
-										${shipmentInstance?.origin?.name}
-									</td>
-									<td style="text-align: right">
-										
-									</td>
-								</tr>
-								
-							</tbody>								
-						</table>
-					</div>
+					
 					<div id="comments" class="box">	
 						<h4>
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" alt="note" style="vertical-align: middle"/>
@@ -373,12 +376,12 @@
 								<tr>
 									<th></th>
 									<th><warehouse:message code="document.label"/></th>
-									<th class="right"><warehouse:message code="document.uploaded.label"/></th>
+									<th class="right"><warehouse:message code="default.lastUpdated.label"/></th>
 								</tr>															
 								<g:each in="${shipmentInstance.documents}" var="document" status="i">
 									<tr id="document-${document.id}"
 										class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
-										<td style="width:1%">
+										<td style="width:1%" class="middle">
 											<g:set var="f" value="${document?.filename?.toLowerCase()}"/>
 											<g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
@@ -400,23 +403,24 @@
 											</g:else>
 										</td>
 										<td>
-											<g:link controller="document" action="download" id="${document.id}" style="color: #666;" title="${document?.filename}">
-												<format:metadata obj="${document?.documentType}"/>
-												·
-												<span class="fade">
-													<g:link controller="document" action="download" id="${document.id}" style="color: #666">
-														<warehouse:message code="default.button.download.label"/>													
-													</g:link>
-													·																													
-													<g:link action="editDocument" params="[documentId:document.id,shipmentId:shipmentInstance.id]" style="color: #666">
-														<warehouse:message code="default.button.edit.label"/>													
-													</g:link>
-													·																													
-													<g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteDocument.message')}')" style="color: #666">
-														<warehouse:message code="default.button.delete.label"/>													
-													</g:link>																		
-												</span>
-											</g:link> 
+											<div>
+												<g:link controller="document" action="download" id="${document.id}" style="color: #666;" title="${document?.filename}">											
+													<label><format:metadata obj="${document?.documentType}"/></label>
+												</g:link> 
+											</div>											
+											<div class="fade">
+												<g:link controller="document" action="download" id="${document.id}" style="color: #666">
+													<warehouse:message code="default.button.download.label"/>													
+												</g:link>
+												·																													
+												<g:link action="editDocument" params="[documentId:document.id,shipmentId:shipmentInstance.id]" style="color: #666">
+													<warehouse:message code="default.button.edit.label"/>													
+												</g:link>
+												·																													
+												<g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteDocument.message')}')" style="color: #666">
+													<warehouse:message code="default.button.delete.label"/>													
+												</g:link>																		
+											</div>
 										</td>
 										<td class="right">
 											<span class="fade"><format:date obj="${document?.dateCreated}"/></span>
@@ -447,10 +451,12 @@
 										<img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" class="middle"/>
 									</td>																				
 									<td>
-							   			<g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]" style="color: #666;">
-											Packing List
-							   			</g:link>
-							   			·
+										<div>
+								   			<g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]" style="color: #666;">
+												<label>Packing List</label>
+								   			</g:link>
+							   			</div>
+							   			
 							   			<g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]" style="color: #666;">
 							   				<warehouse:message code="default.button.download.label"/>	
 							   			</g:link>
@@ -464,10 +470,12 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>										
 									</td>
 									<td>
-							   			<g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]" style="color: #666;">
-											Packing List (Pallet)
-							   			</g:link>
-							   			·
+										<div>
+								   			<g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]" style="color: #666;">
+												<label>Packing List (Pallet)</label>
+								   			</g:link>
+							   			</div>
+							   			
 							   			<g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]" style="color: #666;">
 							   				<warehouse:message code="default.button.download.label"/>	
 							   			</g:link>
@@ -481,10 +489,12 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>											
 									</td>
 									<td>
-										<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }" style="color: #666;">
-											Goods Receipt Note (Excel)
-										</g:link> 
-							   			·
+										<div>
+											<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }" style="color: #666;">
+												<label>Goods Receipt Note (Excel)</label>
+											</g:link>
+										</div> 
+							   			
 										<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }" style="color: #666;">
 							   				<warehouse:message code="default.button.download.label"/>	
 							   			</g:link>
@@ -499,12 +509,13 @@
 									</td>
 									<td>
 										<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }" style="color: #666;">
-											Certificate of Donation
+											<label>Certificate of Donation</label>
 										</g:link> 
-							   			·
-										<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }" style="color: #666;">
-							   				<warehouse:message code="default.button.download.label"/>	
-							   			</g:link>
+							   			<div>
+											<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }" style="color: #666;">
+								   				<warehouse:message code="default.button.download.label"/>	
+								   			</g:link>
+							   			</div>
 									</td>
 							   		<td class="right">
 										<span class="fade"><format:date obj="${shipmentInstance?.lastUpdated}"/></span>								   		
@@ -598,37 +609,31 @@
 				
 				
 				<div class="yui-u">
-					
-					
-					
-					<g:if test="${shipmentInstance.shipmentItems}">
-						<g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
-						<div id="items" class="box">	
-						
-							<h4>
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
-								<label><warehouse:message code="shipping.contents.label"/></label>
-							</h4>									
-						
-																
-							<table>		
-								<tr>
-									<th><warehouse:message code="shipping.container.label"/></th>
-									<th><warehouse:message code="product.label"/></th>
-									<th class="center"><warehouse:message code="default.lotSerialNo.label"/></th>
-									<th class="center"><warehouse:message code="default.expires.label"/></th>
-									<th class="center"><warehouse:message code="shipping.shipped.label"/></th>
-									<g:if test="${shipmentInstance?.wasReceived()}">
-										<th class="center"><warehouse:message code="shipping.received.label"/></th>
-										<%-- 
-										<th class="center"><warehouse:message code="shipping.totalReceived.label"/></th>
-										--%>
-									</g:if>
-									<th><warehouse:message code="shipping.recipient.label"/></th>
-									<th class="left"><warehouse:message code="default.comment.label"/></th>										
-								</tr>
+					<g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
+					<div id="items" class="box">	
+						<h4>
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
+							<label><warehouse:message code="shipping.contents.label"/></label>
+						</h4>									
+						<table>		
+							<tr>
+								<th><warehouse:message code="shipping.container.label"/></th>
+								<th><warehouse:message code="product.label"/></th>
+								<th class="center"><warehouse:message code="default.lotSerialNo.label"/></th>
+								<th class="center"><warehouse:message code="default.expires.label"/></th>
+								<th class="center"><warehouse:message code="shipping.shipped.label"/></th>
+								<g:if test="${shipmentInstance?.wasReceived()}">
+									<th class="center"><warehouse:message code="shipping.received.label"/></th>
+									<%-- 
+									<th class="center"><warehouse:message code="shipping.totalReceived.label"/></th>
+									--%>
+								</g:if>
+								<th><warehouse:message code="shipping.recipient.label"/></th>
+								<th class="left"><warehouse:message code="default.comment.label"/></th>										
+							</tr>
+							<g:if test="${shipmentInstance.shipmentItems}">
 								<g:set var="count" value="${0 }"/>
-								<g:set var="previousContainer"/>
+								<g:set var="previousContainer"/>							
 								<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort()}"/>
 								<g:each var="shipmentItem" in="${shipmentItems}" status="i">
 									<g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>												
@@ -687,11 +692,18 @@
 										
 									</tr>
 									<g:set var="previousContainer" value="${shipmentItem.container }"/>
-									
 								</g:each>
-							</table>							
-						</div>
-					</g:if>		
+							</g:if>		
+							<g:else>
+								<tr style="height: 500px;">
+									<td colspan="7" class=" middle center">
+										<warehouse:message code="shipment.noShipmentItems.message"/>
+									</td>
+								</tr>
+							</g:else>						
+						</table>							
+					</div>
+							
 				</div>				
 				
 			</div>			

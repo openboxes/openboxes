@@ -4,6 +4,7 @@
 	<div id="transactionLogTabs" class="tabs">												
 		<ul>
 			<li><a href="#tabs-1" id="current-stock-tab"><warehouse:message code="inventory.currentStock.label"/></a></li>
+			<li><a href="#tabs-2"><warehouse:message code="inventory.stockHistory.label"/></a></li>
 			<%-- 
 			<li><a href="#tabs-2"><warehouse:message code="request.pendingRequestLog.label"/></a></li>
 			<li><a href="#tabs-3"><warehouse:message code="order.pendingOrderLog.label"/></a></li>
@@ -16,6 +17,9 @@
 		<div id="tabs-1">										
 			<g:render template="showCurrentStock"/>
 		</div>
+		<div id="tabs-2">										
+			<g:render template="showStockHistory" />
+		</div>
 		<%-- 
 		<div id="tabs-2">
 			<g:render template="showPendingRequestLog"/>
@@ -25,16 +29,14 @@
 		</div>
 		--%>
 		<div id="tabs-4">
-			<g:render template="showPendingShipmentLog"/>
+			<g:render template="showPendingShipmentLog" model="[shipmentMap:commandInstance?.shipmentMap]"/>
 		</div>
 		<%-- 
 		<div id="tabs-5" style="padding: 0px;">
 			<g:render template="showLotNumbers"/>
 		</div>
-		--%>
-	
+		--%>	
 	</div>
-	
 </g:if>
 <g:elseif test="${commandInstance?.inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED }">
 	<div class="padded center box">

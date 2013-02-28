@@ -276,15 +276,17 @@ class ProductService {
 
 
 	Category getRootCategory() {
-		def rootCategory;
-		def categories = Category.findAllByParentCategoryIsNull();
-		if (categories && categories.size() == 1) {
-			rootCategory = categories.get(0);
-		}
-		else {
-			rootCategory = new Category();
-			rootCategory.categories = [];
-			categories.each { rootCategory.categories << it; }
+		def rootCategory = Category.getRootCategory()
+		if (!rootCategory) { 
+			def categories = Category.findAllByParentCategoryIsNull();
+			if (categories && categories.size() == 1) {
+				rootCategory = categories.get(0);
+			}
+			else {
+				rootCategory = new Category();
+				rootCategory.categories = [];
+				categories.each { rootCategory.categories << it; }
+			}
 		}
 		return rootCategory;
 	}
@@ -384,10 +386,17 @@ class ProductService {
 	 * @return
 	 */
 	public def searchProductAndProductGroup(String term){
+		long startTime = System.currentTimeMillis()
 		def text = "%${term.toLowerCase()}%"
-		def products = Product.executeQuery("select p.id, p.name, g.description, g.id as gid from Product as p left join p.productGroups as g where lower(p.name) like ? or lower(g.description) like ?", [text, text])
+		def products = Product.executeQuery(
+			"""select p.id, p.name, p.productCode 
+				from Product as p 				
+				where lower(p.name) like ? 
+				or lower(p.productCode) like ?""", [text, text])
 		// products.each{ println it}
-		products
+		println " * Search product and product group: " + (System.currentTimeMillis() - startTime) + " ms"
+		
+		return products
 	}
 
 	/**
@@ -734,17 +743,30 @@ class ProductService {
 	 * @return
 	 */
 	def getTopLevelCategories() {
-		return Category.findAllByParentCategory(Category.getRootCategory())
+		def rootCategory = Category.getRootCategory()
+		if (rootCategory) { 
+			return Category.findAllByParentCategory(rootCategory)
+		}
+		else { 
+			return Category.findAllByParentCategoryIsNull()
+		}
+		
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @return all tag labels
 	 */
-	def getAllTags() {
+	def getAllTagLabels() {
 		return Tag.list().collect { it.tag }.unique()
 	}
 
+	/**
+	 * @return	all tags
+	 */
+	def getAllTags() { 
+		return Tag.list();
+	}
+	
 	/**
 	 * 
 	 * @return

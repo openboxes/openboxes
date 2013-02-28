@@ -5,7 +5,7 @@
 		<g:form method="GET" action="showTransactionLog">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
 
-			<!--  Filter -->
+				<!--  Filter -->
 			
 				<table style="border: 1px solid lightgrey">
 					<tr class="odd">

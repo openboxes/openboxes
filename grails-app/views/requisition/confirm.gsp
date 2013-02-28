@@ -131,14 +131,12 @@
 			<div class="clear"></div>	
 			
 			<div class="buttons">
-				<div class="left">
+				<div class="right">
 					<g:link controller="requisition" action="pick" id="${requisition.id }" class="button">
 						<warehouse:message code="default.button.back.label"/>	
 					</g:link>
-				</div>
-				<div class="right">
 					<g:link controller="requisition" action="transfer" id="${requisition.id }" class="button">
-						<warehouse:message code="default.button.continue.label"/>	
+						<warehouse:message code="default.button.next.label"/>	
 					</g:link>
 				</div>
 			</div>			

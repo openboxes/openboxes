@@ -250,6 +250,8 @@ class ProductController {
 				}
 			}
 			productInstance.properties = params
+			
+			println "price per unit: " + productInstance?.pricePerUnit
 
 			if (!productInstance.productCode) {
 				productInstance.productCode = productService.generateProductIdentifier();

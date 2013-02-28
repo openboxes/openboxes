@@ -19,7 +19,7 @@ label.error {
 }
 .buttons { 
 	padding-top: 10px; 
-	border-top: 3px solid lightgrey;
+	/*border-top: 3px solid lightgrey;*/
 	text-align: center; 
 	padding: 10px; 
 }
@@ -1484,26 +1484,27 @@ blockquote {
 	user-select: none;
 }
 
-#requisition-items tbody > tr:nth-child(odd)        { background-color: #f7f7f7; }
-#requisition-items tbody > tr:nth-child(even)        { background-color: #fff; }
-#requisition-items td { padding: 2px; maring: 0}
+#requisition-items tbody > tr:nth-child(even)        { background-color: #f7f7f7; }
+#requisition-items tbody > tr:nth-child(odd)        { background-color: #fff; }
+#requisition-items td { padding: 2px; margin: 0}
+#requisition-items input { border: 0}
+#requisition-items tbody > tr:nth-child(odd) input      { background-color: #fff; }
+#requisition-items tbody > tr:nth-child(even) input      { background-color: #f7f7f7; }
 
-.requisition { border-collapse: collapse; }
-.requisition td, .requisition th { padding: 10px; border: 1px solid lightgrey; }
+table.requisition { border-collapse: collapse; }
+table.requisition td, table.requisition th { padding: 10px; border-right: 1px solid lightgrey; }
 
 .disabled { 
 	pointer-events: none;
-	cursor: default;
-	
+	cursor: default;	
 }
 
-a.button:link, a.button:visited {
-	color: black;
-    /*color: blue;*/
-    /*font-weight: bold;*/
-    /*font-size: 0.9em;*/ /* removed because it's distracting */
-    /*text-decoration: underline;*/
-   	text-decoration: none;	/* removed because we want to see underline */
-}
-a.button:hover { color: white; }
 .status { text-transform: uppercase; }
+
+#requisition-items td input[type="text"] {
+     width: 100%; 
+     box-sizing: border-box;
+     -webkit-box-sizing:border-box;
+     -moz-box-sizing: border-box;
+}
+fieldset { padding: 5px; }

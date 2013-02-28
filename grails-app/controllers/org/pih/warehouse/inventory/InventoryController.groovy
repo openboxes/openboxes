@@ -62,6 +62,7 @@ class InventoryController {
 		
 		// Get the primary category from either the request or the session or as the first listed by default
 		List quickCategories = productService.getQuickCategories();
+		/*
 		cmd.categoryInstance = Category.get(params?.categoryId)
 		if (!cmd.categoryInstance) {
 			cmd.categoryInstance = Category.get(session?.inventoryCategoryId);
@@ -70,7 +71,9 @@ class InventoryController {
 				//cmd.categoryInstance =  quickCategories.get(0);
 			}
 		}
-		session?.inventoryCategoryId = cmd.categoryInstance.id
+		session?.inventoryCategoryId = cmd?.categoryInstance?.id
+		*/
+		cmd.categoryInstance = productService.getRootCategory()
 		
 		// if we have arrived via a quick link tab, reset any subcategories or search terms in the session
 		if (params?.resetSearch) {
@@ -117,7 +120,7 @@ class InventoryController {
 
 		def categories = productService.getTopLevelCategories()
 		
-		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags, numProducts : cmd.numResults, categories: categories ]
+		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags, numProducts : cmd.numResults, categories: categories, rootCategory: productService.getRootCategory() ]
 	}
 	
 		
@@ -384,13 +387,16 @@ class InventoryController {
 	}
 
 	def listReorderStock = {
+
 		def warehouse = Location.get(session.warehouse.id)
+		
 		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
 		
+		
 		Map inventoryLevelByProduct = new HashMap();
-		inventoryService.getInventoryLevelsByInventory(warehouse.inventory).each {
-			inventoryLevelByProduct.put(it.product, it);
-		}
+		//inventoryService.getInventoryLevelsByInventory(warehouse.inventory).each {
+		//	inventoryLevelByProduct.put(it.product, it);
+		//}
 		
 		// Set of categories that we can filter by
 		def categories = [] as Set
@@ -708,8 +714,11 @@ class InventoryController {
 			transactionInstance = new Transaction();
 		}
 		
+		def localTransfer = LocalTransfer.findBySourceTransactionOrDestinationTransaction(transactionInstance, transactionInstance)
+		
 		def model = [
 			transactionInstance : transactionInstance,
+			localTransfer: localTransfer,
 			productInstanceMap: Product.list().groupBy { it.category },
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.list(),

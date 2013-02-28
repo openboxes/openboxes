@@ -130,7 +130,7 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentOutgoingShipments(String locationId) { 		
+	List<Shipment> getRecentOutgoingShipments(String locationId, int daysBefore, int daysAfter) { 		
 		Location location = Location.get(locationId);
 		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
 		//	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
@@ -142,7 +142,7 @@ class ShipmentService {
 				eq("origin", location)
 				or {
 					//between("expectedShippingDate",null,null)
-					between("expectedShippingDate",now-5,now+30)
+					between("expectedShippingDate",now-daysBefore,now+daysAfter)
 					isNull("expectedShippingDate")
 				}
 			}
@@ -167,11 +167,17 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentIncomingShipments(String locationId) { 		
+	List<Shipment> getRecentIncomingShipments(String locationId, int daysBefore, int daysAfter) { 		
+		def startTime = System.currentTimeMillis()
 		Location location = Location.get(locationId);
+		Date fromDate = new Date() - daysBefore
+		Date toDate = new Date() + daysAfter
 		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
-		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
+		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate, 
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
+		
+		println " * Recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
+		return shipments
 	}
 	
 
@@ -181,6 +187,7 @@ class ShipmentService {
 	 * @return
 	 */
 	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
+		def startTime = System.currentTimeMillis()
 		def shipmentMap = new TreeMap<ShipmentStatusCode, ListCommand>();
 		
 		ShipmentStatusCode.list().each { 
@@ -196,6 +203,9 @@ class ShipmentService {
 			shipmentList.objectList.add(it);
 			shipmentMap.put(key, shipmentList)
 		}	
+		
+		println " * Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
+		
 		return shipmentMap;
 	}
 	
@@ -363,9 +373,12 @@ class ShipmentService {
 	 * @return
 	 */
 	List<Shipment> getShipmentsByDestination(Location location) {
-		return Shipment.withCriteria { 
+		def startTime = System.currentTimeMillis()
+		def shipments = Shipment.withCriteria { 
 			eq("destination", location) 
 		}
+		println " * Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
+		return shipments
 	}
 	
 	/**
@@ -374,9 +387,13 @@ class ShipmentService {
 	 * @return
 	 */
 	List<Shipment> getShipmentsByOrigin(Location location) {
-		return Shipment.withCriteria { 
+		def startTime = System.currentTimeMillis()
+		def shipments = Shipment.withCriteria { 
 			eq("origin", location);
 		}
+		println " * Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
+		
+		return shipments
 	}
 	
 	

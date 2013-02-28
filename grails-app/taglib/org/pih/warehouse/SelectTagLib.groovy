@@ -47,6 +47,33 @@ class SelectTagLib {
 		
 	}
 	
+	def selectLocation2 = { attrs, body ->
+		def currentLocation = Location.get(session?.warehouse?.id)
+		
+		def locations = locationService.getAllLocations().sort { it?.name?.toLowerCase() }
+		if (attrs.locationGroup) { 
+			locations = locations.findAll { it.locationGroup == attrs.locationGroup } 
+		}
+		if (attrs.locationType) { 
+			locations = locations.findAll { it.locationType == attrs.locationType }
+			
+		}
+				
+		attrs.from = locations
+		attrs.optionKey = 'id'
+		//attrs.optionValue = 'name'
+		
+		//attrs.groupBy = 'locationType'
+		attrs.value = attrs.value ?: currentLocation?.id
+		if (attrs.groupBy) {
+			attrs.optionValue = { it.name }
+		}
+		else {
+			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+		}
+		out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+	}
+
 	
 	def selectLocation = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)

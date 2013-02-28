@@ -198,7 +198,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsNoInventoryLevelsAtCurrentInventory() {
         inventoryLevelTestFixture()
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def terms = ["Tylenol"]
         def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
         assert result.contains(tylenolProduct)
@@ -210,7 +210,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsNotSupported() {
         inventoryLevelTestFixture()
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def terms = ["Tylenol"]
         def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
         assert !result.contains(tylenolProduct)
@@ -222,7 +222,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsSupported() {
         inventoryLevelTestFixture()
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def terms = ["Aspirin"]
         def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
         assert result.contains(aspirinProduct)
@@ -294,7 +294,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
         transactionEntryTestFixture()
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
 
         def map = inventoryService.getQuantityByProductMap(TransactionEntry.list())
 
@@ -305,7 +305,7 @@ class InventoryServiceTests extends GroovyTestCase {
     //todo: getQuantity is broken now, need to know why
     void xtest_getQuantityByInventoryItem(){
         transactionEntryTestFixture()
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         assert inventoryService.getQuantity(bostonInventory, aspirinItem1) == 94
         assert inventoryService.getQuantity(bostonInventory, aspirinItem2) == 3
         assert inventoryService.getQuantity(bostonInventory, tylenolItem) == 25
@@ -313,7 +313,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsQuantityForInventory(){
         transactionEntryTestFixture()
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def results = inventoryService.getQuantityForProducts(bostonInventory, [tylenolProduct.id])
         assert results[tylenolProduct.id] == 25
         assert results.keySet().size() == 1
@@ -321,7 +321,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
 	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
 		transactionEntryTestFixture()
-		def inventoryService = new InventoryService()
+		//def inventoryService = new InventoryService()
 		def results = inventoryService.getQuantityForProducts(bostonInventory, [])		
 		assert results == [:]
 	}
@@ -332,7 +332,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
         transactionEntryTestFixture()
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
 
         // fetch the map
         def map = inventoryService.getQuantityByInventoryItemMap(TransactionEntry.list())
@@ -349,7 +349,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
         def products = [aspirinProduct, tylenolProduct]
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def inventoryItems = inventoryService.getInventoryItemsWithQuantity(products, bostonInventory)
         assert inventoryItems.size() == 2
         assert inventoryItems[aspirinProduct]
@@ -368,7 +368,7 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_isValidForLocalTransfer_shouldCheckIfTransactionSupportsLocalTransfer() {
         localTransferTestFixture()
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
 
         // a transaction that isn't of transfer in or transfer out type shouldn't be marked as valid
         assert inventoryService.isValidForLocalTransfer(transaction1) == false
@@ -385,7 +385,7 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
         localTransferTestFixture()
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
 
         def warehouse = bostonLocation
 
@@ -427,7 +427,7 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
         localTransferTestFixture()
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
 
         def baseTransaction = transaction4
 
@@ -455,12 +455,12 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsByTags() {
         productTagTestFixture()
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def tags = new ArrayList()
         tags.add("thistag")
         tags.add("thattag")
 
-        def results = inventoryService.getProductsByTags(tags)
+        def results = inventoryService.getProductsByTags(tags, 10, 0)
         assertEquals 2, results.size()
     }
 
@@ -470,7 +470,7 @@ class InventoryServiceTests extends GroovyTestCase {
         def tags = Tag.list()
         assertEquals 2, tags.size()
 
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def results = inventoryService.getProductsByTag("thistag")
         assertEquals 1, results.size()
     }
@@ -478,7 +478,7 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_getProductsByTermsAndCategoriesAndLotNumberWithProductSearchTerm() {
         basicTestFixture()
         def terms = ["Asp", "rin"]
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory,  25, 0)
         assert results.contains(aspirinProduct)
     }
@@ -487,7 +487,7 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
         basicTestFixture()
         def terms = ["lot9383"]
-        def inventoryService = new InventoryService()
+        //def inventoryService = new InventoryService()
         def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 1000, 0)
         assert results.contains(tylenolProduct)
     }
@@ -495,7 +495,7 @@ class InventoryServiceTests extends GroovyTestCase {
 	void test_getProductsByTermsAndCategoriesWithProductName() {
 		basicTestFixture()
 		def terms = ["Ibuprofen"]
-		def inventoryService = new InventoryService()
+		//def inventoryService = new InventoryService()
 		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
@@ -503,11 +503,20 @@ class InventoryServiceTests extends GroovyTestCase {
 	void test_getProductsByTermsAndCategoriesWithDescription() {
 		basicTestFixture()
 		def terms = ["NSAID"]
-		def inventoryService = new InventoryService()
+		//def inventoryService = new InventoryService()
 		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
 
+	/*
+	@Test
+	void getQuantityByInventoryAndProduct_shouldReturnBlah() { 
+		basicTestFixture();
+		def results = inventoryService.getQuantityByInventoryAndProduct(haitiInventory, false)
+		println results
+		
+	}
+	*/
 
 
 

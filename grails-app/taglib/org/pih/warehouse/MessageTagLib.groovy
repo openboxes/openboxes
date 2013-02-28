@@ -29,7 +29,11 @@ class MessageTagLib {
 					attrs.default, locale)
 				localized.put(it, message)
 			}
-			
+			if (!request.localized) {
+				request.localized = [:]
+			}
+			request.localized[attrs.code] = localized
+						
 			def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 			attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
 			
@@ -37,13 +41,13 @@ class MessageTagLib {
 				out << """<span class='localized-string'> 
 							${defaultTagLib.message.call(attrs)}
 							<span class='text' style='display:none;'>${attrs.code} = ${localized}</span> 
-							<img class='copy' src='${createLinkTo(dir:'images/icons/silk',file:'decline.png')}' title='${localized}'/> 
+							<img class='copy' id="${attrs.code}" src='${createLinkTo(dir:'images/icons/silk',file:'decline.png')}' title='${localized}'/> 
 						</span>"""
 			} else { 
 				out << """<span class='localized-string'> 
 							${defaultTagLib.message.call(attrs)}
 							<span class='text' style='display:none;'>${attrs.code} = ${localized}</span> 
-							<img class='copy' src='${createLinkTo(dir:'images/icons/silk',file:'accept.png')}' title='${localized}'/> 
+							<img class='copy' id="${attrs.code}" src='${createLinkTo(dir:'images/icons/silk',file:'accept.png')}' title='${localized}'/> 
 						</span>"""
 			}
 		}

@@ -17,7 +17,9 @@
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="expiredStockCount"></div>
+							<div id="expiredStockCount">
+								<img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+							</div>
 						</td>
 					</tr>
     			
@@ -31,34 +33,31 @@
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="lowStockCount"></div>
+							<div id="lowStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 							
 						</td>
 					</tr>
+					 
 					<tr class="even">
 						<td class="center" style="width: 1%">
 							<img src="${createLinkTo(dir:'images/icons/silk/reload.png')}" class="middle"/>
 						</td>
 						<td>
-							<g:link controller="inventory" action="listReorderStock">
+							
 								Items that are below reorder level
-							</g:link>
+							<g:link controller="inventory" action="listReorderStock"></g:link>
 						</td>
 						<td class="right">
-							<div id="reorderStockCount"></div>
+							<%-- 
+							<div id="reorderStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+							--%>
+							<warehouse:message code="default.notAvailable.label"/>
 						</td>
-					</tr>						
+					</tr>
+											
 				</tbody>
 			</table>
 		</div>
 	</div>
 </div>
-<script type="text/javascript">
-
-$(function() { 		
-	$('#lowStockCount').load('${request.contextPath}/json/getLowStockCount?location.id=${session.warehouse.id}');
-	$('#reorderStockCount').load('${request.contextPath}/json/getReorderStockCount?location.id=${session.warehouse.id}');
-	$('#expiredStockCount').load('${request.contextPath}/json/getExpiredStockCount?location.id=${session.warehouse.id}');
-})
-</script>
 

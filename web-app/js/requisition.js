@@ -37,6 +37,8 @@ openboxes.requisition.PicklistItem = function(attrs){
 
 };
 openboxes.requisition.Requisition = function(attrs) {
+	
+	console.log(attrs);
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
@@ -44,6 +46,7 @@ openboxes.requisition.Requisition = function(attrs) {
     self.originId= ko.observable(attrs.originId);
     self.originName = ko.observable(attrs.originName);
     self.dateRequested = ko.observable(attrs.dateRequested);
+    self.description = ko.observable(attrs.description);
     self.requestedDeliveryDate = ko.observable(attrs.requestedDeliveryDate);
     self.requestedById = ko.observable(attrs.requestedById);
     self.requestedByName = ko.observable(attrs.requestedByName);

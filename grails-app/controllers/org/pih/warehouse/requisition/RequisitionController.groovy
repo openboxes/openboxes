@@ -33,9 +33,16 @@ class RequisitionController {
     }
 
     def list = {
-        def requisitions = Requisition.findAllByDestination(session.warehouse)
+        def requisitions = []
+		requisitions = Requisition.findAllByDestination(session.warehouse)
         render(view:"list", model:[requisitions: requisitions])
     }
+	
+	def listStock = { 
+		def requisitions = []		
+		requisitions = Requisition.findAllByIsTemplate(true)
+		render(view:"listStock", model:[requisitions: requisitions])		
+	}
 
     def create = {
         println params
@@ -75,8 +82,161 @@ class RequisitionController {
 			response.sendError(404)
 		}
 	}
+	
+	def editHeader = {
+		def requisition = Requisition.get(params.id)
+		if(requisition) {
+			def locations
+			if (requisition.isWardRequisition()) {
+				locations = getWardsPharmacies()
+			} else {
+				locations = getDepots()
+			}
+			
+			if (!locations) {
+				requisition.errors.rejectValue("origin", "requisition.origin.error")
+			}
+	
+			
+			return [requisition: requisition, locations: locations];
+		}
+		else {
+			response.sendError(404)
+		}
+	}
+	
+	def addAddition = {
+		log.info "add addition " + params
+		def requisition = Requisition.get(params.id)
+		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+		
+		def substitutionItem = new RequisitionItem(params)
+		substitutionItem.requisition = requisition
+		substitutionItem.parentRequisitionItem = requisitionItem
+		requisition.addToRequisitionItems(substitutionItem)
+		requisitionItem.addToRequisitionItems(substitutionItem)
+		if (!substitutionItem.hasErrors()&&substitutionItem.save()) {
+			flash.message = "saved substitution item " + substitutionItem
+		}
+		
+		redirect(controller: "requisitionItem", action: "change", id: requisitionItem?.id)
+	}
+	
+	def addSubstitution = { 
+		log.info "add substitution " + params
+		def requisition = Requisition.get(params.id)
+		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+		requisitionItem.cancelReasonCode = params.parentCancelReasonCode
+		requisitionItem.quantityCanceled = requisitionItem.quantity
+		
+		def substitutionItem = new RequisitionItem(params)
+		substitutionItem.requisition = requisition
+		substitutionItem.parentRequisitionItem = requisitionItem
+		requisition.addToRequisitionItems(substitutionItem)
+		requisitionItem.addToRequisitionItems(substitutionItem)
+		if (!substitutionItem.hasErrors()&&substitutionItem.save()) { 
+			flash.message = "saved substitution item " + substitutionItem
+		}
+		
+		redirect(controller: "requisitionItem", action: "change", id: requisitionItem?.id)
+	}
+
+	
+
+	
+	def changeQuantity = {
+		log.info "change quantity " + params
+		def requisition = Requisition.get(params.id)
+		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+		requisitionItem.cancelReasonCode = params.parentCancelReasonCode
+		requisitionItem.quantityCanceled = requisitionItem.quantity
+		
+		def updatedRequisitionItem = new RequisitionItem(params)
+		updatedRequisitionItem.requisition = requisition
+		updatedRequisitionItem.product = requisitionItem.product
+		updatedRequisitionItem.parentRequisitionItem = requisitionItem
+		requisition.addToRequisitionItems(updatedRequisitionItem)
+		requisitionItem.addToRequisitionItems(updatedRequisitionItem)
+		requisitionItem.quantityCanceled = requisitionItem.quantity
+		
+		//updatedRequisitionItem.validate()
+		updatedRequisitionItem.errors.each { println it }
+		//if (requisitionItem.quantity == updatedRequisitionItem.quantity && requisitionItem.product == updatedRequisitionItem.product) {
+		//	throw new Exception("Quantity and product must be different")
+		//}
+		//if (requisitionItem.quantity == updatedRequisitionItem.quantity && requisitionItem.product == updatedRequisitionItem.product) { 
+		//	updatedRequisitionItem.errors.reject("Quantity and product must be different")
+		//}
+		
+		//if (updatedRequisitionItem.save()) {
+		//	flash.message = "saved changes " + updatedRequisitionItem
+		//}
+		//else { 
+		//	flash.message = "did not save changes"
+		//}
+		redirect(controller: "requisitionItem", action: "change", id: requisitionItem?.id)
+	}
+	
+
+	def saveHeader = { 
+		def success = true
+		
+		def requisition = Requisition.get(params.id)
+		
+		if(requisition) {
+			
+			requisition.properties = params
+						
+			if (!requisition.validate()) { 
+				
+				def locations
+				if (requisition.isWardRequisition()) {
+					locations = getWardsPharmacies()
+				} else {
+					locations = getDepots()
+				}
+				
+				if (!locations) {
+					requisition.errors.rejectValue("origin", "requisition.origin.error")
+				}
+				render(view:"editHeader", model:[requisition:requisition, locations: locations])
+			}
+		}
+		
+		redirect(action: "edit", id: requisition?.id)
+		
+		
+	}
+	
+	
+	def review = {
+		def requisition = Requisition.get(params.id)
+		def location = Location.get(session.warehouse.id)
+		def quantityAvailableToPromiseMap = [:]
+		def quantityOnHandMap = [:]
+		requisition?.requisitionItems?.each { requisitionItem -> 
+			quantityOnHandMap[requisitionItem?.product?.id] = 
+				inventoryService.getQuantityOnHand(location, requisitionItem?.product)
+			quantityAvailableToPromiseMap[requisitionItem?.product?.id] = 
+				inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
+		}
+		
+		if (!requisition) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			println "Requisition Status: " + requisition.id + " [" + requisition.status + "]"
+			return [requisition: requisition,quantityOnHandMap:quantityOnHandMap, quantityAvailableToPromiseMap:quantityAvailableToPromiseMap ]
+		}
+			
+    }
+	
 
     def save = {
+		
+		println "Save " + params
+		
         def jsonRequest = request.JSON
         def jsonResponse = []
         def requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session.warehouse.id))
@@ -180,6 +340,31 @@ class RequisitionController {
 			response.sendError(404)
 		}
 	}
+	
+	
+	def pickNextItem = { 
+		def requisition = Requisition.get(params?.id)
+		def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
+		println "requisition " + requisitionItem?.requisition?.id
+		def currentIndex = requisition.requisitionItems.findIndexOf { it == requisitionItem }
+		def nextItem = requisition?.requisitionItems[currentIndex+1]?:requisition?.requisitionItems[0]
+		
+		redirect(action: "pick", id: requisition?.id, 
+				params: ["requisitionItem.id":nextItem?.id])
+	}
+	
+	def pickPreviousItem = { 
+		def requisition = Requisition.get(params?.id)
+		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+		def lastItem = requisition?.requisitionItems?.size()-1
+		def currentIndex = requisition.requisitionItems.findIndexOf { it == requisitionItem }
+		def previousItem = requisition?.requisitionItems[currentIndex-1]?:requisition?.requisitionItems[lastItem]
+		
+		redirect(action: "pick", id: requisition?.id, 
+				params: ["requisitionItem.id":previousItem?.id])
+		
+	}
+	
 
 	def picked = {		
 		def requisition = Requisition.get(params.id)
@@ -265,7 +450,6 @@ class RequisitionController {
             redirect(action: "list")
         }
         else {
-			println requisition.status 
             return [requisition: requisition]
         }
     }

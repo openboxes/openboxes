@@ -9,9 +9,12 @@ class RequisitionTests extends GrailsUnitTestCase {
     void testDefaultValues(){
        def requisition = new Requisition()
        assert requisition.dateRequested <= new Date()
-       def tomorrow = new Date().plus(1)
-       tomorrow.clearTime()
-       assert requisition.requestedDeliveryDate >= tomorrow
+       //def tomorrow = new Date().plus(1)
+       //tomorrow.clearTime()
+       def today = new Date()
+	   today.clearTime()
+	   
+	   assert requisition.requestedDeliveryDate >= today
     }
 
     void testNotNullableConstraints() {
@@ -81,7 +84,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         name: "test",
         version: 3,
         lastUpdated: today,
-        status:  RequisitionStatus.OPEN,
+        status:  RequisitionStatus.CREATED,
         recipientProgram: "prog",
         origin: boston,
         destination: miami,
@@ -96,7 +99,7 @@ class RequisitionTests extends GrailsUnitTestCase {
       assert json.name == requisition.name
       assert json.version == requisition.version
       assert json.lastUpdated == requisition.lastUpdated.format("dd/MMM/yyyy hh:mm a")
-      assert json.status == "OPEN"
+      assert json.status == "CREATED"
       assert json.recipientProgram == requisition.recipientProgram
       assert json.originId == requisition.origin.id
       assert json.originName == requisition.origin.name

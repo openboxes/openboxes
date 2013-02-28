@@ -84,6 +84,7 @@ class InventoryItemController {
 				shipmentMap.put(it, quantity)
 			}
 		}	
+		commandInstance.shipmentMap = shipmentMap;
 		
 		def orderItems = 
 			orderService.getPendingOrderItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance);
@@ -94,6 +95,7 @@ class InventoryItemController {
 				orderMap.put(it, quantity)
 			}
 		}
+		commandInstance.orderMap = orderMap;
 		
 		//def requestItems =
 		//	requisitionService.getPendingRequisitionItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
@@ -104,11 +106,31 @@ class InventoryItemController {
 //				requestMap.put(it, quantity)
 //			}
 //		}
+		commandInstance.requestMap = requestMap;
+		
+		
+		println commandInstance?.transactionLogMap
 	
-		session.lastProduct = commandInstance.productInstance
-			
-			
-		[ commandInstance: commandInstance, orderMap: orderMap, shipmentMap: shipmentMap, requestMap: requestMap ]
+		// FIXME Hacky implementation of recently viewed products 
+		try { 
+			if (!session.productsViewed) { 
+				session.productsViewed = [:]
+			}
+			if (!session.productsViewed?.values()?.contains(commandInstance?.productInstance)) {
+				if (session?.productsViewed?.values()?.size() < 10) {
+					session.productsViewed.put(new Date(), commandInstance?.productInstance)
+				}	
+				else { 
+					def earliestDate = session.productsViewed.keySet().min()
+					session.productsViewed.remove(earliestDate)
+					session.productsViewed.put(new Date(), commandInstance?.productInstance)
+				}
+			}
+		} catch (Exception e) { 
+			log.error("Error while saving recently viewed product", e)
+		}
+					
+		[ commandInstance: commandInstance ]
 	}
 
 	/**
@@ -182,7 +204,7 @@ class InventoryItemController {
             result = inventoryItems[product].collect { ((InventoryItem)it).toJson() }
         }
         String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
-        println jsonString
+        println "record inventory " + jsonString
 
 		[ commandInstance : commandInstance, product : jsonString]
 	}
@@ -378,7 +400,46 @@ class InventoryItemController {
 		}
 		redirect(controller: "inventoryItem", action: "showStockCard", id: itemInstance?.product?.id, params: ['inventoryItem.id':itemInstance?.id])
 	}
-	
+
+	def transferStock = {
+		log.info "Params " + params;
+		def quantity = 0
+		def destination = Location.get(params?.destination?.id)
+		def inventoryItem = InventoryItem.get(params.id)
+		def inventory = Inventory.get(params?.inventory?.id)
+		if (inventoryItem) {
+			
+			try {
+				quantity = Integer.valueOf(params?.quantity);
+			} catch (Exception e) {
+				inventoryItem.errors.reject("inventoryItem.quantity.invalid")
+			}
+			
+			def transaction
+			try { 
+				transaction = inventoryService.transferStock(inventoryItem, inventory, destination, quantity);
+			} catch (Exception e) { 
+				log.error("Error transferring stock ", e)
+				flash.transaction = transaction
+				chain(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, model:[transaction:transaction, itemInstance:inventoryItem])
+				return
+			}
+			log.info("transaction " + transaction + " " + transaction?.id)
+			
+			
+			if (!transaction.hasErrors()) {
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
+			}
+			else {
+				
+				chain(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, model:[transaction:transaction])
+				return
+			}
+		}
+		redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id])
+	}
+
+		
 	def update = {		
 		
 		log.info "Params " + params;

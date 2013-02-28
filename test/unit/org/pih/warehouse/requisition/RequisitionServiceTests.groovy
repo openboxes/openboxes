@@ -76,7 +76,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		def oldItem2 = new RequisitionItem(id:"item2", quantity: 40)
 		def oldRequisition = new Requisition(id:"requisition1",
 		origin: toronto, name:"oldRequisition",
-		status: RequisitionStatus.OPEN,
+		status: RequisitionStatus.CREATED,
 		description: "oldDescription",
 		requisitionItems: [oldItem1, oldItem2])
 		mockDomain(Requisition, [oldRequisition])

@@ -37,6 +37,7 @@ class LocationService {
 		def locations = []
 		def requiredActivities = grailsApplication.config.app.loginLocation.requiredActivities
 		if (requiredActivities) { 
+			println "Required activities: " + requiredActivities 
 			requiredActivities.each { activity ->
 				locations += getAllLocations()?.findAll { it.supports(activity) }
 			}			

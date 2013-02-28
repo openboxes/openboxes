@@ -40,7 +40,7 @@
 				                                   	<g:hiddenField name='transaction.id' value='${transactionEntryInstance?.transaction?.id }'/>
 				                                   	
 				                                   	
-				                                   	${transactionEntryInstance?.transaction?.transactionNumber }
+				                                   	${transactionEntryInstance?.transaction?.transactionNumber?:transactionEntryInstance?.transaction?.id }
 				                                   
 				                                </td>
 				                            </tr>

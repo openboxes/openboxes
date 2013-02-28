@@ -77,7 +77,18 @@
 	                                  <label for="products"><warehouse:message code="tag.products.label" default="Products" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'products', 'errors')}">
-                                    	${tagInstance?.products }
+                                    	<table>
+			                                <g:each in="${tagInstance.products.sort()}" var="p">
+			                                	<tr>
+			                                    
+			                                		<td>
+			                                    		<g:link controller="inventoryItem" action="showStockCard" id="${p.id}">
+			                                    			${p.productCode } ${p?.encodeAsHTML()}
+			                                    		</g:link>
+			                                    	</td>
+			                                    </tr>
+			                                </g:each>
+                                		</table>
 	                                </td>
 	                            </tr>
 	                        	                        

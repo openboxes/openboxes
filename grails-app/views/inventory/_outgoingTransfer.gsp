@@ -6,6 +6,16 @@
 		<table>
 			<tr class="prop">
 				<td class="name">
+					<label><warehouse:message code="transaction.type.label"/></label>
+				</td>
+				<td class="value">
+					<span>
+						${command?.transactionInstance?.transactionType?.name }
+					</span>								
+				</td>
+			</tr>	
+			<tr class="prop">
+				<td class="name">
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
@@ -15,6 +25,17 @@
 					</span>								
 				</td>
 			</tr>	
+			<tr class="prop">
+				<td class="name">
+					<label><warehouse:message code="transaction.source.label"/></label>
+				</td>
+				<td class="value">
+					<span>
+						${command?.warehouseInstance?.name}
+					</span>								
+				</td>
+			</tr>	
+			
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.destination.label"/></label>
@@ -33,7 +54,7 @@
 				</td>
 				<td class="value">
 					<span class="value">
-						<g:textArea cols="80" rows="1" name="transactionInstance.comment" 
+						<g:textArea cols="80" rows="5" name="transactionInstance.comment" 
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -53,6 +74,7 @@
 									<th><warehouse:message code="product.label"/></th>
 									<th><warehouse:message code="product.lotNumber.label"/></th>
 									<th><warehouse:message code="default.expires.label"/></th>
+									<th><warehouse:message code="default.unitOfMeasure.label"/></th>
 									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
 									<th><warehouse:message code="default.qty.label"/></th>
 									<th><warehouse:message code="default.actions.label"/></th>
@@ -84,13 +106,18 @@
 													</span>
 												</td>
 												<td>
-													<span class="${onHandQuantity >0? '':'fade'}">
+													<span class="${onHandQuantity >0? '':'fade'} lotNumber">
 														${inventoryItem?.lotNumber }
 													</span>
 												</td>
 												<td>
 													<span class="${onHandQuantity >0? '':'fade'}">
 														<format:date obj="${inventoryItem?.expirationDate }"/>
+													</span>
+												</td>
+												<td>
+													<span>
+														${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
 													</span>
 												</td>
 												<td>
@@ -103,11 +130,11 @@
 														<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>									
 														<g:if test="${command?.transactionInstance?.transactionEntries }">
 															<g:textField name="transactionEntries[${status }].quantity"
-																value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="1" autocomplete="off" />
+																value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="10" autocomplete="off"  class="text" />
 														</g:if>
 														<g:else>
-															<g:textField name="transactionEntries[${status }].quantity"
-																value="" size="1" autocomplete="off" />
+															<g:textField name="transactionEntries[${status }].quantity" class="text"
+																value="" size="10" autocomplete="off" />
 														</g:else>
 														<g:set var="status" value="${status+1 }"/>										
 														
@@ -117,7 +144,7 @@
 													</g:else>
 												</td>
 												<td class="center">
-													<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+													<img class="delete middle button" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>													
 												</td>
 											</tr>
 										</g:if>
@@ -132,7 +159,7 @@
 				<tr class="prop">
 					<td colspan="7">
 						<div class="center">
-							<button type="submit" name="save">
+							<button type="submit" name="save" class="button">
 								<warehouse:message code="default.button.save.label"/>
 							</button>
 							&nbsp;

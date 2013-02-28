@@ -113,14 +113,13 @@
 			                
 		                
 						<div class="buttons">
-							<div class="left">
+							<div class="right">
 								<g:link controller="requisition" action="confirm" id="${requisition.id }" class="button">
 									<warehouse:message code="default.button.back.label"/>	
 								</g:link>
-							</div>
-							<div class="right">
+
 								<g:link controller="requisition" action="complete" id="${requisition.id }" class="button">
-									<warehouse:message code="default.button.continue.label"/>	
+									<warehouse:message code="default.button.finish.label"/>	
 								</g:link>
 							</div>
 						</div>			

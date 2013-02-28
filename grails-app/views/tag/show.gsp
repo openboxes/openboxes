@@ -64,11 +64,18 @@
                             <td valign="top" class="name"><warehouse:message code="tag.products.label" default="Products" /></td>
                             
                             <td valign="top" style="text-align: left;" class="value">
-                                <ul>
+                                <table>
                                 <g:each in="${tagInstance.products}" var="p">
-                                    <li><g:link controller="product" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link></li>
+                                	<tr>
+                                    	<td>
+                                    		${p.productCode }
+                                    	</td>
+                                		<td>
+                                    		<g:link controller="product" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link>
+                                    	</td>
+                                    </tr>
                                 </g:each>
-                                </ul>
+                                </table>
                             </td>
                             
                         </tr>

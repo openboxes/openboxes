@@ -37,7 +37,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		group1 = ProductGroup.findByDescription("Hoo moodiccina")
 		group2 = ProductGroup.findByDescription("Boo floweree")
 		
-		
+		def category = DbHelper.createCategoryIfNotExists("ROOT")
+		category.isRoot = true;
+		category.save(flush:true)
 		DbHelper.createProductWithTags("Ibuprofen 200mg tablet", ["nsaid","pain","favorite"])
 		DbHelper.createProductWithTags("Acetaminophen 325mg tablet", ["pain","pain reliever"])
 		DbHelper.createProductWithTags("Naproxen 220mg tablet", ["pain reliever","pain","nsaid","fever reducer"])
@@ -63,12 +65,17 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	
 	void test_searchProductAndProductGroup_shouldGetAllProductsUnderMachtedGroups(){
 		def result = productService.searchProductAndProductGroup("floweree")
-		assert result.size() == 5
-		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "Boo floweree" && it[0] == product1.id && it[3] == group2.id}
-		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "Hoo moodiccina" && it[0] == product1.id && it[3] == group1.id}
-		assert result.any{ it[1] == "boo pill" && it[2] == "Boo floweree" && it[0] == product2.id && it[3] == group2.id}
-		assert result.any{ it[1] == "goomoon" &&  it[2] == "Boo floweree" && it[0] == product5.id && it[3] == group2.id}
-		assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == null && it[0] == product6.id && it[3] == null}
+		println result
+		
+		// Only searches products, not product groups any longer
+		assert result.size() == 2
+		//[[ff8081813d20ed97013d20ee12e1025c, boo floweree 250mg, null], [ff8081813d20ed97013d20ee13d40263, buhoo floweree root, null]]
+		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == null && it[0] == product1.id}
+		//assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "Hoo moodiccina" && it[0] == product1.id && it[3] == group1.id}
+		//assert result.any{ it[1] == "boo pill" && it[2] == "Boo floweree" && it[0] == product2.id && it[3] == group2.id}
+		//assert result.any{ it[1] == "goomoon" &&  it[2] == "Boo floweree" && it[0] == product5.id && it[3] == group2.id}
+		assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == null && it[0] == product6.id}
+	
 	}
 
 	/*
@@ -262,12 +269,15 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void test_findOrCreateCategory_shouldReturnRootCategoryOnRoot() {
 		def categoryName = "ROOT"
 		def category = productService.findOrCreateCategory(categoryName)
+		
+		println category
 		assertEquals category.name, "ROOT"
 	}
 
 	void test_findOrCreateCategory_shouldReturnRootCategoryOnEmpty() {
 		def categoryName = ""
 		def category = productService.findOrCreateCategory(categoryName)
+		println category
 		assertEquals category.name, "ROOT"
 	}
 
@@ -337,9 +347,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 	
 	
-	void test_getAllTags() { 
+	void test_getAllTagLabels() { 
 		def service = new ProductService();
-		def tags = service.getAllTags()
+		def tags = service.getAllTagLabels()
 		println tags
 		assertEquals 6, tags.size()
 	}

@@ -48,8 +48,10 @@ class RequisitionService {
 			outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber()
 			outboundTransaction.transactionDate = new Date();
 			outboundTransaction.requisition = requisition
+			// requisition origin is where the requisition originated from (the destination of stock transfer)
 			outboundTransaction.destination = requisition.origin
-			outboundTransaction.inventory = requisition?.destination.inventory
+			// requisition inventory is the location where the requisition is placed
+			outboundTransaction.inventory = requisition?.destination?.inventory
 			outboundTransaction.comment = comments
 			outboundTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
 		}
@@ -138,7 +140,7 @@ class RequisitionService {
 	}
 
 	void uncancelRequisition(Requisition requisition) {
-		requisition.status = RequisitionStatus.OPEN
+		requisition.status = RequisitionStatus.PENDING
 		requisition.save(flush: true)
 	}
 

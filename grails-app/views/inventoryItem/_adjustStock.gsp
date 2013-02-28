@@ -1,14 +1,3 @@
-
-<script type="text/javascript">
-	$(document).ready(function(){
-		$("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '500px' });				
-		$("#btnAdjustStock-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('open'); });									
-		$("#btnAdjustClose-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('close'); });									
-	});
-</script>	
-<g:link controller="inventoryItem" action="showRecordInventory" params="['productInstance.id':commandInstance?.productInstance?.id,'inventoryInstance.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
-</g:link>
-
 <div id="dlgAdjustStock-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.adjustStock.label')}" style="padding: 10px; display: none;" >	
 	<table>
 		<tr>
@@ -29,7 +18,9 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>                            
 								<td valign="top" class="value">
-									<g:if test="${itemInstance?.lotNumber }">${itemInstance?.lotNumber }</g:if>
+									<g:if test="${itemInstance?.lotNumber }">
+										<span class="lotNumber">${itemInstance?.lotNumber }</span>
+									</g:if>
 									<g:else><span class="fade"><warehouse:message code="default.none.label"/></span></g:else>
 								</td>
 							</tr>
@@ -49,6 +40,7 @@
 								<td valign="top" class="value">
 									<g:hiddenField id="oldQuantity" name="oldQuantity" value="${itemQuantity }"/>
 									${itemQuantity }
+									${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
 								</td>
 							</tr>  	        
 							
@@ -56,7 +48,9 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="inventory.newQuantity.label" /></label></td>                            
 								<td valign="top" class="value">
-									<g:textField id="newQuantity" name="newQuantity" size="6" value="${itemQuantity }" />
+									<g:textField id="newQuantity" name="newQuantity" size="6" value="${itemQuantity }" class="text"/>
+									${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+									
 								</td>
 							</tr>  	        
 						</tbody>
@@ -75,10 +69,15 @@
 						</tfoot>						
 					</table>
 				</g:form>				
-			</td>
-			
+			</td>	
 		</tr>
 	</table>													
 </div>		
-		     
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '500px' });				
+		$("#btnAdjustStock-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('open'); });									
+		$("#btnAdjustClose-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('close'); });									
+	});
+</script>  
 
