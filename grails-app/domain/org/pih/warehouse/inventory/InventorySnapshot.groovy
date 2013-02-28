@@ -12,33 +12,38 @@ package org.pih.warehouse.inventory;
 import java.util.Date;
 
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.product.Product;
 
-class Inventory implements java.io.Serializable {
+class InventorySnapshot implements java.io.Serializable {
 
 	String id
 	
     // Core data elements
-    Location warehouse		// we could assume that a warehouse has an inventory
-    
-	// Auditing
+    Location location
+    Product product
+	InventoryItem inventoryItem
+
+	Integer quantityOnHand
+	Integer quantityInbound
+	Integer quantityOutbound
+	
+		// Auditing
 	Date dateCreated;
 	Date lastUpdated;
 		
-    // Association mapping
-    static belongsTo = [ warehouse: Location ]
-    static hasMany = [ configuredProducts : InventoryLevel ]
-
-    // Show use warehouse name
-    String toString() { return "${warehouse.name}"; }
 
 	static mapping = { 
 		id generator: 'uuid'
-		cache true
 	}
 	
     // Constraints
     static constraints = {
-		warehouse(nullable:false)
+		product(nullable:false)
+		location(nullable:false)
+		inventoryItem(nullable:true)
+		quantityOnHand(nullable:true)
+		quantityInbound(nullable:true)
+		quantityOutbound(nullable:true)
     }
 	
 }

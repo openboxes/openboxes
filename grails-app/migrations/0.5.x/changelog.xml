@@ -25,4 +25,12 @@
     <include file="0.5.x/add-product-booleans.xml"/>
     <include file="0.5.x/add-requisition-item-canceled-quantity.xml"/>
     <include file="0.5.x/add-requisition-to-transaction.xml"/>
+    <include file="0.5.x/create-table-inventory-snapshot.xml"/>
+    <include file="0.5.x/create-table-localization.xml"/>
+    <include file="0.5.x/add-column-product-price-per-unit.xml"/>
+    <include file="0.5.x/add-column-requisition-commodity-class.xml"/>
+    <include file="0.5.x/add-column-requisition-published-and-template.xml"/>
+    <include file="0.5.x/add-column-category-is-root.xml"/>
+    <include file="0.5.x/add-column-requisition-item-parent-requisition-item.xml"/>
+    
 </databaseChangeLog>

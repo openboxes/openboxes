@@ -23,14 +23,20 @@ class RequisitionItem implements Serializable {
 	
 	String id
 	String description	
-	InventoryItem inventoryItem
+	
+	// Requested item or product
     Product product
     Category category
+	InventoryItem inventoryItem
     ProductGroup productGroup
+	
+	// Cancellation
 	Integer quantity 
 	Integer quantityCanceled
 	String cancelReasonCode
 	String cancelComments
+	
+	// Miscellaneous information
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
@@ -38,6 +44,10 @@ class RequisitionItem implements Serializable {
     String comment
     Integer orderIndex
 
+	// Parent requisition item
+	RequisitionItem parentRequisitionItem
+	
+	
 	
 	// Audit fields
 	Date dateCreated
@@ -45,11 +55,13 @@ class RequisitionItem implements Serializable {
 
 	static transients = [ "type" ]
 	
-	static belongsTo = [ requisition: Requisition ]
-
+	static belongsTo = [ requisition: Requisition ]	
+	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ]
+	
 	static mapping = {
 		id generator: 'uuid'
         picklistItems cascade: "all-delete-orphan", sort: "id"
+		requisitionItems cascade: "all-delete-orphan", sort: "id"
 	}
 		
     static constraints = {
@@ -68,6 +80,7 @@ class RequisitionItem implements Serializable {
         comment(nullable:true)
         recipient(nullable:true)
         orderIndex(nullable: true)
+		parentRequisitionItem(nullable:true)
 	}
 
     def calculateQuantityPicked() {

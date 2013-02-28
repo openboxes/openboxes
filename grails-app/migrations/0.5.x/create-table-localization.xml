@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="jmiranda (generated)" id="1361238137701-1">
+		<validCheckSum>7031408cf1a2de502029e04463308a70</validCheckSum>
+		<preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="localization"/>
+            </not>
+        </preConditions>
+		<createTable tableName="localization">
+			<column autoIncrement="false" name="id" type="CHAR(38)">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="version" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="code" type="VARCHAR(250)">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_created" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_updated" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="locale" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="text" type="VARCHAR(2000)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1361238338554-2">
+		<validCheckSum>fb4822ae86726cad4921b995d258456</validCheckSum>
+		<preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="localization_code_locale_idx"/>
+            </not>
+        </preConditions>
+		<createIndex indexName="localization_code_locale_idx" tableName="localization" unique="true">
+			<column name="code"/>
+			<column name="locale"/>
+		</createIndex>
+	</changeSet>
+
+</databaseChangeLog>

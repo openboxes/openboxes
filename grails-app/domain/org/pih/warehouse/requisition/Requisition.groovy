@@ -35,9 +35,17 @@ class Requisition implements Serializable {
 	String description 		// a user-defined, searchable name for the order 
 	String requestNumber 	// an auto-generated reference number
 	
+	// Dates 
+	Date dateRequested  = new Date()
+	Date requestedDeliveryDate = new Date()
+	
+	// Frequency - for stock requisitions we should know how often (monthly, weekly, daily)  
+	
+	// Requisition type, status, and commodity class
+	RequisitionType type;	
 	RequisitionStatus status;
-	RequisitionType type;
-
+	CommodityClass commodityClass
+	
 	Location origin			// the vendor
 	Location destination 	// the customer location 
 	
@@ -45,14 +53,18 @@ class Requisition implements Serializable {
 	Person recipient
 	String recipientProgram	
 	
-	List requisitionItems
-	
-	Date dateRequested  = new Date()
-    Date requestedDeliveryDate = new Date().plus(1)
+	// Stock requisitions will need to be handled through a template version of a requisition
+	Boolean isTemplate 
+	Boolean isPublished
+	Date datePublished = new Date()
+
+	// Not used yet
 	Date dateValidFrom 
 	Date dateValidTo
 	
 	Fulfillment fulfillment;
+	
+	List requisitionItems
 	
 	// Audit fields
 	Date dateCreated
@@ -97,7 +109,10 @@ class Requisition implements Serializable {
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
         recipientProgram(nullable:true)
-
+		commodityClass(nullable:true)
+		isTemplate(nullable:true)
+		isPublished(nullable:true)
+		datePublished(nullable:true)
 	}
 
     Boolean isWardRequisition() {
@@ -113,11 +128,11 @@ class Requisition implements Serializable {
     }
 
 	Boolean isPending() { 
-		return (status in [RequisitionStatus.CREATED, RequisitionStatus.OPEN]);
+		return (status in [RequisitionStatus.CREATED]);
 	}
 
     Boolean isOpen() {
-        return (status == RequisitionStatus.OPEN)
+        return (status == RequisitionStatus.CREATED)
     }
 
     Boolean isRequested() {
@@ -129,6 +144,7 @@ class Requisition implements Serializable {
       id: id,
       requestedById: requestedBy?.id,
       requestedByName: requestedBy?.name,
+	  description: description,
       dateRequested: dateRequested.format("MM/dd/yyyy"),
       requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy"),
       name: name,

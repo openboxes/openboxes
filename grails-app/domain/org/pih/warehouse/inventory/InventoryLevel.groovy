@@ -33,6 +33,9 @@ class InventoryLevel {
 	
 	static mapping = {
 		id generator: 'uuid'
+		product index: 'inventory_level_prod_inv_idx'
+		inventory index: 'inventory_level_prod_inv_idx'
+		cache true
 	}
 
 	static belongsTo = [ inventory: Inventory ]

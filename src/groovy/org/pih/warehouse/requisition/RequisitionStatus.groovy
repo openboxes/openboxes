@@ -11,9 +11,9 @@ package org.pih.warehouse.requisition
 
 public enum RequisitionStatus {
 	CREATED(1),
-	OPEN(2),
-	PICKING(3),
-	PICKED(4),
+	PICKING(2),
+	PICKED(3),
+	PENDING(4),
 	FULFILLED(5),
 	ISSUED(6),
 	RECEIVED(7),
@@ -26,9 +26,9 @@ public enum RequisitionStatus {
 	static int compare(RequisitionStatus a, RequisitionStatus b) {
 		return a.sortOrder <=> b.sortOrder
 	}
-	
+	/* remove OPEN, FULFILLED */
 	static list() {
-		[ CREATED, OPEN, PICKING, PICKED, FULFILLED, ISSUED, RECEIVED, CANCELED ]
+		[ CREATED, PICKING, PICKED, PENDING, FULFILLED, ISSUED, RECEIVED, CANCELED ]
 	}
 	
 	String toString() { return name() }

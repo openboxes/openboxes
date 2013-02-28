@@ -56,6 +56,8 @@ class Product implements Comparable, Serializable {
 	// http://en.wikipedia.org/wiki/Stock_keeping_unit
 	String productCode 						
 	
+	// Price per unit (global for the entire system)
+	Float pricePerUnit
 	
 	// Controlled Substances
 	// http://en.wikipedia.org/wiki/Controlled_Substances_Act
@@ -236,7 +238,7 @@ class Product implements Comparable, Serializable {
 		manufacturerName(nullable:true, maxSize: 255)
 		//route(nullable:true)
 		//dosageForm(nullable:true)
-		
+		pricePerUnit(nullable:true)
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
 

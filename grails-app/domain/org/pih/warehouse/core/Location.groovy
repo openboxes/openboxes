@@ -68,6 +68,7 @@ class Location implements Comparable, java.io.Serializable {
 		// Needs to be eagerly fetched because of Location.supportsActivity() method
 		supportedActivities lazy: false
 		locationType lazy: false
+		cache true
 	}
 	
 	static transients = ["transactions", "events", "shipments", "requests", "orders" ]

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1361916937666-1">
+    	<preConditions onFail="MARK_RAN">
+    		<not>
+    			<columnExists tableName="requisition" columnName="is_template"/>
+			</not>
+    	</preConditions>
+        <addColumn tableName="requisition">
+            <column name="is_template" type="TINYINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1361916937666-2">
+    	<preConditions onFail="MARK_RAN">
+    		<not>
+    			<columnExists tableName="requisition" columnName="is_published"/>
+			</not>
+    	</preConditions>
+        <addColumn tableName="requisition">
+            <column name="is_published" type="TINYINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1361916937666-3">
+    	<preConditions onFail="MARK_RAN">
+    		<not>
+    			<columnExists tableName="requisition" columnName="date_published"/>
+			</not>
+    	</preConditions>
+        <addColumn tableName="requisition">
+            <column name="date_published" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

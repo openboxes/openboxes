@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="Thoughtworks (generated)" id="1360271810919-1">
+		<createTable tableName="inventory_snapshot">
+			<column name="id" type="CHAR(38)" />
+			<column name="version" type="INT" />
+			<column name="product_id" type="CHAR(38)" />
+			<column name="location_id" type="CHAR(38)" />
+			<column name="inventory_item_id" type="CHAR(38)" />
+			<column name="quantity_on_hand" type="INT" />
+			<column name="quantity_available_to_promise" type="INT" />
+			<column name="quantity_inbound" type="INT" />
+			<column name="quantity_outbound" type="INT" />
+			<column name="last_updated" type="DATETIME" />
+			<column name="date_created" type="DATETIME" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

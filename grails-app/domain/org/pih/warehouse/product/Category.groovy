@@ -20,8 +20,8 @@ class Category implements Comparable, Serializable {
 	Category parentCategory
 	Date dateCreated;
 	Date lastUpdated;
-	boolean deleted 
-	
+	Boolean deleted = false
+	Boolean isRoot = false
 
 	static hasMany = [ categories : Category ];
 	static mappedBy = [ categories : "parentCategory" ];
@@ -31,12 +31,15 @@ class Category implements Comparable, Serializable {
 		id generator: 'uuid'
 		sort name:"desc"
 		categories sort:"name"
+		cache true
 	}
 	
 	static constraints = {
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)
+		isRoot(nullable:true)
+		deleted(nullable:true)
 		// parent category can't be the category itself or any of its children
 		parentCategory(nullable:true, 
 						validator: { value, obj ->  value != obj && !(obj.getChildren().find {it == value}) })
@@ -64,7 +67,7 @@ class Category implements Comparable, Serializable {
 	}
 	
 	static Category getRootCategory() { 
-		return Category.findByName("ROOT")
+		return Category.findByIsRoot(true)
 	}
 	
 	
