@@ -248,7 +248,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>	
-	<script src="${createLinkTo(dir:'js/spin/', file:'spin.js')}" type="text/javascript" ></script>
+	
     <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> 
     	<!--headless driver throw error when using watermark-->
 	</g:if>
