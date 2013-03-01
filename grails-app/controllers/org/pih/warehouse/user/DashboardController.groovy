@@ -181,6 +181,9 @@ class DashboardController {
 		users.each { 
 			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+			if (it.lastUpdated == it.lastLoginDate) { 
+				activityType = "dashboard.activity.loggedIn.label"
+			}
 			activityType = "${warehouse.message(code: activityType)}"
 
 			
