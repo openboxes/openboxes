@@ -1,5 +1,18 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <!-- Block which includes the logo and login banner -->
+<g:if test="${session.useDebugLocale}">
+<div id="debug-header" class="error">
+ 	You are in DEBUG mode.
+ 	
+ 	<g:each var="localization" in="${flash.localizations }">
+ 		<div>
+ 			${localization.code } = ${localization.text }
+ 		</div>
+ 	</g:each>
+ 	
+ 	
+</div>
+</g:if>
 <div id="header" class="yui-b">
 	<div class="yui-gf">				
 		<div id="banner">

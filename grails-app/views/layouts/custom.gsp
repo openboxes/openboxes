@@ -197,11 +197,47 @@
 	</div>
 	
 	<div id="localization-dialog" class="dialog" style="display: none;">
-		
+	
 		<g:form controller="localization" action="save">
+			<style>
+				#localization-dialog label { display: block; }
+				#localization-dialog div { padding; 20px; margin: 10px; }
+			</style>
+			<div style="float: left;">
+				<div>
+					<label>ID</label>
+					<g:hiddenField id="id" name="id" value=""/>
+					<div id="show-id"></div>
+				</div>
+				<div>			
+					<label>Locale</label>
+					<g:hiddenField id="locale" name="locale" value="${session?.user?.locale }"/>
+					<div id="show-locale">${session?.user?.locale }</div>
+				</div>
+				<div>
+					<label>Code</label>
+					<g:hiddenField id="code" name="code" value=""/>
+					<div id="show-code"></div>
+				</div>
+				<div>
+					<label>Args</label>
+					
+					<div id="show-args"></div>		
+				</div>
+				<div>
+					<label>Text</label>
+					<g:textArea id="text" name="text" value="" cols="60" rows="4"/>		
+				</div>
+			</div>			
+			<div class="clear"></div>		
+			<div class="buttons">			
+				<button class="button">Save</button>
+				<button class="button">Delete</button>
+			</div>
+		</g:form>
 		
-			
-		
+		<%-- 
+		<g:form controller="localization" action="save">
 			<g:each var="localized" in="${request.localized }">
 				<table id="localization-table-${localized?.key?.replace(".", "-") }" class="localization-table" style="display: none;">
 					<tr class="${localized.key }">
@@ -231,7 +267,8 @@
 					</tr>
 				</table>
 			</g:each>
-		</g:form>	
+		</g:form>
+		--%>	
 	</div>
 
 	<!-- YUI "footer" block that includes footer information -->
@@ -263,7 +300,7 @@
 		$(function() { 		
 						
 			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
-			$("#localization-dialog").dialog({ autoOpen: false, modal: true, width: '800px' });	
+			$("#localization-dialog").dialog({ autoOpen: false, modal: true, width: '1000px' });	
 
 			
 			/*
@@ -278,17 +315,48 @@
 			*/
 			
 			<g:if test="${session.useDebugLocale}">
-				$('.copy').click(function(event) {
-					var id = $(this).attr("id");
-					$("table.localization-table").hide();					
-					var copyText = $(this).siblings('.text').text();			
-					//alert(copyText);
-					var idWithDashes = id.toString().replace(/\./g, '-');
-					console.log(idWithDashes);
-					$("table#localization-table-" + idWithDashes).toggle();
-					$("#localization-dialog").dialog('open');
+				$('.show-localization-dialog').live('click', function(event) {
 					event.preventDefault();
+					var id = $(this).attr("data-id");
+					console.log($(id));
+					//$("table.localization-table").hide();					
+					//$(this).siblings('.text').toggle();			
+					//alert(copyText);					
+					
+					var text = $(this).attr("data-text");				
+					var code = $(this).attr("data-code");				
+					var localized = $(this).attr("data-localized");				
+					var args = $(this).attr("data-args");				
+					var locale = $(this).attr("data-locale");				
+					//var idWithDashes = id.toString().replace(/\./g, '-');
+					//console.log(idWithDashes);
+					//$("table#localization-table-" + idWithDashes).toggle();
+					//var dialog = $("#localization-dialog-" + id).dialog('open');
+					console.log(args);
+					var argsArray = args.split(",");
+					
+					$.each(argsArray, function(index, item ) {
+						console.log(index + ": " + item);
+					});
+
+
+					$("#id").val(id);
+					$("#show-id").text(id);
+					$("#code").val(code);
+					$("#show-code").text(code);
+					$("#text").val(text);
+					//$("#localized").text(localized);
+					$("#args").text(args);
+					$("#locale").val(locale);
+					$("#show-locale").val(locale);
+					$("#localization-dialog").dialog('open');
+					//console.log(dialog);
 				});
+				//$("a").click(function(event) { 
+				//	alert("This link is disabled in debug mode.")
+				//	event.preventDefault();
+				//	
+				//});
 			</g:if>
 
 			<%-- Automatic status message updater because it's not an ideal solution and isn't currently used 
