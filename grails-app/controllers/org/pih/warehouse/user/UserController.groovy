@@ -279,13 +279,25 @@ class UserController {
        user.removeFromLocationRoles(it)       
      }
    }
+   
+   
+   def disableDebugMode = { 
+	   log.info ("params " + params)
+	   
+	   session.useDebugLocale = false
+	   redirect(controller: "dashboard", action: "index")	   
+   }
 
+   def enableDebugMode = { 
+	   log.info ("params " + params)
+	   session.useDebugLocale = true
+	   redirect(controller: "dashboard", action: "index")
+   }
     
 	/**
 	 * Updates the locale of the default user
 	 * Used by the locale selectors in the footer
-	 */
-	
+	 */	
 	def updateAuthUserLocale = {
 		
 		log.info "update auth user locale " + params

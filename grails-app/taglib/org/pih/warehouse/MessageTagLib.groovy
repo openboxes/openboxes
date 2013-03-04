@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Localization;
 class MessageTagLib {
    
 	static namespace = "warehouse"
+	def messageSource 
 	
 	Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
 	
@@ -27,33 +28,38 @@ class MessageTagLib {
 		//	flash.localizations = []
 		//}
 		
+		// Checks the database to see if there's a localization property for the given code
 		if (session.user) { 
 			def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString()) 
 			if (localization) { 
 				//println "Arguments: " + attrs?.args + ":" + attrs?.args?.class
 				def message = localization.text 
 				if (attrs?.args) { 
-					message = MessageFormat.format(localization.text, attrs.args.toArray())
+					//message = MessageFormat.format(localization.text, attrs.args.toArray())
+					message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
 				}
 				
 				if (session.useDebugLocale) { 
 					//flash.localizations << ['code':attrs.code, 'text':localization.text]
-					
+					def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
 					out << """<span style="border: 3px solid lightgrey; padding: 2px;">
 									<img class='show-localization-dialog' 
 										data-id="${localization.id}"
 										data-code="${localization.code}" 
 										data-locale="${localization.locale}" 
-										data-text="${localization.text}" 
+										data-message="${message}" 
+										data-resolved-message="${resolvedMessage}" 
+										data-message="${localization.text}" 
 										data-args="${attrs.args}" 
 										data-localized="" 
 										src="${createLinkTo(dir:'images/icons/silk',file: 'database.png')}" title=""/>
-									${attrs.code} = ${message}
+									${localization.code}
 							</span>
 							"""
 					return;
 				}
 				else { 
+					message = MessageFormat.format(localization.text, attrs?.args?.toArray())
 					out << """${message}"""
 				}
 				return;
@@ -68,11 +74,9 @@ class MessageTagLib {
 			def message = ""
 			locales.each { 
 				def locale = new Locale(it)
-				def messageSource = grailsAttributes.applicationContext.messageSource
-				//println messageSource
-				message = messageSource.getMessage(attrs.code, attrs.args == null ? null : attrs.args.toArray(), attrs.default, locale)
-				//message = messageSource.getMessage(attrs.code, locale)				
-				localized.put(it, message)
+				// This would be used if we actually wanted to translate the message				
+				def localizedMessage = messageSource.getMessage(attrs.code, attrs.args == null ? null : attrs.args.toArray(), attrs.default, locale)								
+				localized.put(it, localizedMessage)
 			}
 			def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 			attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
@@ -87,17 +91,22 @@ class MessageTagLib {
 					<div id="${attrs.code}">test</div>
 				"""
 			*/
-			message = "${defaultTagLib.message.call(attrs)}"
+			println "Arguments " + attrs.args
+			//def messageSource = grailsAttributes.applicationContext.messageSource
+			message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
+			def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
 			//flash.localizations << ['code':attrs.code, 'text':message]
 			out << """
 					<span style="border: 3px solid lightgrey; padding: 2px;">
-						<img class='show-localization-dialog' data-code="${attrs.code}" 
+						<img class='show-localization-dialog' 
+							data-code="${attrs.code}" 
 							data-locale="${attrs.locale}" 
 							data-args="${attrs?.args?.join(',')}" 
-							data-text="${message}" 
+							data-resolved-message="${resolvedMessage}" 
+							data-message="${message}" 
 							data-localized="${localized}" 
 							src="${createLinkTo(dir:'images/icons/silk',file: image + '.png')}" title="${localized}"/>
-						${attrs.code} = ${message}
+						${attrs.code}
 					</span>
 					
 				"""

@@ -79,6 +79,24 @@
 	</g:if>
  	--%>
  	
+ 	<g:if test="${session.useDebugLocale}">
+	<div id="debug-header" class="notice" style="margin-bottom: 0px;">
+	 	You are in DEBUG mode.
+	 	
+	 	<div class="right">
+		 	<g:link controller="localization" action="list">Show all localizations</g:link> |
+		 	<g:link controller="user" action="disableDebugMode">Disable debug mode</g:link>
+	 	</div>
+	 	<g:each var="localization" in="${flash.localizations }">
+	 		<div>
+	 			${localization.code } = ${localization.text }
+	 		</div>
+	 	</g:each>
+	 	
+	 	
+	</div>
+</g:if>
+ 	
 	<!-- Header "hd" includes includes logo, global navigation -->
 	<div id="hd" role="banner">
 	    <g:render template="/common/header"/>		    
@@ -206,8 +224,9 @@
 			<div style="float: left;">
 				<div>
 					<label>ID</label>
-					<g:hiddenField id="id" name="id" value=""/>
+					<g:hiddenField id="id" name="id" value=""/>					
 					<div id="show-id"></div>
+			
 				</div>
 				<div>			
 					<label>Locale</label>
@@ -226,13 +245,17 @@
 				</div>
 				<div>
 					<label>Text</label>
-					<g:textArea id="text" name="text" value="" cols="60" rows="4"/>		
+					<g:textArea id="message" name="text" value="" cols="60" rows="4"/>		
+				</div>
+				<div>
+					<label>Resolved text</label>
+					<div id="resolved-message"></div>		
 				</div>
 			</div>			
 			<div class="clear"></div>		
 			<div class="buttons">			
-				<button class="button">Save</button>
-				<button class="button">Delete</button>
+				<button id="save-localization" class="button">Save</button>
+				<g:link controller="localization" action="list">Show all localizations</g:link>
 			</div>
 		</g:form>
 		
@@ -314,49 +337,29 @@
 			});
 			*/
 			
-			<g:if test="${session.useDebugLocale}">
-				$('.show-localization-dialog').live('click', function(event) {
-					event.preventDefault();
+			<g:if test="${session.useDebugLocale}">			
+				$(".show-localization-dialog").click(function(event) { 
 					var id = $(this).attr("data-id");
-					console.log($(id));
-					//$("table.localization-table").hide();					
-					//$(this).siblings('.text').toggle();			
-					//alert(copyText);					
-					
-					var text = $(this).attr("data-text");				
+					var message = $(this).attr("data-message");				
+					var resolvedMessage = $(this).attr("data-resolved-message");				
 					var code = $(this).attr("data-code");				
 					var localized = $(this).attr("data-localized");				
-					var args = $(this).attr("data-args");				
+					var args = $(this).attr("data-args");		
 					var locale = $(this).attr("data-locale");				
-					//var idWithDashes = id.toString().replace(/\./g, '-');
-					//console.log(idWithDashes);
-					//$("table#localization-table-" + idWithDashes).toggle();
-					//var dialog = $("#localization-dialog-" + id).dialog('open');
-					console.log(args);
 					var argsArray = args.split(",");
-					
-					$.each(argsArray, function(index, item ) {
-						console.log(index + ": " + item);
-					});
-
-
 					$("#id").val(id);
 					$("#show-id").text(id);
 					$("#code").val(code);
-					$("#show-code").text(code);
-					$("#text").val(text);
-					//$("#localized").text(localized);
-					$("#args").text(args);
+					$("#message").val(message);
+					$("#resolved-message").text(resolvedMessage);
+					$("#localized").text(localized);
 					$("#locale").val(locale);
+					$("#show-code").text(code);					
+					$("#show-args").text(args);
 					$("#show-locale").val(locale);
 					$("#localization-dialog").dialog('open');
-					//console.log(dialog);
+					event.preventDefault();
 				});
-				//$("a").click(function(event) { 
-				//	alert("This link is disabled in debug mode.")
-				//	event.preventDefault();
-				//	
-				//});
 			</g:if>
 
 			<%-- Automatic status message updater because it's not an ideal solution and isn't currently used 
