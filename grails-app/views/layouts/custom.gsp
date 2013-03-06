@@ -31,29 +31,18 @@
 	<g:javascript library="jquery" plugin="jquery" />
 	<jqui:resources />
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-
-	
   		
  	<!-- Include Jquery Validation and Jquery Validation UI plugins --> 
  	<jqval:resources />       
     <jqvalui:resources />
 
-
-	<%--
-	<link href="${createLinkTo(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.jqGrid/js', file:'jquery.jqGrid.min.js')}" type="text/javascript" ></script>
-	 --%>
-	<%--
-    <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
-    <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
-	--%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="all" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 	
-  <!-- jquery validation messages -->
-  <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
-    <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
-  </g:if>
+	<!-- jquery validation messages -->
+	<g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
+		<script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
+	</g:if>
 
 
 	<!-- Custom styles to be applied to all pages -->
@@ -85,6 +74,7 @@
 	 	
 	 	<div class="right">
 		 	<g:link controller="localization" action="list">Show all localizations</g:link> |
+		 	<g:link controller="localization" action="create">Create new localization</g:link> |
 		 	<g:link controller="user" action="disableDebugMode">Disable debug mode</g:link>
 	 	</div>
 	 	<g:each var="localization" in="${flash.localizations }">
@@ -92,6 +82,8 @@
 	 			${localization.code } = ${localization.text }
 	 		</div>
 	 	</g:each>
+	 	<div id="localizations">
+	 	</div>
 	 	
 	 	
 	</div>
@@ -146,62 +138,9 @@
 	    		</g:if>
 
     		</ul>
-    		
-    		
-    		
-    		<%-- 				    
-		    	<g:link controller="dashboard" action="index">
-			    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
-		    	</g:link>
-			    &nbsp;&rsaquo;&nbsp;								
-				<g:if test="${session?.warehouse}">									
-					<g:if test="${session.warehouse.logo }">
-						<img class="photo" width="25" height="25" 
-							src="${createLink(controller:'location', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-					</g:if>
-					${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
-				</g:if> 
-				<!--  note that both breadcrumbs are overrideable by using the content tag is the view to set the value of label1 or label2 -->
-			    <g:set var="label1">${g.pageProperty(name: 'page.label1') ?: warehouse.message(code: "breadcrumbs." + params.controller + ".label")}</g:set>
-			    <g:set var="label2">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</g:set>
-			   		${label1 ?: params.controller}
-			    <g:if test="${label1 != label2}">
-					&nbsp;&rsaquo;&nbsp;								
-	    			${label2}
-	    		</g:if>
-    		--%>
-  	
    		</div>
-   		<%-- 
-		<g:if test="${session?.warehouse}">
-			<div style="width:100%;">
-				<div class="box" style="width: 100%; text-align: center;">
-					<g:globalSearch cssClass="globalSearch" width="300" name="searchTerms" jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-				</div>
-			</div>
-		</g:if>   		
-   		--%>
   	</g:if>
-	
-
-  	<%-- 
-  	<div class="page-actions">
-  		${g.pageProperty(name: 'page.actions')}
-  	</div>
-  	--%>
-  	<%--
-  	<div class="page-header">
-	  	<div class="page-actions">
-	  		${g.pageProperty(name: 'page.actions')}
-	  	</div>
-	  	<div class="page-title">
-			<g:if test="${session?.user && session?.warehouse}">
-				<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
-		   	</g:if>
-	   	</div>
-	</div>  	
-  	 --%>
-	
+		
 	<!-- Body includes the divs for the main body content and left navigation menu -->
 		
 	<div id="bd" role="main">
@@ -214,84 +153,77 @@
 		</div>
 	</div>
 	
-	<div id="localization-dialog" class="dialog" style="display: none;">
-	
-		<g:form controller="localization" action="save">
-			<style>
-				#localization-dialog label { display: block; }
-				#localization-dialog div { padding; 20px; margin: 10px; }
-			</style>
-			<div style="float: left;">
-				<div>
-					<label>ID</label>
-					<g:hiddenField id="id" name="id" value=""/>					
-					<div id="show-id"></div>
-			
-				</div>
-				<div>			
-					<label>Locale</label>
-					<g:hiddenField id="locale" name="locale" value="${session?.user?.locale }"/>
-					<div id="show-locale">${session?.user?.locale }</div>
-				</div>
-				<div>
-					<label>Code</label>
-					<g:hiddenField id="code" name="code" value=""/>
-					<div id="show-code"></div>
-				</div>
-				<div>
-					<label>Args</label>
-					
-					<div id="show-args"></div>		
-				</div>
-				<div>
-					<label>Text</label>
-					<g:textArea id="message" name="text" value="" cols="60" rows="4"/>		
-				</div>
-				<div>
-					<label>Resolved text</label>
-					<div id="resolved-message"></div>		
-				</div>
-			</div>			
-			<div class="clear"></div>		
-			<div class="buttons">			
-				<button id="save-localization" class="button">Save</button>
-				<g:link controller="localization" action="list">Show all localizations</g:link>
-			</div>
-		</g:form>
-		
-		<%-- 
-		<g:form controller="localization" action="save">
-			<g:each var="localized" in="${request.localized }">
-				<table id="localization-table-${localized?.key?.replace(".", "-") }" class="localization-table" style="display: none;">
-					<tr class="${localized.key }">
-						<td>						
-							<label>${localized.key }</label>
-						</td>
-					<tr>
-					<g:each var="value" in="${localized.value }">
-						<tr class="prop">
-							<td class="name">						
-								${value.key }
-							</td>
-							<td class="value">	
-								<g:textArea name="${localized.key }_${value.key }" 
-									value="${value.value }" class="text" cols="60" rows="3"/> 
-							</td>		
-						</tr>						
-					</g:each>
-					<tr>
-						<td colspan="2">
-							<div class="buttons">
-								<button class="button">
-									<warehouse:message code="default.button.save.label"></warehouse:message>
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
-			</g:each>
-		</g:form>
-		--%>	
+	<div id="localization-dialog" class="dialog" style="display: none;" title="Edit Translation">
+	    <div id="localization-form">
+            <g:form controller="localization" action="save">
+                <style>
+                    #localization-dialog label { display: block; }
+                    #localization-dialog div { padding: 20px; margin: 10px; }
+                </style>
+                <div style="float: left;">
+                    <div data-bind="if: id">
+                        <label>ID</label>
+                        <div data-bind="text: id"></div>
+                        <input type="hidden" data-bind="value: id"/>
+                    </div>
+                    <div>
+                        <label>Locale</label>
+                        <input type="hidden" data-bind="value: locale"/>
+                        <div data-bind="text: locale"></div>
+                    </div>
+                    <div>
+                        <label>Code</label>
+                        <input type="hidden" data-bind="value: code"/>
+                        <div data-bind="text: code"></div>
+                    </div>
+                    <div>
+                        <label>Original Text</label>
+                        <div data-bind="text: text"></div>
+                    </div>
+                    <div>
+                        <label>Translation</label>
+                        <textarea cols="60" rows="6" data-bind="value: translation"></textarea>
+                    </div>
+                </div>
+                <!--
+                <div style="float: left">
+                    <div>
+                        <label>Translation</label>
+                        <textarea cols="60" rows="3" data-bind="value: text"></textarea>
+                    </div>
+                    <div>
+                        <label>Translation</label>
+                        <div data-bind="text: translation"></div>
+                    </div>
+                    <div>
+                        <select id="src" name="src">
+                            <option value="en">English</option>
+                            <option value="fr">French</option>
+                            <option value="sp">Spanish</option>
+                        </select>
+                        to
+                        <select id="dest" name="dest">
+                            <option value="en">English</option>
+                            <option value="fr" selected>French</option>
+                            <option value="sp">Spanish</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button id="help-localization-btn" class="button">Help</button>
+
+                    </div>
+                </div>
+                -->
+                <div class="clear"></div>
+                <div class="buttons">
+                    <button id="save-localization-btn" class="button">Save</button>
+                    <button id="delete-localization-btn" class="button">Delete</button>
+                    <button id="close-localization-dialog-btn" class="button">Cancel</button>
+
+
+                </div>
+            </g:form>
+        </div>
 	</div>
 
 	<!-- YUI "footer" block that includes footer information -->
@@ -307,7 +239,10 @@
 	<script src="${createLinkTo(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>	
+	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
+	<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
+		
 	
     <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> 
     	<!--headless driver throw error when using watermark-->
@@ -320,77 +255,158 @@
 	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
 	
 	<script type="text/javascript">
-		$(function() { 		
-						
-			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
-			$("#localization-dialog").dialog({ autoOpen: false, modal: true, width: '1000px' });	
 
-			
-			/*
-			$(".open-dialog").click(function() { 
-				var id = $(this).attr("id");
-				$("#dialog-" + id).dialog('open');
-			});
-			$(".close-dialog").click(function() { 
-				var id = $(this).attr("id");
-				$("#dialog-" + id).dialog('close');
-			});
-			*/
-			
-			<g:if test="${session.useDebugLocale}">			
-				$(".show-localization-dialog").click(function(event) { 
+        // Define the localization
+        if(typeof openboxes === "undefined") openboxes = {};
+        if(typeof openboxes.localization === "undefined") openboxes.localization = {};
+        openboxes.localization.Localization = function(data) {
+            console.log(data);
+            var self = this;
+            if(!data) data = {};
+            self.id = ko.observable(data.id);
+            self.code = ko.observable(data.code);
+            self.locale = ko.observable(data.locale);
+            self.text = ko.observable(data.text);
+            self.translation = ko.observable(data.translation);
+            //self.deleteUrl = ko.observable("${request.contextPath}/json/deleteLocalization?id=" + data.id);
+            //self.resolvedText = ko.observablae(data.resolvedText);
+            //self.lastUpdated = ko.observable(data.lastUpdated);
+            //self.version = ko.observable(data.version);
+        };
+
+
+
+		$(function() {
+
+            // Instantiate megamenu
+            $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
+
+            <g:if test="${session.useDebugLocale}">
+                // Initialize the localization dialog
+                $("#localization-dialog").dialog({ autoOpen: false, modal: true, width: '500px' });
+
+                // Instantiate a new localization object to be used
+                var data = { id:"", code: "", text: "", translation: "" };
+                var viewModel = new openboxes.localization.Localization(data);
+                ko.applyBindings(viewModel);
+
+                // Delete localization event handler
+                $("#delete-localization-btn").click(function() {
+                    event.preventDefault();
+                    console.log("delete localization");
+                    console.log($(this));
+                    console.log($(event));
+                    console.log(viewModel.id());
+                    if (viewModel.id() == undefined) {
+                        alert("This translation is not currently saved to the database so it cannot be deleted.");
+                    }
+                    else {
+                        $.ajax({
+                            url: "${request.contextPath}/json/deleteLocalization",
+                            type: "get",
+                            contentType: 'text/json',
+                            dataType: "json",
+                            data: {id: viewModel.id() },
+                            success: function(data) {
+                                alert("You have successfully deleted this localization.");
+                                location.reload();
+                            },
+                            error: function(data) {
+                                alert("An error occurred while deleting this translation.");
+                            }
+                        });
+                    }
+
+                });
+
+                // Close dialog event handler
+                $("#close-localization-dialog-btn").click(function() {
+                    event.preventDefault();
+                    $("#localization-dialog").dialog("close");
+                });
+
+                // Help event handler
+                $("#help-localization-btn").click(function() {
+                    event.preventDefault();
+                    $.ajax({
+                        url: "${request.contextPath}/json/getTranslation",
+                        type: "get",
+                        contentType: 'text/json',
+                        dataType: "json",
+                        data: {text: viewModel.text, src: "en", dest: "fr"},
+                        success: function(data) {
+                            //alert("success: " + data);
+                            console.log(data);
+                            viewModel.translation = data;
+                            //ko.applyBindings(viewModel);
+                        },
+                        error: function(data) {
+                            //console.log(data);
+                            //alert("error");
+                            viewModel.translation = "Error. Try again.";
+                            //ko.applyBindings(viewModel);
+                        }
+                    });
+                });
+
+                // Save event handler
+                $("#save-localization-btn").click(function() {
+                    event.preventDefault();
+                    var jsonData = ko.toJSON(viewModel);
+                    console.log("save localization");
+                    console.log(jsonData);
+
+                    $.ajax({
+                        url: "${request.contextPath}/json/saveLocalization",
+                        type: "post",
+                        contentType: 'text/json',
+                        dataType: "json",
+                        data: jsonData,
+                        success: function(data) {
+                            //alert("success");
+                            $("#localization-dialog").dialog("close");
+                            location.reload();
+                        },
+                        error: function(data) {
+                            //alert("fail");
+                            $("#localization-dialog").dialog("close");
+                            location.reload();
+                        }
+                    });
+                });
+
+                // Open dialog event handler
+                $(".open-localization-dialog").click(function() {
 					var id = $(this).attr("data-id");
-					var message = $(this).attr("data-message");				
-					var resolvedMessage = $(this).attr("data-resolved-message");				
-					var code = $(this).attr("data-code");				
-					var localized = $(this).attr("data-localized");				
-					var args = $(this).attr("data-args");		
-					var locale = $(this).attr("data-locale");				
-					var argsArray = args.split(",");
-					$("#id").val(id);
-					$("#show-id").text(id);
-					$("#code").val(code);
-					$("#message").val(message);
-					$("#resolved-message").text(resolvedMessage);
-					$("#localized").text(localized);
-					$("#locale").val(locale);
-					$("#show-code").text(code);					
-					$("#show-args").text(args);
-					$("#show-locale").val(locale);
+					var code = $(this).attr("data-code");
+                    var resolvedMessage = $(this).attr("data-resolved-message");
+                    console.log("Get localization");
+                    console.log(id);
+                    console.log(code);
+					var url = "${request.contextPath}/json/getLocalization"
+					$.getJSON( url, { id: id, code: code, resolvedMessage: resolvedMessage },
+						function (data, status, jqxhr) {
+                            console.log("getJSON response: ");
+							console.log(data);
+                            viewModel.id(data.id);
+                            viewModel.code(data.code);
+							viewModel.text(data.text);
+                            viewModel.locale(data.locale);
+                            viewModel.translation(data.translation);
+						}
+					);
+
 					$("#localization-dialog").dialog('open');
 					event.preventDefault();
 				});
 			</g:if>
-
-			<%-- Automatic status message updater because it's not an ideal solution and isn't currently used 
-			<g:if test="${new Boolean(grailsApplication.config.grails.statusUpdate.enabled?:'true') }">
-				<g:if test="${session.user && session.warehouse}">
-				
-					// Creates an AJAX update thread that calls back to the server to see if there are any alerts 
-					// or status updates that need to be broadcast to all users
-					var handler = $.PeriodicalUpdater('${request.contextPath}/dashboard/status', 
-						{ 
-							method: 'get', // method; get or post 
-							data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
-							minTimeout: 5000, // starting value for the timeout in milliseconds 
-							maxTimeout: 60000, // maximum length of time between requests 
-							multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
-							type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
-							maxCalls: 10, // maximum number of calls. 0 = no limit. 
-							autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
-						}, 
-						function(remoteData, success, xhr, handle) { 
-							if (remoteData != '') {
-								for (var i = 0; i < remoteData.length; i++) {
-									$('#status').text(remoteData[i].comment);
-								}	
-								$('#status').addClass("notice");						
-							}
-						}
-					);
-				</g:if>
-			</g:if>
-			--%> 
+			/*
+			$.each( $(".localization"), function( key, value ) {
+  				console.log( key + ": " + value );
+  				//$(this).hide();
+  				$(this).appendTo("#localizations");
+			});
+			*/
 			
 			$(".warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
@@ -459,20 +475,6 @@
 		</g:each>
     </script>    
     
-    <%-- Disable feedback widget if grails.feedback.enabled is set to false --%>   
     
-	<%-- 
-    <g:if test="${new Boolean(grailsApplication.config.grails.feedback.enabled?:'true') }">
-		<script type="text/javascript">
-		  var uvOptions = {};
-		  (function() {
-            $.fn.watermark = $.fn.watermark || function(text,options){} //for headless driver stub the problematic watermark
-		    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-		    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/gMxKSy5iKCBPkbBzs8Q.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-		  })();
-		</script>    
-	</g:if>
-	--%>
 </body>
 </html>

@@ -10,18 +10,26 @@
 package org.pih.warehouse.core
 
 import java.util.Date;
+import java.util.Map;
 
 class Localization implements Serializable {
 	
 	String id
 	String code
 	String locale
-	String text	
-	
+	String text
+
+
+    // Transient fields
+	String translation
+    Map translations
+
 	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
-	
+
+    static transients = ['translation', 'translations']
+
 	static mapping = {
 		id generator: 'uuid'
 	}
@@ -32,4 +40,19 @@ class Localization implements Serializable {
 		locale(nullable:true)
 		text(nullable:true)
 	}
+	
+	
+	Map toJson(){
+		[
+		  id: id,
+		  version: version,
+		  code: code,
+		  locale: locale,
+		  text: text,
+          translation: translation,
+          translations: translations,
+		  lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
+		  dateCreated: dateCreated?.format("dd/MMM/yyyy hh:mm a")
+		]
+	}	
 }

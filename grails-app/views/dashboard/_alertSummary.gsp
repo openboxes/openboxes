@@ -13,7 +13,7 @@
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiredStock">
-								Items that have expired
+                                <warehouse:message code="inventory.listExpiredStock.label" default="Items that have expired"/>
 							</g:link>
 						</td>
 						<td class="right">
@@ -29,7 +29,7 @@
 						</td>
 						<td>
 							<g:link controller="inventory" action="listLowStock">
-								Items that have stocked out
+                                <warehouse:message code="inventory.listLowStock.label" default="Items that have stocked out"/>
 							</g:link>
 						</td>
 						<td class="right">
@@ -43,8 +43,7 @@
 							<img src="${createLinkTo(dir:'images/icons/silk/reload.png')}" class="middle"/>
 						</td>
 						<td>
-							
-								Items that are below reorder level
+                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
 							<g:link controller="inventory" action="listReorderStock"></g:link>
 						</td>
 						<td class="right">

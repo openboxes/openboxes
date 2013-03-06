@@ -29,32 +29,38 @@ class MessageTagLib {
 		//}
 		
 		// Checks the database to see if there's a localization property for the given code
-		if (session.user) { 
-			def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString()) 
-			if (localization) { 
+		if (session.user) {
+
+			def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
+			if (localization) {
+                println "Querying database for translation " + attrs.code + " " + session?.user?.locale
 				//println "Arguments: " + attrs?.args + ":" + attrs?.args?.class
-				def message = localization.text 
-				if (attrs?.args) { 
+				def message = localization.text
+
+                // If there are arguments, we need to get the
+				if (attrs?.args) {
 					//message = MessageFormat.format(localization.text, attrs.args.toArray())
-					message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
+					message = messageSource.getMessage(attrs.code, null, attrs.default, session?.user?.locale)
 				}
 				
 				if (session.useDebugLocale) { 
 					//flash.localizations << ['code':attrs.code, 'text':localization.text]
-					def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
-					out << """<span style="border: 3px solid lightgrey; padding: 2px;">
-									<img class='show-localization-dialog' 
-										data-id="${localization.id}"
-										data-code="${localization.code}" 
-										data-locale="${localization.locale}" 
-										data-message="${message}" 
-										data-resolved-message="${resolvedMessage}" 
-										data-message="${localization.text}" 
-										data-args="${attrs.args}" 
-										data-localized="" 
-										src="${createLinkTo(dir:'images/icons/silk',file: 'database.png')}" title=""/>
-									${localization.code}
-							</span>
+                    //attrs.message = localization.text
+                    def resolvedMessage = MessageFormat.format(localization.text, attrs?.args?.toArray())
+					//def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
+					out << """
+								${resolvedMessage}
+								<img class='open-localization-dialog'
+									data-id="${localization.id}"
+									data-code="${localization.code}" 
+									data-locale="${localization.locale}" 
+									data-message="${message}" 
+									data-resolved-message="${resolvedMessage}" 
+									data-message="${localization.text}" 
+									data-args="${attrs.args}" 
+									data-localized="" 
+									src="${createLinkTo(dir:'images/icons/silk',file: 'database.png')}"/>
+							
 							"""
 					return;
 				}
@@ -81,7 +87,7 @@ class MessageTagLib {
 			def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 			attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
 			
-			def image = (!hasOthers)?'error':'accept';
+			def image = (!hasOthers)?'decline':'accept';
 			// Has not been localized
 			/*
 			out << """<span class='localized-string'> 
@@ -91,23 +97,21 @@ class MessageTagLib {
 					<div id="${attrs.code}">test</div>
 				"""
 			*/
-			println "Arguments " + attrs.args
+		
 			//def messageSource = grailsAttributes.applicationContext.messageSource
 			message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
 			def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
 			//flash.localizations << ['code':attrs.code, 'text':message]
 			out << """
-					<span style="border: 3px solid lightgrey; padding: 2px;">
-						<img class='show-localization-dialog' 
-							data-code="${attrs.code}" 
-							data-locale="${attrs.locale}" 
-							data-args="${attrs?.args?.join(',')}" 
-							data-resolved-message="${resolvedMessage}" 
-							data-message="${message}" 
-							data-localized="${localized}" 
-							src="${createLinkTo(dir:'images/icons/silk',file: image + '.png')}" title="${localized}"/>
-						${attrs.code}
-					</span>
+					${resolvedMessage}
+					<img class='open-localization-dialog'
+						data-code="${attrs.code}" 
+						data-locale="${attrs.locale}" 
+						data-args="${attrs?.args?.join(',')}" 
+						data-resolved-message="${resolvedMessage}" 
+						data-message="${message}" 
+						data-localized="${localized}" 
+						src="${createLinkTo(dir:'images/icons/silk',file: image + '.png')}" title="${localized}"/>
 					
 				"""
 			

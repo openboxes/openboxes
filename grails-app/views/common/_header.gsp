@@ -25,9 +25,11 @@
 					    <g:if test="${session.user}">
 					    	<g:if test="${session?.warehouse}">
 								<li>
-									
 									<g:link class="middle" controller="user" action="show" id="${session.user.id}">
-										<span class="middle">Welcome,</span> <span class="middle">${session?.user?.name}</span> 
+                                        <span class="middle">
+                                            <warehouse:message code="header.welcome.label" default="Welcome"/>,
+                                        </span>
+                                        <span class="middle">${session?.user?.name}</span>
 									</g:link>
 								</li>
 								<li>
@@ -35,8 +37,7 @@
 								</li>
 								<li>
 									<a href="javascript:void(0);" class="warehouse-switch middle">
-										
-										<span class="middle">${session?.warehouse?.name }</span>										
+										<span class="middle">${session?.warehouse?.name }</span>
 									</a>
 								</li>
 								

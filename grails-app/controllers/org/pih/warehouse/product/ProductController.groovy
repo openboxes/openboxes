@@ -55,7 +55,7 @@ class ProductController {
 	 * Perform a bulk update of 
 	 */
 	def batchEdit = { BatchEditCommand cmd ->
-
+		def startTime = System.currentTimeMillis()
 		def location = Location.get(session.warehouse.id)
 
 		log.info "Batch edit: " + params
@@ -77,6 +77,8 @@ class ProductController {
 		}
 		cmd.rootCategory = productService.getRootCategory();
 
+		println "edit product: " + (System.currentTimeMillis - startTime) + " ms"
+		
 		[ commandInstance : cmd, categoryInstance: categoryInstance ]
 	}
 

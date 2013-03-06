@@ -253,13 +253,19 @@ class DashboardController {
 		def incomingRequests = Requisition.findAllByDestination(session?.warehouse).groupBy{it.status}.sort()
 		def outgoingRequests = Requisition.findAllByOrigin(session?.warehouse).groupBy{it.status}.sort()
 		
+		def categories = []
+
+		def category = productService.getRootCategory()		
+		categories = category.categories
+		/*
 		def c = Product.createCriteria()
 		def categories = c.list { 
 			projections { 
 				distinct 'category'
 			}
 		}
-		
+		*/
+		println categories
 		categories = categories.groupBy { it?.parentCategory } 
 		[
 			categories: categories,

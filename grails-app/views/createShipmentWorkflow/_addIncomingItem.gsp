@@ -5,8 +5,8 @@
 			<table>
 				<tbody>
 					<tr>
-						<td>
-							<g:textField name="productSearch" class="text autocomplete" style="width: 550px" autocomplete="off"/>
+						<td class="center">
+							<g:textField name="productSearch" class="text autocomplete" style="width: 600px" autocomplete="off"/>
 						</td>
 					</tr>
 				</tbody>
@@ -21,11 +21,18 @@
 
                 </th>
                 <th>
-                    <warehouse:message code="category.label"/>
+                    <warehouse:message code="product.productCode.label"/>
                 </th>
                 <th>
                     <warehouse:message code="product.label"/>
                 </th>
+                <th>
+                    <warehouse:message code="product.manufacturer.label"/>
+                </th>
+                <th>
+                    <warehouse:message code="category.label"/>
+                </th>
+
             </tr>
             </thead>
             <tbody>
@@ -78,7 +85,8 @@
 						<td valign="top" class="value">
 							<g:jqueryDatePicker id="expirationDate" name="expirationDate" 
 								value="${item?.expirationDate }" 
-								format="MM/dd/yyyy" 
+								format="MM/dd/yyyy"
+                                size="15"
 								readOnly="true"
 								cssClass="text"/>
 						</td>
@@ -88,7 +96,8 @@
 							<label><warehouse:message code="default.quantity.label" /></label>
 						</td>                            
 						<td valign="top" class="value">
-							<g:textField name="quantity" value="${item?.quantity }" size="5" class="text" /> 
+							<g:textField name="quantity" value="${item?.quantity }" size="10" class="text" />
+                            ${item?.product?.unitOfMeasure}
 						</td>
 					</tr>  	        
 					<tr class="prop">
@@ -136,17 +145,19 @@
 	function rowBuilder(rowdata) {
 	    return "<tr id='" + rowdata.value + "'>" + 
 		    	"<td class='center'><button class=\"choose\">Choose</button></td>" +
-		    	"<td class='category'>" + rowdata.category.name + "</td>" +
-		    	"<td class='label'>" + rowdata.label + "</td>" +
-	    	"</tr>";
+		    	"<td class='productCode'>" + rowdata.product.productCode + "</td>" +
+                "<td class='productName'>" + rowdata.product.name + "</td>" +
+                "<td class='manufacturer'>" + rowdata.product.manufacturer + "</td>" +
+                "<td class='category'>" + rowdata.category.name + "</td>" +
+                "</tr>";
 	}
 
 	$(document).ready(function() {
 		$("#dlgAddIncomingItem").dialog({ 
 			autoOpen: true, 
 			modal: true, 
-			width: 600,
-			height: 300
+			width: 800,
+			height: 500
 		});	
 
 		$("#searchItemForm input.autocomplete").keyup(function(event, ui) {
@@ -182,7 +193,8 @@
 		$("button.choose").live('click', function(event) {
 			var row = $(this).closest("tr");
 			$("#hiddenProduct").val(row.attr('id'));
-			var displayProduct = "<span class='fade'>" + row.find('.category').text() + " &rsaquo;</span> " + row.find('.label').text()
+			var displayProduct = "<span class='fade'>" + row.find('.productCode').text() + "</span> "
+                    + row.find('.productName').text();
 			$("#displayProduct").html(displayProduct);
 			$("#searchItemForm").toggle();
 			$("#editItemForm").toggle();

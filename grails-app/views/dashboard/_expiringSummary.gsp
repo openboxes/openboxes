@@ -13,7 +13,8 @@
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:30]">
-								Items that will expire within 30 days
+                                <warehouse:message code="inventory.listExpiringStock.label" args="[30]" default="Items that will expire within {0} days"/>
+
 							</g:link>
 						</td>
 						<td class="right">
@@ -26,7 +27,7 @@
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:90]">
-								Items that will expire within 90 days
+                                <warehouse:message code="inventory.listExpiringStock.label" args="[90]" default="Items that will expire within {0} days"/>
 							</g:link>
 						</td>
 						<td class="right">
@@ -40,7 +41,7 @@
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:180]">
-								Items that will expire within 180 days
+                                <warehouse:message code="inventory.listExpiringStock.label" args="[180]" default="Items that will expire within {0} days"/>
 							</g:link>
 						</td>
 						<td class="right">

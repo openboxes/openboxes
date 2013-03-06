@@ -32,7 +32,7 @@
 	                                  <label for="code"><warehouse:message code="localization.code.label" default="Code" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: localizationInstance, field: 'code', 'errors')}">
-	                                    <g:textField name="code" value="${localizationInstance?.code}" />
+	                                    <g:textField name="code" value="${localizationInstance?.code}" class="text" size="80" />
 	                                </td>
 	                            </tr>
 	                        
@@ -41,7 +41,7 @@
 	                                  <label for="locale"><warehouse:message code="localization.locale.label" default="Locale" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: localizationInstance, field: 'locale', 'errors')}">
-	                                    <g:textField name="locale" value="${localizationInstance?.locale}" />
+	                                    <g:textField name="locale" value="${localizationInstance?.locale}" class="text" size="80" />
 	                                </td>
 	                            </tr>
 	                        
@@ -50,7 +50,7 @@
 	                                  <label for="text"><warehouse:message code="localization.text.label" default="Text" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: localizationInstance, field: 'text', 'errors')}">
-	                                    <g:textField name="text" value="${localizationInstance?.text}" />
+	                                    <g:textField name="text" value="${localizationInstance?.text}" class="text" size="80" />
 	                                </td>
 	                            </tr>
 	                        

@@ -9,10 +9,13 @@
 **/ 
 package org.pih.warehouse
 
+import org.pih.warehouse.core.ApiException
+
 import java.text.SimpleDateFormat;
 
 import grails.converters.*;
 import org.pih.warehouse.core.Constants;
+import org.pih.warehouse.core.Localization;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.inventory.Inventory;
@@ -31,7 +34,131 @@ class JsonController {
 	def productService
 	def localizationService	
 	def shipmentService
-	
+	def messageSource
+
+
+    def getTranslation = {
+        def translation = getTranslation(params.text, params.src, params.dest)
+        def json = [translation]
+        render json as JSON
+    }
+
+    def getTranslation(String text, String source, String destination) {
+        def translation = ""
+        text = text.encodeAsURL()
+        def email = "jmiranda@pih.org"
+        def password = "pa55w0rd"
+        String urlString = "http://www.syslang.com/frengly/controller?action=translateREST&src=${source.encodeAsHTML()}&dest=${destination}&text=${text.encodeAsHTML()}&email=${email}&password=${password}"
+        try {
+            println "Before " + urlString
+            def url = new URL(urlString)
+            def connection = url.openConnection()
+            println "content type; " + connection.contentType
+            if(connection.responseCode == 200){
+                def xml = connection.content.text
+                println "XML: " + xml
+                def root = new XmlParser(false, true).parseText(xml)
+                translation = root.translation.text()
+            }
+            else {
+                println "connection " + connection.responseCode
+
+            }
+        } catch (Exception e) {
+            log.error("Error trying to translate using syslang API ", e);
+            throw new ApiException(message: "Unable to query syslang API: " + e.message)
+        }
+        return translation
+    }
+
+	def getLocalization = { 
+		log.info "get localization " + params
+		def localization = Localization.get(params.id)
+		// Get the localization from the database
+		// Create a new localization based on the message source
+
+		if (!localization) {
+            localization = new Localization();
+
+            // Get translation from message source
+			def message = messageSource.getMessage(params.code, null, params.resolvedMessage, session?.user?.locale?:"en")
+		    println "get translation for code " + params.code + ", " + session?.user?.locale + " = " + message
+
+            //localization.translation = getTranslation(message, "en", "fr")
+			localization.code = params.code
+			localization.text = message
+
+			//localization.args = []
+			localization.locale = session.user.locale
+		}
+
+        // If the translation message is empty, set it equal to the same as the localization text
+        if (!localization.translation)
+            localization.translation = localization.text
+
+        println "localization.toJson() = " + (localization.toJson() as JSON)
+
+
+		render localization.toJson() as JSON;
+	}
+
+	def saveLocalization = { 
+		log.info "Save localization " + params
+		def data = request.JSON
+		log.info "Data " + data
+		log.info "ID: " + data.id
+		def locale = session?.user?.locale
+		def localization = Localization.get(data?.id?.toString())
+        println "found localization " + localization
+		if (!localization) {
+            println "Nope.  Looking by code and locale"
+			localization = Localization.findByCodeAndLocale(data.code, locale?.toString())
+		    if (!localization) {
+                println "Nope. Creating empty localization "
+			    localization = new Localization();
+		    }
+        }
+		
+		//localization.properties = data
+		localization.text = data.translation
+		localization.code = data.code
+		localization.locale = locale
+
+        println localization.id
+		println localization.code
+		println localization.text
+		println localization.locale
+		def jsonResponse = []
+
+        // Attempt to save localization
+		if (!localization.hasErrors() && localization.save()) {
+			jsonResponse = [success: true, data: localization.toJson()]
+		}
+		else {
+			jsonResponse = [success: false, errors: localization.errors]
+		}	
+		log.info(jsonResponse as JSON)
+		render jsonResponse as JSON
+		//def localization = new Localization(params)
+		return true
+	}
+
+    def deleteLocalization = {
+        log.info "get localization " + params
+        // Get the localization from the database
+        def jsonResponse = []
+        def localization = Localization.get(params.id)
+        try {
+            if (localization) {
+                localization.delete();
+                jsonResponse = [success: true, message: "successfully deleted translation"]
+            }
+        } catch (Exception e) {
+            jsonResponse = [success: false, message: e.message]
+        }
+        render jsonResponse as JSON
+    }
+
 	
 	def getQuantityToReceive = {
 		def product = Product.get(params?.product?.id)
@@ -383,9 +510,15 @@ class JsonController {
 		
 		if (params.term) {			
 			// Match full name
-			products = Product.withCriteria { 
-				ilike("name", "%" + params.term + "%")
-			}
+
+            products = Product.withCriteria {
+                ilike("productCode", params.term + "%")
+            }
+            if (!products) {
+                products = Product.withCriteria {
+                    ilike("name", "%" + params.term + "%")
+                }
+            }
 		}
 		
 		def location = Location.get(params.warehouseId);
@@ -405,7 +538,7 @@ class JsonController {
 		// Convert from products to json objects 
 		if (products) {
 			// Make sure items are unique
-			products.unique();
+			//products.unique();
 			products = products.collect() { product ->
 				def productQuantity = 0;
 				// We need to check to make sure this is a valid product
@@ -441,6 +574,7 @@ class JsonController {
 					product: product,
 					category: product?.category,
 					quantity: productQuantity,
+                    productCode: product?.productCode,
 					value: product.id,
 					label: localizedName,
 					valueText: localizedName,

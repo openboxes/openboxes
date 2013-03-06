@@ -18,14 +18,25 @@
 				params: ['locale':locale,'targetUri':targetUri])}">
 				<!-- fetch the display for locale based on the current locale -->
 				${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
-			</a> &nbsp;
+			</a>
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_BROWSER]">
+			&nbsp;&nbsp; | &nbsp;&nbsp;
 			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', 
 				params: ['locale':'debug','targetUri':targetUri])}">
-				(<warehouse:message code="admin.debug.label"/>)
+				<warehouse:message code="admin.debug.label"/>:
 			</a>
+			${session.useDebugLocale?"on":"off" }
+			
+			(<g:if test="${session.useDebugLocale }">
+				<g:link controller="user" action="disableDebugMode">disable</g:link>
+			</g:if>
+			<g:else>
+				<g:link controller="user" action="enableDebugMode">enable</g:link>
+			
+			</g:else>)
 		</g:isUserInRole>		
+		
 		<%-- 
 		&nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="default.layout.label"/>: &nbsp; 

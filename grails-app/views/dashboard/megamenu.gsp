@@ -8,23 +8,7 @@
 			</g:link>
 			<div>
 				<div class="buttonsBar" style="min-width: 200px;">
-					<div style="float:left">
-						<div class="megaButton">
-							<g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">
-								<label><warehouse:message code="inventory.browseAllProducts.label"/></label>
-							</g:link>
-						</div>		
-						<g:if test="${session.productsViewed }" >
-							<g:each var="product" in="${session?.productsViewed?.values() }">
-								<div class="megaButton">
-									<g:link controller="inventoryItem" action="showStockCard" id="${product.id }" class="product">
-										<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
-										${product.name }
-									</g:link>					
-								</div>
-							</g:each>
-						</g:if>
-					</div>
+					
 					<div style="float:left">
 						<div class="megaButton">
 							<g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">
@@ -35,7 +19,7 @@
 							<g:if test='${quickCategories }'>
 								<g:each var="category" in="${quickCategories}">
 									<div class="megaButton">
-										<g:link class="outline" controller="inventory" action="browse" params="[categoryId:category.id,resetSearch:true]">
+										<g:link class="outline" controller="inventory" action="browse" params="[subcategoryId:category.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
 											<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 											<format:category category="${category}"/> (${category?.products?.size() })
 										</g:link>
@@ -43,7 +27,7 @@
 									<g:if test="${category.categories}">
 										<g:each var="childCategory" in="${category.categories}">
 											<div class="megaButton">
-												<g:link class="indent" controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
+												<g:link class="indent" controller="inventory" action="browse" params="[subcategoryId:childCategory.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
 													<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 													<format:category category="${childCategory}"/> (${childCategory?.products?.size() })
 												</g:link>
@@ -54,15 +38,10 @@
 							</g:if>	
 							<g:elseif test='${categories }'>
 								<g:each var="entry" in="${categories}">
-									<div class="megaButton">
-										<g:link class="outline" controller="inventory" action="browse" params="[categoryId:entry.key.id,resetSearch:true]">
-											<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
-											${entry.key } (${entry?.key?.products?.size() }) 
-										</g:link>
-									</div>
+									
 									<g:each var="category" in="${entry.value }">
 										<div class="megaButton">
-											<g:link class="indent" controller="inventory" action="browse" params="[categoryId:category.id,resetSearch:true]">
+											<g:link class="indent" controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
 												<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 												${category } (${category.products.size() })
 											</g:link>
@@ -72,7 +51,7 @@
 							</g:elseif>	
 						</div>	
 					</div>
-					<div style="float: left">
+					<div style="float: left; padding: 10px">
 						<div class="megaButton">
 							<g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">
 								<label><warehouse:message code="inventory.browseByTag.label"/></label>
@@ -90,6 +69,8 @@
 							</g:if>
 						</div>	
 					</div>				
+					
+					
 					<div class="clear"></div>		
 				</div>			
 			</div>				
@@ -340,6 +321,19 @@
 					<div class="megaButton">									
 						<g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
 					</div>
+					
+					<g:if test="${session.productsViewed }">
+						<div>
+							<g:each var="product" in="${session?.productsViewed?.values() }">
+								<div class="megaButton">
+									<g:link controller="inventoryItem" action="showStockCard" id="${product.id }" class="product">
+										<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
+										${product.name }
+									</g:link>					
+								</div>
+							</g:each>
+						</div>
+					</g:if>					
 					<div class="megaButton">									
 						<g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
 					</div>
