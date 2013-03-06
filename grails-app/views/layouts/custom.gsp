@@ -158,7 +158,6 @@
             <g:form controller="localization" action="save">
                 <style>
                     #localization-dialog label { display: block; }
-                    #localization-dialog div { padding: 20px; margin: 10px; }
                 </style>
                 <div style="float: left;">
                     <div data-bind="if: id">
