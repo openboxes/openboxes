@@ -8,6 +8,7 @@
 					<g:link action="tree" id="${category?.id }"><format:category category="${category}"/></g:link>
 					
 					<span style="float: right">
+                        <g:link action="tree" id="${category?.id }"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png') }"/></g:link>
 						<g:link action="deleteCategory" id="${category?.id }"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png') }"/></g:link>	
 					</span>
 				</p>
@@ -27,9 +28,10 @@
 			<li id="${category?.id }" class="category-tree-item draggable droppable">
 				<p>
 					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
-					<g:link action="tree" id="${category?.id }"><format:category category="${category}"/></g:link>					
+					<g:link action="tree" id="${category?.id }"><format:category category="${category}"/></g:link>
 					<span style="float: right">
-						<g:link action="deleteCategory" id="${category?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png') }"/></g:link>			
+                        <g:link action="tree" id="${category?.id }"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png') }"/></g:link>
+						<g:link action="deleteCategory" id="${category?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png') }"/></g:link>
 					</span>
 				</p>
 			</li>
