@@ -46,8 +46,8 @@ class JsonController {
     def getTranslation(String text, String source, String destination) {
         def translation = ""
         text = text.encodeAsURL()
-        def email = "jmiranda@pih.org"
-        def password = "pa55w0rd"
+        def email = "openboxes@pih.org"
+        def password = "0p3nb0x3s"
         String urlString = "http://www.syslang.com/frengly/controller?action=translateREST&src=${source.encodeAsHTML()}&dest=${destination}&text=${text.encodeAsHTML()}&email=${email}&password=${password}"
         try {
             println "Before " + urlString
@@ -84,7 +84,7 @@ class JsonController {
 			def message = messageSource.getMessage(params.code, null, params.resolvedMessage, session?.user?.locale?:"en")
 		    println "get translation for code " + params.code + ", " + session?.user?.locale + " = " + message
 
-            //localization.translation = getTranslation(message, "en", "fr")
+            localization.translation = getTranslation(message, "en", session?.user?.locale?:"en")
 			localization.code = params.code
 			localization.text = message
 
