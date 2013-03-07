@@ -37,7 +37,7 @@ openboxes.requisition.PicklistItem = function(attrs){
 
 };
 openboxes.requisition.Requisition = function(attrs) {
-	
+	console.log("initialize requisition");
 	console.log(attrs);
     var self = this;
     if(!attrs) attrs = {};
