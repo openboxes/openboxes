@@ -265,7 +265,6 @@ class DashboardController {
 			}
 		}
 		*/
-		println categories
 		categories = categories.groupBy { it?.parentCategory } 
 		[
 			categories: categories,

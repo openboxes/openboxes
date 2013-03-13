@@ -970,7 +970,7 @@ span.right { float: left; }
 span.left { width: 10%;  float: left; text-align: center; } 
 #wizard { }
 
-.actions { cursor: pointer; position: absolute; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 0px; display: none; } 
+.actions { cursor: pointer; position: absolute; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 0px; display: none; min-width: 200px; }
 .action-menu { cursor: pointer; } 
 .action-menu { padding: 0; }
 .action-menu-root { margin: 0px; } 

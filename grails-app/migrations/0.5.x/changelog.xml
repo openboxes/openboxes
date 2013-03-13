@@ -32,5 +32,8 @@
     <include file="0.5.x/add-column-requisition-published-and-template.xml"/>
     <include file="0.5.x/add-column-category-is-root.xml"/>
     <include file="0.5.x/add-column-requisition-item-parent-requisition-item.xml"/>
-    
+    <include file="0.5.x/add-unique-constraint-product-code.xml"/>
+    <!--
+    <include file="0.5.x/add-column-requisition-item-product-package.xml"/>
+    -->
 </databaseChangeLog>

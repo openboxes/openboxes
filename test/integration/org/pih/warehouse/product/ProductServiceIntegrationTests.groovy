@@ -1,6 +1,7 @@
 package org.pih.warehouse.product
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringUtils
+import org.junit.Test;
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -23,12 +24,12 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	def product6;
 	def group1;
 	def group2;
+
+    /**
+     *
+     */
 	protected void setUp(){
-		product1 = DbHelper.createProductWithGroups("boo floweree 250mg",[
-			"Hoo moodiccina",
-			"Boo floweree"
-		])
-		
+		product1 = DbHelper.createProductWithGroups("boo floweree 250mg",["Hoo moodiccina", "Boo floweree"])
 		product2 = DbHelper.createProductWithGroups("boo pill",["Boo floweree"])
 		product3 = DbHelper.createProductWithGroups("foo",["Hoo moodiccina"])
 		product4 = DbHelper.createProductWithGroups("abc tellon",["Hoo moodiccina"])
@@ -36,14 +37,32 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		product6 = DbHelper.createProductWithGroups("buhoo floweree root",[])
 		group1 = ProductGroup.findByDescription("Hoo moodiccina")
 		group2 = ProductGroup.findByDescription("Boo floweree")
-		
+
+        // Create new root category if it doesn't exist
+        def rootCategory = Category.findByName("ROOT")
 		def category = DbHelper.createCategoryIfNotExists("ROOT")
+        println rootCategory
+        println category
+        assertEquals rootCategory, category
 		category.isRoot = true;
 		category.save(flush:true)
+        assertTrue !category.hasErrors()
+
+        // Create products with tags
 		DbHelper.createProductWithTags("Ibuprofen 200mg tablet", ["nsaid","pain","favorite"])
 		DbHelper.createProductWithTags("Acetaminophen 325mg tablet", ["pain","pain reliever"])
 		DbHelper.createProductWithTags("Naproxen 220mg tablet", ["pain reliever","pain","nsaid","fever reducer"])
-		DbHelper.createTag("tagwithnoproducts")	
+
+        // Create a tag without products
+		DbHelper.createTag("tagwithnoproducts")
+
+        // Create a product with a unique product code
+        def product7 = DbHelper.createProductIfNotExists("Test Product")
+        product7.productCode = "AB13"
+        product7.save(flush: true)
+        assertNotNull product7
+        assertTrue !product7.hasErrors()
+
 	}
 
 	/**
@@ -56,14 +75,15 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	String csvize(row, delimiter) { 
 		return "\"" + row.join("\"" + delimiter + "\"") + "\"\n"
 	}
-	
-	
-	void test_csvize() { 
+
+    @Test
+	void csvize() {
 		def row = ["1", "test", "another", "last one"]
 		assertEquals csvize(row), "\"1\",\"test\",\"another\",\"last one\"\n"		
 	}
-	
-	void test_searchProductAndProductGroup_shouldGetAllProductsUnderMachtedGroups(){
+
+    @Test
+	void searchProductAndProductGroup_shouldGetAllProductsUnderMachtedGroups(){
 		def result = productService.searchProductAndProductGroup("floweree")
 		println result
 		
@@ -88,8 +108,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals("Invalid format", message)		
 	}
 	*/
-
-	void test_importProducts_shouldFailWhenProductNameIsMissing() {				
+    @Test
+	void importProducts_shouldFailWhenProductNameIsMissing() {
 		def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row)  			
 
@@ -99,7 +119,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertTrue message.contains("Product name cannot be empty")
 	}
 
-	void test_importProducts_shouldNotUpdateProductsWhenSaveToDatabaseIsFalse() {
+    @Test
+	void importProducts_shouldNotUpdateProductsWhenSaveToDatabaseIsFalse() {
 		def product = DbHelper.createProductIfNotExists("Sudafed");
 		assertNotNull product.id
 		def row1 = ["${product.id}","","Sudafed 2","OTC Medicines","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
@@ -111,7 +132,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals "Medicines", product2.category.name
 	}
 
-	void test_importProducts_shouldCreateNewProductWithNewCategory() {
+    @Test
+	void importProducts_shouldCreateNewProductWithNewCategory() {
 		def category = Category.findByName("category 123")
 		assertNull category
 		def row1 = ["1235","","product 1235","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
@@ -124,7 +146,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertNotNull category
 	}
 
-	void test_importProducts_shouldCreateNewProductWithExistingCategory() { 
+    @Test
+    void importProducts_shouldCreateNewProductWithExistingCategory() {
 		def category = Category.findByName("Medicines")
 		assertNotNull category
 		def row1 = ["1235","","product 1235","Medicines","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
@@ -135,7 +158,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals category, product.category		
 	}
 
-	void test_importProducts_shouldUpdateNameOnExistingProduct() {
+    @Test
+	void importProducts_shouldUpdateNameOnExistingProduct() {
 		def productBefore = DbHelper.createProductIfNotExists("Sudafed");
 		assertNotNull productBefore.id
 		def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
@@ -146,8 +170,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
 		assertEquals "Sudafed 2.0", productAfter.name		
 	}
-	
-	void test_importProducts_shouldUpdateAllFieldsOnExistingProduct() {
+
+    @Test
+	void importProducts_shouldUpdateAllFieldsOnExistingProduct() {
 		def productBefore = DbHelper.createProductIfNotExists("Sudafed");
 		assertNotNull productBefore.id
 		def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
@@ -172,23 +197,25 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals "UPC-1202323", productAfter.upc
 		assertEquals "NDC-122929-39292", productAfter.ndc
 	}
-	
-	void test_getDelimiter_shouldDetectCommaDelimiter() { 		
+
+    @Test
+	void getDelimiter_shouldDetectCommaDelimiter() {
 		def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed description","EA","Acme","Brand X","ACME-249248","Vendor Y","Y-1284","Sudafed","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 		def delimiter = productService.getDelimiter(csv)
 		assertEquals ",", delimiter
 	}
-
-	void test_getDelimiter_shouldDetectTabDelimiter() {		
+    @Test
+	void getDelimiter_shouldDetectTabDelimiter() {
 		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed descrition","each","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, "\t") + csvize(row1, "\t")		
 		def delimiter = productService.getDelimiter(csv)
 		assertEquals "\t", delimiter
 	}
 
-	void test_getDelimiter_shouldDetectSemiColonDelimiter() {
+    @Test
+	void getDelimiter_shouldDetectSemiColonDelimiter() {
 		def row1 = ["","00001","Sudafed 2","Medicines","Sudafed description","each","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, ";") + csvize(row1, ";")
 		def delimiter = productService.getDelimiter(csv)
@@ -248,8 +275,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 	*/
 
-	
-	void test_findOrCreateCategory_shouldReturnExistingCategory() { 
+    @Test
+	void findOrCreateCategory_shouldReturnExistingCategory() {
 		def categoryName = "Medicines"
 		def existingCategory = Category.findByName(categoryName)		
 		assertNotNull existingCategory
@@ -257,7 +284,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals existingCategory, category
 	}
 
-	void test_findOrCreateCategory_shouldCreateNewCategory() {
+    @Test
+	void findOrCreateCategory_shouldCreateNewCategory() {
 		def categoryName = "Nonexistent Category"
 		def nonexistentCategory = Category.findByName(categoryName)
 		assertNull nonexistentCategory
@@ -266,7 +294,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals existingCategory, category
 	}
 
-	void test_findOrCreateCategory_shouldReturnRootCategoryOnRoot() {
+    @Test
+	void findOrCreateCategory_shouldReturnRootCategoryOnRoot() {
 		def categoryName = "ROOT"
 		def category = productService.findOrCreateCategory(categoryName)
 		
@@ -274,15 +303,17 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals category.name, "ROOT"
 	}
 
-	void test_findOrCreateCategory_shouldReturnRootCategoryOnEmpty() {
+    @Test
+	void findOrCreateCategory_shouldReturnRootCategoryOnEmpty() {
 		def categoryName = ""
 		def category = productService.findOrCreateCategory(categoryName)
 		println category
+        assertNotNull category
 		assertEquals category.name, "ROOT"
 	}
 
-	
-	void test_exportProducts_shouldReturnAllProducts() { 
+    @Test
+	void exportProducts_shouldReturnAllProducts() {
 		def csv = productService.exportProducts()		
 		def lines = csv.split("\n")
 		assertNotNull lines
@@ -290,9 +321,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		
 		//'"ID","Product Code","Name","Category","Description","Unit of Measure","Manufacturer","Manufacturer Code","Cold Chain","UPC","NDC","Date Created","Date Updated"'
 	}
-	
-	
-	void test_exportProducts_shouldRenderProductsAsCsv() { 
+
+    @Test
+	void exportProducts_shouldRenderProductsAsCsv() {
 		def csv = productService.exportProducts()
 		
 		println csv
@@ -321,7 +352,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals "Date Updated", columns[17]
 	}
 
-	void test_getExistingProducts() { 
+    @Test
+	void getExistingProducts() {
 		def product1 = DbHelper.createProductIfNotExists("Sudafed");
 		def product2 = DbHelper.createProductIfNotExists("Advil");		
 		assertNotNull product1.id		
@@ -334,8 +366,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals "Sudafed", existingProducts[0].name
 		assertEquals "Advil", existingProducts[1].name		
 	}
-	
-	void test_getExistingProducts_shouldReturnAdvil() {
+
+    @Test
+	void getExistingProducts_shouldReturnAdvil() {
 		def product = DbHelper.createProductIfNotExists("Advil");		
 		assertNotNull product.id
 		def row1 = ["","","Sudafed","Medicines","","","","","false","","","",""]
@@ -345,16 +378,17 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals 1, existingProducts.size()
 		assertEquals "Advil", existingProducts[0].name
 	}
-	
-	
-	void test_getAllTagLabels() { 
+
+    @Test
+	void getAllTagLabels() {
 		def service = new ProductService();
 		def tags = service.getAllTagLabels()
 		println tags
 		assertEquals 6, tags.size()
 	}
-	
-	void test_getPopularTags() { 		
+
+    @Test
+	void getPopularTags() {
 		//def service = new ProductService();
 		
 		def popularTagMap = productService.getPopularTags()
@@ -374,26 +408,107 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals 3, popularTagMap[Tag.findByTag("pain")]
 		assertEquals 2, popularTagMap[Tag.findByTag("pain reliever")]
 		//assertEquals expectedProduct, popularTagMap["favorite"][0]
-		
-		
 	}
-	
-	void test_getTopLevelCategories() {
+
+    @Test
+    void getAllCategories() {
+        def categories = Category.list()
+        assertNotNull categories
+        categories.each {
+            println it.id + ":" + it?.name + ":" + it?.parentCategory?.name
+        }
+    }
+
+
+    @Test
+    void getRootCategory() {
+        def rootCategory = productService.getRootCategory()
+        assertNotNull rootCategory
+        assertEquals rootCategory.name, "ROOT"
+        assertTrue rootCategory.isRoot
+        assertTrue rootCategory.isRootCategory()
+    }
+
+    @Test
+	void getTopLevelCategories() {
 		def topLevelCategories = productService.getTopLevelCategories()
 		println topLevelCategories
 		assertNotNull topLevelCategories		
 		assertEquals 5, topLevelCategories.size()		
-	}		
-	
-	void test_addTagsToProduct() { 
+	}
+
+    @Test
+	void addTagsToProduct_shouldAddTagToProduct() {
 		def product = Product.findByName("Ibuprofen 200mg tablet")
 		assertNotNull product		
 		productService.addTagsToProduct(product, ["awesome", "super"])
 		println product.tags*.tag		
 		assertEquals product.tagsToString(), "awesome,favorite,nsaid,pain,super"		
 	}
-	
-	void test_deleteTag() { 
+
+    @Test
+    void addTagsToProduct_shouldNotAddSameTagMoreThanOnce() {
+        def product = Product.findByName("Ibuprofen 200mg tablet")
+        assertNotNull product
+        productService.addTagsToProduct(product, ["awesome", "super", "awesome"])
+        println product.tags*.tag
+        assertEquals product.tagsToString(), "awesome,favorite,nsaid,pain,super"
+    }
+
+    @Test
+    void addTagsToProducts_shouldAddEachTagToAllProducts() {
+        def products = []
+        def tags = ["newtag1", "newtag2"]
+        def ibuprofen = Product.findByName("Ibuprofen 200mg tablet")
+        def acetaminophen = Product.findByName("Acetaminophen 325mg tablet")
+        products << ibuprofen
+        products << acetaminophen
+
+        productService.addTagsToProducts(products, tags)
+
+        assertNotNull Tag.findByTag("newtag1")
+        assertNotNull Tag.findByTag("newtag2")
+
+        assert ibuprofen.tagsToString().contains("newtag1")
+        assert ibuprofen.tagsToString().contains("newtag2")
+        assert acetaminophen.tagsToString().contains("newtag1")
+        assert acetaminophen.tagsToString().contains("newtag2")
+
+    }
+
+    @Test
+    void addTagsToProducts_shouldNotAddTagMoreThanOnce() {
+        def products = []
+        def tags = ["sametag", "sametag"]
+        def ibuprofen = Product.findByName("Ibuprofen 200mg tablet")
+        def acetaminophen = Product.findByName("Acetaminophen 325mg tablet")
+        products << ibuprofen
+        products << acetaminophen
+
+        productService.addTagsToProducts(products, tags)
+
+        // Check to make sure the tag was created
+        def tag = Tag.findByTag("sametag")
+        assertNotNull tag
+
+        // Should have only created the tag once
+        def sameTags = Tag.findByTag("sametag")
+        assert 1, sameTags.size()
+
+        // Check that both products have one instance of the tag
+        assert ibuprofen.tagsToString().contains("sametag")
+        assert acetaminophen.tagsToString().contains("sametag")
+
+        // Check that the tag has only been added to the products once
+        def occurrences = ibuprofen.tags.findIndexValues { it == tag }
+        assertEquals 1, occurrences.size()
+
+        occurrences = acetaminophen.tags.findIndexValues { it == tag }
+        assertEquals 1, occurrences.size()
+    }
+
+    @Test
+	void deleteTag_shouldDeleteTagFromDatabase() {
 		def product = Product.findByName("Ibuprofen 200mg tablet")
 		assertNotNull product	
 		assertEquals product.tagsToString(), "favorite,nsaid,pain"	
@@ -406,8 +521,75 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 
 	
-	
-	
-	
-		
+	@Test
+	void saveProduct_failOnValidationError() {
+        def product = new Product();
+        def returnValue = productService.saveProduct(product)
+        assertNull returnValue
+        assertEquals 2, product.errors.getErrorCount()
+        assertNotNull product.errors.getFieldError("name")
+        assertNotNull product.errors.getFieldError("category")
+        assertNull product.errors.getFieldError("description")
+        //println product.errors['name']
+        //println product.errors['category']
+        //assertEquals 'Name is blank.', 'blank', product.errors['name']
+        //assertEquals 'NickName is blank.', 'blank', user.errors['category']
+
+        //product.errors
+
+    }
+
+    @Test
+    void saveProduct_shouldSaveProduct() {
+        def product = new Product();
+        productService.saveProduct(product)
+        println product.errors
+
+
+    }
+
+    @Test
+    void saveProduct_shouldSaveProductAndTags() {
+        def product = new Product();
+        productService.saveProduct(product)
+        println product.errors
+
+    }
+
+    @Test
+    void saveProduct_shouldFailOnInvalidCategory() {
+        def product = new Product();
+        productService.saveProduct(product)
+        println product.errors
+    }
+
+
+    @Test
+    void saveProduct_shouldGenerateUniqueProductCode() {
+        def product = new Product();
+        productService.saveProduct(product)
+        println product.errors
+
+    }
+
+    @Test
+    void saveProduct_shouldFailOnDuplicateProductCode() {
+        def product = new Product();
+        productService.saveProduct(product)
+        println product.errors
+
+    }
+
+    @Test
+    void validateProductIdentifier_shouldSucceedOnUniqueProductCode() {
+        Product product = Product.findByProductCode("ZZZZ")
+        assertNull product
+        assertTrue productService.validateProductIdentifier("ZZZZ")
+    }
+
+    @Test
+    void validateProductIdentifier_shouldFailOnDuplicateProductCode() {
+        assertFalse productService.validateProductIdentifier("AB13")
+    }
+
 }

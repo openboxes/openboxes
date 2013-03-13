@@ -210,7 +210,7 @@ class Product implements Comparable, Serializable {
     static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
 		description(nullable:true)
-		productCode(nullable:true, maxSize: 255, unique: false)
+		productCode(nullable:true, maxSize: 255, unique: true)
 		unitOfMeasure(nullable:true, maxSize: 255)
 		category(nullable:false)
 		
@@ -270,34 +270,59 @@ class Product implements Comparable, Serializable {
 	InventoryLevel getInventoryLevel(locationId) {		
 		def location = Location.get(locationId)		
 		return InventoryLevel.findByProductAndInventory(this, location.inventory)
-	} 
-	
-	
+	}
+
+    /**
+     * Get the latest inventory date for this product at the given location.
+     *
+     * @param locationId
+     * @return
+     */
+    Date latestInventoryDate(def locationId){
+        def inventory = Location.get(locationId).inventory
+        def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes:[TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]]).first()
+        return date
+    }
+
+    /**
+     * Get bin location for this product in a given location.
+     *
+     * @param locationId
+     * @return
+     */
+    String getBinLocation(def locationId) {
+        def inventoryLevel = getInventoryLevel(locationId)
+        return inventoryLevel?.binLocation
+    }
+
+    /**
+     * @return  tags as a comma separated string
+     */
+    String tagsToString() {
+        if (tags) {
+            return tags.sort { it.tag }.collect { it.tag }.join(",")
+        }
+        else {
+            return null
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
 	String toString() { return "$name"; }
 	
 	/**
-	* Sort by name
-	*/
+	 * Sort by name
+	 */
 	int compareTo(obj) {
 		this.name <=> obj.name
 	}
-	
-	String tagsToString() { 
-		if (tags) { 
-			return tags.sort { it.tag }.collect { it.tag }.join(",")
-		}
-		else { 
-			return null
-		}
-		
-	}
 
-  Date latestInventoryDate(def locationId){
-    def inventory = Location.get(locationId).inventory 
-    def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes:[TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]]).first()
-    return date
-  }
-	
+
+
+
 	
 	/**
 	 * Some utility methods

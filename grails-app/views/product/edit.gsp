@@ -79,7 +79,7 @@
 												
 												<tr class="prop">
 					                                <td valign="top" class="name">
-					                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
+					                                  <label for="category.id"><warehouse:message code="product.primaryCategory.label" /></label>
 					                                </td>
 					                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
 														<%-- 
@@ -165,7 +165,7 @@
 												
 												<tr class="prop">
 					                                <td valign="top" class="name">
-					                                  <label for="categories"><warehouse:message code="product.tags.label" /></label>
+					                                  <label for="tagsToBeAdded"><warehouse:message code="product.tags.label" /></label>
 					                                </td>
 													<td valign="top" class="value">									
 												       	<%-- 
@@ -297,7 +297,7 @@
 								
 									<fieldset>
 					            		<legend>
-					            			<warehouse:message code="product.manufacturerDetails.label" default="Manufacturer details"/>
+					            			<warehouse:message code="product.productIdentifiers.label" default="Product identifiers"/>
 					            		</legend>								
 								
 										<table>	

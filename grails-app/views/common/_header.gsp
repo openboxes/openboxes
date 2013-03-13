@@ -36,6 +36,7 @@
 									<span class="middle">|</span>
 								</li>
 								<li>
+
 									<a href="javascript:void(0);" class="warehouse-switch middle">
 										<span class="middle">${session?.warehouse?.name }</span>
 									</a>

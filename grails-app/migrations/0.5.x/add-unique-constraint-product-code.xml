@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1363017455068-1">
+    	<preConditions onFail="MARK_RAN">
+            <and>
+    			<columnExists tableName="product" columnName="product_code"/>
+                <indexExists indexName="product_code"/>
+            </and>
+    	</preConditions>
+
+        <createIndex indexName="product_code" tableName="product" unique="true">
+            <column name="product_code"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

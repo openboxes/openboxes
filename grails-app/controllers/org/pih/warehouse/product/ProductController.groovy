@@ -77,7 +77,7 @@ class ProductController {
 		}
 		cmd.rootCategory = productService.getRootCategory();
 
-		println "edit product: " + (System.currentTimeMillis - startTime) + " ms"
+		println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		[ commandInstance : cmd, categoryInstance: categoryInstance ]
 	}
@@ -154,6 +154,8 @@ class ProductController {
 
 		def productInstance = new Product();
 		productInstance.properties = params
+
+        /*
 		if (!productInstance.productCode) { 
 			productInstance.productCode = productService.generateProductIdentifier();
 		}
@@ -190,11 +192,19 @@ class ProductController {
 		if (_toBeDeleted) {
 			productInstance.categories.removeAll(_toBeDeleted)
 		}
+        */
 
-		def warehouseInstance = Location.get(session.warehouse.id);
-		def inventoryInstance = warehouseInstance?.inventory;
+        // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
+        // when the session is closed.
+        if (!productInstance?.id || productInstance.validate()) {
+            if (!productInstance.productCode) {
+                productInstance.productCode = productService.generateProductIdentifier();
+            }
+        }
 
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+            def warehouseInstance = Location.get(session.warehouse.id);
+            def inventoryInstance = warehouseInstance?.inventory;
 			//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
 			sendProductCreatedEmail(productInstance)
 			redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
@@ -219,6 +229,8 @@ class ProductController {
 
 
 	def edit = {
+
+        def startTime = System.currentTimeMillis()
 		def productInstance = Product.get(params.id)
 		def location = Location.get(session?.warehouse?.id);
 		if (!productInstance) {
@@ -231,6 +243,8 @@ class ProductController {
 			if (!inventoryLevelInstance) {
 				inventoryLevelInstance = new InventoryLevel();
 			}
+
+            println "edit product: " + (System.currentTimeMillis() - startTime) + " ms"
 
 			[productInstance: productInstance, rootCategory: productService.getRootCategory(),
 				inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
@@ -246,7 +260,7 @@ class ProductController {
 				def version = params.version.toLong()
 				if (productInstance.version > version) {
 					productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
+						warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this product while you were editing")
 					render(view: "edit", model: [productInstance: productInstance])
 					return
 				}
@@ -255,9 +269,6 @@ class ProductController {
 			
 			println "price per unit: " + productInstance?.pricePerUnit
 
-			if (!productInstance.productCode) {
-				productInstance.productCode = productService.generateProductIdentifier();
-			}
 			/*
 			try {
 				productService.saveProduct(productInstance)
@@ -316,7 +327,13 @@ class ProductController {
 				productInstance.categories.removeAll(_toBeDeleted)
 			}
 
-
+            // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
+            // when the session is closed.
+            if (productInstance.validate()) {
+                if (!productInstance.productCode) {
+                    productInstance.productCode = productService.generateProductIdentifier();
+                }
+            }
 
 			/*
 			 productInstance?.categories?.clear();		

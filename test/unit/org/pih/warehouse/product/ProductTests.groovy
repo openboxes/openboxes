@@ -10,6 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.test.*
+import org.junit.Test
 import org.pih.warehouse.inventory.InventoryItem
 
 class ProductTests extends GrailsUnitTestCase {
@@ -20,8 +21,9 @@ class ProductTests extends GrailsUnitTestCase {
     protected void tearDown() {
         super.tearDown()
     }
-	
-    void testToJson() {
+
+    @Test
+    void toJson() {
         Product product = new Product(id: "prod1", name: "product1")
         InventoryItem item1 = new InventoryItem(id: "item1", product:product)
         InventoryItem item2 = new InventoryItem(id: "item2", product:product)
@@ -41,4 +43,5 @@ class ProductTests extends GrailsUnitTestCase {
 //        assert map.inventoryItems.any { it.inventoryItemId == item4.id }
 
     }
+
 }

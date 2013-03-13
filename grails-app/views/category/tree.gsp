@@ -28,6 +28,9 @@
 			</div>
 
         <div class="yui-gd">
+
+
+
             <div class="yui-u first">
                 <table>
                     <tr>
@@ -92,10 +95,10 @@
                         </td>
                     </tr>
                 </table>
-
             </div>
-            <div class="yui-u">
 
+            <div class="yui-u">
+                <h1><format:category category="${categoryInstance}"/></h1>
                 <table>
                     <g:if test="${categoryInstance }">
                         <tr>
@@ -172,6 +175,7 @@
                                                             <g:each var="product" in="${categoryInstance?.products }" status="status">
                                                                 <tr>
                                                                     <td>
+                                                                        <label>${product?.productCode}</label>
                                                                         <g:link controller="product" action="edit" id="${product?.id}" target="_blank"><format:product product="${product}"/></g:link>
                                                                     </td>
                                                                 </tr>
@@ -184,7 +188,7 @@
                                             <tr class="prop">
                                                 <td colspan="2" style="text-align:center">
 
-                                                    <button type="submit" name="save" class="save">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
+                                                    <button type="submit" name="save" class="button">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
                                                     &nbsp;
                                                     <g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                                 </td>
@@ -219,12 +223,12 @@
                                                         <label for="name" class="desc"><warehouse:message code="default.name.label" default="Name" /></label>
                                                     </td>
                                                     <td class="value">
-                                                        <g:textField name="name" value="${categoryInstance?.name}" />
+                                                        <g:textField name="name" class="text" size="80" value="${categoryInstance?.name}" />
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
                                                     <td colspan="2" style="text-align:center">
-                                                        <button type="submit" name="create" class="save">${warehouse.message(code: 'default.button.create.label', default: 'Create')}</button>
+                                                        <button type="submit" name="create" class="button">${warehouse.message(code: 'default.button.create.label', default: 'Create')}</button>
                                                         &nbsp;
                                                         <g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                                     </td>

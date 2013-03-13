@@ -7,23 +7,23 @@
 	
 	<!-- YUI -->
 	<yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
-	
+
 	<!-- Include Favicon -->
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-	
+
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there is a slight distinction between these two ... need to figure out what that distinction is -->
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="all" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="all" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="all" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="all" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="all" />	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="all" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="all" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
-	<!--  
+	<!--
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="all" />
-	--> 
-	
+	-->
+
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 
@@ -31,14 +31,14 @@
 	<g:javascript library="jquery" plugin="jquery" />
 	<jqui:resources />
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-  		
- 	<!-- Include Jquery Validation and Jquery Validation UI plugins --> 
- 	<jqval:resources />       
+
+ 	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
+ 	<jqval:resources />
     <jqvalui:resources />
 
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="all" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
-	
+
 	<!-- jquery validation messages -->
 	<g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
 		<script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
@@ -47,12 +47,12 @@
 
 	<!-- Custom styles to be applied to all pages -->
 	<style type="text/css" media="screen"></style>
-	
+
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
 
 	<g:render template="/common/customCss"/>
-	
+
 	<ga:trackPageview />
 </head>
 <body class="yui-skin-sam">

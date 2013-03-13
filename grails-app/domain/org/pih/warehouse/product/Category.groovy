@@ -63,7 +63,7 @@ class Category implements Comparable, Serializable {
 	}
 	
 	Boolean isRootCategory() { 
-		return this.parentCategory == null
+		return isRoot
 	}
 	
 	static Category getRootCategory() { 

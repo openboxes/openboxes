@@ -3,15 +3,21 @@
 		<div class="box">
 			<table>
 				<tr>
-					<td>					
-						<label><warehouse:message code="inventory.filterByProduct.label"/></label>
+					<td>
+                        <div style="float: right">
+                            <g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">
+                                <warehouse:message code="inventory.resetSearch.label" default="Reset search"/>
+                            </g:link>
+                        </div>
+						<h3><warehouse:message code="inventory.filterByProduct.label"/></h3>
 					</td>
 				</tr>				
 				<tr>
 					<td>
 						<g:hiddenField name="max" value="${params.max?:10 }"/>
 						<g:textField name="searchTerms" 
-							value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}" class="text medium" size="40"/>
+							value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}"
+                            class="text medium" size="46"/>
 					</td>
 				</tr>
 				<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
@@ -34,7 +40,7 @@
 				</g:else>
 				<tr>
 					<td>
-						<div style="padding: 10px;">
+						<div >
 							<div>
 								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
 								<warehouse:message code="inventory.showHiddenProducts.label"/>					
@@ -44,19 +50,24 @@
 								<warehouse:message code="inventory.showOutOfStockProducts.label"/>
 							</div>					
 						</div>
-						<div class="right">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+						<div class="left">
 							<button type="submit" class="button icon search" name="searchPerformed" value="true">
 								<warehouse:message code="default.search.label"/>
 							</button>
 						</div>
 					</td>
-				</tr>	
-				
-					
-				<tr class="prop">
+				</tr>
+			</table>
+        </div>
+        <div class="box">
+            <table>
+				<tr>
 					<td>					
-						<label><warehouse:message code="inventory.browseByTag.label"/></label>
- 						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">Clear</g:link>
+                        <h3><warehouse:message code="inventory.browseByTag.label"/></h3>
 					</td>
 				</tr>	
 				<tr class="">
@@ -79,19 +90,20 @@
 						</g:else>	
 					</td>
 				</tr>
-				<tr class="prop">
+            </table>
+        </div>
+        <div class="box">
+            <table>
+				<tr>
 					<td>					
-						<label><warehouse:message code="inventory.browseByCategory.label"/></label>
-						<%-- 
- 						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">Clear</g:link>
- 						--%>
-					</td>
+                        <h3><warehouse:message code="inventory.browseByCategory.label"/></h3>
+                    </td>
 				</tr>	
 				<g:each var="category" in="${commandInstance?.categoryInstance?.categories}">
 					<tr>
 						<td>
 							<img src="${resource(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>
-							<g:link controller="inventory" action="browse" params="['subcategoryId':category?.id,'max':params.max,'searchPerformed':true,'showHiddenProducts':params.showHiddenProducts?:'on','showOutOfStockProducts':params.showOutOfStockProducts?:'on']">							
+							<g:link controller="inventory" action="browse" params="['subcategoryId':category?.id,'max':params.max,'searchPerformed':true,'showHiddenProducts':params.showHiddenProducts?:'on','showOutOfStockProducts':params.showOutOfStockProducts?:'on']">
 								${category?.name } (${category?.products?.size() })
 							</g:link>
 						</td>

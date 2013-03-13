@@ -589,14 +589,16 @@ class DocumentService {
 			//sheet.autoSizeColumn(4);
 			//sheet.autoSizeColumn(5);
 			sheet.setColumnWidth((short)0, (short) ((50 * 8) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)1, (short) ((50 * 10) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)2, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)3, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)1, (short) ((50 * 2) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)2, (short) ((50 * 8) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)3, (short) ((50 * 2) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)4, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)5, (short) ((50 * 2) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)6, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)7, (short) ((50 * 10) / ((double) 1 / 20)))
-			
+			sheet.setColumnWidth((short)5, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)6, (short) ((50 * 2) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)7, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)8, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)9, (short) ((50 * 10) / ((double) 1 / 20)))
+
 			// Bold font
 			Font boldFont = workbook.createFont();
 			boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
@@ -690,9 +692,7 @@ class DocumentService {
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.name);
 
-			row.createCell(7).setCellValue(new Date());
-			row.getCell(7).setCellStyle(timestampStyle);
-			
+
 			// SHIPMENT TYPE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentType.label'));
@@ -806,43 +806,74 @@ class DocumentService {
 			row.createCell(1).setCellValue(shipmentInstance?.additionalInformation);
 			row.getCell(1).setCellStyle(wrapTextCellStyle);
 
-			// EMPTY ROW
+			// TWO EMPTY ROWS
 			row = sheet.createRow((short)counter++);
+            row = sheet.createRow((short)counter++);
+
+            // Merge cells
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(11, 11, 1, 2))
+            sheet.addMergedRegion(new CellRangeAddress(12, 13, 1, 9))
+
+
+
+            int CELL_INDEX = 0;
 
 			// ITEM TABLE HEADER
 			row = sheet.createRow((short)counter++);
-			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'container.label'));
-			row.getCell(0).setCellStyle(tableHeaderLeftStyle);
-			
-			row.createCell(1).setCellValue("" + getMessageTagLib().message(code:'product.label'));
-			row.getCell(1).setCellStyle(tableHeaderLeftStyle);
-			
-			row.createCell(2).setCellValue("" + getMessageTagLib().message(code:'inventory.lotNumber.label'));
-			row.getCell(2).setCellStyle(tableHeaderLeftStyle);
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'container.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(3).setCellValue("" + getMessageTagLib().message(code:'inventoryItem.expires.label'));
-			row.getCell(3).setCellStyle(tableHeaderLeftStyle);
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventoryLevel.binLocation.label'));
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.productCode.label'));
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.vendorCode.label'));
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventory.lotNumber.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventoryItem.expires.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 						
-			row.createCell(4).setCellValue("" + getMessageTagLib().message(code:'default.qty.label'));
-			row.getCell(4).setCellStyle(tableHeaderCenterStyle);
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.qty.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
 			
-			row.createCell(5).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
-			row.getCell(5).setCellStyle(tableHeaderCenterStyle);
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
 			
-			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'shipping.recipient.label'));
-			row.getCell(6).setCellStyle(tableHeaderCenterStyle);
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'shipping.recipient.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
 			
-			row.createCell(7).setCellValue("" + getMessageTagLib().message(code:'default.comments.label'));
-			row.getCell(7).setCellStyle(tableHeaderLeftStyle);
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.comments.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
+            def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
 			shipmentInstance.shipmentItems.sort(). each { itemInstance ->
+
+                CELL_INDEX = 0
 				log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
 				row = sheet.createRow((short)counter++);
 				
 				if (previousContainer != itemInstance?.container?.name) { 
-					row.createCell(0).setCellValue(itemInstance?.container?.name?:getMessageTagLib().message(code:'shipping.unpacked.label').toString());
-					row.getCell(0).setCellStyle(tableDataPalletStyle);
+					row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.name?:getMessageTagLib().message(code:'shipping.unpacked.label').toString());
+					row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
 					// If we're at a place in the XLS file where we want to merge cells (e.g. the packing list)
 					// Then we merge rows when the container name is different from the previous container name
 					if (row.getRowNum() > 16) { 
@@ -853,30 +884,39 @@ class DocumentService {
 				}
 				else { 
 					finalRowIndex = row.getRowNum()
-					row.createCell(0).setCellValue("");
-					row.getCell(0).setCellStyle(tableDataPalletStyle);
-					
+					row.createCell(CELL_INDEX).setCellValue("");
+					row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
 				}
-				row.createCell(1).setCellValue(itemInstance?.inventoryItem?.product?.name);
-				row.getCell(1).setCellStyle(tableDataLeftStyle);
-				
-				row.createCell(2).setCellValue(itemInstance?.inventoryItem?.lotNumber);
-				row.getCell(2).setCellStyle(tableDataLeftStyle);
 
-				row.createCell(3).setCellValue(itemInstance?.inventoryItem?.expirationDate);
-				row.getCell(3).setCellStyle(tableDataDateStyle);
+                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.getBinLocation(shipmentInstance?.destination?.id));
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
 
-				row.createCell(4).setCellValue(itemInstance?.quantity);
-				row.getCell(4).setCellStyle(tableDataCenterStyle)
-				
-				row.createCell(5).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
-				row.getCell(5).setCellStyle(tableDataCenterStyle)
-				
-				row.createCell(6).setCellValue(itemInstance?.recipient?.name);
-				row.getCell(6).setCellStyle(tableDataCenterStyle);
+                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode);
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
 
-				row.createCell(7).setCellValue("");
-				row.getCell(7).setCellStyle(tableDataCenterStyle);
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.vendorCode);
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.lotNumber);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.expirationDate);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataDateStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.quantity);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+				
+				row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+				
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.recipient?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
 				
 				row.setHeightInPoints(30.0)
 				previousContainer = itemInstance?.container?.name

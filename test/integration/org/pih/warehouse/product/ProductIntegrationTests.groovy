@@ -1,9 +1,14 @@
 package org.pih.warehouse.product
+
+import org.junit.Test
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
 import testutils.DbHelper
 
 class ProductIntegrationTests extends GroovyTestCase{
+
+
+    @Test
     void testSaveProductProductGroup(){
         def suppliers = Category.findByName("Supplies")
         def name = "Test" + UUID.randomUUID().toString()[0..5]
@@ -22,7 +27,7 @@ class ProductIntegrationTests extends GroovyTestCase{
     }
 
 
-
+    @Test
     void testGetProductFromGroup(){
        def group = ProductGroup.findByDescription("PainKiller")
         def products = group.products
@@ -31,12 +36,14 @@ class ProductIntegrationTests extends GroovyTestCase{
 
     }
 
+    @Test
     void testGetProductGroup(){
         def product = Product.findByName("MacBook Pro 8G")
         def groups = product.productGroups
         assert groups.any{g -> g.description == "Laptop"}
     }
 
+    @Test
     void testLatestInventoryDate(){
       def product = DbHelper.createProductIfNotExists("TestProductABC") 
       Location boston =  Location.findByName("Boston Headquarters")
@@ -56,4 +63,36 @@ class ProductIntegrationTests extends GroovyTestCase{
       assert dateForMiami.format("MM/dd/yyyy") == fiveDaysAgo.format("MM/dd/yyyy")
 
     }
+
+
+    @Test
+    void getBinLocation_shouldReturnCorrectBinLocation() {
+        def product = DbHelper.createProductIfNotExists("TestProductABC")
+        def boston =  Location.findByName("Boston Headquarters")
+        assertNotNull boston.inventory
+        def inventoryLevel = DbHelper.createInventoryLevel(product, boston, "A1-01-01", InventoryStatus.SUPPORTED, 0, 100, 500)
+        assertNotNull inventoryLevel
+        assertEquals "A1-01-01", product.getBinLocation(boston.id)
+    }
+
+    @Test
+    void getBinLocation_shouldReturnNullWhenInventoryLevelIsNull() {
+        def product = DbHelper.createProductIfNotExists("TestProductABC")
+        def boston =  Location.findByName("Boston Headquarters")
+        assertNotNull boston.inventory
+        //def inventoryLevel = DbHelper.createInventoryLevel(product, location, "A1-01-01", InventoryStatus.SUPPORTED, 0, 100, 500)
+        //assertNotNull inventoryLevel
+        assertNull product.getBinLocation(boston.id)
+    }
+
+    @Test
+    void getBinLocation_shouldReturnNullWhenBinLocationIsNull() {
+        def product = DbHelper.createProductIfNotExists("TestProductABC")
+        def boston =  Location.findByName("Boston Headquarters")
+        assertNotNull boston.inventory
+        def inventoryLevel = DbHelper.createInventoryLevel(product, boston, null, InventoryStatus.SUPPORTED, 0, 100, 500)
+        assertNotNull inventoryLevel
+        assertNull product.getBinLocation(boston.id)
+    }
+
 }

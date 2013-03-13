@@ -21,6 +21,8 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
 
+import static org.pih.warehouse.product.Product.*
+
 /**
  * @author jmiranda
  *
@@ -744,13 +746,7 @@ class ProductService {
 	 */
 	def getTopLevelCategories() {
 		def rootCategory = Category.getRootCategory()
-		if (rootCategory) { 
-			return Category.findAllByParentCategory(rootCategory)
-		}
-		else { 
-			return Category.findAllByParentCategoryIsNull()
-		}
-		
+		return rootCategory ? Category.findAllByParentCategory(rootCategory) : []
 	}
 
 	/**
@@ -768,8 +764,7 @@ class ProductService {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * @return  all tags that have a product
 	 */
 	def getPopularTags() {
 		def popularTags = [:]
@@ -785,10 +780,10 @@ class ProductService {
 	}
 	
 	/**
-	 * 
+     * Add the list of tags to the given product.
+     *
 	 * @param product
 	 * @param tags
-	 * @return
 	 */
 	def addTagsToProduct(product, tags) { 
 		if (tags) {
@@ -802,6 +797,20 @@ class ProductService {
 			}
 		}
 	}
+
+    /**
+     * Add a list of tags to each of the given products.
+     *
+     * @param products
+     * @param tags
+     * @return
+     */
+    def addTagsToProducts(products, tags) {
+        products.each { product ->
+            addTagsToProduct(product, tags)
+        }
+
+    }
 	
 	/**
 	 * 
@@ -813,15 +822,35 @@ class ProductService {
 		product.removeFromTags(tag)
 		tag.delete();
 	}
-	
-	
+
+    /**
+     * Ensure that the given product code does not exist
+     * @param productCode
+     * @return
+     */
+	def validateProductIdentifier(productCode) {
+        println "Validating product identifier " + productCode
+        def count = Product.executeQuery( "select count(p.productCode) from Product p where productCode = :productCode", [productCode: productCode] );
+        return count ? (count[0] == 0) : false
+    }
 	
 	/**
 	 * Generate a product identifier.
 	 * @return
 	 */
-	def generateProductIdentifier() { 
-		return identifierService.generateProductIdentifier()
+	def generateProductIdentifier() {
+        def productCode
+
+        try {
+            productCode = identifierService.generateProductIdentifier()
+            if (validateProductIdentifier(productCode)) {
+                return productCode
+            }
+
+        } catch (Exception e) {
+            log.warn("Error generating unique product code " + e.message, e)
+        }
+        return productCode
 	}
 	
 	
@@ -830,29 +859,44 @@ class ProductService {
 	def downloadDocument(url) { 
 		// move code from ProductController		
 	}
-	
+
+    /**
+     * Save the given product
+     * @param product
+     * @return
+     */
+    def saveProduct(Product product) {
+        return saveProduct(product, null)
+    }
+
 	/**
 	 * Saves the given product 
 	 * @param product
+     * @param tags
+     *
 	 * @return
 	 */
-	def saveProduct(Product product, String tagsToBeSaved) { 
-		def productInstance = Product.get(params.id)		
-		if (productInstance) {
-			
+	def saveProduct(Product product, String tags) {
+		//def productInstance = Product.get(product.id)
+		if (product) {
+
+            // Generate product code if it doesn't already exist
+            if (!product.productCode) {
+                product.productCode = generateProductIdentifier();
+            }
 			// Handle tags
 			try {
-				if (tagsToBeSaved) {
-					productInstance.tags.clear()
-					tagsToBeSaved.split(",").each { tagText ->
+				if (tags) {
+                    product.tags.clear()
+					tags.split(",").each { tagText ->
 						Tag tag = Tag.findByTag(tagText)
 						if (!tag) tag = new Tag(tag:tagText)
-						productInstance.addToTags(tag)
+                        product.addToTags(tag)
 					}
 				}
 			} catch (Exception e) {
 				log.error("Error occurred: " + e.message)
-				throw new ValidationException(productInstance.errors)
+				throw new ValidationException(product.errors)
 			}
 			
 			// Handle attributes
@@ -894,11 +938,11 @@ class ProductService {
 			}
 			*/
 			
-			if (!productInstance.validate()) {
-				throw new ValidationException("Product is not valid", productInstance.errors)
-			}
+			//if (!product.validate()) {
+			//	throw new ValidationException("Product is not valid", product.errors)
+			//}
 
-			productInstance.save(flush: true)
+			return product.save(flush: true)
 		}
 	}
 	

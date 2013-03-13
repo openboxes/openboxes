@@ -71,7 +71,22 @@ class DbHelper {
 
         product
     }
-	
+
+    static InventoryLevel createInventoryLevel(Product product, Location location, String binLocation, InventoryStatus status, int min, int reorder, int max) {
+        def inventoryLevel = new InventoryLevel()
+        if (product && location.inventory) {
+            inventoryLevel.product = product
+            inventoryLevel.binLocation = binLocation
+            inventoryLevel.inventory = location.inventory
+            inventoryLevel.minQuantity = min
+            inventoryLevel.reorderQuantity = reorder
+            inventoryLevel.maxQuantity = max
+            inventoryLevel.save(failOnError: true)
+        }
+        return inventoryLevel
+
+    }
+
     static InventoryItem createInventoryItem(Product product, String lotNumber, expirationDate = new Date().plus(30)) {
         def existingOne = InventoryItem.findByProductAndLotNumber(product, lotNumber)
         if (existingOne) return existingOne

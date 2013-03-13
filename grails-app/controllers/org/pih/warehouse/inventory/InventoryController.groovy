@@ -44,7 +44,7 @@ class InventoryController {
 	def list = { 
 		[ warehouses : Location.getAll() ]
 	}
-	
+
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
@@ -161,22 +161,36 @@ class InventoryController {
 	 * 
 	 */
 	def show = {
-		def inventoryInstance = Inventory.get(params.id)
-		if (!inventoryInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			
-			def inventoryMapping = inventoryInstance.inventoryItems.groupBy{ it?.product } 
-			[	
-				inventoryMapping: inventoryMapping,
-				inventoryInstance: inventoryInstance,
-				categories : Category.getAll(),
-				productTypes : ProductType.getAll(), 
-				productInstanceList : Product.getAll() ]
 
-		}
+        long startTime = System.currentTimeMillis()
+        def location = Location.get(session.warehouse.id)
+		def inventoryInstance = Inventory.get(params.id)
+        if (!inventoryInstance) {
+            inventoryInstance = location.inventory
+        }
+        if (!inventoryInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+            redirect(action: "list")
+            return
+        }
+
+        def transactions = Transaction.findAllByInventory(inventoryInstance)
+        def transactionEntries = (transactions*.transactionEntries).flatten()
+        log.info "transactionEntries: " + transactionEntries.size()
+
+        def productQuantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
+        def elapsedTime = (System.currentTimeMillis() - startTime)
+        log.info("Show current inventory: " + elapsedTime + " ms");
+
+        //def inventoryMapping = inventoryInstance.inventoryItems.groupBy{ it?.product }
+        [
+            //inventoryMapping: inventoryMapping,
+            location: location,
+            elapsedTime: elapsedTime,
+            productQuantityMap: productQuantityMap,
+
+        ]
+
 	}
 	
 	

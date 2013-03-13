@@ -643,8 +643,9 @@
 											<td class="container top left" rowspan="${rowspan }">
 												<g:render template="container" model="[container:shipmentItem?.container]"/>
 											</td>
-										</g:if>												
+										</g:if>
 										<td class="product">
+                                            <label>${shipmentItem?.inventoryItem?.product?.productCode}</label>
 											<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
 												<format:product product="${shipmentItem?.inventoryItem?.product}"/>
 											</g:link>

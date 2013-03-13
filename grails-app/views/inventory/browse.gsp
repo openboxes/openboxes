@@ -29,7 +29,7 @@
 	        	<g:set var="varStatus" value="${0}"/>
 	        	<g:set var="totalProducts" value="${0}"/> 							        	
         	
-	            <div class="yui-gd">
+	            <div class="yui-gf">
 					<div class="yui-u first">
 	       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 
@@ -45,8 +45,6 @@
 							</div>
 						</g:if>
 						<div class="tabs">
-						
-		
 							<ul>
 								<li>
 									<a href="#tabs-1">
@@ -68,11 +66,11 @@
 										</g:if>
 									</a>
 								</li>
-							</ul>		
-							<div id="tabs-1" style="padding: 0px;">			
-								
-							
-    											
+							</ul>
+							<div id="tabs-1" style="padding: 0px;">
+
+
+
 					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 					                <table id="inventory-browser-table" border="0"> 
 										<thead> 
@@ -212,7 +210,8 @@
                     var checked = ($(this).attr("checked") == 'checked');
 		            $(".checkbox").attr("checked", checked);
 				});
-				
+
+
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -220,7 +219,8 @@
 	    					expires: 1
 	    				}
 	    			}
-				); 
+				);
+
 
 		    	$(".isRelated").hide();
 		    	$(".expandable").click(function(event) {
