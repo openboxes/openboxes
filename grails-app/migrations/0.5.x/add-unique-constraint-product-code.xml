@@ -4,7 +4,9 @@
     	<preConditions onFail="MARK_RAN">
             <and>
     			<columnExists tableName="product" columnName="product_code"/>
-                <indexExists indexName="product_code"/>
+                <not>
+                    <indexExists indexName="product_code"/>
+                </not>
             </and>
     	</preConditions>
 
