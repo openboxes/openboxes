@@ -829,7 +829,7 @@ class ProductService {
      * @return
      */
 	def validateProductIdentifier(productCode) {
-        println "Validating product identifier " + productCode
+        if (!productCode) return false
         def count = Product.executeQuery( "select count(p.productCode) from Product p where productCode = :productCode", [productCode: productCode] );
         return count ? (count[0] == 0) : false
     }
@@ -887,16 +887,16 @@ class ProductService {
 			// Handle tags
 			try {
 				if (tags) {
-                    product.tags.clear()
 					tags.split(",").each { tagText ->
-						Tag tag = Tag.findByTag(tagText)
-						if (!tag) tag = new Tag(tag:tagText)
-                        product.addToTags(tag)
+                        def tag = findOrCreateTag(tagText)
+                        if (tag) {
+                            product.addToTags(tag)
+                        }
 					}
 				}
 			} catch (Exception e) {
 				log.error("Error occurred: " + e.message)
-				throw new ValidationException(product.errors)
+				throw new ValidationException(e.message, product?.errors)
 			}
 			
 			// Handle attributes
@@ -945,7 +945,21 @@ class ProductService {
 			return product.save(flush: true)
 		}
 	}
-	
+
+    /**
+     * Find or create a tag with the given tag text.
+     *
+     * @param tagText
+     * @return
+     */
+    def findOrCreateTag(tagText) {
+        Tag tag = Tag.findByTag(tagText)
+        if (!tag) {
+            tag = new Tag(tag:tagText)
+            tag.save();
+        }
+        return tag;
+    }
 	
 	
 	def findSimilarProducts(Product product) { 

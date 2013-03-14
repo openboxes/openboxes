@@ -520,6 +520,15 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertNull tag2
 	}
 
+    @Test
+    void generateProductIdentifier_shouldGenerateUniqueIdentifiers() {
+
+        for (int i = 0; i<100; i++) {
+
+            println productService.generateProductIdentifier()
+        }
+    }
+
 	
 	@Test
 	void saveProduct_failOnValidationError() {
@@ -542,17 +551,39 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     @Test
     void saveProduct_shouldSaveProduct() {
         def product = new Product();
-        productService.saveProduct(product)
-        println product.errors
-
-
+        product.name = "Test product"
+        product.category = Category.getRootCategory()
+        def returnValue = productService.saveProduct(product)
+        println returnValue
+        assertNotNull returnValue
+        assertEquals product, returnValue
+        assertEquals returnValue.category, Category.getRootCategory()
+        assertNotNull product.productCode
     }
 
     @Test
     void saveProduct_shouldSaveProductAndTags() {
         def product = new Product();
-        productService.saveProduct(product)
-        println product.errors
+        product.name = "Test product"
+        product.category = Category.getRootCategory()
+
+        def returnValue = productService.saveProduct(product, "a tag,the next tag,another tag")
+        assertNotNull returnValue
+        assertNotNull product.id
+        assertNotNull product.tags
+        assertEquals 3, product.tags.size()
+
+
+        // The following tests don't work because tags are not sorted in any particular order
+        // so they are returned in random order.
+        //assertEquals "a tag,another tag,the next tag", product.tagsToString()
+        //assertEquals "a tag", product.tags.iterator().next().tag
+        //assertEquals "another tag", product.tags.iterator().next().tag
+        //assertEquals "the next tag", product.tags.iterator().next().tag
+
+        // Lookup the product using the newly saved product id
+        //def returnValue = Product.get(product.id)
+        //assertNotNull returnValue
 
     }
 
@@ -561,35 +592,86 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         def product = new Product();
         productService.saveProduct(product)
         println product.errors
+        assertNotNull product.errors.getFieldError("category")
     }
 
 
     @Test
     void saveProduct_shouldGenerateUniqueProductCode() {
         def product = new Product();
+        product.name = "New product"
+        product.category = Category.getRootCategory()
         productService.saveProduct(product)
-        println product.errors
-
+        assertNotNull product
+        assertNotNull product.productCode
     }
 
     @Test
     void saveProduct_shouldFailOnDuplicateProductCode() {
-        def product = new Product();
-        productService.saveProduct(product)
+        def product = Product.findByProductCode("AB13")
+        assertNotNull product
+
+        product = new Product();
+        product.name = "New product"
+        product.productCode = "AB13"
+        product.category = Category.getRootCategory()
+        def returnValue = productService.saveProduct(product)
         println product.errors
+        assertNull returnValue
+        assertNotNull product.errors.getFieldError("productCode")
+
 
     }
 
     @Test
-    void validateProductIdentifier_shouldSucceedOnUniqueProductCode() {
-        Product product = Product.findByProductCode("ZZZZ")
+    void validateProductIdentifier_shouldReturnTrueOnUnique() {
+        // Ensuring that product does not exist
+        def product = Product.findByProductCode("ZZZZ")
         assertNull product
         assertTrue productService.validateProductIdentifier("ZZZZ")
     }
 
     @Test
-    void validateProductIdentifier_shouldFailOnDuplicateProductCode() {
+    void validateProductIdentifier_shouldReturnFalseOnDuplicate() {
+        // Ensuring that product does exist
+        def product = Product.findByProductCode("AB13")
+        assertNotNull product
         assertFalse productService.validateProductIdentifier("AB13")
+    }
+
+    @Test
+    void validateProductIdentifier_shouldReturnFalseOnEmpty() {
+        assertFalse productService.validateProductIdentifier("");
+    }
+
+    @Test
+    void validateProductIdentifier_shouldReturnFalseOnNull() {
+        assertFalse productService.validateProductIdentifier(null);
+    }
+
+
+    @Test
+    void findOrCreateTag_shouldCreateTagSuccessfully() {
+        def tag1 = Tag.findByTag("brand new tag")
+        assertNull tag1
+        def tag2 = productService.findOrCreateTag("brand new tag")
+        assertNotNull tag2
+
+    }
+
+    @Test
+    void findOrCreateTag_shouldFindExistingTag() {
+        def tag1 = Tag.findByTag("favorite")
+        assertNotNull tag1
+        assertEquals 1, Tag.findAllByTag("favorite").size()
+
+        def tag2 = productService.findOrCreateTag("favorite")
+        assertNotNull tag2
+        assertEquals tag1.id, tag2.id
+        assertEquals tag1, tag2
+
+        // Make sure there's still only one "favorite" tag
+        assertEquals 1, Tag.findAllByTag("favorite").size()
     }
 
 }
