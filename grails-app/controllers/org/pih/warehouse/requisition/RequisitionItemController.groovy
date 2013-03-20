@@ -139,7 +139,7 @@ class RequisitionItemController {
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
             //redirect(action: "list")
-			redirect(controller: "requisition", action: "review", id: rrequisition?.id)
+			redirect(controller: "requisition", action: "review", id: requisition?.id)
         }
     }
 	
@@ -151,7 +151,7 @@ class RequisitionItemController {
 			requisitionItem.properties = params
 			//requisitionItem.quantityCanceled = requisitionItem.calculateQuantityRemaining()
 			requisitionItem.save(flush:true)
-			redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id, , params:['requisitionItem.id':requisitionItem.id])	
+			redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id , params:['requisitionItem.id':requisitionItem.id])
 		}
 		else { 
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
