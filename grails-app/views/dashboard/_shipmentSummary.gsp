@@ -42,7 +42,7 @@
 								</g:link>
 							</td>
 						</tr>	
-						<tr class="odd prop">
+						<tr class="odd">
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>
 							</td>
@@ -59,7 +59,7 @@
 							</td>
 						</tr>
 							
-						<tr class="even prop">
+						<tr class="even">
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>
 							</td>

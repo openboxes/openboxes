@@ -14,13 +14,14 @@
 				<th>
 					${warehouse.message(code: 'shipping.shipment.label')}
 				</th>
-				<th><g:if test="${incoming}">
-						<label class="block"><warehouse:message
+				<th>
+                    <label class="block"><warehouse:message
 								code="default.origin.label" /></label>
-					</g:if> <g:else>
-						<label class="block"><warehouse:message
+				</th>
+                <th>
+                    <label class="block"><warehouse:message
 								code="default.destination.label" /></label>
-					</g:else></th>
+			    </th>
 				<%-- 
                     	<th>
                     		<label class="block">${warehouse.message(code: 'shipping.expectedShippingDate.label')}</label>
@@ -36,51 +37,6 @@
 
 		</thead>
 		<tbody>
-			<tr class="odd">
-				<td></td>
-				<td colspan="1"><g:select name="shipmentType" class="filter"
-						from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-						optionKey="id" optionValue="${{format.metadata(obj:it)}}"
-						value="${shipmentType}"
-						noSelection="['':warehouse.message(code:'default.all.label')]" />
-				</td>
-				<td></td>
-				<td></td>
-				<td><g:if test="${incoming}">
-						<g:select name="origin" class="filter"
-							from="${org.pih.warehouse.core.Location.list().sort()}"
-							optionKey="id" optionValue="name" value="${origin}"
-							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
-				</g:if> <g:else>
-						<g:select name="destination" class="filter"
-							from="${org.pih.warehouse.core.Location.list().sort()}"
-							optionKey="id" optionValue="name" value="${destination}"
-							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
-				</g:else></td>
-				<%-- 
-                    	<td>
-	           	<g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
-					value="${statusStartDate}" format="MM/dd/yyyy"/>
-					
-                     	${warehouse.message(code: 'default.dateTo.label')}
-				<g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
-				value="${statusEndDate}" format="MM/dd/yyyy"/>
-                    	
-                    		<a href="javascript:void(0);" class="clear-dates"><warehouse:message code="default.clear.label"/></a>
-                    	
-                    	</td>
-                    	--%>
-				<td>
-					<%-- 
-					<g:select name="status" class="filter"
-						from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
-						optionKey="name" optionValue="${{format.metadata(obj:it)}}"
-						value="${status}"
-						noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
-					--%>
-				</td>
-				<td></td>
-			</tr>
 			<g:each var="shipmentInstance" in="${shipments}" status="i">
 				<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					<td>
@@ -95,7 +51,7 @@
 							</div>
 						</div>
 					</td>
-					<td class="left"><img
+					<td class="center"><img
 						src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
 						style="vertical-align: middle; width: 24px; height: 24px;" />
@@ -110,11 +66,12 @@
 							id="${shipmentInstance.id}">
 							${fieldValue(bean: shipmentInstance, field: "name")}
 						</g:link></td>
-					<td align="center"><g:if test="${incoming}">
-							${fieldValue(bean: shipmentInstance, field: "origin.name")}
-						</g:if> <g:else>
-							${fieldValue(bean: shipmentInstance, field: "destination.name")}
-						</g:else></td>
+					<td align="center">
+                        ${fieldValue(bean: shipmentInstance, field: "origin.name")}
+					</td>
+                    <td>
+                        ${fieldValue(bean: shipmentInstance, field: "destination.name")}
+					</td>
 
 					<td><g:set var="today" value="${new Date() }" /> <format:metadata
 							obj="${shipmentInstance?.status.code}" /> <g:if

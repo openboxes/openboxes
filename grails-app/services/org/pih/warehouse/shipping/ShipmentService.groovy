@@ -407,14 +407,28 @@ class ShipmentService {
 	 * @param statusEndDate
 	 * @return
 	 */
-	List<Shipment> getShipments(ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate) {
-		def shipments = Shipment.withCriteria {
-			and {
-				if (shipmentType) { eq("shipmentType", shipmentType) }
-				if (origin) { eq("origin", origin) }
-				if (destination) { eq("destination", destination) }
-			}
-		}
+	List<Shipment> getShipments(String terms, ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate, Date lastUpdatedStart, Date lastUpdatedEnd) {
+
+        println "Get shipments: " + terms + " " + shipmentType + " " + origin + " " + destination + " " + lastUpdatedStart + " " + lastUpdatedEnd
+
+        def shipments = Shipment.withCriteria {
+            and {
+                if (terms) {
+                    or {
+                        ilike("name", "%" + terms + "%")
+                        ilike("shipmentNumber", "%" + terms + "%")
+                    }
+                }
+                if (shipmentType) { eq("shipmentType", shipmentType) }
+                if (origin) { eq("origin", origin) }
+                if (destination) { eq("destination", destination) }
+                if (lastUpdatedStart) { ge("lastUpdated", lastUpdatedStart)}
+                if (lastUpdatedEnd) { le("lastUpdated", lastUpdatedEnd)}
+            }
+
+        }
+
+        println "Shipments: " + shipments.size()
 		
 		// now filter by event code and eventdate
 		shipments = shipments.findAll( { def status = it.getStatus()

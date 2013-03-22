@@ -10,52 +10,60 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            <g:form action="list" method="post">
-            	<g:if test="${incoming}">
-            		<g:hiddenField name="type" value="incoming"/>
-            	</g:if>
-            	
-				<g:set var="shipments" value="${shipments.sort { it.status.code }}"/>
-				<g:set var="shipmentMap" value="${shipments.groupBy { it.status.code }}"/>
-				<div class="tabs">
-					<ul>
-						<g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
-							<li>
-								<a href="#${shipmentStatusCode }">
-									<format:metadata obj="${shipmentStatusCode }"/>
-									<span class="fade">(${shipmentMap[shipmentStatusCode]?.size() })</span>
-								</a>
-							</li>
-						</g:each>
-					</ul>		
-					<g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
-						<div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">	            	
-							<g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode]]"/>
-						</div>
-					</g:each>
-				</div>
-	            
-	            <g:if test="${shipments.size()==0}">
-					<div class=""><warehouse:message
-							code="shipping.noShipmentsMatchingConditions.message" />
-					</div>
-				</g:if>
-			</g:form>
+            <div class="yui-gf">
+                <div class="yui-u first">
+                    <g:render template="filters" model="[]"/>
+
+                </div>
+                <div class="yui-u">
+                    <g:form action="list" method="post">
+                        <g:if test="${incoming}">
+                            <g:hiddenField name="type" value="incoming"/>
+                        </g:if>
+
+                        <g:set var="shipments" value="${shipments.sort { it.status.code }}"/>
+                        <g:set var="shipmentMap" value="${shipments.groupBy { it.status.code }}"/>
+                        <div class="tabs">
+                            <ul>
+                                <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
+                                    <li>
+                                        <a href="#${shipmentStatusCode }">
+                                            <format:metadata obj="${shipmentStatusCode }"/>
+                                            <span class="fade">(${shipmentMap[shipmentStatusCode]?.size() })</span>
+                                        </a>
+                                    </li>
+                                </g:each>
+                            </ul>
+                            <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
+                                <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
+                                    <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode]]"/>
+                                </div>
+                            </g:each>
+                        </div>
+
+                        <g:if test="${shipments.size()==0}">
+                            <div class=""><warehouse:message
+                                    code="shipping.noShipmentsMatchingConditions.message" />
+                            </div>
+                        </g:if>
+                    </g:form>
+                </div>
+            </div>
 			
         </div>		
 		<script type="text/javascript">
 			$(function() { 		
-				$(".clear-dates").click(function() {
-					$('#statusStartDate-datepicker').val('');					
-					$('#statusEndDate-datepicker').val('');
-					$('#statusStartDate').val('');					
-					$('#statusEndDate').val('');
-				});			
+				//$(".clear-dates").click(function() {
+				//	$('#statusStartDate-datepicker').val('');
+				//	$('#statusEndDate-datepicker').val('');
+				//	$('#statusStartDate').val('');
+				//	$('#statusEndDate').val('');
+				//});
 
 
-				$(".filter").change(function() { 
-					$(this).closest("form").submit();
-				});
+				//$(".filter").change(function() {
+				//	$(this).closest("form").submit();
+				//});
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
