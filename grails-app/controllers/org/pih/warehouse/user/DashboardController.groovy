@@ -12,13 +12,15 @@ package org.pih.warehouse.user;
 
 import grails.converters.JSON;
 
-import org.pih.warehouse.core.Comment;
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.order.Order;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.requisition.Requisition;
-import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode;
 import org.pih.warehouse.util.LocalizationUtil;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.InventoryItem;
@@ -30,7 +32,8 @@ class DashboardController {
 	def orderService
 	def shipmentService
 	def inventoryService
-	def productService 
+	def productService
+    def requisitionService
 	def sessionFactory
 	
 	def showCacheStatistics = {
@@ -91,11 +94,29 @@ class DashboardController {
 		//def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
 		//def lowStock = inventoryService.getLowStock(location)
 		//def reorderStock = inventoryService.getReorderStock(location)
-		
+
+        // Days to include for activity list
+        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
+        def activityList = []
+
+
+        // Find recent requisition activity
+        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where r.isTemplate = false and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
+                ['lastUpdated':new Date()-daysToInclude, origin:location, destination: location])
+        requisitions.each {
+            def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << new DashboardActivityCommand(
+                    type: "basket",
+                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    requisition: it)
+        }
 				
-		// Days to include for activity list
-		def daysToInclude = params.daysToInclude?:3
-		def activityList = []
+        // Add recent shipments
 		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
 			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location], [max: 10] );
 		shipments.each { 
@@ -196,15 +217,20 @@ class DashboardController {
 				user: it)
 		}
 		
-		activityList = activityList.sort { it.lastUpdated }.reverse()
-		def activityListTotal = activityList.size()
 		//activityList = activityList.groupBy { it.lastUpdated }
-		def startIndex = params.offset?Integer.valueOf(params.offset):0
-		def endIndex = (startIndex + (params.max?Integer.valueOf(params.max):10))
-		if (endIndex > activityListTotal) endIndex = activityListTotal
-		endIndex -= 1
-		activityList = activityList[startIndex..endIndex]
-		
+        def activityListTotal = 0
+		def startIndex = 0
+        def endIndex = 0
+        if (activityList) {
+            activityList = activityList.sort { it.lastUpdated }.reverse()
+            activityListTotal = activityList.size()
+            startIndex = params.offset?Integer.valueOf(params.offset):0
+            endIndex = (startIndex + (params.max?Integer.valueOf(params.max):10))
+            if (endIndex > activityListTotal) endIndex = activityListTotal
+            endIndex -= 1
+    		activityList = activityList[startIndex..endIndex]
+        }
+
 		//def outgoingOrders = orderService.getOutgoingOrders(location)
 		//def incomingOrders = orderService.getIncomingOrders(location)
 		
@@ -222,17 +248,28 @@ class DashboardController {
 			//lowStock: lowStock,
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
+            requisitions:  requisitionService.getRequisitions(),
 			//outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
 			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentIncomingShipments),
+
 			activityList : activityList,
 			activityListTotal : activityListTotal,
 			startIndex: startIndex,
 			endIndex: endIndex,
-			daysToInclude: daysToInclude
+			daysToInclude: daysToInclude,
+            tags:productService.getAllTags()
 		]
 	}
+
+
+    def hideTag = {
+        Tag tag = Tag.get(params.id)
+        tag.isActive = false
+        tag.save(flush:true)
+        redirect(controller: "dashboard", action: "index")
+    }
 	
 	def status = { 
 		def admin = User.get(1)
@@ -247,35 +284,42 @@ class DashboardController {
 	}
 	
 	def megamenu = {
+
+        def startTime = System.currentTimeMillis()
+
+        // Shipments
 		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()
+        def incomingShipmentsCount = Shipment.countByDestination(session?.warehouse)
+
 		def outgoingShipments = Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort();
+        def outgoingShipmentsCount = Shipment.countByOrigin(session?.warehouse)
+        // Orders
 		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
-		def incomingRequests = Requisition.findAllByDestination(session?.warehouse).groupBy{it.status}.sort()
-		def outgoingRequests = Requisition.findAllByOrigin(session?.warehouse).groupBy{it.status}.sort()
+
+        // Requisitions
+        def incomingRequests = Requisition.findAllByDestinationAndIsTemplate(session?.warehouse, false).groupBy{it?.status}.sort()
+		def outgoingRequests = Requisition.findAllByOriginAndIsTemplate(session?.warehouse, false).groupBy{it?.status}.sort()
 		
 		def categories = []
 
 		def category = productService.getRootCategory()		
 		categories = category.categories
-		/*
-		def c = Product.createCriteria()
-		def categories = c.list { 
-			projections { 
-				distinct 'category'
-			}
-		}
-		*/
-		categories = categories.groupBy { it?.parentCategory } 
+		categories = categories.groupBy { it?.parentCategory }
+
+        println "Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
+
 		[
 			categories: categories,
 			incomingShipments: incomingShipments,
-			outgoingShipments: outgoingShipments,
+            incomingShipmentsCount: incomingShipmentsCount,
+            outgoingShipments: outgoingShipments,
+			outgoingShipmentsCount: outgoingShipmentsCount,
 			incomingOrders: incomingOrders,
 			incomingRequests: incomingRequests,
 			outgoingRequests: outgoingRequests,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()
-			]
+		]
 
 		
 	}
@@ -380,6 +424,7 @@ class DashboardActivityCommand {
 	User user
 	Shipment shipment
 	Receipt receipt
+    Requisition requisition
 	Product product
 	Transaction transaction
 	InventoryItem inventoryItem

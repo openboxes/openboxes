@@ -91,9 +91,15 @@ class FormatTagLib {
 			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
 			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
-			 
-			 // default format is to display the localized name of the product 
-			 out << LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
+			 def value = "";
+             if (attrs?.product?.productCode) {
+                 value = "<label>" + attrs?.product?.productCode + "<label> "
+             }
+             value += LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
+
+
+			 // default format is to display the localized name of the product
+			 out << value
 		 }
 		 // TODO: add more formats
 	 }

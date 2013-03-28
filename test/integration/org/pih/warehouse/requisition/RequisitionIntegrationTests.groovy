@@ -1,21 +1,43 @@
 package org.pih.warehouse.requisition
 
-
+import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 
 class RequisitionIntegrationTests extends GroovyTestCase {
 
-    void test_RequisitionSaved() {
+    @Test
+    void save_shouldReturnErrors() {
+        def requisition = new Requisition()
+        requisition.save()
+        assertTrue requisition.hasErrors()
+        println requisition.errors
+        assertEquals 4, requisition.errors.errorCount
+        assertTrue requisition.errors.hasFieldErrors("commodityClass")
+        assertTrue requisition.errors.hasFieldErrors("origin")
+        assertTrue requisition.errors.hasFieldErrors("destination")
+        assertTrue requisition.errors.hasFieldErrors("requestedBy")
+    }
 
+    @Test
+    void save_shouldSaveRequisition() {
         def location = Location.list().first()
         def product1 = Product.findByName("Advil 200mg")
         def product2 = Product.findByName("Tylenol 325mg")
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()
-        def requisition = new Requisition(name:'testRequisition'+ UUID.randomUUID().toString()[0..5], origin: location, destination: location, requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
+        def requisition = new Requisition(
+                name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
+                commodityClass: CommodityClass.MEDICATION,
+                type:  RequisitionType.WARD_NON_STOCK,
+                origin: location,
+                destination: location,
+                requestedBy: person,
+                dateRequested: new Date(),
+                requestedDeliveryDate: new Date().plus(1))
+
         requisition.addToRequisitionItems(item1)
         requisition.addToRequisitionItems(item2)
 
@@ -27,10 +49,19 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
     }
 
-    void test_saveRequisitionItemOnly(){
+    @Test
+    void save_shouldSaveRequisitionItemOnly(){
         def location = Location.list().first()
         def person = Person.list().first()
-        def requisition = new Requisition(name:'testRequisition'+ UUID.randomUUID().toString()[0..5], origin: location, destination: location, requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
+        def requisition = new Requisition(
+                name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
+                commodityClass: CommodityClass.MEDICATION,
+                type:  RequisitionType.WARD_NON_STOCK,
+                origin: location,
+                destination: location,
+                requestedBy: person,
+                dateRequested: new Date(),
+                requestedDeliveryDate: new Date().plus(1))
 
         assert requisition.save(flush:true)
 

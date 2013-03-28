@@ -1,35 +1,26 @@
-<div id="requisition-header">
-
-			<%-- 	
-			<div id="requisition-header">
-				<div class="title" id="description"
-					data-bind="html: requisition.name"></div>
-				<div class="time-stamp fade"
-					data-bind="text: requisition.lastUpdated"></div>
-				<div class="status fade">
-					<span data-bind="text: requisition.status"></span>
-				</div>
-			</div>
-			--%>
-
-
+<div id="requisition-summary">
 	<g:if test="${requisition?.id}">
-		<table>
+		<table style="width: auto;">
 			<tbody>			
 				<tr>
-					<td class="center">
+
+                    <td class="top" style="width: 1%;">
+                        <g:render template="../requisition/actions" model="[requisition:requisition]" />
+                    </td>
+
+                    <td class="center">
 						<div>
 							<g:if test="${requisition?.requestNumber }">
 								<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
 							</g:if>
 						</div>
 						${requisition?.requestNumber }
-						
-					</td>				
+
+					</td>
 					<td>
 						<div class="title" id="description">
 							${requisition?.name }
-						</div> 						
+						</div>
 						<div class="clear"></div>
 						<div class="fade">
 							<span id="origin">
@@ -48,10 +39,14 @@
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="request-items">
-								<warehouse:message code="requisition.requisitionItem.label"/>:
+								<warehouse:message code="requisition.requisitionItems.label"/>:
 								<b>${requisition?.requisitionItems?.size()?:0}</b>
 							</span>
-							
+                            <span id="last-updated">
+                                <warehouse:message code="default.lastUpdated.label"/>:
+                                <b><g:formatDate date="${requisition?.lastUpdated }" format="MMM dd, yyyy"/></b>
+                            </span>
+
 							<%--
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="requested-by">
@@ -80,10 +75,7 @@
 						<div class="left">	
 							<div class="title">${requisition?.status }</div>
 							<div class="clear"></div>
-							<div class="fade">
-								<g:formatDate date="${requisition?.lastUpdated }" format="MMM dd, yyyy hh:mma"/>
-							</div>
-						</div>					
+						</div>
 					</td>
 					
 										
@@ -91,7 +83,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td class="top" colspan="3">
+					<td class="top" colspan="4">
 						<%-- 
 						<g:render template="actionsOther" model="[requisition:requisition]"/>
 						--%>
@@ -103,7 +95,7 @@
 	</g:if>
 	<g:else>
 		<div class="title" id="description">
-			${warehouse.message(code: 'requisition.new.label') }
+            ${requisition?.name?:warehouse.message(code: 'requisition.new.label') }
 		</div>
 		<div class="clear"></div>	
 	</g:else>

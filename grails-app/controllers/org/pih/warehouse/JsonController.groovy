@@ -28,7 +28,7 @@ import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
-
+import org.pih.warehouse.requisition.RequisitionItem
 class JsonController {
 	def inventoryService
 	def productService
@@ -36,6 +36,33 @@ class JsonController {
 	def shipmentService
 	def messageSource
 
+
+    def addToRequisitionItems = {
+        log.info "request " + request
+        log.info "params " + params
+        log.info "request.id " + request.id
+        log.info "params.id " + params.id
+
+        def requisition = Requisition.get(params.requisitionId)
+        def product = Product.get(params.productId);
+        def requisitionItem = new RequisitionItem()
+        if (requisition && product) {
+            requisitionItem.product = product
+            requisitionItem.quantity = 1;
+            requisitionItem.substitutable = false
+            requisition.addToRequisitionItems(requisitionItem)
+            requisition.save(flush: true)
+        }
+        def json
+        if (requisitionItem) {
+            json = [success: true, data: requisitionItem.toJson()]
+        }
+        else {
+            json = [success: false, errors: requisitionItem.errors]
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
 
     def getTranslation = {
         def translation = getTranslation(params.text, params.src, params.dest)
@@ -164,7 +191,7 @@ class JsonController {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityToReceive = inventoryService.getQuantityToReceive(location, product)
-		println "quantityToReceive(" + params + "): " + quantityToReceive
+		//println "quantityToReceive(" + params + "): " + quantityToReceive
 		render (quantityToReceive?:"0")
 	}
 
@@ -172,7 +199,7 @@ class JsonController {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityToShip = inventoryService.getQuantityToShip(location, product)
-		println "quantityToShip(" + params + "): " + quantityToShip
+		//println "quantityToShip(" + params + "): " + quantityToShip
 		render (quantityToShip?:"0")
 	}
 
@@ -181,36 +208,52 @@ class JsonController {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
-		println "quantityOnHand(" + params + "): " + quantityOnHand
+		//println "quantityOnHand(" + params + "): " + quantityOnHand
 		render (quantityOnHand?:"0")
 	}
-	
-	
+
+    def getTotalStockCount = {
+        def location = Location.get(params?.location?.id)
+        def results = inventoryService.getTotalStock(location)
+        render results?.keySet()?.size()
+    }
+
+    def getInStockCount = {
+        def location = Location.get(params?.location?.id)
+        def results = inventoryService.getInStock(location)
+        println "in stock: " + results
+        render results?.keySet()?.size()
+    }
+
+    def getOutOfStockCount = {
+        def location = Location.get(params?.location?.id)
+        def results = inventoryService.getOutOfStock(location)
+        render results?.keySet()?.size()
+    }
+
 	def getLowStockCount = { 
-		println "low stock count " + params
 		def location = Location.get(params?.location?.id)
-		def results = inventoryService.getLowStock(location)		
-		render ((results)?results.size():"N/A")
+		def results = inventoryService.getLowStock(location)
+        println "low: " + results
+		render results?.keySet()?.size()
 	}
 
 	def getReorderStockCount = {
-		println "reorder stock count " + params
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getReorderStock(location)
 		println "reorder: " + results
-		render ((results)?results.size():"N/A")
+		render results?.keySet()?.size()
 	}
 
 	def getExpiringStockCount = {
-		println "expired stock count " + params
 		def daysUntilExpiry = Integer.valueOf(params.daysUntilExpiry)
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiringStock(null, location, daysUntilExpiry)
-		render ((results)?results.size():"N/A")
+		render ((results)?results?.size():"N/A")
 	}
 	
 	def getExpiredStockCount = {
-		println "expired stock count " + params
+		//println "expired stock count " + params
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiredStock(null, location)
 		render ((results)?results.size():"N/A")
@@ -477,14 +520,20 @@ class JsonController {
 					items.unique();
 					items = items.collect() {						
 						
-						[	value: it.id,
+						[
+                            label:  it.name + " (" +  it.email + ") ",
+                            value: it.id,
 							valueText: it.name,
-							label:  "" + it.firstName + " " + it.lastName + " " +  it.email + " ",
 							desc: (it?.email) ? it.email : "",
 						]
 					}
+
 				}
 				else {
+                    /*
+                    response.status = 404;
+                    render "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}"
+                    */
 					def item =  [
 						value: "null",
 						valueText : params.term,						
@@ -493,13 +542,17 @@ class JsonController {
 						icon: ""
 					];
 					items.add(item)
+
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		
 		}
-		render items as JSON;
+        println "returning ${items?.size()} items: " + items
+        render items as JSON;
+
+
 	}
 
 	def findProductByName = {
@@ -658,24 +711,48 @@ class JsonController {
 		render shipmentItem as JSON
 	}
 
-  
-  def searchProduct = {
-      def location = Location.get(session.warehouse.id);
-      def products = productService.searchProductAndProductGroup(params.term)
-      def productIds = products.collect{ it[0]}
-      //def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
-	  // To reference quantities ...
-	  // quantities[productData[0]] 
-      def result = []  
-      
-      products.each{ productData ->
-		  println "productData " + productData
-		  //if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
-		  //result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
-		  result.add([id: productData[0], value: productData[2] + " - " + productData[1], type:"Product", quantity: null, group: ""])
-      }
-      //println result
-      render result.sort{"${it.group}${it.value}"} as JSON
+
+    def searchProduct = {
+        def location = Location.get(session.warehouse.id);
+        def results = productService.searchProductAndProductGroup(params.term)
+        if (!results) {
+            results = productService.searchProductAndProductGroup(params.term, true)
+        }
+
+        def productIds = results.collect { it[0] }
+        def products = productService.getProducts(productIds as String[])
+
+        //def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
+        // To reference quantities ...
+        // quantities[productData[0]]
+        def result = []
+        def value = ""
+        def productPackageName = ""
+        products.each { product ->
+            //println "productData " + productData
+            //if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
+            //result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
+            //result.add([id: productData[0], value: productData[2] + " - " + productData[1], type:"Product", quantity: null, group: ""])
+            productPackageName = "EA/1"
+            value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
+            value = value.trim()
+
+            // Add the EACH level items
+            result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
+
+            // Add the package level items
+            product.packages.each { pkg ->
+                productPackageName = pkg.uom.code + "/" + pkg.quantity;
+                value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
+                value = value.trim()
+                result.add([id: product.id, value: value, type: "Product", quantity: null, group: null,
+                        productPackageId: pkg?.id, productPackageName: productPackageName])
+
+            }
+
+        }
+        println result
+        render result.sort { "${it.group}${it.value}" } as JSON
     }
 
 

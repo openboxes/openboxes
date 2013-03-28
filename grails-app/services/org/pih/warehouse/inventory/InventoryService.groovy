@@ -38,6 +38,8 @@ import org.springframework.validation.Errors;
 import org.pih.warehouse.reporting.Consumption;
 import org.pih.warehouse.auth.AuthService
 
+import static org.pih.warehouse.inventory.InventoryLevel.*
+
 class InventoryService implements ApplicationContextAware {
 
 	def sessionFactory
@@ -231,10 +233,20 @@ class InventoryService implements ApplicationContextAware {
 		log.debug("get products: " + commandInstance?.warehouseInstance)
 		log.info "command.tag  = " + commandInstance.tag
 		def products = []
+
+        // User wants to view all products that match the given tag
 		if (commandInstance.tag) {
 			commandInstance.numResults = countProductsByTags(commandInstance.tag)
 			products = getProductsByTags(commandInstance.tag, commandInstance?.maxResults as int, commandInstance?.offset as int)
-		} else {
+		}
+
+        // User wants to view all products in the given shipment
+        else if (commandInstance.shipment) {
+            commandInstance.numResults = countProductsByShipment(commandInstance.shipment)
+            products = getProductsByShipment(commandInstance.shipment, commandInstance?.maxResults as int, commandInstance?.offset as int)
+
+        }
+        else {
 			// Get all products, including hidden ones
 			def matchCategories = getExplodedCategories(categories)
 			println " * Get all categories: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -294,9 +306,9 @@ class InventoryService implements ApplicationContextAware {
 		products.each { product ->
 			def innerStartTime = System.currentTimeMillis()
 			inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
-			println "product " + product
-			println "inventoryLevel.class.name = " + inventoryLevel?.class?.name
-			println "inventoryLevels " + inventoryLevel
+			//println "product " + product
+			//println "inventoryLevel.class.name = " + inventoryLevel?.class?.name
+			//println "inventoryLevels " + inventoryLevel
 			
 						
 			if (inventoryLevel && inventoryLevel instanceof ArrayList) { 
@@ -624,8 +636,8 @@ class InventoryService implements ApplicationContextAware {
 		if (category) {
 			expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
 		}
-		
-		println " * Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        println "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return expiredStock
 
 	}
@@ -653,29 +665,63 @@ class InventoryService implements ApplicationContextAware {
 		if (threshold) {
 			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
 		}
-		println " * Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        println "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return expiringStock
 	}
 
 
-	List getLowStock(Location location) {
-		long startTime = System.currentTimeMillis()
-		def quantityMap = getQuantityForInventory(location.inventory)
-		def lowStock = quantityMap.findAll { it.value <= 0 }
+    def getTotalStock(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        println "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        return quantityMap
+    }
 
-		println " * Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
-		return lowStock.keySet() as List
+    def getInStock(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        def inStock = quantityMap.findAll { it.value > 0 }
+        println "Get in stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        return inStock
+    }
+
+    def getOutOfStock(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        def stockOut = quantityMap.findAll { it.value <= 0 }
+
+        println "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
+        return stockOut
+    }
+
+	def getLowStock(Location location) {
+		long startTime = System.currentTimeMillis()
+		def quantityMap = getQuantityByProductMap(location.inventory)
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
+        def lowStock = quantityMap.findAll { inventoryLevelMap[it]?.minQuantity && it.value <= inventoryLevelMap[it]?.minQuantity }
+        println "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
+		return lowStock
 	}
 
-	List getReorderStock(Location location) {
+	def getReorderStock(Location location) {
 		long startTime = System.currentTimeMillis()
-		def quantityMap = getQuantityForInventory(location.inventory)
-		def reorderStock = quantityMap.findAll { it.value <= it?.key?.product?.getInventoryLevel(location?.id)?.reorderQuantity }
-		println " * Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
-		return reorderStock.keySet() as List
-
+		def quantityMap = getQuantityByProductMap(location.inventory)
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+		def reorderStock = quantityMap.findAll { inventoryLevelMap[it]?.reorderQuantity && it.value <= inventoryLevelMap[it]?.reorderQuantity }
+		println "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
+		return reorderStock
 	}
 
+    def getOverStock(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def overStock = quantityMap.findAll { inventoryLevelMap[it]?.maxQuantity && it.value > inventoryLevelMap[it]?.maxQuantity }
+        println "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        return overStock
+    }
 
 	/**
 	 * Get all products matching the given terms and categories.
@@ -835,7 +881,7 @@ class InventoryService implements ApplicationContextAware {
 			projections { count('id') }
 			tags { 'in'('tag', inputTags) }
 		}
-		println "Results " + results[0]
+		//println "Results " + results[0]
 		return results[0]
 	}
 	
@@ -852,6 +898,21 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return products
 	}
+
+    def countProductsByShipment(shipment) {
+        return getProductsByShipment(shipment, 0, 0)?.size()?:0
+    }
+
+    def getProductsByShipment(shipment, max, offset) {
+        def products = []
+        if (shipment) {
+            shipment.shipmentItems.each { shipmentItem ->
+                products << shipmentItem.inventoryItem.product
+            }
+        }
+        return products;
+
+    }
 
 	/**
 	 * Return a list of products that are marked as NON_SUPPORTED or NON_INVENTORIED
@@ -1001,7 +1062,7 @@ class InventoryService implements ApplicationContextAware {
                 }
 			}
 		}
-		println "getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+		println " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1059,7 +1120,7 @@ class InventoryService implements ApplicationContextAware {
 				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
 		}
-		println "getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+		println " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantityMap
 	}
 

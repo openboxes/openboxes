@@ -39,10 +39,11 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
         def model = controller.edit()
 
-        assert model.locations[0] == location3
-        assert model.locations[1] == location1
-        assert !model.locations.contains(location2)
-        assert !model.locations.contains(myLocation)
+        // Removed locations from the model in edit action
+        //assert model.locations[0] == location3
+        //assert model.locations[1] == location1
+        //assert !model.locations.contains(location2)
+        //assert !model.locations.contains(myLocation)
     }
 
     void testEditExistingRequisition(){

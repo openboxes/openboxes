@@ -16,7 +16,12 @@ class AutoSuggestStringTagLib {
 		
 
 	def autoSuggestString = { attrs, body ->
+        def startTime = System.currentTimeMillis()
+
 		out << g.render(template: '/taglib/autoSuggestString', model: [attrs:attrs]);
+
+        println "Autosuggeststring: " + (System.currentTimeMillis() - startTime) + " ms"
+
 	}
 	
 	def autoSuggestString_v1 = { attrs, body ->

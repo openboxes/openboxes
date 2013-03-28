@@ -28,8 +28,12 @@ public enum RequisitionStatus {
 	}
 	/* remove OPEN, FULFILLED */
 	static list() {
-		[ CREATED, PICKING, PICKED, PENDING, FULFILLED, ISSUED, RECEIVED, CANCELED ]
+		[ CREATED, PICKING, PICKED, PENDING, ISSUED, RECEIVED, CANCELED ]
 	}
+
+    static listAll() {
+        [ CREATED, PICKING, PICKED, PENDING, FULFILLED, ISSUED, RECEIVED, CANCELED ]
+    }
 	
 	String toString() { return name() }
 

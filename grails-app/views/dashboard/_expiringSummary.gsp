@@ -7,9 +7,26 @@
 
     		<table>
     			<tbody>
-					<tr class="even">
+
+                    <tr class="even">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listExpiredStock">
+                                <warehouse:message code="inventory.listExpiredStock.label" default="Items that have expired"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="expiredStockCount">
+                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                            </div>
+                        </td>
+                    </tr>
+
+					<tr class="odd">
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/silk/clock_red.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:30]">
@@ -21,7 +38,7 @@
 							<div id="expiringIn30DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 						</td>
 					</tr>
-					<tr class="odd">
+					<tr class="even">
 						<td class="center" style="width: 1%">
 							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
 						</td>
@@ -35,7 +52,7 @@
 						
 						</td>
 					</tr>
-					<tr class="even">
+					<tr class="odd">
 						<td class="center" style="width: 1%">
 							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
 						</td>

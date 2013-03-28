@@ -129,6 +129,8 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.version = ko.observable(attrs.version);
     self.productId = ko.observable(attrs.productId);
     self.productName = ko.observable(attrs.productName);
+    self.productPackageId = ko.observable(attrs.productPackageId);
+    self.productPackageName = ko.observable(attrs.productPackageName);
     self.quantity =  ko.observable(attrs.quantity);
     self.comment = ko.observable(attrs.comment);
     self.unitOfMeasure = ko.observable(attrs.unitOfMeasure)
@@ -189,9 +191,9 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
               delete pickedItem.version;
         });
         var jsonString = JSON.stringify(picklist);
+
         //console.log("here are the picklistItems: "  + jsonString);
         //console.log("endpoint is " + formElement.action);
-        
         jQuery.ajax({
             url: formElement.action,
             contentType: 'text/json',
@@ -245,6 +247,8 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
         var jsonString = getJsonDataFromRequisition();
         printMessage("here is the req: "  + jsonString);
         printMessage("endpoint is " + formElement.action);
+        alert(jsonString);
+
         try {
             jQuery.ajax({
                 url: formElement.action,
@@ -273,32 +277,38 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
                 },
                 error: function() {
                     printMessage("failure");
+                    alert("There was an error saving requisition items");
                 }
             });
         } catch (err) {
             printMessage("here is the err: " + err);
         }
+
     };
 
     //private functions
-    function getJsonDataFromRequisition(){
-       var data = ko.toJS(self.requisition);
+    function getJsonDataFromRequisition() {
+        var data = ko.toJS(self.requisition);
+        console.log(data);
         data["origin.id"] = data.originId;
         data["requestedBy.id"] = data.requestedById;
         delete data.version;
         delete data.status;
         delete data.lastUpdated;
-        for(var attr in data){
-          if(data[attr] == null) delete data[attr];
+        for (var attr in data) {
+            if (data[attr] == null) delete data[attr];
         }
-        _.each(data.requisitionItems, function(item){
-          item["product.id"] = item.productId;
-          for(var attr in item){
-            if(item[attr] == null) delete item[attr];
-          }
-          delete item.version;
+        _.each(data.requisitionItems, function (item) {
+            // Convert to variable names that will automatically bind on the server
+            item["product.id"] = item.productId;
+            item["productPackage.id"] = item.productPackageId;
+
+            for (var attr in item) {
+                if (item[attr] == null) delete item[attr];
+            }
+            delete item.version;
         });
-        return JSON.stringify( data);
+        return JSON.stringify(data);
     }
 };
 

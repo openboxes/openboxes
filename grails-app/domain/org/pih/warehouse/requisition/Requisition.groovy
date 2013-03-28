@@ -54,9 +54,9 @@ class Requisition implements Serializable {
 	String recipientProgram	
 	
 	// Stock requisitions will need to be handled through a template version of a requisition
-	Boolean isTemplate 
-	Boolean isPublished
-	Date datePublished = new Date()
+	Boolean isTemplate = false
+	Boolean isPublished = false
+	Date datePublished
 
 	// Not used yet
 	Date dateValidFrom 
@@ -80,7 +80,7 @@ class Requisition implements Serializable {
 		requisitionItems cascade: "all-delete-orphan", sort: "id"
 //		comments cascade: "all-delete-orphan"
 //		documents cascade: "all-delete-orphan"
-		events cascade: "all-delete-orphan"
+		//events cascade: "all-delete-orphan"
 	}
 	
 	static constraints = { 
@@ -109,7 +109,7 @@ class Requisition implements Serializable {
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
         recipientProgram(nullable:true)
-		commodityClass(nullable:true)
+		commodityClass(nullable:false)
 		isTemplate(nullable:true)
 		isPublished(nullable:true)
 		datePublished(nullable:true)

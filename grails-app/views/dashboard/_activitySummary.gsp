@@ -2,25 +2,32 @@
 	<div class="widget-header">
 		<h2>
 			<warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/>
-		</h2>
-	</div>	    			
+            <div style="float: right" class="fade">
+                <g:link controller="dashboard" action="index" class="${!params.daysToInclude || params.daysToInclude.equals('3')?'selected':''}" params="[daysToInclude:3]">Last 3 days</g:link> |
+                <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('7')?'selected':''}" params="[daysToInclude:7]">Last week</g:link> |
+                <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('30')?'selected':''}" params="[daysToInclude:30]">Last month</g:link>
+            </div>
+        </h2>
+	</div>
 	<div class="widget-content" style="padding: 0; margin: 0">	    					    			
 		<%-- 	
 		<div style="padding: 10px">
 			There are ${activityList.size() } recent activities.		
 		</div>
 		--%>
-		<div id="activity-summary" >	
-		
+		<div id="activity-summary" >
+
 			<table>
 				<tbody>
-					<tr>
-						<td colspan="2">
-							<div class="fade">
-								<warehouse:message code="dashboard.showing.message" args="[startIndex+1,endIndex+1,activityListTotal,daysToInclude]"/>
-							</div>
-						</td>
-					</tr>
+                    <g:if test="${activityList}">
+                        <tr>
+                            <td colspan="2">
+                                <div class="fade">
+                                    <warehouse:message code="dashboard.showing.message" args="[startIndex+1,endIndex+1,activityListTotal,daysToInclude]"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </g:if>
 					<g:set var="status" value="${0 }"/>
 		 			<g:each var="activity" in="${activityList }" status="i">
 		 				<tr class="${status++%2?'even':'odd' } prop">
@@ -41,9 +48,9 @@
 		 			</g:each>
 		 			
 		 			<g:unless test="${activityList }">
-						<tr class="prop">
-							<td>
-								<warehouse:message code="dashboard.noActivityFound.message"/>
+						<tr class="">
+							<td class="center">
+								<span class="fade"><warehouse:message code="dashboard.noActivityFound.message"/></span>
 							</td>
 						</tr>	 			
 		 			</g:unless>

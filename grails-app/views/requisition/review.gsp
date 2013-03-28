@@ -17,20 +17,20 @@
                 
                 <div id="tabs-details">
 
-					<table class="requisition">
+					<table class="requisition" style="width: auto;margin-left: auto;margin-right: auto;">
 						<thead>
 							<tr class="odd">
+                                <%--
 								<th class="center">
 									<g:checkBox name="selectAll" class="selectAll"/>
 								</th>
+								--%>
 								<th>
-									<warehouse:message code="default.status.label" />										
-								</th>
-								<th>
-									<warehouse:message code="product.label" />
+									<warehouse:message code="requisitionItem.product.label" /> /
+                                    <warehouse:message code="requisitionItem.productPackage.label" />
 								</th>
 								<th class="right">
-									<warehouse:message code="requisition.quantity.label" />
+									<warehouse:message code="requisitionItem.quantity.label" />
 								</th>
 								<th class="right">
 									<warehouse:message code="default.quantityOnHand.label" />
@@ -40,9 +40,6 @@
 									<warehouse:message code="default.quantityAvailableToPromise.label" />
 								</th>
 								--%>
-								<th>
-									<warehouse:message code="default.lastUpdated.label"/>
-								</th>
 								<th>
 									<warehouse:message code="default.actions.label"/>
 								</th>
@@ -68,7 +65,7 @@
 				</div>
 				<div class="clear"></div>	
 				<div class="buttons">
-					<div class="right">
+					<div class="center">
 						<g:link controller="requisition" action="edit" id="${requisition.id }" class="button">
 							<warehouse:message code="default.button.back.label"/>	
 						</g:link>

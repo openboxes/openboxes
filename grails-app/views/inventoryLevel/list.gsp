@@ -28,13 +28,16 @@
                             <g:sortableColumn property="id" title="${warehouse.message(code: 'inventoryLevel.id.label', default: 'Id')}" />
                         
                             <th><warehouse:message code="inventoryLevel.product.label" default="Product" /></th>
-                   	    
-                            <g:sortableColumn property="supported" title="${warehouse.message(code: 'inventoryLevel.supported.label', default: 'Supported')}" />
+
+                            <g:sortableColumn property="inventory" title="${warehouse.message(code: 'inventoryLevel.inventory.label', default: 'Inventory')}" />
+
+                            <g:sortableColumn property="status" title="${warehouse.message(code: 'inventoryLevel.status.label', default: 'Status')}" />
                         
                             <g:sortableColumn property="minQuantity" title="${warehouse.message(code: 'inventoryLevel.minQuantity.label', default: 'Min Quantity')}" />
                         
                             <g:sortableColumn property="reorderQuantity" title="${warehouse.message(code: 'inventoryLevel.reorderQuantity.label', default: 'Reorder Quantity')}" />
-                        
+                            <g:sortableColumn property="maxQuantity" title="${warehouse.message(code: 'inventoryLevel.maxQuantity.label', default: 'Max Quantity')}" />
+
                             <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'inventoryLevel.dateCreated.label', default: 'Date Created')}" />
                         
                         </tr>
@@ -46,13 +49,16 @@
                             <td><g:link action="edit" id="${inventoryLevelInstance.id}">${fieldValue(bean: inventoryLevelInstance, field: "id")}</g:link></td>
                         
                             <td>${fieldValue(bean: inventoryLevelInstance, field: "product")}</td>
-                        
-                            <td><g:formatBoolean boolean="${inventoryLevelInstance.supported}" /></td>
+
+                            <td>${fieldValue(bean: inventoryLevelInstance, field: "inventory")}</td>
+
+                            <td>${inventoryLevelInstance.status}</td>
                         
                             <td>${fieldValue(bean: inventoryLevelInstance, field: "minQuantity")}</td>
                         
                             <td>${fieldValue(bean: inventoryLevelInstance, field: "reorderQuantity")}</td>
-                        
+                            <td>${fieldValue(bean: inventoryLevelInstance, field: "maxQuantity")}</td>
+
                             <td><format:date obj="${inventoryLevelInstance.dateCreated}" /></td>
                         
                         </tr>

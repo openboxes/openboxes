@@ -83,7 +83,11 @@ class DatePickerTagLib {
 						//showOtherMonths: true,
 						//selectOtherMonths: true
 
-					});
+					}).keyup(function(e) {
+                        if(e.keyCode == 8 || e.keyCode == 46) {
+                            \$.datepicker._clearDate(this);
+                        }
+                    });
 					
 					// If we reset the date, we need to reset the hidden form field as well.
 					jQuery('#${id}-datepicker').change(function() {

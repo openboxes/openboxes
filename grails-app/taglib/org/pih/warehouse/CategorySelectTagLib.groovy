@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse
 
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 
@@ -21,21 +22,44 @@ class CategorySelectTagLib {
 		out << render(template:"../taglib/selectCategoryMcDropDown", model:[attrs:attrs])
 	}
 	
-	
+	def getCategories(node) {
+        def array = []
+        array << node
+        if (node.categories) {
+            for (Category c : node.categories) {
+                def categories = getCategories(c)
+                categories.each {
+                    array << it
+                }
+            }
+        }
+        else {
+            return node;
+        }
+
+        return array;
+    }
+
+
 	def selectCategory_v2 = { attrs ->		
-		if (!attrs.from) { 
-			attrs.from = productService.getRootCategory()
-			attrs.depth = 0;
-		}
-		
+		//if (!attrs.from) {
+		//	attrs.from = productService.getRootCategory()
+		//	attrs.depth = 0;
+		//}
+        attrs.from = getCategories(productService.getRootCategory())
 		attrs.optionKey = 'id'
 		attrs.noSelection = ['null':'-Choose a category-']
-
 		attrs.value = attrs.value
-		attrs.optionValue = { it.name }
-		//out << g.select(attrs)
+
+        if (attrs.abbreviate) {
+    		attrs.optionValue = { StringUtils.abbreviate(it.name, 50) + " (" + it?.products?.size() + ")"}
+        }
+        else {
+            attrs.optionValue = { it.name + " (" + it?.products?.size() + ")"}
+        }
+	    out << g.select(attrs)
 		
-		out << render(template:"../taglib/selectCategories", model:[attrs:attrs])
+		//out << render(template:"../taglib/selectCategories", model:[attrs:attrs])
 		
 	}
 	

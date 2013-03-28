@@ -22,6 +22,14 @@
                 </g:link>
             </div>
         </g:else>
+    <%--
+            <div class="action-menu-item">
+                <g:link controller="inventory" action="browse" params="['shipment.id':shipmentInstance?.id]">
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'database.png')}" class="middle"/>&nbsp;
+                    <warehouse:message code="shipping.viewInInventoryBrowser.label" default="View in inventory browser"/>
+                </g:link>
+            </div>
+    --%>
         <div class="action-menu-item">
             <hr/>
         </div>

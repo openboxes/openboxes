@@ -35,5 +35,9 @@ class DashboardControllerTests extends ControllerUnitTestCase {
 		//def model = controller.list()		
 		//assertEquals 2, model.locations.size()
 		//assertEquals "list" model.view
-	}	
+	}
+
+
+
+
 }

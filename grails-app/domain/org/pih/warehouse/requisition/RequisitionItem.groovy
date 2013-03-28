@@ -16,7 +16,8 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.picklist.PicklistItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.ProductGroup;
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductPackage;
 
 
 class RequisitionItem implements Serializable {
@@ -29,9 +30,10 @@ class RequisitionItem implements Serializable {
     Category category
 	InventoryItem inventoryItem
     ProductGroup productGroup
-	
-	// Cancellation
-	Integer quantity 
+	ProductPackage productPackage
+    Integer quantity
+
+    // Cancellation / change
 	Integer quantityCanceled
 	String cancelReasonCode
 	String cancelComments
@@ -69,6 +71,7 @@ class RequisitionItem implements Serializable {
         category(nullable:true)
         product(nullable:false)
         productGroup(nullable:true)
+        productPackage(nullable:true)
         inventoryItem(nullable:true)
         requestedBy(nullable:true)
         quantity(nullable:false, min:1)
@@ -105,7 +108,9 @@ class RequisitionItem implements Serializable {
         id: id,
         version: version,
         productId: product?.id,
-        productName: product?.name,
+        productName: product?.name + ((productPackage) ? " ("+productPackage?.uom?.code + "/" + productPackage?.quantity + ")" : " (EA/1)"),
+        productPackageId: productPackage?.id,
+        productPackageName: productPackage?.uom?.code + "/" + productPackage?.quantity,
 		unitOfMeasure: product?.unitOfMeasure?:"EA",
         quantity:quantity,
         comment: comment,

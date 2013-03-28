@@ -26,6 +26,7 @@ class Tag implements Serializable {
 	
 	String id
 	String tag
+    Boolean isActive = Boolean.TRUE
 	Date dateCreated;
 	Date lastUpdated;
 	User createdBy
@@ -36,14 +37,13 @@ class Tag implements Serializable {
 	static mapping = {
 		id generator: 'uuid'		
 		products joinTable: [name:'product_tag', column: 'product_id', key: 'tag_id']
-		//products joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id']
-		//products joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id']
 	}
 	
 	static hasMany = [products : Product] 
 	
 	static constraints = {
 		tag(nullable:false, maxSize: 255)
+        isActive(nullable: true)
 		updatedBy(nullable:true)
 		createdBy(nullable:true)
 	}

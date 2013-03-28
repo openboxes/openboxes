@@ -21,8 +21,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		requisitionService.identifierService = [generateRequisitionIdentifier: { -> return "ABC-123" }]
 		mockDomain(Requisition, [])
 		mockDomain(RequisitionItem, [])
-		Product product1 = new Product(id:"prod1")
-		Product product2 = new Product(id:"prod2")
+		Product product1 = new Product(id:"prod1", name: "Product")
+		Product product2 = new Product(id:"prod2", name: "Product")
 		mockDomain(Product, [product1, product2])
 		Location boston = new Location(name:"boston", id:"2")
 		Location miami = new Location(name: "miami", id: "3")
@@ -37,15 +37,16 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		]
 		def jsonNull = new org.codehaus.groovy.grails.web.json.JSONObject.Null()
 		Map data = [id: jsonNull, "origin.id": miami.id, "requestedBy.id": john.id,
-			dateRequested: today, requestedDeliveryDate: tomorrow,
-			name: "testRequisition",
-			requisitionItems: items]
+			dateRequested: today, requestedDeliveryDate: tomorrow, commodityClass: CommodityClass.MEDICATION,
+			name: "testRequisition", requisitionItems: items]
 		//def service = new RequisitionService()
 
 		def requisition = requisitionService.saveRequisition(data, boston)
 
 		def requisitionPersisted = Requisition.findByName("testRequisition")
 
+        assertNotNull requisition
+        assertNotNull requisitionPersisted
 
 		assert requisition == requisitionPersisted
 		assert requisition.requestedBy == john

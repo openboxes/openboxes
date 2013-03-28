@@ -13,26 +13,19 @@
             </g:if>
 			<g:hasErrors bean="${categoryInstance}">
 				<div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
-			</g:hasErrors>            
+			</g:hasErrors>
 
 
-			<div class="buttonBar">            	
-            	<span class="linkButton">
-					<g:link class="list" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-            	</span>	
-              <g:isUserAdmin>
-                <span class="linkButton">
-            <g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-                </span>	
-              </g:isUserAdmin>
-			</div>
+            <div class="buttonBar">
+                <g:link class="button" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
+                <g:isUserAdmin>
+                    <g:link class="button" controller="category" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
+                </g:isUserAdmin>
+            </div>
 
-        <div class="yui-gd">
-
-
-
+        <div class="yui-ga">
             <div class="yui-u first">
-                <table>
+                <table style="width:auto;">
                     <tr>
                         <td>
                             <fieldset>
@@ -49,7 +42,8 @@
 
                                     <script>
                                         $(function() {
-                                            //$( ".draggable" ).draggable();
+
+                                            $(".chzn-select").chosen();
 
                                             $('li.draggable').draggable(
                                                     {
@@ -97,156 +91,7 @@
                 </table>
             </div>
 
-            <div class="yui-u">
-                <h1><format:category category="${categoryInstance}"/></h1>
-                <table>
-                    <g:if test="${categoryInstance }">
-                        <tr>
-                            <td>
-                                <g:form action="saveCategory">
-                                    <g:hiddenField name="id" value="${categoryInstance?.id }"/>
-                                    <fieldset>
-                                        <table>
-                                            <tr class="prop odd">
-                                                <td class="name">
-                                                    <label><warehouse:message code="category.parent.label"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <select name="parentCategory.id">
-                                                        <option value="null"><warehouse:message code="category.chooseACategory.label"/></option>
-                                                        <g:render template="selectOptions" model="[category:rootCategory, selected:categoryInstance?.parentCategory, level: 0]"/>
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="prop even">
 
-
-                                                <td class="name">
-                                                    <label><warehouse:message code="default.name.label"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <g:textField name="name" value="${categoryInstance?.name }" class="text" size="60"/>
-                                                </td>
-                                            </tr>
-                                            <tr class="prop even">
-                                                <td class="name">
-                                                    <label><warehouse:message code="category.isRoot.label" default="Is root node?"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <g:checkBox name="isRoot" value="${categoryInstance?.isRoot }"/>
-
-                                                </td>
-                                            </tr>
-                                            <tr class="prop even">
-                                                <td class="name">
-                                                    <label><warehouse:message code="default.sortOrder.label" default="Sort order"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <g:textField name="sortOrder" value="${categoryInstance?.sortOrder }" class="text" size="10"/>
-
-                                                </td>
-                                            </tr>
-
-                                            <tr class="prop odd">
-                                                <td class="name">
-                                                    <label><warehouse:message code="category.children.label"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <g:if test="${categoryInstance?.categories }">
-                                                        <table>
-                                                            <g:each var="child" in="${categoryInstance?.categories }" status="status">
-                                                                <tr>
-                                                                    <td>
-                                                                        <g:link action="tree" id="${child.id }"><format:category category="${child}"/></g:link>
-                                                                    </td>
-                                                                </tr>
-                                                            </g:each>
-                                                        </table>
-                                                    </g:if>
-                                                </td>
-                                            </tr>
-                                            <tr class="prop even">
-                                                <td class="name">
-                                                    <label><warehouse:message code="category.products.label"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <g:if test="${categoryInstance?.products }">
-                                                        <table>
-                                                            <g:each var="product" in="${categoryInstance?.products }" status="status">
-                                                                <tr>
-                                                                    <td>
-                                                                        <label>${product?.productCode}</label>
-                                                                        <g:link controller="product" action="edit" id="${product?.id}" target="_blank"><format:product product="${product}"/></g:link>
-                                                                    </td>
-                                                                </tr>
-                                                            </g:each>
-                                                        </table>
-                                                    </g:if>
-                                                </td>
-                                            </tr>
-
-                                            <tr class="prop">
-                                                <td colspan="2" style="text-align:center">
-
-                                                    <button type="submit" name="save" class="button">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
-                                                    &nbsp;
-                                                    <g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </fieldset>
-                                </g:form>
-                            </td>
-                        </tr>
-                    </g:if>
-                    <g:else>
-                        <tr>
-                            <td>
-                                <g:if test="${params.addCategory=='addCategory' }">
-                                    <g:form action="save" method="post" >
-                                        <fieldset>
-                                            <table>
-                                                <tbody>
-                                                <tr class="prop">
-                                                    <td class="name">
-                                                        <label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
-                                                    </td>
-                                                    <td class="value">
-                                                        <select name="parentCategory.id" style="display: inline">
-                                                            <option value="null"></option>
-                                                            <g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr class="prop">
-                                                    <td valign="top" class="name ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
-                                                        <label for="name" class="desc"><warehouse:message code="default.name.label" default="Name" /></label>
-                                                    </td>
-                                                    <td class="value">
-                                                        <g:textField name="name" class="text" size="80" value="${categoryInstance?.name}" />
-                                                    </td>
-                                                </tr>
-                                                <tr class="prop">
-                                                    <td colspan="2" style="text-align:center">
-                                                        <button type="submit" name="create" class="button">${warehouse.message(code: 'default.button.create.label', default: 'Create')}</button>
-                                                        &nbsp;
-                                                        <g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </fieldset>
-
-                                    </g:form>
-                                </g:if>
-
-                            </td>
-                        </tr>
-
-
-                    </g:else>
-
-                </table>
 
 
                 <%--

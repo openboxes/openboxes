@@ -10,6 +10,7 @@
 //grails.server.port.http = 8081
 
 grails.project.class.dir = "target/classes"
+grails.project.docs.output.dir = "web-app/docs"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir	= "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
@@ -43,7 +44,10 @@ grails.project.dependency.resolution = {
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
         compile 'org.apache.commons:commons-email:1.2'
 		compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
-		
+
+        //runtime ":resources:1.2.RC2"
+        //runtime ":cached-resources:1.0"
+
         test "org.codehaus.geb:geb-spock:0.6.3"
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
         test ('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }

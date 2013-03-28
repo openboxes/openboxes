@@ -53,43 +53,62 @@ class Category implements Comparable, Serializable {
 	int compareTo(obj) {
 		this.getHierarchyAsString(">") <=> obj.getHierarchyAsString(">")
 	}
-	
+
+    /**
+     * @param separator
+     * @return  a string representation of the category hierarchy
+     */
 	String getHierarchyAsString(String separator) {
-		String s = ""
-		getParents().each {
-			s += it.name + separator
+		String hierarchyAsString = ""
+		def nodes = getParents()
+        nodes.each {
+            hierarchyAsString += it.name + separator
 		}
-		return s;
+        hierarchyAsString += this.name
+		return hierarchyAsString;
 	}
-	
+
+    /**
+     * @return  true if the category is marked as root or if it's the same object returned by the getRootCategory() method.
+     */
 	Boolean isRootCategory() { 
-		return isRoot
+		return isRoot || this.equals(Category.getRootCategory())
 	}
-	
+
+    /**
+     * @return  the root category
+     */
 	static Category getRootCategory() { 
-		return Category.findByIsRoot(true)
+		def rootCategory = Category.findByIsRoot(true)
+        if (!rootCategory)
+            rootCategory = Category.findByParentCategoryIsNull()
+        return rootCategory
 	}
-	
-	
-	List getParents() { 
+
+    /**
+     * @return
+     */
+	def getParents() {
 		def parents = []
-		getAllParents(this, parents)	
-		return (parents? parents.reverse() : []);
-	}
+        getParents(this, parents)
+		return (parents ? parents.reverse() : []);
+    }
 	
 
-	def List getAllParents(Category node, List parents) {	
-		if (node) { 
-			parents << node;
-			if (node.parentCategory) {
-				getAllParents(node.parentCategory, parents)
-			}
-			else {
-				//return parents;
-			}
-		}
+	def List getParents(Category node, List parents) {
+        if (!node?.parentCategory) {
+            return parents;
+        }
+        else {
+            parents << node.parentCategory;
+            return getParents(node.parentCategory, parents)
+        }
 	}
-	
+
+    /**
+     *
+     * @return
+     */
 	def getChildren() {
 		return categories ? categories*.children.flatten() + categories : []
 	}
@@ -98,7 +117,7 @@ class Category implements Comparable, Serializable {
 	// but there's probably a better solution.
 	def getProducts() { 
 		try {  
-			return Product.findAllByCategory(this);
+			return Product.findAllByCategory(this, [cache: true]);
 		} catch (Exception e) { 
 			//log.info("Error getting products for category " + this.id  + " - " + this.name)
 			return null;	
@@ -122,4 +141,21 @@ class Category implements Comparable, Serializable {
 		}
 		return false;
 	}
+
+    Map toJson() {
+        [
+            id: id,
+            description: description,
+            name: name,
+            version: version,
+            dateCreated: dateCreated?.format("dd/MMM/yyyy hh:mm a"),
+            lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
+            sortOrder: sortOrder,
+            deleted: deleted,
+            isRoot: isRoot,
+            categories: categories?.collect{ it.toJson() }
+            //parentCategory: parentCategory.toJson()
+        ]
+    }
+
 }

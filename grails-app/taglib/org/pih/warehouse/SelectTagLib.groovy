@@ -10,17 +10,50 @@
 package org.pih.warehouse
 
 import org.pih.warehouse.core.ActivityCode;
-import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipper;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
+import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.requisition.CommodityClass
 
 class SelectTagLib {
 	
 	def locationService
 	def shipmentService
+
+    def selectTag = { attrs, body ->
+        attrs.from = Tag.list()
+        attrs.multiple = true
+        attrs.optionKey = "id"
+        attrs.optionValue = { it?.tag }
+        out << g.select(attrs)
+    }
+
+
+    def selectUnitOfMeasure = { attrs, body ->
+
+
+        def product = Product.get(attrs?.product?.id)
+
+        if (product.packages) {
+            attrs.noSelection = ["null":"EA/1"]
+            attrs.from = product?.packages?.sort()
+            attrs.optionKey = "id"
+            attrs.optionValue = { it?.uom?.code + "/" + it.quantity + " -- " + it?.uom?.name }
+            out << g.select(attrs)
+        }
+        else {
+            out << product.unitOfMeasure
+
+        }
+    }
 	
 	def selectShipper = { attrs, body ->
 		attrs.from = Shipper.list().sort { it?.name?.toLowerCase() } 
@@ -46,30 +79,91 @@ class SelectTagLib {
 		out << render(template: '/taglib/selectContainer', model: [attrs:attrs])
 		
 	}
-	
-	def selectLocation2 = { attrs, body ->
-		def currentLocation = Location.get(session?.warehouse?.id)
-		
+
+
+    def selectDepot = { attrs, body ->
+        def currentLocation = Location.get(session?.warehouse?.id)
+        def locations = []
+
+        locations = Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}.sort{ it.name }
+        attrs.from = locations
+        attrs.optionKey = 'id'
+        //attrs.optionValue = 'name'
+
+        //attrs.groupBy = 'locationType'
+        attrs.value = attrs.value ?: currentLocation?.id
+        if (attrs.groupBy) {
+            attrs.optionValue = { it.name }
+        }
+        else {
+            attrs.optionValue = { "" + format.metadata(obj: it?.locationType) + " - " + it.name }
+        }
+        out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+
+    }
+
+
+    def selectUser = { attrs, body ->
+        attrs.from = User.list().sort()
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name + " (" + it.username + ")"}
+        out << g.select(attrs)
+    }
+
+    def selectPerson = { attrs, body ->
+
+        def person = Person.get(attrs?.value?.id)
+        //attrs.from = Person.list().sort { it.lastName }
+        //attrs.optionKey = 'id'
+        //attrs.optionValue = { it.name }
+        attrs.selectedPerson = person
+
+        out << render(template: "/taglib/selectPerson", model: [attrs:attrs])
+
+    }
+
+
+	def selectWardOrPharmacy = { attrs, body ->
+        println "select ward or pharmacy"
+        def currentLocation = Location.get(session.warehouse.id)
+        def locations = []
+        if (currentLocation) {
+
+            // If the current location is in a location group, then we want to pull from the locations from that group
+            if(currentLocation?.locationGroup != null) {
+                locations = Location.list().findAll { location -> location.locationGroup?.id == currentLocation.locationGroup?.id }.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
+            }
+
+            // But if there are no other locations in the location group, then we just want to get all locations that are wards or phaamracies
+            if (!locations) {
+                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
+            }
+        }
+        /*
+        def currentLocation = Location.get(session?.warehouse?.id)
 		def locations = locationService.getAllLocations().sort { it?.name?.toLowerCase() }
-		if (attrs.locationGroup) { 
+        println locations
+		if (attrs.locationGroup) {
+            println "filter by location group " + attrs.locationGroup
 			locations = locations.findAll { it.locationGroup == attrs.locationGroup } 
 		}
-		if (attrs.locationType) { 
+		if (attrs.locationType) {
+            println "filter by location type " + attrs.locationType
 			locations = locations.findAll { it.locationType == attrs.locationType }
-			
 		}
-				
+        println locations
+        */
 		attrs.from = locations
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
 		
-		//attrs.groupBy = 'locationType'
+		attrs.groupBy = 'locationType'
 		attrs.value = attrs.value ?: currentLocation?.id
 		if (attrs.groupBy) {
 			attrs.optionValue = { it.name }
 		}
 		else {
-			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+			attrs.optionValue = { "" + format.metadata(obj: it?.locationType) + " - " + it.name }
 		}
 		out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
 	}
@@ -165,7 +259,22 @@ class SelectTagLib {
 		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
-	
+
+    def selectCommodityClass = { attrs, body ->
+        attrs.from = CommodityClass.list()
+        //attrs.optionKey = 'id'
+        //attrs.optionValue = 'name'
+        attrs.optionValue = { format.metadata(obj: it)  }
+        out << g.select(attrs)
+    }
+
+    def selectRequisitionType = { attrs, body ->
+        attrs.from = RequisitionType.list()
+        //attrs.optionKey = 'id'
+        //attrs.optionValue = 'name'
+        attrs.optionValue = { format.metadata(obj: it)  }
+        out << g.select(attrs)
+    }
 
 	/**
 	 * Generic select widget using optgroup.

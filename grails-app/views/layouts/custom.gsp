@@ -1,6 +1,6 @@
 <%@ page import="java.util.Locale" %>
 <?xml version="1.0" encoding="UTF-8"?>
-<html>
+<html lang="en" ng-app>
 <head>
 	<!-- Include default page title -->
 	<title><g:layoutTitle default="OpenBoxes" /></title>
@@ -12,17 +12,9 @@
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
 	<!-- Include Main CSS -->
-	<!-- TODO Apparently there is a slight distinction between these two ... need to figure out what that distinction is -->
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="all" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="all" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="all" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="all" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="all" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
-	<!--
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="all" />
-	-->
+    <link rel="stylesheet" href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
 
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -32,12 +24,15 @@
 	<jqui:resources />
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 
+
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />
     <jqvalui:resources />
 
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="all" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'openboxes.css')}" type="text/css" media="all" />
+	<!--
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+    -->
 
 	<!-- jquery validation messages -->
 	<g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
@@ -54,6 +49,7 @@
 	<g:render template="/common/customCss"/>
 
 	<ga:trackPageview />
+    <r:layoutResources/>
 </head>
 <body class="yui-skin-sam">
 
@@ -106,13 +102,11 @@
                     <li>
                         <g:link controller="dashboard" action="index">
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
-                            <span><warehouse:message code="default.home.label" default="Home"/></span>
                         </g:link>
                     </li>
                     <g:if test="${session?.user && session?.warehouse}">
                         <li>
                             <a href="javascript:void(0);" class="warehouse-switch">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="map"/>
                                 ${session?.warehouse?.name }
                             </a>
                         </li>
@@ -248,8 +242,9 @@
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
 	<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
+    <script src="${createLinkTo(dir:'js/', file:'angular.min.js')}" type="text/javascript"></script>
 
-    <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> 
+    <g:if test="${System.getenv().get('headless') != 'false'}" env="test">
     	<!--headless driver throw error when using watermark-->
 	</g:if>
     <g:else>
@@ -258,7 +253,8 @@
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>	
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
-	
+    <script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
+
 	<script type="text/javascript">
         <g:if test="${session.useDebugLocale}">
             // Define the localization
@@ -477,8 +473,8 @@
 		<g:each in="${1..12}" var="monthNum">
 			monthNamesShort[${monthNum-1}] = '<warehouse:message code="month.short.${monthNum}.label"/>';
 		</g:each>
-    </script>    
-    
+    </script>
+    <r:layoutResources/>
     
 </body>
 </html>

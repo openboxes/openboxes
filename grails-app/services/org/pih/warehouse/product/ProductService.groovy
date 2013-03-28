@@ -267,6 +267,13 @@ class ProductService {
 		return searchResults;
 	}
 
+    /*
+    def getProducts(List ids) {
+        return getProducts(ids.toArray())
+
+    }
+    */
+
 
 	List<Product> getProducts(String [] ids) {
 		def products = []
@@ -275,6 +282,52 @@ class ProductService {
 		}
 		return products
 	}
+
+    def getProducts(Category category, List<Tag> tags, Map params) {
+        println "get products: " + params
+
+        def criteria = Product.createCriteria()
+        def results = criteria.list(max:params.max?:10, offset:params.offset) {
+            and {
+                if (category) {
+                    if (params.includeCategoryChildren) {
+                        def categories = category.children?:[]
+                        categories << category
+                        //categories = categories.collect { it.id }
+
+                        println "Categories to search in " + categories
+                        'in'("category", categories)
+                    }
+                    else {
+                        println "Equality search " + category
+                        eq("category", category)
+                    }
+                }
+
+                if (params.name) ilike("name", params.name + "%")
+                if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
+                if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
+                if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
+                if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
+                if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
+                if (params.productCode) ilike("productCode", params.productCode + "%")
+                if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
+                if (params.createdById) eq("createdBy.id", params.createdById)
+                if (params.updatedById) eq("updatedBy.id", params.updatedById)
+
+                if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
+                if (params.productCodeIsNull) isNull("productCode")
+                if (params.brandNameIsNull) isNull("brandName")
+                if (params.manufacturerIsNull) isNull("manufacturer")
+                if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
+                if (params.vendorIsNull) isNull("vendor")
+                if (params.vendorCodeIsNull) isNull("vendorCode")
+
+            }
+        }
+
+        return results
+    }
 
 
 	Category getRootCategory() {
@@ -382,14 +435,19 @@ class ProductService {
 
 	}
 
+
+    public def searchProductAndProductGroup(String term) {
+        return searchProductAndProductGroup(term, false)
+    }
+
 	/**
 	 * 
 	 * @param term
 	 * @return
 	 */
-	public def searchProductAndProductGroup(String term){
+	public def searchProductAndProductGroup(String term, Boolean wildcards){
 		long startTime = System.currentTimeMillis()
-		def text = "%${term.toLowerCase()}%"
+		def text = (wildcards) ? "%${term.toLowerCase()}%" : "${term.toLowerCase()}%"
 		def products = Product.executeQuery(
 			"""select p.id, p.name, p.productCode 
 				from Product as p 				
@@ -753,14 +811,20 @@ class ProductService {
 	 * @return all tag labels
 	 */
 	def getAllTagLabels() {
-		return Tag.list().collect { it.tag }.unique()
+		return Tag.findAllByIsActive(true).collect { it.tag }.unique()
 	}
 
 	/**
 	 * @return	all tags
 	 */
 	def getAllTags() { 
-		return Tag.list();
+		def tags = Tag.findAllByIsActive(true);
+
+
+        println "tags: " + tags.size()
+        //tags =
+        return tags;
+
 	}
 	
 	/**
@@ -768,7 +832,10 @@ class ProductService {
 	 */
 	def getPopularTags() {
 		def popularTags = [:]
-		String sql = "select tag.id, count(*) from product_tag join tag on tag.id = product_tag.tag_id group by tag.tag order by tag.tag"
+		String sql = """select tag.id, count(*)
+            from product_tag join tag on tag.id = product_tag.tag_id
+            where tag.is_active = true
+            group by tag.tag order by tag.tag"""
 		def sqlQuery = sessionFactory.currentSession.createSQLQuery(sql)		
 		println sqlQuery
 		def list = sqlQuery.list()
@@ -788,7 +855,7 @@ class ProductService {
 	def addTagsToProduct(product, tags) { 
 		if (tags) {
 			tags.each { tagName ->
-				Tag tag = Tag.findByTag(tagName)
+				Tag tag = Tag.findByTagAndIsActive(tagName, true)
 				if (!tag) {
 					tag = new Tag(tag: tagName)
 					tag.save()
@@ -953,7 +1020,7 @@ class ProductService {
      * @return
      */
     def findOrCreateTag(tagText) {
-        Tag tag = Tag.findByTag(tagText)
+        Tag tag = Tag.findByTagAndIsActive(tagText, true)
         if (!tag) {
             tag = new Tag(tag:tagText)
             tag.save();

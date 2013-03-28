@@ -35,10 +35,22 @@
 	                                    <g:textField name="tag" cols="40" rows="5" value="${tagInstance?.tag}" class="text" size="60" />
 	                                </td>
 	                            </tr>
-	                        
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="product.properties.label" default="Properties"/></label>
+                                    </td>
+                                    <td valign="top" class=" ${hasErrors(bean: tagInstance, field: 'active', 'errors')}">
+                                        <div>
+                                            <g:checkBox name="active" value="${tagInstance?.isActive}" />
+                                            <label for="active"><warehouse:message
+                                                    code="default.isActive.label" default="Is active?" /></label>
+                                        </div>
+                                    </td>
+                                </tr>
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="updatedBy"><warehouse:message code="tag.updatedBy.label" default="Updated By" /></label>
+	                                  <label for="updatedBy.id"><warehouse:message code="tag.updatedBy.label" default="Updated By" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'updatedBy', 'errors')}">
 	                                    <g:select name="updatedBy.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${tagInstance?.updatedBy?.id}" noSelection="['null': '']" />
@@ -47,7 +59,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="createdBy"><warehouse:message code="tag.createdBy.label" default="Created By" /></label>
+	                                  <label for="createdBy.id"><warehouse:message code="tag.createdBy.label" default="Created By" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'createdBy', 'errors')}">
 	                                    <g:select name="createdBy.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${tagInstance?.createdBy?.id}" noSelection="['null': '']" />
@@ -78,12 +90,13 @@
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'products', 'errors')}">
                                     	<table>
-			                                <g:each in="${tagInstance.products.sort()}" var="p">
-			                                	<tr>
+			                                <g:each in="${tagInstance.products.sort()}" var="p" status="i">
+			                                	<tr class="${i%2?'odd':'even'}">
 			                                    
 			                                		<td>
+                                                        <label>${p.productCode }</label>
 			                                    		<g:link controller="inventoryItem" action="showStockCard" id="${p.id}">
-			                                    			${p.productCode } ${p?.encodeAsHTML()}
+			                                    			 ${p?.encodeAsHTML()}
 			                                    		</g:link>
 			                                    	</td>
 			                                    </tr>

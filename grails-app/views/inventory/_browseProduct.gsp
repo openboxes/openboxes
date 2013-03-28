@@ -15,6 +15,7 @@
 		</g:else>
 	</td>
 	<td>
+        <cache:cache key="actions-${inventoryItem?.product?.id}">
 		<div class="action-menu hover">
 			<button class="action-btn">
 				<img
@@ -65,10 +66,7 @@
 											<p>${inventoryItem?.product?.description }</p>
 										</td>
 									</tr>					
-									
-									
 								</table>
-								
 							</td>
 						</tr>
 						<tr>
@@ -96,7 +94,8 @@
 
 				</div>
 			</div>
-		</div>	
+		</div>
+        </cache:cache>
 	</td>
 	<td class="top center">
 		<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 

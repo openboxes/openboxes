@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem;
 
 import grails.converters.JSON
@@ -62,22 +63,111 @@ class RequisitionController {
         render(view:"edit", model:[requisition:requisition, locations: locations])
     }
 
+    def createNonStock = {
+        println params
+        def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
+        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_NON_STOCK
+        //requisition.name = getName(requisition)
+        render(view:"createNonStock", model:[requisition:requisition])
+    }
+
+    def chooseTemplate = {
+        println params
+        def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_STOCK
+        //requisition.name = getName(requisition)
+        def templates = Requisition.findAllByIsPublishedAndIsTemplate(true,true)
+
+        render(view:"chooseTemplate", model:[requisition:requisition, templates:templates])
+    }
+
+    def createStockFromTemplate = {
+        def requisition = new Requisition()
+        def requisitionTemplate = Requisition.get(params.id)
+        if (requisitionTemplate) {
+
+            requisition.type = requisitionTemplate.type
+            requisition.origin = requisitionTemplate.origin
+            requisition.destination = requisitionTemplate.destination
+            requisition.commodityClass = requisitionTemplate.commodityClass
+            requisition.createdBy = User.get(session.user.id)
+            requisition.dateRequested = new Date()
+
+            requisitionTemplate.requisitionItems.each {
+                def requisitionItem = new RequisitionItem()
+                requisitionItem.inventoryItem = it.inventoryItem
+                requisitionItem.quantity = it.quantity
+                requisitionItem.product = it.product
+                requisitionItem.productPackage = it.productPackage
+                requisition.addToRequisitionItems(requisitionItem)
+            }
+        }
+        else {
+            flash.message = "Could not find requisition template"
+        }
+        render(view:"createStock", model:[requisition:requisition])
+
+
+    }
+
+    def createAdhoc = {
+        println params
+        def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_ADHOC
+        //requisition.name = getName(requisition)
+        render(view:"createNonStock", model:[requisition:requisition])
+    }
+
+    def createDepot = {
+        println params
+        def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.type = params.type as RequisitionType ?: RequisitionType.DEPOT_TO_DEPOT
+        //requisition.name = getName(requisition)
+        render(view:"createNonStock", model:[requisition:requisition])
+    }
+
+
+    def saveNonStock = {
+        def requisition = new Requisition(params)
+        // Need to handle commodity class since it is an enum
+        if (params.commodityClass) {
+            requisition.commodityClass = params.commodityClass as CommodityClass
+        }
+        requisition.name = getName(requisition)
+        requisition = requisitionService.saveRequisition(requisition)
+        if (!requisition.hasErrors()) {
+            redirect(controller: "requisition", action: "edit", id: requisition?.id)
+        }
+        else {
+            render(view: "createNonStock", model: [requisition:requisition])
+        }
+    }
+
+    def saveStock = {
+        def requisition = new Requisition(params)
+
+
+        // Need to handle commodity class since it is an enum
+        if (params.commodityClass) {
+            requisition.commodityClass = params.commodityClass as CommodityClass
+        }
+        requisition.name = getName(requisition)
+
+        if (requisitionService.saveRequisition(requisition)) {
+            redirect(controller: "requisition", action: "edit", id: requisition?.id)
+        }
+        else {
+            render(view: "createNonStock", model: [requisition:requisition])
+        }
+
+    }
+
+
 	def edit = {
 		def requisition = Requisition.get(params.id)
 		if(requisition) {
-			def locations
-			if (requisition.isWardRequisition()) {
-				locations = getWardsPharmacies()
-			} else {
-				locations = getDepots()
-			}
-			
-			if (!locations) {
-				requisition.errors.rejectValue("origin", "requisition.origin.error")
-			}
-	
-			
-			return [requisition: requisition, locations: locations];
+			return [requisition: requisition];
 		}else {
 			response.sendError(404)
 		}
@@ -85,24 +175,7 @@ class RequisitionController {
 	
 	def editHeader = {
 		def requisition = Requisition.get(params.id)
-		if(requisition) {
-			def locations
-			if (requisition.isWardRequisition()) {
-				locations = getWardsPharmacies()
-			} else {
-				locations = getDepots()
-			}
-			
-			if (!locations) {
-				requisition.errors.rejectValue("origin", "requisition.origin.error")
-			}
-	
-			
-			return [requisition: requisition, locations: locations];
-		}
-		else {
-			response.sendError(404)
-		}
+        [requisition: requisition];
 	}
 	
 	def addAddition = {
@@ -184,22 +257,11 @@ class RequisitionController {
 		def requisition = Requisition.get(params.id)
 		
 		if(requisition) {
-			
 			requisition.properties = params
-						
-			if (!requisition.validate()) { 
-				
-				def locations
-				if (requisition.isWardRequisition()) {
-					locations = getWardsPharmacies()
-				} else {
-					locations = getDepots()
-				}
-				
-				if (!locations) {
-					requisition.errors.rejectValue("origin", "requisition.origin.error")
-				}
-				render(view:"editHeader", model:[requisition:requisition, locations: locations])
+            requisition.name = getName(requisition)
+		    requisition = requisitionService.saveRequisition(requisition)
+			if (requisition.hasErrors()) {
+				render(view:"editHeader", model:[requisition:requisition])
 			}
 		}
 		
@@ -234,21 +296,29 @@ class RequisitionController {
 	
 
     def save = {
-		
-		println "Save " + params
-		
-        def jsonRequest = request.JSON
         def jsonResponse = []
-        def requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session.warehouse.id))
-        if (!requisition.hasErrors()) {
-            jsonResponse = [success: true, data: requisition.toJson()]
+        def requisition = new Requisition()
+		try {
+            println "Save " + params
+            println "Request " + request.JSON
+            def jsonRequest = request.JSON
+
+            println "jsonRequest: " + jsonRequest
+            requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
+            if (!requisition.hasErrors()) {
+                jsonResponse = [success: true, data: requisition.toJson()]
+            }
+            else {
+                jsonResponse = [success: false, errors: requisition.errors]
+            }
+            log.info(jsonResponse as JSON)
+        } catch (Exception e) {
+            log.error("Error saving requisition " + e.message, e)
+            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
         }
-        else {
-            jsonResponse = [success: false, errors: requisition.errors]
-        }
-        log.info(jsonResponse as JSON)
         render jsonResponse as JSON
     }
+
 
 	def confirm = {
 		def requisition = Requisition.get(params?.id)
@@ -550,6 +620,28 @@ class RequisitionController {
 		}				
 		return locations
 	}
+
+    /**
+     * Generate the name of the requisition.
+     *
+     * @param requisition
+     * @return
+     */
+    def getName(requisition) {
+        def commodityClass = (requisition.commodityClass) ? "${warehouse.message(code:'enum.CommodityClass.' + requisition.commodityClass)}" : null
+        def requisitionType = (requisition.type) ? "${warehouse.message(code: 'enum.RequisitionType.' + requisition.type)}" : null
+        def requisitionName =
+            [
+                requisitionType,
+                requisition.origin,
+                requisition.recipientProgram,
+                commodityClass,
+                "${g:formatDate(date: requisition.dateRequested, format: 'MMM dd yyyy')}"
+            ]
+
+        return requisitionName.findAll{ it }.join(" - ")
+    }
+
 
 	
 }

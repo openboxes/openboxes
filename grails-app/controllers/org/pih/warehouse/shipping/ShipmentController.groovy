@@ -59,8 +59,15 @@ class ShipmentController {
 	def redirect = {
 		redirect(controller: "shipment", action: "showDetails", id: params.id)
 	}
+
+    def show = {
+        redirect(action: "showDetails", params : [ 'id':params.id ])
+    }
 	
 	def list = {
+        def startTime = System.currentTimeMillis()
+        println "Get shipments: " + params
+
 		boolean incoming = params?.type?.toUpperCase() == "INCOMING"
 		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
 		def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
@@ -68,12 +75,17 @@ class ShipmentController {
 		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
+        def lastUpdatedStart = params.lastUpdatedStart ? Date.parse("MM/dd/yyyy", params.lastUpdatedStart) : null
+        def lastUpdatedEnd = params.lastUpdatedEnd ? Date.parse("MM/dd/yyyy", params.lastUpdatedEnd) : null
+		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate, lastUpdatedStart, lastUpdatedEnd)
 		
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b ->
 			return b.lastUpdated <=> a.lastUpdated
 		} )
+
+
+        println "List shipments: " + (System.currentTimeMillis() - startTime) + " ms"
 
 		[ 
 			shipments:shipments, 

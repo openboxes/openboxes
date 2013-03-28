@@ -8,7 +8,7 @@
 	placeholder="${attrs.placeholder }"
 	name="${attrs.name}" value="${attrs.value}">
 
-<script language="javascript">
+<script type="text/javascript" language="javascript">
 	$(document).ready(function() {
 		$("#autosuggest-${attrs.id}").autocomplete({
 			delay: ${attrs.delay?:300},

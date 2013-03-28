@@ -10,7 +10,8 @@
 package org.pih.warehouse.inventory
 
 class InventoryCommand {
-	
+
+    def shipment
 	def warehouseInstance;								// warehouseInstance	
 	def searchTerms;									// request-level search terms  
 	def categoryInstance; 								// categoryInstance
@@ -37,6 +38,7 @@ class InventoryCommand {
 	List tag
 	
 	static constraints = {
+        shipment(nullable:true)
 		warehouseInstance(nullable:true)
 		searchTerms(nullable:true)
 		categoryInstance(nullable:true)

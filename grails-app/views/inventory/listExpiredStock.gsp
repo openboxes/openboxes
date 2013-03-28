@@ -23,6 +23,9 @@
 			
 		            <g:form action="listExpiredStock" method="get">
 						<div class="box">
+                            <h2>
+                                <warehouse:message code="default.filters.label" default="Filters"/>
+                            </h2>
 		          			<span class="filter-list-item">
 		           				<label><warehouse:message code="category.label"/></label>            			
 				           		<g:select name="category"
@@ -36,12 +39,15 @@
 								</button>
 							</span>
 						</div>
+
 		
 		            </g:form>
 				</div>
-				<div class="yui-f">
+				<div class="yui-u">
 		            <div class="box">
-			            
+                        <h2>
+                            <warehouse:message code="default.results.label" default="Results"/>
+                        </h2>
 						<table>
 							<tr>					
 								<td>

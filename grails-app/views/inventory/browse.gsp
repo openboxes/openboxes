@@ -5,11 +5,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
-        <title>Browse inventory</title>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.popover',file:'jquery.popover.css')}" type="text/css" media="screen, projection" />    
-		<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-    	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
-    </head>    
+        <title><warehouse:message code="inventory.browse.label" default="Browse inventory"/></title>
+    </head>
     <body>
     
     	
@@ -137,7 +134,7 @@
                                                        <g:set var="counter" value="${0 }"/>
                                                        <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
                                                            <g:if test="${inventoryItem.product }">
-                                                               <g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]"/>
+                                                               <cache:render cachekey="${inventoryItem?.product?.id}" template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]" />
                                                            </g:if>
                                                            <%-- 
                                                            <g:elseif test="${inventoryItem.productGroup }">
@@ -167,8 +164,7 @@
 									<div class="paginateButtons">
 										<g:paginate total="${numProducts}"
 											action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
-											
-											
+
 										<div class="right">
 											<warehouse:message code="inventory.browseResultsPerPage.label"/>:
 											<g:if test="${params.max != '10'}"><g:link action="browse" params="[max:10]">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
@@ -185,8 +181,13 @@
 				</div>    	
 			</div>
 		</div>
+        <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+        <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 		<script>
 			$(document).ready(function() {
+
+
+                $(".chzn-select").chosen();
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();
 				});
@@ -242,6 +243,17 @@
 		    	$('.nailthumb-container').nailthumb({ width : 20, height : 20 });
 		    	$('.nailthumb-container-100').nailthumb({ width : 100, height : 100 });
 
+                $("#tagcloud a").tagcloud({
+                    size: {
+                        start: 10,
+                        end: 25,
+                        unit: 'px'
+                    },
+                    color: {
+                        start: "#CDE",
+                        end: "#FS2"
+                    }
+                });
 
 		    	function refreshQuantity() {
 			    	$.each($(".quantityOnHand"), function(index, value) {

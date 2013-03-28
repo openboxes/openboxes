@@ -11,7 +11,8 @@
 package org.pih.warehouse.inventory;
 
 import grails.validation.ValidationException;
-import groovy.sql.Sql;
+import groovy.sql.Sql
+import org.pih.warehouse.shipping.Shipment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,29 +40,24 @@ class InventoryController {
     def index = {
 		redirect(action: "browse");
 	}
-	
-	
-	def list = { 
-		[ warehouses : Location.getAll() ]
-	}
 
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
 	def browse = { InventoryCommand cmd ->
 
+
         if(!params.max) params.max = 10
         if(!params.offset) params.offset = 0
 
-        log.debug("Browse inventory " + params)
 		// Get the current warehouse from either the request or the session
 		cmd.warehouseInstance = Location.get(params?.warehouse?.id) 
 		if (!cmd.warehouseInstance) {
 			cmd.warehouseInstance = Location.get(session?.warehouse?.id);
 		}
-		
+
 		// Get the primary category from either the request or the session or as the first listed by default
-		List quickCategories = productService.getQuickCategories();
+		def quickCategories = productService.getQuickCategories();
 		/*
 		cmd.categoryInstance = Category.get(params?.categoryId)
 		if (!cmd.categoryInstance) {
@@ -337,19 +333,80 @@ class InventoryController {
 		
 		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
 	}
-	
-	/*
-	def listLowStock = { 
-		
+
+
+
+    def list = {
+
+        println "List " + params
+        def warehouse = Location.get(session.warehouse.id)
+        //def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+        def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+
+        println "QuantityMap: " + quantityMap
+        [quantityMap:quantityMap]
+    }
+    def listTotalStock = {
+        def warehouse = Location.get(session.warehouse.id)
+        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        def totalStock = inventoryService.getTotalStock(warehouse);
+        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+
+        render (view: "list", model: [quantityMap:totalStock])
+
+    }
+
+    def listInStock = {
+        def warehouse = Location.get(session.warehouse.id)
+        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        def inStock = inventoryService.getInStock(warehouse);
+        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+
+        render (view: "list", model: [quantityMap:inStock])
+
+    }
+
+    def listLowStock = {
+        def warehouse = Location.get(session.warehouse.id)
+        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        def outOfStock = inventoryService.getLowStock(warehouse);
+        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+
+        //[inventoryItems:lowStock, quantityMap:quantityMap]
+        render (view: "list", model: [quantityMap:outOfStock])
+    }
+
+    def listReorderStock = {
+        def warehouse = Location.get(session.warehouse.id)
+        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        def outOfStock = inventoryService.getReorderStock(warehouse);
+        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+
+        //[inventoryItems:lowStock, quantityMap:quantityMap]
+        render (view: "list", model: [quantityMap:outOfStock])
+    }
+
+    def listOutOfStock = {
 		def warehouse = Location.get(session.warehouse.id)
 		def categorySelected = (params.category) ? Category.get(params.category) : null;
-		def lowStock = inventoryService.getLowStock(warehouse);
-		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+		def outOfStock = inventoryService.getOutOfStock(warehouse);
+		//def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
 
-		[inventoryItems:lowStock, quantityMap:quantityMap]
+		//[inventoryItems:lowStock, quantityMap:quantityMap]
+        render (view: "list", model: [quantityMap:outOfStock])
 	}
-	*/
-	
+
+    def listOverStock = {
+        def warehouse = Location.get(session.warehouse.id)
+        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        def overStock = inventoryService.getOverStock(warehouse);
+        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+
+        //[inventoryItems:lowStock, quantityMap:quantityMap]
+        render (view: "list", model: [quantityMap:overStock])
+    }
+
+
 	def listExpiredStock = { 
 		def warehouse = Location.get(session.warehouse.id)
 		def categorySelected = (params.category) ? Category.get(params.category) : null;		
@@ -372,7 +429,9 @@ class InventoryController {
 		[inventoryItems:expiringStock, quantityMap:quantityMap, categories:categories, 
 			categorySelected:category, thresholdSelected:threshold ]
 	}
-	
+
+
+    /*
 	def listLowStock = {
 		def warehouse = Location.get(session.warehouse.id)
 		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
@@ -399,7 +458,8 @@ class InventoryController {
 		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'], 
 			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
 	}
-
+    */
+    /*
 	def listReorderStock = {
 
 		def warehouse = Location.get(session.warehouse.id)
@@ -429,7 +489,7 @@ class InventoryController {
 		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'],
 			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
 	}
-	
+	*/
 	
 	def searchRecall = {
 		

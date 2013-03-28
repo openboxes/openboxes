@@ -83,8 +83,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 
     @Test
-	void searchProductAndProductGroup_shouldGetAllProductsUnderMachtedGroups(){
-		def result = productService.searchProductAndProductGroup("floweree")
+	void searchProductAndProductGroup_shouldGetAllProductsUnderMatchedGroups(){
+		def result = productService.searchProductAndProductGroup("floweree", true)
 		println result
 		
 		// Only searches products, not product groups any longer

@@ -7,7 +7,9 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/ 
-package org.pih.warehouse.product;
+package org.pih.warehouse.product
+
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -57,19 +59,15 @@ class ProductController {
 	def batchEdit = { BatchEditCommand cmd ->
 		def startTime = System.currentTimeMillis()
 		def location = Location.get(session.warehouse.id)
+        def category = Category.get(params.categoryId)
+        def tagIds = params.list("tagId")
 
 		log.info "Batch edit: " + params
-		def categoryInstance = Category.get(params?.category?.id)
-		if (categoryInstance) {
-			cmd.productInstanceList = Product.findAllByCategory(categoryInstance)
-			//cmd.inventoryLevelMap = inventoryService.getInventoryLevels(cmd.productInstanceList, location)
-		}
-		else {
-			//flash.message = "Only displaying first 100 products.  Please select a category."
-			//params.max = 25;
-			//cmd.productInstanceList = Product.list(params);
-			cmd.productInstanceList = []
-		}
+
+        if (category || tagIds)
+            cmd.productInstanceList = productService.getProducts(category, tagIds, params)
+
+        //cmd.inventoryLevelMap = inventoryService.getInventoryLevels(cmd.productInstanceList, location)
 
 		cmd.productInstanceList.eachWithIndex { product, index ->
 			println product.category
@@ -78,12 +76,29 @@ class ProductController {
 		cmd.rootCategory = productService.getRootCategory();
 
 		println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
-		
-		[ commandInstance : cmd, categoryInstance: categoryInstance ]
+
+        //def domainClass = new DefaultGrailsDomainClass(Product.class)
+
+		[ commandInstance : cmd, products: cmd.productInstanceList?:[], categoryInstance: category ]
 	}
+
+    def batchEditProperties = {
+        def startTime = System.currentTimeMillis()
+        def location = Location.get(session.warehouse.id)
+        def category = Category.get(params.categoryId)
+        def tagIds = params.list("tagId")
+
+        def products = productService.getProducts(category, tagIds, params)
+
+        println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        [products: product]
+    }
 
 
 	def batchSave = { BatchEditCommand cmd ->
+
+        println "Batch save " + cmd
 
 		// If there are no products (usually when returning to batchSave after login
 		if (!cmd.productInstanceList) {
@@ -105,7 +120,7 @@ class ProductController {
 			}
 			else {
 				// copy the errors from this product on to the overall command object errors
-				prod.errors.getAllErrors(). each {
+				prod.errors.getAllErrors().each {
 					cmd.errors.reject(it.getCode(), it.getDefaultMessage())
 				}
 			}
@@ -113,16 +128,27 @@ class ProductController {
 
 		if (!cmd.hasErrors()) {
 			flash.message = "${warehouse.message(code: 'product.allSavedSuccessfully.message')}"
+            chain(controller: "product", action: "batchEdit", params: params)
 		}
-		else {
+        else {
+
+            def category = Category.get(params.categoryId)
+            def tagIds = params.list("tagId")
+            def products = productService.getProducts(category, tagIds, params)
+
+            render(view: "batchEdit", model: [commandInstance: cmd, products:  products])
+        }
+		//else {
 			// reset the flash message in the case of two submits in a row
-			flash.message = null
-		}
+			//flash.message = null
+		//}
 
 
-		cmd.rootCategory = productService.getRootCategory();
+        println "flash " + flash.message
+        println "params " + params
+		//cmd.rootCategory = productService.getRootCategory();
+		//render(view: "batchEdit", model: [commandInstance:cmd, products:  cmd.productInstanceList]);
 
-		render(view: "batchEdit", model: [commandInstance:cmd]);
 
 	}
 
@@ -145,8 +171,14 @@ class ProductController {
 	}
 
 	def create = {
+        def startTime = System.currentTimeMillis()
 		def productInstance = new Product(params)
-		render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
+        def rootCategory = productService.getRootCategory()
+
+        println "Create product: " + (System.currentTimeMillis() - startTime) + " ms"
+
+		render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory])
+        println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
 	}
 
 	def save = {
@@ -266,8 +298,6 @@ class ProductController {
 				}
 			}
 			productInstance.properties = params
-			
-			println "price per unit: " + productInstance?.pricePerUnit
 
 			/*
 			try {
@@ -348,7 +378,8 @@ class ProductController {
 			 */
 			if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
-				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+				//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                redirect(controller: "product", action: "edit", id: productInstance?.id)
 			}
 			else {
 
@@ -368,6 +399,8 @@ class ProductController {
 		else {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
 			redirect(controller: "inventoryItem", action: "browse")
+
+
 		}
 	}
 

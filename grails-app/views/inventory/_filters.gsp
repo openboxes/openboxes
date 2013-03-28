@@ -17,37 +17,27 @@
 						<g:hiddenField name="max" value="${params.max?:10 }"/>
 						<g:textField name="searchTerms" 
 							value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}"
-                            class="text medium" size="46"/>
+                            class="text medium" size="45"/>
 					</td>
 				</tr>
-				<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
-					<tr>
-						<td>							
-							<select id="subcategoryId" name="subcategoryId" class="text">
-								<option value=""><warehouse:message code="inventory.filterByCategory.label"/></option>
-								<g:render template="../category/selectOptions" 
-									model="[category:commandInstance?.categoryInstance, selected:commandInstance?.subcategoryInstance, level: 0]"/>								
-							</select>
-						</td>
-					</tr>					
-				</g:if>
-				<g:else>				
-					<tr>
-						<td>
-							<format:category category="${commandInstance?.categoryInstance }"/>
-						</td>
-					</tr>
-				</g:else>
+                <tr>
+                    <td>
+                        <g:selectCategory_v2 id="subcategoryId" name="subcategoryId" class="chzn-select"
+                            style="width:100%;"
+                            value="${commandInstance?.subcategoryInstance?.id}"/>
+                    </td>
+                </tr>
 				<tr>
 					<td>
 						<div >
 							<div>
-								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
-								<warehouse:message code="inventory.showHiddenProducts.label"/>					
+								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>
+								<warehouse:message code="inventory.showHiddenProducts.label"/>
 							</div>
 							<div>
-								<g:checkBox name="showOutOfStockProducts" value="${commandInstance.showOutOfStockProducts}" size="24"/>	
+								<g:checkBox name="showOutOfStockProducts" value="${commandInstance.showOutOfStockProducts}" size="24"/>
 								<warehouse:message code="inventory.showOutOfStockProducts.label"/>
+
 							</div>					
 						</div>
                     </td>
@@ -72,16 +62,16 @@
 				</tr>	
 				<tr class="">
 					<td>
-						<g:if test="${tags }">			
-							<g:each in="${tags }" var="tag" status="status">
-								<g:set var="selectedTag" value="${params.tag == tag.key.tag }"/>								
-								<g:link controller="inventory" action="browse" params="['tag':tag.key.tag,'max':params.max]">
-									<span class="tag ${selectedTag?'selected':'' }">
-										${tag?.key?.tag } (${tag?.key?.products?.size() })
-										<%-- (${tag.value })--%>
-									</span>
-								</g:link>
-							</g:each>
+						<g:if test="${tags }">
+                            <div id="tagcloud">
+                                <g:each in="${tags }" var="tag" status="status">
+                                    <g:set var="selectedTag" value="${params.tag == tag.key.tag }"/>
+                                    <span class="${selectedTag?'selected':'' }">
+                                        <g:link controller="inventory" action="browse" params="['tag':tag.key.tag,'max':params.max]" rel="${tag?.key?.products?.size() }">
+                                            ${tag?.key?.tag } (${tag?.key?.products?.size() })</g:link>
+                                    </span>
+                                </g:each>
+                            </div>
 						</g:if>
 						<g:else>
 							<span class="fade">

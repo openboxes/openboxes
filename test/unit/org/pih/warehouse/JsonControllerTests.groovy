@@ -24,15 +24,17 @@ class JsonControllerTests extends ControllerUnitTestCase {
         def product22 = new Product(id: "product22", name: "moo", productCode: "ab22")
         def product3 = new Product(id: "product3", name: "gookiller", productCode: "ab3")
 
+
+
         def productsSearchResult = [
           [product11.id, product11.name, product11.productCode],
           [product12.id, product12.name, product12.productCode],
           [product21.id, product21.name, product21.productCode],
-          [product3.id, product3.name, product3.productCode],
-        ]
+          [product3.id, product3.name, product3.productCode] ]
 
         def productServiceMock = mockFor(ProductService)
-        productServiceMock.demand.searchProductAndProductGroup(1..1){ term -> productsSearchResult}
+        productServiceMock.demand.searchProductAndProductGroup(1..2){ term -> productsSearchResult}
+        productServiceMock.demand.getProducts(1..1){ term -> [ product11, product12, product21, product3 ]}
 
         def inventoryServiceMock = mockFor(InventoryService)
         def quantities = [:]
@@ -42,7 +44,7 @@ class JsonControllerTests extends ControllerUnitTestCase {
         quantities[product22.id] = 2200
         quantities[product3.id] = 3000
 
-        inventoryServiceMock.demand.getQuantityForProducts{inventory, prodcutIds -> quantities}
+        inventoryServiceMock.demand.getQuantityForProducts{inventory, productIds -> quantities}
         controller.inventoryService =  inventoryServiceMock.createMock()
         controller.productService = productServiceMock.createMock()
         controller.session.warehouse = location
@@ -63,12 +65,12 @@ class JsonControllerTests extends ControllerUnitTestCase {
         assert jsonResult[3].id == product3.id
 
         //result should contain label
-        assert jsonResult[0].value == product11.productCode + " - " + product11.name
+        assert jsonResult[0].value == product11.productCode + " " + product11.name + " (EA/1)"
         //assert jsonResult[1].value == group2.description
-        assert jsonResult[1].value == product12.productCode + " - " + product12.name
+        assert jsonResult[1].value == product12.productCode + " " + product12.name + " (EA/1)"
         //assert jsonResult[3].value == group1.description
-        assert jsonResult[2].value == product21.productCode + " - " + product21.name
-        assert jsonResult[3].value == product3.productCode + " - " + product3.name
+        assert jsonResult[2].value == product21.productCode + " " + product21.name + " (EA/1)"
+        assert jsonResult[3].value == product3.productCode + " " + product3.name + " (EA/1)"
         
         //result should contain type
         assert jsonResult[0].type == "Product"

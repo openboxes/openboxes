@@ -388,7 +388,6 @@ tfoot th, tfoot td {
 
 
 .toggle-button, .expandable { 
-	cursor: hand;
 }
 .toggleable { 
 	display: none;

@@ -21,8 +21,6 @@ class LinkTagLib extends ApplicationTagLib {
       }
 
       def applicationTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-      
-      applicationTagLib.link.call(attrs, body)
-      
+	  applicationTagLib.link.call(attrs, body)
     }
 }

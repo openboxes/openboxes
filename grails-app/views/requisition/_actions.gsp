@@ -37,7 +37,7 @@
 					</g:link>		
 				</div>
 				<div class="action-menu-item">
-					<g:link controller="requisition" action="edit" id="${requisition?.id}">
+					<g:link controller="requisition" action="editHeader" id="${requisition?.id}">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
 						&nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition')}
 					</g:link>		
@@ -52,12 +52,14 @@
 				--%>
 				<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
 					<g:isUserManager>
+                        <%--
 						<div class="action-menu-item">
 							<g:link controller="requisition" name="processRequisition" action="pick" id="${requisition?.id}">
 								<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
 								&nbsp;${warehouse.message(code: 'requisition.process.label', default: 'Process requisition')}
 							</g:link>				
 						</div>
+                        --%>
 						<g:if test="${requisition.status == RequisitionStatus.CANCELED }">
 							<div class="action-menu-item">
 								<g:link controller="requisition" action="uncancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">
@@ -69,7 +71,7 @@
 						<g:else>
 							<div class="action-menu-item">
 								<g:link controller="requisition" action="cancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">
-									<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" />
+									<img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />
 									&nbsp;${warehouse.message(code: 'requisition.cancel.label', default: 'Cancel requisition')}
 								</g:link>				
 							</div>

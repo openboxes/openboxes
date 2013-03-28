@@ -32,6 +32,39 @@ class RequisitionService {
 	def shipmentService;
 	def inventoryService;
 
+    /**
+     * Get recent requisitions
+     */
+    def getRequisitions() {
+        return Requisition.findAllByIsTemplate(false)
+
+    }
+
+    /**
+     * Get requisition template
+     */
+    def getRequisitionTemplates() {
+        return Requisition.findAllByIsTemplateAndIsPublished(true, true)
+    }
+
+
+    /**
+     * Save the requisition
+     *
+     * @param requisition
+     * @return
+     */
+    def saveRequisition(Requisition requisition) {
+        if (!requisition.requestNumber) {
+            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+        }
+        //requisition.name = generateRequisitionName(requisition)
+        requisition.save(flush: true)
+        return requisition
+    }
+
+
+
 	def completeInventoryTransfer(Requisition requisition, String comments) { 
 		
 		// Make sure a transaction has not already been created for this requisition
@@ -107,8 +140,8 @@ class RequisitionService {
 		if (!requisition.requestNumber) { 
 			requisition.requestNumber = identifierService.generateRequisitionIdentifier()
 		}
-		
 		def requisitionItems = itemsData.collect{  itemData ->
+            println "itemData: " + itemData
 			def requisitionItem = requisition.requisitionItems?.find{i -> itemData.id  && i.id == itemData.id }
 			if(requisitionItem) {
 				requisitionItem.properties = itemData
@@ -117,6 +150,9 @@ class RequisitionService {
 				requisitionItem = new RequisitionItem(itemData)
 				requisition.addToRequisitionItems(requisitionItem)
 			}
+            println "package: " + requisitionItem?.productPackage
+            println "json: " + requisitionItem.toJson()
+
 			requisitionItem
 		}
 
@@ -126,8 +162,11 @@ class RequisitionService {
 		itemsToDelete.each{requisition.removeFromRequisitionItems(it)}
 		requisition.destination = userLocation
 		requisition.save(flush:true)
-		requisition.requisitionItems?.each{it.save(flush:true)}
-		requisition
+        println "Requisition: " + requisition
+        println "Errors: " + requisition.errors
+
+        requisition.requisitionItems?.each{it.save(flush:true)}
+		return requisition
 	}
 
 	void deleteRequisition(Requisition requisition) {

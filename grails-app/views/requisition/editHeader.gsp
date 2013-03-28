@@ -32,167 +32,157 @@
 			
 				<g:hiddenField name="id" value="${requisition?.id }"/>
 			
-				<div id="requisition-header-details" class="dialog ui-validation expandable">
-					<div class="yui-g">
+				<div id="requisition-header-details" class="dialog ui-validation expandable box">
+
+
+                    <div class="yui-g">
 						<div class="yui-u first">
-						
-							<table id="requisition-header-details-table" class="header-summary-table">
-								
-								<tbody>	
-								
-									<g:isUserAdmin>
-										<tr class="prop">
-											<td class="name"><label><warehouse:message
-														code="requisition.isTemplate.label" /></label>
-											</td>
-											<td class="value">
-												<g:checkBox name="isTemplate" value="${requisition?.isTemplate }"/>											
-											</td>
-										</tr>
-										<tr class="prop">
-											<td class="name"><label><warehouse:message
-														code="requisition.isPublished.label" /></label>
-											</td>
-											<td class="value">
-												<g:checkBox name="isPublished" value="${requisition?.isPublished }"/>			
-											</td>
-										</tr>
-									</g:isUserAdmin>
-											
-											
-									<tr class="prop">
-										<td class="name"><label><warehouse:message
-													code="requisition.type.label" /></label></td>
-										<td class="value">
-											
-											<g:select name="type" value="${requisition?.type }" noSelection="['null':'']"
-												from="${org.pih.warehouse.requisition.RequisitionType.list() }"/>
-											
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name"><label><warehouse:message
-													code="requisition.commodityClass.label" /></label></td>
-										<td class="value">
-											<g:select name="type" value="${requisition?.commodityClass }" noSelection="['null':'']"
-												from="${org.pih.warehouse.requisition.CommodityClass.list() }"/>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name">
-											<label for="origin.id"> <g:if
-													test="${requisition.isWardRequisition()}">
-													<warehouse:message code="requisition.requestingWard.label" />
-												</g:if> <g:else>
-													<warehouse:message code="requisition.requestingDepot.label" />
-												</g:else>
-											</label>
-										</td>
-										<td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-											
-											<g:select name="origin.id"
-												from="${locations}" id="depot"
-												
-												optionKey="id" optionValue="name" class='required' value="${requisition?.origin?.id }"
-												noSelection="['null':'']" />
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name"><label><warehouse:message
-													code="requisition.requestedBy.label" /></label></td>
-										<td class="value">
-											<g:autoSuggest name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-												width="200" valueId="${requisition?.requestedBy?.id }" valueName="${requisition?.requestedBy?.name }" styleClass="text"/>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name">
-											<label><warehouse:message
-													code="requisition.dateRequested.label" /></label></td>
-										<td class="value">
-											<g:jqueryDatePicker id="dateRequested" name="dateRequested" 
-												value="${requisition?.dateRequested}" format="MM/dd/yyyy"/>
-										</td>
-									</tr>
-																
-									
-								</tbody>
-							</table>
-												
-						
-						</div>
-					
-						<div class="yui-u">
-						
-						
-							<table class="">
-								<tbody>
-									<tr class="prop">
-										<td class="name">
-											<label for="destination.id"> 
-												<warehouse:message code="requisition.destination.label" />
-											</label>
-										</td>
-										<td class="value">	
-											${session?.warehouse?.name }
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name">
-											<label><warehouse:message
-													code="requisition.processedBy.label" /></label>
-										</td>
-										<td class="value">
-											${requisition?.createdBy?.name }
-										</td>
-										
-										
-									</tr>
-									<g:if test="${requisition.isDepotRequisition()}">
-										<tr>
-											<td class="name"><label><warehouse:message
-														code="requisition.program.label" /></label></td>
-											<td class="value">
-												<input id="recipientProgram"
-													name="recipientProgram" class="autocomplete text" size="60"
-													placeholder="${warehouse.message(code:'requisition.program.label')}"
-													data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram" />
-											</td>
-										</tr>
-									</g:if>
-									<tr class="prop">
-										<td class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label" /></label></td>
-										<td class="value">
-										
-											<g:jqueryDatePicker id="requestedDeliveryDate" name="requestedDeliveryDate" 
-													value="${requisition?.requestedDeliveryDate}" format="MM/dd/yyyy"/>											
-										</td>
-									</tr>		
-									<tr class="prop">							
-										<td class="name">
-											<label for="description"> 
-												<warehouse:message code="default.description.label" />
-											</label>
-										</td>
-									
-										<td class="value">	
-										
-											<g:textArea name="description" cols="80" rows="5"
-												placeholder="${warehouse.message(code:'requisition.description.message')}"
-												class="text">${requisition.description }</g:textArea>
-										</td>
-									</tr>	
-															
-								</tbody>
-							</table>							
-						</div>
-					</div>
-					
-				</div>				
+                            <table id="requisition-header-details-table" class="header-summary-table">
+                                <tbody>
+                                    <tr class="prop">
+                                        <td class="name"><label><warehouse:message
+                                                code="requisition.requisitionNumber.label" /></label></td>
+                                        <td class="value">
+                                            ${requisition.requestNumber}
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name"><label><warehouse:message
+                                                    code="requisition.type.label" /></label></td>
+                                        <td class="value">
+                                           <g:selectRequisitionType name="type" value="${requisition?.type }" noSelection="['null':'']"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name"><label><warehouse:message
+                                                    code="requisition.commodityClass.label" /></label></td>
+                                        <td class="value">
+                                            <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass }" noSelection="['null':'']"/>
+                                        </td>
+                                    </tr>
+                                    <g:if test="${requisition.isWardRequisition()}">
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label for="origin.id">
+                                                    <warehouse:message code="requisition.wardOrPharmacy.label" />
+                                                </label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                                <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
+                                                                        noSelection="['null':'']"/>
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                    <g:elseif test="${requisition.isDepotRequisition()}">
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label for="origin.id">
+                                                    <warehouse:message code="requisition.depot.label" />
+                                                </label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                                <g:selectDepot name="origin.id" value="${requisition?.origin?.id}"
+                                                               noSelection="['null':'']"/>
+                                            </td>
+                                        </tr>
+                                    </g:elseif>
+                                    <tr class="prop">
+                                        <td class="name"><label><warehouse:message
+                                                    code="requisition.requestedBy.label" /></label></td>
+                                        <td class="value">
+
+                                            <%--
+                                            <g:autoSuggest name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                                width="200" valueId="${requisition?.requestedBy?.id }" valueName="${requisition?.requestedBy?.name }" styleClass="text"/>
+                                            --%>
+                                            <g:selectPerson name="requestedBy" value="${requisition?.requestedBy}"
+                                                            noSelection="['null':'']" size="40"/>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="yui-u">
+
+                            <table>
+                                <tbody>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label for="destination.id">
+                                                <warehouse:message code="requisition.destination.label" />
+                                            </label>
+                                        </td>
+                                        <td class="value">
+                                            ${session?.warehouse?.name }
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message
+                                                    code="requisition.processedBy.label" /></label>
+                                        </td>
+                                        <td class="value">
+                                            ${requisition?.createdBy?.name }
+                                        </td>
+
+
+                                    </tr>
+                                    <g:if test="${requisition.isDepotRequisition()}">
+                                        <tr>
+                                            <td class="name"><label><warehouse:message
+                                                        code="requisition.program.label" /></label></td>
+                                            <td class="value">
+                                                <input id="recipientProgram"
+                                                    name="recipientProgram" class="autocomplete text" size="60"
+                                                    placeholder="${warehouse.message(code:'requisition.program.label')}"
+                                                    data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram" />
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message
+                                                    code="requisition.dateRequested.label" /></label></td>
+                                        <td class="value">
+                                            <g:jqueryDatePicker id="dateRequested" name="dateRequested"
+                                                                value="${requisition?.dateRequested}" format="MM/dd/yyyy"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label" /></label></td>
+                                        <td class="value">
+
+                                            <g:jqueryDatePicker id="requestedDeliveryDate" name="requestedDeliveryDate"
+                                                                value="${requisition?.requestedDeliveryDate}" format="MM/dd/yyyy"/>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label for="description">
+                                                <warehouse:message code="default.description.label" />
+                                            </label>
+                                        </td>
+
+                                        <td class="value">
+
+                                            <g:textArea name="description" cols="60" rows="5"
+                                                placeholder="${warehouse.message(code:'requisition.description.message')}"
+                                                class="text">${requisition.description }</g:textArea>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+				</div>
 					
 				<div class="buttons">
 			
-					<button class="button" name="saveAndContinue">${warehouse.message(code:'default.button.saveAndContinue.label', default: 'Save & Continue') }</button>									
+					<button class="button" name="saveAndContinue">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
 					
 					&nbsp;
 					<g:link controller="requisition" action="edit" id="${requisition?.id }">

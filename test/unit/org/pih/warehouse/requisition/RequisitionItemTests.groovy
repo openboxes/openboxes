@@ -46,7 +46,7 @@ class RequisitionItemTests extends GrailsUnitTestCase {
 	  println json 
       assert json.id == requisitionItem.id
       assert json.productId == requisitionItem.product.id
-      assert json.productName == requisitionItem.product.name
+      assert json.productName == requisitionItem.product.name + " (EA/1)"
       assert json.quantity == requisitionItem.quantity
       assert json.comment == requisitionItem.comment
       assert json.recipient == requisitionItem.recipient

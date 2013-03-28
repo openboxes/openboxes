@@ -7,53 +7,93 @@
 
     		<table>
     			<tbody>
-					<tr class="even">
-						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/bell.png')}" class="middle"/>
-						</td>
-						<td>
-							<g:link controller="inventory" action="listExpiredStock">
-                                <warehouse:message code="inventory.listExpiredStock.label" default="Items that have expired"/>
-							</g:link>
-						</td>
-						<td class="right">
-							<div id="expiredStockCount">
-								<img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-							</div>
-						</td>
-					</tr>
-    			
+                    <tr class="even">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/time.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listTotalStock">
+                                <warehouse:message code="inventory.listTotalStock.label" default="Items that have ever been stocked"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="totalStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+
 					<tr class="odd">
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/box.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
 						</td>
 						<td>
-							<g:link controller="inventory" action="listLowStock">
-                                <warehouse:message code="inventory.listLowStock.label" default="Items that have stocked out"/>
+							<g:link controller="inventory" action="listOutOfStock">
+                                <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="lowStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+							<div id="outOfStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 							
 						</td>
 					</tr>
-					 
+                    <tr class="even">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listInStock">
+                                <warehouse:message code="inventory.listInStock.label" default="Items that are currently stocked"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="inStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                    <tr class="odd">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <!--<img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>-->
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listLowStock">
+                                <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="lowStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        </td>
+                    </tr>
+
 					<tr class="even">
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/reload.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <!--<img src="${createLinkTo(dir:'images/icons/silk/creditcards.png')}" class="middle"/>-->
 						</td>
 						<td>
-                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
-							<g:link controller="inventory" action="listReorderStock"></g:link>
+                            <g:link controller="inventory" action="listReorderStock">
+                                <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
+							</g:link>
 						</td>
 						<td class="right">
-							<%-- 
 							<div id="reorderStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-							--%>
-							<warehouse:message code="default.notAvailable.label"/>
 						</td>
 					</tr>
-											
+                    <tr class="odd">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <!--<img src="${createLinkTo(dir:'images/icons/silk/package.png')}" class="middle"/>-->
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listOverStock">
+                                <warehouse:message code="inventory.listOverStock.label" default="Items that are over stocked"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="overStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        </td>
+                    </tr>
+
 				</tbody>
 			</table>
 		</div>

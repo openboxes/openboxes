@@ -36,16 +36,17 @@
 	                                ${requisitionItemInstance?.product?.productCode} - ${requisitionItemInstance?.product?.name}
                                 </td>
                             </tr>
-                            <%-- 
+
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="description"><warehouse:message code="product.unitOfMeasure.label" default="Product" /></label>
+                                  <label for="description"><warehouse:message code="requisitionItem.productPackage.label" default="Product package" /></label>
                                 </td>
                                 <td valign="top" class="value">
-	                                ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+	                                ${requisitionItemInstance?.productPackage?.uom}
+                                    (${requisitionItemInstance?.productPackage?.uom?.code}/${requisitionItemInstance?.productPackage?.quantity})
                                 </td>
                             </tr>
-                            --%>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="quantity"><warehouse:message code="requisitionItem.quantity.label" default="Quantity requested" /></label>
@@ -77,17 +78,11 @@
                                     <div id="quantityCanceled">
                                     	${requisitionItemInstance?.quantityCanceled?:0 }
                                     	${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+
+                                        ${requisitionItemInstance?.cancelReasonCode }
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="quantityCanceled"><warehouse:message code="requisitionItem.cancelReasonCode.label" default="Cancel reason" /></label>
-                                </td>
-                                <td class="middle value">
-                                	${requisitionItemInstance?.cancelReasonCode }
-								</td>
-							</tr>                            
                             <%--
                             <tr class="prop">
                                 <td valign="top" class="name">

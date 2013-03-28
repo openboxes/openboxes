@@ -9,10 +9,10 @@
 			<div>
 				<div class="buttonsBar" style="min-width: 200px;">
 					
-					<div style="float:left">
+					<div>
 						<div class="megaButton">
 							<g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">
-								<label><warehouse:message code="inventory.browseByCategory.label"/></label>
+								<warehouse:message code="inventory.browseByCategory.label"/>
 							</g:link>
 						</div>
 						<div style="max-height: 400px; overflow: auto;">
@@ -20,15 +20,13 @@
 								<g:each var="category" in="${quickCategories}">
 									<div class="megaButton">
 										<g:link class="outline" controller="inventory" action="browse" params="[subcategoryId:category.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-											<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 											<format:category category="${category}"/> (${category?.products?.size() })
 										</g:link>
 									</div>
 									<g:if test="${category.categories}">
 										<g:each var="childCategory" in="${category.categories}">
 											<div class="megaButton">
-												<g:link class="indent" controller="inventory" action="browse" params="[subcategoryId:childCategory.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-													<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
+												<g:link controller="inventory" action="browse" params="[subcategoryId:childCategory.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
 													<format:category category="${childCategory}"/> (${childCategory?.products?.size() })
 												</g:link>
 											</div>
@@ -41,8 +39,7 @@
 									
 									<g:each var="category" in="${entry.value }">
 										<div class="megaButton">
-											<g:link class="indent" controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-												<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
+											<g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
 												${category } (${category.products.size() })
 											</g:link>
 										</div>
@@ -51,6 +48,7 @@
 							</g:elseif>	
 						</div>	
 					</div>
+                    <%--
 					<div style="float: left; padding: 10px">
 						<div class="megaButton">
 							<g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">
@@ -69,7 +67,7 @@
 							</g:if>
 						</div>	
 					</div>				
-					
+					--%>
 					
 					<div class="clear"></div>		
 				</div>			
@@ -117,29 +115,29 @@
                         </g:link>
                     </div>
 	                <div class="megaButton">
-	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_NON_STOCK']">
+	                    <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
 	                    </g:link>
 	                </div>
 	                <div class="megaButton">
-	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_STOCK']">
+	                    <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'WARD_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
 	                    </g:link>
 	                </div>
 	                <div class="megaButton">
-	                    <g:link controller="requisition" action="create" class="create" params="[type:'WARD_ADHOC']">
+	                    <g:link controller="requisition" action="createAdhoc" class="create" params="[type:'WARD_ADHOC']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
 	                    </g:link>
 	                </div>
 	                <div class="megaButton">
-	                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_TO_DEPOT']">
+	                    <g:link controller="requisition" action="createDepot" class="create" params="[type:'DEPOT_TO_DEPOT']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depotToDepot.label')]" />
 	                    </g:link>
 	                </div>
 	                <g:isUserAdmin>
 	                    <div class="megaButton">
-	                        <g:link controller="requisition" action="listStock" class="list">
-	                            <warehouse:message code="requisition.listStock.label" /> 
+	                        <g:link controller="requisitionTemplate" action="list" class="list">
+	                            <warehouse:message code="requisitionTemplate.list.label" />
 	                        </g:link>
 	                    </div>
 	                </g:isUserAdmin>
@@ -167,9 +165,20 @@
 				<warehouse:message code="shipping.label" />
 			</g:link>
 			<div class="buttonsBar" style="min-width: 200px;">
-				<div class="megaButton">
-					<g:link controller="shipment" action="list" params="[type:'outgoing']" class="list"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
-				</div>					
+                <div class="megaButton">
+                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
+                </div>
+                <div class="megaButton">
+   					<g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                            <warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/>
+                    </g:link>
+				</div>
+                <div class="megaButton">
+                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                        <img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
+                        All (${outgoingShipmentsCount})
+                    </g:link>
+                </div>
 				<g:each in="${outgoingShipments}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[status:statusRow.key]" class="shipment-status-${statusRow.key }">
@@ -178,9 +187,6 @@
 						</g:link>
 					</div>
 				</g:each>
-				<div class="megaButton">					
-					<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
-				</div>	
 			</div>
 		</li>
 	</g:authorize>		
@@ -191,9 +197,23 @@
 			</g:link>
 
 			<div class="buttonsBar" style="min-width: 200px;">
-				<div class="megaButton">
-					<g:link controller="shipment" action="list" params="[type: 'incoming']" class="list"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+                <div class="megaButton">
+                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
+                </div>
+                <div class="megaButton">
+					<g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
+                        <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
+                    </g:link>
 				</div>
+
+                <div class="megaButton">
+                    <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
+                        <img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
+                        All (${incomingShipmentsCount})
+                    </g:link>
+                </div>
+
+
 				<g:each in="${incomingShipments}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="shipment-status-${statusRow.key }">
@@ -202,9 +222,6 @@
 						</g:link>
 					</div>
 				</g:each>					
-				<div class="megaButton">						
-					<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
-				</div>							
 			</div>
 		</li>		
 	</g:authorize>			
@@ -213,6 +230,13 @@
 			<warehouse:message code="report.label" />
 		</a>
 		<div class="buttonsBar" style="min-width: 200px;">
+
+            <div class="megaButton">
+                <g:link controller="inventory" action="show">
+                    <warehouse:message code="inventory.viewCurrentStock.label" default="View current stock"/>
+                </g:link>
+            </div>
+
 			<div class="megaButton">
 				<g:link controller="report" action="showTransactionReport" class="report_inventory"><warehouse:message code="report.showTransactionReport.label"/></g:link>							
 			</div>
@@ -365,6 +389,9 @@
 						<div class="megaButton">
 							<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
 						</div>
+                        <div class="megaButton">
+                            <g:link controller="product" action="batchEdit" class="create"><warehouse:message code="product.batchEdit.label"/></g:link>
+                        </div>
 						<div>
 							<hr/>
 						</div>
@@ -380,6 +407,5 @@
 			</div>
 		</li>
 	</g:authorize>	
-	
 </ul>
 <!--MegaMenu Ends-->
