@@ -59,7 +59,7 @@ You must not remove this notice, or any other, from this software.
 
         # Application settings
         #inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
-        #app.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
+        #openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
         # Google Product Search
         #google.api.key=<Google API key>

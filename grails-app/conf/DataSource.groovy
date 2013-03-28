@@ -15,6 +15,9 @@ dataSource {
 	loggingSql = false
 	username = "root"
 	password = "root"
+	//format_sql = true
+	//use_sql_comments = true
+	//generate_statistics=true
 }
 
 // Hibernate caching properties

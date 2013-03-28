@@ -18,9 +18,9 @@ beans = {
 	//	defaultLocale = new Locale("de","DE")
 	//	java.util.Locale.setDefault(defaultLocale)
 	//}
-  
-		
-	
+
+
+
 	/**
 	 * c3P0 pooled data source that allows 'DB keepalive' queries
 	 * to prevent stale/closed DB connections
@@ -45,8 +45,8 @@ beans = {
 		maxConnectionAge = 4 * 60 * 60
 		//get rid too many of idle connections after 30 minutes
 		maxIdleTimeExcessConnections = 30 * 60
-	
-		
+
+
 	}
 }
 
