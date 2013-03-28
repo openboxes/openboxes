@@ -43,8 +43,12 @@ grails {
 		port = "25"
 	}
 }
+/* Indicates which activities are required for a location to allow logins */
+openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
-app.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
+/* Grails resources plugin */
+grails.resources.adhoc.includes = []
+grails.resources.adhoc.excludes = ["*"]
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -159,7 +163,7 @@ log4j = {
     if (mail.error.starttls)
 		System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
 	
-	// Example of changing the log pattern for the default console    
+	// Example of changing the log pattern for the default console
 	appenders {
 		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
 		//println "mail.error.server: '${mail.error.server}'"
@@ -231,7 +235,6 @@ log4j = {
             asyncAppender.addAppender(smtpAppender)
             appender asyncAppender
         }
-		
     }
 	
 	root {
@@ -248,10 +251,10 @@ log4j = {
             'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
 
 	warn	'org.mortbay.log',
-			'org.codehaus.groovy.grails.web.pages',			// GSP		
-			'org.codehaus.groovy.grails.web.servlet',		// controllers
-			'org.codehaus.groovy.grails.web.sitemesh',		// layouts
-			'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
+            'org.codehaus.groovy.grails.web.pages',			// GSP
+            'org.codehaus.groovy.grails.web.servlet',		// controllers
+            'org.codehaus.groovy.grails.web.sitemesh',		// layouts
+            'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
 			'org.codehaus.groovy.grails.web.mapping', 		// URL mapping
 			'org.codehaus.groovy.grails.commons', 			// core / classloading
 			'org.codehaus.groovy.grails.plugins',			// plugins
@@ -262,8 +265,8 @@ log4j = {
 			'org.apache.http.wire',
 			'net.sf.ehcache.hibernate'
 		
-	info	'org.liquibase', 	
-			'grails.app.controller',
+	info	'org.liquibase',
+            'grails.app.controller',
 			'com.mchange',
 			'org.springframework',
 			'org.hibernate',
@@ -374,6 +377,13 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentLocalDateTime, class: org.joda.time.LocalDateTime
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
+
+/**
+ * Google analytics and feedback have been removed until I can
+ * improve performance.
+ */
+//google.analytics.enabled = false
+//grails.feedback.enabled = false
 
 
 /**
