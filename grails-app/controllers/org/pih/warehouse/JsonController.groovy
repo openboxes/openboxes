@@ -111,7 +111,12 @@ class JsonController {
 			def message = messageSource.getMessage(params.code, null, params.resolvedMessage, session?.user?.locale?:"en")
 		    println "get translation for code " + params.code + ", " + session?.user?.locale + " = " + message
 
-            localization.translation = getTranslation(message, "en", session?.user?.locale?.toString()?:"en")
+            //try {
+            //    localization.translation = getTranslation(message, "en", session?.user?.locale?.toString()?:"en")
+            //} catch (Exception e) {
+                //localization.translation = message;
+            //}
+            localization.translation = message
 			localization.code = params.code
 			localization.text = message
 
