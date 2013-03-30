@@ -18,11 +18,11 @@
         (${requisitionItem?.productPackage?.uom?.code?:"EA" }/${requisitionItem?.productPackage?.quantity?:1 })
 
     </td>
-	<td class="quantity right">
+	<td class="quantity center">
 		${requisitionItem?.quantity * (requisitionItem?.productPackage?.quantity?:1) }
         ${requisitionItem?.product.unitOfMeasure?:"EA" }
 	</td>
-	<td class="quantity right error">
+	<td class="quantity center">
 		${quantityOnHand?:0 }
 		${requisitionItem?.product.unitOfMeasure?:"EA" }
 	</td>
@@ -32,13 +32,15 @@
 		${requisitionItem?.product.unitOfMeasure?:"EA" }
 	</td>
 	--%>
-	<td>
+	<td class="center">
 		<g:link controller="requisitionItem" action="change" id="${requisitionItem?.id }" class="button">
 			<warehouse:message code="default.button.change.label"/>
 		</g:link>
+        <%--
 		<g:link controller="requisitionItem" action="delete" id="${requisitionItem?.id }" class="button"
                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 			<warehouse:message code="default.button.delete.label"/>
 		</g:link>
+		--%>
 	</td>
 </tr>

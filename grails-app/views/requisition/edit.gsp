@@ -22,103 +22,101 @@
 		<div class="errors">
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
-	</g:hasErrors>	
+	</g:hasErrors>
 
 
 
 	<g:render template="summary" model="[requisition:requisition]"/>
 
 
-	<div class="yui-ga">
-		<div class="yui-u first">
 
+	<div class="yui-gd">
+		<div class="yui-u first">
+            <g:render template="header" model="[requisition:requisition]"/>
+        </div>
+        <div class="yui-u">
 
 			<g:form name="requisitionForm" method="post" action="save">
-
-                <g:render template="header" model="[requisition:requisition]"/>
-
-
-
                 <g:if test="${requisition?.id}">
-                    <fieldset>
-                        <legend>
-                            <div class="box">
-                                <warehouse:message code="requisition.requisitionItems.label"/>
-                            </div>
-                        </legend>
-                        <div>
-                            <table id="requisition-items" class="ui-validation-items requisition"
-                                data-bind="visible: requisition.requisitionItems().length"
-                                style="width: auto; margin-left: auto; margin-right: auto; margin-top: 10px;">
-                                <thead>
-                                    <tr class="prop odd">
+
+                    <div class="box">
+                        <h3>
+                            <warehouse:message code="requisition.requisitionItems.label" default="Requisition items"/>
+                        </h3>
+
+                        <table id="requisition-items" class="ui-validation-items"
+                            data-bind="visible: requisition.requisitionItems().length">
+                            <thead>
+                                <tr class="prop">
+                                    <th class="list-header">
+                                        ${warehouse.message(code: 'requisitionItems.label')}
+                                    </th>
+                                    <th class="list-header center">
+                                        ${warehouse.message(code: 'requisitionItem.quantity.label')}
+                                    </th>
+                                    <g:if test="${requisition.isDepotRequisition()}">
                                         <th class="list-header">
-                                            ${warehouse.message(code: 'requisitionItems.label')}
+                                            ${warehouse.message(code: 'requisitionItem.recipient.label')}
                                         </th>
-                                        <th class="list-header center">
-                                            ${warehouse.message(code: 'requisitionItem.quantity.label')}
-                                        </th>
-                                        <g:if test="${requisition.isDepotRequisition()}">
-                                            <th class="list-header">
-                                                ${warehouse.message(code: 'requisitionItem.recipient.label')}
-                                            </th>
-                                        </g:if>
-                                        <%--
-                                        <th class="list-header">
-                                            ${warehouse.message(code: 'requisitionItem.comment.label')}
-                                        </th>
-                                         --%>
-                                        <th class="center">
-                                            ${warehouse.message(code: 'requisitionItem.delete.label')}
-                                        </th>
-                                    </tr>
-                                <thead>
-                                <tbody data-bind="foreach: requisition.requisitionItems">
-                                    <tr class="requisitionItemsRow">
-                                        <td class="list-header">
+                                    </g:if>
+                                    <%--
+                                    <th class="list-header">
+                                        ${warehouse.message(code: 'requisitionItem.comment.label')}
+                                    </th>
+                                     --%>
+                                    <th class="center">
+                                        ${warehouse.message(code: 'requisitionItem.delete.label')}
+                                    </th>
+                                </tr>
+                            <thead>
+                            <tbody data-bind="foreach: requisition.requisitionItems">
+                                <tr class="requisitionItemsRow">
+                                    <td class="list-header">
 
-                                            <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
-                                            <input type="hidden" data-bind="value: productPackageId, uniqueName: true" class="productPackageId"/>
-                                            <input type="hidden" data-bind="value: productId, uniqueName: true" class="productId" />
-                                            <input type="text" name="product" size="80"
-                                                   placeholder="${warehouse.message(code:'requisition.addItem.label')}"
-                                                   class="required autocomplete text search-product"
-                                                   data-bind="search_product: {source: '${request.contextPath }/json/searchProduct', id:'searchProduct'+$index()}, value: productName" />
-                                        </td>
-                                        <td class="list-header center">
-                                            <input name="quantity" type="text"
-                                                class="required number quantity text center" size="10" data-bind="value: quantity" />
-                                        </td>
-                                        <g:if test="${requisition.isDepotRequisition()}">
-                                          <td class="list-header"><input type="text"
-                                                data-bind="value: recipient, uniqueName: true" /></td>
-                                        </g:if><%--
-                                        <td class="list-header"><input type="text"
-                                            data-bind="value: comment, uniqueName: true" size="30%"
-                                            class="text" />
-                                        </td>
-                                        --%>
-                                        <td class="center middle">
-                                            <a href='#' class="button"
-                                                data-bind='click: $root.requisition.removeItem' tabindex="-1">
-                                                    ${warehouse.message(code:'default.button.delete.label')}
-                                            </a>
-                                        </td>
+                                        <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
+                                        <input type="hidden" data-bind="value: productPackageId, uniqueName: true" class="productPackageId"/>
+                                        <input type="hidden" data-bind="value: productId, uniqueName: true" class="productId" />
+                                        <input type="text" name="product" size="80"
+                                               placeholder="${warehouse.message(code:'requisition.addItem.label')}"
+                                               class="required autocomplete text search-product"
+                                               data-bind="search_product: {source: '${request.contextPath }/json/searchProduct', id:'searchProduct'+$index()}, value: productName" />
+                                    </td>
+                                    <td class="list-header center">
+                                        <input name="quantity" type="text"
+                                            class="required number quantity text center" size="10" data-bind="value: quantity" />
+                                    </td>
+                                    <g:if test="${requisition.isDepotRequisition()}">
+                                      <td class="list-header"><input type="text"
+                                            data-bind="value: recipient, uniqueName: true" /></td>
+                                    </g:if><%--
+                                    <td class="list-header"><input type="text"
+                                        data-bind="value: comment, uniqueName: true" size="30%"
+                                        class="text" />
+                                    </td>
+                                    --%>
+                                    <td class="center middle">
+                                        <a href='#' class="button"
+                                            data-bind='click: $root.requisition.removeItem' tabindex="-1">
+                                                ${warehouse.message(code:'default.button.delete.label')}
+                                        </a>
+                                    </td>
 
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="buttons center">
-                                <g:if test="${requisition?.id}">
-                                    <button class="button"
-                                            id="addRequisitionItemRow" name="addRequisitionItemRow"
-                                            data-bind='click: requisition.addItem'>
-                                        ${warehouse.message(code:'requisition.addNewItem.label')}</button>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="left">
+                            <g:if test="${requisition?.id}">
+                                <button class="button"
+                                        id="addRequisitionItemRow" name="addRequisitionItemRow"
+                                        data-bind='click: requisition.addItem'>
+                                    ${warehouse.message(code:'requisition.addNewItem.label')}</button>
 
-                                </g:if>
-                            </div>
+                            </g:if>
                         </div>
-                    </fieldset>
+                        <div class="clear"></div>
+
+
+                    </div>
                 </g:if>
 				<div class="buttons">
 					<div class="center">

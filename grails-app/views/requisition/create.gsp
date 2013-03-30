@@ -20,9 +20,9 @@
 		<div class="errors">
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
-	</g:hasErrors>	
+	</g:hasErrors>
 
-	
+
 
 	<g:render template="summary" model="[requisition:requisition]"/>
 	

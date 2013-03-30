@@ -139,6 +139,12 @@ class SelectTagLib {
                 locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
             }
         }
+
+        if (!locations) {
+            out << render(template: "/taglib/createLocation", model: [location: currentLocation])
+            return;
+        }
+
         /*
         def currentLocation = Location.get(session?.warehouse?.id)
 		def locations = locationService.getAllLocations().sort { it?.name?.toLowerCase() }

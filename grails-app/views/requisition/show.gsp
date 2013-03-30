@@ -15,17 +15,16 @@
             
                 <g:render template="summary" model="[requisition:requisition]"/>
 
-                <g:render template="header" model="[requisition:requisition]"/>
 
-
-                <div id="tabs-details">
-
-                    <div class="yui-ga">
-                        <div class="yui-u first">
-
+                <div class="yui-gd">
+                    <div class="yui-u first">
+                        <g:render template="header" model="[requisition:requisition]"/>
+                    </div>
+                    <div class="yui-u">
+                        <div id="tabs-details">
                             <div class="box">
-
-                                <table class="requisition">
+                                <h3><warehouse:message code="requisition.show.label"/></h3>
+                                <table>
                                     <thead>
                                         <tr class="odd">
                                             <th><warehouse:message code="requisition.progressBar.label" /></th>
@@ -93,7 +92,7 @@
                         </div>
                         <div class="clear"></div>
                         <div class="buttons">
-                            <div class="right">
+                            <div class="center">
                                 <g:link controller="requisition" action="list" class="button">
                                     <warehouse:message code="default.button.back.label"/>
                                 </g:link>

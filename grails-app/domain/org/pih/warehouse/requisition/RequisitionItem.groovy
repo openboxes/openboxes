@@ -103,6 +103,19 @@ class RequisitionItem implements Serializable {
         return PicklistItem.findAllByRequisitionItem(this)
     }
 
+    def getNextRequisitionItem() {
+        def currentIndex = requisition.requisitionItems.findIndexOf { it == this }
+        def nextItem = requisition?.requisitionItems[currentIndex+1]?:requisition?.requisitionItems[0]
+        return nextItem
+    }
+
+    def getPreviousRequisitionItem() {
+        def lastIndex = requisition?.requisitionItems?.size()-1
+        def currentIndex = requisition.requisitionItems.findIndexOf { it == this }
+        def previousItem = requisition?.requisitionItems[currentIndex-1]?:requisition?.requisitionItems[lastIndex]
+        return previousItem
+    }
+
     Map toJson(){
       [
         id: id,

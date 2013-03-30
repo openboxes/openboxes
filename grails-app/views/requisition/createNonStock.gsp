@@ -6,9 +6,6 @@
 <meta name="layout" content="custom" />
 <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
 <title><warehouse:message code="${requisition?.id ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></title>
-<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
 </head>
 <body>
 
@@ -19,12 +16,12 @@
 		<div class="errors">
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
-	</g:hasErrors>	
+	</g:hasErrors>
 
-	<g:render template="summary" model="[requisition:requisition]"/>
-	
-	
-	<div class="yui-ga">
+
+    <g:render template="summary" model="[requisition:requisition]"/>
+    <g:render template="flowHeader" model="[requisition:requisition]"/>
+    <div class="yui-ga">
 		<div class="yui-u first">
 
 
@@ -98,8 +95,8 @@
                                         </label>
                                     </td>
                                     <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
-                                                 noSelection="['null':'']"/>
+                                        <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
+                                             noSelection="['null':'']"/>
                                     </td>
                                 </tr>
                             </g:if>

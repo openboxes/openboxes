@@ -1,13 +1,12 @@
 <div id="requisition-summary">
 	<g:if test="${requisition?.id}">
-		<table style="width: auto;">
+		<table>
 			<tbody>			
 				<tr>
 
-                    <td class="top" style="width: 1%;">
+                    <td class="top">
                         <g:render template="../requisition/actions" model="[requisition:requisition]" />
                     </td>
-
                     <td class="center">
 						<div>
 							<g:if test="${requisition?.requestNumber }">
@@ -15,7 +14,6 @@
 							</g:if>
 						</div>
 						${requisition?.requestNumber }
-
 					</td>
 					<td>
 						<div class="title" id="description">
@@ -42,6 +40,7 @@
 								<warehouse:message code="requisition.requisitionItems.label"/>:
 								<b>${requisition?.requisitionItems?.size()?:0}</b>
 							</span>
+                            <span class="fade">&nbsp;|&nbsp;</span>
                             <span id="last-updated">
                                 <warehouse:message code="default.lastUpdated.label"/>:
                                 <b><g:formatDate date="${requisition?.lastUpdated }" format="MMM dd, yyyy"/></b>
@@ -81,22 +80,25 @@
 										
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr>
-					<td class="top" colspan="4">
-						<%-- 
-						<g:render template="actionsOther" model="[requisition:requisition]"/>
-						--%>
-						<g:render template="../requisition/buttons" model="[requisition:requisition]"/>
-					</td>				
-				</tr>
-			</tfoot>			
-		</table>			
+            <%--
+            <tfoot>
+                <tr>
+                    <td class="top" colspan="4">
+                        <g:render template="actionsOther" model="[requisition:requisition]"/>
+                        <g:render template="../requisition/buttons" model="[requisition:requisition]"/>
+                    </td>
+                </tr>
+            </tfoot>
+            --%>
+        </table>
 	</g:if>
 	<g:else>
 		<div class="title" id="description">
-            ${requisition?.name?:warehouse.message(code: 'requisition.new.label') }
+            <h1>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h1>
 		</div>
 		<div class="clear"></div>	
 	</g:else>
+</div>
+<div id="flow-header">
+    <g:render template="/requisition/flowHeader" model="[requisition:requisition]"/>
 </div>
