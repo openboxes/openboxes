@@ -247,8 +247,6 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
         var jsonString = getJsonDataFromRequisition();
         printMessage("here is the req: "  + jsonString);
         printMessage("endpoint is " + formElement.action);
-        alert(jsonString);
-
         try {
             jQuery.ajax({
                 url: formElement.action,
