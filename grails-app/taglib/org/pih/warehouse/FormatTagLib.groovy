@@ -93,7 +93,7 @@ class FormatTagLib {
 			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 def value = "";
              if (attrs?.product?.productCode) {
-                 value = "<label>" + attrs?.product?.productCode + "<label> "
+                 value = attrs?.product?.productCode + " "
              }
              value += LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
 
