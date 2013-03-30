@@ -21,21 +21,30 @@
         </h2>
 	</div>
 	<div class="widget-content">
+        <div id="tag-summary">
+            <g:if test="${tags}">
+                <div id="tagcloud">
+                    <g:each in="${tags }" var="tag">
+                        <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
+                            ${tag.tag } (${tag?.products?.size() })</g:link>
+                        <g:if test="${params.editTags}">
+                            <g:isUserAdmin>
+                                <g:link controller="dashboard" action="hideTag" id="${tag.id}" params="[editTags:true]">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
+                            </g:isUserAdmin>
+                            <br/>
+                        </g:if>
 
-        <div id="tagcloud">
-            <g:each in="${tags }" var="tag">
-                <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
-                    ${tag.tag } (${tag?.products?.size() })</g:link>
-                <g:if test="${params.editTags}">
-                    <g:isUserAdmin>
-                        <g:link controller="dashboard" action="hideTag" id="${tag.id}" params="[editTags:true]">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
-                    </g:isUserAdmin>
-                    <br/>
-                </g:if>
-
-            </g:each>
+                    </g:each>
+                </div>
+            </g:if>
+            <g:else>
+                <div style="margin:10px;" class="center">
+                    <span class="fade"><warehouse:message code="tag.noTags.label"/></span>
+                </div>
+            </g:else>
         </div>
+
         <%--
 		<div id="tagSummary">
             <g:isUserAdmin>

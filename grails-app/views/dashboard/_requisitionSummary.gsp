@@ -9,10 +9,10 @@
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
 			<g:if test="${!requisitions}">
-				<div style="text-align: left; padding: 10px;" class="fade">
-					(<warehouse:message code="requisition.noRecent.label"/>)
-				</div>
-			</g:if>	    		
+				<div style="margin:10px;" class="center">
+					<span class="fade"><warehouse:message code="requisition.noRecent.label"/></span>
+                </div>
+			</g:if>
 			<g:else>
                 <table>
                     <g:set var="requisitionMap" value="${requisitions.groupBy { it.status }}"/>
