@@ -35,5 +35,6 @@
     <include file="0.5.x/add-unique-constraint-product-code.xml"/>
     <include file="0.5.x/add-column-requisition-item-product-package.xml"/>
     <include file="0.5.x/add-column-tag-is-active.xml"/>
+    <include file="0.5.x/insert-role-assistant.xml"/>
 
 </databaseChangeLog>

@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.user
 
+import org.junit.Test
 import org.pih.warehouse.core.User;
 import java.util.Locale;
 
@@ -29,7 +30,7 @@ class UserTests extends GrailsUnitTestCase {
 		super.tearDown()
 	}
 
-		
+    @Test
 	void testNullable_shouldPassWhenNullableErrorsDetected() {
 		def user = new User()
 		assertFalse user.validate()
@@ -40,6 +41,7 @@ class UserTests extends GrailsUnitTestCase {
 		//assertEquals "nullable", user.errors["locale"]
 	}
 
+    @Test
 	void testUnique_shouldFailWhenUsernameIsNotUnique() {
 		// Test user to test uniqueness of nickName property.
 		//def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN"))
@@ -50,7 +52,8 @@ class UserTests extends GrailsUnitTestCase {
 		assertEquals 'Username is not unique.', 'unique', user2.errors['username']
 
 	}
-	
+
+	@Test
 	void testUnique_shouldPassWhenUsernameIsUnique() { 
 		//def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN"))
 		//mockForConstraintsTests(User, [user1])
@@ -60,6 +63,7 @@ class UserTests extends GrailsUnitTestCase {
 		assertTrue user3.validate()
 	}
 
+    @Test
 	void testList_shouldPassWhen() {
 		mockDomain(User, [new User(username: "username", password: "password", firstName: "First", lastName: "Last", locale: new Locale("en", "EN"))])
 		def users = User.list()

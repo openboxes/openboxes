@@ -22,29 +22,31 @@ class UserService {
 		return User.get(id)
 	}
 
-  Boolean isUserAdmin(User u){
-    def user = User.get(u.id)
-    def roles = [RoleType.ROLE_ADMIN]
-		return  effectRoles(user).any { roles.contains(it.roleType)}
-  }
-  Boolean isUserManager(User u){
-    def user = User.get(u.id)
-    def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
-		return effectRoles(user).any { roles.contains(it.roleType)}
-  }
-  Boolean canUserBrowse(User u){
-    def user = User.get(u.id)
-    def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER]
-		return effectRoles(user).any { roles.contains(it.roleType)}
-  }
-	
-	Boolean isUserInRole(String userId, Collection roles) { 
-		User user = getUser(userId)
-		return effectRoles(user).any { roles.contains(it.roleType) }
-	}
-	
-	
-	def findPersons(String terms, Map params) { 		
+    Boolean isUserAdmin(User u) {
+        def user = User.get(u.id)
+        def roles = [RoleType.ROLE_ADMIN]
+        return effectRoles(user).any { roles.contains(it.roleType) }
+    }
+
+    Boolean isUserManager(User u) {
+        def user = User.get(u.id)
+        def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
+        return effectRoles(user).any { roles.contains(it.roleType) }
+    }
+
+    Boolean canUserBrowse(User u) {
+        def user = User.get(u.id)
+        def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
+        return effectRoles(user).any { roles.contains(it.roleType) }
+    }
+
+    Boolean isUserInRole(String userId, Collection roles) {
+        User user = getUser(userId)
+        return effectRoles(user).any { roles.contains(it.roleType) }
+    }
+
+
+    def findPersons(String terms, Map params) {
 		def criteria = Person.createCriteria()
 		def results = criteria.list (params) {
 			or { 

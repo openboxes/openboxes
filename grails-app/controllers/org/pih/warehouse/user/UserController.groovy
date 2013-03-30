@@ -208,54 +208,56 @@ class UserController {
      * Update a user 
      */
     def update = {
-		  log.info(params)
-      def userInstance = User.get(params.id)
-      if (userInstance) {
-          if (params.version) {
-              def version = params.version.toLong()
-              if (userInstance.version > version) {
-                  userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
-				  def locations = Location.AllDepotWardAndPharmacy()
-				  render(view: "edit", model: [userInstance: userInstance, locations: locations])
-                  return
-              }
-          }
-			
-        // Password in the db is different from the one specified 
-        // so the user must have changed the password.  We need 
-        // to compare the password with confirm password before 
-        // setting the new password in the database
-        if (userInstance.password != params.password) {
-          userInstance.properties = params
-          userInstance.password = params?.password?.encodeAsPassword();
-          userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
-        }
-        else { 
-          userInstance.properties = params	
-          // Needed to bypass the password == passwordConfirm validation
-          userInstance.passwordConfirm = userInstance.password 			
-        }
-        
-        
-       updateRoles(userInstance, params.locationRolePairs) 
-       if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-          // if this is the current user, update reference to that user in the session
-          if (session.user.id == userInstance?.id) {
-            session.user = User.get(userInstance?.id)
-          }
-          
-          flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
-                  redirect(action: "show", id: userInstance.id)
-          }
-        else {
-			def locations = Location.AllDepotWardAndPharmacy()
-			render(view: "edit", model: [userInstance: userInstance, locations: locations])
-        }
-      }
-      else {
+        log.info(params)
+        def userInstance = User.get(params.id)
+        if (userInstance) {
+            if (params.version) {
+                def version = params.version.toLong()
+                if (userInstance.version > version) {
+                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
+                    def locations = Location.AllDepotWardAndPharmacy()
+                    render(view: "edit", model: [userInstance: userInstance, locations: locations])
+                    return
+                }
+            }
+
+            // Password in the db is different from the one specified
+            // so the user must have changed the password.  We need
+            // to compare the password with confirm password before
+            // setting the new password in the database
+            if (userInstance.password != params.password) {
+                userInstance.properties = params
+                userInstance.password = params?.password?.encodeAsPassword();
+                userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
+            } else {
+                userInstance.properties = params
+                // Needed to bypass the password == passwordConfirm validation
+                userInstance.passwordConfirm = userInstance.password
+            }
+
+            // If a non-admin user edits their profile they will not have access to
+            // the roles or location roles, so we need to prevent the updateRoles
+            // method from being called.
+            if (params.locationRolePairs) {
+                updateRoles(userInstance, params.locationRolePairs)
+            }
+
+            if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
+                // if this is the current user, update reference to that user in the session
+                if (session.user.id == userInstance?.id) {
+                    session.user = User.get(userInstance?.id)
+                }
+
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+                redirect(action: "show", id: userInstance.id)
+            } else {
+                def locations = Location.AllDepotWardAndPharmacy()
+                render(view: "edit", model: [userInstance: userInstance, locations: locations])
+            }
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
-      }
+        }
     }
 
    private void updateRoles(user, locationRolePairs){

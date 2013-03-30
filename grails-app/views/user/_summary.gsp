@@ -1,10 +1,14 @@
 				<div class="${(userInstance?.active) ? 'active':'inactive'}">
-					<table>
+					<table style="width:auto;">
 						<tr>
-	            			<td class="top" style="width:50px;">
+	            			<td class="top">
 								<g:render template="actions"/>
 							</td>
-							
+							<td>
+                                <div class="nailthumb-container">
+                                    <g:userPhoto user="${userInstance}"/>
+                                </div>
+							</td>
 							<td>
 		            			<span style="font-weight: bold; font-size: 1.2em; color: grey;">
 		            				${fieldValue(bean: userInstance, field: "firstName")} 
@@ -32,27 +36,17 @@
 							</td>							
 						
 							<td class="top right">
-								<g:if test="${userInstance.photo}">
-									<g:link action="viewPhoto" id="${userInstance?.id }">
-		            					<img
-		            						src="${createLink(controller:'user', action:'viewThumb', id:userInstance.id)}" 
-		            						style="vertical-align: middle" />
-	            					</g:link>
-	            				</g:if>
-	            				<g:else>
-	            					<g:if test="${userInstance?.active}">
-		            					<img class="photo" src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg') }"
-		            						style="vertical-align: bottom;" />
-		            						
-	            					</g:if>
-	            					<g:else>
-		            					<img class="photo" src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg') }"
-		            						style="vertical-align: bottom;" />
-	            					</g:else>
-	            				</g:else>
+
 	            			</td>
 							
 						</tr>
 						
 					</table>
 				</div>
+
+                <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+                <script>
+                    $(document).ready(function() {
+                        $('.nailthumb-container').nailthumb({ width: 24, height: 24 });
+                    });
+                </script>

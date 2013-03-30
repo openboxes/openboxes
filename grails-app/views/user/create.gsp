@@ -17,20 +17,16 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${userInstance}">
-		    <div class="errors">
-		        <g:renderErrors bean="${userInstance}" as="list" />
-		    </div>
+                <div class="errors">
+                    <g:renderErrors bean="${userInstance}" as="list" />
+                </div>
             </g:hasErrors>
-            
-            
-			<div class="buttonBar">            	
-            	<span class="linkButton">
-            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
-            	</span>
-            	<span class="linkButton">
-            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
-            	</span>
-           	</div>
+
+
+            <div class="buttonBar">
+                <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
+                <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
+            </div>
             
             
             <g:form action="save" method="post" >

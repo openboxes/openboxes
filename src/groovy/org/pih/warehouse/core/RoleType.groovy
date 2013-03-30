@@ -11,17 +11,21 @@ package org.pih.warehouse.core;
 
 public enum RoleType {
 
-	ROLE_MANAGER('Manager'),
-	ROLE_ADMIN('Admin'),
-	ROLE_BROWSER('Browser')
+    ROLE_ADMIN('Admin', 1),
+	ROLE_MANAGER('Manager', 2),
+    ROLE_ASSISTANT('Assistant', 3),
+	ROLE_BROWSER('Browser', 4)
  
 	String name
+    Integer sortOrder
 
-	RoleType(String name) {
+
+    RoleType(String name, Integer sortOrder) {
 		this.name = name
+        this.sortOrder = sortOrder
 	}
 
 	static list() {
-		[ROLE_BROWSER, ROLE_MANAGER, ROLE_ADMIN]
+		[ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER,  ROLE_ADMIN]
 	}
 }
