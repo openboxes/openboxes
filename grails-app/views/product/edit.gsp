@@ -968,9 +968,6 @@
     --%>
 		<script type="text/javascript">
 	    	$(document).ready(function() {
-
-                $(".chzn-select").chosen();
-	    	
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {

@@ -64,11 +64,5 @@
         </div>
     </div>
 
-    <script>
-        $(function() {
-            $(".chzn-select").chosen();
-        });
-    </script>
-
 </body>
 </html>

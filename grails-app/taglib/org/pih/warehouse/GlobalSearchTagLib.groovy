@@ -22,7 +22,7 @@ class GlobalSearchTagLib {
 		attrs.minLength = (attrs.minLength) ?: 1;
 		attrs.jsonUrl = (attrs.jsonUrl) ?: "";
 		attrs.cssClass= (attrs.cssClass) ?:""
-		attrs.size = (attrs.size)?:"30"
+		attrs.size = (attrs.size)?:"100"
 		attrs.display = (attrs.display)?:"visible"
 		
 		

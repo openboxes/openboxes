@@ -935,7 +935,7 @@ button.action-btn, button.previous, button.next {
 }
 
 .wizard-box {
-    border: 1px solid lightgrey;
+    border: 0px solid lightgrey;
     margin: 1px;
     background-color: white;
     padding: 7px;
@@ -1149,7 +1149,7 @@ body {
 .widget-small { border: 1px solid lightgrey;  margin: 5px; }
 .widget-header { background-color: #FFF; margin: 1px; font-weight: bold; font-size: 110%;}
 .widget-content { margin: 10px; }
-.widget-small .widget-content {  font-size: 110%;}
+
 .widget-content tr { height: 30px; }
 .widget-content td,th { vertical-align: middle; }
 img {
@@ -1161,10 +1161,6 @@ a:hover {
 }
 .fade {
     color: #aaa;
-}
-
-#logo {
-    padding: 0px;
 }
 
 #chooseLocation {
@@ -1476,8 +1472,17 @@ h2 {
 
 
 .logo {
+    /*
     font-size: 2em;
     font-weight: bold;
+    */
+    font-size: 20px;
+    font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
+    text-transform: lowercase;
+
+}
+.logo a, .logo a:hover, .logo a:visited {
+    color: #666;
 }
 
 
@@ -1803,7 +1808,6 @@ fieldset .prop { margin: 10px; }
 .step.selected { font-weight: bold; text-decoration: underline; background-color: #f7f7f7 /*#F8F7EF*/; }
 span.right { float: left; }
 span.left { width: 10%;  float: left; text-align: center; }
-#wizard { }
 
 .actions { cursor: pointer; position: absolute; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 0px; display: none; min-width: 200px; }
 .action-menu { cursor: pointer; }
@@ -2036,9 +2040,15 @@ img.photo_tiny {
 /* Image in Text Box */
 .globalSearch {
     vertical-align: middle;
-    background:#FFFFFF url(../images/icons/silk/magnifier.png) no-repeat 4px 4px;
+    background:#FFFFFF url(../images/icons/silk/magnifier.png) no-repeat 5px 5px;
     padding:4px 4px 4px 24px;
     border:1px solid #CCCCCC;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    width: 300px;
 }
 
 span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}
@@ -2757,3 +2767,36 @@ fieldset { padding: 5px; }
 select {
     text-overflow: ellipsis;
 }
+
+
+/* =============================================================================
+   Filter list
+   ========================================================================== */
+
+ul.filter-list {
+    list-style: none;
+    padding: 0;
+}
+.filter-list-item {
+    padding: 0 5px 0 0;
+    overflow: hidden;
+}
+.filter-list-item input {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* =============================================================================
+   Form Field list
+   ========================================================================== */
+
+
+
+/* =============================================================================
+   wizard.css
+   ========================================================================== */
+
+.step { font-size: 16px; font-weight: bolder; }

@@ -38,7 +38,6 @@
 						<g:if test="${!showQuantity }">
 							<div class="notice">
 								<warehouse:message code="inventory.tooManyProducts.message"></warehouse:message>
-								
 							</div>
 						</g:if>
 						<div class="tabs">
@@ -185,9 +184,6 @@
         <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 		<script>
 			$(document).ready(function() {
-
-
-                $(".chzn-select").chosen();
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();
 				});

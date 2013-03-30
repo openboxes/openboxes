@@ -1,10 +1,36 @@
-<!-- Add breadcrumb -->
-<span class="linkButton">
-	<a class="home" href="${createLink(uri: '/home/index')}"><warehouse:message code="default.home.label"/></a>
-	&raquo;
-	<g:if test="${session?.warehouse}">
-		<a class="building" href="${createLink(uri: request.contextPath + '/show/' + session.warehouse?.id)}">${session.warehouse?.name}</a>
-		&raquo;
-	</g:if>
-	<g:else><warehouse:message code="warehouse.unknown.label"/></g:else>
-</span>
+<ul class="breadcrumb">
+    <li>
+        <g:link controller="dashboard" action="index">
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
+        </g:link>
+    </li>
+    <g:if test="${session?.user && session?.warehouse}">
+        <li>
+            <a href="javascript:void(0);" class="warehouse-switch">
+                ${session?.warehouse?.name }
+            </a>
+        </li>
+    </g:if>
+    <g:if test="${controllerName }">
+        <li>
+            <g:link controller="${controllerName }" action="index">
+                <warehouse:message code="${controllerName + '.label'}" />
+            </g:link>
+        </li>
+    </g:if>
+<%--
+<g:if test="${actionName }">
+    <li>
+        <a href="">
+            ${actionName.capitalize() }
+        </a>
+    </li>
+</g:if>
+--%>
+    <g:if test="${g.layoutTitle() && !actionName.equals('index') && !actionName.contains('list') }">
+        <li>
+            <a href="#">${g.layoutTitle()}</a>
+        </li>
+    </g:if>
+
+</ul>

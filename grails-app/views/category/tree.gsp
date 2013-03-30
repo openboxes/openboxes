@@ -43,8 +43,6 @@
                                     <script>
                                         $(function() {
 
-                                            $(".chzn-select").chosen();
-
                                             $('li.draggable').draggable(
                                                     {
                                                         revert		: true,

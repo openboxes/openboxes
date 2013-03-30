@@ -132,11 +132,6 @@
                 </fieldset>
             </g:form>
         </div>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $(".chzn-select").chosen();
-            });
-        </script>
 
     </body>
 </html>
