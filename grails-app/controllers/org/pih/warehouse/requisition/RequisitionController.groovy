@@ -362,8 +362,10 @@ class RequisitionController {
 		
 		def requisition = Requisition.get(params?.id)
 		if (requisition) {
-			
-			requisition.status = RequisitionStatus.PICKING
+
+            if (requisition.status < RequisitionStatus.PICKING) {
+    			requisition.status = RequisitionStatus.PICKING
+            }
 			requisition.save(flush:true)
 						
 			def currentInventory = Location.get(session.warehouse.id).inventory
