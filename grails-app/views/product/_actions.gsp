@@ -18,14 +18,12 @@
 				<warehouse:message code="inventory.showStockCard.label"/>
 			</g:link>
 		</div>
-		<g:isUserAdmin>
 		<div class="action-menu-item">
 			<g:link controller="product" action="edit" id="${productInstance?.id }"> 
 				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 				<warehouse:message code="product.edit.label"/>
 			</g:link>
 		</div>
-		</g:isUserAdmin>
 		<div class="action-menu-item">
 			<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': productInstance?.id, 'disableFilter':true]">
 				<img src="${resource(dir: 'images/icons/silk', file: 'calendar.png')}"/>&nbsp;
