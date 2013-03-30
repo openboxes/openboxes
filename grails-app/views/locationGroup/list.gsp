@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><warehouse:message code="locationGroupss.label" /></title>
+        <title><warehouse:message code="locationGroups.label" /></title>
     </head>
     <body>        
         <div class="body">
@@ -11,6 +11,15 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
+
+            <div class="buttonBar">
+                <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locationGroup.label').toLowerCase()]"/></g:link>
+                <g:isUserAdmin>
+                    <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'locationGroup.label').toLowerCase()]"/></g:link>
+                </g:isUserAdmin>
+            </div>
+
+
 			<div class="box">           	
                 <table>
                     <thead>

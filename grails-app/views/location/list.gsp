@@ -35,17 +35,14 @@
            	
            	<div class="list">           	
 				<div class="buttonBar">            	
-	            	<span class="linkButton">
-	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
-	            	</span>
-                <g:isUserAdmin>
-                  <span class="linkButton">
-                    <g:link class="new" action="edit"><warehouse:message code="default.add.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
-                  </span>	
-                </g:isUserAdmin>
-	           	</div>
-	           	
-	            <div class="dialog box">
+                    <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
+                    <g:isUserAdmin>
+                        <g:link class="button" action="edit"><warehouse:message code="default.add.label"
+                             args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
+                    </g:isUserAdmin>
+                </div>
+
+                   <div class="dialog box">
 					<g:form action="list" method="get">
 						<span class="criteria">
 							<label><warehouse:message code="location.search.label"/></label>            						
