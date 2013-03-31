@@ -458,19 +458,21 @@ class InventoryController {
 
     def getCsv(map) {
         def csv = "";
-        csv += "${warehouse.message(code: 'product.productCode.label')}" + ","
-        csv += "${warehouse.message(code: 'product.label')}" + ","
-        csv += "${warehouse.message(code: 'product.manufacturer.label')}" + ","
-        csv += "${warehouse.message(code: 'product.vendor.label')}" + ","
-        csv += "${warehouse.message(code: 'inventory.quantity.label')}" + ","
+        csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventory.quantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
         csv += "\n"
 
         map.each { k, v ->
-            csv += k.name + ","
-            csv += k.productCode + ","
-            csv += k.manufacturer + ","
-            csv += k.vendor + ","
-            csv += v + ","
+            csv += '"' + (k.productCode?:"")  + '"' + ","
+            csv += '"' + (k.name?:"")  + '"' + ","
+            csv += '"' + (k.manufacturer?:"")  + '"' + ","
+            csv += '"' + (k.vendor?:"") + '"' + ","
+            csv += '"' + (v?:"")  + '"' + ","
+            csv += '"' + (k.unitOfMeasure?:"")  + '"' + ","
             csv += "\n"
         }
         return csv
