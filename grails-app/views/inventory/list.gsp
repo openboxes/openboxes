@@ -60,7 +60,12 @@
                 </div>
                 <div class="yui-u">
 
+
+
                     <div class="box">
+                        <div class="right">
+                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">Download .csv</g:link>
+                        </div>
                         <h2>
                             <warehouse:message code="default.results.label" default="Results"/> -
                             <warehouse:message code="default.showing.message" args="[quantityMap?.keySet()?.size()]"/>
@@ -68,7 +73,7 @@
                         <table>
                             <tr>
                                 <th><warehouse:message code="product.label"/></th>
-                                <th colspan="2" class="center"><warehouse:message code="default.quantity.label"/></th>
+                                <th class="center"><warehouse:message code="default.quantity.label"/></th>
 
                             </tr>
                             <g:each var="entry" in="${quantityMap}" status="i">
@@ -78,10 +83,8 @@
                                             ${entry.key}
                                         </g:link>
                                     </td>
-                                    <td class="right">
+                                    <td class="center">
                                         ${entry.value}
-                                    </td>
-                                    <td>
                                         ${entry?.key?.unitOfMeasure}
                                     </td>
 

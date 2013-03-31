@@ -352,6 +352,11 @@ class InventoryController {
         def totalStock = inventoryService.getTotalStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
 
+        if (params.format == "csv") {
+            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            render(contentType: "text/csv", text:getCsv(totalStock))
+        }
+
         render (view: "list", model: [quantityMap:totalStock])
 
     }
@@ -361,6 +366,10 @@ class InventoryController {
         def categorySelected = (params.category) ? Category.get(params.category) : null;
         def inStock = inventoryService.getInStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        if (params.format == "csv") {
+            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            render(contentType: "text/csv", text:getCsv(inStock))
+        }
 
         render (view: "list", model: [quantityMap:inStock])
 
@@ -369,21 +378,29 @@ class InventoryController {
     def listLowStock = {
         def warehouse = Location.get(session.warehouse.id)
         def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def outOfStock = inventoryService.getLowStock(warehouse);
+        def lowStock = inventoryService.getLowStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        if (params.format == "csv") {
+            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            render(contentType: "text/csv", text:getCsv(lowStock))
+        }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:outOfStock])
+        render (view: "list", model: [quantityMap:lowStock])
     }
 
     def listReorderStock = {
         def warehouse = Location.get(session.warehouse.id)
         def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def outOfStock = inventoryService.getReorderStock(warehouse);
+        def reorderStock = inventoryService.getReorderStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        if (params.format == "csv") {
+            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            render(contentType: "text/csv", text:getCsv(reorderStock))
+        }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:outOfStock])
+        render (view: "list", model: [quantityMap:reorderStock])
     }
 
     def listOutOfStock = {
@@ -391,6 +408,10 @@ class InventoryController {
 		def categorySelected = (params.category) ? Category.get(params.category) : null;
 		def outOfStock = inventoryService.getOutOfStock(warehouse);
 		//def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        if (params.format == "csv") {
+            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            render(contentType: "text/csv", text:getCsv(outOfStock))
+        }
 
 		//[inventoryItems:lowStock, quantityMap:quantityMap]
         render (view: "list", model: [quantityMap:outOfStock])
@@ -401,6 +422,10 @@ class InventoryController {
         def categorySelected = (params.category) ? Category.get(params.category) : null;
         def overStock = inventoryService.getOverStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        if (params.format == "csv") {
+            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            render(contentType: "text/csv", text:getCsv(overStock))
+        }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
         render (view: "list", model: [quantityMap:overStock])
@@ -429,6 +454,27 @@ class InventoryController {
 		[inventoryItems:expiringStock, quantityMap:quantityMap, categories:categories, 
 			categorySelected:category, thresholdSelected:threshold ]
 	}
+
+
+    def getCsv(map) {
+        def csv = "";
+        csv += "${warehouse.message(code: 'product.productCode.label')}" + ","
+        csv += "${warehouse.message(code: 'product.label')}" + ","
+        csv += "${warehouse.message(code: 'product.manufacturer.label')}" + ","
+        csv += "${warehouse.message(code: 'product.vendor.label')}" + ","
+        csv += "${warehouse.message(code: 'inventory.quantity.label')}" + ","
+        csv += "\n"
+
+        map.each { k, v ->
+            csv += k.name + ","
+            csv += k.productCode + ","
+            csv += k.manufacturer + ","
+            csv += k.vendor + ","
+            csv += v + ","
+            csv += "\n"
+        }
+        return csv
+    }
 
 
     /*
