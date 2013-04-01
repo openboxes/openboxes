@@ -39,10 +39,14 @@ import org.pih.warehouse.core.Constants
 class Transaction implements Comparable, Serializable {
 	
 	def beforeInsert = {
-		createdBy = AuthService.currentUser.get()
+        if (!createdBy) {
+    		createdBy = AuthService.currentUser.get()
+        }
 	}
 	def beforeUpdate ={
-		updatedBy = AuthService.currentUser.get()
+		if (!updatedBy) {
+            updatedBy = AuthService.currentUser.get()
+        }
 	}
 	
 	String id
