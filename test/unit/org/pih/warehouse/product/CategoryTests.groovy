@@ -134,7 +134,7 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void toJson_shouldReturnSomething() {
+    void toJson() {
         def categoryA = Category.findByName("A")
 
         def json = categoryA.toJson()
@@ -143,6 +143,29 @@ class CategoryTests extends GrailsUnitTestCase {
         assertEquals categoryA.description, json.description
         assertEquals 2, json.categories.size()
 
+    }
+
+
+    @Test
+    void compareTo_shouldSortCategoriesByName() {
+
+        def categories = Category.findAll()
+        categories = categories.sort();
+        println categories
+    }
+
+    @Test
+    void compareTo_shouldSortCategoriesBySortOrder() {
+        category1.sortOrder = 10
+        category2.sortOrder = 20
+        category8.sortOrder = 1
+        def categories = [category1, category2, category8]
+        categories = categories.sort()
+        println categories
+
+        assertEquals categories[0], category8
+        assertEquals categories[1], category1
+        assertEquals categories[2], category2
     }
 
 

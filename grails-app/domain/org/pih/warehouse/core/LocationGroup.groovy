@@ -15,7 +15,7 @@ import java.util.Date;
  * Represents a logical grouping of locations (e.g. a site 
  * that has multiple facilities like depots, pharmacies, etc).
  */
-class LocationGroup implements Serializable {
+class LocationGroup implements Serializable, Comparable<LocationGroup> {
 
 	String id
 	String name
@@ -54,5 +54,13 @@ class LocationGroup implements Serializable {
         }
         return false;
     }
+
+    /**
+     * Sort by name
+     */
+    int compareTo(LocationGroup obj) {
+        return name <=> obj.name
+    }
+
 
 }

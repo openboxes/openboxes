@@ -18,7 +18,7 @@ import org.pih.warehouse.shipping.Shipment;
 /**
  * A location can be a customer, warehouse, or supplier.  
  */
-class Location implements Comparable, java.io.Serializable {
+class Location implements Comparable<Location>, java.io.Serializable {
 	
 	String id
 	String name
@@ -82,8 +82,8 @@ class Location implements Comparable, java.io.Serializable {
 	
 	String toString() { return this.name } 
 	
-	int compareTo(obj) { 
-		return name <=> obj?.name
+	int compareTo(Location location) {
+		return name <=> location?.name
 	}
 	
 	/**

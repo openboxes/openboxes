@@ -48,10 +48,14 @@ class Category implements Comparable, Serializable {
 	String toString() { return "$name"; }	
 
 	/**
-	 * Sort by name
+	 * Sort by sort order, name
 	 */
 	int compareTo(obj) {
-		this.getHierarchyAsString(">") <=> obj.getHierarchyAsString(">")
+        def compare = sortOrder <=> obj.sortOrder
+        if (compare == 0) {
+            compare = this.getHierarchyAsString(">") <=> obj.getHierarchyAsString(">")
+        }
+        return compare
 	}
 
     /**
