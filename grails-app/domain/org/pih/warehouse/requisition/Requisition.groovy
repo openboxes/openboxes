@@ -24,10 +24,10 @@ import org.pih.warehouse.fulfillment.Fulfillment;
 class Requisition implements Serializable {
 
 	def beforeInsert = {
-		createdBy = AuthService.currentUser.get()
+		if (!createdBy) createdBy = AuthService.currentUser.get()
 	}
 	def beforeUpdate ={
-		updatedBy = AuthService.currentUser.get()
+		if (!updatedBy) updatedBy = AuthService.currentUser.get()
 	}
 	
 	String id
@@ -116,11 +116,11 @@ class Requisition implements Serializable {
 	}
 
     Boolean isWardRequisition() {
-        return (type in [RequisitionType.WARD_NON_STOCK, RequisitionType.WARD_STOCK])
+        return (type in [RequisitionType.WARD_NON_STOCK, RequisitionType.WARD_STOCK, RequisitionType.WARD_ADHOC])
     }
 
     Boolean isDepotRequisition() {
-        return (type in [RequisitionType.DEPOT_NON_STOCK, RequisitionType.DEPOT_STOCK])
+        return (type in [RequisitionType.DEPOT_NON_STOCK, RequisitionType.DEPOT_STOCK, RequisitionType.DEPOT_TO_DEPOT])
     }
 
     Boolean isStockRequisition() {
