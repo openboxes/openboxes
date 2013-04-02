@@ -38,10 +38,7 @@ class SelectTagLib {
 
 
     def selectUnitOfMeasure = { attrs, body ->
-
-
         def product = Product.get(attrs?.product?.id)
-
         if (product.packages) {
             attrs.noSelection = ["null":"EA/1"]
             attrs.from = product?.packages?.sort()
@@ -50,7 +47,7 @@ class SelectTagLib {
             out << g.select(attrs)
         }
         else {
-            out << product.unitOfMeasure
+            out << product.unitOfMeasure?:"EA/1"
 
         }
     }

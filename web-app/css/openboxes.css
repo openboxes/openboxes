@@ -1038,6 +1038,23 @@ button.action-btn, button.previous, button.next {
     -moz-border-radius:100px;
     -webkit-border-radius:100px;
 }
+.count {
+    display: block;
+    float: left;
+    font-size: 10px;
+    font-weight: bold;
+    text-align:center;
+    width:25px;
+    margin: 2px 5px 0px 0px;
+    line-height:25px;
+    color: #ccc;
+    background: #FFF;
+    border: 2px solid #CCC;
+    -webkit-border-radius:20px;
+    -moz-border-radius:20px;
+    border-radius:20px;
+}
+
 
 .circle a {
     font-size:9px;
@@ -1096,7 +1113,7 @@ button.action-btn, button.previous, button.next {
 
 li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 {
-    color: black;
+    color: #666;
     font-size: 14px;
     vertical-align: middle;
     padding: 5px 0px 2px;
@@ -1396,7 +1413,9 @@ label.clear {
 /* TODO figure out what this was meant for */
 h2 {
     font-size: 1.2em;
+    font-weight: normal;
     background-color: #F7F7F7;
+    color: #666;
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
@@ -1814,7 +1833,7 @@ span.left { width: 10%;  float: left; text-align: center; }
 .action-menu { padding: 0; }
 .action-menu-root { margin: 0px; }
 .action-menu-item { margin: 0px; padding: 3px; }
-.filter-list-item, .filter { margin: 10px;  }
+
 .document-list-item { margin: 1px; }
 
 .details { cursor: pointer; position: absolute; z-index:999; background-color: white; border: 1px solid lightgrey; padding: 10px; display: none; }
@@ -2773,13 +2792,14 @@ select {
    Filter list
    ========================================================================== */
 
+
 ul.filter-list {
     list-style: none;
     padding: 0;
 }
+.filter-list-item, .filter { margin: 10px;  }
 .filter-list-item {
     padding: 0 5px 0 0;
-    overflow: hidden;
 }
 .filter-list-item input {
     width: 100%;
@@ -2799,4 +2819,4 @@ ul.filter-list {
    wizard.css
    ========================================================================== */
 
-.step { font-size: 16px; font-weight: bolder; }
+

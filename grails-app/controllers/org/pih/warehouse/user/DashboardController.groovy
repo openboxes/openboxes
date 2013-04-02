@@ -248,7 +248,7 @@ class DashboardController {
 			//lowStock: lowStock,
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
-            requisitions:  requisitionService.getRequisitions(),
+            requisitions:  requisitionService.getRequisitions(session.warehouse),
 			//outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
@@ -297,8 +297,9 @@ class DashboardController {
 		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
 
         // Requisitions
-        def incomingRequests = Requisition.findAllByDestinationAndIsTemplate(session?.warehouse, false).groupBy{it?.status}.sort()
-		def outgoingRequests = Requisition.findAllByOriginAndIsTemplate(session?.warehouse, false).groupBy{it?.status}.sort()
+        def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
+		def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
+        def myRequisitions = requisitionService.getRequisitions(session?.warehouse, null, session?.user, null, null, null, null)
 		
 		def categories = []
 
@@ -317,6 +318,7 @@ class DashboardController {
 			incomingOrders: incomingOrders,
 			incomingRequests: incomingRequests,
 			outgoingRequests: outgoingRequests,
+            myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()
 		]

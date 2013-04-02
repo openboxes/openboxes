@@ -1,12 +1,15 @@
 <div class="widget-large">
 	<div class="widget-header">
+        <div style="float: right; font-weight: normal; font-size: 10px;" class="fade box">
+            <g:link controller="dashboard" action="index" class="${!params.daysToInclude || params.daysToInclude.equals('3')?'selected':''}" params="[daysToInclude:3]">
+                <warehouse:message code="dashboard.lastThreeDays.label" default="Last 3 days"/></g:link> |
+            <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('7')?'selected':''}" params="[daysToInclude:7]">
+                <warehouse:message code="dashboard.lastWeek.label" default="Last week"/></g:link> |
+            <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('30')?'selected':''}" params="[daysToInclude:30]">
+                <warehouse:message code="dashboard.lastMonth.label" default="Last month"/></g:link>
+        </div>
 		<h2>
 			<warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/>
-            <div style="float: right" class="fade">
-                <g:link controller="dashboard" action="index" class="${!params.daysToInclude || params.daysToInclude.equals('3')?'selected':''}" params="[daysToInclude:3]">Last 3 days</g:link> |
-                <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('7')?'selected':''}" params="[daysToInclude:7]">Last week</g:link> |
-                <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('30')?'selected':''}" params="[daysToInclude:30]">Last month</g:link>
-            </div>
         </h2>
 	</div>
 	<div class="widget-content" style="padding: 0; margin: 0">	    					    			

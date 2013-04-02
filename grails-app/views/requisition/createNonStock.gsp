@@ -20,7 +20,7 @@
 
 
     <g:render template="summary" model="[requisition:requisition]"/>
-    <g:render template="flowHeader" model="[requisition:requisition]"/>
+
     <div class="yui-ga">
 		<div class="yui-u first">
 

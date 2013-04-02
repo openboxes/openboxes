@@ -1,6 +1,7 @@
 package org.pih.warehouse.requisition
 
 import grails.test.GrailsUnitTestCase
+import org.junit.Test
 import org.pih.warehouse.core.*
 
 
@@ -68,6 +69,45 @@ class RequisitionTests extends GrailsUnitTestCase {
         assert requisition.errors["requestedDeliveryDate"]
     }
     */
+
+    @Test
+    void compareTo_shouldSortByOriginTypeCommodityClassDateCreated() {
+        def justin = new Person(id:"1", firstName:"Justin", lastName:"Miranda")
+        def boston = new Location(id: "bos", name:"Boston")
+        def miami = new Location(id: "mia", name:"Miami")
+        def today = new Date()
+        def tomorrow = new Date().plus(1)
+        def yesterday = new Date().minus(1)
+        def requisition1 = new Requisition(id: "1", destination: boston, origin: miami)
+        def requisition2 = new Requisition(id: "2", destination: miami, origin: boston)
+
+        def requisition3 = new Requisition(id: "3", destination: boston, origin: miami, dateRequested: today)
+        def requisition4 = new Requisition(id: "4", destination: boston, origin: miami, dateRequested: tomorrow)
+
+        def requisition5 = new Requisition(id: "5", destination: boston, origin: miami, dateRequested: today, type: RequisitionType.WARD_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition6 = new Requisition(id: "6", destination: boston, origin: miami, dateRequested: today, type: RequisitionType.WARD_ADHOC, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition7 = new Requisition(id: "7", destination: miami, origin: boston, dateRequested: today, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+
+        def requisition8 = new Requisition(id: "8", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
+        def requisition9 = new Requisition(id: "9", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition10 = new Requisition(id: "10", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
+
+        def requisition11 = new Requisition(id: "11", dateCreated: tomorrow)
+        def requisition12 = new Requisition(id: "12", dateCreated: yesterday)
+        def requisition13 = new Requisition(id: "13", dateCreated: today)
+
+        def equal = 0, firstWins = 1, secondWins = -1
+        assertEquals equal, requisition1 <=> requisition1
+        assertEquals firstWins, requisition1 <=> requisition2
+        assertEquals firstWins, requisition3 <=> requisition4
+
+
+        assertEquals([requisition7,requisition5,requisition6], [requisition5,requisition6,requisition7].sort())
+        assertEquals([requisition9,requisition8,requisition10], [requisition8,requisition9,requisition10].sort())
+        assertEquals([requisition11,requisition13,requisition12], [requisition11,requisition12,requisition13].sort())
+
+    }
+
 
     void testToJson(){
       def peter = new Person(id:"person1", firstName:"peter", lastName:"zhao")

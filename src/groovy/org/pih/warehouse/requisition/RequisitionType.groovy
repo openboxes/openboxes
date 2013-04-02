@@ -11,12 +11,13 @@ package org.pih.warehouse.requisition
 
 public enum RequisitionType {
 	WARD_STOCK(0),
-	WARD_NON_STOCK(1),
-	DEPOT_STOCK(2),
-	DEPOT_NON_STOCK(3),
-	DEPOT_TO_DEPOT(4),
-	WARD_ADHOC(5)
-	
+    WARD_ADHOC(1),
+	WARD_NON_STOCK(2),
+	DEPOT_STOCK(3),
+    DEPOT_ADHOC(4),
+	DEPOT_NON_STOCK(5),
+	DEPOT_TO_DEPOT(6)
+
 	int sortOrder
 
 	RequisitionType(int sortOrder) {

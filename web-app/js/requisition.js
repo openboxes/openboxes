@@ -125,15 +125,18 @@ openboxes.requisition.Requisition = function(attrs) {
 openboxes.requisition.RequisitionItem = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
+    console.log(attrs);
     self.id = ko.observable(attrs.id);
     self.version = ko.observable(attrs.version);
     self.productId = ko.observable(attrs.productId);
     self.productName = ko.observable(attrs.productName);
     self.productPackageId = ko.observable(attrs.productPackageId);
     self.productPackageName = ko.observable(attrs.productPackageName);
+    self.productPackageQuantity = ko.observable(attrs.productPackageQuantity);
     self.quantity =  ko.observable(attrs.quantity);
+    self.totalQuantity =  ko.observable(attrs.totalQuantity);
     self.comment = ko.observable(attrs.comment);
-    self.unitOfMeasure = ko.observable(attrs.unitOfMeasure)
+    self.unitOfMeasure = ko.observable(attrs.unitOfMeasure);
     //self.substitutable =  ko.observable(attrs.substitutable);
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
@@ -148,6 +151,10 @@ openboxes.requisition.RequisitionItem = function(attrs) {
         return picklistItem.inventoryItemId() == inventoryItemId;
       });
     };
+
+    self.totalQuantity = ko.computed(function() {
+        return self.quantity() * self.productPackageQuantity();
+    }, this);
 
     self.quantityPicked = ko.computed(function() {
         var sum = 0;

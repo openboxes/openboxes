@@ -86,13 +86,40 @@ class RequisitionItem implements Serializable {
 		parentRequisitionItem(nullable:true)
 	}
 
+    /**
+     * Return the package quantity multiplied by the quantity requested.
+     *
+     * @return
+     */
+    def totalQuantity() {
+        return (productPackage?.quantity?:1) * (quantity?:0)
+    }
+
+    def totalQuantityCanceled() {
+        println "product pacakage: " + productPackage
+        println "product pacakage: " + productPackage?.quantity
+        println "quantity canceled: " + quantityCanceled
+        println "total quantity canceled: " + (productPackage?.quantity?:1) * (quantityCanceled?:0)
+
+
+        return (productPackage?.quantity?:1) * (quantityCanceled?:0)
+    }
+
+    def isCanceled() {
+        return totalQuantityCanceled() == totalQuantity()
+    }
+
+    def isCompleted() {
+        return calculateQuantityRemaining() <= 0
+    }
+
     def calculateQuantityPicked() {
-        def quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum{it.quantity}		
+        def quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum{ it.quantity }
 		return quantityPicked?:0
     }
 
 	def calculateQuantityRemaining() {
-		return quantity - (calculateQuantityPicked() + (quantityCanceled?:0))
+		return totalQuantity() - (calculateQuantityPicked() + (quantityCanceled?:0))
 	}
 	
     def calculateNumInventoryItem(Inventory inventory) {
@@ -101,6 +128,10 @@ class RequisitionItem implements Serializable {
 
     def retrievePicklistItems() {
         return PicklistItem.findAllByRequisitionItem(this)
+    }
+
+    def availableInventoryItems() {
+        return InventoryItem.findAllByProduct(product)
     }
 
     def getNextRequisitionItem() {
@@ -121,11 +152,15 @@ class RequisitionItem implements Serializable {
         id: id,
         version: version,
         productId: product?.id,
-        productName: product?.name + ((productPackage) ? " ("+productPackage?.uom?.code + "/" + productPackage?.quantity + ")" : " (EA/1)"),
+        productName: product?.productCode + " " + product?.name + ((productPackage) ? " ("+productPackage?.uom?.code + "/" + productPackage?.quantity + ")" : " (EA/1)"),
         productPackageId: productPackage?.id,
         productPackageName: productPackage?.uom?.code + "/" + productPackage?.quantity,
+        productPackageQuantity: productPackage?.quantity?:1,
 		unitOfMeasure: product?.unitOfMeasure?:"EA",
         quantity:quantity,
+        totalQuantity:totalQuantity(),
+        quantityCanceled:quantityCanceled,
+        totalQuantityCanceled:totalQuantityCanceled(),
         comment: comment,
         recipient: recipient,
         substitutable: substitutable,

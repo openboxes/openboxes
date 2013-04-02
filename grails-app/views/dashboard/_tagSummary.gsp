@@ -1,23 +1,23 @@
 
 <div class="widget-large">
 	<div class="widget-header">
+
+        <g:isUserAdmin>
+            <div style="float: right; font-weight: normal; font-size: 10px;" class="fade box">
+                <g:if test="${!params.editTags}">
+                    <g:link controller="dashboard" action="index" params="[editTags:true]">
+                        <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
+                    </g:link>
+                </g:if>
+                <g:else>
+                    <g:link controller="dashboard" action="index">
+                        <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
+                    </g:link>
+                </g:else>
+            </div>
+        </g:isUserAdmin>
         <h2>
             <warehouse:message code="tags.label" default="Tags"/>
-            <g:isUserAdmin>
-                <div style="float: right" class="fade">
-                    <g:if test="${!params.editTags}">
-                        <g:link controller="dashboard" action="index" params="[editTags:true]">
-                            <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
-                        </g:link>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="dashboard" action="index">
-                            <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
-                        </g:link>
-                    </g:else>
-                </div>
-            </g:isUserAdmin>
-
         </h2>
 	</div>
 	<div class="widget-content">

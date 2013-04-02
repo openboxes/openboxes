@@ -3,7 +3,14 @@
 		<div class="${actionName.contains('create')||actionName.equals('show')||actionName.equals('editHeader')?'active-step':''}">
 			<g:link controller="requisition" action="show" id="${requisition?.id}">
                 <span class="step">1</span>
-				<warehouse:message code="requisition.create.label" args="[warehouse.message(code:'enum.RequisitionType.' + requisition.type)]"/>
+
+                <g:if test="${requisition?.id}">
+                    <warehouse:message code="requisition.show.label" args="[warehouse.message(code:'enum.RequisitionType.' + requisition.type).toLowerCase()]"/>
+                </g:if>
+                <g:else>
+                    <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'enum.RequisitionType.' + requisition.type).toLowerCase()]"/>
+                </g:else>
+
 			</g:link>
 		</div>
         <div class="${actionName.equals('edit')?'active-step':''}">

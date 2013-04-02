@@ -1,7 +1,7 @@
     <div id="requisition-header" class="box dialog">
         <div class="right">
             <g:if test="${requisition?.id }">
-                <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button">
+                <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button icon edit">
                     ${warehouse.message(code:'requisition.button.edit.label')}
                 </g:link>
             </g:if>

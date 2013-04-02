@@ -356,10 +356,10 @@
 									<td colspan="2" class="center">											
 										<g:form action="saveComment">
 											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-		                                    <g:textArea name="comment" rows="3" style="width:100%" placeholder="${warehouse.message(code:'default.comment.message')}"/>
-		                                    <div class="buttons">
+		                                    <g:textArea name="comment" rows="10" cols="50" placeholder="${warehouse.message(code:'default.comment.message')}"/>
+		                                    <span class="buttons">
 												<button type="submit" class="button"><warehouse:message code="default.button.add.label"/></button>
-											</div>
+											</span>
 										</g:form>											
 									</td>
 								</tr>

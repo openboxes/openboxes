@@ -49,7 +49,7 @@ class LocationService {
 	
 	
 	Map getLoginLocationsMap(Location currentLocation) { 
-		return getLoginLocations(currentLocation).groupBy { it.locationGroup }
+		return getLoginLocations(currentLocation).sort { it.locationGroup }.groupBy { it.locationGroup }
 	}
 	
 	List getDepots() {

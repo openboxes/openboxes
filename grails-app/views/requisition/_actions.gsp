@@ -42,14 +42,27 @@
 						&nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition')}
 					</g:link>		
 				</div>
-				<%-- 
-				<div class="action-menu-item">
-					<g:link controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
-						<img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-						&nbsp;${warehouse.message(code: 'requisition.print.label', default: 'Print requisition')}
-					</g:link>				
-				</div>
-				--%>
+                <div class="action-menu-item">
+                    <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
+                        &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="printDeliveryNote" id="${requisition?.id}" target="_blank">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.button.printDeliveryNote.label', default: 'Print delivery note')}
+                    </g:link>
+                </div>
+
+    <%--
+    <div class="action-menu-item">
+        <g:link controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
+            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
+            &nbsp;${warehouse.message(code: 'requisition.print.label', default: 'Print requisition')}
+        </g:link>
+    </div>
+    --%>
 				<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
 					<g:isUserManager>
                         <%--

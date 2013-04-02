@@ -30,11 +30,12 @@
                                             <th><warehouse:message code="requisition.progressBar.label" /></th>
                                             <th><warehouse:message code="requisition.progressPercentage.label" /></th>
                                             <th><warehouse:message code="product.label" /></th>
-                                            <th class="right"><warehouse:message code="requisition.quantity.label" /></th>
-                                            <th class="right"><warehouse:message code="picklist.quantity.label" /></th>
-                                            <th class="right"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
-                                            <th class="right"><warehouse:message code="requisition.quantityRemaining.label" /></th>
-                                            <th><warehouse:message code="product.uom.label" /></th>
+                                            <th class="center"><warehouse:message code="requisition.quantity.label" /></th>
+                                            <th class="center"><warehouse:message code="requisition.totalQuantity.label" default="Total quantity" /></th>
+                                            <th class="center"><warehouse:message code="picklist.quantity.label" /></th>
+                                            <th class="center"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
+                                            <th class="center"><warehouse:message code="requisition.quantityRemaining.label" /></th>
+                                            <th class="center"><warehouse:message code="product.uom.label" /></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,22 +65,33 @@
                                                 <td class="product">
                                                     <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id }">
                                                     <format:metadata
-                                                        obj="${requisitionItem?.product?.name}" /></g:link>
+                                                        obj="${requisitionItem?.product?.name}" />
+                                                        <g:if test="${requisitionItem?.productPackage}">
+                                                            (${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity})
+                                                        </g:if>
+                                                        <g:else>
+                                                            (EA/1)
+                                                        </g:else>
+                                                    </g:link>
 
-                                                    <g:if test="${requisitionItem?.productPackage}"></g:if>
-                                                    ${requisitionItem?.productPackage}
                                                 </td>
-                                                <td class="quantity right">
-                                                    ${requisitionItem?.quantity}
+                                                <td class="quantity center">
+                                                    <g:showQuantity requisitionItem="${requisitionItem}"/>
+
+
+
                                                 </td>
-                                                <td class="quantityPicked right">
+                                                <td class="quantity center">
+                                                    ${requisitionItem?.totalQuantity()}
+                                                </td>
+                                                <td class="quantityPicked center">
                                                     ${requisitionItem?.calculateQuantityPicked()?:0}
                                                 </td>
-                                                <td class="quantityCanceled right">
+                                                <td class="quantityCanceled center">
                                                     ${requisitionItem?.quantityCanceled?:0}
                                                 </td>
-                                                <td class="quantityRemaining right">
-                                                    ${quantityRemaining }
+                                                <td class="quantityRemaining center">
+                                                    ${requisitionItem.calculateQuantityRemaining()?:0}
                                                 </td>
                                                 <td>
                                                     ${requisitionItem?.product.unitOfMeasure?:"EA" }

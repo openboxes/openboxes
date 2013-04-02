@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
@@ -37,7 +38,6 @@ class RequisitionService {
      */
     def getRequisitions() {
         return Requisition.findAllByIsTemplate(false)
-
     }
 
     /**
@@ -45,6 +45,73 @@ class RequisitionService {
      */
     def getRequisitionTemplates() {
         return Requisition.findAllByIsTemplateAndIsPublished(true, true)
+    }
+
+    /**
+     * Get all requisitions for the given destination.
+     * @param destination
+     * @return
+     */
+    def getRequisitions(Location destination) {
+        return getRequisitions(destination, null, null, null, null, null, null)
+    }
+
+    /**
+     * Get all requisitions for the given destination and origin.
+     * @param destination
+     * @param origin
+     * @return
+     */
+    def getRequisitions(Location destination, Location origin) {
+        return getRequisitions(destination, origin, null, null, null, null, null)
+    }
+
+    /**
+     * Get all requisitions for the given destination and query.
+     * @param destination
+     * @param query
+     * @param params
+     * @return
+     */
+    def getRequisitions(Location destination, Location origin, User createdBy, RequisitionType requisitionType, CommodityClass commodityClass, String query, Map params) {
+        //return Requisition.findAllByDestination(session.warehouse)
+
+        def criteria = Requisition.createCriteria()
+
+        def results = criteria.list() {
+            and {
+                // Base query needs to include the following
+                or {
+                    eq("isTemplate", false)
+                    isNull("isTemplate")
+                }
+                if (destination) {
+                    eq("destination", destination)
+                }
+                if (createdBy) {
+                    eq("createdBy.id", createdBy.id)
+                }
+                if (commodityClass) {
+                    eq("commodityClass", commodityClass)
+                }
+                if (requisitionType) {
+                    eq("type", requisitionType)
+                }
+                if (origin) {
+                    eq("origin", origin)
+                }
+                if (query) {
+                    or {
+                        ilike("name", "%" + query + "%")
+                        ilike("requestNumber", "%" + query + "%")
+                    }
+                }
+                //eq("isPublished", false)
+            }
+        }
+
+        return results
+
     }
 
 

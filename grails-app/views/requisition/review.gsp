@@ -5,6 +5,10 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition').toLowerCase()}" />
         <title><warehouse:message code="default.review.label" args="[entityName]" /></title>
+        <style>
+            .selected { color: #666; }
+            .unselected { color: #ccc; }
+        </style>
     </head>
     <body>
         <div class="body">
@@ -21,8 +25,6 @@
                         <g:render template="header" model="[requisition:requisition]"/>
                     </div>
                     <div class="yui-u">
-
-
                         <div id="tabs-details" class="box">
                             <h3>
                                 <warehouse:message code="requisition.review.label"/>
@@ -30,6 +32,7 @@
                             <table>
                                 <thead>
                                     <tr class="odd">
+                                        <th><warehouse:message code="default.status.label" default="Status"/></th>
                                         <%--
                                         <th class="center">
                                             <g:checkBox name="selectAll" class="selectAll"/>
@@ -41,6 +44,9 @@
                                         </th>
                                         <th class="center">
                                             <warehouse:message code="requisitionItem.quantity.label" />
+                                        </th>
+                                        <th class="center">
+                                            <warehouse:message code="requisitionItem.quantityCanceled.label" />
                                         </th>
                                         <th class="center">
                                             <warehouse:message code="default.quantityOnHand.label" />
@@ -66,7 +72,7 @@
                                         in="${requisition?.requisitionItems.findAll { !it.parentRequisitionItem }}" status="i">
                                         <g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:i]"/>
                                         <g:each var="childRequisitionItem" in="${requisitionItem?.requisitionItems}">
-                                            <g:render template="reviewRequisitionItem" model="[requisitionItem:childRequisitionItem, i:i, isChild:true]"/>
+                                            <g:render template="reviewRequisitionItem" model="[requisition:requisition,requisitionItem:childRequisitionItem, i:i, isChild:true]"/>
                                         </g:each>
 
                                     </g:each>
@@ -91,7 +97,7 @@
 		</div>
 		<script type="text/javascript">
 			$(function() {
-				$(".selectAll").click(function() { 
+				$(".selectAll").click(function() {
 					var thisCheck = $(this);
 					if (thisCheck.is(':checked')) {
 						$(".selectItem").attr("checked", true);

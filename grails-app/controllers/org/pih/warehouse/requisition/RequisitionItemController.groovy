@@ -66,22 +66,22 @@ class RequisitionItemController {
         }
     }
 
-	def change = { 
-		def location = Location.get(session.warehouse.id)
-		def requisitionItemInstance = RequisitionItem.get(params.id)
-		def quantityOnHand = inventoryService.getQuantityOnHand(location, requisitionItemInstance?.product)?:0
-		def quantityOutgoing = inventoryService.getQuantityToShip(location, requisitionItemInstance?.product)?:0
-		def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
-		
-		if (!requisitionItemInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			return [requisitionItemInstance: requisitionItemInstance, quantityOnHand: quantityOnHand, quantityAvailableToPromise: quantityAvailableToPromise]
-		}
-	}
-	
+    def change = {
+        def location = Location.get(session.warehouse.id)
+        def requisitionItemInstance = RequisitionItem.get(params.id)
+        def quantityOnHand = inventoryService.getQuantityOnHand(location, requisitionItemInstance?.product)?:0
+        def quantityOutgoing = inventoryService.getQuantityToShip(location, requisitionItemInstance?.product)?:0
+        def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
+
+        if (!requisitionItemInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            return [requisitionItemInstance: requisitionItemInstance, quantityOnHand: quantityOnHand, quantityAvailableToPromise: quantityAvailableToPromise]
+        }
+    }
+
     def update = {
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (requisitionItemInstance) {
@@ -160,8 +160,8 @@ class RequisitionItemController {
 		}
     }
 
-	
-	def uncancel = {
+
+    def uncancel = {
 		def requisitionItem = RequisitionItem.get(params.id)
 		if (requisitionItem) {
 			requisitionItem.quantityCanceled = 0 

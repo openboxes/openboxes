@@ -106,7 +106,7 @@
                                                                     <tr>
                                                                         <td>
                                                                             <div class="button-group">
-                                                                                <g:each var="warehouse" in="${entry.value }">
+                                                                                <g:each var="warehouse" in="${entry.value.sort() }">
                                                                                     <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
                                                                                     <a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
                                                                                         ${warehouse.name}
@@ -126,7 +126,7 @@
                                                             ${session.user.warehouse }
                                                         </div>
                                                         --%>
-                                                            <g:unless test="${!session.loginLocations }">
+                                                            <g:unless test="${session.loginLocationsMap }">
                                                                 <div style="background-color: black; color: white;" class="warehouse button">
                                                                     <warehouse:message code="dashboard.noWarehouse.message"/>
                                                                 </div>

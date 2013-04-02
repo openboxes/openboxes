@@ -54,6 +54,11 @@
                                     <th class="list-header center">
                                         ${warehouse.message(code: 'requisitionItem.quantity.label')}
                                     </th>
+                                    <%--
+                                    <th class="list-header center">
+                                        ${warehouse.message(code: 'requisitionItem.totalQuantity.label', default:'Total quantity')}
+                                    </th>
+                                    --%>
                                     <g:if test="${requisition.isDepotRequisition()}">
                                         <th class="list-header">
                                             ${warehouse.message(code: 'requisitionItem.recipient.label')}
@@ -85,6 +90,11 @@
                                         <input name="quantity" type="text"
                                             class="required number quantity text center" size="10" data-bind="value: quantity" />
                                     </td>
+                                    <%--
+                                    <td class="list-header center">
+                                        <div class="middle" data-bind="text: totalQuantity"></div>
+                                    </td>
+                                    --%>
                                     <g:if test="${requisition.isDepotRequisition()}">
                                       <td class="list-header"><input type="text"
                                             data-bind="value: recipient, uniqueName: true" /></td>
@@ -216,8 +226,8 @@
 
         // Make sure quantity is a digit
 		$("input.quantity").keyup(function(){
-		   this.value=this.value.replace(/[^\d]/,'');
-		   $(this).trigger("change");//Safari and IE do not fire change event for us!
+		    this.value=this.value.replace(/[^\d]/,'');
+		    $(this).trigger("change");//Safari and IE do not fire change event for us!
 		});
 
         // On page load, put focus on product search box

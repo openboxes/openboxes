@@ -34,8 +34,14 @@ class RequisitionController {
     }
 
     def list = {
+
+        def requisition = new Requisition(params)
+        def origin = Location.get(params?.origin?.id)
+        def createdBy = User.get(params?.createdBy?.id)
+
         def requisitions = []
-		requisitions = Requisition.findAllByDestination(session.warehouse)
+		requisitions = requisitionService.getRequisitions(session.warehouse, origin, createdBy, requisition.type, requisition.commodityClass, params.q, params)
+        requisitions = requisitions.sort()
         render(view:"list", model:[requisitions: requisitions])
     }
 	
@@ -61,15 +67,6 @@ class RequisitionController {
 		}
 		
         render(view:"edit", model:[requisition:requisition, locations: locations])
-    }
-
-    def createNonStock = {
-        println params
-        def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
-        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_NON_STOCK
-        //requisition.name = getName(requisition)
-        render(view:"createNonStock", model:[requisition:requisition])
     }
 
     def chooseTemplate = {
@@ -111,9 +108,19 @@ class RequisitionController {
 
     }
 
+    def createNonStock = {
+        println params
+        def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
+        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_NON_STOCK
+        //requisition.name = getName(requisition)
+        render(view:"createNonStock", model:[requisition:requisition])
+    }
+
     def createAdhoc = {
         println params
         def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
         requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_ADHOC
         //requisition.name = getName(requisition)
         render(view:"createNonStock", model:[requisition:requisition])
@@ -122,6 +129,7 @@ class RequisitionController {
     def createDepot = {
         println params
         def requisition = new Requisition(status: RequisitionStatus.CREATED)
+        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
         requisition.type = params.type as RequisitionType ?: RequisitionType.DEPOT_TO_DEPOT
         //requisition.name = getName(requisition)
         render(view:"createNonStock", model:[requisition:requisition])
@@ -220,7 +228,7 @@ class RequisitionController {
 	def changeQuantity = {
 		log.info "change quantity " + params
 		def requisition = Requisition.get(params.id)
-		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+		def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
 		requisitionItem.cancelReasonCode = params.parentCancelReasonCode
 		requisitionItem.quantityCanceled = requisitionItem.quantity
 		
@@ -247,7 +255,7 @@ class RequisitionController {
 		//else { 
 		//	flash.message = "did not save changes"
 		//}
-		redirect(controller: "requisitionItem", action: "change", id: requisitionItem?.id)
+		redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
 	}
 	
 
@@ -273,27 +281,39 @@ class RequisitionController {
 	
 	def review = {
 		def requisition = Requisition.get(params.id)
-		def location = Location.get(session.warehouse.id)
-		def quantityAvailableToPromiseMap = [:]
-		def quantityOnHandMap = [:]
-		requisition?.requisitionItems?.each { requisitionItem -> 
-			quantityOnHandMap[requisitionItem?.product?.id] = 
-				inventoryService.getQuantityOnHand(location, requisitionItem?.product)
-			quantityAvailableToPromiseMap[requisitionItem?.product?.id] = 
-				inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
-		}
+
 		
 		if (!requisition) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
+
+            def location = Location.get(session.warehouse.id)
+            def quantityAvailableToPromiseMap = [:]
+            def quantityOnHandMap = [:]
+            requisition?.requisitionItems?.each { requisitionItem ->
+                quantityOnHandMap[requisitionItem?.product?.id] =
+                    inventoryService.getQuantityOnHand(location, requisitionItem?.product)
+                quantityAvailableToPromiseMap[requisitionItem?.product?.id] =
+                    inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
+            }
+
+            def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
+            def quantityOnHand = (requisitionItem)?inventoryService.getQuantityOnHand(location, requisitionItem?.product):0
+            def quantityOutgoing = (requisitionItem)?inventoryService.getQuantityToShip(location, requisitionItem?.product):0
+            def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
+
 			println "Requisition Status: " + requisition.id + " [" + requisition.status + "]"
-			return [requisition: requisition,quantityOnHandMap:quantityOnHandMap, quantityAvailableToPromiseMap:quantityAvailableToPromiseMap ]
+			return [requisition: requisition,
+                    quantityOnHandMap:quantityOnHandMap,
+                    quantityAvailableToPromiseMap:quantityAvailableToPromiseMap,
+                    selectedRequisitionItem: requisitionItem,
+                    quantityOnHand: quantityOnHand,
+                    quantityOutgoing:quantityOutgoing]
 		}
-			
     }
-	
+
 
     def save = {
         def jsonResponse = []

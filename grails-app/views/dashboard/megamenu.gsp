@@ -114,6 +114,11 @@
                             <warehouse:message code="requisition.list.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
                         </g:link>
                     </div>
+                    <div class="megaButton">
+                        <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="list">
+                            <warehouse:message code="requisition.listByMe.label" default="List my requisitions" /> (${myRequisitions?.size()?:0 })
+                        </g:link>
+                    </div>
 	                <div class="megaButton">
 	                    <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
