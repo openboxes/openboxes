@@ -43,12 +43,16 @@ class AuthTagLib {
 
 
     def userRole = { attrs, body ->
-        out << User.get(attrs.user.id).getHighestRole()
+        User.withTransaction {
+            out << User.get(attrs.user.id).getHighestRole()
+        }
     }
 
     def userPhoto = { attrs, body ->
-        def user = User.get(attrs.user.id)
-        out << render(template: "/taglib/userPhoto", model: [userInstance:user])
+        User.withTransaction {
+            def user = User.get(attrs.user.id)
+            out << render(template: "/taglib/userPhoto", model: [userInstance:user])
+        }
     }
 	
 	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
