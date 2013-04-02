@@ -1,5 +1,5 @@
 
-<%--
+
 <g:if test="${selectedRequisitionItem && requisitionItem == selectedRequisitionItem}">
 <div id="modifyRequisitionItem-${selectedRequisitionItem?.id}" class="dialog" style="display: none;">
     <table>
@@ -117,5 +117,3 @@
     </table>
 </div>
 </g:if>
-
---%>
