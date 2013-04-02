@@ -40,7 +40,7 @@ class RequisitionController {
         def createdBy = User.get(params?.createdBy?.id)
 
         def requisitions = []
-		requisitions = requisitionService.getRequisitions(session.warehouse, origin, createdBy, requisition.type, requisition.commodityClass, params.q, params)
+		requisitions = requisitionService.getRequisitions(session?.warehouse, origin, createdBy, requisition?.type, requisition?.commodityClass, params.q, params)
         requisitions = requisitions.sort()
         render(view:"list", model:[requisitions: requisitions])
     }

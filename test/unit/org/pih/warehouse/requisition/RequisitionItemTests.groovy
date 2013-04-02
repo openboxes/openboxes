@@ -27,7 +27,7 @@ class RequisitionItemTests extends GrailsUnitTestCase {
     }
 
     void testToJsonData(){
-      def product = new Product(id: "prod1", name:"aspin")
+      def product = new Product(id: "prod1", productCode: "ASP", name:"aspin")
       def requisitionItem = new RequisitionItem(
         id: "1234",
         product: product,
@@ -46,7 +46,7 @@ class RequisitionItemTests extends GrailsUnitTestCase {
 	  println json 
       assert json.id == requisitionItem.id
       assert json.productId == requisitionItem.product.id
-      assert json.productName == requisitionItem.product.name + " (EA/1)"
+      assert json.productName == "ASP " + requisitionItem.product.name + " (EA/1)"
       assert json.quantity == requisitionItem.quantity
       assert json.comment == requisitionItem.comment
       assert json.recipient == requisitionItem.recipient
