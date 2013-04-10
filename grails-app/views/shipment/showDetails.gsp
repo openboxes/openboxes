@@ -8,7 +8,7 @@
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
 	<style>
-		.container { border-right: 2px solid lightgrey; background-color: f7f7f7; }
+		.container { border-right: 2px solid lightgrey; background-color: #f7f7f7; }
 		.newContainer { border-top: 2px solid lightgrey }
 		tr.box { margin: 10px; }
 	</style>
@@ -35,7 +35,7 @@
 				<div class="yui-u first">
 				
 				
-<div id="events" class="box">
+                    <div id="events" class="box">
 						<h4>
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'date.png')}" alt="event" style="vertical-align: middle"/>
 							<label><warehouse:message code="shipping.tracking.label"/></label>
