@@ -9,18 +9,22 @@
 **/ 
 package org.pih.warehouse
 
+import grails.plugin.springcache.annotations.Cacheable
+
 import java.text.SimpleDateFormat;
 import org.pih.warehouse.core.Person;
 
 class AutoSuggestStringTagLib {
-		
 
+
+    @Cacheable("autoSuggestStringTagCache")
 	def autoSuggestString = { attrs, body ->
+        println "autoSuggestString: " + attrs
         def startTime = System.currentTimeMillis()
 
 		out << g.render(template: '/taglib/autoSuggestString', model: [attrs:attrs]);
 
-        println "Autosuggeststring: " + (System.currentTimeMillis() - startTime) + " ms"
+        println "autoSuggestString: " + (System.currentTimeMillis() - startTime) + " ms"
 
 	}
 	

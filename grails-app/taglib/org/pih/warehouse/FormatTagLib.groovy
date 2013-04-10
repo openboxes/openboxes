@@ -19,8 +19,9 @@ import java.text.SimpleDateFormat
 class FormatTagLib {
 	
 	static namespace = "format"
-	
-	Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+	def grailsApplication
+
+	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
 	
 	/**
 	 * Formats a Date
@@ -93,7 +94,8 @@ class FormatTagLib {
 	 	if (attrs.product != null) {
 			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+             Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 def value = "";
              if (attrs?.product?.productCode) {
                  value = attrs?.product?.productCode + " "
@@ -122,7 +124,8 @@ class FormatTagLib {
 		if (attrs.category) {
 			// use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			// (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-			Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+            Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+            Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			
 			// default format is to display the localized name of the catergory
 			def value = LocalizationUtil.getLocalizedString(attrs?.category?.name?.encodeAsHTML(), locale)			
@@ -155,7 +158,8 @@ class FormatTagLib {
 		 if (attrs.obj != null) {
 			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+             Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 
 			 // handle String; localize the string directly
 			 if (attrs.obj instanceof String) {

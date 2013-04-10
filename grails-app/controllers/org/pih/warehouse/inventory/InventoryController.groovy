@@ -8,8 +8,9 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 
-package org.pih.warehouse.inventory;
+package org.pih.warehouse.inventory
 
+import grails.plugin.springcache.annotations.Cacheable;
 import grails.validation.ValidationException;
 import groovy.sql.Sql
 import org.pih.warehouse.shipping.Shipment;
@@ -44,6 +45,7 @@ class InventoryController {
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
+    @Cacheable("inventoryControllerCache")
 	def browse = { InventoryCommand cmd ->
 
 

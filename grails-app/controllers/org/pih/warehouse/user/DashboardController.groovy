@@ -10,8 +10,8 @@
 package org.pih.warehouse.user;
 
 
-import grails.converters.JSON;
-
+import grails.converters.JSON
+import grails.plugin.springcache.annotations.Cacheable;
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.core.User;
@@ -71,8 +71,8 @@ class DashboardController {
 		redirect(controller: "inventory", action: "browse", params:params)
 			
 	}
-	
-	
+
+    @Cacheable("dashboarControllerCache")
 	def index = {
 		if (!session.warehouse) {		
 			log.info "Location not selected, redirect to chooseLocation"	
@@ -282,7 +282,7 @@ class DashboardController {
 		}
 		render results as JSON
 	}
-	
+    @Cacheable("dashboarControllerCache")
 	def megamenu = {
 
         def startTime = System.currentTimeMillis()
@@ -307,7 +307,7 @@ class DashboardController {
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
 
-        println "Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
+        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
 
 		[
 			categories: categories,
