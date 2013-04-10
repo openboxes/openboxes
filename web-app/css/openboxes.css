@@ -1772,10 +1772,12 @@ div#dashboard li {
     border-left: 0px;
 }
 
+/*
 .list .active {
     font-weight: bold;
     background-color: #ccc;
 }
+*/
 .list li {
     background-color: #eee;
 }
@@ -1814,10 +1816,9 @@ div#dashboard li {
     vertical-align: top;
     line-height: 1.5em;
 }
-/*
-.active	{ background-color: #6699CC; color: white;}
-.inactive { background-color: #EEE; }
-*/
+.active	{ color: green; }
+.inactive { color: red; }
+
 label { display: inline; text-decoration: none;}
 label.block { display: block;}
 fieldset .prop { margin: 10px; }
