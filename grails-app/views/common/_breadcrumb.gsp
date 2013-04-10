@@ -27,8 +27,8 @@
     </li>
 </g:if>
 --%>
-    <g:if test="${g.layoutTitle() && !actionName.equals('index') && !actionName.contains('list') }">
-        <li>
+    <g:if test="${g.layoutTitle() && !actionName.equals('index') && !actionName.equals('list') }">
+        <li class="last">
             <a href="#">${g.layoutTitle()}</a>
         </li>
     </g:if>
