@@ -17,11 +17,7 @@ class DatePickerTagLib {
 	
 	
 	def datePicker = { attrs, body ->
-		//attrs.from = Shipper.list().sort { it?.name?.toLowerCase() }
-		//attrs.optionKey = 'id'
-		//attrs.value = ""
-		//attrs.optionValue = { it.name }
-		def datePickerTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormTagLib')		
+		def datePickerTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormTagLib')
 		out << datePickerTagLib.datePicker.call(attrs)
 	}
 

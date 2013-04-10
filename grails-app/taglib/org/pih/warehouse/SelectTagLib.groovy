@@ -108,15 +108,9 @@ class SelectTagLib {
     }
 
     def selectPerson = { attrs, body ->
-
         def person = Person.get(attrs?.value?.id)
-        //attrs.from = Person.list().sort { it.lastName }
-        //attrs.optionKey = 'id'
-        //attrs.optionValue = { it.name }
         attrs.selectedPerson = person
-
         out << render(template: "/taglib/selectPerson", model: [attrs:attrs])
-
     }
 
 

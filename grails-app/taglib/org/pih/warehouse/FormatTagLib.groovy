@@ -69,10 +69,13 @@ class FormatTagLib {
 	  * @attr obj REQUIRED the date to format
 	 */
 	 def expirationDate = { attrs, body ->
-		 if (attrs.obj != null) {
+		 if (attrs.obj) {
 			 DateFormat df = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)
 			 out << df.format(attrs.obj)
 		 }
+         else {
+             out << warehouse.message(code:'default.never.label')
+         }
 	 }
 
 	 /**
