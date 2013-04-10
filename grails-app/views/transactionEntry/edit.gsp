@@ -27,6 +27,11 @@
 					<div class="yui-u">						
 						<g:form method="post" >
 			            	<div class="box">
+
+
+                                <h2>
+                                    <warehouse:message code="transactionEntry.label"/> &rsaquo;
+                                    <format:product product="${transactionEntryInstance?.inventoryItem?.product}"/></h2>
 				                <g:hiddenField name="id" value="${transactionEntryInstance?.id}" />
 				                <g:hiddenField name="version" value="${transactionEntryInstance?.version}" />
 				                <div class="dialog">
@@ -34,7 +39,7 @@
 				                        <tbody>
 				                            <tr class="prop">
 				                                <td valign="top" class="name">
-				                                  <label for="transaction"><warehouse:message code="transactionEntry.transaction.label" default="Transaction" /></label>
+				                                  <label for="transaction.id"><warehouse:message code="transactionEntry.transaction.label" default="Transaction" /></label>
 				                                </td>
 				                                <td valign="top" class="value ${hasErrors(bean: transactionEntryInstance, field: 'transaction', 'errors')}">
 				                                   	<g:hiddenField name='transaction.id' value='${transactionEntryInstance?.transaction?.id }'/>
@@ -47,7 +52,7 @@
 				                        
 				                            <tr class="prop">
 				                                <td valign="top" class="name">
-				                                  <label for="inventoryItem"><warehouse:message code="transactionEntry.inventoryItem.label" default="Inventory Item" /></label>
+				                                  <label for="inventoryItem.id"><warehouse:message code="transactionEntry.inventoryItem.label" default="Inventory Item" /></label>
 				                                </td>
 				                                <td valign="top" class="value ${hasErrors(bean: transactionEntryInstance, field: 'inventoryItem', 'errors')}">
 				                                    <g:select name="inventoryItem.id" from="${org.pih.warehouse.inventory.InventoryItem.findAllByProduct(transactionEntryInstance?.inventoryItem?.product)}" 

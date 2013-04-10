@@ -4,16 +4,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         
-        <title><warehouse:message code="inventory.list.label"/></title>
+        <title>
+            <warehouse:message code="${controllerName}.${actionName}.label"/>
+        </title>
     </head>    
 
 	<body>
 		<div class="body">
-
-
-            <h3>
-                <warehouse:message code="${controllerName}.${actionName}.label"/>
-            </h3>
 
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -67,24 +64,42 @@
                             <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">Download .csv</g:link>
                         </div>
                         <h2>
-                            <warehouse:message code="default.results.label" default="Results"/> -
+                            <warehouse:message code="${controllerName}.${actionName}.label"/> -
                             <warehouse:message code="default.showing.message" args="[quantityMap?.keySet()?.size()]"/>
                         </h2>
                         <table>
                             <tr>
+                                <th><warehouse:message code="product.productCode.label"/></th>
                                 <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="product.manufacturer.label"/></th>
+                                <th><warehouse:message code="product.vendor.label"/></th>
                                 <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                                <th><warehouse:message code="product.unitOfMeasure.label"/></th>
 
                             </tr>
-                            <g:each var="entry" in="${quantityMap}" status="i">
+                            <g:each var="entry" in="${quantityMap.sort()}" status="i">
                                 <tr class="${i%2?'odd':'even'}">
+                                    <td>
+                                        ${entry.key.productCode}
+                                    </td>
                                     <td>
                                         <g:link controller="inventoryItem" action="showStockCard" id="${entry.key.id}">
                                             ${entry.key}
                                         </g:link>
                                     </td>
+                                    <td>
+                                        ${entry.key.manufacturer}
+
+                                    </td>
+                                    <td>
+                                        ${entry.key.vendor}
+
+                                    </td>
+
                                     <td class="center">
                                         ${entry.value}
+                                    </td>
+                                    <td>
                                         ${entry?.key?.unitOfMeasure}
                                     </td>
 

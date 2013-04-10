@@ -1,4 +1,7 @@
 <div class="box">
+    <h2>${warehouse.message(code: 'transaction.details.label')}</h2>
+
+
 	<table>
 		<tr class="propOff">
 			<td class=""><label><warehouse:message
@@ -30,6 +33,12 @@
                 </div>
 			</td>
 		</tr>
+        <tr id="inventory" class="propOff">
+            <td class=""><label><warehouse:message
+                    code="inventory.label" /></label><div> <format:metadata
+                    obj="${transactionInstance?.inventory?.warehouse }" />
+            </div></td>
+        </tr>
 		<g:if test="${transactionInstance?.outgoingShipment }">
 			<tr class="propOff">
 				<td class=""><label><warehouse:message
@@ -62,12 +71,6 @@
 			<td class=""><label><warehouse:message
 						code="transaction.date.label" /></label><div><format:datetime
 						obj="${transactionInstance?.transactionDate}" />
-            </div></td>
-		</tr>
-		<tr id="inventory" class="propOff">
-			<td class=""><label><warehouse:message
-						code="inventory.label" /></label><div> <format:metadata
-						obj="${transactionInstance?.inventory?.warehouse }" />
             </div></td>
 		</tr>
 		<g:if test="${transactionInstance?.comment }">
@@ -126,7 +129,7 @@
                     </div>
 				</td>
 			</tr>
-		</g:if>		
-		
+		</g:if>
+
 	</table>
 </div>

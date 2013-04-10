@@ -30,6 +30,7 @@
 				<div class="yui-g">
 					<div class="yui-u first">
 						<div class="box">
+                            <h2>${warehouse.message(code: 'transaction.details.label')}</h2>
 							<g:form action="saveTransaction">
 								<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 								<table>
@@ -121,8 +122,8 @@
 									<tfoot>									
 										<tr>
 											<td class="center" colspan="2">
-												<button type="submit" name="save">								
-													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
+												<button type="submit" name="save" class="button">
+													<warehouse:message code="default.button.save.label"/>
 												</button>
 												&nbsp;
 												<g:if test="${params?.product?.id }">
@@ -146,7 +147,8 @@
 					</div>
 					<div class="yui-u">									
 						<div class="box">
-							<g:form action="saveTransaction">	
+                            <h2>${warehouse.message(code: 'transaction.transactionEntries.label')}</h2>
+							<g:form action="saveTransaction">
 								<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 								<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
 							
@@ -186,7 +188,8 @@
 			                                    		${quantityMap[transactionEntry?.inventoryItem] }
 			                                    	</td>
 			                                    	<td class="center">
-			                                    		<g:textField class="quantity" name="transactionEntries[${i }].quantity" value="${transactionEntry?.quantity }" size="6"/>
+			                                    		<g:textField class="quantity text" name="transactionEntries[${i }].quantity"
+                                                            value="${transactionEntry?.quantity }" size="6"/>
 			                                    	</td>
 			                                    	<td class="center">
 		                                    			
@@ -250,8 +253,8 @@
 											<tr>
 												<td colspan="6">
 													<div class="center">
-														<button type="submit" name="save">								
-															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
+														<button type="submit" name="save" class="button">
+															<warehouse:message code="default.button.save.label"/>
 														</button>
 														&nbsp;
 														<g:if test="${params?.product?.id }">
