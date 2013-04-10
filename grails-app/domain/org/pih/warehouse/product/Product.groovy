@@ -107,6 +107,9 @@ class Product implements Comparable, Serializable {
     // WHO Model Lists of Essential Medicines - http://www.who.int/medicines/publications/essentialmedicines/en/
     Boolean essential = Boolean.TRUE
 
+    // Used to indicate that the product is to be reconditioned
+    Boolean reconditioned = Boolean.FALSE
+
     // primary category
     Category category;
 

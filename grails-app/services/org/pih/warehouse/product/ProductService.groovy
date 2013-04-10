@@ -819,12 +819,7 @@ class ProductService {
 	 */
 	def getAllTags() { 
 		def tags = Tag.findAllByIsActive(true);
-
-
-        println "tags: " + tags.size()
-        //tags =
         return tags;
-
 	}
 	
 	/**

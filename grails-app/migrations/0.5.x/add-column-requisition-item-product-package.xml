@@ -5,7 +5,7 @@
 	<changeSet author="jmiranda (generated)" id="1362765696920-1">
 		<preConditions onFail="MARK_RAN">
     		<not>
-    			<columnExists tableName="requisition" columnName="product_package_id"/>
+    			<columnExists tableName="requisition_item" columnName="product_package_id"/>
 			</not>
     	</preConditions>	
 		<addColumn tableName="requisition_item">

@@ -72,6 +72,31 @@ class InventoryLevelController {
         }
     }
 
+    def clone = {
+        def inventoryLevelInstance = InventoryLevel.get(params.id)
+        if (!inventoryLevelInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+            //redirect(action: "list")
+            redirect(action: "create")
+        }
+        else {
+
+            def inventoryLevelClone = new InventoryLevel()
+            inventoryLevelClone.binLocation = inventoryLevelInstance.binLocation
+            inventoryLevelClone.product = inventoryLevelInstance.product
+            inventoryLevelClone.status = inventoryLevelInstance.status
+            inventoryLevelClone.inventory = inventoryLevelInstance.inventory
+            inventoryLevelClone.minQuantity = inventoryLevelInstance.minQuantity
+            inventoryLevelClone.maxQuantity = inventoryLevelInstance.maxQuantity
+            inventoryLevelClone.reorderQuantity = inventoryLevelInstance.reorderQuantity
+            inventoryLevelClone.save(flush: true)
+
+            //inventoryLevelInstance.inventory.addToConfiguredProducts()
+
+            redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
+        }
+    }
+
     def update = {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (inventoryLevelInstance) {

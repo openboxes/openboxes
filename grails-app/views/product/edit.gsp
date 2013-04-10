@@ -234,6 +234,11 @@
 															<label for="hazardousMaterial"><warehouse:message
 																code="product.hazardousMaterial.label" /></label>
 														</span>
+                                                        <span>
+                                                            <g:checkBox name="reconditioned" value="${productInstance?.reconditioned}" />
+                                                            <label for="reconditioned"><warehouse:message
+                                                                    code="product.reconditioned.label" default="Reconditioned"/></label>
+                                                        </span>
 													</td>
 												</tr>
 												<tr class="prop">
@@ -579,17 +584,17 @@
                                                     <td>
                                                         <%--<g:textField name="inventoryLevels[${i}].minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>--%>
                                                         ${inventoryLevelInstance?.minQuantity }
-                                                        <span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
+                                                        ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
                                                     <td>
                                                         <%--<g:textField name="inventoryLevels[${i}].reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>--%>
                                                         ${inventoryLevelInstance?.reorderQuantity }
-                                                        <span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
+                                                        ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
                                                     <td>
                                                         <%--<g:textField name="inventoryLevels[${i}].maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="10" class="text"/>--%>
                                                         ${inventoryLevelInstance?.maxQuantity }
-                                                        <span class="fade">${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}</span>
+                                                        ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
 
                                                     <td>
@@ -602,9 +607,11 @@
                                                         <a href="javascript:void(0);" class="open-dialog create button" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
                                                             ${warehouse.message(code:'default.button.edit.label')}</a>
 
+                                                        <g:link controller="inventoryLevel" action="clone" class="button" id="${inventoryLevelInstance?.id}">
+                                                            ${warehouse.message(code:'default.button.clone.label')}</g:link>
 
                                                         <g:link controller="inventoryLevel" action="delete" class="button" id="${inventoryLevelInstance?.id}">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'bin.png')}"/>${warehouse.message(code:'default.button.delete.label')}</g:link>
+                                                            ${warehouse.message(code:'default.button.delete.label')}</g:link>
 
                                                     </td>
                                                 </tr>

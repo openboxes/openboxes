@@ -60,6 +60,7 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'minQuantity', 'errors')}">
                     <g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>
+                    ${inventoryLevelInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                 </td>
             </tr>
 
@@ -69,6 +70,7 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'reorderQuantity', 'errors')}">
                     <g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>
+                    ${inventoryLevelInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                 </td>
             </tr>
             <tr class="prop">
@@ -77,6 +79,7 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'maxQuantity', 'errors')}">
                     <g:textField name="maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="10" class="text"/>
+                    ${inventoryLevelInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                 </td>
             </tr>
             </tbody>
