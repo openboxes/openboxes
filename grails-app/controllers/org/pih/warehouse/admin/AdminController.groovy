@@ -24,6 +24,7 @@ import sun.misc.BASE64Encoder;
 
 class AdminController {
 
+    def sessionFactory // inject Hibernate sessionFactory
 	def mailService;
 	def grailsApplication
 	def config = ConfigurationHolder.config
@@ -61,7 +62,32 @@ class AdminController {
 			//remoteFileLastModifiedDate: new Date(getRemoteFileLastModifiedDate(command?.remoteWebArchiveUrl)) 
 		]				
 	}
-	
+
+    def evictDomainCache = {
+        def domainClass = grailsApplication.getDomainClass(params.name)
+        if (domainClass) {
+            sessionFactory.evict(domainClass.clazz)
+            flash.message = "Domain cache '${params.name}' was invalidated"
+        }
+        else {
+            flash.message = "Domain cache '${params.name}' does not exist"
+        }
+        redirect(action: "showSettings")
+    }
+
+    def evictQueryCache = {
+        if (params.name) {
+            sessionFactory.evictQueries(params.name)
+            flash.message = "Query cache '${params.name}' was invalidated"
+        }
+        else {
+            sessionFactory.evictQueries()
+            flash.message = "All query caches were invalidated"
+        }
+        redirect(action: "showSettings")
+    }
+
+
 	
 	def download = { UpgradeCommand command ->
 		log.info "download " + params
@@ -120,7 +146,8 @@ class AdminController {
 			}
 		}
 			
-		[	
+		[
+            cacheStatistics: sessionFactory.getStatistics(),
 			externalConfigProperties: externalConfigProperties,
 			systemProperties : System.properties,
 			env: GrailsUtil.environment,

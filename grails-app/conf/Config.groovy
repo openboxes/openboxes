@@ -283,6 +283,8 @@ log4j = {
             //'org.apache.http.wire',          // shows traffic between htmlunit and server
             //'com.gargoylesoftware.htmlunit'
 
+    //trace 'org.hibernate.cache'
+
 }
 
 // Added by the JQuery Validation plugin:
