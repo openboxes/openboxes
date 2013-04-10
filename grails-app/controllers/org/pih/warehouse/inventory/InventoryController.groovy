@@ -841,10 +841,10 @@ class InventoryController {
 		def model = [
 			transactionInstance : transactionInstance,
 			localTransfer: localTransfer,
-			productInstanceMap: Product.list().groupBy { it.category },
-			transactionTypeList: TransactionType.list(),
-			locationInstanceList: Location.list(),
-			warehouseInstance: Location.get(session?.warehouse?.id)
+			//productInstanceMap: Product.list().groupBy { it.category },
+			//transactionTypeList: TransactionType.list(),
+			//locationInstanceList: Location.list(),
+			//warehouseInstance: Location.get(session?.warehouse?.id)
 		];
 		
 		render(view: "showTransaction", model: model);
@@ -1264,8 +1264,9 @@ class InventoryController {
 
 	
 	
-	def editTransaction = { 		
-		log.debug "edit transaction: " + params
+	def editTransaction = {
+        def startTime = System.currentTimeMillis()
+		log.info "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def products = Product.list();
@@ -1277,7 +1278,10 @@ class InventoryController {
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.list(),
 			quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
-			warehouseInstance: warehouseInstance ]
+			warehouseInstance: warehouseInstance
+        ]
+
+        println "Edit transaction " + (System.currentTimeMillis() - startTime) + " ms"
 
 		render(view: "editTransaction", model: model)
 
