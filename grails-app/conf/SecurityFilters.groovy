@@ -15,7 +15,7 @@ import org.pih.warehouse.core.Location
 
 class SecurityFilters {
 	
-  static ArrayList controllersWithAuthUserNotRequired = ['api','rxNorm','test']
+  static ArrayList controllersWithAuthUserNotRequired = ['test']
   static ArrayList actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
   static ArrayList actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
 	def authService 

@@ -21,7 +21,7 @@ class RoleFilters {
             'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle']
     def static changeControllers = ['createProductFromTemplate']
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
-    def static adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
+    def static adminActions = ['console':['index','execute'], 'product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
             before = {
