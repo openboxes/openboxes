@@ -218,12 +218,12 @@ class Product implements Comparable, Serializable {
 
         active(nullable: true)
         coldChain(nullable: true)
+        reconditioned(nullable: true)
         controlledSubstance(nullable: true)
         hazardousMaterial(nullable: true)
         serialized(nullable: true)
         lotControl(nullable: true)
         essential(nullable: true)
-
 
         defaultUom(nullable: true)
         upc(nullable: true, maxSize: 255)
@@ -270,7 +270,9 @@ class Product implements Comparable, Serializable {
     }
 
     def getInventoryLevels() {
-        return InventoryLevel.findAllByProduct(this)
+        Product.withTransaction {
+            return InventoryLevel.findAllByProduct(this)
+        }
     }
 
     InventoryLevel getInventoryLevel(locationId) {
