@@ -220,48 +220,48 @@ class JsonController {
     def getTotalStockCount = {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getTotalStock(location)
-        render results?.keySet()?.size()
+        render (results?.keySet()?.size()?:"0")
     }
 
     def getInStockCount = {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getInStock(location)
         println "in stock: " + results
-        render results?.keySet()?.size()
+        render (results?.keySet()?.size()?:"0")
     }
 
     def getOutOfStockCount = {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getOutOfStock(location)
-        render results?.keySet()?.size()
+        render (results?.keySet()?.size()?:"0")
     }
 
 	def getLowStockCount = { 
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getLowStock(location)
         println "low: " + results
-		render results?.keySet()?.size()
+		render (results?.keySet()?.size()?:"0")
 	}
 
 	def getReorderStockCount = {
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getReorderStock(location)
 		println "reorder: " + results
-		render results?.keySet()?.size()
+		render (results?.keySet()?.size()?:"0")
 	}
 
 	def getExpiringStockCount = {
 		def daysUntilExpiry = Integer.valueOf(params.daysUntilExpiry)
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiringStock(null, location, daysUntilExpiry)
-		render ((results)?results?.size():"N/A")
+		render ((results)?results?.size():"0")
 	}
 	
 	def getExpiredStockCount = {
 		//println "expired stock count " + params
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiredStock(null, location)
-		render ((results)?results.size():"N/A")
+		render ((results)?results.size():"0")
 	}
 
 	def findTags = {
