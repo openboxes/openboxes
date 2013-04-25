@@ -267,7 +267,7 @@ class ProductController {
 		def location = Location.get(session?.warehouse?.id);
 		if (!productInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-			redirect(controller: "inventoryItem", action: "browse")
+			redirect(controller: "inventory", action: "browse")
 		}
 		else {
 
