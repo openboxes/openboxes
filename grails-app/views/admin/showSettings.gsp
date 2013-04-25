@@ -16,12 +16,8 @@
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
                 <div class="box">
+                    <h3><warehouse:message code="admin.generalSettings.header"/></h3>
                     <table>
-                        <tr class="">
-                            <td colspan="2">
-                                <h3><warehouse:message code="admin.generalSettings.header"/></h3>
-                            </td>
-                        </tr>
                         <tr class="prop">
                             <td class="name">
                                 <label>
@@ -138,12 +134,8 @@
                     </table>
                 </div>
                 <div class="box">
+                    <h3><warehouse:message code="admin.cacheSettings.header" default="Cache settings"/></h3>
                     <table>
-                        <tr>
-                            <td colspan="2">
-                                <h3><warehouse:message code="admin.cacheSettings.header" default="Cache settings"/></h3>
-                            </td>
-                        </tr>
                         <tr class="prop">
                             <td class="name">
                                 <label><warehouse:message code="admin.cacheEnabled.label" default="Cached enabled?"/></label>
@@ -366,12 +358,8 @@
                     </table>
                 </div>
                 <div class="box">
+                    <h3><warehouse:message code="admin.emailSettings.header"/></h3>
                     <table>
-                        <tr>
-                            <td colspan="2">
-                                <h3><warehouse:message code="admin.emailSettings.header"/></h3>
-                            </td>
-                        </tr>
                         <tr class="prop">
                             <td class="name">
                                 <label><warehouse:message code="admin.emailEnabled.label"/></label>
@@ -399,12 +387,8 @@
                     </table>
                 </div>
                 <div class="box">
+                    <h3><warehouse:message code="admin.externalAppConfig.header"/></h3>
                     <table>
-                        <tr class="">
-                            <td colspan="2">
-                                <h3><warehouse:message code="admin.externalAppConfig.header"/></h3>
-                            </td>
-                        </tr>
                         <tr class="prop">
                             <td class="name">
                                 <label><warehouse:message code="admin.externalConfigFile.label"/></label>
@@ -434,12 +418,8 @@
                 </div>
 
                 <div class="box">
+                    <h3><warehouse:message code="admin.systemProperties.header"/></h3>
                     <table>
-                        <tr class="">
-                            <td colspan="2">
-                                <h3><warehouse:message code="admin.systemProperties.header"/></h3>
-                            </td>
-                        </tr>
                         <g:each in="${systemProperties}" var="prop">
                             <tr class="prop">
                                 <td class="name">

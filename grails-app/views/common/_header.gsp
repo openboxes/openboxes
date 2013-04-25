@@ -4,17 +4,18 @@
 	<div class="yui-gf">				
 		<div id="banner">
 		    <div id="bannerLeft" class="yui-u first" >
-				<div class="logo" >					
-					<a href="${createLink(uri: '/dashboard/index')}">
-						<g:if test="${session?.warehouse?.logo }">
-							<img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
-						</g:if>
-						<g:else>
-                            <img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>
-
+				<div class="logo" >
+                    <g:if test="${session?.warehouse?.logo }">
+                        <a href="${createLink(uri: '/dashboard/index')}">
+                            <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
+                        </a>
+                    </g:if>
+                    <g:else>
+                        <img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>
+                        <a href="${createLink(uri: '/dashboard/index')}">
                             <span class="middle"><warehouse:message code="default.openboxes.label"/></span>
-						</g:else>
-					</a>
+                        </a>
+                    </g:else>
 				</div>
 		    </div>
 		    
@@ -27,9 +28,8 @@
                                     <warehouse:message code="header.welcome.label" default="Welcome"/>,
                                 </span>
                                 <g:link controller="user" action="show" id="${session.user.id}">
-
                                     <span id="username">${session?.user?.name}</span>
-                                    <span id="userrole">(<g:userRole user="${session.user}"/>)</span>
+                                    <span id="userrole">[<g:userRole user="${session.user}"/>]</span>
                                 </g:link>
 
                             </li>

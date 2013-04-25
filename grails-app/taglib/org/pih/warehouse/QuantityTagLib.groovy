@@ -18,10 +18,10 @@ class QuantityTagLib {
         def requisitionItem = attrs.requisitionItem
         if (requisitionItem) {
             if (requisitionItem?.productPackage) {
-                out << "${requisitionItem?.quantity} x ${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity}"
+                out << "${requisitionItem?.quantity} ${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity}"
             }
             else {
-                out << "${requisitionItem?.quantity} x EA/1"
+                out << "${requisitionItem?.quantity} EA/1"
             }
 
 

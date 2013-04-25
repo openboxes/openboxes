@@ -24,14 +24,14 @@
 
                             </td>
                             <td>
-                                <g:link controller="requisition" action="list" fragment="${statusMessage}">
+                                <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
                                     <warehouse:message code="requisitions.label"/>
                                     ${format.metadata(obj: status)?.toLowerCase()}
                                 </g:link>
                             </td>
                             <td class="right">
 
-                                <g:link controller="requisition" action="list" fragment="${statusMessage}">
+                                <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
                                     ${requisitionMap[status]?.size()?:0}
                                 </g:link>
                             </td>

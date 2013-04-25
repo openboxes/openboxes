@@ -52,10 +52,10 @@
                     </tr>
                     <tr class="odd">
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
                             <!--<img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>-->
                         </td>
                         <td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
                             <g:link controller="inventory" action="listLowStock">
                                 <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
                             </g:link>
@@ -67,10 +67,10 @@
 
 					<tr class="even">
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
                             <!--<img src="${createLinkTo(dir:'images/icons/silk/creditcards.png')}" class="middle"/>-->
 						</td>
 						<td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
                             <g:link controller="inventory" action="listReorderStock">
                                 <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
 							</g:link>
@@ -81,10 +81,10 @@
 					</tr>
                     <tr class="odd">
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
                             <!--<img src="${createLinkTo(dir:'images/icons/silk/package.png')}" class="middle"/>-->
                         </td>
                         <td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
                             <g:link controller="inventory" action="listOverStock">
                                 <warehouse:message code="inventory.listOverStock.label" default="Items that are over stocked"/>
                             </g:link>
