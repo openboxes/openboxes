@@ -63,7 +63,7 @@
 											<td>	
 												<div class="button-group">
 													<g:set var="locationGroup" value="${entry.key }"/>
-													<g:each var="warehouse" in="${entry.value }" status="status">
+													<g:each var="warehouse" in="${entry.value.sort() }" status="status">
 														<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button">
 															${warehouse.name}
 														</a>
