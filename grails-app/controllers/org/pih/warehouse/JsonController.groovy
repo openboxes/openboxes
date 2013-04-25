@@ -191,7 +191,6 @@ class JsonController {
         render jsonResponse as JSON
     }
 
-	
 	def getQuantityToReceive = {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
@@ -208,8 +207,7 @@ class JsonController {
 		render (quantityToShip?:"0")
 	}
 
-	
-	def getQuantityOnHand = { 
+	def getQuantityOnHand = {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
@@ -236,7 +234,7 @@ class JsonController {
         render (results?.keySet()?.size()?:"0")
     }
 
-	def getLowStockCount = { 
+	def getLowStockCount = {
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getLowStock(location)
         println "low: " + results
@@ -256,7 +254,7 @@ class JsonController {
 		def results = inventoryService.getExpiringStock(null, location, daysUntilExpiry)
 		render ((results)?results?.size():"0")
 	}
-	
+
 	def getExpiredStockCount = {
 		//println "expired stock count " + params
 		def location = Location.get(params?.location?.id)
@@ -747,7 +745,7 @@ class JsonController {
 
             // Add the package level items
             product.packages.each { pkg ->
-                productPackageName = pkg.uom.code + "/" + pkg.quantity;
+                productPackageName = pkg?.uom?.code + "/" + pkg?.quantity;
                 value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
                 value = value.trim()
                 result.add([id: product.id, value: value, type: "Product", quantity: null, group: null,
