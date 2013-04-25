@@ -17,7 +17,7 @@ import org.pih.warehouse.core.Person;
 class AutoSuggestStringTagLib {
 
 
-    @Cacheable("autoSuggestStringTagCache")
+    //@Cacheable("autoSuggestStringTagCache")
 	def autoSuggestString = { attrs, body ->
         println "autoSuggestString: " + attrs
         def startTime = System.currentTimeMillis()

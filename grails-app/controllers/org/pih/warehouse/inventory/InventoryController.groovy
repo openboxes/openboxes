@@ -45,7 +45,7 @@ class InventoryController {
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
-    @Cacheable("inventoryControllerCache")
+    //@Cacheable("inventoryControllerCache")
 	def browse = { InventoryCommand cmd ->
 
 

@@ -72,7 +72,7 @@ class DashboardController {
 			
 	}
 
-    @Cacheable("dashboarControllerCache")
+    //@Cacheable("dashboardControllerCache")
 	def index = {
 		if (!session.warehouse) {		
 			log.info "Location not selected, redirect to chooseLocation"	
@@ -248,7 +248,7 @@ class DashboardController {
 			//lowStock: lowStock,
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
-            requisitions:  requisitionService.getRequisitions(session.warehouse),
+            requisitions:  requisitionService.getAllRequisitions(session.warehouse),
 			//outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
@@ -282,7 +282,8 @@ class DashboardController {
 		}
 		render results as JSON
 	}
-    @Cacheable("dashboarControllerCache")
+
+    //@Cacheable("dashboarControllerCache")
 	def megamenu = {
 
         def startTime = System.currentTimeMillis()
@@ -299,7 +300,9 @@ class DashboardController {
         // Requisitions
         def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
 		def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-        def myRequisitions = requisitionService.getRequisitions(session?.warehouse, null, session?.user, null, null, null, null)
+
+        Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
+        def myRequisitions = requisitionService.getRequisitions(requisition, [:])
 		
 		def categories = []
 
