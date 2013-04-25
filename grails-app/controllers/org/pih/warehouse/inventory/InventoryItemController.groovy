@@ -7,22 +7,17 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.inventory;
+package org.pih.warehouse.inventory
 
-
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-
-
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.shipping.Container;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.ShipmentItemException;
-
-
-import grails.converters.*
-import grails.validation.ValidationException;
+import grails.converters.JSON
+import grails.validation.ValidationException
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentItemException
 
 class InventoryItemController {
 

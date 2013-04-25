@@ -9,19 +9,17 @@
 **/ 
 package org.pih.warehouse
 
-import org.pih.warehouse.core.ActivityCode;
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.shipping.Container;
-import org.pih.warehouse.shipping.Shipper;
-import org.springframework.beans.SimpleTypeConverter;
-import org.springframework.web.servlet.support.RequestContextUtils as RCU
-import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.CommodityClass
+import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.shipping.Shipper
+import org.springframework.beans.SimpleTypeConverter
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class SelectTagLib {
 	

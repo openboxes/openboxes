@@ -8,27 +8,17 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 
-package org.pih.warehouse.inventory;
+package org.pih.warehouse.inventory
 
-import grails.validation.ValidationException;
-import groovy.sql.Sql;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.List
 
-import org.pih.warehouse.shipping.ShipmentStatusCode;
-import org.pih.warehouse.util.DateUtil;
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Location 
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.core.Location;
-
-import org.pih.warehouse.reporting.Consumption;
+import org.pih.warehouse.util.DateUtil
 
 class BrowseInventoryController {
 	

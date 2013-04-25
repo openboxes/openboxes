@@ -7,14 +7,13 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
+package org.pih.warehouse.core
 
-import grails.validation.ValidationException;
-
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.order.Order;
-import org.pih.warehouse.requisition.Requisition;
-import org.pih.warehouse.shipping.Shipment;
+import grails.validation.ValidationException
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
 
 class LocationController {
 	

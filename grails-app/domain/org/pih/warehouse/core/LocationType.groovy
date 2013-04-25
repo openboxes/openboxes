@@ -9,8 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-import java.util.Date;
-import org.springframework.context.i18n.LocaleContextHolder as LCH
+import java.util.Date
 
 /**
  * Represents the type of a Location

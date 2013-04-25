@@ -11,8 +11,7 @@ package org.pih.warehouse
 
 import grails.plugin.springcache.annotations.Cacheable
 
-import java.text.SimpleDateFormat;
-import org.pih.warehouse.core.Person;
+import java.text.SimpleDateFormat
 
 class AutoSuggestStringTagLib {
 

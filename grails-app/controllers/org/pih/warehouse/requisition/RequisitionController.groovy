@@ -9,17 +9,13 @@
  * */
 package org.pih.warehouse.requisition
 
+import grails.converters.JSON
+import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryItem;
-
-import grails.converters.JSON
-import grails.validation.ValidationException;
-
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem;
-
-
+import org.pih.warehouse.picklist.PicklistItem
 
 class RequisitionController {
 

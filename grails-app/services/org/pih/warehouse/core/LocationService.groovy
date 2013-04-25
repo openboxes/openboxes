@@ -11,8 +11,6 @@ package org.pih.warehouse.core;
 
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pih.warehouse.core.ActivityCode;
 
 class LocationService {
 	

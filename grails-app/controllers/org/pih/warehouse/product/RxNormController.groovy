@@ -7,13 +7,11 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.product;
+package org.pih.warehouse.product
 
-import org.pih.warehouse.core.ApiException;
-
+import org.pih.warehouse.core.ApiException
 import groovyx.net.http.RESTClient
 import static groovyx.net.http.Method.GET
-import grails.converters.XML
 
 class RxNormController {
 

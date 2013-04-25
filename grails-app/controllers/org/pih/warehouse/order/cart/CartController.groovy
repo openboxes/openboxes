@@ -9,9 +9,9 @@
 **/ 
 package org.pih.warehouse.order.cart
 
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 
 class CartController {
 

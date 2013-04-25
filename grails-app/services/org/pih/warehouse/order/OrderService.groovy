@@ -9,23 +9,17 @@
 **/ 
 package org.pih.warehouse.order
 
-import java.util.Date
-import java.util.List
-import java.util.Map
-import java.util.Set
-
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.EventType;
-import org.pih.warehouse.core.ListCommand;
-import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.*
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+
+import java.util.Date
+import java.util.List
+import java.util.Map
+import java.util.Set
 
 class OrderService {
 

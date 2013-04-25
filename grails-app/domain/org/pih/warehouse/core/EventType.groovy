@@ -9,9 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-import java.util.Date;
-
-import org.pih.warehouse.core.EventCode;
+import java.util.Date
 
 /**
  * Represents the type of an Event

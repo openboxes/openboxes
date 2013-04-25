@@ -9,9 +9,8 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.requisition.RequisitionItem;
-import org.pih.warehouse.shipping.ShipmentItem;
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.requisition.RequisitionItem
 
 class FulfillmentItem implements Serializable {
 

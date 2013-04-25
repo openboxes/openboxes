@@ -9,9 +9,8 @@
 **/ 
 package org.pih.warehouse.core
 
-import groovy.sql.Sql;
+import groovy.sql.Sql
 import org.pih.warehouse.auth.AuthService
-
 
 class UserService {
 

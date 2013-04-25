@@ -9,9 +9,8 @@
 **/ 
 package org.pih.warehouse
 
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Role;
-import org.pih.warehouse.core.User;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 
 class AuthTagLib {
    	

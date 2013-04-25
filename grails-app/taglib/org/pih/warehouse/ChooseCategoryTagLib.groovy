@@ -9,8 +9,7 @@
 **/ 
 package org.pih.warehouse
 
-import java.text.SimpleDateFormat;
-import org.pih.warehouse.core.Person;
+import java.text.SimpleDateFormat
 
 class ChooseCategoryTagLib {
 

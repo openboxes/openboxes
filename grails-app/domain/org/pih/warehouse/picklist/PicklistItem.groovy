@@ -9,11 +9,8 @@
 **/ 
 package org.pih.warehouse.picklist
 
-import org.pih.warehouse.inventory.InventoryItem;
-
-
-import org.pih.warehouse.requisition.RequisitionItem;
-
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.requisition.RequisitionItem
 
 class PicklistItem implements Serializable {
 	

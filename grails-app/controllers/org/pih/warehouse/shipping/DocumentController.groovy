@@ -7,13 +7,13 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.order.Order;
-import org.pih.warehouse.requisition.Requisition;
-import org.pih.warehouse.core.DocumentType;
-import org.springframework.web.multipart.MultipartFile;
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.requisition.Requisition
+import org.springframework.web.multipart.MultipartFile
 
 /**
  * Command object 

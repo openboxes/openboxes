@@ -7,11 +7,12 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
 
-import java.util.Date;
-import org.pih.warehouse.core.Constants;
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person;
+
+import java.util.Date
 
 class Container implements Comparable, java.io.Serializable {
 

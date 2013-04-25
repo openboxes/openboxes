@@ -9,24 +9,13 @@
 **/ 
 package org.pih.warehouse.product
 
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.inventory.InventoryService
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.hibernate.exception.ConstraintViolationException;
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.MailService;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.InventoryService;
-import org.pih.warehouse.inventory.TransactionException;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.report.ReportService;
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
-import org.springframework.validation.Errors;
+import java.util.Set
 
 import sun.util.logging.resources.logging;
 

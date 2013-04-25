@@ -9,18 +9,10 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventCode;
-import org.pih.warehouse.core.EventType;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.receiving.Receipt;
-import org.pih.warehouse.shipping.ReferenceNumber;
-import org.pih.warehouse.donation.Donor;
-import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.core.*
+import org.pih.warehouse.donation.Donor
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.receiving.Receipt
 
 import java.io.Serializable;
 

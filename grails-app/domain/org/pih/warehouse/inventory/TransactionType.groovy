@@ -9,8 +9,7 @@
 **/ 
 package org.pih.warehouse.inventory;
 
-import java.util.Date;
-import org.pih.warehouse.inventory.TransactionCode 
+import java.util.Date
 
 class TransactionType implements Serializable {
 	

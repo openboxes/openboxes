@@ -9,17 +9,11 @@
  * */
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Event;
-
-
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.fulfillment.Fulfillment;
-
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
+import org.pih.warehouse.fulfillment.Fulfillment
 
 class Requisition implements Comparable<Requisition>, Serializable {
 

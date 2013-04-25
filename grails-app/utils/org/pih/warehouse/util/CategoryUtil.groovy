@@ -9,10 +9,9 @@
 **/ 
 package org.pih.warehouse.util
 
-import javax.annotation.Resource;
+import org.pih.warehouse.product.ProductService
 
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.ProductService;
+import javax.annotation.Resource
 
 class CategoryUtil {
 

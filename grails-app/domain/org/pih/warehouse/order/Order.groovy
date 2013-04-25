@@ -9,14 +9,7 @@
 **/ 
 package org.pih.warehouse.order
 
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventCode;
-import org.pih.warehouse.core.EventType;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
+import org.pih.warehouse.core.*
 
 class Order implements Serializable {
 	

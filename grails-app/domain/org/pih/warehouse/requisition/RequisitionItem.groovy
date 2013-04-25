@@ -9,16 +9,14 @@
 **/ 
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.picklist.PicklistItem;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
-import org.pih.warehouse.product.ProductPackage;
-
+import org.pih.warehouse.product.ProductPackage
 
 class RequisitionItem implements Serializable {
 	

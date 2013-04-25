@@ -7,13 +7,10 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.user;
+package org.pih.warehouse.user
 
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.core.Role;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.LocationRole;
-import org.pih.warehouse.core.RoleType;
+import org.pih.warehouse.core.*
+
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
 import javax.swing.ImageIcon

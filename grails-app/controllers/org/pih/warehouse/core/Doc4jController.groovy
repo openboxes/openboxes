@@ -9,14 +9,11 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFFont
+import org.pih.warehouse.shipping.Shipment;
 
 import java.io.File;
-import java.io.FileOutputStream;
-
-
-import org.pih.warehouse.shipping.Shipment;
+import java.io.FileOutputStream
 
 class Doc4jController {
 

@@ -9,9 +9,9 @@
 **/ 
 package org.pih.warehouse.reporting
 
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.product.Product;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 
 class Consumption {
 

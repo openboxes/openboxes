@@ -9,12 +9,11 @@
 **/ 
 package org.pih.warehouse.user
 
-import grails.util.GrailsUtil;
-
-import org.apache.commons.mail.EmailException;
-import org.pih.warehouse.core.RoleType;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.core.Role;
+import grails.util.GrailsUtil
+import org.apache.commons.mail.EmailException
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
 
 class AuthController {
 

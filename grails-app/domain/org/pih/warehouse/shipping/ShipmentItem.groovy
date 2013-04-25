@@ -9,14 +9,14 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import java.util.Date;
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.donation.Donor
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.order.OrderShipment
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.ReceiptItem
 
-import org.pih.warehouse.order.OrderShipment;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.receiving.ReceiptItem;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.donation.Donor;
-import org.pih.warehouse.inventory.InventoryItem;
+import java.util.Date
 
 class ShipmentItem implements Comparable, Serializable {
 

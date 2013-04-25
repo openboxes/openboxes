@@ -9,8 +9,8 @@
 **/ 
 package org.pih.warehouse.api
 
-import grails.converters.JSON;
-import org.pih.warehouse.product.Product;
+import grails.converters.JSON
+import org.pih.warehouse.product.Product
 
 class ApiController {
 

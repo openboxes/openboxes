@@ -7,18 +7,16 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.inventory;
+package org.pih.warehouse.inventory
 
-import java.util.Date;
-
-import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.requisition.Requisition;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.User
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment;
+
+import java.util.Date
 
 /**
  *  Represents a unit of work completed within a single warehouse.  A

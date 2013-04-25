@@ -7,29 +7,14 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
-import org.hibernate.exception.ConstraintViolationException;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventCode;
-import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.ListCommand
-import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.inventory.TransactionException;
-import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.receiving.Receipt;
-import org.pih.warehouse.receiving.ReceiptItem;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
-
+import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.*
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 class ShipmentService {

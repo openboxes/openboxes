@@ -9,16 +9,18 @@
  * */
 package org.pih.warehouse.product
 
-import java.util.Date;
-import java.util.Collection;
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.shipping.ShipmentItem
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.*;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.inventory.*;
-import org.pih.warehouse.shipping.ShipmentItem;
+import java.util.Date;
+import java.util.Collection
 
 /**
  * An product is an instance of a generic.  For instance,

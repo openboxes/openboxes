@@ -9,9 +9,9 @@
 **/ 
 package org.pih.warehouse.util
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
-import org.pih.warehouse.core.LocalizationService;
-import org.pih.warehouse.inventory.Transaction;
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.core.LocalizationService
+import org.pih.warehouse.inventory.Transaction
 
 public class LocalizationUtil {
 

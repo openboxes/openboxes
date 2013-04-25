@@ -7,9 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
-
-import groovy.sql.Sql
+package org.pih.warehouse.core
 
 class PersonController {
 	def userService

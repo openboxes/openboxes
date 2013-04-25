@@ -7,12 +7,12 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.inventory;
+package org.pih.warehouse.inventory
 
-import java.util.Date;
-
-import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product;
+
+import java.util.Date
 
 class InventorySnapshot implements java.io.Serializable {
 

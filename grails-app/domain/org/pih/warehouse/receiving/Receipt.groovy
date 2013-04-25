@@ -9,11 +9,11 @@
 **/ 
 package org.pih.warehouse.receiving
 
-import java.io.Serializable;
-import java.util.Date;
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.shipping.Shipment
 
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.shipping.Shipment;
+import java.io.Serializable;
+import java.util.Date
 
 class Receipt implements Serializable {
 

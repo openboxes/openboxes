@@ -7,13 +7,12 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
+package org.pih.warehouse.core
 
-import java.util.Date;
-
-import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.User
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.product.Product;
+
+import java.util.Date
 
 class Tag implements Serializable {
 

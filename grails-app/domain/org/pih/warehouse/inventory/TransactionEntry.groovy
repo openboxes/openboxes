@@ -7,9 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.inventory;
-
-import org.pih.warehouse.product.Product;
+package org.pih.warehouse.inventory
 
 class TransactionEntry implements Comparable, Serializable {
 	

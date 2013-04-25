@@ -9,8 +9,7 @@
 **/ 
 package org.pih.warehouse.core;
 
-import java.util.Date;
-import org.pih.warehouse.core.User
+import java.util.Date
 
 class Comment implements Serializable {
 

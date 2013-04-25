@@ -9,16 +9,17 @@
 **/ 
 package org.pih.warehouse.admin
 
-import java.net.HttpURLConnection;
-import java.net.URLConnection;
+import grails.util.GrailsUtil
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+
+//import java.net.HttpURLConnection;
+//import java.net.URLConnection;
 import java.util.concurrent.FutureTask;
 
-import javax.swing.text.html.HTML;
+// import javax.swing.text.html.HTML;
 
-import grails.converters.XML;
-import grails.util.GrailsUtil;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.pih.warehouse.util.FileUtil;
+// import grails.converters.XML;
+// import org.pih.warehouse.util.FileUtil;
 
 import sun.misc.BASE64Encoder;
 
@@ -162,8 +163,8 @@ class AdminController {
 	def downloadWar = { 
 		log.info params
 		log.info("Updating war file " + params)
-		def url = "http://ci.pih-emr.org/downloads/openboxes.war"
-		
+		// def url = "http://ci.pih-emr.org/downloads/openboxes.war"
+
 		// Requires executor plugin
 		//def future = callAsync {
 		//	return doDownloadWar(url) 
@@ -185,7 +186,7 @@ class AdminController {
 		log.info params
 		def source = session.command.localWebArchive
 		
-		def destination = new File(session.command.localWebArchivePath) 
+		// def destination = new File(session.command.localWebArchivePath)
 		
 		def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
 		log.info "Backing up " + source.absolutePath + " to " + backup.absolutePath 

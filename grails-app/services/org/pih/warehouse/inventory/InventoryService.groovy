@@ -7,38 +7,25 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.inventory;
+package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
-import org.hibernate.Criteria;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.pih.warehouse.product.Category;
-
-import java.text.SimpleDateFormat;
-
-import org.pih.warehouse.importer.ImportDataCommand;
-import org.pih.warehouse.importer.ImporterUtil;
-
-
-import org.pih.warehouse.picklist.Picklist;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.ProductAttribute;
-import org.pih.warehouse.product.ProductGroup;
-import org.pih.warehouse.shipping.Shipment;
-
-
+import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.reporting.Consumption
+import org.pih.warehouse.shipping.Shipment
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors;
 
-import org.pih.warehouse.reporting.Consumption;
-import org.pih.warehouse.auth.AuthService
-
-import static org.pih.warehouse.inventory.InventoryLevel.*
+import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
 

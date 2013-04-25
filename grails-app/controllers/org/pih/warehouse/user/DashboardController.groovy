@@ -7,25 +7,22 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.user;
-
+package org.pih.warehouse.user
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.Cacheable;
+import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Comment
-import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.order.Order;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.receiving.Receipt;
-import org.pih.warehouse.requisition.Requisition;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentStatusCode;
-import org.pih.warehouse.util.LocalizationUtil;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Transaction;
-
+import org.pih.warehouse.util.LocalizationUtil
 
 class DashboardController {
 

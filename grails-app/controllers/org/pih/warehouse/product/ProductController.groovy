@@ -9,7 +9,13 @@
  **/ 
 package org.pih.warehouse.product
 
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass;
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -22,14 +28,6 @@ import java.awt.image.BufferedImage
 
 import javax.imageio.ImageIO as IIO
 import javax.swing.ImageIcon
-
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.core.Tag
-import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
 
 import com.google.zxing.BarcodeFormat
 

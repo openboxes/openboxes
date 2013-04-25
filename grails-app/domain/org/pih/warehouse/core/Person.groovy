@@ -9,10 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-import java.util.Date;
-
-import org.pih.warehouse.core.Location;
-
+import java.util.Date
 
 class Person implements Comparable, Serializable {
     

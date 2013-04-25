@@ -9,11 +9,11 @@
 **/ 
 package org.pih.warehouse.product
 
-import java.util.Date;
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.User
 
-import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.UnitOfMeasure;
-import org.pih.warehouse.core.User;
+import java.util.Date
 
 class ProductPackage implements Serializable {
 

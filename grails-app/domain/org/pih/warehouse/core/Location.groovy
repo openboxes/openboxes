@@ -9,11 +9,11 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.order.Order;
-import org.pih.warehouse.requisition.Requisition;
-import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
 
 /**
  * A location can be a customer, warehouse, or supplier.  

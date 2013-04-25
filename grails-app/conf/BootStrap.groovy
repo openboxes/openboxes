@@ -6,14 +6,9 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
+
 import grails.util.Environment
-
-import javax.sql.DataSource
-
-import liquibase.Liquibase
-import liquibase.database.DatabaseFactory
-
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -23,13 +18,18 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.picklist.*
-import org.pih.warehouse.product.*
-import org.pih.warehouse.requisition.*
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+import javax.sql.DataSource
 
+import liquibase.Liquibase
+import liquibase.database.DatabaseFactory
 
 class BootStrap {
 

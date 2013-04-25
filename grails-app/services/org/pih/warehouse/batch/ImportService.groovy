@@ -8,20 +8,15 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 package org.pih.warehouse.batch
+
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.InventoryExcelImporter
+import org.springframework.validation.Errors
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.List
 
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.importer.InventoryExcelImporter;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.springframework.validation.Errors;
 import org.grails.plugins.excelimport.ExcelImportUtils;
 import au.com.bytecode.opencsv.CSVReader;
 

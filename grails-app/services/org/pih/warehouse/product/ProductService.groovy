@@ -9,19 +9,16 @@
  **/ 
 package org.pih.warehouse.product
 
-
 import grails.validation.ValidationException
 import groovy.xml.Namespace
-
-import java.text.SimpleDateFormat
-
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
 
-import static org.pih.warehouse.product.Product.*
+import java.text.SimpleDateFormat
+
+import org.grails.plugins.csv.CSVWriter
 
 /**
  * @author jmiranda

@@ -7,13 +7,6 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  * */
-
-import org.pih.warehouse.core.User
-import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.UserService
-
-
 class RoleFilters {
     def userService
     def dependsOn = [SecurityFilters]

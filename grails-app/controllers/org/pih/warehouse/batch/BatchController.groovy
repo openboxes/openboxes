@@ -9,14 +9,14 @@
 **/ 
 package org.pih.warehouse.batch
 
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.importer.ImportDataCommand;
-import org.pih.warehouse.importer.InventoryExcelImporter;
-import org.pih.warehouse.importer.ProductExcelImporter;
-import org.pih.warehouse.product.Product;
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
-import au.com.bytecode.opencsv.CSVReader;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.InventoryExcelImporter
+import org.pih.warehouse.importer.ProductExcelImporter
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
+
+// import au.com.bytecode.opencsv.CSVReader;
 
 
 class BatchController {
@@ -31,7 +31,7 @@ class BatchController {
 		log.info params 
 		log.info command.location
 		
-		def dataMapList = null;
+		// def dataMapList = null;
 		if ("POST".equals(request.getMethod())) {
 			File localFile = null;
 			if (request instanceof DefaultMultipartHttpServletRequest) {

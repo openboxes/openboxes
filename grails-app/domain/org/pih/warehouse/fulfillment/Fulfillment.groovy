@@ -9,10 +9,8 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import org.pih.warehouse.core.Person;
-
-
-import org.pih.warehouse.requisition.Requisition;
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.requisition.Requisition
 
 class Fulfillment implements Serializable {
 

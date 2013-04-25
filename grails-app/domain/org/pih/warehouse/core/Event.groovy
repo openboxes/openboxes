@@ -9,8 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-import java.util.Date;
-import org.pih.warehouse.core.Location;
+import java.util.Date
 
 /**
 * Represents a particular Event of interest during the course of a Shipment

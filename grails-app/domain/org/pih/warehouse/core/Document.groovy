@@ -10,8 +10,7 @@
 package org.pih.warehouse.core
 
 import java.net.URI;
-import java.util.Date;
-import org.pih.warehouse.core.DocumentType;
+import java.util.Date
 
 /**
  * A document is a file (e.g. document, image) that can be associated with an 

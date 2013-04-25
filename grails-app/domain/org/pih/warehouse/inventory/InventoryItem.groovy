@@ -9,11 +9,10 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import java.util.Date;
-import java.util.Map;
+import org.pih.warehouse.product.Product
 
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.inventory.Transaction;
+import java.util.Date;
+import java.util.Map
 
 /**
  * Represents an instance of a product, referenced by lot number

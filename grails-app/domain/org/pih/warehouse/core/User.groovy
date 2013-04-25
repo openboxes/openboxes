@@ -9,9 +9,7 @@
  * */
 package org.pih.warehouse.core
 
-import java.util.Date;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.Location;
+import java.util.Date
 
 class User extends Person {
 

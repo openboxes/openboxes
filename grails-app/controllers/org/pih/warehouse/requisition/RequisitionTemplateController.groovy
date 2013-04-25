@@ -10,15 +10,6 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem;
-
-import grails.converters.JSON
-import grails.validation.ValidationException;
-
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem;
-
-
 
 class RequisitionTemplateController {
 

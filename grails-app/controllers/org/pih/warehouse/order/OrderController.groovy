@@ -9,16 +9,13 @@
 **/ 
 package org.pih.warehouse.order
 
-import java.util.Date;
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.shipping.DocumentCommand;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
+import java.util.Date
 
 class OrderController {
 	def orderService

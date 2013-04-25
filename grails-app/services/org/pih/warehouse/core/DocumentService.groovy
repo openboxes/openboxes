@@ -7,7 +7,11 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
+package org.pih.warehouse.core
+
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.Shipment;
 
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -23,8 +27,7 @@ import org.apache.poi.ss.usermodel.CreationHelper
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.hssf.util.CellReference;
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.apache.poi.hssf.util.CellReference
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
@@ -50,9 +53,7 @@ import org.docx4j.wml.TcPr
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
-import org.groovydev.SimpleImageBuilder;
-import org.pih.warehouse.shipping.ReferenceNumber
-import org.pih.warehouse.shipping.Shipment
+import org.groovydev.SimpleImageBuilder
 
 class DocumentService {
 	

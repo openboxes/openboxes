@@ -7,27 +7,14 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.inventory;
-
-import grails.validation.ValidationException;
+package org.pih.warehouse.inventory
 
 import java.util.Map;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.grails.plugins.excelimport.ExcelImportUtils;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.ProductAttribute;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.core.Constants 
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType;
-import org.springframework.validation.Errors;
+import org.grails.plugins.excelimport.ExcelImportUtils
 
 /**
  * Stateful session bean

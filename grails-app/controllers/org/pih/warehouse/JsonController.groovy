@@ -9,26 +9,19 @@
 **/ 
 package org.pih.warehouse
 
-import org.pih.warehouse.core.ApiException
-
-import java.text.SimpleDateFormat;
-
-import grails.converters.*;
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Localization;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.inventory.Inventory;
+import grails.converters.JSON
+import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.ProductGroup;
-import org.pih.warehouse.requisition.Requisition;
-import org.pih.warehouse.shipping.Container;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ShipmentItem
+
+import java.text.SimpleDateFormat
+
 class JsonController {
 	def inventoryService
 	def productService

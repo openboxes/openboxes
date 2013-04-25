@@ -7,12 +7,10 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
+package org.pih.warehouse.core
 
-import grails.util.GrailsUtil;
 import org.apache.commons.mail.SimpleEmail
 import org.apache.commons.mail.HtmlEmail
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 class MessageService {
 

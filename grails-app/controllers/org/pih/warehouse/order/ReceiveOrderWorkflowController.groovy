@@ -9,17 +9,10 @@
 **/ 
 package org.pih.warehouse.order
 
-import grails.util.GrailsUtil;
-import org.pih.warehouse.core.Address;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.shipping.ReceiptException;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentException;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
+import org.pih.warehouse.shipping.ReceiptException
+import org.pih.warehouse.shipping.ShipmentException
 
 class ReceiveOrderWorkflowController {
 
