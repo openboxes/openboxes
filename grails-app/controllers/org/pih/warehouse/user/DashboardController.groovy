@@ -245,7 +245,8 @@ class DashboardController {
 			//lowStock: lowStock,
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
-            requisitions:  requisitionService.getAllRequisitions(session.warehouse),
+            //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
+            requisitions:  requisitionService.getRequisitions(session.warehouse),
 			//outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
@@ -298,8 +299,8 @@ class DashboardController {
         def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
 		def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
 
-        Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
-        def myRequisitions = requisitionService.getRequisitions(requisition, [:])
+        //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
+        //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
 		
 		def categories = []
 
@@ -307,7 +308,7 @@ class DashboardController {
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
 
-        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
 
 		[
 			categories: categories,
@@ -318,7 +319,7 @@ class DashboardController {
 			incomingOrders: incomingOrders,
 			incomingRequests: incomingRequests,
 			outgoingRequests: outgoingRequests,
-            myRequisitions: myRequisitions,
+            //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()
 		]
