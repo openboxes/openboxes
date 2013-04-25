@@ -58,7 +58,9 @@
 											${warehouse.message(code: 'shipment.label')}
 										</th>
 										<th>
-											${warehouse.message(code: 'transaction.source.label')} /
+											${warehouse.message(code: 'transaction.source.label')}
+                                        </th>
+                                        <th>
 											${warehouse.message(code: 'transaction.destination.label')}
 										</th>
 										<th style="text-align: center">
@@ -116,9 +118,11 @@
 													<g:if test="${transaction?.source }">
 														${transaction?.source?.name }
 													</g:if>
-													<g:elseif test="${transaction?.destination }">
+                                                </td>
+                                                <td>
+													<g:if test="${transaction?.destination }">
 														${transaction?.destination?.name }
-													</g:elseif>
+													</g:if>
 												</td>
 												<td style="text-align: center">
 													<g:set var="quantityChange" value="${0 }"/>

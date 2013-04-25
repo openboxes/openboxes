@@ -50,10 +50,16 @@
 	                  </div>
 	                  <div class="action-menu-item">
 	                    <a  href="javascript:void(0);" id="btnTransferStock-${itemInstance?.id}">
-	                      <img src="${resource(dir: 'images/icons/silk', file: 'book_go.png')}"/>&nbsp;
-	                      <warehouse:message code="inventory.transferStock.label"/>
+	                      <img src="${resource(dir: 'images/icons/silk', file: 'book_next.png')}"/>&nbsp;
+	                      <warehouse:message code="inventory.transferStock.label" default="Issue stock"/>
 	                    </a>
 	                  </div>
+                        <div class="action-menu-item">
+                            <a  href="javascript:void(0);" id="btnReturnStock-${itemInstance?.id}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'book_previous.png')}"/>&nbsp;
+                            <warehouse:message code="inventory.returnStock.label" default="Return stock"/>
+                            </a>
+                        </div>
 	                  <div class="action-menu-item">
 	                    <a  href="javascript:void(0);" id="btnAddToShipment-${itemInstance?.id}">
 	                      <img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
@@ -64,6 +70,7 @@
 	                  <g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
 	                  <g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
 					  <g:render template="transferStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+                      <g:render template="returnStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
 	                  <g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
 	                </div>
 	              </g:isUserManager>

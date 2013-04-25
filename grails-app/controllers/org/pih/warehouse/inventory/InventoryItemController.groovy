@@ -405,7 +405,8 @@ class InventoryItemController {
 		log.info "Params " + params;
 		def quantity = 0
 		def destination = Location.get(params?.destination?.id)
-		def inventoryItem = InventoryItem.get(params.id)
+        def source = Location.get(params?.source?.id)
+        def inventoryItem = InventoryItem.get(params.id)
 		def inventory = Inventory.get(params?.inventory?.id)
 		if (inventoryItem) {
 			
@@ -417,7 +418,7 @@ class InventoryItemController {
 			
 			def transaction
 			try { 
-				transaction = inventoryService.transferStock(inventoryItem, inventory, destination, quantity);
+				transaction = inventoryService.transferStock(inventoryItem, inventory, destination, source, quantity);
 			} catch (Exception e) { 
 				log.error("Error transferring stock ", e)
 				flash.transaction = transaction

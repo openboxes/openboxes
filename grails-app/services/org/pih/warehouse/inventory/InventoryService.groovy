@@ -1846,7 +1846,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param params
 	 */
-	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location destination, Integer quantity) {
+	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location destination, Location source, Integer quantity) {
 		def transaction = new Transaction();
 		//def inventoryInstance = Inventory.get(params?.inventory?.id)
 		Integer quantityOnHand = getQuantity(inventoryItem);
@@ -1856,15 +1856,31 @@ class InventoryService implements ApplicationContextAware {
 			def transactionEntry = new TransactionEntry();
 			transactionEntry.quantity = quantity;
 			transactionEntry.inventoryItem = inventoryItem
-			
-			if (!destination.inventory) { 
-				//throw new RuntimeException("Destination does not have an inventory")
-				transaction.errors.reject("Destination does not have an inventory")
-			}			
-			if (inventory == destination.inventory) { 
-				//throw new RuntimeException("Destination must be different from source")
-				transaction.errors.reject("Destination must be different from source")
-			}
+
+            if (destination && source) {
+                transaction.errors.reject("Cannot specify both destination and source in a transaction")
+            }
+            if (destination) {
+                if (!destination?.inventory) {
+                    //throw new RuntimeException("Destination does not have an inventory")
+                    transaction.errors.reject("Destination does not have an inventory")
+                }
+                if (inventory == destination?.inventory) {
+                    //throw new RuntimeException("Destination must be different from source")
+                    transaction.errors.reject("Destination must be different from source")
+                }
+            }
+            if (source) {
+                if (!source?.inventory) {
+                    //throw new RuntimeException("Destination does not have an inventory")
+                    transaction.errors.reject("Source does not have an inventory")
+                }
+                if (inventory == source?.inventory) {
+                    //throw new RuntimeException("Destination must be different from source")
+                    transaction.errors.reject("Source must be different from source")
+                }
+            }
+
 			if (quantity <= 0) { 
 				//throw new RuntimeException("Quantity must be greater than 0")
 				transaction.errors.reject("Quantity must be greater than 0")
@@ -1879,9 +1895,10 @@ class InventoryService implements ApplicationContextAware {
 			// Need to create a transaction if we want the inventory item
 			// to show up in the stock card
 			transaction.transactionDate = new Date();		
-			transaction.destination = destination;		
-			transaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID);
-			transaction.inventory = inventory;
+			transaction.destination = destination;
+            transaction.source = source
+			transaction.transactionType = (destination) ? TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) : TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+            transaction.inventory = inventory;
 			transaction.transactionNumber = generateTransactionNumber()
 
 			// Add transaction entry to transaction
@@ -1892,7 +1909,6 @@ class InventoryService implements ApplicationContextAware {
 			if (!transaction.hasErrors() && transaction.save()) {
 				// saved successfully
 				log.info("Saved transaction " + transaction)
-				
 				if (!saveLocalTransfer(transaction)) {
 					throw new ValidationException("Unable to save local transfer", transaction.errors)
 				}

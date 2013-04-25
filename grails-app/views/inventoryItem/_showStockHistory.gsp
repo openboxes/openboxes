@@ -68,7 +68,9 @@
                                             ${warehouse.message(code: 'requisition.label')}
                                         </th>
 										<th>
-											${warehouse.message(code: 'transaction.source.label')} /
+											${warehouse.message(code: 'transaction.source.label')}
+                                        </th>
+                                        <th>
 											${warehouse.message(code: 'transaction.destination.label')}
 										</th>
 										<th style="text-align: center">
@@ -138,9 +140,17 @@
 													<g:if test="${transaction?.source }">
 														${transaction?.source?.name }
 													</g:if>
-													<g:elseif test="${transaction?.destination }">
+                                                    <g:else>
+                                                        <span class="fade">${warehouse.message(code:'default.none.label') }</span>
+                                                    </g:else>
+                                                </td>
+                                                <td>
+													<g:if test="${transaction?.destination }">
 														${transaction?.destination?.name }
-													</g:elseif>
+													</g:if>
+                                                    <g:else>
+                                                        <span class="fade">${warehouse.message(code:'default.none.label') }</span>
+                                                    </g:else>
 												</td>
 												<td style="text-align: center">
 													<g:set var="quantityChange" value="${0 }"/>
