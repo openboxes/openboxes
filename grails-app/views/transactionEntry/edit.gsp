@@ -49,7 +49,30 @@
 				                                   
 				                                </td>
 				                            </tr>
-				                        
+
+                                            <tr class="prop">
+                                                <td valign="top" class="name">
+                                                    <label for="product"><warehouse:message code="product.label" default="Product" /></label>
+                                                </td>
+                                                <td valign="top" class="value">
+                                                    <span id="product">
+                                                        ${transactionEntryInstance?.inventoryItem?.product?.productCode}
+                                                        ${transactionEntryInstance?.inventoryItem?.product?.name}
+                                                    </span>
+
+                                                </td>
+                                            </tr>
+                                            <tr class="prop">
+                                                <td valign="top" class="name">
+                                                    <label for="unitOfMeasure"><warehouse:message code="product.unitOfMeasure.label" default="Unit of measure" /></label>
+                                                </td>
+                                                <td valign="top" class="value">
+                                                    <span id="unitOfMeasure">
+                                                        ${transactionEntryInstance?.inventoryItem?.product?.unitOfMeasure}
+                                                    </span>
+
+                                                </td>
+                                            </tr>
 				                            <tr class="prop">
 				                                <td valign="top" class="name">
 				                                  <label for="inventoryItem.id"><warehouse:message code="transactionEntry.inventoryItem.label" default="Inventory Item" /></label>

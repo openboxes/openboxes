@@ -110,7 +110,7 @@
 		<g:if test="${localTransfer }">
 			<tr class="propOff">
 				<td class="">
-					<label><warehouse:message code="localTransfer.destinationTransaction.label" default="Outgoing transaction"/></label>
+					<label><warehouse:message code="localTransfer.destinationTransaction.label" default="Incoming transaction"/></label>
                     <div>
                         <g:link id="${localTransfer.destinationTransaction?.id}" controller="inventory" action="showTransaction">
                             ${localTransfer?.destinationTransaction?.transactionNumber?:localTransfer?.destinationTransaction?.transactionType?.name }
@@ -121,7 +121,7 @@
 			</tr>
 			<tr class="propOff">
 				<td class="">
-					<label><warehouse:message code="localTransfer.sourceTransaction.label" default="Incoming transaction"/></label>				
+					<label><warehouse:message code="localTransfer.sourceTransaction.label" default="Outgoing transaction"/></label>
                     <div>
                         <g:link id="${localTransfer.sourceTransaction?.id}" controller="inventory" action="showTransaction">
                             ${localTransfer?.sourceTransaction?.transactionNumber?:localTransfer?.sourceTransaction?.transactionType?.name }
