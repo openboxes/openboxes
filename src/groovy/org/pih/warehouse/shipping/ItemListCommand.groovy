@@ -9,13 +9,10 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import java.io.Serializable;
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.codehaus.groovy.grails.validation.Validateable;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.product.Product;
+import java.io.Serializable
 
 class ItemListCommand implements Serializable {
 	

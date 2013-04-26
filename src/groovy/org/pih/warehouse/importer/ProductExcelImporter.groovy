@@ -9,16 +9,8 @@
 **/ 
 package org.pih.warehouse.importer
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.ProductService;
-import org.springframework.validation.Errors;
-
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.grails.plugins.excelimport.AbstractExcelImporter;
 import org.grails.plugins.excelimport.ExcelImportUtils;
 

@@ -9,12 +9,10 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import java.util.List;
-
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.codehaus.groovy.grails.validation.Validateable;
-import org.pih.warehouse.core.Location;
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
+import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.core.Location
 
 @Validateable
 class TransactionCommand {

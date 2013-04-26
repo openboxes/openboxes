@@ -9,13 +9,11 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import org.pih.warehouse.inventory.InventoryItem;
-
-
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 @Validateable
 class FulfillmentItemCommand  implements Serializable {

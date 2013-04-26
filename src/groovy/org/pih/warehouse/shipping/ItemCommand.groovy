@@ -9,8 +9,8 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 
 class ItemCommand implements Serializable {
 	

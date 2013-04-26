@@ -9,25 +9,12 @@
 **/ 
 package org.pih.warehouse.importer
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
-import org.grails.plugins.excelimport.ExcelImportUtils;
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.importer.ImportDataCommand;
-import org.pih.warehouse.importer.AbstractExcelImporter;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.springframework.validation.Errors
+import org.grails.plugins.excelimport.ExcelImportUtils
 
 class InventoryExcelImporter extends AbstractExcelImporter {
 

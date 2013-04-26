@@ -9,16 +9,9 @@
 **/ 
 package org.pih.warehouse.order
 
-import java.util.List;
-
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.codehaus.groovy.grails.validation.Validateable;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.ShipmentType;
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
+import org.codehaus.groovy.grails.validation.Validateable
 
 @Validateable
 class OrderItemListCommand implements Serializable {

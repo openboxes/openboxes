@@ -9,14 +9,14 @@
 **/ 
 package org.pih.warehouse.importer
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.product.Category
+import org.springframework.validation.Errors
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
-import org.pih.warehouse.product.Category;
-import org.springframework.validation.Errors;
+import java.util.Date
 
 class ImporterUtil {
 

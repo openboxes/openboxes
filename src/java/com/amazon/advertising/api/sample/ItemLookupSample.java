@@ -21,14 +21,13 @@
 
 package com.amazon.advertising.api.sample;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * This class shows how to make a simple authenticated ItemLookup call to the

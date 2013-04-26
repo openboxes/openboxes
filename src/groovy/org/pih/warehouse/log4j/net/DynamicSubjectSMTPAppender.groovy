@@ -1,19 +1,18 @@
 package org.pih.warehouse.log4j.net
 
+import org.apache.log4j.Layout
+import org.apache.log4j.PatternLayout
+import org.apache.log4j.helpers.LogLog
+import org.apache.log4j.net.SMTPAppender
+import org.apache.log4j.spi.LoggingEvent
+
 import java.util.Date;
 
 import javax.mail.Multipart;
 import javax.mail.Transport;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
-
-import org.apache.log4j.Layout;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.net.SMTPAppender;
-import org.apache.log4j.or.ThreadGroupRenderer;
-import org.apache.log4j.spi.LoggingEvent;
+import javax.mail.internet.MimeUtility
 
 /**
  *

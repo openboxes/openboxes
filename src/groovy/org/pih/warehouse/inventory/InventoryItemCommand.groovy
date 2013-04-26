@@ -9,10 +9,9 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.ProductGroup;
-
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductGroup
 
 class InventoryItemCommand {
 	

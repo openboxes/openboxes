@@ -9,9 +9,6 @@
 **/ 
 package org.pih.warehouse.order
 
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.shipping.ShipmentStatusCode;
-
 public enum OrderStatus {
 
 	PENDING(1),

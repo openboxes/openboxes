@@ -9,12 +9,8 @@
 **/ 
 package org.pih.warehouse.product
 
-import java.util.List;
-
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.inventory.InventoryLevel;
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
 
 class BatchEditCommand {
 	

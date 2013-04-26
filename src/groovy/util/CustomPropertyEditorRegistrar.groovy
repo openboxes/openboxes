@@ -9,11 +9,12 @@
 **/ 
 package util
 
-import java.util.Date
-import java.text.SimpleDateFormat
-import org.springframework.beans.propertyeditors.CustomDateEditor
 import org.springframework.beans.PropertyEditorRegistrar
 import org.springframework.beans.PropertyEditorRegistry
+import org.springframework.beans.propertyeditors.CustomDateEditor
+
+import java.util.Date
+import java.text.SimpleDateFormat
 
 public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	public void registerCustomEditors(PropertyEditorRegistry registry) {

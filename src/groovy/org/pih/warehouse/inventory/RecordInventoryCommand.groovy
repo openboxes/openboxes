@@ -9,12 +9,9 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.pih.warehouse.product.Product;
-import org.codehaus.groovy.grails.validation.Validateable
-
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
+import org.pih.warehouse.product.Product
 
 class RecordInventoryCommand {
 	

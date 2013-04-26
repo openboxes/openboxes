@@ -9,9 +9,6 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.shipping.ShipmentStatusCode;
-
 public enum InventoryStatus {
 
 	INACTIVE(0),

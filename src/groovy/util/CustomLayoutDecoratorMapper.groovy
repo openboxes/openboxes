@@ -9,12 +9,11 @@
 **/ 
 package util
 
-import javax.servlet.ServletContext
-import javax.servlet.http.HttpServletRequest
+import com.opensymphony.module.sitemesh.Decorator
+import com.opensymphony.module.sitemesh.Page
 import org.codehaus.groovy.grails.web.sitemesh.GrailsLayoutDecoratorMapper
-import com.opensymphony.module.sitemesh.*
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
-import org.codehaus.groovy.grails.web.metaclass.ControllerDynamicMethods
+
+import javax.servlet.http.HttpServletRequest
 
 class CustomLayoutDecoratorMapper extends GrailsLayoutDecoratorMapper {
 

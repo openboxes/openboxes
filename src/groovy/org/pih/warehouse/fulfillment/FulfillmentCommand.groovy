@@ -9,12 +9,10 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-
-
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem;
+import org.pih.warehouse.requisition.RequisitionItem
 
 class FulfillmentCommand implements Serializable {
 

@@ -9,8 +9,6 @@
 **/ 
 package org.pih.warehouse.order.cart
 
-import org.pih.warehouse.product.Product;
-
 class Cart implements Serializable {
 	
 	// Key: item id, value: item count
