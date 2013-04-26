@@ -12,8 +12,6 @@ package org.pih.warehouse.shipping;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
-import java.util.List
-
 import au.com.bytecode.opencsv.CSVWriter
 import com.ocpsoft.pretty.time.PrettyTime;
 

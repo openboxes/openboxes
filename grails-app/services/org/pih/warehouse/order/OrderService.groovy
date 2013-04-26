@@ -16,11 +16,6 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 
-import java.util.Date
-import java.util.List
-import java.util.Map
-import java.util.Set
-
 class OrderService {
 
 	boolean transactional = true

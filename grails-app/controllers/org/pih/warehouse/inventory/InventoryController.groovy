@@ -20,9 +20,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.Consumption
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List
+// import java.util.Calendar;
 
 import org.pih.warehouse.util.DateUtil
 
@@ -344,7 +342,7 @@ class InventoryController {
     }
     def listTotalStock = {
         def warehouse = Location.get(session.warehouse.id)
-        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
         def totalStock = inventoryService.getTotalStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
 
@@ -359,7 +357,7 @@ class InventoryController {
 
     def listInStock = {
         def warehouse = Location.get(session.warehouse.id)
-        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
         def inStock = inventoryService.getInStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
@@ -373,7 +371,7 @@ class InventoryController {
 
     def listLowStock = {
         def warehouse = Location.get(session.warehouse.id)
-        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
         def lowStock = inventoryService.getLowStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
@@ -387,7 +385,7 @@ class InventoryController {
 
     def listReorderStock = {
         def warehouse = Location.get(session.warehouse.id)
-        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
         def reorderStock = inventoryService.getReorderStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
@@ -401,7 +399,7 @@ class InventoryController {
 
     def listOutOfStock = {
 		def warehouse = Location.get(session.warehouse.id)
-		def categorySelected = (params.category) ? Category.get(params.category) : null;
+		// def categorySelected = (params.category) ? Category.get(params.category) : null;
 		def outOfStock = inventoryService.getOutOfStock(warehouse);
 		//def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
@@ -415,7 +413,7 @@ class InventoryController {
 
     def listOverStock = {
         def warehouse = Location.get(session.warehouse.id)
-        def categorySelected = (params.category) ? Category.get(params.category) : null;
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
         def overStock = inventoryService.getOverStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
@@ -779,7 +777,7 @@ class InventoryController {
 	def saveTransaction = {	
 		log.debug "save transaction: " + params
 		def transactionInstance = Transaction.get(params.id);
-		def inventoryInstance = Inventory.get(params.inventory.id);
+		// def inventoryInstance = Inventory.get(params.inventory.id);
 		
 		if (!transactionInstance) {
 			transactionInstance = new Transaction();

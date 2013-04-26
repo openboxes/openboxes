@@ -12,11 +12,6 @@ package org.pih.warehouse.product
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryService
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set
-
 import sun.util.logging.resources.logging;
 
 class CreateProductFromTemplateController {
