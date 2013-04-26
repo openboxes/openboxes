@@ -9,9 +9,10 @@
 **/ 
 package org.pih.warehouse.product
 
+import static groovyx.net.http.Method.GET
 import org.pih.warehouse.core.ApiException
 import groovyx.net.http.RESTClient
-import static groovyx.net.http.Method.GET
+
 
 class RxNormController {
 
@@ -83,7 +84,7 @@ class RxNormController {
 	
 	def test2 = { 
 		def client = new RESTClient("http://rxnav.nlm.nih.gov/REST/")
-		def data = "";
+	//	def data = "";
 		
 		def rxnormApiKey = grailsApplication.config.rxnorm.api.key
 		if (!rxnormApiKey) {

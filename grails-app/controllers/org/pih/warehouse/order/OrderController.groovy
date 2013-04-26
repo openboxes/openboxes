@@ -15,7 +15,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-import java.util.Date
+// import java.util.Date
 
 class OrderController {
 	def orderService
@@ -389,7 +389,7 @@ class OrderController {
 			shipmentInstance.addToShipmentItems(shipmentItem);
 			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) { 
 				
-				def orderShipment = OrderShipment.link(orderItem, shipmentItem);
+	//			def orderShipment = OrderShipment.link(orderItem, shipmentItem);
 				/*
 				if (!orderShipment.hasErrors() && orderShipment.save(flush:true)) { 
 					flash.message = "success"

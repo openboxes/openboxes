@@ -167,7 +167,7 @@ class PurchaseOrderWorkflowController {
 			
 			action {
 				log.info("Finishing workflow, save order object " + flow.order)
-				def order = flow.order;
+				// def order = flow.order;
 
 				try {
 					

@@ -13,9 +13,9 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryService
 
-import java.util.Set
+// import java.util.Set
 
-import sun.util.logging.resources.logging;
+// import sun.util.logging.resources.logging;
 
 class CreateProductController {
 	

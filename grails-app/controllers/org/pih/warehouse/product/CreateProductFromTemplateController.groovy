@@ -12,7 +12,7 @@ package org.pih.warehouse.product
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryService
 
-import sun.util.logging.resources.logging;
+// import sun.util.logging.resources.logging;
 
 class CreateProductFromTemplateController {
 	

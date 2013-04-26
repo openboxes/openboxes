@@ -224,7 +224,7 @@ class InventoryItemController {
 		cmd.inventoryLevelInstance = InventoryLevel.findByProductAndInventory(cmd?.productInstance, cmd?.inventoryInstance);
 		def transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(cmd?.inventoryInstance, [cmd?.productInstance]);
 		
-		def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
+	//	def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
 
 		render(view: "showRecordInventory", model: [ commandInstance : cmd ])
 	}
@@ -319,7 +319,7 @@ class InventoryItemController {
 	
 	def edit = {
 		def itemInstance = InventoryItem.get(params.id)
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
+	//	def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (!itemInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
 			redirect(action: "show", id: itemInstance.id)
@@ -382,7 +382,7 @@ class InventoryItemController {
 	def adjustStock = {
 		log.info "Params " + params;
 		def itemInstance = InventoryItem.get(params.id)
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
+	//	def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (itemInstance) {
 			boolean hasErrors = inventoryService.adjustStock(itemInstance, params);
 			if (!itemInstance.hasErrors() && !hasErrors) {
@@ -441,7 +441,7 @@ class InventoryItemController {
 		log.info "Params " + params;
 		def itemInstance = InventoryItem.get(params.id)
 		def productInstance = Product.get(params?.product?.id)
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
+	//	def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (itemInstance) {
 			if (params.version) {
 				def version = params.version.toLong()

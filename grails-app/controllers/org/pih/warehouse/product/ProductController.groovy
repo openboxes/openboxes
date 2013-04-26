@@ -19,15 +19,11 @@ import org.pih.warehouse.inventory.InventoryLevel;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
+import java.awt.Image as AWTImage
+import javax.imageio.ImageIO as IIO
 import javax.swing.ImageIcon;
 
-import java.awt.Graphics2D
-import java.awt.Image as AWTImage
-import java.awt.image.BufferedImage
 
-import javax.imageio.ImageIO as IIO
-import javax.swing.ImageIcon
 
 import com.google.zxing.BarcodeFormat
 
@@ -56,7 +52,7 @@ class ProductController {
 	 */
 	def batchEdit = { BatchEditCommand cmd ->
 		def startTime = System.currentTimeMillis()
-		def location = Location.get(session.warehouse.id)
+	//	def location = Location.get(session.warehouse.id)
         def category = Category.get(params.categoryId)
         def tagIds = params.list("tagId")
 
@@ -82,11 +78,11 @@ class ProductController {
 
     def batchEditProperties = {
         def startTime = System.currentTimeMillis()
-        def location = Location.get(session.warehouse.id)
+     //   def location = Location.get(session.warehouse.id)
         def category = Category.get(params.categoryId)
         def tagIds = params.list("tagId")
 
-        def products = productService.getProducts(category, tagIds, params)
+      //  def products = productService.getProducts(category, tagIds, params)
 
         println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
 
@@ -665,7 +661,7 @@ class ProductController {
 	def upnDatabase = {
 
 		def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
-		def count=0, MAXSIZE=100000
+	//	def count=0, MAXSIZE=100000
 		def rows = []
 		try {
 			def line = ""

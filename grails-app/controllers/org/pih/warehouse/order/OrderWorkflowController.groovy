@@ -62,7 +62,7 @@ class OrderWorkflowController {
 			on("submit") {
 				def p = new Person(params)
 				flow.person = p
-				def e = yes()
+				// def e = yes()
 				if(p.hasErrors() || !p.validate()) return error()
 			}.to "enterShipping"
 			on("return").to "showCart"
@@ -83,8 +83,8 @@ class OrderWorkflowController {
 		processPurchaseOrder  {
 			action {
 				def a =  flow.address
-				def p = flow.person
-				def pd = flow.paymentDetails
+				// def p = flow.person
+				// def pd = flow.paymentDetails
 				def cartItems = flow.cartItems
 				//def o = new Order(person:p, shippingAddress:a, paymentDetails:pd)
 				def order = new Order();
