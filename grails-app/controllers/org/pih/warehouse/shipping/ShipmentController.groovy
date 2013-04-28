@@ -17,11 +17,11 @@ import org.pih.warehouse.inventory.TransactionException
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem;
 
-import java.io.Serializable;
-import java.sql.ResultSet;
-import java.text.SimpleDateFormat;
+// import java.io.Serializable;
+// import java.sql.ResultSet;
+// import java.text.SimpleDateFormat;
 import au.com.bytecode.opencsv.CSVWriter
-import com.ocpsoft.pretty.time.PrettyTime;
+//import com.ocpsoft.pretty.time.PrettyTime;
 
 
 class ShipmentController {
@@ -239,7 +239,7 @@ class ShipmentController {
 	
 	def sendShipment = {
 		def transactionInstance 
-		def userInstance = User.get(session.user.id)
+		// def userInstance = User.get(session.user.id)
 		def shipmentInstance = Shipment.get(params.id)
 		def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 
@@ -586,7 +586,7 @@ class ShipmentController {
 				containerCopy.save(flush:true);
 				
 				container.shipmentItems.each { 
-					def shipmentItemCopy = new ShipmentItem(
+					// def shipmentItemCopy = new ShipmentItem(
 					product: it.product, 
 					quantity: it.quantity,  
 					recipient: it.recipient,

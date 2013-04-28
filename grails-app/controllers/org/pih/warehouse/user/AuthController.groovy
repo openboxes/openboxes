@@ -73,9 +73,9 @@ class AuthController {
 
 				// Need to fetch the manager and roles in order to avoid 
 				// Hibernate error ("could not initialize proxy - no Session")				
-				def warehouse = userInstance?.warehouse?.name;
-				def managerUsername = userInstance?.manager?.username;
-				def roles = userInstance?.roles;
+				// def warehouse = userInstance?.warehouse?.name;
+				// def managerUsername = userInstance?.manager?.username;
+				// def roles = userInstance?.roles;
 	
 				session.user = userInstance;
 				

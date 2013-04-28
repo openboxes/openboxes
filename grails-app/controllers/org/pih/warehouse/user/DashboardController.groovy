@@ -284,7 +284,7 @@ class DashboardController {
     //@Cacheable("dashboarControllerCache")
 	def megamenu = {
 
-        def startTime = System.currentTimeMillis()
+      //   def startTime = System.currentTimeMillis()
 
         // Shipments
 		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()

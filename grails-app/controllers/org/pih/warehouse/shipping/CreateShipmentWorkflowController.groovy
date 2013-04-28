@@ -357,7 +357,7 @@ class CreateShipmentWorkflowController {
 				def transactionInstance
 				def userInstance = User.get(session.user.id)
 				def shipmentInstance = Shipment.get(params.id)
-				def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+				//def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 		
 				// This probably shouldn't occur, but we can leave it for now
 				if (!shipmentInstance) {
