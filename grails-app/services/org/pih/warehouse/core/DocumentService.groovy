@@ -27,7 +27,7 @@ import org.apache.poi.ss.usermodel.CreationHelper
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.hssf.util.CellReference
+//import org.apache.poi.hssf.util.CellReference
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
@@ -94,7 +94,7 @@ class DocumentService {
 			log.debug "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
 			fileInputStream = new FileInputStream(file)			
 			def builder = new SimpleImageBuilder()
-			def result = builder.
+			// def result = builder.
 				image(stream: fileInputStream) {
 					fit(width: width, height: height) {
 						save(stream: outputStream, format: extension?.toLowerCase())

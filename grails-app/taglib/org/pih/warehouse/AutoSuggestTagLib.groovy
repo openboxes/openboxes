@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse
 
-import java.text.SimpleDateFormat
+// import java.text.SimpleDateFormat
 
 class AutoSuggestTagLib {
 		
@@ -46,9 +46,9 @@ class AutoSuggestTagLib {
 		def styleClass = attrs.styleClass ?: ''
 		def placeholder = attrs.placeholder ?: ""
 		
-		def showValue = (valueName && valueId) ? true : false;
-		//def spanDisplay = (showValue) ? "inline" : "none";
-		//def suggestDisplay = (showValue) ? "none" : "inline";
+		// def showValue = (valueName && valueId) ? true : false;
+		// def spanDisplay = (showValue) ? "inline" : "none";
+		// def suggestDisplay = (showValue) ? "none" : "inline";
 		def spanDisplay = "none";
 		def suggestDisplay = "inline";
     def valueDataBind = attrs.valueDataBind ? "data-bind='${attrs.valueDataBind}'" : ""

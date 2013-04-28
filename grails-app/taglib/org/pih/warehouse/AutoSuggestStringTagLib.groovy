@@ -11,7 +11,7 @@ package org.pih.warehouse
 
 import grails.plugin.springcache.annotations.Cacheable
 
-import java.text.SimpleDateFormat
+// import java.text.SimpleDateFormat
 
 class AutoSuggestStringTagLib {
 
@@ -35,10 +35,10 @@ class AutoSuggestStringTagLib {
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 		def styleClass = (attrs.styleClass)?:"";
-		def showValue = (value) ? true : false;
-		//def spanDisplay = (showValue) ? "inline" : "none";
-		//def suggestDisplay = (showValue) ? "none" : "inline";
-		def spanDisplay = "none";
+		// def showValue = (value) ? true : false;
+		// def spanDisplay = (showValue) ? "inline" : "none";
+		// def suggestDisplay = (showValue) ? "none" : "inline";
+		// def spanDisplay = "none";
 		def suggestDisplay = "inline";
 		
 		def html = """

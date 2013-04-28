@@ -238,7 +238,7 @@ class SelectTagLib {
 	}
 
 	def selectShipmentOrigin = { attrs,body ->
-		def currentLocation = Location.get(session?.warehouse?.id)
+		// def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getShipmentOrigins().sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -247,7 +247,7 @@ class SelectTagLib {
 	}
 
 	def selectShipmentDestination = { attrs,body ->
-		def currentLocation = Location.get(session?.warehouse?.id)
+		// def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getShipmentDestinations().sort { it?.name?.toLowerCase() } ;
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'

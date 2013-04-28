@@ -107,7 +107,7 @@ class CategorySelectTagLib {
 		def value = attrs.value
 		//def cname = attrs.name
 		def cname = "product.id"
-		def isChecked, ht, wd, style, html
+		// def isChecked, ht, wd, style, html
 
 		//  sets the style to override height and/or width if either of them
 		//  is specified, else the default from the CSS is taken

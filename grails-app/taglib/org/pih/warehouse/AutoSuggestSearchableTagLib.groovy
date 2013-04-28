@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse
 
-import java.text.SimpleDateFormat;
+// import java.text.SimpleDateFormat;
 
 class AutoSuggestSearchableTagLib {
 		
@@ -24,10 +24,10 @@ class AutoSuggestSearchableTagLib {
 		def minLength = (attrs.minLength) ?: 1;
 		def jsonUrl = (attrs.jsonUrl) ?: "";
 
-		def showValue = (valueName && valueId) ? true : false;
-		//def spanDisplay = (showValue) ? "inline" : "none";
-		//def suggestDisplay = (showValue) ? "none" : "inline";
-		def spanDisplay = "none";
+		// def showValue = (valueName && valueId) ? true : false;
+		// def spanDisplay = (showValue) ? "inline" : "none";
+		// def suggestDisplay = (showValue) ? "none" : "inline";
+	    // def spanDisplay = "none";
 		def suggestDisplay = "inline";
 		
 		def html = """

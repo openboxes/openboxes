@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse
 
-import java.text.SimpleDateFormat
+// import java.text.SimpleDateFormat
 
 class InventoryTagLib {
 	
@@ -18,11 +18,11 @@ class InventoryTagLib {
 		def name = attrs.name
 		
 		def onSelectCallback = attrs.onSelectCallback;
-		def width = (attrs.width) ? attrs.width : "100px";
-		def minLength = (attrs.minLength) ? attrs.minLength : 1;
+		// def width = (attrs.width) ? attrs.width : "100px";
+		// def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def searchUrl = (attrs.searchUrl) ? attrs.searchUrl : "";
 		
-		def spanDisplay = "";
+		// def spanDisplay = "";
 		def suggestDisplay = "inline";
 		
 		def html = """

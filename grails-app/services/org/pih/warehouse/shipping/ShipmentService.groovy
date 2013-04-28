@@ -15,7 +15,7 @@ import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+// import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 class ShipmentService {
 
@@ -1211,7 +1211,7 @@ class ShipmentService {
 				}
 				else {
 					log.info("Creating new shipment item ...");
-					def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+					// def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
 					shipmentItem = new ShipmentItem(shipment: it.shipment, container: it.container, 
 						inventoryItem: it.inventoryItem, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
 					addToShipmentItems(shipmentItem, it.shipment);

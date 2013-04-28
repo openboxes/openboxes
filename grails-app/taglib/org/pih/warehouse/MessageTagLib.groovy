@@ -20,7 +20,7 @@ class MessageTagLib {
 	def messageSource
 	
 	def message = { attrs, body ->		
-		long startTime = System.currentTimeMillis()
+		// long startTime = System.currentTimeMillis()
 		def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 		
 		//if (!flash.localizations) {

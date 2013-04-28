@@ -9,8 +9,8 @@
 **/ 
 package org.pih.warehouse.core;
 
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
+// import java.text.DecimalFormat
+// import java.text.SimpleDateFormat
 
 class LocationService {
 	
