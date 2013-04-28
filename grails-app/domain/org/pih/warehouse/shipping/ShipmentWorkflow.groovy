@@ -10,7 +10,7 @@
 package org.pih.warehouse.shipping
 
 import java.io.Serializable;
-import java.util.Date;
+// import java.util.Date;
 
 class ShipmentWorkflow implements Serializable {
 

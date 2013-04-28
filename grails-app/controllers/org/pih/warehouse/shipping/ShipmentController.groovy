@@ -587,10 +587,10 @@ class ShipmentController {
 				
 				container.shipmentItems.each { 
 					// def shipmentItemCopy = new ShipmentItem(
-					product: it.product, 
-					quantity: it.quantity,  
-					recipient: it.recipient,
-					container: containerCopy);
+					//product: it.product,
+					//quantity: it.quantity,
+					//recipient: it.recipient,
+					//ontainer: containerCopy);
 					//containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
 					containerCopy.shipment.addToShipmentItems(shipmentItem).save(flush:true);
 				}    		

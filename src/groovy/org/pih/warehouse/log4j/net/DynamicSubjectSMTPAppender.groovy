@@ -6,7 +6,7 @@ import org.apache.log4j.helpers.LogLog
 import org.apache.log4j.net.SMTPAppender
 import org.apache.log4j.spi.LoggingEvent
 
-import java.util.Date;
+// import java.util.Date;
 
 import javax.mail.Multipart;
 import javax.mail.Transport;

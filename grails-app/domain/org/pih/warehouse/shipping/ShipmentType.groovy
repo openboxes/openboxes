@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import java.util.Date;
+// import java.util.Date;
 
 /**
  * Represents the type of shipment (Sea, Air, Suitcase)
