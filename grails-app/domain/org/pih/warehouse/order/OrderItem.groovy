@@ -16,7 +16,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-import java.util.Date
+// import java.util.Date
 
 class OrderItem implements Serializable {
 	

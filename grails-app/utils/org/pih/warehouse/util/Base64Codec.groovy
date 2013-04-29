@@ -12,7 +12,7 @@ package org.pih.warehouse.util
 import java.security.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
-import sun.misc.BASE64Decoder;
+// import sun.misc.BASE64Decoder;
 
 
 class Base64Codec {

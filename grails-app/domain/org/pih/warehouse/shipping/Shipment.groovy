@@ -14,7 +14,7 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.receiving.Receipt
 
-import java.io.Serializable;
+// import java.io.Serializable;
 
 class Shipment implements Comparable, Serializable {
 	
@@ -330,9 +330,7 @@ class Shipment implements Comparable, Serializable {
 	 * Clones the specified container
 	 */
 	void cloneContainer(Container container, Integer quantity) {
-		def newContainer = new Container(
-			
-		)
+		// def newContainer = new Container()
 	}
 	
 	Float totalWeightInKilograms() {

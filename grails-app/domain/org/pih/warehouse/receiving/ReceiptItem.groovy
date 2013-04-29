@@ -14,7 +14,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
-import java.util.Date
+// import java.util.Date
 
 class ReceiptItem implements Comparable, Serializable {
 	

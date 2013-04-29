@@ -16,7 +16,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment;
 
-import java.util.Date
+// import java.util.Date
 
 /**
  *  Represents a unit of work completed within a single warehouse.  A

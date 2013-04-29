@@ -11,7 +11,7 @@ package org.pih.warehouse.util
 
 import java.security.MessageDigest
 import sun.misc.BASE64Encoder
-import sun.misc.CharacterEncoder
+// import sun.misc.CharacterEncoder
 
 class PasswordCodec {
 	static encode = { String str -> 

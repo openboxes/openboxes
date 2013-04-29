@@ -14,7 +14,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-import java.io.Serializable;
+// import java.io.Serializable;
 
 @Validateable
 class OrderItemCommand  implements Serializable {

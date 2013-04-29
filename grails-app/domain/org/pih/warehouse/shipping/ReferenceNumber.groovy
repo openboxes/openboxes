@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import java.io.Serializable;
+// import java.io.Serializable;
 
 class ReferenceNumber implements Serializable{
 

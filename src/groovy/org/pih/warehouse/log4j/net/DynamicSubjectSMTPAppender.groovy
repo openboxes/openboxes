@@ -29,7 +29,7 @@ public class DynamicSubjectSMTPAppender extends SMTPAppender {
 			//ThreadGroupRenderer stackTraceRenderer = new ThreadGroupRenderer();
 			//println("First 100 Chars of Stack Trace: " + stackTraceRenderer.(cb.get(cb.length()-1).getMessage()).substring(0,99));
 			int length = cb.length()
-			def message = cb.get(length-1).getMessage()
+			// def message = cb.get(length-1).getMessage()
 			
 			StringBuffer sbuf = new StringBuffer();
 			String t = layout.getHeader();
