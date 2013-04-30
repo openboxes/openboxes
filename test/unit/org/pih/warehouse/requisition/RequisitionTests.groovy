@@ -72,7 +72,7 @@ class RequisitionTests extends GrailsUnitTestCase {
 
     @Test
     void compareTo_shouldSortByOriginTypeCommodityClassDateCreated() {
-        def justin = new Person(id:"1", firstName:"Justin", lastName:"Miranda")
+        // def justin = new Person(id:"1", firstName:"Justin", lastName:"Miranda")
         def boston = new Location(id: "bos", name:"Boston")
         def miami = new Location(id: "mia", name:"Miami")
         def today = new Date()
@@ -96,8 +96,9 @@ class RequisitionTests extends GrailsUnitTestCase {
         def requisition12 = new Requisition(id: "12", dateCreated: yesterday)
         def requisition13 = new Requisition(id: "13", dateCreated: today)
 
-        def equal = 0, firstWins = 1, secondWins = -1
-        assertEquals equal, requisition1 <=> requisition1
+        // def equal1 = 0,
+        def firstWins = 1 //, secondWins = -1
+        // assertEquals equal1, requisition1 <=> requisition1
         assertEquals firstWins, requisition1 <=> requisition2
         assertEquals firstWins, requisition3 <=> requisition4
 

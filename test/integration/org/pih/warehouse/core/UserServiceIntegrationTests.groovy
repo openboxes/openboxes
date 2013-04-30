@@ -1,7 +1,7 @@
 package org.pih.warehouse.core
 
 import grails.test.*
-import org.pih.warehouse.auth.AuthService
+// import org.pih.warehouse.auth.AuthService
 
 import testutils.DbHelper;
 
@@ -34,8 +34,8 @@ class UserServiceIntegrationTests extends GroovyTestCase{
 		assertFalse "Should not contain inactive users with ROLE_ADMIN", activeAdmins.contains(adminUser)
 		assertEquals 1, activeAdmins.size()
 		activeAdmins.each { admin -> 			
-			assert "Should have ROLE_ADMIN", admin.roles.contains(roleAdmin)
-			assert "Should be active", admin.active
+			assertTrue "Should have ROLE_ADMIN", admin.roles.contains(roleAdmin)
+			assertTrue "Should be active", admin.active
 		}
 		
 		

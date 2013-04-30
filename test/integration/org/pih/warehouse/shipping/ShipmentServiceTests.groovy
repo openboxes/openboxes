@@ -146,7 +146,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 		printShipment("After move", shipment1)
 		printShipment("After move", shipment2)
 
-		def testPallet = Container.findByName("Pallet 1")
+		// def testPallet = Container.findByName("Pallet 1")
 		assertEquals shipment2, pallet1.shipment
 				
 		// Assertion fails because the moveContainer method simply changes the 

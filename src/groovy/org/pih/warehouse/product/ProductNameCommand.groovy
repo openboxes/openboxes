@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.product;
 
-import java.io.Serializable;
+// import java.io.Serializable;
 
 class ProductNameCommand implements Serializable {
 	String name

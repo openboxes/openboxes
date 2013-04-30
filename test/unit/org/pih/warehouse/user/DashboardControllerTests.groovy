@@ -11,7 +11,7 @@ package org.pih.warehouse.user
 import org.pih.warehouse.core.Location;
 
 import grails.test.*
-import grails.converters.JSON
+// import grails.converters.JSON
 
 class DashboardControllerTests extends ControllerUnitTestCase {
 	

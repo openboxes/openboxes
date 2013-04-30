@@ -7,7 +7,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
-import org.springframework.mock.web.MockHttpServletResponse
+// import org.springframework.mock.web.MockHttpServletResponse
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.picklist.*
@@ -39,7 +39,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.params.id = requisition.id
         controller.session.warehouse = myLocation
 
-        def model = controller.edit()
+        // def model = controller.edit()
 
         // Removed locations from the model in edit action
         //assert model.locations[0] == location3
@@ -158,7 +158,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
         def requisition = new Requisition(id: "1234", name: "jim", origin: location1, destination: location2, requestedBy:person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1) )
         mockDomain(Requisition, [requisition])
-        int oldSize = Requisition.count()
+        // int oldSize = Requisition.count()
 
         controller.params.id = "1234"
         controller.delete()
@@ -315,7 +315,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.metaClass.warehouse = stubMessager;
 
         controller.params.id = "do not exist"
-        def result = controller.show()
+        // def result = controller.show()
 
         assert redirectArgs.action == "list"
         assert controller.flash.message == "do not exist"

@@ -12,7 +12,7 @@ package org.pih.warehouse.shipping
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 
-import java.io.Serializable
+// import java.io.Serializable
 
 class ItemListCommand implements Serializable {
 	

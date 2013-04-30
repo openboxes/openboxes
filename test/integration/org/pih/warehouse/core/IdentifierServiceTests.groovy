@@ -1,10 +1,10 @@
 package org.pih.warehouse.core
 
-import groovy.util.GroovyTestCase;
+// import groovy.util.GroovyTestCase;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test
-import com.dumbster.smtp.SimpleSmtpServer
+// import com.dumbster.smtp.SimpleSmtpServer
 
 class IdentifierServiceTests extends GroovyTestCase{
   

@@ -16,9 +16,9 @@ class OrderServiceTests extends GroovyTestCase {
 	protected void setUp() {
 		
 		def locationType = new LocationType(name: "Depot").save(flush:true)
-		def origin = new Location(name: "Origin", locationType: locationType).save(flush:true)
-		def destination = new Location(name: "Destination", locationType: locationType).save(flush:true)
-		def orderer = DbHelper.createAdmin("Justin", "Miranda", "justin.miranda@gmail.com", "justin.miranda", "password", true)
+	//	def origin = new Location(name: "Origin", locationType: locationType).save(flush:true)
+	//	def destination = new Location(name: "Destination", locationType: locationType).save(flush:true)
+	//	def orderer = DbHelper.createAdmin("Justin", "Miranda", "justin.miranda@gmail.com", "justin.miranda", "password", true)
 	}
 
 	@Test

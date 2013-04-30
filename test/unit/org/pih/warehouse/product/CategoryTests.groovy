@@ -11,7 +11,7 @@ package org.pih.warehouse.product
 
 import grails.test.GrailsUnitTestCase
 import org.junit.Test
-import org.pih.warehouse.inventory.InventoryItem
+// import org.pih.warehouse.inventory.InventoryItem
 
 class CategoryTests extends GrailsUnitTestCase {
 
@@ -61,7 +61,7 @@ class CategoryTests extends GrailsUnitTestCase {
     @Test
     void getRootCategory_shouldGetRootCategoryByIsRoot() {
         //def rootCategory = Category.getRootCategory()
-        def newRootCategory = new Category(name: "E", parentCategory: null, isRoot: true).save(failOnError: true)
+        // def newRootCategory = new Category(name: "E", parentCategory: null, isRoot: true).save(failOnError: true)
         def rootCategory = Category.getRootCategory()
         assertNotNull rootCategory
         assertEquals "E", rootCategory.name

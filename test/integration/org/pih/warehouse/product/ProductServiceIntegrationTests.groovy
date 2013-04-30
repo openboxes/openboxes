@@ -1,12 +1,12 @@
 package org.pih.warehouse.product
 
-import org.apache.commons.lang.StringUtils
+// import org.apache.commons.lang.StringUtils
 import org.junit.Test;
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
+// import org.pih.warehouse.core.Location
+// import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.core.User;
+// import org.pih.warehouse.core.User;
 
 import testutils.DbHelper
 
@@ -200,7 +200,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Test
 	void getDelimiter_shouldDetectCommaDelimiter() {
-		def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
+		// def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed description","EA","Acme","Brand X","ACME-249248","Vendor Y","Y-1284","Sudafed","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 		def delimiter = productService.getDelimiter(csv)
@@ -393,9 +393,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		
 		def popularTagMap = productService.getPopularTags()
 		
-		def expectedProduct = Product.findByName("Ibuprofen 200mg tablet")
+	// 	def expectedProduct = Product.findByName("Ibuprofen 200mg tablet")
 		def expectedTags = ["favorite", "fever reducer", "nsaid", "pain", "pain reliever"]
-		def excludedTags = ["tagwithnoproducts"]
+	//	def excludedTags = ["tagwithnoproducts"]
 		
 		
 		println popularTagMap
@@ -493,7 +493,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
         // Should have only created the tag once
         def sameTags = Tag.findByTag("sametag")
-        assert 1, sameTags.size()
+        assertEquals 1, sameTags.size()
 
         // Check that both products have one instance of the tag
         assert ibuprofen.tagsToString().contains("sametag")

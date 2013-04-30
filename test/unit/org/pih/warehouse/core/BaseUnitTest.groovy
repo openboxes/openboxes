@@ -15,7 +15,7 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem 
 import org.pih.warehouse.inventory.TransactionCode;
 import org.pih.warehouse.inventory.TransactionType 
-import org.pih.warehouse.core.Location 
+// import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product 
 

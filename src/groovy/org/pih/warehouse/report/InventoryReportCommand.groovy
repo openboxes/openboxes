@@ -13,7 +13,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-import java.util.HashSet;
+// import java.util.HashSet;
 class InventoryReportCommand {
 
 	Product product

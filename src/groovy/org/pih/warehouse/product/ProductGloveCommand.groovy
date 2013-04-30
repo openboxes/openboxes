@@ -8,7 +8,7 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 package org.pih.warehouse.product;
-import java.io.Serializable;
+// import java.io.Serializable;
 
 class ProductGloveCommand implements Serializable {
 	

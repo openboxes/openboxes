@@ -3,7 +3,7 @@ package org.pih.warehouse
 import grails.test.ControllerUnitTestCase
 import org.pih.warehouse.product.*
 import grails.converters.JSON
-import org.pih.warehouse.requisition.RequisitionService
+//import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.core.*
@@ -16,8 +16,8 @@ class JsonControllerTests extends ControllerUnitTestCase {
         def bostonInventory = new Inventory(id: "bostonInventory")        
         def location = new Location(name: "boston", id: "1234", inventory: bostonInventory)
         mockDomain(Location, [location])
-        def group1 = new ProductGroup(id: "group1", description: "painkiller")
-        def group2 = new ProductGroup(id: "group2", description: "painLight")
+     //   def group1 = new ProductGroup(id: "group1", description: "painkiller")
+     //   def group2 = new ProductGroup(id: "group2", description: "painLight")
         def product11 = new Product(id: "product11", name: "sophin 2500mg", productCode: "ab11")
         def product12 = new Product(id: "product12", name: "boo killer", productCode: "ab12")
         def product21 = new Product(id: "product21", name: "foo killer", productCode: "ab21")

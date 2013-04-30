@@ -4,9 +4,9 @@ import grails.test.GrailsUnitTestCase
 
 import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService;
+// import org.pih.warehouse.inventory.InventoryService;
 import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.product.Category
+// import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class RequisitionItemTests extends GrailsUnitTestCase {

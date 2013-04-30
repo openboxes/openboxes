@@ -1,9 +1,9 @@
 package org.pih.warehouse.requisition
 import org.pih.warehouse.core.*
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.Transaction
+// import org.pih.warehouse.inventory.Inventory
+// import org.pih.warehouse.inventory.InventoryItem
+// import org.pih.warehouse.inventory.InventoryService
+// import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.*
 import grails.test.GrailsUnitTestCase
 

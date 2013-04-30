@@ -101,10 +101,10 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
 
     public void test_moveItem_shouldMoveWithNoDestination() {
         
-		assert 1, Product.count()
-		assert 1, Shipment.count()
-		assert 3, Container.count()
-		assert 2, InventoryItem.count()
+		assertEquals 1, Product.count()
+        assertEquals 1, Shipment.count()
+        assertEquals 3, Container.count()
+        assertEquals 2, InventoryItem.count()
 		
 		def quantityInContainerOne = shipmentItemContainerOneProductALotABC.quantity
 

@@ -11,7 +11,7 @@ package org.pih.warehouse.user
 
 import org.junit.Test
 import org.pih.warehouse.core.User;
-import java.util.Locale;
+// import java.util.Locale;
 
 import grails.test.*
 
