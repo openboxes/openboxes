@@ -16,10 +16,10 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         requisition.save()
         assertTrue requisition.hasErrors()
         println requisition.errors
-        assertEquals 4, requisition.errors.errorCount
-        assertTrue requisition.errors.hasFieldErrors("commodityClass")
-        assertTrue requisition.errors.hasFieldErrors("origin")
+        assertEquals 3, requisition.errors.errorCount
+        //assertTrue requisition.errors.hasFieldErrors("commodityClass")
         assertTrue requisition.errors.hasFieldErrors("destination")
+        assertTrue requisition.errors.hasFieldErrors("origin")
         assertTrue requisition.errors.hasFieldErrors("requestedBy")
     }
 

@@ -54,13 +54,6 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         super.tearDown()
     }
 
-
-    @Test
-    void sort() {
-        fail("Not implemented yet")
-
-    }
-
     @Test
     void constructor() {
         def requisitionItem = new RequisitionItem()

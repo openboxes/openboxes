@@ -1,5 +1,6 @@
 package org.pih.warehouse.requisition
 
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.*
 // import org.pih.warehouse.inventory.Inventory
@@ -19,13 +20,13 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		super.tearDown()
 	}
 
-    @Test
+    @Ignore
     void createNewRequisitionFromTemplate() {
         fail("Not implemented yet")
     }
 
 
-    @Test
+    @Ignore
     void issueRequisition_shouldCreateNewTransactions() {
         fail("Not implemented yet")
     }

@@ -39,6 +39,7 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
         super.setUp()
 
         productA = new Product(id: "productIdA", name: "Product A")
+        mockDomain(Product, [productA])
 
         shipment = new Shipment(id: "shipmentId")
         mockDomain(Shipment, [shipment]);

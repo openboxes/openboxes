@@ -188,6 +188,7 @@ class OrderService {
 			return order;
 		}
 		else {
+            println order.errors
 			throw new OrderException(message: "Unable to save order due to errors", order: order)
 		}
 	}
