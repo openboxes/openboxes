@@ -39,9 +39,15 @@
 				<div class="action-menu-item">
 					<g:link controller="requisition" action="editHeader" id="${requisition?.id}">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
-						&nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition')}
+						&nbsp;${warehouse.message(code: 'requisition.editHeader.label', default: 'Edit requisition')}
 					</g:link>		
 				</div>
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="edit" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition items')}
+                    </g:link>
+                </div>
                 <div class="action-menu-item">
                     <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
@@ -75,9 +81,9 @@
                         --%>
 						<g:if test="${requisition.status == RequisitionStatus.CANCELED }">
 							<div class="action-menu-item">
-								<g:link controller="requisition" action="uncancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">
+								<g:link controller="requisition" action="undoCancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">
 									<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />
-									&nbsp;${warehouse.message(code: 'requisition.uncancel.label', default: 'Un-cancel requisition')}
+									&nbsp;${warehouse.message(code: 'requisition.undoCancel.label', default: 'Undo cancel requisition')}
 								</g:link>				
 							</div>
 						</g:if>
@@ -98,6 +104,12 @@
 			                    &nbsp;${warehouse.message(code: 'request.delete.label', default: 'Delete requisition')}
 			                </g:link>
 			            </div>
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="rollback" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
+                                &nbsp;${warehouse.message(code: 'request.rollback.label', default: 'Rollback requisition')}
+                            </g:link>
+                        </div>
 		            </g:isUserAdmin>
 					
 					<%-- 

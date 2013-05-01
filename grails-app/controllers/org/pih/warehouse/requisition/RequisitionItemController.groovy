@@ -9,7 +9,13 @@
 **/ 
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.core.Location;
+import grails.validation.ValidationException
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductPackage;
 
 class RequisitionItemController {
 
@@ -142,15 +148,156 @@ class RequisitionItemController {
 			redirect(controller: "requisition", action: "review", id: requisition?.id)
         }
     }
-	
-	def cancel = {
+
+
+    /** ========================================================================================================================= */
+
+
+
+    def changeQuantity = {
+        log.info "change quantity " + params
+        def requisition = Requisition.get(params.id)
+        def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
+        def productPackage = ProductPackage.get(params?.productPackage?.id)
+        try {
+            requisitionItem.changeQuantity(params.quantity as int, productPackage, params.reasonCode, params.comments);
+        } catch(ValidationException e) {
+            requisitionItem.errors = e.errors
+            flash.errors = e.errors
+        }
+
+        // If there are errors we want to render the review page with those errors
+        if (requisitionItem.hasErrors()) {
+            log.error("There are errors: " + requisitionItem.errors)
+            redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id,
+                    params:['requisitionItem.id': requisitionItem.id,actionType:params.actionType])
+            //render(view: "../requisition/review", model: [requisition:requisition, selectedRequisitionItem: requisitionItem])
+            return;
+        }
+        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
+    }
+
+    /**
+     *  Allow user to cancel the given requisition item.
+     */
+    def cancelQuantity = {
+        log.info "cancel quantity = " + params
+        def requisitionItem = RequisitionItem.get(params.id)
+        if (requisitionItem) {
+
+            try {
+                requisitionItem.cancelQuantity(params.reasonCode, params.comments)
+            } catch(ValidationException e) {
+                requisitionItem.errors = e.errors
+                flash.errors = e.errors
+            }
+
+            // If there are errors we want to render the review page with those errors
+            if (requisitionItem.hasErrors()) {
+                def redirectAction = params?.redirectAction ?: "review"
+                redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id,
+                        params:['requisitionItem.id': requisitionItem.id,actionType:params.actionType])
+                return;
+            }
+
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+            redirect(controller: "requisition", action: "list")
+            return
+        }
+        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
+    }
+
+    /**
+     *  Allow user to approve the given requisition item.
+     */
+    def approveQuantity = {
+        log.info "approve quantity = " + params
+        def requisitionItem = RequisitionItem.get(params.id)
+        if (requisitionItem) {
+            requisitionItem.approveQuantity()
+            def redirectAction = params?.redirectAction ?: "review"
+            // params:['requisitionItem.id':requisitionItem.id]
+            redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id)
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+            redirect(controller: "requisition", action: "list")
+        }
+    }
+    /**
+     * Allow user to undo changes made during the review process.
+     */
+    def undoChanges = {
+        log.info "cancel quantity = " + params
+        def requisitionItem = RequisitionItem.get(params.id)
+        if (requisitionItem) {
+            requisitionItem.undoChanges()
+            //requisitionItem.save();
+            def redirectAction = params?.redirectAction ?: "review"
+            // For now we don't need to choose the selected requisition item (e.g. params:['requisitionItem.id':requisitionItem.id])
+            redirect(controller: "requisition", action: redirectAction,
+                    id: requisitionItem?.requisition?.id)
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+            redirect(controller: "requisition", action: "list")
+        }
+    }
+
+    /**
+     * Allow user to choose substitute during the review process.
+     */
+    def chooseSubstitute = {
+        log.info "choose substitute " + params
+        def redirectAction = params?.redirectAction ?: "review"
+        def requisitionItem = RequisitionItem.get(params.id)
+        def product = Product.get(params.productId)
+        def productPackage = ProductPackage.get(params.productPackageId)
+        if (requisitionItem) {
+
+            try {
+                requisitionItem.chooseSubstitute(product, productPackage, params.quantity as int, params.reasonCode, params.comments)
+            } catch(ValidationException e) {
+                requisitionItem.errors = e.errors
+                flash.errors = e.errors
+            }
+
+            // If there are errors we want to render the review page with those errors
+            if (requisitionItem.hasErrors()) {
+                flash.message = "errors"
+
+
+                chain(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id,
+                        params:['requisitionItem.id': requisitionItem.id,actionType:params.actionType], model: [selectedRequisitionItem:requisitionItem])
+                return;
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+            redirect(controller: "requisition", action: "list")
+            return;
+        }
+        redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id)
+
+    }
+
+
+    /** ========================================================================================================================= */
+
+    /**
+     *
+     */
+	def cancelPicking = {
 		log.info "Cancel requisition item " + params
 		
 		def requisitionItem = RequisitionItem.get(params.id)
 		if (requisitionItem) {
-			requisitionItem.properties = params
+            requisitionItem.cancelQuantity(params.reasonCode, params.comments)
+			//requisitionItem.properties = params
 			//requisitionItem.quantityCanceled = requisitionItem.calculateQuantityRemaining()
-			requisitionItem.save(flush:true)
+			//requisitionItem.save(flush:true)
 			redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id , params:['requisitionItem.id':requisitionItem.id])
 		}
 		else { 
@@ -161,7 +308,8 @@ class RequisitionItemController {
     }
 
 
-    def uncancel = {
+    def undoCancelPicking = {
+        println params
 		def requisitionItem = RequisitionItem.get(params.id)
 		if (requisitionItem) {
 			requisitionItem.quantityCanceled = 0 
@@ -176,8 +324,104 @@ class RequisitionItemController {
 
 		}
 	}
-	
-	
-	
+
+    def undoCancelReviewing = {
+        println "Undo changes: " + params
+        def requisitionItem = RequisitionItem.get(params.id)
+        if (requisitionItem) {
+            requisitionItem.quantityCanceled = 0
+            requisitionItem.cancelComments = null
+            requisitionItem.cancelReasonCode = null
+            requisitionItem.save(flush:true)
+            redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id, params:['requisitionItem.id':requisitionItem.id])
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
+            redirect(controller: "requisition", action: "list")
+
+        }
+    }
+
+    def addAddition = {
+        log.info "add addition " + params
+        /*
+		def requisition = Requisition.get(params.id)
+		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+
+		def supplementalItem = new RequisitionItem(params)
+        supplementalItem.requisition = requisition
+        supplementalItem.parentRequisitionItem = requisitionItem
+		requisition.addToRequisitionItems(supplementalItem)
+		requisitionItem.addToRequisitionItems(supplementalItem)
+		if (!supplementalItem.hasErrors() && supplementalItem.save()) {
+			flash.message = "saved substitution item " + supplementalItem
+		}
+		*/
+        redirect(controller: "requisition", action: "review", id: requisition?.id)
+    }
+
+    def addSubstitution = {
+        log.info "add substitution " + params
+        /*
+		def requisition = Requisition.get(params.id)
+		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+		requisitionItem.cancelReasonCode = params.parentCancelReasonCode
+		requisitionItem.quantityCanceled = requisitionItem.quantity
+
+		def substitutionItem = new RequisitionItem(params)
+		substitutionItem.requisition = requisition
+		substitutionItem.parentRequisitionItem = requisitionItem
+		requisition.addToRequisitionItems(substitutionItem)
+		requisitionItem.addToRequisitionItems(substitutionItem)
+		if (!substitutionItem.hasErrors() && substitutionItem.save()) {
+			flash.message = "saved substitution item " + substitutionItem
+		}
+		*/
+        redirect(controller: "requisition", action: "review", id: requisition?.id)
+    }
+
+
+
+    def undoChangeQuantity = {
+        def requisition = Requisition.get(params.id)
+        def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
+
+        try {
+            requisitionItem.cancelComments = null
+            requisitionItem.cancelReasonCode = null
+            requisitionItem.quantityCanceled = 0
+            requisitionItem.requisitionItems.clear();
+            requisitionItem.save(flush: true)
+        } catch(Exception e) {
+            flash.message = "Unable to undo quantity change: " + e.message
+        }
+
+        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
+
+
+
+    }
+
+    def substitute = {
+        println "substitute " + params
+        def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+        def requisition = Requisition.get(params.id)
+        def picklist = Picklist.findByRequisition(requisition)
+
+        def inventoryItem = InventoryItem.get(params.inventoryItem.id)
+        if (!inventoryItem) {
+            flash.message = "Could not find inventory item with lot number '${params.lotNumber}'"
+        }
+        else {
+            def picklistItem = new PicklistItem()
+            picklistItem.inventoryItem = inventoryItem
+            picklistItem.requisitionItem = requisitionItem
+            picklistItem.quantity = Integer.valueOf(params.quantity)
+            picklist.addToPicklistItems(picklistItem);
+            picklist.save(flush:true)
+        }
+
+        chain(action: "pick", id: requisition.id, params: ['requisitionItem.id':requisitionItem.id])
+    }
 
 }

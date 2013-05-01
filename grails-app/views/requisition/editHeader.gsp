@@ -33,6 +33,21 @@
 				<g:hiddenField name="id" value="${requisition?.id }"/>
 			
 				<div id="requisition-header-details" class="dialog ui-validation expandable box">
+                    <h2>
+                        ${warehouse.message(code: 'requisition.editHeader.label', default: 'Edit requisition header')}
+
+                        <div class="right">
+                            <g:if test="${requisition?.id }">
+                                <g:link controller="requisition" action="edit" id="${requisition?.id }">
+                                    <warehouse:message code="default.button.cancel.label"/>
+                                </g:link>
+
+                            </g:if>
+                        </div>
+
+
+                    </h2>
+
 
 
                     <div class="yui-g">
@@ -46,18 +61,27 @@
                                             ${requisition.requestNumber}
                                         </td>
                                     </tr>
+                                    <g:isUserAdmin>
+                                        <tr class="prop">
+                                            <td class="name"><label><warehouse:message
+                                                    code="requisition.status.label" /></label></td>
+                                            <td class="value">
+                                                <g:selectRequisitionStatus name="status" value="${requisition.status}"/>
+                                            </td>
+                                        </tr>
+                                    </g:isUserAdmin>
                                     <tr class="prop">
                                         <td class="name"><label><warehouse:message
-                                                    code="requisition.type.label" /></label></td>
+                                                    code="requisition.requisitionType.label" /></label></td>
                                         <td class="value">
-                                           <g:selectRequisitionType name="type" value="${requisition?.type }" noSelection="['null':'']"/>
+                                           <g:selectRequisitionType name="type" value="${requisition?.type }" noSelection="['':'']" class="chzn-select-deselect"/>
                                         </td>
                                     </tr>
                                     <tr class="prop">
                                         <td class="name"><label><warehouse:message
                                                     code="requisition.commodityClass.label" /></label></td>
                                         <td class="value">
-                                            <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass }" noSelection="['null':'']"/>
+                                            <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass }" noSelection="['':'']" class="chzn-select-deselect"/>
                                         </td>
                                     </tr>
                                     <g:if test="${requisition.isWardRequisition()}">
@@ -68,7 +92,7 @@
                                                 </label>
                                             </td>
                                             <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                                <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
+                                                <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
                                                                         noSelection="['null':'']"/>
                                             </td>
                                         </tr>
@@ -81,7 +105,7 @@
                                                 </label>
                                             </td>
                                             <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                                <g:selectDepot name="origin.id" value="${requisition?.origin?.id}"
+                                                <g:selectDepot name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
                                                                noSelection="['null':'']"/>
                                             </td>
                                         </tr>
@@ -114,7 +138,7 @@
                                             </label>
                                         </td>
                                         <td class="value">
-                                            ${session?.warehouse?.name }
+                                            ${requisition?.destination?.name}
                                         </td>
                                     </tr>
                                     <tr class="prop">
@@ -181,14 +205,18 @@
 				</div>
 					
 				<div class="buttons">
-			
-					<button class="button" name="saveAndContinue">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-					
+
+                    <g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button">
+                        <warehouse:message code="default.button.back.label"/>
+                    </g:link>
+					<button class="button" name="saveAndContinue">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
+
+                    <%--
 					&nbsp;
 					<g:link controller="requisition" action="edit" id="${requisition?.id }">
 						<warehouse:message code="default.button.cancel.label"/>
 					</g:link>
-					
+                    --%>
 
 				</div>					
 			</g:form>

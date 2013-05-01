@@ -54,6 +54,8 @@
 					</div>
 				</g:if>
                 <div id="requisition-template-details" class="dialog ui-validation box">
+
+                    <h2>${warehouse.message(code:'requisition.chooseTemplate.label', default:'Choose stock requisition template')}</h2>
                     <table id="requisition-template-table">
 
                         <tbody>
@@ -110,9 +112,24 @@
                                             </g:each>
                                         </div>
                                     </g:each>
+                                    <g:unless test="${templates}">
+                                        <div class="center empty">
+                                            <warehouse:message code="requisitionTemplate.noPublishedTemplates.message"/>
+                                        </div>
+                                        <div class="center">
+                                            <g:isUserAdmin>
+                                                <g:link controller="requisitionTemplate" action="list" class="button">
+                                                    <warehouse:message code="requisitionTemplate.list.label"/>
+                                                </g:link>
+                                                <g:link controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']" class="button">
+                                                    <warehouse:message code="requisitionTemplate.create.label"/>
+                                                </g:link>
+
+                                            </g:isUserAdmin>
+                                        </div>
+                                    </g:unless>
                                 </td>
                             </tr>
-
                         </tbody>
                     </table>
                 </div>

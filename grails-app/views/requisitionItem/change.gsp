@@ -36,9 +36,7 @@
                     </div>
                     <div class="yui-u">
                         <div class="box">
-
-
-                            <h3>
+                            <h2>
                                 ${requisitionItemInstance?.product?.productCode} - ${requisitionItemInstance?.product?.name}
                                 <g:if test="${requisitionItemInstance?.productPackage}">
                                     (${requisitionItemInstance?.productPackage?.uom?.code}/${requisitionItemInstance?.productPackage?.quantity})
@@ -46,34 +44,35 @@
                                 <g:else>
                                     (EA/1)
                                 </g:else>
-                                <span>
-                                    <g:link controller="requisition" action="review" class="button" id="${requisitionItemInstance?.requisition?.id }">
-                                        <warehouse:message code="requisition.backToItems.label" default="Back to requisition items"/>
-                                    </g:link>
-                                </span>
-                            </h3>
-                            <br/>
+                            </h2>
                             <div>
-                                <span class="box">
+                                <div class="box">
                                     <label for="quantity"><warehouse:message code="requisitionItem.quantityRequested.label" default="Quantity requested" /></label>
+                                    <div>
                                     ${requisitionItemInstance?.quantity }
                                     <%--
                                     <g:textField name="quantity" class="text" size="10" value="${fieldValue(bean: requisitionItemInstance, field: 'quantity')}" />
                                     --%>
                                     ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
-                                </span>
-                                <span class="box">
+                                    </div>
+                                </div>
+                                <div class="box">
                                     <label for="quantity"><warehouse:message code="requisitionItem.quantityCanceled.label" default="Quantity canceled" /></label>
-                                    ${requisitionItemInstance?.quantityCanceled?:0 }
-                                    ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
-                                    ${requisitionItemInstance?.cancelReasonCode }
-                                </span>
 
-                                <span class="box">
+                                    <div>
+                                        ${requisitionItemInstance?.quantityCanceled?:0 }
+                                        ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+                                        ${requisitionItemInstance?.cancelReasonCode }
+                                    </div>
+                                </div>
+
+                                <div class="box">
                                     <label><warehouse:message code="default.quantityOnHand.label" default="Quantity on Hand" /></label>
-                                    ${quantityOnHand }
-                                    ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
-                                </span>
+                                    <div>
+                                        ${quantityOnHand }
+                                        ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+                                    </div>
+                                </div>
                             </div>
                             <br/>
 
@@ -91,6 +90,7 @@
                                     <g:each var="requisitionItem" in="${requisitionItemInstance?.requisitionItems }">
                                         <tr>
                                             <td>
+                                                ${requisitionItem?.product?.productCode }
                                             </td>
                                             <td>
                                                 ${requisitionItem?.product?.name }
@@ -131,7 +131,7 @@
                             </ul>
                             <div id="tabs-change">
                                 <g:if test="${!requisitionItemInstance?.quantityCanceled }">
-                                    <div class="box">
+                                    <div class="">
                                         <h3>${warehouse.message(code:'requisitionItem.changeQuantityOrPackageSize.label') }</h3>
                                         <div class="dialog">
                                             <g:form controller="requisition" action="changeQuantity">
@@ -248,19 +248,23 @@
                                         </g:form>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
+                    </div>
+                    <div class="buttons center">
+                        <g:link controller="requisition" action="review" class="button" id="${requisitionItemInstance?.requisition?.id }">
+                            <warehouse:message code="requisition.backToItems.label" default="Back to requisition items"/>
+                        </g:link>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 		<script>
 			$(document).ready(function() {				
 		    	
-                $(".tabs").tabs();
+                $(".tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
+                $(".tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
 		    	//$("#quantityOnHand").load('${request.contextPath}/json/getQuantityOnHand?location.id=${session.warehouse.id}&product.id=${requisitionItem?.product?.id}');
 		    	//$("#quantityAvailableToPromise").load('${request.contextPath}/json/getQuantityAvailableToPromise?location.id=${session.warehouse.id}&product.id=${requisitionItem?.product?.id}');
 		    	

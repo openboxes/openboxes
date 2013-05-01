@@ -273,11 +273,29 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
                         if(result.data.requisitionItems){
                           for(var idx in result.data.requisitionItems){
                             var localItem = self.requisition.findRequisitionItemByOrderIndex(result.data.requisitionItems[idx].orderIndex);
+                              console.log("idx");
+                              console.log(idx);
+                              console.log("result.data.requisitionItems[idx].orderIndex");
+                              console.log(result.data.requisitionItems[idx].orderIndex);
+                              console.log("localItem");
+                              console.log(localItem);
                             localItem.id(result.data.requisitionItems[idx].id);
                             localItem.version(result.data.requisitionItems[idx].version);
                           }
                         }
                         if(self.savedCallback) self.savedCallback();
+                    }
+                    else {
+                        var errorMessage = "Please fix the following error(s):\n"
+                        if (result.errors.errors) {
+                            for (var i=0; i<result.errors.errors.length; i++) {
+                                errorMessage += " * " + result.errors.errors[i].message + "\n";
+                            }
+                            alert(errorMessage);
+                        }
+                        else {
+                            alert("Unknown error.  Please try again.")
+                        }
                     }
                 },
                 error: function() {
@@ -287,6 +305,7 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
             });
         } catch (err) {
             printMessage("here is the err: " + err);
+            alert("There was an error saving requisition items " + err);
         }
 
     };
@@ -436,8 +455,8 @@ openboxes.requisition.Picklist.getNewer = function(serverData, localData){
 };
 
 window.printMessage = function(message) {
-    var html = $("<p>" + message + "</p>");
-    $("#debug").append(html);
+    //var html = $("<p>" + message + "</p>");
+    //$("#debug").append(html);
+    console.log(message);
 };
-
 

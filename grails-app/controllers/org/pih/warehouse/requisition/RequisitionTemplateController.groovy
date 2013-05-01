@@ -10,6 +10,14 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem;
+
+import grails.converters.JSON
+import grails.validation.ValidationException;
+
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product;
 
 class RequisitionTemplateController {
 
@@ -24,9 +32,13 @@ class RequisitionTemplateController {
     }
 
 	def list = {
+        def destination = Location.get(session.warehouse.id)
 		def requisitions = []		
-		requisitions = Requisition.findAllByIsTemplate(true)
-		render(view:"list", model:[requisitions: requisitions])
+		//requisitions = Requisition.findAllByIsTemplateAndDestination(true, destination)
+        requisitions = Requisition.findAllByIsTemplate(true)
+
+
+        render(view:"list", model:[requisitions: requisitions])
 	}
 
     def create = {
@@ -56,12 +68,49 @@ class RequisitionTemplateController {
             flash.message = "Requisition template has been created"
         }
         else {
-            flash.message = "there are errors"
+            //flash.message = "there are errors"
             render(view: "create", model: [requisition:  requisition])
             return;
         }
         redirect(action: "edit", id: requisition.id)
 	}
+
+    def publish = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            requisition.isPublished = true
+            if (!requisition.hasErrors() && requisition.save(flush: true)) {
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+                redirect(action:"list")
+            }
+            else {
+                render(view: "edit", model: [requisition: requisition])
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            redirect(action: "list")
+        }
+    }
+
+    def unpublish = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            requisition.isPublished = false
+            if (!requisition.hasErrors() && requisition.save(flush: true)) {
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+                redirect(action:"list")
+            }
+            else {
+                render(view: "edit", model: [requisition: requisition])
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            redirect(action: "list")
+        }
+    }
+
 
     def update = {
         def requisition = Requisition.get(params.id)
@@ -121,6 +170,46 @@ class RequisitionTemplateController {
         redirect(action: "list", id:params.id)
     }
 
+    def addToRequisitionItems = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            def productCodes = params.multipleProductCodes.split(",")
+            def processedProductCodes = []
+            def ignoredProductCodes = []
+            productCodes.each { productCode ->
+                def product = Product.findByProductCode(productCode.trim())
+                if (product) {
+                    def requisitionItem = requisition.requisitionItems.find { it.product = product }
+                    if (!requisitionItem) {
+                        requisitionItem = new RequisitionItem()
+                        requisitionItem.product = product
+                        requisitionItem.quantity = 1;
+                        requisitionItem.substitutable = false
+                        requisition.addToRequisitionItems(requisitionItem)
+                        requisition.save(flush: true)
+                        processedProductCodes << productCode
+                    }
+                    else {
+                        ignoredProductCodes << productCode
+                    }
+                }
+                else {
+                    ignoredProductCodes << productCode
+                }
+
+            }
+            flash.message = "Added requisition item with product codes " + processedProductCodes?:"none" + " (ignored: " + ignoredProductCodes + ")"
+
+
+
+        }
+
+        redirect(action: "edit", id: requisition.id)
+
+
+    }
+
+
     def removeFromRequisitionItems = {
         def requisition = Requisition.get(params.id)
 
@@ -135,6 +224,7 @@ class RequisitionTemplateController {
         redirect(action: "edit", id: requisition.id)
     }
 
+    /*
     def copy = {
         def requisition = Requisition.get(params.id)
 
@@ -144,6 +234,7 @@ class RequisitionTemplateController {
         }
 
     }
+    */
 
 
 	private List<Location> getDepots() {

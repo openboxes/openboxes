@@ -3,9 +3,91 @@ package org.pih.warehouse.requisition
 import grails.test.GrailsUnitTestCase
 import org.junit.Test
 import org.pih.warehouse.core.*
+import org.pih.warehouse.picklist.PicklistItem
 
 
 class RequisitionTests extends GrailsUnitTestCase {
+
+    @Test
+    void calculatePercentageCompleted_shouldBeNotCompleted() {
+        def requisition = new Requisition()
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem)
+        mockDomain(PicklistItem)
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 0))
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 0))
+        assertEquals 0, requisition.calculatePercentageCompleted()
+
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 999))
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 999))
+        assertEquals 0, requisition.calculatePercentageCompleted()
+
+    }
+
+    @Test
+    void calculatePercentageCompleted_shouldBeHalfCompleted() {
+        def requisition = new Requisition()
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem)
+        mockDomain(PicklistItem)
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 1000))
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 0))
+        assertEquals 50, requisition.calculatePercentageCompleted()
+    }
+
+    @Test
+    void calculatePercentageCompleted_shouldBeCompleted() {
+        def requisition = new Requisition()
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem)
+        mockDomain(PicklistItem)
+        requisition.addToRequisitionItems(new RequisitionItem(quantity: 1000, quantityCanceled: 1000))
+        assertEquals 100, requisition.calculatePercentageCompleted()
+    }
+
+
+
+    @Test
+    void newInstance_shouldCopyRequisitionAndRequisitionItems() {
+        def origin = new Location(name: "HUM")
+        def destination = new Location(name: "Boston")
+        def requestedBy = new User(username: "jmiranda")
+        def requisition = new Requisition(id:  "1", origin: origin, destination: destination, requestedBy: requestedBy,
+                type: RequisitionType.DEPOT_TO_DEPOT, commodityClass: CommodityClass.MEDICATION,
+                dateRequested: new Date(), requestedDeliveryDate: new Date())
+
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem)
+
+        requisition.addToRequisitionItems(new RequisitionItem(id: "1"))
+        requisition.addToRequisitionItems(new RequisitionItem(id: "2"))
+
+
+        def requisitionClone = requisition.newInstance()
+        assertNotNull requisitionClone
+        assertNotSame "1", requisitionClone.id
+        assertNotSame requisitionClone, requisition
+        assertEquals origin, requisitionClone.origin
+        assertEquals destination, requisitionClone.destination
+        assertEquals RequisitionType.DEPOT_TO_DEPOT, requisitionClone.type
+        assertEquals CommodityClass.MEDICATION, requisitionClone.commodityClass
+        assertEquals new Date().clearTime(), requisitionClone.dateRequested.clearTime()
+        assertEquals new Date().clearTime(), requisitionClone.requestedDeliveryDate.clearTime()
+        assertNull requisitionClone.requestedBy
+        assertEquals 2, requisitionClone.requisitionItems.size()
+
+    }
+
+    @Test
+    void newInstance_shouldReturnEmptyRequisition() {
+        def requisition = new Requisition()
+        mockDomain(Requisition, [requisition])
+        def requisitionClone = requisition.newInstance()
+
+        assertNotSame requisitionClone, requisition
+        assertEquals 0, requisitionClone.requisitionItems.size()
+    }
+
 
     void testDefaultValues(){
        def requisition = new Requisition()
@@ -92,9 +174,9 @@ class RequisitionTests extends GrailsUnitTestCase {
         def requisition9 = new Requisition(id: "9", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
         def requisition10 = new Requisition(id: "10", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
 
-        def requisition11 = new Requisition(id: "11", dateCreated: tomorrow)
-        def requisition12 = new Requisition(id: "12", dateCreated: yesterday)
-        def requisition13 = new Requisition(id: "13", dateCreated: today)
+        def requisition11 = new Requisition(id: "11", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: tomorrow)
+        def requisition12 = new Requisition(id: "12", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK,dateCreated: yesterday)
+        def requisition13 = new Requisition(id: "13", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: today)
 
         // def equal1 = 0,
         def firstWins = 1 //, secondWins = -1

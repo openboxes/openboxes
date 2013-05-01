@@ -9,36 +9,27 @@
  **/
 package org.pih.warehouse.requisition
 
-public enum CommodityClass {
-
-	CONSUMABLES(0),
-    MEDICATION(1),
-    MIXED(2),
-    COLD_CHAIN(3),
-	CONTROLLED_SUBSTANCE(4),
-	HAZARDOUS_MATERIAL(5),
+public enum RequisitionItemStatus {
+	PENDING(0),
+    APPROVED(1),
+    CHANGED(2),
+	CANCELED(3),
+	COMPLETED(4)
 
 	int sortOrder
 
-	CommodityClass(int sortOrder) {
+    RequisitionItemStatus(int sortOrder) {
 		[
 			this.sortOrder = sortOrder
 		]
 	}
 
-	static int compare(CommodityClass a, CommodityClass b) {
+	static int compare(RequisitionItemStatus a, RequisitionItemStatus b) {
 		return a.sortOrder <=> b.sortOrder
 	}
 
 	static list() {
-		[
-			CONSUMABLES,
-            MEDICATION,
-            MIXED,
-            COLD_CHAIN,
-			CONTROLLED_SUBSTANCE,
-			HAZARDOUS_MATERIAL
-		]
+		[ PENDING, APPROVED, CHANGED, CANCELED, COMPLETED ]
 	}
 
 	String toString() {

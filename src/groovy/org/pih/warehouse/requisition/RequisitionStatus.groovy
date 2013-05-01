@@ -11,13 +11,16 @@ package org.pih.warehouse.requisition
 
 public enum RequisitionStatus {
 	CREATED(1),
-	PICKING(2),
-	PICKED(3),
-	PENDING(4),
-	FULFILLED(5),
-	ISSUED(6),
-	RECEIVED(7),
-	CANCELED(8)
+    EDITING(2),
+    REVIEWING(3),
+	PICKING(4),
+	PICKED(5),
+	PENDING(6),
+	FULFILLED(7),
+    CONFIRMING(8),
+	ISSUED(9),
+	RECEIVED(10),
+	CANCELED(11)
 	
 	int sortOrder
 
@@ -28,11 +31,11 @@ public enum RequisitionStatus {
 	}
 	/* remove OPEN, FULFILLED */
 	static list() {
-		[ CREATED, PICKING, PICKED, PENDING, ISSUED, RECEIVED, CANCELED ]
+		[ CREATED, EDITING, REVIEWING, PICKING, PICKED, PENDING, CONFIRMING, ISSUED, RECEIVED, CANCELED ]
 	}
 
     static listAll() {
-        [ CREATED, PICKING, PICKED, PENDING, FULFILLED, ISSUED, RECEIVED, CANCELED ]
+        [ CREATED, EDITING, REVIEWING, PICKING, PICKED, PENDING, CONFIRMING, FULFILLED, ISSUED, RECEIVED, CANCELED ]
     }
 	
 	String toString() { return name() }

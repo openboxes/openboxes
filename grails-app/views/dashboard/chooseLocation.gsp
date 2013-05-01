@@ -31,23 +31,11 @@
 				
 				<g:form controller="dashboard" action="chooseLocation">
 					<div class="box">
-						<table>
-							<tbody>
-								<tr>
-									<td class="left middle">
-					    				<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
-										<span class="title middle">
-											${warehouse.message(code: 'dashboard.chooseLocation.label')}
-										</span>		
-									</td>
-								</tr>
-								<tr>
-									<td>
-										
-									</td>
-								</tr>
-							</tbody>
-						</table>
+                        <h2>
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
+                            ${warehouse.message(code: 'dashboard.chooseLocation.label')}
+                        </h2>
+                        <br/>
 						<div id="chooseLocationSelect">
 							<table>
 								<tbody>

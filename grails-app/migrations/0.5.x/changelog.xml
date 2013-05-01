@@ -37,5 +37,11 @@
     <include file="0.5.x/add-column-tag-is-active.xml"/>
     <include file="0.5.x/insert-role-assistant.xml"/>
     <include file="0.5.x/add-column-product-reconditioned.xml"/>
+    <include file="0.5.x/add-column-requisition-item-requisition-item-type.xml"/>
+    <include file="0.5.x/add-column-requisition-item-quantity-approved.xml"/>
+    <include file="0.5.x/add-column-requisition-item-audit-fields.xml"/>
 
+    <!--
+    <include file="0.5.x/create-table-reason-code.xml"/>
+    -->
 </databaseChangeLog>

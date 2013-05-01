@@ -572,9 +572,12 @@ class JsonController {
 		
 		def location = Location.get(params.warehouseId);
 		log.info ("warehouse: " + location);
-		def quantityMap = 
-			inventoryService.getQuantityForInventory(location?.inventory)		
-			
+		def quantityMap = [:]
+
+        if (false) {
+		    quantityMap = inventoryService.getQuantityForInventory(location?.inventory)
+        }
+
 		// FIXME Needed to create a new map with inventory item id as the index 
 		// in order to get the quantity below.  For some reason, the inventory item 
 		// object was getting toString()'d when used below as a key and therefore
@@ -625,7 +628,7 @@ class JsonController {
 					quantity: productQuantity,
                     productCode: product?.productCode,
 					value: product.id,
-					label: localizedName,
+					label: product?.productCode + " " + localizedName,
 					valueText: localizedName,
 					desc: product.description,
 					inventoryItems: inventoryItemList,
@@ -706,6 +709,52 @@ class JsonController {
 		}
 		render shipmentItem as JSON
 	}
+
+    def searchProductPackages = {
+
+        log.info "Search product packages " + params
+        def location = Location.get(session.warehouse.id);
+        def results = productService.searchProductAndProductGroup(params.term)
+        if (!results) {
+            results = productService.searchProductAndProductGroup(params.term, true)
+        }
+
+        def productIds = results.collect { it[0] }
+        def products = productService.getProducts(productIds as String[])
+
+        //def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
+        // To reference quantities ...
+        // quantities[productData[0]]
+        def result = []
+        def value = ""
+        def productPackageName = ""
+        products.each { product ->
+            //println "productData " + productData
+            //if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
+            //result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
+            //result.add([id: productData[0], value: productData[2] + " - " + productData[1], type:"Product", quantity: null, group: ""])
+            productPackageName = "EA/1"
+            value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
+            value = value.trim()
+
+            // Add the EACH level items
+            result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
+
+            // Add the package level items
+            product.packages.each { pkg ->
+                productPackageName = pkg?.uom?.code + "/" + pkg?.quantity;
+                value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
+                value = value.trim()
+                result.add([id: product.id, value: value, type: "Product", quantity: null, group: null,
+                        productPackageId: pkg?.id, productPackageName: productPackageName, productPackageQty: pkg?.quantity])
+
+            }
+
+        }
+        println result
+        render result.sort { "${it.group}${it.value}" } as JSON
+    }
+
 
 
     def searchProduct = {

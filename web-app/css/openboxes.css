@@ -31,12 +31,20 @@ body {
 }
 
 a:link, a:visited, a:hover {
-    color: blue;
+    color: #666;
     /*font-weight: bold;*/
     /*font-size: 0.9em;*/ /* removed because it's distracting */
     /*text-decoration: underline;*/
-    text-decoration: none;	/* removed because we want to see underline */
+    text-decoration: none;	    /* removed because we do not want to see underline */
 }
+a:hover {
+    text-decoration: underline;
+}
+
+a.button:link,a.button:visited,a.button:hover {
+
+}
+
 
 h1 {
     font-weight: normal;
@@ -1054,6 +1062,10 @@ button.action-btn, button.previous, button.next {
     -moz-border-radius:20px;
     border-radius:20px;
 }
+.count.active {
+    background-color: #f3961c;
+    color: white;
+}
 
 
 .circle a {
@@ -1114,13 +1126,11 @@ button.action-btn, button.previous, button.next {
 li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 {
     color: #666;
-    font-size: 14px;
+    font-size: 1.2em;
     vertical-align: middle;
     padding: 5px 0px 2px;
     margin: 0px;
     margin-bottom: 5px;
-
-
     /*color: #008000;*//*green */
 }
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
@@ -1179,13 +1189,17 @@ a:hover {
 .fade {
     color: #aaa;
 }
+.empty {
+    line-height: 100px;
+    color: #aaa;
+}
 
 #chooseLocation {
-    width: 500px;
+    width: 1000px;
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -250px;
+    margin-left: -500px;
 }
 #chooseLocationSelect {
     max-height: 400px;
@@ -1205,7 +1219,7 @@ a:hover {
 }
 
 .loginField {
-    font-weight: none;
+    font-weight: bold;
 
 }
 
@@ -1418,6 +1432,8 @@ h2 {
     color: #666;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    font-weight: bold;
+
 }
 .category-header {
     font-size: 1.2em;
@@ -1488,7 +1504,7 @@ h2 {
 	padding: 0 0 0 10px;
 }
 */
-
+.chzn-select, .chzn-select-deselect { width: 100%; }
 
 .logo {
     /*
@@ -1823,6 +1839,7 @@ label { display: inline; text-decoration: none;}
 label.block { display: block;}
 fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; }
+.progressbar { width: 250px; height: 20px; }
 #progressbar {  padding: 10px; margin: 10px; }
 #progressbar .step { padding-left: 0; border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
 .step.selected { font-weight: bold; text-decoration: underline; background-color: #f7f7f7 /*#F8F7EF*/; }
@@ -1976,6 +1993,9 @@ img.photo_tiny {
     text-align: right;
 }
 
+/* =============================================================================
+   jquery tabs
+   ========================================================================== */
 
 /**
  * jquery tabs
@@ -1989,6 +2009,7 @@ img.photo_tiny {
 .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }
  */
+.ui-tabs .ui-tabs-panel { padding: 0; }
 
 
 #transactionLogTabs {
@@ -2090,7 +2111,9 @@ div.clear {
     clear: both;
 }
 
-/*requisition */
+/* =============================================================================
+   requisition.css
+   ========================================================================== */
 
 #requisition-header{
     padding: 0.5em;
@@ -2349,12 +2372,14 @@ blockquote {
     user-select: none;
 }
 
+/*
 #requisition-items tbody > tr:nth-child(even)        { background-color: #f7f7f7; }
 #requisition-items tbody > tr:nth-child(odd)        { background-color: #fff; }
 #requisition-items td { padding: 2px; margin: 0}
 #requisition-items input { border: 0}
 #requisition-items tbody > tr:nth-child(odd) input      { background-color: #fff; }
 #requisition-items tbody > tr:nth-child(even) input      { background-color: #f7f7f7; }
+*/
 
 table.requisition { border-collapse: collapse; }
 table.requisition td, table.requisition th { padding: 10px; border-right: 1px solid lightgrey; }
@@ -2373,6 +2398,33 @@ table.requisition td, table.requisition th { padding: 10px; border-right: 1px so
     -moz-box-sizing: border-box;
 }
 fieldset { padding: 5px; }
+
+
+tr.canceled, tr.canceled a {
+    /*text-decoration: line-through;*/
+    color: #aaa;
+    font-style: italic;
+}
+
+span.canceled, div.canceled {
+    text-decoration: line-through;
+    color: #ccc;
+
+}
+
+.requisition-number {
+    background-color: #f7f7f7;
+    color: black;
+    font-size: 1.3em;
+    padding: 1px;
+    border: 1px solid lightgrey;
+    margin: 1px;
+    font: bold;
+    border-radius: 0.2em;
+
+}
+
+
 
 /* ------------------------------------------
  * CSS3 GITHUB BUTTONS (Nicolas Gallagher)
@@ -2820,4 +2872,14 @@ ul.filter-list {
    wizard.css
    ========================================================================== */
 
+
+/* =============================================================================
+    Vertical Tabs
+   ========================================================================== */
+.ui-tabs-vertical { width: 55em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
 

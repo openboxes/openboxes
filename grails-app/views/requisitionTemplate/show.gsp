@@ -74,7 +74,7 @@
                                 </label>
                             </td>
                             <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                <g:selectLocation2 name="origin.id" value="${requisition?.origin?.id}"
+                                <g:selectLocation name="origin.id" value="${requisition?.origin?.id}"
                                     locationGroup="${session?.warehouse?.locationGroup}" noSelection="['null':'']"/>
                             </td>
                         </tr>

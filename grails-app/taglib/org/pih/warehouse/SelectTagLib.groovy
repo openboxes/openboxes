@@ -12,9 +12,17 @@ package org.pih.warehouse
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.RequisitionStatus;
+import org.pih.warehouse.shipping.Container;
+import org.pih.warehouse.shipping.Shipper;
+import org.springframework.beans.SimpleTypeConverter;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.requisition.CommodityClass
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipper
@@ -26,6 +34,14 @@ class SelectTagLib {
 	def locationService
 	def shipmentService
 
+
+    def selectReasonCode = { attrs, body ->
+        attrs.from = ReasonCode.listReasonCodesForRequisitionChange()
+        attrs.optionValue = { format.metadata(obj: it) }
+        out << g.select(attrs)
+    }
+
+
     def selectTag = { attrs, body ->
         attrs.from = Tag.list()
         attrs.multiple = true
@@ -34,18 +50,28 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectRequisitionStatus = { attrs, body ->
+        attrs.from = RequisitionStatus.list()
+        attrs.optionValue = { it?.name() }
+        out << g.select(attrs)
+
+    }
+
 
     def selectUnitOfMeasure = { attrs, body ->
         def product = Product.get(attrs?.product?.id)
         if (product.packages) {
             attrs.noSelection = ["null":"EA/1"]
+            //attrs.value = attrs.value
             attrs.from = product?.packages?.sort()
             attrs.optionKey = "id"
             attrs.optionValue = { it?.uom?.code + "/" + it.quantity + " -- " + it?.uom?.name }
             out << g.select(attrs)
         }
         else {
-            out << product.unitOfMeasure?:"EA/1"
+            attrs.noSelection = ["null":"EA/1"]
+            out << g.select(attrs)
+            //out << product.unitOfMeasure?:"EA/1"
 
         }
     }

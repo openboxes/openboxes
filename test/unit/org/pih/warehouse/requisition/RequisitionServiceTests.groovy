@@ -1,4 +1,6 @@
 package org.pih.warehouse.requisition
+
+import org.junit.Test
 import org.pih.warehouse.core.*
 // import org.pih.warehouse.inventory.Inventory
 // import org.pih.warehouse.inventory.InventoryItem
@@ -15,9 +17,21 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 	
 	protected void tearDown() {
 		super.tearDown()
-	}	
-	
-	void testCreateNewRequisition(){
+	}
+
+    @Test
+    void createNewRequisitionFromTemplate() {
+        fail("Not implemented yet")
+    }
+
+
+    @Test
+    void issueRequisition_shouldCreateNewTransactions() {
+        fail("Not implemented yet")
+    }
+
+
+    void testCreateNewRequisition(){
 		requisitionService.identifierService = [generateRequisitionIdentifier: { -> return "ABC-123" }]
 		mockDomain(Requisition, [])
 		mockDomain(RequisitionItem, [])
@@ -205,5 +219,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 
 		assert requisitionFromDb.status == RequisitionStatus.CANCELED
 	}
+
+
 }
 

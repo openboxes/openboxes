@@ -40,9 +40,9 @@
                 <g:if test="${requisition?.id}">
 
                     <div class="box">
-                        <h3>
+                        <h2>
                             <warehouse:message code="requisition.requisitionItems.label" default="Requisition items"/>
-                        </h3>
+                        </h2>
 
                         <table id="requisition-items" class="ui-validation-items"
                             data-bind="visible: requisition.requisitionItems().length">

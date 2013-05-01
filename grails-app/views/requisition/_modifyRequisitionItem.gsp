@@ -23,7 +23,7 @@
                     <div id="tabs-change">
                         <g:if test="${!selectedRequisitionItem?.quantityCanceled }">
                             <div class="box">
-                                <h3>${warehouse.message(code:'requisitionItem.changeQuantity.label') }</h3>
+                                <h2>${warehouse.message(code:'requisitionItem.changeQuantity.label') }</h2>
                                 <div class="dialog">
                                     <g:form controller="requisition" action="changeQuantity">
                                         <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
@@ -57,7 +57,7 @@
                     <div id="tabs-substitution">
                         <g:if test="${!selectedRequisitionItem?.quantityCanceled }">
                             <div class="box">
-                                <h3>${warehouse.message(code:'requisitionItem.addSubstitution.label') }</h3>
+                                <h2>${warehouse.message(code:'requisitionItem.addSubstitution.label') }</h2>
                                 <div class="dialog">
                                     <g:form controller="requisition" action="addSubstitution">
                                         <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
@@ -87,7 +87,7 @@
                     </div>
                     <div id="tabs-addition">
                         <div class="box">
-                            <h3>${warehouse.message(code:'requisitionItem.addAddition.label') }</h3>
+                            <h2>${warehouse.message(code:'requisitionItem.addAddition.label') }</h2>
                             <div class="dialog">
                                 <g:form controller="requisition" action="addAddition">
                                     <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>

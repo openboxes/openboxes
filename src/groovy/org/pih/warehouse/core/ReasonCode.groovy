@@ -31,7 +31,7 @@ package org.pih.warehouse.core;
 public enum ReasonCode {
 
     STOCKOUT(0),
-    STOCKLOW(1),
+    LOW_STOCK(1),
     EXPIRED(2),
     DAMAGED(3),
     CLINICAL_OVERRIDE(4),
@@ -39,7 +39,8 @@ public enum ReasonCode {
     PACKAGE_SIZE(6),
     CANCELED_BY_REQUESTER(7),
     COULD_NOT_LOCATE(8),
-    OTHER(9)
+    DIFFERENT_LOCATION(9),
+    OTHER(10)
 
 
     final Integer sortOrder
@@ -49,7 +50,7 @@ public enum ReasonCode {
     }
 	
 	static listReasonCodesForRequisitionChange() {
-		[STOCKOUT,STOCKLOW,EXPIRED,CLINICAL_OVERRIDE,REPLACED_BY_FORMULARY_ITEM,PACKAGE_SIZE,CANCELED_BY_REQUESTER,OTHER]
+		[STOCKOUT,LOW_STOCK,EXPIRED,CLINICAL_OVERRIDE,REPLACED_BY_FORMULARY_ITEM,PACKAGE_SIZE,CANCELED_BY_REQUESTER,DIFFERENT_LOCATION,OTHER]
 	}
 
     static listReasonCodesForPicklistChange() {

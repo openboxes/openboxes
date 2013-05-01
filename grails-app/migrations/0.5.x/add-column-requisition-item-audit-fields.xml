@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1366998651167-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition_item" columnName="created_by_id" />
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition_item">
+            <column name="created_by_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1366998651167-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition_item" columnName="updated_by_id" />
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition_item">
+            <column name="updated_by_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

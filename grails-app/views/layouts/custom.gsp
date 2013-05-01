@@ -314,8 +314,8 @@
 				$("#warehouseMenu").dialog({ 
 					autoOpen: true, 
 					modal: true, 
-					width: 600,
-					height: 400
+					width: 800,
+					height: 500
 				});
 			});
 			
