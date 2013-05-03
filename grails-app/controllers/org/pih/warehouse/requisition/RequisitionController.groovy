@@ -39,9 +39,19 @@ class RequisitionController {
         def requisitions = []
 		//requisitions = requisitionService.getRequisitions(session?.warehouse, origin, createdBy, requisition?.type, requisition?.status, requisition?.commodityClass, params.q, params)
         requisitions = requisitionService.getRequisitions(requisition, params)
+        def requisitionsMap = [:]
+
+        // Used to display the counts
+        def requisitionsLocal = Requisition.findAllByDestination(session.warehouse)
+        requisitionsLocal.groupBy { it.status }.each { k, v ->
+            requisitionsMap[k] = v.size()?:0
+        }
+        //requisitionsMap["createdByMe"] = requisitionsLocal.findAll { it.createdBy == session.user }.size()?:0
+        //requisitionsMap["updatedByMe"] = requisitionsLocal.findAll { it.updatedBy == session.user }.size()?:0
+        //requisitionsMap["submittedByMe"] = requisitionsLocal.findAll { it.requestedBy == session.user }.size()?:0
 
         //requisitions = requisitions.sort()
-        render(view:"list", model:[requisitions: requisitions])
+        render(view:"list", model:[requisitions: requisitions, requisitionsMap:requisitionsMap])
     }
 	
 	def listStock = {

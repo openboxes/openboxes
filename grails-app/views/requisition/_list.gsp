@@ -28,6 +28,12 @@
 			</th>
             <g:sortableColumn property="requestedBy" params="${pageParams}"
                               title="${warehouse.message(code: 'requisition.requestedBy.label', default: 'Requested by')}" />
+            <th>
+                <warehouse:message code="default.createdBy.label"/>
+            </th>
+            <th>
+                <warehouse:message code="default.updatedBy.label"/>
+            </th>
 
             <g:sortableColumn property="dateRequested" params="${pageParams}"
                               title="${warehouse.message(code: 'requisition.dateRequested.label', default: 'Date requested')}" />
@@ -95,9 +101,11 @@
                     ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
                     --%>
 				</td>
-				<td>${requisition.requestedBy}</td>
+				<td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
+                <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
+                <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
 
-                <td><format:datetime obj="${requisition.dateRequested}" format="MMM dd"/></td>
+                <td><format:date obj="${requisition.dateRequested}"/></td>
 
                 <%--
                 <td>${requisition.createdBy}</td>

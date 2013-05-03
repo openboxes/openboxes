@@ -101,6 +101,8 @@
                     </div>
                 </div>
                 <div class="yui-u">
+
+
                     <div class="buttonBar button-group">
                         <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
                             <warehouse:message code="default.all.label"/>
@@ -109,21 +111,26 @@
                             <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
                             <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
                                 <format:metadata obj="${requisitionStatus}"/>
+                                (${requisitionsMap[requisitionStatus]?:0 })
                             </g:link>
                         </g:each>
                     </div>
+                    <%--
                     <div class="buttonBar button-group">
                         <g:link controller="requisition" action="list" params="['requestedBy.id':session.user.id]" class="button">
                             ${warehouse.message(code:'requisitions.submittedByMe.label', default: 'Submitted by me')}
+                            (${requisitionsMap["submittedByMe"]?:0 })
                         </g:link>
                         <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="button">
                             ${warehouse.message(code:'requisitions.createdByMe.label', default: 'Created by me')}
+                            (${requisitionsMap["createdByMe"]?:0 })
                         </g:link>
                         <g:link controller="requisition" action="list" params="['updatedBy.id':session.user.id]" class="button">
                             ${warehouse.message(code:'requisitions.updatedByMe.label', default: 'Updated by me')}
+                            (${requisitionsMap["updatedByMe"]?:0 })
                         </g:link>
                     </div>
-
+                    --%>
 
 
                     <g:set var="pageParams" value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order]"/>
