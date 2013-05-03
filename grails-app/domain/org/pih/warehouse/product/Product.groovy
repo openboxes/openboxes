@@ -15,6 +15,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
@@ -281,6 +282,62 @@ class Product implements Comparable, Serializable {
         def location = Location.get(locationId)
         return InventoryLevel.findByProductAndInventory(this, location.inventory)
     }
+
+    def getStatus(String locationId, Integer currentQuantity) {
+        def status = ""
+        def inventoryLevel = getInventoryLevel(locationId)
+        def latestInventoryDate = latestInventoryDate(locationId)
+        println "Location " + locationId
+        println "Current quantity = " + currentQuantity
+        println "Status: " + inventoryLevel?.status
+        println "Latest inventory " + latestInventoryDate
+
+        if (inventoryLevel?.status == InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
+            if (currentQuantity <= 0) {
+                if (latestInventoryDate) {
+                    status = "STOCK_OUT"
+                }
+                else {
+                    status = "SUPPORTED_NON_INVENTORY"
+                }
+            }
+            else if (inventoryLevel?.maxQuantity && currentQuantity >= inventoryLevel?.maxQuantity) {
+                status = "OVERSTOCK"
+            }
+            else if (inventoryLevel?.minQuantity && currentQuantity <= inventoryLevel?.minQuantity) {
+                status = "LOW_STOCK"
+            }
+            else if (inventoryLevel?.reorderQuantity && currentQuantity <= inventoryLevel?.reorderQuantity ) {
+                status = "REORDER"
+            }
+            else {
+                status = "IN_STOCK"
+            }
+        }
+        else if (inventoryLevel?.status == InventoryStatus.NOT_SUPPORTED) {
+            status = "NOT_SUPPORTED"
+        }
+        else if (inventoryLevel?.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
+            status = "SUPPORTED_NON_INVENTORY"
+        }
+        else {
+            status = "SUPPORTED"
+        }
+
+        return status;
+
+    }
+
+
+    def getQuantityOnHand(Integer locationId) {
+
+    }
+
+    def getQuantityAvailableToPromise(Integer locationId) {
+
+
+    }
+
 
     /**
      * Get the latest inventory date for this product at the given location.

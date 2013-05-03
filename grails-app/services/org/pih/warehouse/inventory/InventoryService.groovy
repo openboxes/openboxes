@@ -685,8 +685,13 @@ class InventoryService implements ApplicationContextAware {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        println inventoryLevelMap.keySet().size()
 		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
-        def lowStock = quantityMap.findAll { inventoryLevelMap[it]?.minQuantity && it.value <= inventoryLevelMap[it]?.minQuantity }
+        def lowStock = quantityMap.findAll { product,quantity ->
+           def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
+            minQuantity && quantity <= minQuantity
+        }
+        println lowStock.keySet().size()
         log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return lowStock
 	}
@@ -695,7 +700,10 @@ class InventoryService implements ApplicationContextAware {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-		def reorderStock = quantityMap.findAll { inventoryLevelMap[it]?.reorderQuantity && it.value <= inventoryLevelMap[it]?.reorderQuantity }
+		def reorderStock = quantityMap.findAll { product, quantity ->
+            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
+            reorderQuantity && quantity <= reorderQuantity
+        }
         log.debug "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return reorderStock
 	}
@@ -705,7 +713,10 @@ class InventoryService implements ApplicationContextAware {
         def quantityMap = getQuantityByProductMap(location.inventory)
         //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def overStock = quantityMap.findAll { inventoryLevelMap[it]?.maxQuantity && it.value > inventoryLevelMap[it]?.maxQuantity }
+        def overStock = quantityMap.findAll { product, quantity ->
+            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
+            maxQuantity && quantity > maxQuantity
+        }
         log.debug "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return overStock
     }
