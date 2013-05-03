@@ -87,7 +87,6 @@
 				<g:each in="${incomingOrders}" var="orderStatusRow">
 					<div class="megaButton">
 						<g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="order-status-${orderStatusRow[0] }">
-							<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 							<format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
 						</g:link>
 					</div>					
@@ -187,14 +186,12 @@
 				</div>
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                        <img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
                         All (${outgoingShipmentsCount})
                     </g:link>
                 </div>
 				<g:each in="${outgoingShipments}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
 						</g:link>
 					</div>
@@ -220,7 +217,6 @@
 
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                        <img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
                         All (${incomingShipmentsCount})
                     </g:link>
                 </div>
@@ -229,7 +225,6 @@
 				<g:each in="${incomingShipments}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
 						</g:link>
 					</div>
@@ -363,7 +358,6 @@
 							<g:each var="product" in="${session?.productsViewed?.values() }">
 								<div class="megaButton">
 									<g:link controller="inventoryItem" action="showStockCard" id="${product.id }" class="product">
-										<img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" class="middle" />
 										${product.name }
 									</g:link>					
 								</div>

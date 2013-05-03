@@ -19,28 +19,30 @@
 						<td>
 							<g:render template="expiringSummary"/>
 						</td>
-						<td rowspan="3" width="40%">
+						<td rowspan="5" width="40%">
                             <g:render template="activitySummary"/>
 						</td>
 					
 					</tr>
 					<tr>
-						<td>
-							<g:render template="shipmentSummary"/>
+						<td rowpan="4">
+                            <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
 						</td>
 						<td>
-							<g:render template="receiptSummary"/>
+                            <g:render template="shipmentSummary"/>
+                            <g:render template="receiptSummary"/>
 						</td>
+                        <td>
+
+                        </td>
 					</tr>
                     <tr>
-                        <td>
-                            <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
-                        </td>
-                        <td>
+                        <td colspan="2">
                             <g:render template="tagSummary" model="[tags:tags]"/>
+
                         </td>
                     </tr>
-					
+
 				</table>
 	    	</div>
 		</div>
@@ -53,7 +55,7 @@
                 $('#inStockCount').load('${request.contextPath}/json/getInStockCount?location.id=${session.warehouse.id}');
                 $('#outOfStockCount').load('${request.contextPath}/json/getOutOfStockCount?location.id=${session.warehouse.id}');
                 $('#lowStockCount').load('${request.contextPath}/json/getLowStockCount?location.id=${session.warehouse.id}');
-                $('#overStockCount').load('${request.contextPath}/json/getLowStockCount?location.id=${session.warehouse.id}');
+                $('#overStockCount').load('${request.contextPath}/json/getOverStockCount?location.id=${session.warehouse.id}');
                 $('#reorderStockCount').load('${request.contextPath}/json/getReorderStockCount?location.id=${session.warehouse.id}');
                 $('#expiredStockCount').load('${request.contextPath}/json/getExpiredStockCount?location.id=${session.warehouse.id}');
                 $('#expiringIn30DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=30');

@@ -40,14 +40,14 @@
                     </g:each>
                     <tfoot>
                         <tr>
-                            <td colspan="2">
+                            <th colspan="2">
                                 <label>${warehouse.message(code:'default.total.label')}</label>
-                            </td>
-                            <td class="right">
+                            </th>
+                            <th class="right">
                                 <g:link controller="requisition" action="list">
                                     ${requisitions?.size()?:0}
                                 </g:link>
-                            </td>
+                            </th>
                         </tr>
 
                     </tfoot>
