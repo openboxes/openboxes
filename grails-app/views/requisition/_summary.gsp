@@ -125,7 +125,7 @@
 </div>
 
 
-<g:if test="${requsition?.destination?.id && requisition?.destination?.id != session?.warehouse?.id}">
+<g:if test="${requisition?.destination?.id && requisition?.destination?.id != session?.warehouse?.id}">
     <div class="error">
         <warehouse:message code="requisition.wrongLocation.message" default="CAUTION: You are logged into the wrong location!"/>
     </div>
