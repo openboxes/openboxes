@@ -1,3 +1,6 @@
+import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+
 /**
 * Copyright (c) 2012 Partners In Health.  All rights reserved.
 * The use and distribution terms for this software are covered by the
@@ -27,8 +30,10 @@ class UrlMappings {
 		//}
 		"401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
+        //"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
+        //"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
 		"500"(controller:"errors", action:"handleException")
-		"/"(controller:"home", action:"index")      
+        "/"(controller:"home", action:"index")
 	}
 
 

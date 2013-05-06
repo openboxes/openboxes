@@ -31,7 +31,6 @@ class LoggingFilters {
 				MDC.remove('ipAddress')
 				MDC.remove('requestUri')
 				MDC.remove('queryString')
-				//MDC.remove('params')
 			}
 		}
 	}

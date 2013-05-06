@@ -208,7 +208,7 @@ class MailService {
 	def sendHtmlMailWithAttachment(String to, String subject, String body, byte [] bytes, String name, String mimeType) {
 		def toList = new ArrayList();
 		toList.add(to)
-		sendHtmlMailWithAttachment(toList, subject, body, bytes, name, mimeType, null)
+		sendHtmlMailWithAttachment(null, toList, subject, body, bytes, name, mimeType, null)
 	}
 
 	/**
@@ -222,7 +222,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) { 
-		sendHtmlMailWithAttachment(userInstance?.email, subject, body, bytes, name, mimeType, null)
+		sendHtmlMailWithAttachment(null, userInstance?.email, subject, body, bytes, name, mimeType, null)
 	}	
 
 	/**
@@ -236,7 +236,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) {
-		sendHtmlMailWithAttachment(toList, [], subject, body, bytes, name, mimeType, null)		
+		sendHtmlMailWithAttachment(null, toList, [], subject, body, bytes, name, mimeType, null)
 	}
 
 	/**
@@ -251,9 +251,24 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) {
-		sendHtmlMailWithAttachment(toList, ccList, subject, body, bytes, name, mimeType, null)
+		sendHtmlMailWithAttachment(null, toList, ccList, subject, body, bytes, name, mimeType, null)
 	}
-	
+
+    /**
+     *
+     * @param toList
+     * @param ccList
+     * @param subject
+     * @param body
+     * @param bytes
+     * @param name
+     * @param mimeType
+     * @return
+     */
+    def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) {
+        sendHtmlMailWithAttachment(fromUser, toList, ccList, subject, body, bytes, name, mimeType, null)
+    }
+
 	/**
 	 * 
 	 * @param toList
@@ -265,7 +280,7 @@ class MailService {
 	 * @param mimeType
 	 * @return
 	 */
-	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType, Integer port) { 
+	def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType, Integer port) {
 		log.info ("Sending email with attachment " + toList)
 		
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
@@ -287,6 +302,11 @@ class MailService {
 				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
+
+                // Override from user
+                if (fromUser) {
+                    email.setFrom(fromUser.email, fromUser.name)
+                }
 				//email.setTextMsg(subject);
 			  
 				// Create the attachment
