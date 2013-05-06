@@ -37,7 +37,7 @@
 				
 						
 				<h3>
-					Google Results ::
+					Google Results -
 					<g:set var="endIndex" value="${(search.startIndex > search.totalResults) ? search?.startIndex + search?.itemsPerPage : search.totalResults}"/>
 					
 					<span class="fade">Showing ${search?.startIndex } - ${endIndex } of 

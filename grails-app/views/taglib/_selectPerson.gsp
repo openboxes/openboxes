@@ -3,7 +3,7 @@
 <input type="text" id="select-${attrs.name}" name="select-${attrs.name}" size="${attrs.size}" value="${attrs?.selectedPerson?.name}" class="autocomplete text" />
 <div id="div-${attrs.name}" style="display: none;">
     <span id="text-${attrs.name}" class="" style="">${attrs?.selectedPerson?.name}</span>
-    <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" id="edit-${attrs.name}"/>
+    <%--<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" id="edit-${attrs.name}"/>--%>
     <img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" id="clear-${attrs.name}"/>
 </div>
 <script language="javascript">
@@ -82,7 +82,7 @@
             $("#text-${attrs.name}").parent().hide();
         });
 
-        $("#edit-${attrs.name}").click(function() {
+        $("#text-${attrs.name}").click(function() {
             $("#select-${attrs.name}").show();
             $("#select-${attrs.name}").select();
             $("#text-${attrs.name}").parent().hide();

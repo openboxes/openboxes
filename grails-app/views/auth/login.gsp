@@ -59,7 +59,7 @@
 								</tr>
 								<tr>
 									<td class="middle center">
-										<button type="submit" class="button icon lock" id="loginButton">
+										<button type="submit" class="button icon lock big" id="loginButton">
 											<g:message code="auth.login.label"/>
 										</button> 
 										<%-- 

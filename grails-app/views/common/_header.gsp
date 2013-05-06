@@ -13,8 +13,7 @@
                     <g:else>
                         <img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>
                         <a href="${createLink(uri: '/dashboard/index')}">
-                            <span class="middle"><warehouse:message code="default.openboxes.label"/></span>
-                        </a>
+                            <span class="middle"><warehouse:message code="default.openboxes.label"/></span></a>
                     </g:else>
 				</div>
 		    </div>
@@ -29,16 +28,14 @@
                                 </span>
                                 <g:link controller="user" action="show" id="${session.user.id}">
                                     <span id="username">${session?.user?.name}</span>
-                                    <span id="userrole">[<g:userRole user="${session.user}"/>]</span>
-                                </g:link>
+                                    <span id="userrole">[<g:userRole user="${session.user}"/>]</span></g:link>
 
                             </li>
                             <g:if test="${session?.warehouse}">
                                 <li>|</li>
                                 <li>
                                     <a href="javascript:void(0);" class="warehouse-switch">
-                                        <span id="current-warehouse">${session?.warehouse?.name }</span>
-                                    </a>
+                                        <span id="current-warehouse">${session?.warehouse?.name }</span></a>
                                 </li>
 
                             </g:if>
