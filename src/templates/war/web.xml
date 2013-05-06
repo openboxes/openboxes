@@ -69,6 +69,11 @@
         <servlet-name>gsp</servlet-name>
         <url-pattern>*.gsp</url-pattern>
     </servlet-mapping>
+    
+    <!-- Session configuration -->
+	<session-config>
+	   <session-timeout>30</session-timeout>
+	</session-config>    
 
     <welcome-file-list>
         <!--
