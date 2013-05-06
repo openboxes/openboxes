@@ -63,7 +63,7 @@
             <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">
                 <div class="action-menu-item">
                     <g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'lorry.png')}" class="middle"/>&nbsp;
+                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" class="middle"/>&nbsp;
                         <g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message
                                 code="shipping.editShipment.label"/></g:if>
                         <g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
