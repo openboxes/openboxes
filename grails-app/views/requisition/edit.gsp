@@ -30,7 +30,7 @@
 
 
 
-	<div class="yui-gd">
+	<div class="yui-gf">
 		<div class="yui-u first">
             <g:render template="header" model="[requisition:requisition]"/>
         </div>

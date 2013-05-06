@@ -16,7 +16,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
 
-            <div class="yui-gd">
+            <div class="yui-gf">
 
 				<div class="yui-u first">
 
@@ -134,9 +134,7 @@
 
 
                     <g:set var="pageParams" value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order]"/>
-
                     <div class="box">
-
                         <h2>
                             ${warehouse.message(code:'default.results.label')} -
                             <span class="fade">

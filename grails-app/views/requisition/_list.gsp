@@ -10,6 +10,9 @@
             <g:sortableColumn property="requestNumber" params="${pageParams}"
                               title="${warehouse.message(code: 'requisition.requestNumber.label', default: 'Request number')}" />
 
+            <g:sortableColumn property="dateRequested" params="${pageParams}"
+                              title="${warehouse.message(code: 'requisition.dateRequested.label', default: 'Date requested')}" />
+
             <%--
             <g:sortableColumn property="type" params="${pageParams}"
                               title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
@@ -23,9 +26,6 @@
             <g:sortableColumn property="origin" params="${pageParams}"
                               title="${warehouse.message(code: 'requisition.origin.label', default: 'Origin')}" />
 
-            <th>
-				<warehouse:message code="default.numItems.label"/>
-			</th>
             <g:sortableColumn property="requestedBy" params="${pageParams}"
                               title="${warehouse.message(code: 'requisition.requestedBy.label', default: 'Requested by')}" />
             <th>
@@ -34,9 +34,6 @@
             <th>
                 <warehouse:message code="default.updatedBy.label"/>
             </th>
-
-            <g:sortableColumn property="dateRequested" params="${pageParams}"
-                              title="${warehouse.message(code: 'requisition.dateRequested.label', default: 'Date requested')}" />
             <%--
 
 			<g:sortableColumn property="createdBy" params="${pageParams}"
@@ -52,6 +49,9 @@
                               title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
             --%>
 
+            <th>
+                <warehouse:message code="default.numItems.label"/>
+            </th>
             <th></th>
 
 		</tr>
@@ -59,7 +59,7 @@
 	<tbody>
         <g:unless test="${requisitions}">
            	<tr class="prop odd">
-           		<td colspan="9" class="center">
+           		<td colspan="11" class="center">
                     <div class="empty">
            			    <warehouse:message code="requisition.noRequisitionsMatchingCriteria.message"/>
                     </div>
@@ -76,6 +76,9 @@
 				</td>
                 <td>
                     ${requisition.requestNumber }
+                </td>
+                <td>
+                    <format:date obj="${requisition.dateRequested}"/>
                 </td>
                 <%--
                 <td>
@@ -94,18 +97,9 @@
                     ${requisition?.origin?.name}
 
                 </td>
-				<td class="left bottom">
-					<div class="count">${requisition?.requisitionItems?.size()?:0}</div>
-
-                    <%--
-                    ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
-                    --%>
-				</td>
 				<td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
                 <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
                 <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
-
-                <td><format:date obj="${requisition.dateRequested}"/></td>
 
                 <%--
                 <td>${requisition.createdBy}</td>
@@ -113,7 +107,16 @@
 				<td><format:datetime obj="${requisition.dateCreated}" /></td>
                 <td><format:datetime obj="${requisition.lastUpdated}" /></td>
                 --%>
-                <td>
+
+                <td class="left bottom">
+                    <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
+
+                    <%--
+                    ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
+                    --%>
+                </td>
+
+                <td class="middle">
                     <img src="${resource(dir:'images/icons/silk', file: 'zoom.png')}" class="dialog-trigger" data-id="#dialog-box-${requisition?.id}"/>
                     <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}">
                         <table>

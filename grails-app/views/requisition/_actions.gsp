@@ -38,7 +38,7 @@
 				</div>
 				<div class="action-menu-item">
 					<g:link controller="requisition" action="editHeader" id="${requisition?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" />
 						&nbsp;${warehouse.message(code: 'requisition.editHeader.label', default: 'Edit requisition')}
 					</g:link>		
 				</div>
@@ -49,15 +49,33 @@
                     </g:link>
                 </div>
                 <div class="action-menu-item">
+                    <g:link controller="requisition" action="pick" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_add.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.pick.label', default: 'Pick requisition items')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
                     <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
                         &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
+                    <g:link controller="requisition" action="confirm" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_edit.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.confirm.label', default: 'Confirm requisition')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
                     <g:link controller="requisition" action="printDeliveryNote" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.button.printDeliveryNote.label', default: 'Print delivery note')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="issue" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_go.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue requisition')}
                     </g:link>
                 </div>
 
