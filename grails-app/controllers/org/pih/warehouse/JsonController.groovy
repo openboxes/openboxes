@@ -227,7 +227,13 @@ class JsonController {
         render (results?.keySet()?.size()?:"0")
     }
 
-	def getLowStockCount = {
+    def getOverStockCount = {
+        def location = Location.get(params?.location?.id)
+        def results = inventoryService.getOverStock(location)
+        render (results?.keySet()?.size()?:"0")
+    }
+
+    def getLowStockCount = {
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getLowStock(location)
         println "low: " + results
