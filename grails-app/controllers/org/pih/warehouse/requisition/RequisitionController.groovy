@@ -389,11 +389,17 @@ class RequisitionController {
 	}
 	
 	
-	def pickNextItem = { 
+	def pickNextItem = {
+        def nextItem
 		def requisition = Requisition.get(params?.id)
 		def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-		def currentIndex = requisition?.requisitionItems?.findIndexOf { it == requisitionItem }
-		def nextItem = requisition?.requisitionItems[currentIndex+1]?:requisition?.requisitionItems[0]
+        if (!requisitionItem) {
+            nextItem = requisition?.requisitionItems?.first()
+        }
+        else {
+		    def currentIndex = requisition?.requisitionItems?.findIndexOf { it == requisitionItem }
+		    nextItem = requisition?.requisitionItems[currentIndex+1]?:requisition?.requisitionItems?.first()
+        }
 		redirect(action: "pick", id: requisition?.id, 
 				params: ["requisitionItem.id":nextItem?.id])
 	}
@@ -401,6 +407,9 @@ class RequisitionController {
 	def pickPreviousItem = { 
 		def requisition = Requisition.get(params?.id)
 		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+        if (!requisitionItem) {
+            requisitionItem = requisition?.requisitionItems?.first()
+        }
 		def lastItem = requisition?.requisitionItems?.size()-1
 		def currentIndex = requisition.requisitionItems.findIndexOf { it == requisitionItem }
 		def previousItem = requisition?.requisitionItems[currentIndex-1]?:requisition?.requisitionItems[lastItem]
