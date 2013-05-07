@@ -9,7 +9,7 @@
 <style>
 	tr.selected-top { border-top: 5px solid #f3961c; border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }
     tr.selected, tr.selected a:not(.button) { color: black; font-size: 1.2em; text-decoration: blink; font-weight: bold; }
-    tr.selected-middle { border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }
+    tr.selected-middle { border-left: 5px solid #f3961c; }
     tr.selected-bottom { border-bottom: 5px solid #f3961c; border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }
     /*tr.unselected, tr.unselected a { color: #ccc; }*/
 </style>
@@ -41,84 +41,86 @@
                             <g:link controller="requisitionItem" action="cancel" class="button">Cancel remaining</g:link>
                             --%>
                             <div class="box">
-                                <h2><warehouse:message code="requisition.process.label"/></h2>
-                                    <table border="0">
-                                        <tr>
-                                            <td class="left" width="1%">
-                                                <div>
-                                                    <g:link controller="requisition"
-                                                            action="pickPreviousItem"
-                                                            id="${requisition?.id}"
-                                                            params="['requisitionItem.id': selectedRequisitionItem?.id]"
-                                                            class="button icon arrowup"
-                                                            style="width:100px;"
-                                                            fragment="${selectedRequisitionItem?.previousRequisitionItem?.id}">${warehouse.message(code:'default.button.previous.label')}</g:link>
-                                                </div>
-                                                <div>
-                                                    <g:link controller="requisition" action="pickNextItem"
-                                                            id="${requisition?.id}"
-                                                            params="['requisitionItem.id': selectedRequisitionItem?.id]"
-                                                            class="button icon arrowdown"
-                                                            style="width:100px;"
-                                                            fragment="${selectedRequisitionItem?.nextRequisitionItem?.id}">${warehouse.message(code:'default.button.next.label')}</g:link>
-                                                </div>
-                                            </td>
-                                            <td class="left">
-                                                <g:each var="requisitionItem" in="${requisition.requisitionItems}" status="${status}">
-                                                    <g:set var="isActive" value="${requisitionItem == selectedRequisitionItem}"/>
-                                                    <g:link controller="requisition" action="pick" id="${requisition.id }"
-                                                            params="['requisitionItem.id':requisitionItem?.id]" fragment="${requisitionItem.id}">
-                                                        <span class="count ${isActive?'active':''}">${status+1}</span>
-                                                    </g:link>
-                                                </g:each>
-
-
-                                            </td>
-
-                                        </tr>
-                                    </table>
-
+                                <h2><warehouse:message code="requisition.pick.label"/></h2>
+                        <%--
+                                <table border="0">
+                                    <tr>
+                                        <th class="left" width="1%">
+                                            <div>
+                                                <g:link controller="requisition"
+                                                        action="pickPreviousItem"
+                                                        id="${requisition?.id}"
+                                                        params="['requisitionItem.id': selectedRequisitionItem?.id]"
+                                                        class="button icon arrowup"
+                                                        style="width:100px;"
+                                                        fragment="${selectedRequisitionItem?.previousRequisitionItem?.id}">${warehouse.message(code:'default.button.previous.label')}</g:link>
+                                            </div>
+                                        </th>
+                                        <th class="center">
+                                            <h3 style="font-weight: bold;">
+                                                ${selectedRequisitionItem?.product?.productCode}
+                                                ${selectedRequisitionItem?.product?.name}
+                                            </h3>
+                                        </th>
+                                        <th class="right" width="1%">
+                                            <div>
+                                                <g:link controller="requisition" action="pickNextItem"
+                                                        id="${requisition?.id}"
+                                                        params="['requisitionItem.id': selectedRequisitionItem?.id]"
+                                                        class="button icon arrowdown"
+                                                        style="width:100px;"
+                                                        fragment="${selectedRequisitionItem?.nextRequisitionItem?.id}">${warehouse.message(code:'default.button.next.label')}</g:link>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </table>
+                                --%>
                                 <table>
-                                    <g:if test="${!selectedRequisitionItem}">
-                                        <thead>
-                                            <tr class="odd">
-                                                <th>
+                                    <thead>
+                                        <tr class="odd">
+                                            <th>
+                                                ${warehouse.message(code: 'default.actions.label')}
+                                            </th>
+                                            <th>
+                                                ${warehouse.message(code: 'product.label')}
+                                            </th>
+                                            <th>
+                                                ${warehouse.message(code: 'product.unitOfMeasure.label')}
+                                            </th>
+                                            <th class="center">
+                                                ${warehouse.message(code: 'requisitionItem.quantityRequested.label')}
+                                            </th>
+                                            <th class="center">
+                                                ${warehouse.message(code: 'requisitionItem.quantityPicked.label')}
+                                            </th>
+                                            <th class="center">
+                                                ${warehouse.message(code: 'requisitionItem.quantityCanceled.label')}
+                                            </th>
+                                            <th class="center">
+                                                ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}
+                                            </th>
+                                            <th>
+                                                ${warehouse.message(code: 'requisitionItem.status.label')}
+                                            </th>
+                                            <th>
+                                                %
+                                            </th>
+                                            <th>
+                                                ${warehouse.message(code: 'default.actions.label')}
+                                            </th>
+                                        </tr>
+                                    </thead>
 
-                                                </th>
-                                                <th>
-                                                    ${warehouse.message(code: 'product.label')}
-                                                </th>
-                                                <th>
-                                                    ${warehouse.message(code: 'product.unitOfMeasure.label')}
-                                                </th>
-                                                <th class="center">
-                                                    ${warehouse.message(code: 'requisitionItem.quantityRequested.label')}
-                                                </th>
-                                                <th class="center">
-                                                    ${warehouse.message(code: 'requisitionItem.quantityPicked.label')}
-                                                </th>
-                                                <th class="center">
-                                                    ${warehouse.message(code: 'requisitionItem.quantityCanceled.label')}
-                                                </th>
-                                                <th class="center">
-                                                    ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}
-                                                </th>
-                                                <th>
-                                                    ${warehouse.message(code: 'requisitionItem.status.label')}
-                                                </th>
-                                                <th>
-                                                    %
-                                                </th>
-                                                <th>
-                                                    ${warehouse.message(code: 'default.actions.label')}
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                    </g:if>
                                     <tbody>
-                                        <g:each var="${requisitionItem }" in="${requisition?.requisitionItems }" status="i">
-                                            <g:render template="pickRequisitionItem"
-                                                      model="[i:i,requisitionItem:requisitionItem,selectedRequisitionItem:selectedRequisitionItem]"/>
+                                        <g:set var="status" value="${0}"/>
+                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems.findAll { !it.parentRequisitionItem }}" status="i">
+                                            <g:if test="${!requisitionItem?.isChanged() && !requisitionItem?.isCanceled()}">
+                                                <g:render template="pickRequisitionItem"
+                                                          model="[i:i,requisitionItem:requisitionItem,selectedRequisitionItem:selectedRequisitionItem]"/>
+                                            </g:if>
+                                            <g:each var="innerRequisitionItem" in="${requisitionItem.requisitionItems}" status="j">
+                                                <g:render template="pickRequisitionItem" model="[requisitionItem:innerRequisitionItem, i:j]"/>
+                                            </g:each>
                                         </g:each>
                                     </tbody>
                                 </table>

@@ -52,7 +52,7 @@
 
                     <div class="yui-g">
 						<div class="yui-u first">
-                            <table id="requisition-header-details-table" class="header-summary-table">
+                            <table id="requisition-header-details-table" >
                                 <tbody>
                                     <tr class="prop">
                                         <td class="name"><label><warehouse:message
@@ -66,7 +66,7 @@
                                             <td class="name"><label><warehouse:message
                                                     code="requisition.status.label" /></label></td>
                                             <td class="value">
-                                                <g:selectRequisitionStatus name="status" value="${requisition.status}"/>
+                                                <g:selectRequisitionStatus name="status" value="${requisition.status}" class="chzn-select-deselect"/>
                                             </td>
                                         </tr>
                                     </g:isUserAdmin>
@@ -111,8 +111,25 @@
                                         </tr>
                                     </g:elseif>
                                     <tr class="prop">
+                                        <td class="name">
+                                            <label for="destination.id">
+                                                <warehouse:message code="requisition.destination.label" />
+                                            </label>
+                                        </td>
+                                        <td class="value">
+                                            <g:isUserAdmin>
+                                                <g:selectDepot name="destination.id" value="${requisition?.destination?.id}" class="chzn-select-deselect"
+                                                               noSelection="['null':'']"/>
+                                            </g:isUserAdmin>
+                                            <g:isUserNotInRole roles="[RoleType.ROLE_ADMIN]">
+                                                ${requisition?.destination?.name}
+                                            </g:isUserNotInRole>
+
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
                                         <td class="name"><label><warehouse:message
-                                                    code="requisition.requestedBy.label" /></label></td>
+                                                code="requisition.requestedBy.label" /></label></td>
                                         <td class="value">
 
                                             <%--
@@ -122,23 +139,6 @@
                                             <g:selectPerson name="requestedBy" value="${requisition?.requestedBy}"
                                                             noSelection="['null':'']" size="40"/>
 
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="yui-u">
-
-                            <table>
-                                <tbody>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="destination.id">
-                                                <warehouse:message code="requisition.destination.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value">
-                                            ${requisition?.destination?.name}
                                         </td>
                                     </tr>
                                     <tr class="prop">

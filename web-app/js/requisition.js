@@ -137,6 +137,7 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.totalQuantity =  ko.observable(attrs.totalQuantity);
     self.comment = ko.observable(attrs.comment);
     self.unitOfMeasure = ko.observable(attrs.unitOfMeasure);
+    self.status = ko.observable(attrs.status?attrs.status.name:"Pending");
     //self.substitutable =  ko.observable(attrs.substitutable);
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
@@ -169,11 +170,11 @@ openboxes.requisition.RequisitionItem = function(attrs) {
         return (num > 0) ? num : 0
     }, this);
 
-    self.status = ko.computed(function() {
-        if(this.quantityPicked() == 0) return "Incomplete";
-        if(this.quantityPicked() >= this.quantity()) return "Complete";
-        return "PartiallyComplete";
-    }, this);
+    //self.status = ko.computed(function() {
+    //    if(this.quantityPicked() == 0) return "Incomplete";
+    //    if(this.quantityPicked() >= this.quantity()) return "Complete";
+    //    return "PartiallyComplete";
+    //}, this);
 };
 
 openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {

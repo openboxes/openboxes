@@ -502,6 +502,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             productPackageQuantity: productPackage?.quantity?:1,
             unitOfMeasure: product?.unitOfMeasure?:"EA",
             quantity:quantity,
+            status: getStatus(),
             totalQuantity:totalQuantity(),
             quantityCanceled:quantityCanceled,
             totalQuantityCanceled:totalQuantityCanceled(),

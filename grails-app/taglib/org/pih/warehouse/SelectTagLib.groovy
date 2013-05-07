@@ -106,12 +106,13 @@ class SelectTagLib {
         def currentLocation = Location.get(session?.warehouse?.id)
         def locations = []
 
-        locations = Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}.sort{ it.name }
+        locations = Location.list().findAll {location -> location.isWarehouse()}.sort{ it.name }
         attrs.from = locations
         attrs.optionKey = 'id'
         //attrs.optionValue = 'name'
 
         //attrs.groupBy = 'locationType'
+        attrs.groupBy = 'locationType'
         attrs.value = attrs.value ?: currentLocation?.id
         if (attrs.groupBy) {
             attrs.optionValue = { it.name }

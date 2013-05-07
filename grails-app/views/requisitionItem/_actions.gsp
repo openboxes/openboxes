@@ -1,96 +1,243 @@
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <div class="action-menu">
 	<button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 	</button>
 	<div class="actions">
-        <%--
-        <div class="action-menu-item">
-            <g:link controller="requisition" action="review" id="${requisition?.id }" params="['requisitionItem.id':requisitionItem?.id]">
-                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                <warehouse:message code="default.button.review.label"/>
-            </g:link>
-        </div>
-        <div class="action-menu-item">
-            <g:link controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.requisition?.id }"
-                    params="['requisitionItem.id':requisitionItem?.id]">
-                <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;
-                <warehouse:message code="requisitionItem.approveQuantity.label" default="Approve quantity"/>
-            </g:link>
-        </div>
-        --%>
-        <g:if test="${requisitionItem?.canApproveQuantity()}">
+
+        <g:if test="${requisitionItem?.requisition?.status == RequisitionStatus.PICKING && actionName == 'pick'}">
+            <div class="box">
+                <g:set var="inventoryItemMap"
+                       value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
+                <g:form action="addToPicklistItems">
+                    <g:hiddenField name="id" value="${requisition?.id}"/>
+                    <g:hiddenField name="requisitionItem.id" value="${requisitionItem?.id}"/>
+
+                    <g:set var="inventoryItems" value="${productInventoryItemsMap[requisitionItem?.product?.id]?.findAll { it.quantity > 0 }}"/>
+
+                    <h2>
+                        ${requisitionItem?.product?.productCode}
+                        ${requisitionItem?.product?.name}
+                        (
+                        <g:if test="${requisitionItem?.productPackage}">
+                            ${requisitionItem?.productPackage?.code}/
+                            ${requisitionItem?.productPackage?.quantity}
+                        </g:if>
+                        <g:else>
+                            EA/1
+                        </g:else>
+                        )
+                        <span class="fade">
+                            ${picklistItem?.inventoryItem?.product?.getInventoryLevel(session?.warehouse?.id)?.binLocation}
+                        </span>
+
+
+                    </h2>
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>
+                                    ${warehouse.message(code: 'inventoryItem.lotNumber.label')}
+                                </th>
+                                <th>
+                                    ${warehouse.message(code: 'inventoryItem.expirationDate.label')}
+                                </th>
+                                <th class="center">
+                                    ${warehouse.message(code: 'requisitionItem.quantityAvailable.label')}
+                                </th>
+                                <th class="center border-right">
+                                    ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}
+                                </th>
+                                <th class="center">
+                                    ${warehouse.message(code: 'picklistItem.quantity.label')}
+                                </th>
+                                <th class="center">
+                                    ${warehouse.message(code: 'product.unitOfMeasure.label')}
+                                </th>
+                                <th>
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <g:unless test="${inventoryItems}">
+                                <tr style="height: 60px;">
+                                    <td colspan="5" class="center middle">
+                                        <span class="fade">${warehouse.message(code: 'requisitionItem.noInventoryItems.label', default: 'No available items')}</span>
+                                    </td>
+                                </tr>
+                            </g:unless>
+                            <g:each var="inventoryItem" in="${inventoryItems}" status="status">
+                                <g:set var="picklistItem" value="${inventoryItemMap[inventoryItem]?.first()}"/>
+                                <g:set var="quantityPicked" value="${inventoryItemMap[inventoryItem]?.first()?.quantity ?: 0}"/>
+                                <g:set var="quantityRemaining" value="${requisitionItem?.calculateQuantityRemaining()?: 0}"/>
+                                <tr class="prop ${status % 2 ? 'odd' : 'even'}">
+                                    <td class="middle">
+                                        <span class="lotNumber">${inventoryItem?.lotNumber?:warehouse.message(code:'default.none.label')}</span>
+                                    </td>
+                                    <td class="middle">
+                                        <g:if test="${inventoryItem?.expirationDate}">
+                                            <g:formatDate
+                                                    date="${inventoryItem?.expirationDate}"
+                                                    format="MMM yyyy"/>
+                                        </g:if>
+                                        <g:else>
+                                            <warehouse:message code="default.never.label"/>
+                                        </g:else>
+                                    </td>
+                                    <td class="middle center">
+                                        ${inventoryItem?.quantity ?: 0}
+                                        ${inventoryItem?.product?.unitOfMeasure?:"EA"}
+                                    </td>
+                                    <td class="middle center border-right">
+                                        ${requisitionItem?.calculateQuantityRemaining()?:0 }
+                                        ${inventoryItem?.product?.unitOfMeasure?:"EA"}
+                                    </td>
+                                    <td class="middle center">
+                                        <g:if test="${picklistItem}">
+                                            <g:hiddenField
+                                                    name="picklistItems[${status}].id"
+                                                    value="${picklistItem.id}"/>
+                                        </g:if>
+                                        <g:hiddenField
+                                                name="picklistItems[${status}].requisitionItem.id"
+                                                value="${requisitionItem.id}"/>
+                                        <g:hiddenField
+                                                name="picklistItems[${status}].inventoryItem.id"
+                                                value="${inventoryItem.id}"/>
+                                        <input name="picklistItems[${status}].quantity"
+                                               value="${quantityPicked}" size="5"
+                                               type="text" class="text"/>
+                                    </td>
+                                    <td class="middle center">
+                                        ${inventoryItem?.product?.unitOfMeasure ?: "EA"}
+                                    </td>
+                                    <td>
+                                        <g:if test="${picklistItem}">
+
+                                            <g:link controller="picklistItem"
+                                                    action="delete"
+                                                    id="${picklistItem?.id}"
+                                                    class="button icon remove"
+                                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                <warehouse:message code="picklist.removeFromPicklistItems.label" default="Remove from picklist"/>
+                                            </g:link>
+                                        </g:if>
+                                    </td>
+                                </tr>
+
+                            </g:each>
+                        </tbody>
+
+                        <g:if test="${inventoryItems}">
+                            <tfoot>
+                                <tr>
+                                    <td colspan="7" class="center">
+                                        <button class="button">
+                                            ${warehouse.message(code: 'picklist.addToPicklistItems.label', default:'Add to picklist items')}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </g:if>
+                    </table>
+                </g:form>
+
+
+        </g:if>
+        <%-- requisitionItem?.requisition?.status == RequisitionStatus.REVIEWING --%>
+        <g:elseif test="${actionName == 'review' }">
+
+            <%--
             <div class="action-menu-item">
-                <g:link controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                <g:link controller="requisition" action="review" id="${requisition?.id }" params="['requisitionItem.id':requisitionItem?.id]">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                    <warehouse:message code="default.button.review.label"/>
+                </g:link>
+            </div>
+            <div class="action-menu-item">
+                <g:link controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.requisition?.id }"
+                        params="['requisitionItem.id':requisitionItem?.id]">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;
                     <warehouse:message code="requisitionItem.approveQuantity.label" default="Approve quantity"/>
                 </g:link>
             </div>
-        </g:if>
-        <g:if test="${requisitionItem.canChangeQuantity()}">
-            <div class="action-menu-item">
-                <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
-                        params="['requisitionItem.id':requisitionItem?.id, actionType:'changeQuantity']" fragment="${requisitionItem?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                    <warehouse:message code="requisitionItem.changeQuantity.label" default="Change quantity"/>
-                </g:link>
-            </div>
-        </g:if>
+            --%>
+            <g:if test="${requisitionItem?.canApproveQuantity()}">
+                <div class="action-menu-item">
+                    <g:link controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.approveQuantity.label" default="Approve quantity"/>
+                    </g:link>
+                </div>
+            </g:if>
+            <g:if test="${requisitionItem.canChangeQuantity()}">
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                            params="['requisitionItem.id':requisitionItem?.id, actionType:'changeQuantity']" fragment="${requisitionItem?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.changeQuantity.label" default="Change quantity"/>
+                    </g:link>
+                </div>
+            </g:if>
+                <%--
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                            params="['requisitionItem.id':requisitionItem?.id, actionType:'changePackageSize']">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.changePackageSize.label" default="Change package size"/>
+                    </g:link>
+                </div>
+                --%>
+            <g:if test="${requisitionItem.canChooseSubstitute()}">
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }" fragment="${requisitionItem?.id}"
+                            params="['requisitionItem.id':requisitionItem?.id, actionType:'chooseSubstitute']" >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.substitute.label" default="Choose substitute"/>
+                    </g:link>
+                </div>
+            </g:if>
+            <g:if test="${requisitionItem.canChangeQuantity()}">
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                            params="['requisitionItem.id':requisitionItem?.id, actionType:'cancelQuantity']" fragment="${requisitionItem?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.cancel.label" default="Cancel requisition item"/>
+                    </g:link>
+                </div>
+            </g:if>
+            <g:if test="${requisitionItem.canUndoChanges()}">
+                <div class="action-menu-item">
+                    <g:link controller="requisitionItem" action="undoChanges" id="${requisitionItem?.id }" params="[redirectAction:'review']" fragment="${requisitionItem?.id}"
+                            onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.undoChange.label" default="Undo changes"/>
+                    </g:link>
+                </div>
+            </g:if>
             <%--
             <div class="action-menu-item">
                 <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
-                        params="['requisitionItem.id':requisitionItem?.id, actionType:'changePackageSize']">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                    <warehouse:message code="requisitionItem.changePackageSize.label" default="Change package size"/>
+                        params="['requisitionItem.id':requisitionItem?.id, actionType:'supplementProduct']">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>&nbsp;
+                    <warehouse:message code="requisitionItem.supplement.label" default="Supplement with different product"/>
                 </g:link>
             </div>
             --%>
-        <g:if test="${requisitionItem.canChooseSubstitute()}">
             <div class="action-menu-item">
-                <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }" fragment="${requisitionItem?.id}"
-                        params="['requisitionItem.id':requisitionItem?.id, actionType:'chooseSubstitute']" >
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch.png')}"/>&nbsp;
-                    <warehouse:message code="requisitionItem.substitute.label" default="Choose substitute"/>
+                <hr/>
+            </div>
+            <div class="action-menu-item">
+                <g:link controller="requisitionItem" action="delete" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}"
+                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                    <warehouse:message code="requisitionItem.delete.label"/>
                 </g:link>
             </div>
-        </g:if>
-        <g:if test="${requisitionItem.canChangeQuantity()}">
-            <div class="action-menu-item">
-                <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
-                        params="['requisitionItem.id':requisitionItem?.id, actionType:'cancelQuantity']" fragment="${requisitionItem?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>&nbsp;
-                    <warehouse:message code="requisitionItem.cancel.label" default="Cancel requisition item"/>
-                </g:link>
-            </div>
-        </g:if>
-        <g:if test="${requisitionItem.canUndoChanges()}">
-            <div class="action-menu-item">
-                <g:link controller="requisitionItem" action="undoChanges" id="${requisitionItem?.id }" params="[redirectAction:'review']" fragment="${requisitionItem?.id}"
-                        onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                    <warehouse:message code="requisitionItem.undoChange.label" default="Undo changes"/>
-                </g:link>
-            </div>
-        </g:if>
-        <%--
-        <div class="action-menu-item">
-            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
-                    params="['requisitionItem.id':requisitionItem?.id, actionType:'supplementProduct']">
-                <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>&nbsp;
-                <warehouse:message code="requisitionItem.supplement.label" default="Supplement with different product"/>
-            </g:link>
-        </div>
-        --%>
-        <div class="action-menu-item">
-            <hr/>
-        </div>
-        <div class="action-menu-item">
-            <g:link controller="requisitionItem" action="delete" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}"
-                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                <warehouse:message code="requisitionItem.delete.label"/>
-            </g:link>
-        </div>
-
+        </g:elseif>
         <%--
 		<div class="action-menu-item">
 			<g:link controller="requisitionItem" action="change">

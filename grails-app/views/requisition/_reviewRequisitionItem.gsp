@@ -1,11 +1,14 @@
 <g:set var="selected" value="${requisitionItem == selectedRequisitionItem}"/>
 <g:set var="quantityOnHand" value="${quantityOnHandMap[requisitionItem?.product?.id]} "/>
+<g:set var="quantityOnHandForSubstitution" value="${quantityOnHandMap[requisitionItem?.substitution?.product?.id]} "/>
 <g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
 <%-- Need to hack this in since the quantityOnHand value was a String --%>
 <g:set var="isCanceled" value="${requisitionItem?.isCanceled()}"/>
 <g:set var="isChanged" value="${requisitionItem?.isChanged()}"/>
+<g:set var="hasSubstitution" value="${requisitionItem?.hasSubstitution()}"/>
 <g:set var="quantityOnHand" value="${quantityOnHand.toInteger()}"/>
 <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
+<g:set var="isAvailableForSubstitution" value="${(quantityOnHandForSubstitution > 0) && (quantityOnHandForSubstitution >= requisitionItem?.substitution?.totalQuantity()) }"/>
 <%--<tr class="${(i % 2) == 0 ? 'even' : 'odd'} ${!selectedRequisitionItem?'':selected?'selected':'unselected'} ${isAvailable?'':'error'}">--%>
 <tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled())?'canceled':''}">
     <%--${isAvailable?'success':'error'}--%>
@@ -16,11 +19,8 @@
         </g:if>
     </td>
     <td class="center">
-        <div class="${isCanceled?'canceled':''}">
+        <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
             ${requisitionItem.status}
-        </div>
-        <div>
-            ${requisitionItem?.cancelReasonCode}
         </div>
         <%--
         <g:if test="${requisitonItem?.isApproved()}">
@@ -49,13 +49,22 @@
 			<img src="${resource(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>
 		</g:if>
         --%>
-        <div class="${isCanceled||isChanged?'canceled':''}">
-            ${requisitionItem?.product?.productCode}
-            <format:metadata obj="${requisitionItem?.product?.name}" />
-        </div>
-        ${requisitionItem?.change?.product?.productCode}
-        <format:metadata obj="${requisitionItem?.change?.product?.name}" />
-
+        <g:if test="${isCanceled||hasSubstitution}">
+            <div class="canceled">
+                ${requisitionItem?.product?.productCode}
+                <format:metadata obj="${requisitionItem?.product?.name}" />
+            </div>
+            <div class="">
+                ${requisitionItem?.change?.product?.productCode}
+                <format:metadata obj="${requisitionItem?.change?.product?.name}" />
+            </div>
+        </g:if>
+        <g:else>
+            <div>
+                ${requisitionItem?.product?.productCode}
+                <format:metadata obj="${requisitionItem?.product?.name}" />
+            </div>
+        </g:else>
 
     </td>
     <td>
@@ -83,10 +92,16 @@
         </g:if>
     </td>
     <td class="center">
-        ${quantityOnHand?:0}
+        <g:if test="${requisitionItem?.hasSubstitution()}">
+            <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0}</div>
+            ${quantityOnHandForSubstitution?:0}
+        </g:if>
+        <g:else>
+            ${quantityOnHand?:0}
+        </g:else>
     </td>
     <td class="center">
-        <g:if test="${isAvailable}">
+        <g:if test="${isAvailable||isAvailableForSubstitution}">
             <div class="available">${warehouse.message(code:'inventory.available.label', default:'Available')}</div>
         </g:if>
         <g:else>
