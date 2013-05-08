@@ -49,6 +49,12 @@
                     </g:link>
                 </div>
                 <div class="action-menu-item">
+                    <g:link controller="requisition" action="review" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_attach.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.review.label', default: 'Review requisition')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
                     <g:link controller="requisition" action="pick" id="${requisition?.id}">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_add.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.pick.label', default: 'Pick requisition items')}

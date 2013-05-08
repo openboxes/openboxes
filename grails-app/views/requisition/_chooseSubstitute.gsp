@@ -60,8 +60,8 @@
                                           'Cancelled by requestor',
                                           'Clinical adjustment',
                                           'Other']"
-                                  noSelection="['null':'']"
-                                  value="${selectedRequisitionItem.cancelReasonCode }"/>
+                                  noSelection="['':'']"
+                                  value="${selectedRequisitionItem.cancelReasonCode?:'Substituted' }"/>
 
                     </td>
                 </tr>

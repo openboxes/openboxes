@@ -241,10 +241,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def chooseSubstitute(Product newProduct, ProductPackage newProductPackage, Integer newQuantity, String reasonCode, String comments) {
 
-        if (!newProduct && newProduct == product) {
+        if (!newProduct || newProduct == product) {
             errors.rejectValue("product", "requisitionItem.product.invalid")
         }
-        if (newQuantity < 0) {
+        if (newQuantity <= 0) {
             errors.rejectValue("quantity","requisitionItem.quantity.invalid")
         }
         if (!reasonCode) {
