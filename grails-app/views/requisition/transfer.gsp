@@ -105,6 +105,7 @@
                                                                 ${status+1 }
                                                             </td>
                                                             <td>
+                                                                ${picklistItem?.inventoryItem?.product?.productCode }
                                                                 ${picklistItem?.inventoryItem?.product }
                                                             </td>
                                                             <td>

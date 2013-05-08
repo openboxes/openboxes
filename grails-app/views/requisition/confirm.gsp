@@ -56,13 +56,17 @@
                                         </td>
                                         <td>
                                             <g:if test="${isSubstitution }">
-                                                <span class="canceled">${picklistItem?.requisitionItem?.product?.name}</span>
+                                                <span class="canceled">
+                                                    ${picklistItem?.requisitionItem?.product?.productCode}
+                                                    ${picklistItem?.requisitionItem?.product?.name}
+                                                </span>
                                             </g:if>
                                             <p>
                                                 <g:if test="${isSubstitution}">
                                                     <img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" />
                                                 </g:if>
-                                                ${picklistItem.inventoryItem.product?.name }
+                                                ${picklistItem?.inventoryItem?.product?.productCode}
+                                                ${picklistItem?.inventoryItem?.product?.name }
                                             </p>
                                         </td>
                                         <td>
@@ -108,7 +112,6 @@
                                     <td>${status++ }</td>
                                     <td>
                                         Canceled
-
                                     </td>
                                     <td>
                                         ${requisitionItem.product?.productCode }
