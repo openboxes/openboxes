@@ -288,11 +288,16 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
                     }
                     else {
                         var errorMessage = "Please fix the following error(s):\n"
-                        if (result.errors.errors) {
+                        console.log("ERRORS");
+                        console.log(result.errors.errors);
+                        if (result.errors.errors.length > 0) {
                             for (var i=0; i<result.errors.errors.length; i++) {
                                 errorMessage += " * " + result.errors.errors[i].message + "\n";
                             }
                             alert(errorMessage);
+                        }
+                        else if (result.message) {
+                            alert("Error:\n" + result.message);
                         }
                         else {
                             alert("Unknown error.  Please try again.")

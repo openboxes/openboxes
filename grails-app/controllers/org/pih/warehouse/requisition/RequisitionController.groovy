@@ -13,11 +13,13 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.hibernate.HibernateException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
+import org.springframework.orm.hibernate3.HibernateSystemException
 
 class RequisitionController {
 
@@ -288,11 +290,8 @@ class RequisitionController {
         def jsonResponse = []
         def requisition = new Requisition()
 		try {
-            println "Save " + params
-            println "Request " + request.JSON
             def jsonRequest = request.JSON
-
-            println "jsonRequest: " + jsonRequest
+            println "Save requisition: " + jsonRequest
             requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
             if (!requisition.hasErrors()) {
                 jsonResponse = [success: true, data: requisition.toJson()]
@@ -301,6 +300,15 @@ class RequisitionController {
                 jsonResponse = [success: false, errors: requisition.errors]
             }
             log.info(jsonResponse as JSON)
+
+        } catch (HibernateException e) {
+            println "hibernate exception " + e.message
+            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+
+        } catch (HibernateSystemException e) {
+            println "hibernate system exception " + e.message
+            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+
         } catch (Exception e) {
             log.error("Error saving requisition: " + e.message, e)
             log.info ("Errors: " + requisition.errors)

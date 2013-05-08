@@ -65,7 +65,7 @@ ko.bindingHandlers.search_product = {
                     // If a product package was selected, set the hidden field
                     //if (ui.item.productPackageId) {
                     var productPackageId = $(this).closest('tr').find(".productPackageId");
-                    productPackageId.val(ui.item.productPackageId);
+                    productPackageId.val(ui.item.productPackageId?ui.item.productPackageId:"null");
                     productPackageId.trigger("change");
 
                     var productPackageId = $(this).closest('tr').find(".productPackageId");
