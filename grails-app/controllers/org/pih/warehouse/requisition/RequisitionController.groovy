@@ -561,8 +561,6 @@ class RequisitionController {
 		println "Add to picklist items " + params
 		def requisition = Requisition.get(params.id)
 	//	def requisitionItem = Requisition.get(params.requisitionItem.id)
-		def picklist = Picklist.findByRequisition(requisition)
-
         println "Requisition " + command?.requisition
 		def picklist = Picklist.findByRequisition(command.requisition)
         if (!picklist) {

@@ -220,13 +220,32 @@ class RequisitionService {
 
     void rollbackRequisition(Requisition requisition) {
         try {
-            requisition.status = RequisitionStatus.CONFIRMING
-            requisition.transactions.each {
-                if (it.localTransfer) {
-                    it.localTransfer.delete()
+            if (requisition.status == RequisitionStatus.ISSUED) {
+                requisition.status = RequisitionStatus.CONFIRMING
+                requisition.transactions.each {
+                    if (it.localTransfer) {
+                        it.localTransfer.delete()
+                    }
+                    it.delete();
                 }
-                it.delete();
             }
+            else if (requisition.status == RequisitionStatus.CANCELED) {
+                requisition.status = RequisitionStatus.PENDING
+            }
+            else if (requisition.status == RequisitionStatus.PICKED) {
+                requisition.status = RequisitionStatus.PICKING
+            }
+            else if (requisition.status == RequisitionStatus.PICKING) {
+                requisition.status = RequisitionStatus.REVIEWING
+            }
+            else if (requisition.status == RequisitionStatus.REVIEWING) {
+                requisition.status = RequisitionStatus.EDITING
+            }
+            else if (requisition.status == RequisitionStatus.EDITING) {
+                requisition.status = RequisitionStatus.CREATED
+            }
+            requisition.save()
+
         } catch (Exception e) {
             throw new RuntimeException(e)
         }
