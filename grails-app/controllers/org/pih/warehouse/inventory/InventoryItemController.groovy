@@ -222,7 +222,7 @@ class InventoryItemController {
 
 		// Get the inventory warning level for the given product and inventory
 		cmd.inventoryLevelInstance = InventoryLevel.findByProductAndInventory(cmd?.productInstance, cmd?.inventoryInstance);
-		def transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(cmd?.inventoryInstance, [cmd?.productInstance]);
+	//	def transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(cmd?.inventoryInstance, [cmd?.productInstance]);
 		
 	//	def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
 

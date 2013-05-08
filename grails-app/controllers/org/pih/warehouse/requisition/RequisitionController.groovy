@@ -256,7 +256,7 @@ class RequisitionController {
 	
 
 	def saveHeader = { 
-		def success = true
+	//	def success = true
 		
 		def requisition = Requisition.get(params.id)
 		
@@ -298,7 +298,7 @@ class RequisitionController {
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
             def quantityOnHand = (requisitionItem)?inventoryService.getQuantityOnHand(location, requisitionItem?.product):0
             def quantityOutgoing = (requisitionItem)?inventoryService.getQuantityToShip(location, requisitionItem?.product):0
-            def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
+     //       def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
 
 			println "Requisition Status: " + requisition.id + " [" + requisition.status + "]"
 			return [requisition: requisition,
@@ -340,7 +340,7 @@ class RequisitionController {
 		def requisition = Requisition.get(params?.id)
 		if (requisition) {
 			def currentInventory = Location.get(session.warehouse.id).inventory
-			def picklist = Picklist.findByRequisition(requisition)
+	//		def picklist = Picklist.findByRequisition(requisition)
 			def productInventoryItemsMap = [:]
 			def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
 			productInventoryItems.keySet().each { product ->
@@ -497,7 +497,7 @@ class RequisitionController {
 		def transaction 
 		try { 
 			def requisition = Requisition.get(params.id)
-			def picklist = Picklist.findByRequisition(requisition)
+	//		def picklist = Picklist.findByRequisition(requisition)
 			transaction = requisitionService.completeInventoryTransfer(requisition, params.comments)
 		} 
 		catch (ValidationException e) { 
@@ -578,7 +578,7 @@ class RequisitionController {
 	def addToPicklistItems = { 
 		println "Add to picklist items " + params
 		def requisition = Requisition.get(params.id)
-		def requisitionItem = Requisition.get(params.requisitionItem.id)
+	//	def requisitionItem = Requisition.get(params.requisitionItem.id)
 		def picklist = Picklist.findByRequisition(requisition)
 
 		

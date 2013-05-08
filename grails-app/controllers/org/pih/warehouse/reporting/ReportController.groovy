@@ -123,7 +123,7 @@ class ReportController {
 	def downloadShippingReport = {		
 		if (params.format == 'docx') { 
 			def tempFile = documentService.generateChecklistAsDocx()
-			def filename = "shipment-checklist.docx"
+	//		def filename = "shipment-checklist.docx"
 			//response.setHeader("Content-disposition", "attachment; filename=" + filename);
 			response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 			response.outputStream << tempFile.readBytes()

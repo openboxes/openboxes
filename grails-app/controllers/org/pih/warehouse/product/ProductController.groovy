@@ -79,8 +79,8 @@ class ProductController {
     def batchEditProperties = {
         def startTime = System.currentTimeMillis()
      //   def location = Location.get(session.warehouse.id)
-        def category = Category.get(params.categoryId)
-        def tagIds = params.list("tagId")
+     //   def category = Category.get(params.categoryId)
+     //   def tagIds = params.list("tagId")
 
       //  def products = productService.getProducts(category, tagIds, params)
 
