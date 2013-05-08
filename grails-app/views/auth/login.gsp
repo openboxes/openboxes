@@ -34,42 +34,32 @@
 					</g:hasErrors>
 								
 					<div id="loginBox" class="box">
-	    				
+                        <h2>
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
+                            <warehouse:message code="default.login.label" default="Login"/>
+                        </h2>
+
 						<table>
 							<tbody>
+                                <tr>
+
+                                    <td>
+
+                                    </td>
+                                </tr>
 								<tr>
-									<td class="left middle">
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
-										<span class="title middle">
-											<warehouse:message code="default.login.label" default="Login"/>
-										</span>				
+									<td class="center middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
+										<g:textField class="text" id="username" name="username" value="${userInstance?.username}" size="35" style="font-size: 1.5em" />
 									</td>
 								</tr>
 								<tr>
-									<td class="left middle" colspan="2">
-										<hr/>
+									<td class="center middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
+										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" size="35" style="font-size: 1.5em" />
 									</td>
 								</tr>
 								<tr>
-									<td class="right middle">
-										<%-- <label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>--%>
-									</td>
-									<td class="left middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="text" id="username" name="username" value="${userInstance?.username}" size="35" />
-									</td>
-								</tr>
-								<tr>
-									<td class="right middle">
-										<%--<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label> --%>
-									</td>
-									<td class="left middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" size="35" />
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td class="middle left">
-										<button type="submit" class="button icon lock" id="loginButton">
+									<td class="middle center">
+										<button type="submit" class="button icon lock big" id="loginButton">
 											<g:message code="auth.login.label"/>
 										</button> 
 										<%-- 

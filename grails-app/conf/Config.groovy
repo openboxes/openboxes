@@ -178,9 +178,9 @@ log4j = {
 				"Thread: [%t]%n" +
 				"Username: %X{username}%n" +
 				"Location: %X{location}%n" +
-				"IP Address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
+				"IP address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
-				"Query String: %X{queryString}%n%n" +
+				"Query string: %X{queryString}%n%n" +
 				"Stacktrace:%n%m%n"
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication 
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
@@ -275,6 +275,7 @@ log4j = {
 			'grails.app.bootstrap',
 			'grails.app.service',
 			'grails.app.task',
+            'grails.plugin.springcache',
 			'BootStrap',
 			'liquibase',
 			'com.gargoylesoftware.htmlunit'

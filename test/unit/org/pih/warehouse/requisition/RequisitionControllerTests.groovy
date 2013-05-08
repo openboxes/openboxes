@@ -315,7 +315,8 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.metaClass.warehouse = stubMessager;
 
         controller.params.id = "do not exist"
-        // def result = controller.show()
+        def result = controller.show()
+        println result
 
         assert redirectArgs.action == "list"
         assert controller.flash.message == "do not exist"

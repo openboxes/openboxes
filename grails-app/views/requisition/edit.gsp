@@ -30,7 +30,7 @@
 
 
 
-	<div class="yui-gd">
+	<div class="yui-gf">
 		<div class="yui-u first">
             <g:render template="header" model="[requisition:requisition]"/>
         </div>
@@ -40,25 +40,32 @@
                 <g:if test="${requisition?.id}">
 
                     <div class="box">
-                        <h3>
-                            <warehouse:message code="requisition.requisitionItems.label" default="Requisition items"/>
-                        </h3>
+                        <h2>
+                            <warehouse:message code="requisition.addRequisitionItems.label" default="Add requisition items"/>
+                        </h2>
 
                         <table id="requisition-items" class="ui-validation-items"
                             data-bind="visible: requisition.requisitionItems().length">
                             <thead>
+
                                 <tr class="prop">
+                                    <th>
+
+                                    </th>
+                                    <th class="list-header middle">
+                                        ${warehouse.message(code: 'requisitionItem.status.label')}
+                                    </th>
                                     <th class="list-header">
                                         ${warehouse.message(code: 'requisitionItems.label')}
                                     </th>
                                     <th class="list-header center">
                                         ${warehouse.message(code: 'requisitionItem.quantity.label')}
                                     </th>
-                                    <%--
-                                    <th class="list-header center">
-                                        ${warehouse.message(code: 'requisitionItem.totalQuantity.label', default:'Total quantity')}
-                                    </th>
-                                    --%>
+                                <%--
+                                <th class="list-header center">
+                                    ${warehouse.message(code: 'requisitionItem.totalQuantity.label', default:'Total quantity')}
+                                </th>
+                                --%>
                                     <g:if test="${requisition.isDepotRequisition()}">
                                         <th class="list-header">
                                             ${warehouse.message(code: 'requisitionItem.recipient.label')}
@@ -76,6 +83,12 @@
                             <thead>
                             <tbody data-bind="foreach: requisition.requisitionItems">
                                 <tr class="requisitionItemsRow">
+                                    <td>
+                                        <div data-bind="text: orderIndex()+1"></div>
+                                    </td>
+                                    <td class="list-header">
+                                        <div data-bind="text: status"></div>
+                                    </td>
                                     <td class="list-header">
 
                                         <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
@@ -113,19 +126,23 @@
 
                                 </tr>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="left">
+                                            <g:if test="${requisition?.id}">
+                                                <button class="button"
+                                                        id="addRequisitionItemRow" name="addRequisitionItemRow"
+                                                        data-bind='click: requisition.addItem'>
+                                                    ${warehouse.message(code:'requisition.addNewItem.label')}</button>
+
+                                            </g:if>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
-                        <div class="left">
-                            <g:if test="${requisition?.id}">
-                                <button class="button"
-                                        id="addRequisitionItemRow" name="addRequisitionItemRow"
-                                        data-bind='click: requisition.addItem'>
-                                    ${warehouse.message(code:'requisition.addNewItem.label')}</button>
-
-                            </g:if>
-                        </div>
-                        <div class="clear"></div>
-
-
                     </div>
                 </g:if>
 				<div class="buttons">

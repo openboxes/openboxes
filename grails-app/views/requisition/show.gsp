@@ -15,23 +15,23 @@
             
                 <g:render template="summary" model="[requisition:requisition]"/>
 
-
-                <div class="yui-gd">
+                <div class="yui-gf">
                     <div class="yui-u first">
                         <g:render template="header" model="[requisition:requisition]"/>
                     </div>
                     <div class="yui-u">
                         <div id="tabs-details">
                             <div class="box">
-                                <h3><warehouse:message code="requisition.show.label"/></h3>
+                                <h2><warehouse:message code="requisition.show.label"/></h2>
                                 <table>
                                     <thead>
                                         <tr class="odd">
+                                            <th></th>
                                             <th><warehouse:message code="requisition.progressBar.label" /></th>
-                                            <th><warehouse:message code="requisition.progressPercentage.label" /></th>
+                                            <th></th>
                                             <th><warehouse:message code="product.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.quantity.label" /></th>
-                                            <th class="center"><warehouse:message code="requisition.totalQuantity.label" default="Total quantity" /></th>
+                                            <th class="center"><warehouse:message code="requisition.totalQuantity.label" default="Quantity requested" /></th>
                                             <th class="center"><warehouse:message code="picklist.quantity.label" /></th>
                                             <th class="center"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.quantityRemaining.label" /></th>
@@ -41,62 +41,17 @@
                                     <tbody>
                                         <g:if test="${requisition?.requisitionItems?.size() == 0}">
                                             <tr class="prop odd">
-                                                <td colspan="8" class="center"><warehouse:message
+                                                <td colspan="9" class="center"><warehouse:message
                                                         code="requisition.noRequisitionItems.message" /></td>
                                             </tr>
                                         </g:if>
-                                        <g:each var="requisitionItem"
-                                            in="${requisition?.requisitionItems}" status="i">
-                                            <g:set var="quantityRemaining"
-                                                value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
-                                            <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                                                <td>
-                                                    <g:set var="value" value="${((requisitionItem?.calculateQuantityPicked()?:0)+(requisitionItem?.quantityCanceled?:0))/(requisitionItem?.quantity?:1) * 100 }" />
-                                                    <div id="progressbar-${requisitionItem?.id }" class="progressbar" style="width: 100px;"></div>
-                                                    <script type="text/javascript">
-                                                        $(function() {
-                                                            $( "#progressbar-${requisitionItem?.id }" ).progressbar({value: ${value}});
-                                                        });
-                                                    </script>
-                                                </td>
-                                                <td>
-                                                    ${value }
-                                                </td>
-                                                <td class="product">
-                                                    <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id }">
-                                                    <format:metadata
-                                                        obj="${requisitionItem?.product?.name}" />
-                                                        <g:if test="${requisitionItem?.productPackage}">
-                                                            (${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity})
-                                                        </g:if>
-                                                        <g:else>
-                                                            (EA/1)
-                                                        </g:else>
-                                                    </g:link>
-
-                                                </td>
-                                                <td class="quantity center">
-                                                    <g:showQuantity requisitionItem="${requisitionItem}"/>
+                                        <g:each var="requisitionItem" in="${requisition?.getInitialRequisitionItems()}" status="i">
+                                            <g:render template="showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
+                                            <g:each var="childRequisitionItem" in="${requisitionItem?.requisitionItems}" status="j">
+                                                <g:render template="showRequisitionItem" model="[i:j,requisitionItem:childRequisitionItem]"/>
+                                            </g:each>
 
 
-
-                                                </td>
-                                                <td class="quantity center">
-                                                    ${requisitionItem?.totalQuantity()}
-                                                </td>
-                                                <td class="quantityPicked center">
-                                                    ${requisitionItem?.calculateQuantityPicked()?:0}
-                                                </td>
-                                                <td class="quantityCanceled center">
-                                                    ${requisitionItem?.quantityCanceled?:0}
-                                                </td>
-                                                <td class="quantityRemaining center">
-                                                    ${requisitionItem.calculateQuantityRemaining()?:0}
-                                                </td>
-                                                <td>
-                                                    ${requisitionItem?.product.unitOfMeasure?:"EA" }
-                                                </td>
-                                            </tr>
                                         </g:each>
                                     </tbody>
                                 </table>

@@ -125,8 +125,8 @@
 		</table>
 	</g:if>
 	--%>
-	<g:set var="latestInventoryDate"
-		value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
+    <g:set var="latestInventoryDate"
+           value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
 	<div class="box">
 		<table>
 			<tbody>
@@ -140,36 +140,8 @@
 						<label><warehouse:message code="default.status.label"/></label>
 					</td>
 					<td class="value">
-						<span class="">	
-							<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
-								<g:if test="${totalQuantity <= 0}">
-									<g:if test="${latestInventoryDate}">
-										<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
-									</g:if>
-									<g:else>
-										<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-									</g:else>
-								</g:if>
-								<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-									<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
-								</g:elseif>
-								<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-									<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>
-								</g:elseif>
-								<g:else>
-									<span style="color: green;"><warehouse:message code="product.inStock.label"/></span>
-								</g:else>
-							</g:if>			
-							<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-								<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
-							</g:elseif>
-							<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-								<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-							</g:elseif>
-							<g:else>
-								<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
-							</g:else>
-						
+						<span class="">
+                            <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity]"/>
 						</span>
 					</td>
 				</tr>	

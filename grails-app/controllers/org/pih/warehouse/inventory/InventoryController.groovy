@@ -452,21 +452,36 @@ class InventoryController {
 
     def getCsv(map) {
         def csv = "";
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventory.quantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
 
-        map.each { k, v ->
-            csv += '"' + (k.productCode?:"")  + '"' + ","
-            csv += '"' + (k.name?:"")  + '"' + ","
-            csv += '"' + (k.manufacturer?:"")  + '"' + ","
-            csv += '"' + (k.vendor?:"") + '"' + ","
-            csv += '"' + (v?:"")  + '"' + ","
-            csv += '"' + (k.unitOfMeasure?:"")  + '"' + ","
+        map.each { product, quantity ->
+            def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
+            def status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
+            def statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
+            csv += '"' + (statusMessage?:"")  + '"' + ","
+            csv += '"' + (product.productCode?:"")  + '"' + ","
+            csv += '"' + (product?.name?:"")  + '"' + ","
+            csv += '"' + (product?.category?.name?:"")  + '"' + ","
+            csv += '"' + (product?.manufacturer?:"")  + '"' + ","
+            csv += '"' + (product?.vendor?:"") + '"' + ","
+            csv += '"' + (inventoryLevel?.binLocation)  + '"' + ","
+            csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
+            csv += '"' + (inventoryLevel?.minQuantity?:"")  + '"' + ","
+            csv += '"' + (inventoryLevel?.reorderQuantity?:"")  + '"' + ","
+            csv += '"' + (inventoryLevel?.maxQuantity?:"")  + '"' + ","
+            csv += '"' + (quantity?:"0")  + '"' + ","
             csv += "\n"
         }
         return csv

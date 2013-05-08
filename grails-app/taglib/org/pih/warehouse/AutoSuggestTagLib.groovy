@@ -12,6 +12,21 @@ package org.pih.warehouse
 // import java.text.SimpleDateFormat
 
 class AutoSuggestTagLib {
+
+    def chooseSubstitute = { attrs, body ->
+        attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+        attrs.name = attrs.name
+        attrs.valueId = (attrs.valueId)?attrs.valueId:"";
+        attrs.valueName = (attrs.valueName)?attrs.valueName:"";
+        attrs.width = (attrs.width) ? attrs.width : '300px';
+        attrs.minLength = (attrs.minLength) ? attrs.minLength : 1;
+        attrs.jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
+        attrs.styleClass = (attrs.styleClass) ?: ""
+        attrs.placeholder = attrs.placeholder ?: ""
+
+
+        out << g.render(template: '/taglib/chooseSubstitute', model: [attrs:attrs]);
+    }
 		
 	
 	def autoSuggest_v2 = { attrs, body ->

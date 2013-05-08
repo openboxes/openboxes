@@ -20,7 +20,7 @@
 	<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">
 		<div class="action-menu-item">
 			<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"
 				alt="Edit shipment" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.editShipment.label"/></g:link>
 		</div>
 	</g:if>

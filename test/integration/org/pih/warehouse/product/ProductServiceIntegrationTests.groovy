@@ -492,7 +492,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         assertNotNull tag
 
         // Should have only created the tag once
-        def sameTags = Tag.findByTag("sametag")
+        def sameTags = Tag.findAllByTag("sametag")
         assertEquals 1, sameTags.size()
 
         // Check that both products have one instance of the tag

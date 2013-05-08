@@ -19,11 +19,12 @@
 		<div class="errors">
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
-	</g:hasErrors>	
+	</g:hasErrors>
 
-	
 
-	<g:render template="summary" model="[requisition:requisition]"/>
+
+    <g:render template="summary" model="[requisition:requisition]"/>
+
 	
 	
 	<div class="yui-ga">
@@ -54,13 +55,17 @@
 					</div>
 					
 				</g:if>
-				<div id="requisition-template-details" class="dialog ui-validation box">
-					<div class="yui-g">
-						<div class="yui-u first">
-						
-							<table id="requisition-template-table">
-								
-								<tbody>
+                <div class="yui-g">
+                    <div class="yui-u first">
+
+
+
+                        <div id="requisition-template-details" class="dialog ui-validation box">
+                            <h2>${warehouse.message(code:'requisitionTemplate.label')}</h2>
+
+                            <table id="requisition-template-table">
+
+                                <tbody>
                                     <tr class="prop">
                                         <td class="name">
                                             <label for="type">
@@ -109,38 +114,37 @@
                                             <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']"/>
                                         </td>
                                     </tr>
-									<tr class="prop">
-										<td class="name">
-											<label for="origin.id">
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label for="origin.id">
                                                 <warehouse:message code="requisition.requestingLocation.label" />
-											</label>
-										</td>
-										<td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
-                                                locationGroup="${session?.warehouse?.locationGroup}" noSelection="['null':'']"/>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name">
-											<label for="destination.id"> 
-												<warehouse:message code="requisition.destination.label" />
-											</label>
-										</td>
-										<td class="value">
-                                            <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
-											${session?.warehouse?.name }
-										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name">
-											<label><warehouse:message
-													code="requisition.createdBy.label" /></label>
-										</td>
-										<td class="value">
+                                            </label>
+                                        </td>
+                                        <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" noSelection="['null':'']"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label for="destination.id">
+                                                <warehouse:message code="requisition.destination.label" />
+                                            </label>
+                                        </td>
+                                        <td class="value">
+                                            <g:hiddenField name="destination.id" value="${requisition?.destination?.id?:session?.warehouse?.id}"/>
+                                            ${requisition?.destination?.name?:session?.warehouse?.name }
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message
+                                                    code="requisition.createdBy.label" /></label>
+                                        </td>
+                                        <td class="value">
                                             <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
-											${requisition?.createdBy?.name?:session?.user?.name }
-										</td>
-									</tr>
+                                            ${requisition?.createdBy?.name?:session?.user?.name }
+                                        </td>
+                                    </tr>
                                     <tr class="prop">
                                         <td class="name">
                                             <label><warehouse:message
@@ -151,39 +155,40 @@
                                             ${requisition?.requestedBy?.name?:session?.user?.name }
                                         </td>
                                     </tr>
-									<g:if test="${requisition.isDepotRequisition()}">
-										<tr>
-											<td class="name"><label><warehouse:message
-														code="requisition.program.label" /></label></td>
-											<td class="value">
+                                    <g:if test="${requisition.isDepotRequisition()}">
+                                        <tr>
+                                            <td class="name"><label><warehouse:message
+                                                        code="requisition.program.label" /></label></td>
+                                            <td class="value">
 
-											</td>
-										</tr>
-									</g:if>
-									<tr class="prop">
-										<td class="name">
-											<label for="description"> 
-												<warehouse:message code="default.description.label" />
-											</label>
-										</td>
-									
-										<td class="value">	
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label for="description">
+                                                <warehouse:message code="default.description.label" />
+                                            </label>
+                                        </td>
+
+                                        <td class="value">
                                             <g:textArea name="description" cols="80" rows="5"
                                                 placeholder="${warehouse.message(code:'requisition.description.message')}"
                                                 class="text">${requisition.description }</g:textArea>
-										</td>
-									</tr>	
-								</tbody>
-							</table>							
-						</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="buttons">
+                            <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+                            &nbsp;
+                            <g:link controller="requisitionTemplate" action="list">
+                                <warehouse:message code="default.button.cancel.label"/>
+                            </g:link>
+                        </div>
+
 					</div>
-				</div>
-				<div class="buttons">
-                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                    &nbsp;
-                    <g:link controller="requisitionTemplate" action="list">
-                        <warehouse:message code="default.button.cancel.label"/>
-                    </g:link>
 				</div>
 			</g:form>
 		</div>

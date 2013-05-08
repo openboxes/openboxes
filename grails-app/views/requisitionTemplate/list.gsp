@@ -17,20 +17,20 @@
 
 
                     <div class="buttonBar">
-                        <span class="linkButton">
-                            <g:link class="list" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/></g:link>
-                        </span>
+                        <g:link class="button" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/></g:link>
                         <g:isUserAdmin>
-                            <span class="linkButton">
-                                <g:link class="new" controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']"><warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/></g:link>
-                            </span>
+                            <g:link class="button" controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']"><warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/></g:link>
                         </g:isUserAdmin>
                     </div>
 
                     <g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
                     <g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
+                    <div class="box">
 
-                    <g:render template="list" model="[requisitions:requisitions]"/>
+                        <h2>${warehouse.message(code:'requisitionTemplates.label')}</h2>
+
+                        <g:render template="list" model="[requisitions:requisitions]"/>
+                    </div>
 
                 </div>
             </div>

@@ -14,15 +14,15 @@
 
 	<g:render template="summary" model="[requisition:requisition]"/>
 
-	<div class="yui-gd">
+	<div class="yui-gf">
 		<div class="yui-u first">
             <g:render template="header" model="[requisition:requisition]"/>
         </div>
         <div class="yui-u">
             <div class="box list dialog">
-                <h3>
+                <h2>
                     <warehouse:message code="requisition.confirm.label"/>
-                </h3>
+                </h2>
                 <table style="width:auto;">
                     <thead>
                         <tr>

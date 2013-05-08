@@ -9,11 +9,17 @@
  * */
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.User
+import org.pih.warehouse.auth.AuthService;
+import org.pih.warehouse.core.Comment;
+import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.Event;
+
+
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.User;
 import org.pih.warehouse.fulfillment.Fulfillment
+import org.pih.warehouse.inventory.Transaction;
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -40,8 +46,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionStatus status;
     CommodityClass commodityClass
 
-    Location origin            // the vendor
-    Location destination     // the customer location
+    Location origin            // where the requisition came from
+    Location destination     // who the requisition will be fulfilled by
 
     Person requestedBy
     Person recipient
@@ -103,10 +109,54 @@ class Requisition implements Comparable<Requisition>, Serializable {
         createdBy(nullable: true)
         updatedBy(nullable: true)
         recipientProgram(nullable: true)
-        commodityClass(nullable: false)
+        commodityClass(nullable: true)
         isTemplate(nullable: true)
         isPublished(nullable: true)
         datePublished(nullable: true)
+    }
+
+    def getTransactions() {
+        return Transaction.findAllByRequisition(this)
+    }
+
+
+    def calculatePercentageCompleted() {
+        def numerator = getCompleteRequisitionItems()?.size()?:0
+        def denominator = getInitialRequisitionItems()?.size()?:1
+        if (denominator) {
+            return (numerator / denominator)*100
+        }
+        else {
+            return 0;
+        }
+    }
+
+    /**
+     * @return  all requisition items that have been completed (canceled or fulfilled)
+     */
+    def getCompleteRequisitionItems() {
+        return initialRequisitionItems?.findAll { it.isCompleted() }
+    }
+
+    /**
+     * @return  all requisition items that have not been completed
+     */
+    def getIncompleteRequisitionItems() {
+        return initialRequisitionItems?.findAll { !it.isCompleted() }
+    }
+
+    /**
+     * @return  all requisition items that were apart of the original requisition
+     */
+    def getInitialRequisitionItems() {
+        return requisitionItems?.findAll { !it.parentRequisitionItem }
+    }
+
+    /**
+     * @return  all requisition items that have been added as substitutions or supplements
+     */
+    def getAdditionalRequisitionItems() {
+        return requisitionItems?.findAll { it.parentRequisitionItem }
     }
 
     Boolean isWardRequisition() {
@@ -139,24 +189,45 @@ class Requisition implements Comparable<Requisition>, Serializable {
      * Sort requisitions by receiving location (alphabetical), requisition type, commodity class (consumables or medications), then date requested, then date created,
      */
     int compareTo(Requisition requisition) {
-        return origin <=> requisition.origin  ?: type <=> requisition.type ?: commodityClass <=> requisition.commodityClass ?: requisition.dateRequested <=> dateRequested ?: requisition.dateCreated <=> dateCreated
+        return origin <=> requisition.origin ?:
+            type <=> requisition.type ?:
+                commodityClass <=> requisition.commodityClass ?:
+                    requisition.dateRequested <=> dateRequested ?:
+                        requisition.dateCreated <=> dateCreated
     }
 
     String toString() {
         return id
     }
 
+    Requisition newInstance() {
+        def requisition = new Requisition()
+        requisition.origin = origin
+        requisition.destination = destination
+        requisition.type = type
+        requisition.commodityClass = commodityClass
+        requisition.requisitionItems = []
+        requisitionItems.each {
+            def requisitionItem = new RequisitionItem()
+            requisitionItem.product = it.product
+            requisitionItem.productPackage = it.productPackage
+            requisitionItem.quantity = it.quantity
+            requisition.addToRequisitionItems(requisitionItem)
+        }
+
+        return requisition
+    }
 
     Map toJson() {
         [
                 id: id,
+                name: name,
+                version: version,
                 requestedById: requestedBy?.id,
                 requestedByName: requestedBy?.name,
                 description: description,
                 dateRequested: dateRequested.format("MM/dd/yyyy"),
                 requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy"),
-                name: name,
-                version: version,
                 lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
                 status: status?.name(),
                 type: type?.name(),
@@ -165,7 +236,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 destinationId: destination?.id,
                 destinationName: destination?.name,
                 recipientProgram: recipientProgram,
-                requisitionItems: requisitionItems?.collect { it.toJson() }
+                requisitionItems: requisitionItems?.sort()?.collect { it?.toJson() }
         ]
     }
 }

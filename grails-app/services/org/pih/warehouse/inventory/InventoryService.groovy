@@ -205,7 +205,7 @@ class InventoryService implements ApplicationContextAware {
 
         long initialStartTime = System.currentTimeMillis()
 		long startTime = System.currentTimeMillis()
-		println "getCurrentInventory()"
+		log.debug "getCurrentInventory()"
 		def inventoryItemCommands = [];
 		List categories = new ArrayList();
 		if (commandInstance?.subcategoryInstance) {
@@ -236,19 +236,19 @@ class InventoryService implements ApplicationContextAware {
         else {
 			// Get all products, including hidden ones
 			def matchCategories = getExplodedCategories(categories)
-			println " * Get all categories: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.debug " * Get all categories: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
 			
 			products = getProductsByTermsAndCategories(searchTerms, matchCategories, commandInstance?.showHiddenProducts, commandInstance?.warehouseInstance.inventory, commandInstance?.maxResults, commandInstance?.offset)
-			println " * Get all products: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.debug " * Get all products: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
 			
 			commandInstance.numResults = products.totalCount
 			
 			if (!commandInstance?.showHiddenProducts) {
 				products.removeAll(getHiddenProducts(commandInstance?.warehouseInstance))
-			}	
-			println " * After removing all hidden products: " + (System.currentTimeMillis() - startTime) + " ms"
+			}
+            log.debug " * After removing all hidden products: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
 			
 			// now localize to only match products for the current locale
@@ -262,22 +262,22 @@ class InventoryService implements ApplicationContextAware {
 			// }
 		}
 		products = products?.sort() { map1, map2 -> map1.category <=> map2.category ?: map1.name <=> map2.name };
-		println " * Sort products " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Sort products " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		// Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
 		def quantityOnHandMap = [:]//getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory, products);
-		println " * Get quantity on hand map " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Get quantity on hand map " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		def quantityOutgoingMap = [:] 
 		// getOutgoingQuantityByProduct(commandInstance?.warehouseInstance, products);
-		println " * Get outgoing map " + (System.currentTimeMillis() - startTime) + " ms"		
+        log.debug " * Get outgoing map " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		def quantityIncomingMap = [:] 
 		// getIncomingQuantityByProduct(commandInstance?.warehouseInstance, products);
-		println " * Get incoming map: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Get incoming map: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		
@@ -287,15 +287,15 @@ class InventoryService implements ApplicationContextAware {
 		
 		startTime = System.currentTimeMillis()
 		def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy { it.product }
-		println " * Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		def inventoryLevel
 		products.each { product ->
 			def innerStartTime = System.currentTimeMillis()
 			inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
-			//println "product " + product
-			//println "inventoryLevel.class.name = " + inventoryLevel?.class?.name
-			//println "inventoryLevels " + inventoryLevel
+			//log.debug "product " + product
+			//log.debug "inventoryLevel.class.name = " + inventoryLevel?.class?.name
+			//log.debug "inventoryLevels " + inventoryLevel
 			
 						
 			if (inventoryLevel && inventoryLevel instanceof ArrayList) { 
@@ -312,9 +312,9 @@ class InventoryService implements ApplicationContextAware {
 						quantityOnHand, quantityToReceive, quantityToShip,
 						commandInstance?.showOutOfStockProducts)
 			}
-			println " * process product : " + (System.currentTimeMillis() - innerStartTime) + " ms"			
+            log.debug " * process product : " + (System.currentTimeMillis() - innerStartTime) + " ms"
 		}
-		println " * process on hand quantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * process on hand quantity: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		/*
@@ -337,15 +337,15 @@ class InventoryService implements ApplicationContextAware {
 			}
 			inventoryItemCommands << inventoryItemCommand
 		}
-		println " * after creating inventory items: " + (System.currentTimeMillis() - startTime) + " ms"
+		log.debug " * after creating inventory items: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		*/
 		
 		commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
-		
-		println " * Get category to product map: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        println "\n\nGet current inventory: " + (System.currentTimeMillis() - initialStartTime) + " ms"
+        log.debug " * Get category to product map: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        log.debug "\n\nGet current inventory: " + (System.currentTimeMillis() - initialStartTime) + " ms"
 		return commandInstance?.categoryToProductMap
 	}
 
@@ -355,7 +355,7 @@ class InventoryService implements ApplicationContextAware {
 		
 		//def startTime = System.currentTimeMillis()
 		//def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
-		//println " * find inventory level by product and inventory: " + (System.currentTimeMillis() - startTime) + " ms"
+		//log.debug " * find inventory level by product and inventory: " + (System.currentTimeMillis() - startTime) + " ms"
 		inventoryItemCommand.description = product.name		
 		inventoryItemCommand.category = product.category
 		inventoryItemCommand.product = product
@@ -582,7 +582,7 @@ class InventoryService implements ApplicationContextAware {
 		Set inventoryItems = getInventoryItemsByProductAndInventory(product, inventory);
 		Map<InventoryItem, Integer> quantityMap = getQuantityForInventory(inventory)
 		
-		//println "getQuantityByInventoryAndProduct: " + quantityMap
+		//log.debug "getQuantityByInventoryAndProduct: " + quantityMap
 		
 		inventoryItems.each {
 			def quantity = quantityMap[it]
@@ -624,7 +624,7 @@ class InventoryService implements ApplicationContextAware {
 			expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
 		}
 
-        println "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return expiredStock
 
 	}
@@ -652,7 +652,7 @@ class InventoryService implements ApplicationContextAware {
 		if (threshold) {
 			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
 		}
-        println "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return expiringStock
 	}
 
@@ -660,7 +660,7 @@ class InventoryService implements ApplicationContextAware {
     def getTotalStock(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)
-        println "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return quantityMap
     }
 
@@ -668,7 +668,7 @@ class InventoryService implements ApplicationContextAware {
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)
         def inStock = quantityMap.findAll { it.value > 0 }
-        println "Get in stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get in stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return inStock
     }
 
@@ -677,7 +677,7 @@ class InventoryService implements ApplicationContextAware {
         def quantityMap = getQuantityByProductMap(location.inventory)
         def stockOut = quantityMap.findAll { it.value <= 0 }
 
-        println "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
         return stockOut
     }
 
@@ -685,9 +685,14 @@ class InventoryService implements ApplicationContextAware {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        println inventoryLevelMap.keySet().size()
 		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
-        def lowStock = quantityMap.findAll { inventoryLevelMap[it]?.minQuantity && it.value <= inventoryLevelMap[it]?.minQuantity }
-        println "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        def lowStock = quantityMap.findAll { product,quantity ->
+           def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
+            minQuantity && quantity <= minQuantity
+        }
+        println lowStock.keySet().size()
+        log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return lowStock
 	}
 
@@ -695,8 +700,11 @@ class InventoryService implements ApplicationContextAware {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-		def reorderStock = quantityMap.findAll { inventoryLevelMap[it]?.reorderQuantity && it.value <= inventoryLevelMap[it]?.reorderQuantity }
-		println "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
+		def reorderStock = quantityMap.findAll { product, quantity ->
+            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
+            reorderQuantity && quantity <= reorderQuantity
+        }
+        log.debug "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return reorderStock
 	}
 
@@ -705,8 +713,11 @@ class InventoryService implements ApplicationContextAware {
         def quantityMap = getQuantityByProductMap(location.inventory)
         //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def overStock = quantityMap.findAll { inventoryLevelMap[it]?.maxQuantity && it.value > inventoryLevelMap[it]?.maxQuantity }
-        println "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        def overStock = quantityMap.findAll { product, quantity ->
+            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
+            maxQuantity && quantity > maxQuantity
+        }
+        log.debug "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return overStock
     }
 
@@ -819,24 +830,24 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 		}
-		println " * Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
 		
 		
 		//products = products.collect { it }.unique { it.id }
-		println " * Get unique IDs: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Get unique IDs: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
-		
-		println "Max " + maxResult
-		println "Offset " + offset
+
+        log.debug "Max " + maxResult
+        log.debug "Offset " + offset
 		products = Product.createCriteria().list(max: maxResult, offset: offset) {
 			inList("id", (products.collect { it.id })?: [""])
 			order("category", "desc")
 			order("name", "asc")
 		}
-		println " * Re-query for products by ID: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * Re-query for products by ID: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 	
 		return products;	
@@ -851,7 +862,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	def getProductsByTags(List inputTags, int max, int offset) {
-		println "Get products by tags: " + inputTags
+        log.debug "Get products by tags: " + inputTags
 		def products = Product.withCriteria {
 			tags { 'in'('tag', inputTags) }
 			maxResults(max)
@@ -862,13 +873,13 @@ class InventoryService implements ApplicationContextAware {
 		return products
 	}
 
-	def countProductsByTags(List inputTags) { 
-		println "Get products by tags: " + inputTags
+	def countProductsByTags(List inputTags) {
+        log.debug "Get products by tags: " + inputTags
 		def results = Product.withCriteria {
 			projections { count('id') }
 			tags { 'in'('tag', inputTags) }
 		}
-		//println "Results " + results[0]
+		//log.debug "Results " + results[0]
 		return results[0]
 	}
 	
@@ -1049,7 +1060,7 @@ class InventoryService implements ApplicationContextAware {
                 }
 			}
 		}
-		println " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1077,8 +1088,8 @@ class InventoryService implements ApplicationContextAware {
 			quantityMap[product] = 0
 			quantityMapByProductAndInventoryItem[product].values().each { quantityMap[product] += it }
 		}
-		
-		println "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+
+        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1107,7 +1118,7 @@ class InventoryService implements ApplicationContextAware {
 				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
 		}
-		println " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantityMap
 	}
 
@@ -1124,8 +1135,8 @@ class InventoryService implements ApplicationContextAware {
 		def startTime = System.currentTimeMillis()
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
-		
-		println "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+
+        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return quantityMap
 	}
@@ -1138,14 +1149,14 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	Map<Product, Integer> getQuantityByProductMap(Inventory inventory, List<Product> products) {
 		long startTime = System.currentTimeMillis()
-		println "get quantity by product map " 
-		
-		println "inventory: " + inventory
-		println "products: " + products.size()
+        log.debug "get quantity by product map "
+
+        log.debug "inventory: " + inventory
+        log.debug "products: " + products.size()
 		def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
-		
-		println "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+
+        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1185,7 +1196,7 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 		}
-		println "getProductsBelowMinimumAndReorderQuantities(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getProductsBelowMinimumAndReorderQuantities(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return [minimumProductsQuantityMap: minimumProductsQuantityMap, reorderProductsQuantityMap: reorderProductsQuantityMap]
 	}
 	/**
@@ -1205,7 +1216,7 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	Integer getQuantityAvailableToPromise(Location location, Product product) { 
 		def quantityMap = getQuantityForProducts(location.inventory, [product.id])
-		println "quantity map " + quantityMap;
+        log.debug "quantity map " + quantityMap;
 		def quantityOnHand = getQuantityOnHand(location, product)?:0
 		def quantityOutgoing = getQuantityToShip(location, product)?:0
 		def quantityAvailableToPromise = quantityOnHand - quantityOutgoing
@@ -1221,7 +1232,7 @@ class InventoryService implements ApplicationContextAware {
 	Integer getQuantityOnHand(Location location, Product product) {
 		log.info "location " + location + " product " + product
 		def quantityMap = getQuantityForProducts(location.inventory, [product.id])
-		println "quantity map " + quantityMap;
+        log.debug "quantity map " + quantityMap;
 		def quantity = quantityMap[product.id]
 		
 		return quantity?:0
@@ -1248,7 +1259,7 @@ class InventoryService implements ApplicationContextAware {
 		def startTime = System.currentTimeMillis()
 		def currentLocation = getCurrentLocation()
 		def quantity = getQuantity(currentLocation.inventory, inventoryItem)
-		println "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantity
 	}
 
@@ -1262,9 +1273,9 @@ class InventoryService implements ApplicationContextAware {
 	Integer getQuantity(Inventory inventory, InventoryItem inventoryItem) {
 
 		if (!inventory) {
-			println AuthService.currentLocation
+            log.debug AuthService.currentLocation
 			def currentLocation = AuthService?.currentLocation?.get()
-			println currentLocation
+            log.debug currentLocation
 			if (!currentLocation?.inventory)
 				throw new Exception("Inventory not found")
 
@@ -1837,7 +1848,7 @@ class InventoryService implements ApplicationContextAware {
 		def transaction = new Transaction();
 		//def inventoryInstance = Inventory.get(params?.inventory?.id)
 		Integer quantityOnHand = getQuantity(inventoryItem);
-		println "quantityOnHand: " + quantityOnHand 
+        log.debug "quantityOnHand: " + quantityOnHand
 		
 		if (inventoryItem && inventory) {
 			def transactionEntry = new TransactionEntry();
@@ -2567,7 +2578,7 @@ class InventoryService implements ApplicationContextAware {
 			// Iterate over each row
 			command?.data?.each { Map params ->
 
-				println params
+                log.debug params
 
 				def lotNumber = (params.lotNumber) ? String.valueOf(params.lotNumber) : null;
 				def quantity = (params.quantity) ?: 0;
@@ -2651,20 +2662,20 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	public Map<String, Integer> getQuantityForProducts(Inventory inventory, ArrayList<String> productIds) {
-		println "inventory " + inventory + " " + ", productIds: " + productIds
+        log.debug "inventory " + inventory + " " + ", productIds: " + productIds
 		def ids = productIds.collect{ "'${it}'"}.join(",")
-		println "ids: " + ids
+        log.debug "ids: " + ids
 		def result =[:]
 		if (ids) {
 			def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids})"
-			println "SQL: " + sql
+            log.debug "SQL: " + sql
 			def transactionEntries = TransactionEntry.executeQuery(sql)
-			println "transactionEntries " + transactionEntries
+			log.debug "transactionEntries " + transactionEntries
 			//transactionEntries.each{ println(it)}
 			def map = getQuantityByProductMap(transactionEntries)
 			map.keySet().each{ result[it.id] = map[it] }
 		}
-		println "getQuantityForProducts " + result
+		log.debug "getQuantityForProducts " + result
 		result
 	}
 

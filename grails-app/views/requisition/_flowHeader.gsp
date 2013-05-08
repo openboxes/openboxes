@@ -1,6 +1,6 @@
 <div class="wizard-box">
 	<div class="wizard-steps "> 
-		<div class="${actionName.contains('create')||actionName.equals('show')||actionName.equals('editHeader')?'active-step':''}">
+		<div class="${actionName.contains('create')||actionName.equals('show')?'active-step':''}">
 			<g:link controller="requisition" action="show" id="${requisition?.id}">
                 <span class="step">1</span>
 
@@ -13,7 +13,7 @@
 
 			</g:link>
 		</div>
-        <div class="${actionName.equals('edit')?'active-step':''}">
+        <div class="${actionName.equals('edit')||actionName.equals('editHeader')?'active-step':''}">
             <g:link controller="requisition" action="edit"  id="${requisition?.id}">
                 <span class="step">2</span>
                 <warehouse:message code="requisition.edit.label"/>
@@ -38,7 +38,7 @@
 			</g:link>
 		</div>
 		<div class="${actionName.equals('issue')?'active-step':''}">
-			<g:link controller="requisition" action="issue" id="${requisition?.id}">
+			<g:link controller="requisition" action="transfer" id="${requisition?.id}">
                 <span class="step">6</span>
 				<warehouse:message code="requisition.issue.label"/>
 			</g:link>

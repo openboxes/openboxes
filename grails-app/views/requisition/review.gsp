@@ -15,49 +15,47 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
+
             <div class="dialog">
             
                 <g:render template="summary" model="[requisition:requisition]"/>
 
 
-                <div class="yui-gd">
+                <div class="yui-gf">
                     <div class="yui-u first">
                         <g:render template="header" model="[requisition:requisition]"/>
                     </div>
                     <div class="yui-u">
                         <div id="tabs-details" class="box">
-                            <h3>
+                            <h2>
                                 <warehouse:message code="requisition.review.label"/>
-                            </h3>
+                            </h2>
                             <table>
                                 <thead>
                                     <tr class="odd">
-                                        <th><warehouse:message code="default.status.label" default="Status"/></th>
-                                        <%--
-                                        <th class="center">
-                                            <g:checkBox name="selectAll" class="selectAll"/>
+                                        <th class='center'>
+                                            <warehouse:message code="default.actions.label"/>
                                         </th>
-                                        --%>
+                                        <th class="center">
+                                            <warehouse:message code="requisitionItem.status.label" default="Status" />
+                                        </th>
                                         <th>
-                                            <warehouse:message code="requisitionItem.product.label" /> /
+                                            <warehouse:message code="requisitionItem.product.label" />
+                                        </th>
+                                        <th>
                                             <warehouse:message code="requisitionItem.productPackage.label" />
                                         </th>
                                         <th class="center">
-                                            <warehouse:message code="requisitionItem.quantity.label" />
+                                            <warehouse:message code="requisitionItem.quantityRequested.label" />
                                         </th>
                                         <th class="center">
-                                            <warehouse:message code="requisitionItem.quantityCanceled.label" />
+                                            <warehouse:message code="requisitionItem.totalQuantity.label" default="Quantity total" />
                                         </th>
                                         <th class="center">
-                                            <warehouse:message code="default.quantityOnHand.label" />
+                                            <warehouse:message code="requisitionItem.quantityAvailable.label" default="Quantity available" />
                                         </th>
-                                        <%--
-                                        <th class="right">
-                                            <warehouse:message code="default.quantityAvailableToPromise.label" />
-                                        </th>
-                                        --%>
-                                        <th class='center'>
-                                            <warehouse:message code="default.actions.label"/>
+                                        <th class="center">
+                                            <warehouse:message code="requisitionItem.availability.label" default="Availability" />
                                         </th>
                                     </tr>
                                 </thead>
@@ -68,12 +66,30 @@
                                                     code="requisition.noRequisitionItems.message" /></td>
                                         </tr>
                                     </g:if>
-                                    <g:each var="requisitionItem"
-                                        in="${requisition?.requisitionItems.findAll { !it.parentRequisitionItem }}" status="i">
+                                    <g:each var="requisitionItem" in="${requisition?.requisitionItems.findAll { !it.parentRequisitionItem }}" status="i">
                                         <g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:i]"/>
-                                        <g:each var="childRequisitionItem" in="${requisitionItem?.requisitionItems}">
-                                            <g:render template="reviewRequisitionItem" model="[requisition:requisition,requisitionItem:childRequisitionItem, i:i, isChild:true]"/>
-                                        </g:each>
+                                        <g:if test="${selectedRequisitionItem && requisitionItem == selectedRequisitionItem && params?.actionType}">
+                                            <tr>
+                                                <td colspan="9">
+                                                    <g:if test="${params?.actionType=='changeQuantity'}">
+                                                        <g:render template="changeQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    </g:if>
+                                                    <g:elseif test="${params?.actionType=='changePackageSize'}">
+                                                        <g:render template="changePackageSize" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    </g:elseif>
+                                                    <g:elseif test="${params?.actionType=='cancelQuantity'}">
+                                                        <g:render template="cancelQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    </g:elseif>
+                                                    <g:elseif test="${params?.actionType=='chooseSubstitute'}">
+                                                        <g:render template="chooseSubstitute" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    </g:elseif>
+                                                    <g:elseif test="${params?.actionType=='supplementProduct'}">
+                                                        <g:render template="supplementProduct" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    </g:elseif>
+                                                </td>
+
+                                            </tr>
+                                        </g:if>
 
                                     </g:each>
                                 </tbody>

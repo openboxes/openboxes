@@ -23,7 +23,7 @@
 		<g:form name="editItemFound" action="createShipment">
 			<h3>
 				<warehouse:message code="shipping.enterQuantityAndRecipient.label"/>
-			</h3>  
+			</h3>
 			<table>
 				<tbody>
 					<g:render template="itemFoundFields" model="['containerId':addItemToContainerId]"/>		

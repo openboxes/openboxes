@@ -6,19 +6,25 @@
 				<tr>
 					<td>
 						<g:hiddenField name="max" value="${params.max?:10 }"/>
-                        <label>${warehouse.message(code:'default.searchTerms.label', default: "Search terms")}</label>
-						<g:textField name="terms"
-							value="${params.terms}"
-                            placeholder="${warehouse.message(code:'shipping.searchTerms.label', default: 'Search by name, shipment number')}"
-                            class="text medium" size="45"/>
+                        <div>
+                            <label>${warehouse.message(code:'default.searchTerms.label', default: "Search terms")}</label>
+                        </div>
+                        <div>
+                            <g:textField name="terms"
+                                value="${params.terms}"
+                                placeholder="${warehouse.message(code:'shipping.searchTerms.label', default: 'Search by name, shipment number')}"
+                                class="text medium" size="45"/>
+                        </div>
 					</td>
 				</tr>
-                <tr class="prop">
+                <tr class="">
                     <td>
                         <div>
-                            <label>${warehouse.message(code: 'shipping.status.label')}</label>
                             <div>
-                                <g:select name="status" class="filter"
+                                <label>${warehouse.message(code: 'shipping.status.label')}</label>
+                            </div>
+                            <div>
+                                <g:select name="status" class="chzn-select-deselect"
                                           from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
                                           optionKey="name" optionValue="${{format.metadata(obj:it)}}"
                                           value="${status}"
@@ -27,12 +33,14 @@
                         </div>
                     </td>
                 </tr>
-                <tr class="prop">
+                <tr class="">
                     <td>
                         <div>
-                            <label>${warehouse.message(code:'shipping.shipmentType.label', default: "Shipment type")}</label>
                             <div>
-                                <g:select name="shipmentType" class="filter"
+                                <label>${warehouse.message(code:'shipping.shipmentType.label', default: "Shipment type")}</label>
+                            </div>
+                            <div>
+                                <g:select name="shipmentType" class="chzn-select-deselect"
                                     from="${org.pih.warehouse.shipping.ShipmentType.list()}"
                                     optionKey="id" optionValue="${{format.metadata(obj:it)}}"
                                     value="${shipmentType}"
@@ -41,12 +49,12 @@
                         </div>
                     </td>
                 </tr>
-                <tr class="prop">
+                <tr class="">
                     <td>
                         <g:if test="${incoming}">
                             <label>${warehouse.message(code: 'shipping.origin.label')}</label>
                             <div>
-                            <g:select name="origin" class="filter"
+                            <g:select name="origin" class="chzn-select-deselect"
                                   from="${org.pih.warehouse.core.Location.list().sort()}"
                                   optionKey="id" optionValue="name" value="${origin}"
                                   noSelection="['null':warehouse.message(code:'default.all.label')]" />
@@ -55,7 +63,7 @@
                         <g:else>
                             <label>${warehouse.message(code: 'shipping.destination.label')}</label>
                             <div>
-                                <g:select name="destination" class="filter"
+                                <g:select name="destination" class="chzn-select-deselect"
                                       from="${org.pih.warehouse.core.Location.list().sort()}"
                                       optionKey="id" optionValue="name" value="${destination}"
                                       noSelection="['null':warehouse.message(code:'default.all.label')]" />
@@ -80,17 +88,17 @@
                     </td>
                 </tr>
                 --%>
-                <tr class="prop">
+                <tr class="">
                     <td>
-                        <label>${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated date')}</label>
-                        
-                        <div>
-                            <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom"
-                                                value="${params.lastUpdatedFrom}" format="MM/dd/yyyy"/>
-                            <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo"
-                                                value="${params.lastUpdatedTo}" format="MM/dd/yyyy"/>
-                        </div>
+                        <label>${warehouse.message(code: 'default.lastUpdatedBetween.label', default: 'Last updated between')}</label>
+                            <div>
+                                <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                                    value="${lastUpdatedFrom}" format="MM/dd/yyyy"/>
 
+                                <span class="center" style="padding-right:15px;">-</span>
+                                <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                                    value="${lastUpdatedTo}" format="MM/dd/yyyy"/>
+                            </div>
 
                     </td>
                 </tr>

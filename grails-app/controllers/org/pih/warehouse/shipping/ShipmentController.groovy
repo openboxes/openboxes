@@ -47,6 +47,13 @@ class ShipmentController {
 	def list = {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
+        Calendar calendar = Calendar.instance
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+        int firstDayOfMonth = calendar.getActualMinimum(Calendar.DAY_OF_MONTH)
+        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), firstDayOfMonth)
+        def lastUpdatedFromDefault = calendar.getTime()
+        def lastUpdatedToDefault = calendar.getTime()
 
 		boolean incoming = params?.type?.toUpperCase() == "INCOMING"
 		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
@@ -55,9 +62,14 @@ class ShipmentController {
 		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-        def lastUpdatedStart = params.lastUpdatedStart ? Date.parse("MM/dd/yyyy", params.lastUpdatedStart) : null
-        def lastUpdatedEnd = params.lastUpdatedEnd ? Date.parse("MM/dd/yyyy", params.lastUpdatedEnd) : null
-		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate, lastUpdatedStart, lastUpdatedEnd)
+        def lastUpdatedFrom = params.lastUpdatedFrom ? Date.parse("MM/dd/yyyy", params.lastUpdatedFrom) : null
+        def lastUpdatedTo = params.lastUpdatedTo ? Date.parse("MM/dd/yyyy", params.lastUpdatedTo) : null
+
+
+        println "lastUpdatedFrom = " + lastUpdatedFrom + " lastUpdatedTo = " + lastUpdatedTo
+
+		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination,
+                statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo)
 		
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b ->
@@ -72,9 +84,9 @@ class ShipmentController {
 			shipmentType:shipmentType?.id, 
 			origin:origin?.id, 
 			destination:destination?.id,
-			status:statusCode?.name, 
-			statusStartDate:statusStartDate, 
-			statusEndDate:statusEndDate, 
+			status:statusCode?.name,
+            lastUpdatedFrom:lastUpdatedFrom,
+            lastUpdatedTo:lastUpdatedTo,
 			incoming: incoming
 		]
 	}

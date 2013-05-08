@@ -15,7 +15,7 @@ import org.pih.warehouse.core.User
 
 // import java.util.Date
 
-class ProductPackage implements Serializable {
+class ProductPackage implements Comparable<ProductPackage>, Serializable {
 
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
@@ -54,6 +54,16 @@ class ProductPackage implements Serializable {
 		updatedBy(nullable:true)
     }
 	
-	String toString() { return name }
-	
+	String toString() {
+        return name
+    }
+
+    /**
+     * Sort by quantity
+     */
+    int compareTo(ProductPackage other) {
+        return other.quantity <=> quantity
+    }
+
+
 }

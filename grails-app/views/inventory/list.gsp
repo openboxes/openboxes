@@ -69,16 +69,29 @@
                         </h2>
                         <table>
                             <tr>
+                                <th class="center"><warehouse:message code="inventoryLevel.status.label"/></th>
                                 <th><warehouse:message code="product.productCode.label"/></th>
                                 <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="category.label"/></th>
                                 <th><warehouse:message code="product.manufacturer.label"/></th>
                                 <th><warehouse:message code="product.vendor.label"/></th>
-                                <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                                <th class="left"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
                                 <th><warehouse:message code="product.unitOfMeasure.label"/></th>
-
+                                <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
                             </tr>
                             <g:each var="entry" in="${quantityMap.sort()}" status="i">
+                                <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
                                 <tr class="${i%2?'odd':'even'}">
+                                    <td>
+                                        <%--
+                                        <g:render template="../product/status" model="[product:entry?.key,totalQuantity:entry?.value]"/>
+                                        --%>
+                                        <g:set var="status" value="${entry?.key?.getStatus(session.warehouse.id, entry?.value?:0 as int)}"/>
+                                        ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
+                                    </td>
                                     <td>
                                         ${entry.key.productCode}
                                     </td>
@@ -88,6 +101,10 @@
                                         </g:link>
                                     </td>
                                     <td>
+                                        ${entry.key?.category?.name}
+
+                                    </td>
+                                    <td>
                                         ${entry.key.manufacturer}
 
                                     </td>
@@ -95,14 +112,25 @@
                                         ${entry.key.vendor}
 
                                     </td>
-
-                                    <td class="center">
-                                        ${entry.value}
+                                    <td class="left">
+                                        ${inventoryLevel?.binLocation?:""}
                                     </td>
-                                    <td>
+                                    <td class="center">
                                         ${entry?.key?.unitOfMeasure}
                                     </td>
 
+                                    <td class="center">
+                                        ${inventoryLevel?.minQuantity?:"--"}
+                                    </td>
+                                    <td class="center">
+                                        ${inventoryLevel?.reorderQuantity?:"--"}
+                                    </td>
+                                    <td class="center">
+                                        ${inventoryLevel?.maxQuantity?:"--"}
+                                    </td>
+                                    <td class="center">
+                                        ${entry.value}
+                                    </td>
                                 </tr>
 
 

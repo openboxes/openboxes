@@ -13,6 +13,7 @@ public enum CommodityClass {
 
 	CONSUMABLES(0),
     MEDICATION(1),
+    MIXED(2),
     COLD_CHAIN(3),
 	CONTROLLED_SUBSTANCE(4),
 	HAZARDOUS_MATERIAL(5),
@@ -33,6 +34,7 @@ public enum CommodityClass {
 		[
 			CONSUMABLES,
             MEDICATION,
+            MIXED,
             COLD_CHAIN,
 			CONTROLLED_SUBSTANCE,
 			HAZARDOUS_MATERIAL
