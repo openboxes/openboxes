@@ -61,23 +61,45 @@
             </div>
         </td>
         <td class="right">
-            <div>
-                <div class="header">
-                    <label><warehouse:message code="requisition.depot.label"/>:</label> ${requisition.destination?.name}
-                </div>
-                <div class="header">
-                    <label><warehouse:message code="requisition.ward.label"/>:</label> ${requisition.origin?.name}
-                </div>
+            <div class="right">
+                <table style="width:auto;" border="0">
+                    <tr class="header">
+                        <td>
+                            <label><warehouse:message code="requisition.depot.label"/>:</label>
+                        </td>
+                        <td class="right">
+                            ${requisition.destination?.name}
+                        </td>
+                    </tr>
+                    <tr class="header">
+                        <td>
+                            <label><warehouse:message code="requisition.ward.label"/>:</label>
+                        </td>
+                        <td class="right">
+                            ${requisition.origin?.name}
+                        </td>
+                    </tr>
 
-                <div class="header">
-                    <label><warehouse:message code="requisition.date.label"/>:</label> <g:formatDate
-                        date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
-                </div>
-                <div class="header">
-                    <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label> <g:formatDate
-                        date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
-                </div>
+                    <tr class="header">
+                        <td>
+                            <label><warehouse:message code="requisition.date.label"/>:</label>
+                        </td>
+                        <td class="right">
+                            <g:formatDate
+                                date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
+                        </td>
+                    </tr>
+                    <tr class="header">
+                        <td>
+                            <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
+                        </td>
+                        <td class="right">
+                            <g:formatDate
+                                date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
+                        </td>
+                    </tr>
 
+                </table>
             </div>
         </td>
     </tr>

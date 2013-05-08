@@ -75,7 +75,7 @@
                                     </tr>
                                 </table>
                                 --%>
-                                <table>
+                                <table border="0">
                                     <thead>
                                         <tr class="odd">
                                             <th>

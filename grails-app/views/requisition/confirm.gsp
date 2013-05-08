@@ -23,7 +23,7 @@
                 <h2>
                     <warehouse:message code="requisition.confirm.label"/>
                 </h2>
-                <table style="width:auto;">
+                <table style="width:auto;" border="1">
                     <thead>
                         <tr>
                             <th></th>
@@ -56,7 +56,7 @@
                                         </td>
                                         <td>
                                             <g:if test="${isSubstitution }">
-                                                <strike>${picklistItem?.requisitionItem?.product?.name}</strike>
+                                                <span class="canceled">${picklistItem?.requisitionItem?.product?.name}</span>
                                             </g:if>
                                             <p>
                                                 <g:if test="${isSubstitution}">
@@ -71,19 +71,19 @@
                                             </span>
                                         </td>
                                         <td class="right" width="1%">
-                                            ${requisitionItem.quantity }
+                                            ${requisitionItem.quantity?:0 }
 
                                         </td>
                                         <td class="right" width="1%">
-                                            ${picklistItem.quantity }
+                                            ${picklistItem.quantity?:0 }
 
                                         </td>
                                         <td class="right" width="1%">
-                                            ${requisitionItem.quantityCanceled }
+                                            ${requisitionItem.quantityCanceled?:0 }
 
                                         </td>
                                         <td class="right" width="1%">
-                                            ${requisitionItem.calculateQuantityRemaining() }
+                                            ${requisitionItem.calculateQuantityRemaining()?:0 }
                                         </td>
                                         <td>
                                             ${picklistItem.inventoryItem.product.unitOfMeasure?:"EA" }
@@ -111,22 +111,23 @@
 
                                     </td>
                                     <td>
-                                        ${requisitionItem.product }
+                                        ${requisitionItem.product?.productCode }
+                                        ${requisitionItem.product?.name }
                                     </td>
                                     <td>
 
                                     </td>
                                     <td class="right">
-                                        ${requisitionItem?.quantity }
+                                        ${requisitionItem?.quantity?:0 }
                                     </td>
                                     <td class="right">
                                         0
                                     </td>
                                     <td class="right">
-                                        ${requisitionItem.quantityCanceled }
+                                        ${requisitionItem.quantityCanceled?:0 }
                                     </td>
                                     <td class="right">
-                                        ${requisitionItem.calculateQuantityRemaining() }
+                                        ${requisitionItem.calculateQuantityRemaining()?:0 }
                                     </td>
                                     <td>
                                         ${requisitionItem.product.unitOfMeasure?:"EA" }

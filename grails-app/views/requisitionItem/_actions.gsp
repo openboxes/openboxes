@@ -5,21 +5,22 @@
 	</button>
 	<div class="actions">
 
-        <g:if test="${requisitionItem?.requisition?.status == RequisitionStatus.PICKING && actionName == 'pick'}">
+        <g:if test="${actionName == 'pick'}">
             <div class="box">
                 <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
                 <g:form controller="requisition" action="addToPicklistItems">
                     <g:hiddenField name="requisition.id" value="${requisition?.id}"/>
                     <g:hiddenField name="requisitionItem.id" value="${requisitionItem?.id}"/>
                     <h2>
+                        ${warehouse.message(code:'picklist.pickingItemsFor.label', default:'Picking items for')}
                         ${requisitionItem?.product?.productCode}
                         ${requisitionItem?.product?.name}
-                        ${requisitionItem?.quantity}
+
                         <g:if test="${requisitionItem?.productPackage}">
-                            (${requisitionItem?.productPackage?.code}/${requisitionItem?.productPackage?.quantity})
+                            (${requisitionItem?.quantity} ${requisitionItem?.productPackage?.code}/${requisitionItem?.productPackage?.quantity})
                         </g:if>
                         <g:else>
-                            (EA)
+                            (${requisitionItem?.quantity} EA)
                         </g:else>
                         <span class="fade">
                             ${picklistItem?.inventoryItem?.product?.getInventoryLevel(session?.warehouse?.id)?.binLocation}
@@ -68,7 +69,7 @@
                             <g:set var="inventoryItems" value="${productInventoryItemsMap[requisitionItem?.product?.id]?.findAll { it.quantity > 0 }}"/>
                             <g:unless test="${inventoryItems}">
                                 <tr style="height: 60px;">
-                                    <td colspan="5" class="center middle">
+                                    <td colspan="7" class="center middle">
                                         <span class="fade">${warehouse.message(code: 'requisitionItem.noInventoryItems.label', default: 'No available items')}</span>
                                     </td>
                                 </tr>
