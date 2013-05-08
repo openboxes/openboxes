@@ -62,9 +62,9 @@
 					            	<!--  So we know which category to show on browse page after submit -->
 					            	
 					            	<div class="box" >
-					            		<h3>
+					            		<h2>
 					            			<warehouse:message code="product.productDetails.label" default="Product details"/>
-					            		</h3>
+					            		</h2>
 						                <table>
 											<tbody>
 												<tr class="prop first">
@@ -315,9 +315,9 @@
 
 
                                     <div class="box">
-                                        <h3>
+                                        <h2>
                                             <warehouse:message code="product.productIdentifiers.label" default="Product identifiers"/>
-                                        </h3>
+                                        </h2>
 
                                         <table>
                                             <tbody>
@@ -351,9 +351,9 @@
                                     </div>
 
 									<div class="box">
-					            		<h3>
+					            		<h2>
 					            			<warehouse:message code="product.manufacturerDetails.label" default="Manufacturer details"/>
-					            		</h3>
+					            		</h2>
 										<table>
 											<tbody>
 
@@ -615,13 +615,13 @@
                                                         --%>
 
 
-                                                        <a href="javascript:void(0);" class="open-dialog create button icon add" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
+                                                        <a href="javascript:void(0);" class="open-dialog create button icon edit" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
                                                             ${warehouse.message(code:'default.button.edit.label')}</a>
 
-                                                        <g:link controller="inventoryLevel" action="clone" class="button icon add" id="${inventoryLevelInstance?.id}">
+                                                        <g:link controller="inventoryLevel" action="clone" class="button icon settings" id="${inventoryLevelInstance?.id}">
                                                             ${warehouse.message(code:'default.button.clone.label')}</g:link>
 
-                                                        <g:link controller="inventoryLevel" action="delete" class="button icon add" id="${inventoryLevelInstance?.id}">
+                                                        <g:link controller="inventoryLevel" action="delete" class="button icon remove" id="${inventoryLevelInstance?.id}">
                                                             ${warehouse.message(code:'default.button.delete.label')}</g:link>
 
                                                     </td>
