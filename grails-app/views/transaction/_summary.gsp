@@ -5,9 +5,17 @@
 		</td>
 		<td class="top">
 			<div class="title"> 
-				${transactionInstance?.transactionNumber }
+				<span class="transactionNumber">${transactionInstance?.transactionNumber }</span>
 				<g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
-					${org.pih.warehouse.util.LocalizationUtil.getLocalizedString(transactionInstance) }
+
+                    <format:metadata obj="${transactionInstance?.transactionType}" /> <g:if
+                        test="${transactionInstance?.source }">
+                    <warehouse:message code="default.from.label" />
+                    ${transactionInstance?.source?.name }
+                </g:if> <g:if test="${transactionInstance?.destination }">
+                    <warehouse:message code="default.to.label" />
+                    ${transactionInstance?.destination?.name }
+                </g:if>
 				</g:link>
 			</div>
 		

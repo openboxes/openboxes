@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.LocalTransfer
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
@@ -218,13 +219,14 @@ class RequisitionService {
 	}
 
     void rollbackRequisition(Requisition requisition) {
-
         try {
-            requisition.status = RequisitionStatus.PENDING
+            requisition.status = RequisitionStatus.CONFIRMING
             requisition.transactions.each {
+                if (it.localTransfer) {
+                    it.localTransfer.delete()
+                }
                 it.delete();
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e)
         }

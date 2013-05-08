@@ -79,7 +79,7 @@ class Transaction implements Comparable, Serializable {
 	}
 	
 	// Transient attributs
-	static transients = ['locationizationService']
+	static transients = ['localTransfer']
 	
     // Constraints 
     static constraints = {
@@ -113,7 +113,13 @@ class Transaction implements Comparable, Serializable {
 							return true 
 						})
     }
-    
+
+
+    LocalTransfer getLocalTransfer() {
+        return LocalTransfer.findBySourceTransactionOrDestinationTransaction(this, this)
+    }
+
+
     /**
 	 * Sort by transaction date, and then by date created
 	 * (Note that sorting of transaction entries, and therefore the whole inventory process, relies on this
