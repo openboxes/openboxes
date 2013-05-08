@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.Transaction
@@ -17,16 +18,17 @@ import org.pih.warehouse.receiving.Receipt
 // import java.io.Serializable;
 
 class Shipment implements Comparable, Serializable {
-	
-	def beforeInsert = {
-		//createdBy = AuthService.currentUser.get()
-	}
-	def beforeUpdate ={
-		//updatedBy = AuthService.currentUser.get()
-	}
-	
-	
-	String id
+
+    def beforeInsert = {
+        //def currentUser = AuthService.currentUser.get()
+        //if (currentUser) createdBy = currentUser
+    }
+    def beforeUpdate = {
+        //def currentUser = AuthService.currentUser.get()
+        //if (currentUser) updatedBy = currentUser
+    }
+
+    String id
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)

@@ -151,12 +151,14 @@
                     </td>
                 </tr>
                 <tr class="prop">
-                    <td class="name"><label><warehouse:message code="transaction.label" /></label></td>
+                    <td class="name"><label><warehouse:message code="transactions.label" /></label></td>
                     <td class="value">
                         <g:each var="transaction" in="${requisition?.transactions }">
-                            <g:link controller="inventory" action="showTransaction" id="${transaction?.id}">
-                                ${transaction.transactionNumber}
-                            </g:link>
+                            <div>
+                                <g:link controller="inventory" action="showTransaction" id="${transaction?.id}">
+                                    ${transaction.transactionNumber}
+                                </g:link>
+                            </div>
                         </g:each>
                         <g:unless test="${requisition?.transactions}">
                             <warehouse:message code="default.none.label"/>

@@ -45,10 +45,16 @@ class RequisitionController {
 
         // Used to display the counts
         def requisitionsLocal = Requisition.findAllByDestination(session.warehouse)
+        println "requisitionsLocal: " + requisitionsLocal.size()
+
+        // Hack to get requisitions that are related to me
+        def requisitionsRelatedToMe = requisitionsLocal.findAll { it?.updatedBy?.id == session?.user?.id || it?.createdBy?.id == session?.user?.id || it?.requestedBy?.id == session?.user?.id }
+        println "requisitionsRelatedToMe: " + requisitionsRelatedToMe.size()
+
         requisitionsLocal.groupBy { it.status }.each { k, v ->
             requisitionsMap[k] = v.size()?:0
         }
-        //requisitionsMap["createdByMe"] = requisitionsLocal.findAll { it.createdBy == session.user }.size()?:0
+        requisitionsMap["relatedToMe"] = requisitionsRelatedToMe.size()?:0
         //requisitionsMap["updatedByMe"] = requisitionsLocal.findAll { it.updatedBy == session.user }.size()?:0
         //requisitionsMap["submittedByMe"] = requisitionsLocal.findAll { it.requestedBy == session.user }.size()?:0
 

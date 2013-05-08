@@ -115,6 +115,12 @@
                             </g:link>
                         </g:each>
                     </div>
+                    <div class="buttonBar button-group">
+                        <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button">
+                            ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'Related to me')}
+                            (${requisitionsMap["relatedToMe"]?:0 })
+                        </g:link>
+                    </div>
                     <%--
                     <div class="buttonBar button-group">
                         <g:link controller="requisition" action="list" params="['requestedBy.id':session.user.id]" class="button">

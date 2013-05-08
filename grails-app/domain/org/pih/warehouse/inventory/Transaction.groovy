@@ -35,17 +35,15 @@ import org.pih.warehouse.shipping.Shipment;
  *  
  */
 class Transaction implements Comparable, Serializable {
-	
-	def beforeInsert = {
-        if (!createdBy) {
-    		createdBy = AuthService.currentUser.get()
-        }
-	}
-	def beforeUpdate ={
-		if (!updatedBy) {
-            updatedBy = AuthService.currentUser.get()
-        }
-	}
+
+    def beforeInsert = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) createdBy = currentUser
+    }
+    def beforeUpdate = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) updatedBy = currentUser
+    }
 	
 	String id
     Location source	    		

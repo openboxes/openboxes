@@ -23,7 +23,7 @@
                 <h2>
                     <warehouse:message code="requisition.confirm.label"/>
                 </h2>
-                <table style="width:auto;" border="1">
+                <table border="0">
                     <thead>
                         <tr>
                             <th></th>

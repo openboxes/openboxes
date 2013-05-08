@@ -17,12 +17,14 @@ import org.pih.warehouse.core.User
 
 class ProductPackage implements Comparable<ProductPackage>, Serializable {
 
-	def beforeInsert = {
-		createdBy = AuthService.currentUser.get()
-	}
-	def beforeUpdate ={
-		updatedBy = AuthService.currentUser.get()
-	}
+    def beforeInsert = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) createdBy = currentUser
+    }
+    def beforeUpdate = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) updatedBy = currentUser
+    }
 
 	String id
 	String name				// Name of product as it appears on the package

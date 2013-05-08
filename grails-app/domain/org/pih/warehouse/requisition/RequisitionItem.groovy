@@ -25,13 +25,15 @@ import org.pih.warehouse.product.ProductPackage
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def beforeInsert = {
-        if (!createdBy) createdBy = AuthService.currentUser.get()
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) createdBy = currentUser
     }
     def beforeUpdate = {
-        if (!updatedBy) updatedBy = AuthService.currentUser.get()
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) updatedBy = currentUser
     }
 
-	String id
+    String id
 	String description	
 	
 	// Requested item or product

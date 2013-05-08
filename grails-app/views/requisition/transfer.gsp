@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -27,7 +28,11 @@
                 </div>
                 <div class="yui-u">
 
-
+                    <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
+                        <div class="notice">
+                            <warehouse:message code="requisition.hasAlreadyBeenCompleted.message" default="This requisition has already been completed"/>
+                        </div>
+                    </g:if>
 
                         <g:form controller="requisition" action="complete" method="POST">
                             <g:hiddenField name="id" value="${requisition?.id }"/>
@@ -113,6 +118,17 @@
                                                             </td>
                                                         </tr>
                                                     </g:each>
+                                                    <g:unless test="${picklist.picklistItems }">
+                                                        <tr>
+                                                            <td colspan="5">
+                                                                <div class="empty center">
+                                                                    <warehouse:message code="picklistItems.empty.label" default="Picklist is empty"/>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+
+                                                    </g:unless>
                                                 </tbody>
                                             </table>
                                         </td>
@@ -121,16 +137,21 @@
                             </table>
                             </div>
 
-                            <div class="clear"></div>
-                            <div class="buttons center">
+
+                                <div class="clear"></div>
+                                <div class="buttons center">
                                     <g:link controller="requisition" action="confirm" id="${requisition.id }" class="button">
                                         <warehouse:message code="default.button.back.label"/>
                                     </g:link>
+                                    <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
 
-                                    <g:link controller="requisition" action="complete" id="${requisition.id }" class="button">
-                                        <warehouse:message code="default.button.finish.label"/>
-                                    </g:link>
-                            </div>
+                                    </g:if>
+                                    <g:else>
+                                        <g:link controller="requisition" action="complete" id="${requisition.id }" class="button">
+                                            <warehouse:message code="default.button.finish.label"/>
+                                        </g:link>
+                                    </g:else>
+                                </div>
 
                         </g:form>
 

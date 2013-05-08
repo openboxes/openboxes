@@ -24,14 +24,16 @@ import org.pih.warehouse.requisition.Requisition
  *
  */
 class Picklist implements Serializable {
-	
-	def beforeInsert = {
-		createdBy = AuthService.currentUser.get()
-	}
-	def beforeUpdate ={
-		updatedBy = AuthService.currentUser.get()
-	}
-	
+
+    def beforeInsert = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) createdBy = currentUser
+    }
+    def beforeUpdate = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) updatedBy = currentUser
+    }
+
 	String id
 	String name
 	String description 		// a user-defined, searchable name for the order 

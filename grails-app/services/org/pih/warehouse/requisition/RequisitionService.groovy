@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -76,10 +77,12 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Requisition requisition, Map params) {
-    //def getRequisitions(Location destination, Location origin, User createdBy, RequisitionType requisitionType, RequisitionStatus status, CommodityClass commodityClass, String query, Map params) {
+        //def getRequisitions(Location destination, Location origin, User createdBy, RequisitionType requisitionType, RequisitionStatus status, CommodityClass commodityClass, String query, Map params) {
         //return Requisition.findAllByDestination(session.warehouse)
 
+        def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
         def criteria = Requisition.createCriteria()
+
 
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
             and {
@@ -94,14 +97,22 @@ class RequisitionService {
                 if (requisition.status) {
                     eq("status", requisition.status)
                 }
+                if (params.relatedToMe) {
+                    def currentUser = AuthService.getCurrentUser().get()
+                    or {
+                        eq("createdBy.id", currentUser.id)
+                        eq("updatedBy.id", currentUser.id)
+                        eq("requestedBy.id", currentUser.id)
+                    }
+                }
                 if (requisition.requestedBy) {
-                    eq("createdBy.id", requisition.requestedBy.id)
+                    eq("requestedBy.id", requisition.requestedBy.id)
                 }
                 if (requisition.createdBy) {
                     eq("createdBy.id", requisition.createdBy.id)
                 }
                 if (requisition.updatedBy) {
-                    eq("createdBy.id", requisition.updatedBy.id)
+                    eq("updatedBy.id", requisition.updatedBy.id)
                 }
                 if (requisition.commodityClass) {
                     eq("commodityClass", requisition.commodityClass)

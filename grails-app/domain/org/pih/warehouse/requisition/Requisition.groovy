@@ -24,10 +24,12 @@ import org.pih.warehouse.inventory.Transaction;
 class Requisition implements Comparable<Requisition>, Serializable {
 
     def beforeInsert = {
-        if (!createdBy) createdBy = AuthService.currentUser.get()
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) createdBy = currentUser
     }
     def beforeUpdate = {
-        if (!updatedBy) updatedBy = AuthService.currentUser.get()
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) updatedBy = currentUser
     }
 
     String id
@@ -216,6 +218,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         }
 
         return requisition
+    }
+
+    Boolean isRelatedToMe(Integer userId) {
+        return (createdBy?.id == userId || updatedBy?.id == userId || requestedBy?.id == userId)
     }
 
     Map toJson() {

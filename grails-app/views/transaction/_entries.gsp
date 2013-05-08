@@ -70,7 +70,9 @@
             <g:else>
                 <tr>
                     <td colspan="4">
-                        <warehouse:message code="transaction.noEntries.message"/>
+                        <div class="empty center">
+                            <warehouse:message code="transaction.noEntries.message"/>
+                        </div>
                     </td>
                 </tr>
             </g:else>

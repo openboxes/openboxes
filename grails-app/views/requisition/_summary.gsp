@@ -46,6 +46,21 @@
                                 <warehouse:message code="default.lastUpdated.label"/>:
                                 <b><g:formatDate date="${requisition?.lastUpdated }" format="MMM dd, yyyy"/></b>
                             </span>
+                            <span class="fade">&nbsp;|&nbsp;</span>
+                            <span id="updated-by">
+                                <warehouse:message code="default.updatedBy.label"/>:
+                                <b>${requisition?.updatedBy?.name}</b>
+                            </span>
+                            <span class="fade">&nbsp;|&nbsp;</span>
+                            <span id="date-created">
+                                <warehouse:message code="default.dateCreated.label"/>:
+                                <b><g:formatDate date="${requisition?.dateCreated }" format="MMM dd, yyyy"/></b>
+                            </span>
+                            <span class="fade">&nbsp;|&nbsp;</span>
+                            <span id="created-by">
+                                <warehouse:message code="default.createdBy.label"/>:
+                                <b>${requisition?.createdBy?.name}</b>
+                            </span>
 
 							<%--
 							<span class="fade">&nbsp;|&nbsp;</span>

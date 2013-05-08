@@ -47,6 +47,16 @@
                     obj="${transactionInstance?.inventory?.warehouse }" />
             </div></td>
         </tr>
+        <tr id="comment" class="prop">
+            <td class=""><label><warehouse:message
+                    code="transaction.comment.label" /></label>
+            </td>
+            <td>
+
+                <div> <format:metadata
+                        obj="${transactionInstance?.comment }" />
+                </div></td>
+        </tr>
 		<g:if test="${transactionInstance?.outgoingShipment }">
 			<tr class="prop">
 				<td class=""><label><warehouse:message
