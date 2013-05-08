@@ -37,7 +37,7 @@
 				<warehouse:message code="requisition.confirm.label"/>
 			</g:link>
 		</div>
-		<div class="${actionName.equals('issue')?'active-step':''}">
+		<div class="${actionName.equals('transfer')?'active-step':''}">
 			<g:link controller="requisition" action="transfer" id="${requisition?.id}">
                 <span class="step">6</span>
 				<warehouse:message code="requisition.issue.label"/>

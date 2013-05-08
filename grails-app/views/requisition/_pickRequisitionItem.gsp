@@ -37,26 +37,12 @@
         <div id="progress-bar-${requisitionItem?.id }" class="progress-bar" style="width: 100px;"></div>
         <script type="text/javascript">
             $(function() {
-                $( "#progress-bar-${requisitionItem?.id }" ).progressbar({value: ${value}});
+                $( "#progress-bar-${requisitionItem?.id }" ).progressbar({value: ${value} });
             });
         </script>
     </td>
     <td>
-        ${value }%
-    </td>
-    <td>
-        <%--
-        <a href="javascript:void(-1);" data-id="${requisitionItem?.id}" class="button open-dialog">
-            ${warehouse.message(code:'requisitionItem.process.label', default: 'Process') }
-        </a>
-        --%>
-        <g:if test="${requisitionItem?.isCanceled()||requisitionItem?.isChanged()}">
-        </g:if>
-        <g:else>
-            <g:link class="button" data-id="${requisitionItem?.id}" controller="requisition" action="pick" id="${requisition.id }" params="['requisitionItem.id':requisitionItem?.id]" fragment="${requisitionItem.id}">
-                ${warehouse.message(code:'requisitionItem.process.label', default: 'Process') }
-            </g:link>
-        </g:else>
+        ${formatNumber(number: value, maxFractionDigits: 0)}%
     </td>
 </tr>
 

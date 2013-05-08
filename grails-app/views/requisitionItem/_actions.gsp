@@ -7,26 +7,20 @@
 
         <g:if test="${requisitionItem?.requisition?.status == RequisitionStatus.PICKING && actionName == 'pick'}">
             <div class="box">
-                <g:set var="inventoryItemMap"
-                       value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
-                <g:form action="addToPicklistItems">
-                    <g:hiddenField name="id" value="${requisition?.id}"/>
+                <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
+                <g:form controller="requisition" action="addToPicklistItems">
+                    <g:hiddenField name="requisition.id" value="${requisition?.id}"/>
                     <g:hiddenField name="requisitionItem.id" value="${requisitionItem?.id}"/>
-
-                    <g:set var="inventoryItems" value="${productInventoryItemsMap[requisitionItem?.product?.id]?.findAll { it.quantity > 0 }}"/>
-
                     <h2>
                         ${requisitionItem?.product?.productCode}
                         ${requisitionItem?.product?.name}
-                        (
+                        ${requisitionItem?.quantity}
                         <g:if test="${requisitionItem?.productPackage}">
-                            ${requisitionItem?.productPackage?.code}/
-                            ${requisitionItem?.productPackage?.quantity}
+                            (${requisitionItem?.productPackage?.code}/${requisitionItem?.productPackage?.quantity})
                         </g:if>
                         <g:else>
-                            EA/1
+                            (EA)
                         </g:else>
-                        )
                         <span class="fade">
                             ${picklistItem?.inventoryItem?.product?.getInventoryLevel(session?.warehouse?.id)?.binLocation}
                         </span>
@@ -37,31 +31,41 @@
 
                         <thead>
                             <tr>
+                                <th colspan="3" class="center no-border-bottom border-right">
+                                    ${warehouse.message(code: 'inventory.availableItems.label', default: 'Available items')}
+                                </th>
+                                <th colspan="4" class="center no-border-bottom">
+                                    ${warehouse.message(code: 'picklist.picklistItems.label')}
+                                </th>
+                            </tr>
+                            <tr>
                                 <th>
                                     ${warehouse.message(code: 'inventoryItem.lotNumber.label')}
                                 </th>
                                 <th>
                                     ${warehouse.message(code: 'inventoryItem.expirationDate.label')}
                                 </th>
-                                <th class="center">
+                                <th class="center border-right">
                                     ${warehouse.message(code: 'requisitionItem.quantityAvailable.label')}
                                 </th>
-                                <th class="center border-right">
-                                    ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}
+                                <%--
+                                <th>
+                                    ${warehouse.message(code: 'requisitionItem.quantityToPick.label', default:'Quantity to pick')}
                                 </th>
+                                --%>
                                 <th class="center">
                                     ${warehouse.message(code: 'picklistItem.quantity.label')}
                                 </th>
                                 <th class="center">
-                                    ${warehouse.message(code: 'product.unitOfMeasure.label')}
+                                    ${warehouse.message(code: 'product.uom.label')}
                                 </th>
                                 <th>
-
+                                    ${warehouse.message(code: 'default.actions.label')}
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-
+                            <g:set var="inventoryItems" value="${productInventoryItemsMap[requisitionItem?.product?.id]?.findAll { it.quantity > 0 }}"/>
                             <g:unless test="${inventoryItems}">
                                 <tr style="height: 60px;">
                                     <td colspan="5" class="center middle">
@@ -84,39 +88,32 @@
                                                     format="MMM yyyy"/>
                                         </g:if>
                                         <g:else>
-                                            <warehouse:message code="default.never.label"/>
+                                            <span class="fade"><warehouse:message code="default.never.label"/></span>
                                         </g:else>
                                     </td>
-                                    <td class="middle center">
+                                    <td class="middle center border-right">
                                         ${inventoryItem?.quantity ?: 0}
                                         ${inventoryItem?.product?.unitOfMeasure?:"EA"}
                                     </td>
-                                    <td class="middle center border-right">
-                                        ${requisitionItem?.calculateQuantityRemaining()?:0 }
-                                        ${inventoryItem?.product?.unitOfMeasure?:"EA"}
+                                    <%--
+                                    <td>
+                                        <g:link controller="requisition" action="addToPicklistItems" id="${requisition?.id}" params=""
+                                            class="button icon arrowright" >
+                                            ${requisitionItem?.calculateQuantityRemaining()} ${inventoryItem?.product?.unitOfMeasure?:"EA"}
+                                        </g:link>
                                     </td>
+                                    --%>
                                     <td class="middle center">
-                                        <g:if test="${picklistItem}">
-                                            <g:hiddenField
-                                                    name="picklistItems[${status}].id"
-                                                    value="${picklistItem.id}"/>
-                                        </g:if>
-                                        <g:hiddenField
-                                                name="picklistItems[${status}].requisitionItem.id"
-                                                value="${requisitionItem.id}"/>
-                                        <g:hiddenField
-                                                name="picklistItems[${status}].inventoryItem.id"
-                                                value="${inventoryItem.id}"/>
-                                        <input name="picklistItems[${status}].quantity"
-                                               value="${quantityPicked}" size="5"
-                                               type="text" class="text"/>
+                                        <g:hiddenField name="picklistItems[${status}].id" value="${picklistItem?.id}"/>
+                                        <g:hiddenField name="picklistItems[${status}].requisitionItem.id" value="${picklistItem?.requisitionItem?.id?:requisitionItem?.id}"/>
+                                        <g:hiddenField name="picklistItems[${status}].inventoryItem.id" value="${picklistItem?.inventoryItem?.id?:inventoryItem?.id}"/>
+                                        <input name="picklistItems[${status}].quantity" value="${quantityPicked}" size="5" type="text" class="text"/>
                                     </td>
                                     <td class="middle center">
                                         ${inventoryItem?.product?.unitOfMeasure ?: "EA"}
                                     </td>
                                     <td>
                                         <g:if test="${picklistItem}">
-
                                             <g:link controller="picklistItem"
                                                     action="delete"
                                                     id="${picklistItem?.id}"
@@ -130,14 +127,21 @@
 
                             </g:each>
                         </tbody>
-
                         <g:if test="${inventoryItems}">
                             <tfoot>
                                 <tr>
                                     <td colspan="7" class="center">
-                                        <button class="button">
-                                            ${warehouse.message(code: 'picklist.addToPicklistItems.label', default:'Add to picklist items')}
-                                        </button>
+                                        <g:if test="${requisitionItem?.retrievePicklistItems()}">
+                                            <button class="button">
+                                                ${warehouse.message(code: 'picklist.updatePicklistItems.label', default:'Update picklist items')}
+                                            </button>
+                                        </g:if>
+                                        <g:else>
+                                            <button class="button">
+                                                ${warehouse.message(code: 'picklist.addToPicklistItems.label', default:'Add to picklist items')}
+                                            </button>
+
+                                        </g:else>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -145,7 +149,7 @@
                     </table>
                 </g:form>
 
-
+            </div>
         </g:if>
         <%-- requisitionItem?.requisition?.status == RequisitionStatus.REVIEWING --%>
         <g:elseif test="${actionName == 'review' }">

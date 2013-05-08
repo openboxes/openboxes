@@ -11,6 +11,8 @@ package org.pih.warehouse.requisition
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -554,49 +556,44 @@ class RequisitionController {
 		[requisition:requisition, picklist: picklist, location:location]
 	}
 
-	def addToPicklistItems = { 
+
+	def addToPicklistItems = { AddToPicklistItemsCommand command ->
 		println "Add to picklist items " + params
 		def requisition = Requisition.get(params.id)
 	//	def requisitionItem = Requisition.get(params.requisitionItem.id)
 		def picklist = Picklist.findByRequisition(requisition)
 
-		
-		if (!picklist) {
-			picklist = new Picklist();
-			picklist.requisition = requisition
-			if (!picklist.save(flush:true)) {
-				throw new ValidationException("Unable to create new picklist", picklist.errors)
-			}
-		}
-		def tmpPicklist = new Picklist()
-		bindData(tmpPicklist, params)
-		//bindData(picklistItems, params.picklistItems)
-		tmpPicklist.picklistItems.each { picklistItem ->
-			if (picklistItem.quantity > 0) { 
-				println "Save to picklist " + picklistItem.id + " " + picklistItem.inventoryItem + " " + picklistItem.quantity
-				def existingPicklistItem
-				if (picklistItem.id) { 
-					existingPicklistItem = PicklistItem.get(picklistItem.id)
-					existingPicklistItem.quantity = picklistItem.quantity
-					existingPicklistItem.save(flush:true)
-				} 
-				else { 					
-					picklist.addToPicklistItems(picklistItem)
-					picklistItem.save(flush:true)
-					picklist.save(flush:true)
-					println "saved picklist " + picklist.id + picklist.errors
-					println picklist.picklistItems
-				}
-				println picklistItem.id + " " + picklistItem.inventoryItem + " " + picklistItem.quantity
-			}
-		}
-		
-		//def picklistItem = new PicklistItem()
-		//requisitionItem = requisitionItem
-		//inventoryItem = 
-		//quantity
-		
-		chain(action: "pick", id: requisition.id)
+        println "Requisition " + command?.requisition
+		def picklist = Picklist.findByRequisition(command.requisition)
+        if (!picklist) {
+            picklist = new Picklist();
+            picklist.requisition = command.requisition
+            if (!picklist.save(flush:true)) {
+                throw new ValidationException("Unable to create new picklist", picklist.errors)
+            }
+        }
+        command?.picklistItems.each { picklistItem ->
+            def existingPicklistItem  = PicklistItem.get(picklistItem.id)
+            if (picklistItem.quantity > 0) {
+                if (existingPicklistItem) {
+                    existingPicklistItem.quantity = picklistItem.quantity
+                    existingPicklistItem.save(flush:true)
+                }
+                else {
+                    println "Adding new item to picklist " + picklistItem?.id + " inventoryItem.id=" + picklistItem?.inventoryItem?.id + " qty=" + picklistItem?.quantity
+                    picklist.addToPicklistItems(picklistItem)
+                    //picklistItem.save(flush:true)
+                    picklist.save(flush:true)
+                }
+            }
+            // Otherwise, if quantity <= 0 then we want to remove this item
+            else {
+                if (existingPicklistItem) {
+                    picklist.removeFromPicklistItems(existingPicklistItem)
+                }
+            }
+        }
+		redirect(action:  "pick", id:  command?.requisition?.id)
 	}
 	
 	
@@ -641,4 +638,20 @@ class RequisitionController {
 
 
 	
+}
+
+
+class AddToPicklistItemsCommand {
+    Requisition requisition
+    RequisitionItem requisitionItem
+    def picklistItems = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(PicklistItem.class));
+
+    static constraints = {
+        requisition(nullable:false)
+        requisitionItem(nullable:false)
+        picklistItems(nullable:true)
+
+    }
+
+
 }
