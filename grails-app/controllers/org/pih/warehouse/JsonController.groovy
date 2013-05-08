@@ -873,7 +873,7 @@ class JsonController {
 		def json = items.collect{
 			def type = it.class.simpleName.toLowerCase()
 			[id: it.id, type: it.class, url: request.contextPath + "/" + type  + "/redirect/" + it.id, 
-				value: it.name  , label: it.name ]
+				value: it.name,  label: it.productCode + " " + it.name ]
 		}
 		render json as JSON
 	}
