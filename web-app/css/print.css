@@ -18,6 +18,10 @@ h6 { font-size: 14px; }
     text-align: center;
     margin: 10px;
 }
+.canceled {
+    color: lightgrey;
+    text-decoration: line-through;
+}
 
 .odd {
     background: #f7f7f7; !important;

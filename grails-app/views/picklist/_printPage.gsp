@@ -1,17 +1,18 @@
 <div class="page" style="page-break-after: always;">
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <tr class="theader">
+            <th></th>
             <th><warehouse:message code="report.number.label"/></th>
             <th class="center">${warehouse.message(code: 'product.productCode.label')}</th>
-            <%-- <th></th>--%>
             <th>${warehouse.message(code: 'product.label')}</th>
             <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
             <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
-            <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
-            <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
+            <th class="center">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
+            <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
             <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
+            <th width="10%" class="center">${warehouse.message(code:'picklistItem.picked.label', default: 'Picked')}</th>
         </tr>
-        <g:each in="${requisitionItems}" status="i" var="requisitionItem">
+        <g:each in="${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() } }" status="i" var="requisitionItem">
             <g:if test="${picklist}">
                 <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
                 <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
@@ -25,12 +26,20 @@
             <g:set var="j" value="${0}"/>
             <g:while test="${j < numInventoryItem}">
                 <tr class="prop">
+                    <td class="middle center">
+                        <g:if test="${requisitionItem?.product?.coldChain}">
+                            <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}"/>
+                        </g:if>
+                        <g:elseif test="${requisitionItem?.product?.controlledSubstance}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>
+                        </g:elseif>
+                        <g:elseif test="${requisitionItem?.product?.hazardousMaterial}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'information.png')}" title="Hazardous material"/>
+                        </g:elseif>
+                    </td>
                     <td class=" middle center">${i + 1}</td>
                     <td class="middle center">
                         <span class="product-code">${requisitionItem?.product?.productCode}</span>
-                        <%--
-                        <img src="${createLink(controller:'product',action:'barcode',params:[data:requisitionItem?.product?.productCode,width:100,height:30,format:'CODE_128']) }"/>
-                        --%>
                     </td>
                     <%--
                     <td>
@@ -58,12 +67,12 @@
                             ${binLocationPart}<br/>
                         </g:each>
                     </td>
-                    <td class="middle">
+                    <td class="middle center">
                         <g:if test="${picklistItems}">
                             <span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
                         </g:if>
                     </td>
-                    <td class="middle">
+                    <td class="middle center">
                         <g:if test="${picklistItems}">
                             <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
                         </g:if>
@@ -73,6 +82,10 @@
                             ${picklistItems[j]?.quantity ?: 0}
                             ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                         </g:if>
+                    </td>
+                    <td>
+
+
                     </td>
                     <% j++ %>
                 </tr>
