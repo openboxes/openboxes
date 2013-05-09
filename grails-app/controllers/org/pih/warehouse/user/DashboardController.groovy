@@ -98,15 +98,17 @@ class DashboardController {
 
 
         // Find recent requisition activity
-        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where r.isTemplate = false and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
-                ['lastUpdated':new Date()-daysToInclude, origin:location, destination: location])
+        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
+                ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination': location])
         requisitions.each {
             def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
+            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
             def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
             activityType = "${warehouse.message(code: activityType)}"
             activityList << new DashboardActivityCommand(
                     type: "basket",
-                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType])}",
+                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType, username])}",
                     url: link,
                     dateCreated: it.dateCreated,
                     lastUpdated: it.lastUpdated,
@@ -115,7 +117,7 @@ class DashboardController {
 				
         // Add recent shipments
 		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location], [max: 10] );
+			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
 		shipments.each { 
 			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -130,7 +132,7 @@ class DashboardController {
 		}
 		//order by e.createdDate desc
 		//[max:params.max.toInteger(), offset:params.offset.toInteger ()]
-		def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude], [max: 10])
+		def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude])
 		shippedShipments.each {
 			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
 			def activityType = "dashboard.activity.shipped.label"
@@ -143,7 +145,7 @@ class DashboardController {
 				lastUpdated: it.lastUpdated,
 				shipment: it)
 		}
-		def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude], [max: 10])
+		def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude])
 		receivedShipment.each {
 			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
 			def activityType = "dashboard.activity.received.label"
@@ -157,7 +159,7 @@ class DashboardController {
 				shipment: it)
 		}
 
-		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
+		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
 		products.each { 
 			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
 			def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
@@ -176,7 +178,7 @@ class DashboardController {
 		// If the current location has an inventory, add recent transactions associated with that location to the activity list
 		if (location?.inventory) { 
 			def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory], [max: 10] );
+				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
 			
 			transactions.each { 
 				def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
