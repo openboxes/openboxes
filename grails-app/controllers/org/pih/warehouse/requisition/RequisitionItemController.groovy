@@ -156,7 +156,7 @@ class RequisitionItemController {
 
     def changeQuantity = {
         log.info "change quantity " + params
-        def requisition = Requisition.get(params.id)
+      //  def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
         def productPackage = ProductPackage.get(params?.productPackage?.id)
         try {
@@ -383,7 +383,7 @@ class RequisitionItemController {
 
 
     def undoChangeQuantity = {
-        def requisition = Requisition.get(params.id)
+       // def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
 
         try {
