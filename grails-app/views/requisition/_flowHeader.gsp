@@ -22,7 +22,7 @@
         <div class="${actionName.equals('review')||actionName.equals('change')?'active-step':''}">
             <g:link controller="requisition" action="review" id="${requisition?.id}">
                 <span class="step">3</span>
-                <warehouse:message code="requisition.review.label"/>
+                <warehouse:message code="requisition.verify.label"/>
             </g:link>
         </div>
 		<div class="${actionName.equals('pick')?'active-step':''}">
@@ -34,7 +34,7 @@
 		<div class="${actionName.equals('confirm')?'active-step':''}">
 			<g:link controller="requisition" action="confirm" id="${requisition?.id}">
                 <span class="step">5</span>
-				<warehouse:message code="requisition.confirm.label"/>
+				<warehouse:message code="requisition.check.label"/>
 			</g:link>
 		</div>
 		<div class="${actionName.equals('transfer')?'active-step':''}">

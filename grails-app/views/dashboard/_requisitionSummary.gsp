@@ -20,7 +20,7 @@
                         <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
                         <tr class="${i%2?'odd':'even'}">
                             <td class="center" style="width: 1%">
-                                <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + statusMessage?.toLowerCase() + '.png')}"/>
+                                <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
 
                             </td>
                             <td>
@@ -53,80 +53,7 @@
                     </tfoot>
                 </table>
 
-            <%--
-                <g:set var="pending" value="${ShipmentStatusCode.PENDING}"/>
-                <g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
-                <g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
-                <g:set var="shipmentsPending" value="${outgoingShipmentsByStatus[pending] }"/>
-                <g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[shipped] }"/>
-                <g:set var="shipmentsReceived" value="${outgoingShipmentsByStatus[received] }"/>
-                <g:set var="outgoingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsShipped.objectList.size + shipmentsReceived.objectList.size }"/>
 
-
-                <table>
-
-                    <tbody>
-                        <tr class="even">
-                            <td class="center" style="width: 1%">
-                                <img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>
-                            </td>
-                            <td>
-                                <g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
-                                    ${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }
-                                </g:link>
-                            </td>
-                            <td style="text-align: right;">
-                                <g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
-                                    ${shipmentsPending.objectList.size}
-                                </g:link>
-                            </td>
-                        </tr>
-                        <tr class="odd prop">
-                            <td class="center" style="width: 1%">
-                                <img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>
-                            </td>
-
-                            <td>
-                                <g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
-                                    ${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }
-                                </g:link>
-                            </td>
-                            <td style="text-align: right;">
-                                <g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
-                                    ${shipmentsShipped.objectList.size}
-                                </g:link>
-                            </td>
-                        </tr>
-
-                        <tr class="even prop">
-                            <td class="center" style="width: 1%">
-                                <img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>
-                            </td>
-
-                            <td>
-                                <g:link controller="shipment" action="list" params="['type':'outgoing','status':received]">
-                                    ${warehouse.message(code: 'dashboard.outgoing.received.label', args: [session.warehouse.name]) }
-                                </g:link>
-                            </td>
-                            <td style="text-align: right;">
-                                <g:link controller="shipment" action="list" params="['type':'outgoing','status':received]">
-                                    ${shipmentsReceived.objectList.size}
-                                </g:link>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="even prop">
-                            <th colspan="2">
-                                <warehouse:message code="default.total.label"/>
-                            </th>
-                            <th class="right">
-                                ${outgoingShipmentsTotal }
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
-                --%>
 			</g:else>
 		</div>
 	</div>	
