@@ -84,6 +84,9 @@
                                                 ${warehouse.message(code: 'default.actions.label')}
                                             </th>
                                             <th>
+                                                ${warehouse.message(code: 'product.productCode.label')}
+                                            </th>
+                                            <th>
                                                 ${warehouse.message(code: 'product.label')}
                                             </th>
                                             <th>

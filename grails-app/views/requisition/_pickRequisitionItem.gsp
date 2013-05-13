@@ -8,6 +8,9 @@
         </g:if>
     </td>
     <td>
+        ${requisitionItem?.product?.productCode}
+    </td>
+    <td>
         <g:link controller="requisition" action="pick" id="${requisition.id }" params="['requisitionItem.id':requisitionItem?.id]">
             <format:product product="${requisitionItem?.product}"/>
         </g:link>
