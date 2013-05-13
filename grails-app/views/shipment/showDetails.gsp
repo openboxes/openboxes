@@ -45,8 +45,8 @@
 								<tr>
 									<th><warehouse:message code="default.date.label"/></th>
 									<th><warehouse:message code="default.time.label"/></th>
-									<th><warehouse:message code="location.label"/></th>
 									<th><warehouse:message code="default.event.label"/></th>
+                                    <th><warehouse:message code="location.label"/></th>
 									<th></th>
 								</tr>
 								<g:set var="i" value="${0 }"/>
@@ -618,6 +618,7 @@
 						<table>		
 							<tr>
 								<th><warehouse:message code="shipping.container.label"/></th>
+                                <th><warehouse:message code="product.productCode.label"/></th>
 								<th><warehouse:message code="product.label"/></th>
 								<th class="center"><warehouse:message code="default.lotSerialNo.label"/></th>
 								<th class="center"><warehouse:message code="default.expires.label"/></th>
@@ -644,8 +645,10 @@
 												<g:render template="container" model="[container:shipmentItem?.container]"/>
 											</td>
 										</g:if>
+                                        <td>
+                                            ${shipmentItem?.inventoryItem?.product?.productCode}
+                                        </td>
 										<td class="product">
-                                            <label>${shipmentItem?.inventoryItem?.product?.productCode}</label>
 											<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
 												<format:product product="${shipmentItem?.inventoryItem?.product}"/>
 											</g:link>

@@ -97,9 +97,9 @@ class FormatTagLib {
              Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
              Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 def value = "";
-             if (attrs?.product?.productCode) {
-                 value = attrs?.product?.productCode + " "
-             }
+             //if (attrs?.product?.productCode) {
+             //    value = attrs?.product?.productCode + " "
+             //}
              value += LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
 
 
