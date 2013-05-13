@@ -747,14 +747,15 @@ class JsonController {
             result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
 
             // Add the package level items
+            /*
             product.packages.each { pkg ->
                 productPackageName = pkg?.uom?.code + "/" + pkg?.quantity;
                 value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
                 value = value.trim()
                 result.add([id: product.id, value: value, type: "Product", quantity: null, group: null,
                         productPackageId: pkg?.id, productPackageName: productPackageName, productPackageQty: pkg?.quantity])
-
             }
+            */
 
         }
         println result
@@ -792,6 +793,7 @@ class JsonController {
             result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
 
             // Add the package level items
+            /*
             product.packages.each { pkg ->
                 productPackageName = pkg?.uom?.code + "/" + pkg?.quantity;
                 value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
@@ -800,6 +802,7 @@ class JsonController {
                         productPackageId: pkg?.id, productPackageName: productPackageName])
 
             }
+            */
 
         }
         println result
