@@ -75,7 +75,7 @@
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="printDeliveryNote" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisition.button.printDeliveryNote.label', default: 'Print delivery note')}
+                        &nbsp;${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">

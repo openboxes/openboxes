@@ -157,15 +157,18 @@
 
             <div class="box">
                 <h2>${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}</h2>
+                <%--
                 <div class="center">
                     <g:form controller="requisitionTemplate" action="addToRequisitionItems">
                         <g:hiddenField name="id" value="${requisition.id}"/>
+
                         <g:textArea name="multipleProductCodes" cols="75" rows="3"
                                     placeholder="${warehouse.message(code:'requisitionTemplate.enterProductCodes.message', default:'Enter multiple product codes separated by commas')}"></g:textArea>
 
                         <button class="button" id="add-requisition-items"><warehouse:message code="default.button.add.label"/></button>
                     </g:form>
                 </div>
+                --%>
                 <div class="center" style="padding: 20px;">
                     <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
                                    width="400" styleClass="text"/>

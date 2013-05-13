@@ -118,7 +118,14 @@
 
                 <td class="middle">
                     <img src="${resource(dir:'images/icons/silk', file: 'zoom.png')}" class="dialog-trigger" data-id="#dialog-box-${requisition?.id}"/>
+
+
                     <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}">
+                        <%--
+                        <div class="summary">
+                            <g:render template="header" model="[requisition:requisition]"/>
+                        </div>
+                        --%>
                         <table>
                             <tr>
                                 <th><warehouse:message code="default.quantity.label"/></th>

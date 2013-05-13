@@ -19,7 +19,8 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.fulfillment.Fulfillment
-import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.picklist.Picklist;
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -39,6 +40,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Dates
     Date dateRequested = new Date()
+    Date dateReviewed
+    Date dateVerified
+    Date dateDelivered
+    Date dateReceived
     Date requestedDeliveryDate = new Date()
 
     // Frequency - for stock requisitions we should know how often (monthly, weekly, daily)
@@ -48,11 +53,31 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionStatus status;
     CommodityClass commodityClass
 
-    Location origin            // where the requisition came from
-    Location destination     // who the requisition will be fulfilled by
+    // where the requisition came from
+    Location origin
 
+    // who the requisition will be fulfilled by
+    Location destination
+
+    // Person who submitted the initial requisition paper form
     Person requestedBy
+
+    // Person who reviewed the requisition
+    Person reviewedBy
+
+    // Pharmacist who verified the requisition before it was issued
+    Person verifiedBy
+
+    // Pharmacist or nurse who signed for the issued stock
+    Person deliveredBy
+
+    // Pharmacist or nurse who signed for the issued stock
+    Person receivedBy
+
+    // Intended recipient
     Person recipient
+
+    // Intended recipient program
     String recipientProgram
 
     // Stock requisitions will need to be handled through a template version of a requisition
@@ -76,6 +101,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
+    static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem]
     static mapping = {
         id generator: 'uuid'
@@ -93,8 +119,14 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requestNumber(nullable: true, maxSize: 255)
         origin(nullable: false)
         destination(nullable: false)
+        fulfillment(nullable: true)
         recipient(nullable: true)
         requestedBy(nullable: false)
+        reviewedBy(nullable: true)
+        verifiedBy(nullable: true)
+        deliveredBy(nullable: true)
+        receivedBy(nullable: true)
+        picklist(nullable: true)
         dateRequested(nullable: false)
         //validator: { value -> value <= new Date()})
         requestedDeliveryDate(nullable: false)
@@ -103,8 +135,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
         //    tomorrow.clearTime()
         //    return value >= tomorrow
         //})
-        fulfillment(nullable: true)
         dateCreated(nullable: true)
+        dateReviewed(nullable: true)
+        dateVerified(nullable: true)
+        dateDelivered(nullable: true)
+        dateReceived(nullable: true)
         lastUpdated(nullable: true)
         dateValidFrom(nullable: true)
         dateValidTo(nullable: true)
@@ -116,6 +151,13 @@ class Requisition implements Comparable<Requisition>, Serializable {
         isPublished(nullable: true)
         datePublished(nullable: true)
     }
+
+    /*
+    def getPicklist() {
+        return Picklist.findByRequisition(this)
+    }
+    */
+
 
     def getTransactions() {
         return Transaction.findAllByRequisition(this)

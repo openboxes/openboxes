@@ -17,14 +17,9 @@
             </g:if>
 
             <div class="yui-gf">
-
 				<div class="yui-u first">
-
                     <div class="box">
-
-
                         <h2><warehouse:message code="default.filters.label"/></h2>
-
                         <g:form action="list" method="GET">
                             <div class="filter-list">
                                 <div class="filter-list-item">
@@ -101,8 +96,6 @@
                     </div>
                 </div>
                 <div class="yui-u">
-
-
                     <div class="buttonBar button-group">
                         <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
                             <warehouse:message code="default.all.label"/>
@@ -115,7 +108,7 @@
                             </g:link>
                         </g:each>
                     </div>
-                    <div class="buttonBar button-group">
+                    <div class="buttonBar button-group right">
                         <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
                             ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'Related to me')}
                             (${requisitionsMap["relatedToMe"]?:0 })
@@ -193,7 +186,7 @@
 				);
 
                 $(".dialog-box").hide();
-                $(".dialog-box").dialog({ autoOpen:false, height: 400, width:600 });
+                $(".dialog-box").dialog({ autoOpen:false, height: 400, width:800 });
 
                 $(".dialog-trigger").toggle(function(){
                         $($(this).attr("data-id")).dialog('open');

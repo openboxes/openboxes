@@ -298,9 +298,11 @@ class DashboardController {
 		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
 
         // Requisitions
-        def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-		def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-
+        //def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
+		//def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
+        def incomingRequests = requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
+        def outgoingRequests = []
+        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(session.warehouse)
         //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
         //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
 		
@@ -321,6 +323,7 @@ class DashboardController {
 			incomingOrders: incomingOrders,
 			incomingRequests: incomingRequests,
 			outgoingRequests: outgoingRequests,
+            requisitionTemplates: requisitionTemplates,
             //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()

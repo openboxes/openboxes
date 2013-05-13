@@ -186,7 +186,7 @@ class RequisitionTemplateController {
                         requisitionItem.quantity = 1;
                         requisitionItem.substitutable = false
                         requisition.addToRequisitionItems(requisitionItem)
-                        requisition.save(flush: true)
+                        requisition.save(flush: true, failOnError: true)
                         processedProductCodes << productCode
                     }
                     else {

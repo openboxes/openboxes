@@ -11,12 +11,18 @@
             type="text/javascript"></script>
     <link rel="stylesheet" href="${createLinkTo(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.css')}"
           type="text/css" media="all"/>
+
+    <style>
+    .cf-header {
+        overflow: auto;
+        width: 100%
+    }
+    </style>
 </head>
 
 <body>
-<div id="print-header" style="line-height: 40px;">
-    <%--<img id="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>--%>
-    <span class="title"><warehouse:message code="picklist.print.label"/></span>
+<div id="print-header" style="line-height: 40px">
+    <span class="title"><warehouse:message code="deliveryNote.print.label" default="Print delivery note"/></span>
     <span style="float: right;">
         <button type="button" id="print-button" onclick="window.print()">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>
@@ -34,26 +40,23 @@
     <tr>
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
-                <div class="print-logo nailthumb-container-100">
+                <div class="print-logo nailthumb-container" style="float: left;">
                     <img src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
                 </div>
             </div>
         </td>
         <td>
             <div class="header">
-                <h1><warehouse:message code="picklist.label"/></h1>
+                <h1><warehouse:message code="requisition.deliveryNote.label"/></h1>
             </div>
             <div class="header">
-                <h3>${requisition.requestNumber} | ${requisition?.name }</h3>
+                <h3>${requisition?.requestNumber} | ${requisition?.name }</h3>
             </div>
             <%--
             <div class="header">
                 <h3>${requisition?.destination?.name}</h3>
             </div>
             --%>
-            <div class="header">
-            </div>
-
             <div class="header">
                 <g:if test="${requisition.requestNumber}">
                     <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
@@ -63,7 +66,7 @@
         <td>
             <div class="right">
                 <table style="width:auto;" border="0">
-                    <tr class="header">
+                    <tr>
                         <td>
                             <label><warehouse:message code="requisition.depot.label"/>:</label>
                         </td>
@@ -71,7 +74,7 @@
                             ${requisition.destination?.name}
                         </td>
                     </tr>
-                    <tr class="header">
+                    <tr>
                         <td>
                             <label><warehouse:message code="requisition.ward.label"/>:</label>
                         </td>
@@ -79,23 +82,20 @@
                             ${requisition.origin?.name}
                         </td>
                     </tr>
-
-                    <tr class="header">
+                    <tr>
                         <td>
                             <label><warehouse:message code="requisition.date.label"/>:</label>
                         </td>
                         <td class="right">
-                            <g:formatDate
-                                date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
+                            <g:formatDate date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
                         </td>
                     </tr>
-                    <tr class="header">
+                    <tr>
                         <td>
                             <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
                         </td>
                         <td class="right">
-                            <g:formatDate
-                                date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
+                            <g:formatDate date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
                         </td>
                     </tr>
 
@@ -103,106 +103,8 @@
             </div>
         </td>
     </tr>
-
 </table>
 
-
-<div class="clear"></div>
-
-<table class="signature-table" border="0">
-    <tr class="theader">
-        <td width="15%"></td>
-        <td width="20%"><warehouse:message code="default.name.label"/></td>
-        <td width="40%"><warehouse:message code="default.signature.label"/></td>
-        <td width="15%" class="center"><warehouse:message code="default.date.label"/></td>
-        <td width="10%" class="center"><warehouse:message code="default.time.label"/></td>
-    </tr>
-    <tr>
-        <td class="right">
-            <label><warehouse:message code="requisition.requestedBy.label"/></label>
-        </td>
-        <td class="middle">
-            ${requisition?.requestedBy?.name}
-        </td>
-        <td>
-
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateRequested}" format="MMM dd, yyyy"/>
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateRequested}" format="hh:mm a"/>
-        </td>
-    </tr>
-    <tr>
-        <td class="right middle">
-            <label><warehouse:message code="requisition.createdBy.label"/></label>
-        </td>
-        <td class="middle">
-            ${requisition?.createdBy?.name?:warehouse.message(code:'default.noone.label')}
-        </td>
-        <td>
-
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateCreated}" format="MMM dd, yyyy"/>
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateCreated}" format="hh:mm a"/>
-        </td>
-    </tr>
-    <tr>
-        <td class="right">
-            <label><warehouse:message code="requisition.verifiedBy.label"/></label>
-        </td>
-        <td class="middle">
-            ${requisition?.verifiedBy?.name?:warehouse.message(code:'default.noone.label')}
-        </td>
-        <td>
-
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateVerified}" format="MMM dd, yyyy"/>
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateVerified}" format="hh:mm a"/>
-        </td>
-    </tr>
-    <tr>
-        <td class="right">
-            <label><warehouse:message code="requisition.pickedBy.label"/></label>
-        </td>
-        <td class="middle">
-            ${picklist?.picker?.name?:warehouse.message(code:'default.noone.label')}
-        </td>
-        <td>
-
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${picklist?.datePicked}" format="MMM dd, yyyy"/>
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${picklist?.datePicked}" format="hh:mm a"/>
-        </td>
-    </tr>
-    <tr>
-        <td class="middle right">
-            <label><warehouse:message code="requisition.reviewedBy.label" default="Checked by"/></label>
-        </td>
-        <td class="middle">
-            ${requisition?.reviewedBy?.name?:warehouse.message(code:'default.noone.label')}
-        </td>
-        <td>
-
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateReviewed}" format="MMM dd, yyyy"/>
-        </td>
-        <td class="middle center">
-            <g:formatDate date="${requisition?.dateReviewed}" format="hh:mm a"/>
-        </td>
-    </tr>
-</table>
 
 <div class="clear"></div>
 
@@ -243,12 +145,18 @@
         </h2>
         <g:render template="printPage" model="[requisitionItems:requisitionItemsOther]"/>
     </g:if>
+
 </div>
 
+<p><warehouse:message code="requisitionItem.comment.label"/>:</p>
+
+<div id="comment-box">
+
+</div>
 <script>
     $(document).ready(function () {
-        $('.nailthumb-container').nailthumb({ width: 100, height: 60 });
-        $('.nailthumb-container-100').nailthumb({ width: 100, height: 100 });
+        $('.nailthumb-container').nailthumb({ width: 100, height: 100 });
+        //window.print();
     });
 </script>
 

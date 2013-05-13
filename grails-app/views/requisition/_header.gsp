@@ -119,14 +119,51 @@
                 <tr class="prop">
                     <td class="name">
                         <label><warehouse:message
-                                code="requisition.processedBy.label" /></label>
+                                code="requisition.createdBy.label" /></label>
                     </td>
                     <td class="value">
-                        ${requisition?.createdBy?.name?:session?.user?.name }
+                        ${requisition?.createdBy?.name}
                     </td>
-
-
                 </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message
+                                code="default.updatedBy.label" /></label>
+                    </td>
+                    <td class="value">
+                        ${requisition?.updatedBy?.name }
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.reviewedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.reviewedBy?.name }
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="picklist.picker.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.picklist?.picker?.name }
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.verifiedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.verifiedBy?.name }
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.receivedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.receivedBy?.name }
+                    </td>
+                </tr>
+
+
                 <g:if test="${requisition.isDepotRequisition()}">
                     <tr>
                         <td class="name"><label><warehouse:message

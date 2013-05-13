@@ -30,7 +30,10 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
-                    <g:select name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id" value="${inventoryLevelInstance?.inventory?.id}"  />
+                    <g:select name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
+                                style="width: 300px;"
+
+                                value="${inventoryLevelInstance?.inventory?.id}" class="chzn-select-deselect" />
                 </td>
             </tr>
             <tr class="prop">
@@ -40,6 +43,7 @@
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'product', 'errors')}">
                     <g:select name="status"
                               from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
+                              class="chzn-select"
                               optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance?.status}"
                               noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />
                 </td>

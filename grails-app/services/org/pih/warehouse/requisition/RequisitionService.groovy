@@ -43,6 +43,13 @@ class RequisitionService {
         return Requisition.findAllByIsTemplateAndIsPublished(true, true)
     }
 
+    /**
+     * Get requisition template
+     */
+    def getAllRequisitionTemplates(Location destination) {
+        return getRequisitions(new Requisition(destination:destination, isTemplate: true, isPublished: true), [max: -1, offset: 0])
+    }
+
     def getAllRequisitions(Location destination) {
         return getRequisitions(new Requisition(destination:destination), [max: -1, offset: 0])
     }
@@ -87,10 +94,20 @@ class RequisitionService {
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
             and {
                 // Base query needs to include the following
-                or {
-                    eq("isTemplate", false)
-                    isNull("isTemplate")
+                if (!requisition.isTemplate) {
+                    or {
+                        eq("isTemplate", false)
+                        isNull("isTemplate")
+                    }
                 }
+                else {
+                    eq("isTemplate", requisition.isTemplate)
+                }
+                if (requisition.isPublished) {
+                    eq("isPublished", requisition.isPublished)
+
+                }
+
                 if (requisition.destination) {
                     eq("destination", requisition.destination)
                 }

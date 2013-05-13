@@ -45,7 +45,7 @@ h6 { font-size: 14px; }
     margin-bottom: 20px;
     margin-top: 20px;
 }
-#signature-table tr { border-bottom: 1px solid lightgrey; }
+#signature-table tr { border-bottom: 1px solid lightgrey;  }
 
 .signature-table {
     width: 90%;
@@ -53,7 +53,7 @@ h6 { font-size: 14px; }
     margin-bottom: 20px;
     margin-top: 20px;
 }
-.signature-table tr, .signature-table td { border: 1px solid lightgrey; }
+.signature-table tr, .signature-table td { border: 1px solid lightgrey; height: 30px; }
 
 
 #details-table{
@@ -96,3 +96,4 @@ h6 { font-size: 14px; }
 	#print-button { display:none; }
 	#print-header { display: none; }
 }
+

@@ -336,9 +336,18 @@ class RequisitionController {
 				productInventoryItemsMap[product.id] = productInventoryItems[product].collect{it.toJson()}
 			}
 		}
-		
 		[requisition: requisition]
 	}
+
+    def savePicklistDetails = {
+        def requisition = Requisition.get(params?.id)
+        if (requisition) {
+            requisition.properties = params
+            requisition.save(flush: true)
+
+        }
+        redirect(action: 'confirm', id: requisition.id)
+    }
 
 	def pick = {
 		println "Pick " + params
@@ -562,13 +571,6 @@ class RequisitionController {
         //render (view: "printDraft", model:[requisition:requisition, picklist: picklist, location:location])
 		[requisition:requisition, picklist: picklist, location:location]
     }
-	
-	def printDeliveryNote = {
-		def requisition = Requisition.get(params.id)
-		def picklist = Picklist.findByRequisition(requisition)
-		def location = Location.get(session.warehouse.id)
-		[requisition:requisition, picklist: picklist, location:location]
-	}
 
 
 	def addToPicklistItems = { AddToPicklistItemsCommand command ->

@@ -100,8 +100,6 @@
 		</li>
 	</g:authorize>
 	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
-	
-		
 		<li>
 			<g:link controller="requisition" action="list">
 				<warehouse:message code="requests.label"/>
@@ -110,21 +108,33 @@
                 <div class="buttonsBar" style="min-width: 200px;">
                     <div class="megaButton">
                         <g:link controller="requisition" action="list" class="list">
-                            <warehouse:message code="requisition.list.label" /> <%--(${incomingRequests?.values()?.flatten()?.size()?:0 })--%>
+                            <warehouse:message code="requisition.list.label" />
+                            (${incomingRequests?.values()?.flatten()?.size()?:0 })
                         </g:link>
                     </div>
-                    <%--
+                    <g:isUserAdmin>
+                        <div class="megaButton">
+                            <g:link controller="requisitionTemplate" action="list" class="list">
+                                <warehouse:message code="requisitionTemplate.list.label" />
+                                (${requisitionTemplates.size()})
+                            </g:link>
+                        </div>
+                    </g:isUserAdmin>
                     <div class="megaButton">
-                        <g:link controller="requisition" action="list" class="list" >
-                            <warehouse:message code="requisition.listPending.label" default="List pending requisitions"/> (${incomingRequests?.values()?.flatten()?.size()?:0 })
-                        </g:link>
+                        <hr/>
                     </div>
-                    <div class="megaButton">
-                        <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="list">
-                            <warehouse:message code="requisition.listByMe.label" default="List my requisitions" /> (${myRequisitions?.size()?:0 })
-                        </g:link>
-                    </div>
-                    --%>
+                <%--
+                <div class="megaButton">
+                    <g:link controller="requisition" action="list" class="list" >
+                        <warehouse:message code="requisition.listPending.label" default="List pending requisitions"/> (${incomingRequests?.values()?.flatten()?.size()?:0 })
+                    </g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="list">
+                        <warehouse:message code="requisition.listByMe.label" default="List my requisitions" /> (${myRequisitions?.size()?:0 })
+                    </g:link>
+                </div>
+                --%>
 	                <div class="megaButton">
 	                    <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
@@ -145,14 +155,7 @@
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depotToDepot.label')]" />
 	                    </g:link>
 	                </div>
-	                <g:isUserAdmin>
-	                    <div class="megaButton">
-	                        <g:link controller="requisitionTemplate" action="list" class="list">
-	                            <warehouse:message code="requisitionTemplate.list.label" />
-	                        </g:link>
-	                    </div>
-	                </g:isUserAdmin>
-					<%-- 
+					<%--
 	                <div class="megaButton">
 	                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depot-stock.label')]" />

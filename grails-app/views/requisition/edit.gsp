@@ -83,13 +83,13 @@
                             <thead>
                             <tbody data-bind="foreach: requisition.requisitionItems">
                                 <tr class="requisitionItemsRow">
-                                    <td>
-                                        <div data-bind="text: orderIndex()+1"></div>
+                                    <td class="middle">
+                                        <div data-bind="text: orderIndex()"></div>
                                     </td>
-                                    <td class="list-header">
+                                    <td class="middle list-header">
                                         <div data-bind="text: status"></div>
                                     </td>
-                                    <td class="list-header">
+                                    <td class="middle list-header">
 
                                         <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
                                         <input type="hidden" data-bind="value: productPackageId, uniqueName: true" class="productPackageId"/>
@@ -99,7 +99,7 @@
                                                class="required autocomplete text search-product"
                                                data-bind="search_product: {source: '${request.contextPath }/json/searchProduct', id:'searchProduct'+$index()}, value: productName" />
                                     </td>
-                                    <td class="list-header center">
+                                    <td class="middle list-header center">
                                         <input name="quantity" type="text"
                                             class="required number quantity text center" size="10" data-bind="value: quantity" />
                                     </td>
@@ -109,7 +109,7 @@
                                     </td>
                                     --%>
                                     <g:if test="${requisition.isDepotRequisition()}">
-                                      <td class="list-header"><input type="text"
+                                      <td class="middle list-header"><input type="text"
                                             data-bind="value: recipient, uniqueName: true" /></td>
                                     </g:if><%--
                                     <td class="list-header"><input type="text"

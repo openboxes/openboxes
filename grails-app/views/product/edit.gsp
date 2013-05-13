@@ -6,7 +6,7 @@
         <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
 
         <g:if test="${productInstance?.id}">
-	        <title>${productInstance?.name }</title>
+	        <title>${productInstance?.productCode } ${productInstance?.name }</title>
 		</g:if>
 		<g:else>
 	        <title><warehouse:message code="product.add.label" /></title>	

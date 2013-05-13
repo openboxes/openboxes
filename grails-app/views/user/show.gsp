@@ -74,35 +74,42 @@
 								</g:else>
 							</td>
 						</tr>
-            <tr class="prop" id="locationRoles">
-                 <td valign="top" class="name">
-                    <warehouse:message code="user.locationRoles.label" />
-                 </td>
-                 <td valign="top" >${userInstance?.locationRolesDescription()}</td>
-             </tr>
+                        <tr class="prop" id="locationRoles">
+                             <td valign="top" class="name">
+                                <warehouse:message code="user.locationRoles.label" />
+                             </td>
+                             <td valign="top" >
+                                 <g:if test="${userInstance?.locationRoles}">
+                                    ${userInstance?.locationRolesDescription()}
+                                 </g:if>
+                                 <g:else>
+                                     <span class="fade">${warehouse.message(code:'default.none.label')}</span>
+                                 </g:else>
+                             </td>
+                         </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name"><warehouse:message
+                                    code="user.defaultLocation.label" /></td>
+                            <td valign="top" class="value">
+                                <g:if test="${userInstance?.warehouse}">
+                                    ${fieldValue(bean: userInstance, field: "warehouse")}
+                                </g:if>
+                                <g:else>
+                                    <span class="fade">
+                                        <warehouse:message code="default.none.label" />
+                                    </span>
+                                </g:else>
+                            </td>
+                        </tr>
 
 						<tr class="prop">
 							<td valign="top" class="name">
-								<warehouse:message code="user.rememberLastLocation.label" />
+                                <warehouse:message code="user.rememberLastLocation.label" />
 							</td>
 							<td valign="top" class="value">
-								<g:if test="${userInstance.rememberLastLocation }">
+                                <g:if test="${userInstance.rememberLastLocation }">
 									${userInstance.rememberLastLocation}
 								</g:if>
-								<g:else>
-									<span class="fade">
-										<warehouse:message code="default.none.label" />
-									</span>
-								</g:else>
-							</td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="user.warehouse.label" /></td>
-							<td valign="top" class="value">
-								<g:if test="${userInstance?.warehouse}">
-									${fieldValue(bean: userInstance, field: "warehouse")}
-								</g:if> 
 								<g:else>
 									<span class="fade">
 										<warehouse:message code="default.none.label" />

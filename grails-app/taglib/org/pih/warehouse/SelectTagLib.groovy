@@ -133,6 +133,7 @@ class SelectTagLib {
     }
 
     def selectPerson = { attrs, body ->
+        attrs.id = attrs.id?:"selectPerson-" + (new Random()).nextInt()
         def person = Person.get(attrs?.value?.id)
         attrs.selectedPerson = person
         out << render(template: "/taglib/selectPerson", model: [attrs:attrs])

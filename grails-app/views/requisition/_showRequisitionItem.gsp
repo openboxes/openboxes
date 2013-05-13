@@ -10,7 +10,7 @@
         <g:elseif test="${requisitionItem?.isSubstituted()}">
             <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"
         </g:elseif>
-        <g:elseif test="${requisitionItem?.isApproved()}">
+        <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
             <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"
         </g:elseif>
         <g:elseif test="${requisitionItem?.isPending()}">
@@ -18,7 +18,7 @@
         </g:elseif>
     </td>
     <td>
-        <g:set var="value" value="${requisitionItem.calculatePercentageCompleted() }" />
+        <g:set var="value" value="${formatNumber(number:requisitionItem.calculatePercentageCompleted(),maxFractionDigits: 0) }" />
         <div id="progressbar-${requisitionItem?.id }" class="progressbar" style="width: 100px;"></div>
         <script type="text/javascript">
             $(function() {

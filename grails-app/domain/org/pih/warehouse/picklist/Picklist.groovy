@@ -48,7 +48,8 @@ class Picklist implements Serializable {
 	Date lastUpdated
 	User createdBy
 	User updatedBy
-	
+
+    static belongsTo = [requisition: Requisition]
 	static hasMany = [ picklistItems : PicklistItem ]
 	static mapping = {
 		id generator: 'uuid'
@@ -58,7 +59,7 @@ class Picklist implements Serializable {
 	static constraints = { 
 		name(nullable:true)
 		description(nullable:true)
-		picker(nullable:false)
+		picker(nullable:true)
 		datePicked(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)

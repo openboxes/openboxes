@@ -44,4 +44,18 @@
 			</g:link>
 		</div>
 	</div>
+
+    <div class="right">
+        <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+            ${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
+        </g:link>
+        <g:link controller="deliveryNote" action="print" id="${requisition?.id}" target="_blank" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+            ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
+        </g:link>
+
+
+    </div>
+
 </div>

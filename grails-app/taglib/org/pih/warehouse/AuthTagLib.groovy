@@ -20,7 +20,7 @@ class AuthTagLib {
 		if (userService.isUserAdmin(session?.user))
 			out << body()
 	}
-	def isUserManager = { attrs, body ->		
+	def isUserManager = { attrs, body ->
 		if (userService.isUserManager(session?.user))
 			out << body()
 	}

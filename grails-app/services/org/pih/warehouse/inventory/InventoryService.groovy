@@ -2147,6 +2147,7 @@ class InventoryService implements ApplicationContextAware {
 			throw new RuntimeException("Invalid transaction type for mirrored transaction")
 		}
 
+        mirroredTransaction.requisition = baseTransaction.requisition
 		mirroredTransaction.transactionDate = baseTransaction.transactionDate
 
 		// create the transaction entries based on the base transaction

@@ -40,6 +40,10 @@
     <include file="0.5.x/add-column-requisition-item-requisition-item-type.xml"/>
     <include file="0.5.x/add-column-requisition-item-quantity-approved.xml"/>
     <include file="0.5.x/add-column-requisition-item-audit-fields.xml"/>
+    <include file="0.5.x/add-column-requisition-verified-by.xml"/>
+    <include file="0.5.x/add-column-requisition-reviewed-by.xml"/>
+    <include file="0.5.x/add-column-requisition-delivered-by.xml"/>
+    <include file="0.5.x/add-column-requisition-received-by.xml"/>
 
     <!--
     <include file="0.5.x/create-table-reason-code.xml"/>
