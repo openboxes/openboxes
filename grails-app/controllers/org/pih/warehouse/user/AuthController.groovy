@@ -78,6 +78,7 @@ class AuthController {
 				// def roles = userInstance?.roles;
 	
 				session.user = userInstance;
+                session.userName = userInstance?.username
 				
 				// For now, we'll just execute this code in dev environments
 				if (GrailsUtil.environment == "development") { 
@@ -115,6 +116,7 @@ class AuthController {
 	def logout = { 
 		session.targetUri = null    	
 		session.user = null;
+        session.userName = null
 		session.locale = null;
 		session.warehouse = null;
 		flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"	
