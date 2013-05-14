@@ -18,6 +18,8 @@
                     </td>
                     <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'product', 'errors')} ${hasErrors(bean: selectedRequisitionItem, field: 'productPackage', 'errors')}">
 
+
+
                         <g:chooseSubstitute id="substitutionId"
                                        name="substitutionId"
                                        data-placeholder="Choose a product package ..."
@@ -31,7 +33,8 @@
                         <label><warehouse:message code="requisitionItem.quantity.label" default="Quantity"/></label>
                     </td>
                     <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'quantity', 'errors')}">
-                        <g:textField id="quantity" name="quantity" value="" class="text" placeholder="${warehouse.message(code:'default.quantity.label') }"/>
+                        <g:textField id="quantity" name="quantity" value="" class="text"
+                                     placeholder="${warehouse.message(code:'default.quantity.label') }"/> EA/1
                     </td>
                 </tr>
                 <tr>
@@ -48,8 +51,18 @@
                         <label><warehouse:message code="requisitionItem.reasonCode.label" default="Reason code"/></label>
                     </td>
                     <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'cancelReasonCode', 'errors')}">
+
+                        <g:selectSubstitutionReasonCode
+                                name="reasonCode"
+                                class="chzn-select"
+                                style="width:450px;"
+                                data-placeholder="Choose a reason code ..."
+                                noSelection="['':'']"
+                                value="${selectedRequisitionItem?.cancelReasonCode }"/>
+
+                        <%--
                         <g:select name="reasonCode"
-                                  style="width: 350px"
+                                  style="width: 450px"
                                   class="chzn-select"
                                   from="['Package size',
                                           'Stock out',
@@ -62,7 +75,7 @@
                                           'Other']"
                                   noSelection="['':'']"
                                   value="${selectedRequisitionItem.cancelReasonCode?:'Substituted' }"/>
-
+                        --%>
                     </td>
                 </tr>
                 <tr>

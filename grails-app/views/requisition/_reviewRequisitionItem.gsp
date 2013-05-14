@@ -8,9 +8,9 @@
 <g:set var="hasSubstitution" value="${requisitionItem?.hasSubstitution()}"/>
 <g:set var="quantityOnHand" value="${quantityOnHand.toInteger()}"/>
 <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
-<g:set var="isAvailableForSubstitution" value="${(quantityOnHandForSubstitution > 0) && (quantityOnHandForSubstitution >= requisitionItem?.substitution?.totalQuantity()) }"/>
+<g:set var="isAvailableForSubstitution" value="${hasSubstitution && (quantityOnHandForSubstitution > 0) && (quantityOnHandForSubstitution >= requisitionItem?.substitution?.totalQuantity()) }"/>
 <%--<tr class="${(i % 2) == 0 ? 'even' : 'odd'} ${!selectedRequisitionItem?'':selected?'selected':'unselected'} ${isAvailable?'':'error'}">--%>
-<tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled())?'canceled':''}">
+<tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled())?'canceled':''} ())?'canceled':''}">
     <%--${isAvailable?'success':'error'}--%>
     <td class="left">
         <a name="${selectedRequisitionItem?.id}"></a>
@@ -67,50 +67,38 @@
         </g:else>
 
     </td>
-    <td>
-        <div class="${isCanceled||isChanged?'canceled':''}">
-            ${requisitionItem?.productPackage?.uom?.code?:"EA" }/${requisitionItem?.productPackage?.quantity?:"1" }
-        </div>
-        <g:if test="${requisitionItem?.change}">
-            ${requisitionItem?.change?.productPackage?.uom?.code?:"EA"}/${requisitionItem?.change?.productPackage?.quantity?:"1"}
-        </g:if>
-    </td>
     <td class="quantity center">
         <div class="${isCanceled||isChanged?'canceled':''}">
             ${requisitionItem?.quantity}
+            ${requisitionItem?.productPackage?.uom?.code?:"EA" }/${requisitionItem?.productPackage?.quantity?:"1" }
         </div>
         <g:if test="${requisitionItem?.change}">
             ${requisitionItem?.change?.quantity}
+            ${requisitionItem?.change?.productPackage?.uom?.code?:"EA"}/${requisitionItem?.change?.productPackage?.quantity?:"1"}
         </g:if>
     </td>
     <td class="center">
         <div class="${isCanceled||isChanged?'canceled':''}">
-            ${requisitionItem?.totalQuantity()}
+            ${requisitionItem?.totalQuantity()} EA/1
         </div>
         <g:if test="${requisitionItem?.change}">
-            ${requisitionItem?.change?.totalQuantity()}
+            ${requisitionItem?.change?.totalQuantity()} EA/1
         </g:if>
-    </td>
-    <td class="center">
-        <g:if test="${requisitionItem?.hasSubstitution()}">
-            <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0}</div>
-            ${quantityOnHandForSubstitution?:0}
-        </g:if>
-        <g:else>
-            ${quantityOnHand?:0}
-        </g:else>
     </td>
     <td class="center">
         <g:if test="${isAvailable||isAvailableForSubstitution}">
             <div class="available">${warehouse.message(code:'inventory.available.label', default:'Available')}</div>
         </g:if>
         <g:else>
-
             <div class="unavailable">${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}</div>
         </g:else>
-        <%--
-        ${quantityOnHand?:0 } ${requisitionItem?.product.unitOfMeasure?:"EA" }
-        --%>
+        <g:if test="${requisitionItem?.hasSubstitution()}">
+            <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0} EA/1</div>
+            ${quantityOnHandForSubstitution?:0} EA/1
+        </g:if>
+        <g:else>
+            ${quantityOnHand?:0} EA/1
+        </g:else>
     </td>
     <%--
     <td class="quantity center">

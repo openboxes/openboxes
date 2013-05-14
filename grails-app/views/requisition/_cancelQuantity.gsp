@@ -31,7 +31,7 @@
             </tr>
             <tr>
                 <td class="right top">
-                    <label><warehouse:message code="requisitionItem.quantity.label" default="Quantity"/></label>
+                    <label><warehouse:message code="requisitionItem.cancelQuantity.label" default="Cancel quantity"/></label>
                 </td>
                 <td>
                     ${selectedRequisitionItem?.quantity}
@@ -43,19 +43,15 @@
                     <label><warehouse:message code="requisitionItem.reasonCode.label" default="Reason code"/></label>
                 </td>
                 <td>
-                    <g:select id="reasonCode" name="reasonCode" class="chzn-select" style="width:300px;"
-                              from="[
-                                      'Stock out',
-                                      'Substituted',
-                                      'Damaged',
-                                      'Expired',
-                                      'Reserved',
-                                      'Package size',
-                                      'Cancelled by requestor',
-                                      'Clinical adjustment',
-                                      'Other']"
 
-                              noSelection="['':'']" value="${selectedRequisitionItem.cancelReasonCode}"/>
+                    <g:selectCancelReasonCode
+                            name="reasonCode"
+                            class="chzn-select"
+                            style="width:450px;"
+                            data-placeholder="Choose a reason code ..."
+                            noSelection="['':'']"
+                            value="${selectedRequisitionItem?.cancelReasonCode }"/>
+
                 </td>
             </tr>
             <tr>

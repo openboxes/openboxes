@@ -36,7 +36,8 @@
                     <td class="name"><label><warehouse:message
                             code="requisition.status.label" /></label></td>
                     <td class="value">
-                        ${requisition.status}
+                        <format:metadata obj="${requisition?.status }"/>
+
                     </td>
                 </tr>
                 <tr class="prop">
@@ -126,15 +127,6 @@
                     </td>
                 </tr>
                 <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message
-                                code="default.updatedBy.label" /></label>
-                    </td>
-                    <td class="value">
-                        ${requisition?.updatedBy?.name }
-                    </td>
-                </tr>
-                <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="requisition.reviewedBy.label" /></label></td>
                     <td class="value">
@@ -160,6 +152,15 @@
                             code="requisition.receivedBy.label" /></label></td>
                     <td class="value">
                         ${requisition?.receivedBy?.name }
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message
+                                code="default.updatedBy.label" /></label>
+                    </td>
+                    <td class="value">
+                        ${requisition?.updatedBy?.name }
                     </td>
                 </tr>
 

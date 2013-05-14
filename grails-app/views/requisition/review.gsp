@@ -28,8 +28,74 @@
                     <div class="yui-u">
                         <div id="tabs-details" class="box">
                             <h2>
-                                <warehouse:message code="requisition.review.label"/>
+                                <warehouse:message code="requisition.verify.label" default="Verify requisition"/>
                             </h2>
+
+                            <g:form controller="requisition" action="saveDetails">
+                                <g:hiddenField name="redirectAction" value="review"/>
+                                <g:hiddenField name="id" value="${requisition?.id}"/>
+                                <table style="width:auto;">
+                                    <tr>
+                                        <td class="left middle">
+                                            <label>
+                                                ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
+                                            </label>
+                                        </td>
+                                        <td class="middle">
+                                            <g:if test="${params.edit}">
+                                                <g:selectPerson id="verifiedBy" name="verifiedBy.id" value="${requisition?.verifiedBy}"
+                                                                noSelection="['null':'']" size="40"/>
+                                            </g:if>
+                                            <g:else>
+                                                <g:if test="${requisition.verifiedBy}">
+                                                    ${requisition?.verifiedBy?.name}
+                                                </g:if>
+                                                <g:else>
+                                                    ${warehouse.message(code:'default.none.label')}
+                                                </g:else>
+                                            </g:else>
+                                        </td>
+                                        <td class="left middle">
+                                            <label>
+                                                ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
+                                            </label>
+                                        </td>
+                                        <td class="middle">
+                                            <g:if test="${params.edit}">
+                                                <g:datePicker name="dateVerified" value="${requisition?.dateVerified}"/>
+                                            </g:if>
+                                            <g:else>
+                                                <g:if test="${requisition.dateVerified}">
+                                                    <g:formatDate date="${requisition?.dateVerified}"/>
+                                                </g:if>
+                                                <g:else>
+                                                    ${warehouse.message(code:'default.none.label')}
+                                                </g:else>
+                                            </g:else>
+                                        </td>
+                                        <td>
+                                            <g:if test="${params.edit}">
+                                                <button class="button icon approve">
+                                                    ${warehouse.message(code:'default.button.save.label')}
+                                                </button>
+                                                &nbsp;
+                                                <g:link controller="requisition" action="review" id="${requisition?.id}">
+                                                    ${warehouse.message(code:'default.button.cancel.label')}
+                                                </g:link>
+                                            </g:if>
+                                            <g:else>
+                                                <g:link controller="requisition" action="review" id="${requisition?.id}"
+                                                        params="[edit:'on']" class="button icon edit">
+                                                    ${warehouse.message(code:'default.button.edit.label')}
+                                                </g:link>
+                                            </g:else>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </g:form>
+
+
                             <table>
                                 <thead>
                                     <tr class="odd">
@@ -42,20 +108,17 @@
                                         <th>
                                             <warehouse:message code="requisitionItem.product.label" />
                                         </th>
-                                        <th>
-                                            <warehouse:message code="requisitionItem.productPackage.label" />
-                                        </th>
-                                        <th class="center">
+                                        <th class="center ">
                                             <warehouse:message code="requisitionItem.quantityRequested.label" />
                                         </th>
                                         <th class="center">
                                             <warehouse:message code="requisitionItem.totalQuantity.label" default="Quantity total" />
                                         </th>
                                         <th class="center">
+                                            <warehouse:message code="requisitionItem.availability.label" default="Availability" /><br/>
                                             <warehouse:message code="requisitionItem.quantityAvailable.label" default="Quantity available" />
                                         </th>
                                         <th class="center">
-                                            <warehouse:message code="requisitionItem.availability.label" default="Availability" />
                                         </th>
                                     </tr>
                                 </thead>

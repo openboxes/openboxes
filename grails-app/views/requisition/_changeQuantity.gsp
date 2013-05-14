@@ -25,18 +25,14 @@
             </tr>
             <tr>
                 <td class="middle right">
-                    <label><warehouse:message code="requisitionItem.unitOfMeasure.label" default="Unit of Measure"/></label>
-                </td>
-                <td class="middle">
-                    <g:selectUnitOfMeasure name="productPackage.id" product="${selectedRequisitionItem?.product}" class="chzn-select" style="width:300px;"/>
-                </td>
-            </tr>
-            <tr>
-                <td class="middle right">
                     <label><warehouse:message code="requisitionItem.quantity.label"/></label>
                 </td>
                 <td class="middle">
-                    <g:textField id="quantity" name="quantity" value="${selectedRequisitionItem?.quantity}" class="text" size="5"/>
+                    <g:textField id="quantity" name="quantity" value="" class="text" size="5"/>
+                    <%--
+                    <g:selectUnitOfMeasure name="productPackage.id" product="${selectedRequisitionItem?.product}" class="chzn-select" style="width:300px;"/>
+                    --%>
+                    EA/1
                 </td>
             </tr>
             <tr>
@@ -44,22 +40,13 @@
                     <label><warehouse:message code="requisitionItem.cancelReasonCode.label" default="Reason code"/></label>
                 </td>
                 <td class="middle">
-                    <g:select name="reasonCode"
-                              style="width: 350px"
-                              data-placeholder="Choose a reason code ..."
-                              class="chzn-select"
-                              from="[
-                                      'Stock out',
-                                      'Substitution',
-                                      'Damaged',
-                                      'Expired',
-                                      'Package size',
-                                      'Reserved',
-                                      'Cancelled by requestor',
-                                      'Clinical adjustment',
-                                      'Other']"
-                              noSelection="['':'']"
-                              value="${selectedRequisitionItem?.cancelReasonCode }"/>
+                    <g:selectChangeQuantityReasonCode
+                        name="reasonCode"
+                        class="chzn-select"
+                        style="width:450px;"
+                        data-placeholder="Choose a reason code ..."
+                        noSelection="['':'']"
+                        value="${selectedRequisitionItem?.cancelReasonCode }"/>
                 </td>
             </tr>
             <tr>

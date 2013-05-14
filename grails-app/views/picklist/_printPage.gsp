@@ -11,15 +11,15 @@
                 <th class="center">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
-                <th width="5%" class="center">${warehouse.message(code:'picklistItem.picked.label', default: 'Pick')}</th>
-                <th width="5%" class="center">${warehouse.message(code:'picklistItem.checked.label', default: 'Check')}</th>
+                <th width="5%" class="center">${warehouse.message(code:'default.comments.label')}</th>
+
 
             </tr>
         </thead>
         <tbody>
             <g:unless test="${requisitionItems}">
                 <tr>
-                    <td colspan="11" class="middle center">
+                    <td colspan="10" class="middle center">
                         <span class="fade">
                             <warehouse:message code="default.none.label"/>
                         </span>
@@ -100,10 +100,6 @@
                             </g:if>
                         </td>
                         <td class="center middle">
-                            <input type="checkbox"/>
-                        </td>
-                        <td class="center middle">
-                            <input type="checkbox"/>
                         </td>
                         <% j++ %>
                     </tr>

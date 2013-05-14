@@ -246,8 +246,8 @@ class RequisitionController {
 	
 	def review = {
 		def requisition = Requisition.get(params.id)
-        if (requisition.status < RequisitionStatus.REVIEWING) {
-            requisition.status = RequisitionStatus.REVIEWING
+        if (requisition.status < RequisitionStatus.VERIFYING) {
+            requisition.status = RequisitionStatus.VERIFYING
             requisition.save(flush:true)
         }
 
@@ -323,8 +323,8 @@ class RequisitionController {
 		def requisition = Requisition.get(params?.id)
 		if (requisition) {
 
-            if (requisition.status < RequisitionStatus.CONFIRMING) {
-                requisition.status = RequisitionStatus.CONFIRMING
+            if (requisition.status < RequisitionStatus.CHECKING) {
+                requisition.status = RequisitionStatus.CHECKING
                 requisition.save(flush:true)
             }
 
@@ -339,15 +339,18 @@ class RequisitionController {
 		[requisition: requisition]
 	}
 
-    def savePicklistDetails = {
+    def saveDetails = {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisition.properties = params
             requisition.save(flush: true)
 
         }
-        redirect(action: 'confirm', id: requisition.id)
+        redirect(action: params.redirectAction ?: "show", id: requisition.id)
     }
+
+
+
 
 	def pick = {
 		println "Pick " + params

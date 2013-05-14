@@ -86,31 +86,41 @@
 							 --%>	
 						</div>
 					</td>
-					<td>
-						<div class="left">	
-							<div class="title">${requisition?.status }</div>
+					<td class="middle">
+						<div class="center">
+                                <div class="box">
+                                    <div class="title ">
+                                        <format:metadata obj="${requisition?.status }"/>
+                                    </div>
+                                    <g:if test="${requisition.lastUpdated}">
+                                        <span class="fade">
+                                            <format:datetime obj="${requisition.lastUpdated}"/>
+                                        </span>
+                                    </g:if>
+                                </div>
 							<div class="clear"></div>
 						</div>
-                        <div class="clear"></div>
-					    <div>
+                        <g:if test="${requisition?.status == org.pih.warehouse.requisition.RequisitionStatus.VERIFYING}">
+                            <div class="clear"></div>
+                            <div>
 
-                            <g:set var="value"><g:formatNumber number="${requisition.calculatePercentageCompleted()}" maxFractionDigits="0" minFractionDigits="0"/></g:set>
-                            <div id="progressbar-${requisition?.id }" class="progressbar"></div>
-                            <script type="text/javascript">
-                                $(function() {
-                                    $( "#progressbar-${requisition?.id }" ).progressbar({value: ${value}});
-                                });
-                            </script>
+                                <g:set var="value"><g:formatNumber number="${requisition.calculatePercentageCompleted()}" maxFractionDigits="0" minFractionDigits="0"/></g:set>
+                                <div id="progressbar-${requisition?.id }" class="progressbar"></div>
+                                <script type="text/javascript">
+                                    $(function() {
+                                        $( "#progressbar-${requisition?.id }" ).progressbar({value: ${value}});
+                                    });
+                                </script>
 
-					    </div>
-                        <div class="left">
-                            ${requisition?.completeRequisitionItems?.size()} of ${requisition?.initialRequisitionItems?.size()}
-                            ${warehouse.message(code:'requisition.processed.label', default: 'processed')}
-                        </div>
-                        <div class="right">
-                            ${value}%
-                        </div>
-
+                            </div>
+                            <div class="left">
+                                ${requisition?.completeRequisitionItems?.size()} of ${requisition?.initialRequisitionItems?.size()}
+                                ${warehouse.message(code:'requisition.processed.label', default: 'items verified')}
+                            </div>
+                            <div class="right">
+                                ${value}%
+                            </div>
+                        </g:if>
                     </td>
 					
 										

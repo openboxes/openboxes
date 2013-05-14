@@ -25,98 +25,64 @@
                 </h2>
 
 
-                <g:if test="${requisition?.picklist}">
-                    <g:form controller="requisition" action="savePicklistDetails">
-                        <g:hiddenField name="id" value="${requisition?.id}"/>
-                        <table>
-                            <tr>
-                                <td class="right middle">
-                                    <label>
-                                        ${warehouse.message(code:'requisition.pickedBy.label', default: 'Picked by')}
-                                    </label>
-                                </td>
-                                <td class="middle">
-                                    <g:if test="${params.edit}">
-                                        <g:selectPerson id="pickedBy" name="picklist.picker.id" value="${requisition?.picklist?.picker}"
-                                                        noSelection="['null':'']" size="40"/>
+                <g:form controller="requisition" action="saveDetails">
+                    <g:hiddenField name="redirectAction" value="confirm"/>
+                    <g:hiddenField name="id" value="${requisition?.id}"/>
+                    <table style="width:auto;">
+                        <tr>
+                            <td class="left middle">
+                                <label>
+                                    ${warehouse.message(code:'requisition.checkedBy.label', default: 'Checked by')}
+                                </label>
+                            </td>
+                            <td class="middle">
+                                <g:if test="${params.edit}">
+                                    <g:selectPerson id="checkedBy" name="reviewedBy.id" value="${requisition?.reviewedBy}"
+                                                    noSelection="['null':'']" size="40"/>
+                                </g:if>
+                                <g:else>
+                                    ${requisition?.verifiedBy?.name}
+                                </g:else>
+                            </td>
+                            <td class="left middle">
+                                <label>
+                                    ${warehouse.message(code:'requisition.dateChecked.label', default: 'Date checked')}
+                                </label>
+                            </td>
+                            <td class="middle">
+                                <g:if test="${params.edit}">
+                                    <g:datePicker name="dateVerified" value="${requisition?.dateChecked}"/>
+                                </g:if>
+                                <g:else>
+                                    <g:if test="${requisition.dateVerified}">
+                                        <g:formatDate date="${requisition?.dateVerified}"/>
                                     </g:if>
                                     <g:else>
-                                        ${requisition?.picklist?.picker?.name}
+                                        ${warehouse.message(code:'default.none.label')}
                                     </g:else>
-                                </td>
-                                <td class="right middle">
-                                    <label>
-                                        ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
-                                    </label>
-                                </td>
-                                <td class="middle">
-                                    <g:if test="${params.edit}">
-                                        <g:selectPerson id="verifiedBy" name="verifiedBy.id" value="${requisition?.verifiedBy}"
-                                                        noSelection="['null':'']" size="40"/>
-                                    </g:if>
-                                    <g:else>
-                                        ${requisition?.verifiedBy?.name}
-                                    </g:else>
-                                </td>
-                                <td rowspan="2">
-                                    <g:if test="${params.edit}">
-                                        <button class="button icon approve">
-                                            ${warehouse.message(code:'default.button.save.label')}
-                                        </button>
-                                        &nbsp;
-                                        <g:link controller="requisition" action="confirm" id="${requisition?.id}">
-                                            ${warehouse.message(code:'default.button.cancel.label')}
-                                        </g:link>
-                                    </g:if>
-                                    <g:else>
-                                        <g:link controller="requisition" action="confirm" id="${requisition?.id}"
-                                                params="[edit:'on']" class="button icon edit">
-                                            ${warehouse.message(code:'default.button.edit.label')}
-                                        </g:link>
-                                    </g:else>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="right middle">
-                                    <label>
-                                        ${warehouse.message(code:'requisition.datePicked.label', default: 'Date picked')}
-                                    </label>
-                                </td>
-                                <td class="middle">
-                                    <g:if test="${params.edit}">
-                                        <g:datePicker name="picklist.datePicked" value="${requisition?.picklist?.datePicked}"/>
-                                    </g:if>
-                                    <g:else>
-                                        <g:if test="${requisition.picklist?.datePicked}">
-                                            <g:formatDate date="${requisition?.picklist?.datePicked}"/>
-                                        </g:if>
-                                        <g:else>
-                                            ${warehouse.message(code:'default.none.label')}
-                                        </g:else>
-                                    </g:else>
-                                </td>
-                                <td class="right middle">
-                                    <label>
-                                        ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
-                                    </label>
-                                </td>
-                                <td class="middle">
-                                    <g:if test="${params.edit}">
-                                        <g:datePicker name="dateVerified" value="${requisition?.dateVerified}"/>
-                                    </g:if>
-                                    <g:else>
-                                        <g:if test="${requisition.dateVerified}">
-                                            <g:formatDate date="${requisition?.dateVerified}"/>
-                                        </g:if>
-                                        <g:else>
-                                            ${warehouse.message(code:'default.none.label')}
-                                        </g:else>
-                                    </g:else>
-                                </td>
-                            </tr>
-                        </table>
-                    </g:form>
-                </g:if>
+                                </g:else>
+                            </td>                                        <td>
+                            <g:if test="${params.edit}">
+                                <button class="button icon approve">
+                                    ${warehouse.message(code:'default.button.save.label')}
+                                </button>
+                                &nbsp;
+                                <g:link controller="requisition" action="confirm" id="${requisition?.id}">
+                                    ${warehouse.message(code:'default.button.cancel.label')}
+                                </g:link>
+                            </g:if>
+                            <g:else>
+                                <g:link controller="requisition" action="confirm" id="${requisition?.id}"
+                                        params="[edit:'on']" class="button icon edit">
+                                    ${warehouse.message(code:'default.button.edit.label')}
+                                </g:link>
+                            </g:else>
+                        </td>
+                        </tr>
+
+                    </table>
+                </g:form>
+
                 <hr/>
 
 
