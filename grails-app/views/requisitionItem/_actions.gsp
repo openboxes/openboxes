@@ -17,7 +17,7 @@
                         ${requisitionItem?.product?.name}
 
                         <g:if test="${requisitionItem?.productPackage}">
-                            (${requisitionItem?.quantity} ${requisitionItem?.productPackage?.code}/${requisitionItem?.productPackage?.quantity})
+                            (${requisitionItem?.quantity} ${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity})
                         </g:if>
                         <g:else>
                             (${requisitionItem?.quantity} EA)
@@ -232,16 +232,18 @@
                 </g:link>
             </div>
             --%>
-            <div class="action-menu-item">
-                <hr/>
-            </div>
-            <div class="action-menu-item">
-                <g:link controller="requisitionItem" action="delete" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}"
-                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                    <warehouse:message code="requisitionItem.delete.label"/>
-                </g:link>
-            </div>
+            <g:isUserAdmin>
+                <div class="action-menu-item">
+                    <hr/>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisitionItem" action="delete" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}"
+                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                        <warehouse:message code="requisitionItem.delete.label"/>
+                    </g:link>
+                </div>
+            </g:isUserAdmin>
         </g:elseif>
         <%--
 		<div class="action-menu-item">
