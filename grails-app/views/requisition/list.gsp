@@ -101,11 +101,13 @@
                             <warehouse:message code="default.all.label"/>
                         </g:link>
                         <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
-                            <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
-                            <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
-                                <format:metadata obj="${requisitionStatus}"/>
-                                (${requisitionsMap[requisitionStatus]?:0 })
-                            </g:link>
+                            <g:if test="${requisitionsMap[requisitionStatus]>0}">
+                                <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
+                                <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
+                                    <format:metadata obj="${requisitionStatus}"/>
+                                    (${requisitionsMap[requisitionStatus]?:0 })
+                                </g:link>
+                            </g:if>
                         </g:each>
                     </div>
                     <div class="buttonBar button-group right">
