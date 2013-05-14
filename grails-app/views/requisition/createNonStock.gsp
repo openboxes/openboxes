@@ -144,7 +144,7 @@
                                     <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
                                     ${requisition?.requestedBy?.name?:session?.user?.name }
                                     --%>
-                                    <g:selectPerson name="requestedBy" value="${requisition?.requestedBy}"
+                                    <g:selectPerson name="requestedBy.id" value="${requisition?.requestedBy}"
                                         noSelection="['null':'']" size="40"/>
 
 

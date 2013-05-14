@@ -1,5 +1,5 @@
 
-<input type="hidden" id="hidden-${attrs.id}" name="${attrs.id}.id" value="${attrs?.selectedPerson?.id}">
+<input type="hidden" id="hidden-${attrs.id}" name="${attrs.name}" value="${attrs?.selectedPerson?.id}">
 <input type="text" id="select-${attrs.id}" name="select-${attrs.id}" size="${attrs.size}" value="${attrs?.selectedPerson?.name}" class="autocomplete text" />
 <script language="javascript">
     $(function() {

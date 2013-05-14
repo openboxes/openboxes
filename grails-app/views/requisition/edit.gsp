@@ -23,13 +23,7 @@
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
 	</g:hasErrors>
-
-
-
 	<g:render template="summary" model="[requisition:requisition]"/>
-
-
-
 	<div class="yui-gf">
 		<div class="yui-u first">
             <g:render template="header" model="[requisition:requisition]"/>
