@@ -12,8 +12,6 @@
                 <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
                 <th width="5%" class="center">${warehouse.message(code:'default.comments.label')}</th>
-
-
             </tr>
         </thead>
         <tbody>

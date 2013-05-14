@@ -30,6 +30,47 @@
 
 <div class="clear"></div>
 
+<div class="right">
+    <table style="width:auto;" border="0">
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="requisition.depot.label"/>:</label>
+            </td>
+            <td class="right">
+                ${requisition.destination?.name}
+            </td>
+        </tr>
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="requisition.ward.label"/>:</label>
+            </td>
+            <td class="right">
+                ${requisition.origin?.name}
+            </td>
+        </tr>
+
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="requisition.date.label"/>:</label>
+            </td>
+            <td class="right">
+                <g:formatDate
+                        date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
+            </td>
+        </tr>
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
+            </td>
+            <td class="right">
+                <g:formatDate
+                        date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
+            </td>
+        </tr>
+
+    </table>
+</div>
+
 <table border="0">
     <tr>
         <td width="1%">
@@ -58,48 +99,6 @@
                 <g:if test="${requisition.requestNumber}">
                     <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
                 </g:if>
-            </div>
-        </td>
-        <td>
-            <div class="right">
-                <table style="width:auto;" border="0">
-                    <tr class="header">
-                        <td>
-                            <label><warehouse:message code="requisition.depot.label"/>:</label>
-                        </td>
-                        <td class="right">
-                            ${requisition.destination?.name}
-                        </td>
-                    </tr>
-                    <tr class="header">
-                        <td>
-                            <label><warehouse:message code="requisition.ward.label"/>:</label>
-                        </td>
-                        <td class="right">
-                            ${requisition.origin?.name}
-                        </td>
-                    </tr>
-
-                    <tr class="header">
-                        <td>
-                            <label><warehouse:message code="requisition.date.label"/>:</label>
-                        </td>
-                        <td class="right">
-                            <g:formatDate
-                                date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
-                        </td>
-                    </tr>
-                    <tr class="header">
-                        <td>
-                            <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
-                        </td>
-                        <td class="right">
-                            <g:formatDate
-                                date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
-                        </td>
-                    </tr>
-
-                </table>
             </div>
         </td>
     </tr>
