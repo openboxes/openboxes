@@ -114,11 +114,13 @@
 												<td>
 													<g:if test="${transaction?.incomingShipment }">
 														<g:link controller="shipment" action="showDetails" id="${transaction?.incomingShipment?.id }">
+                                                            ${transaction.incomingShipment?.shipmentNumber }
 															${transaction.incomingShipment?.name }
 														</g:link>
 													</g:if>
 													<g:elseif test="${transaction?.outgoingShipment }">
 														<g:link controller="shipment" action="showDetails" id="${transaction?.outgoingShipment?.id }">
+                                                            ${transaction.outgoingShipment?.shipmentNumber }
 															${transaction.outgoingShipment?.name }
 														</g:link>
 													</g:elseif>
@@ -129,6 +131,7 @@
                                                 <td>
                                                     <g:if test="${transaction?.requisition }">
                                                         <g:link controller="requisition" action="show" id="${transaction?.requisition?.id }">
+                                                            ${transaction?.requisition?.requestNumber }
                                                             ${transaction?.requisition?.name }
                                                         </g:link>
                                                     </g:if>
