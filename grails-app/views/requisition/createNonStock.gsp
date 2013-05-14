@@ -23,35 +23,38 @@
 
     <div class="yui-ga">
 		<div class="yui-u first">
-
-
 			<g:form name="requisitionForm" method="post" action="saveNonStock">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
 
-				<g:if test="${requisition?.id }">
-					<div class="box">
-						<a class="toggle" href="javascript:void(0);">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
-						</a>
-						<h3 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h3>
-						<g:if test="${requisition?.id }">
-							<g:if test="${!params.editHeader }">
-								<g:link controller="requisition" action="editHeader" id="${requisition?.id }">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
-								</g:link>
-							</g:if>
-							<g:else>
-								<g:link controller="requisition" action="edit" id="${requisition?.id }">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
-								</g:link>
-							</g:else>
-						</g:if>
-					</div>
-					
-				</g:if>
 				<div id="requisition-template-details" class="dialog ui-validation box">
 
-						
+                    <g:if test="${requisition?.id }">
+                        <div class="box">
+                            <a class="toggle" href="javascript:void(0);">
+                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                            </a>
+                            <h2 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h2>
+                            <g:if test="${requisition?.id }">
+                                <g:if test="${!params.editHeader }">
+                                    <g:link controller="requisition" action="editHeader" id="${requisition?.id }">
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
+                                    </g:link>
+                                </g:if>
+                                <g:else>
+                                    <g:link controller="requisition" action="edit" id="${requisition?.id }">
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
+                                    </g:link>
+                                </g:else>
+                            </g:if>
+                        </div>
+
+                    </g:if>
+                    <g:else>
+                        <h2>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h2>
+
+
+
+                    </g:else>
                     <table id="requisition-template-table">
 
                         <tbody>
@@ -166,7 +169,7 @@
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">
-                                        <warehouse:message code="default.description.label" />
+                                        <warehouse:message code="requisition.description.label" />
                                     </label>
                                 </td>
 

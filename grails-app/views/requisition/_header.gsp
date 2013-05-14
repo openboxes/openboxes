@@ -40,19 +40,6 @@
 
                     </td>
                 </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label for="description">
-                            <warehouse:message code="default.description.label" />
-                        </label>
-                    </td>
-
-                    <td class="value">
-                        <span id="description">
-                            ${requisition?.description?:warehouse.message(code:'default.none.label') }
-                        </span>
-                    </td>
-                </tr>
 
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
@@ -131,6 +118,19 @@
                     <td class="value">
                         <g:formatDate date="${requisition?.requestedDeliveryDate }"/>
 
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="description">
+                            <warehouse:message code="default.comments.label" />
+                        </label>
+                    </td>
+
+                    <td class="value">
+                        <span id="description">
+                            ${requisition?.description?:warehouse.message(code:'default.none.label') }
+                        </span>
                     </td>
                 </tr>
 

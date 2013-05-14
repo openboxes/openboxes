@@ -1,3 +1,4 @@
+<g:if test="${requisition?.id}">
 <div class="wizard-box">
 	<div class="wizard-steps "> 
 		<div class="${actionName.contains('create')||actionName.equals('show')?'active-step':''}">
@@ -59,3 +60,4 @@
     </div>
 
 </div>
+</g:if>

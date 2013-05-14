@@ -138,12 +138,6 @@
             --%>
         </table>
 	</g:if>
-	<g:else>
-		<div class="title" id="new-requisition">
-            <h1>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h1>
-		</div>
-		<div class="clear"></div>	
-	</g:else>
 </div>
 <div id="flow-header">
     <g:render template="/requisition/flowHeader" model="[requisition:requisition]"/>
