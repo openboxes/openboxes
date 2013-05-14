@@ -30,6 +30,7 @@ package org.pih.warehouse.core;
  */
 public enum ReasonCode {
 
+
     STOCKOUT(1),
     LOW_STOCK(2),
     EXPIRED(3),
@@ -56,20 +57,62 @@ public enum ReasonCode {
     }
 
     static list() {
-        [STOCKOUT, LOW_STOCK, DAMAGED, EXPIRED, INSUFFICIENT_CONSUMPTION, SUBSTITUTION,
-                CLINICAL_OVERRIDE, REPLACED_BY_FORMULARY_ITEM, NOT_STOCKED, COULD_NOT_LOCATE, DIFFERENT_LOCATION,
-                PACKAGE_SIZE, CANCELED_BY_REQUESTER, NON_FORMULARY_NO_SUBSTITUTION, AVAILABLE_STOCK_RESERVED, DATA_ENTRY_ERROR, OTHER]
+        [       STOCKOUT,
+                LOW_STOCK,
+                EXPIRED,
+                DAMAGED,
+                SUBSTITUTION,
+                PACKAGE_SIZE,
+                CLINICAL_OVERRIDE,
+                INSUFFICIENT_CONSUMPTION,
+                REPLACED_BY_FORMULARY_ITEM,
+                CANCELED_BY_REQUESTER,
+                NON_FORMULARY_NO_SUBSTITUTION,
+                NOT_STOCKED,
+                AVAILABLE_STOCK_RESERVED,
+                COULD_NOT_LOCATE,
+                DIFFERENT_LOCATION,
+                DATA_ENTRY_ERROR,
+                OTHER]
     }
 
 	static listRequisitionQuantityChangeReasonCodes() {
-		[STOCKOUT, LOW_STOCK, DAMAGED, EXPIRED, INSUFFICIENT_CONSUMPTION,
-                PACKAGE_SIZE, CANCELED_BY_REQUESTER, NON_FORMULARY_NO_SUBSTITUTION, NOT_STOCKED,AVAILABLE_STOCK_RESERVED, DATA_ENTRY_ERROR, OTHER]
+		[       STOCKOUT,
+                LOW_STOCK,
+                EXPIRED,
+                DAMAGED,
+                PACKAGE_SIZE,
+                CANCELED_BY_REQUESTER,
+                INSUFFICIENT_CONSUMPTION,
+                NON_FORMULARY_NO_SUBSTITUTION,
+                NOT_STOCKED,
+                AVAILABLE_STOCK_RESERVED,
+                DATA_ENTRY_ERROR,
+                OTHER
+        ]
 	}
     static listRequisitionSubstitutionReasonCodes() {
-        [SUBSTITUTION, REPLACED_BY_FORMULARY_ITEM, STOCKOUT, LOW_STOCK, DAMAGED, EXPIRED, AVAILABLE_STOCK_RESERVED, DATA_ENTRY_ERROR, OTHER]
+        [
+                STOCKOUT,
+                LOW_STOCK,
+                EXPIRED,
+                DAMAGED,
+                SUBSTITUTION,
+                REPLACED_BY_FORMULARY_ITEM,
+                AVAILABLE_STOCK_RESERVED,
+                DATA_ENTRY_ERROR,
+                OTHER
+        ]
     }
 
     static listPicklistQuantityChangeReasonCodes() {
-        [STOCKOUT,EXPIRED,DAMAGED,COULD_NOT_LOCATE,DATA_ENTRY_ERROR,OTHER]
+        [
+                STOCKOUT,
+                EXPIRED,
+                DAMAGED,
+                COULD_NOT_LOCATE,
+                DATA_ENTRY_ERROR,
+                OTHER
+        ]
     }
 }
