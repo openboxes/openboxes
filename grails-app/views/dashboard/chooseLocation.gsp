@@ -35,19 +35,18 @@
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                             ${warehouse.message(code: 'dashboard.chooseLocation.label')}
                         </h2>
-                        <br/>
 						<div id="chooseLocationSelect">
 							<table>
 								<tbody>
 									<g:set var="count" value="${0 }"/>
 									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
 									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
-										<tr class="${count++%2?'even':'odd' }">
-											<td class="top left" >			
-												<h2>${entry.key?:warehouse.message(code:'default.none.label') }</h2>
+										<tr>
+											<td class="middle left" >
+												<h3>${entry.key?:warehouse.message(code:'default.none.label') }</h3>
 											</td>
 										</tr>
-										<tr class="${count++%2?'even':'odd' }">
+										<tr class="">
 											<td>	
 												<div class="button-group">
 													<g:set var="locationGroup" value="${entry.key }"/>
@@ -61,12 +60,12 @@
 											</td>
 										</tr>										
 									</g:each>
-									<tr class="${count++%2?'even':'odd' }">
-										<td class="top left">
-											<h2>${warehouse.message(code: 'default.others.label', default: 'Others')}</h2>
+									<tr class="">
+										<td class="middle left">
+											<h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
 										</td>
 									</tr>
-									<tr class="${count++%2?'even':'odd' }">
+									<tr class="">
 										<td>
 											<div class="button-group">											
 												<g:each var="warehouse" in="${nullLocationGroup }" status="status">
