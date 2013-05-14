@@ -9,7 +9,7 @@
                 <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
                 &nbsp;
                 --%>
-                <warehouse:message code="default.details.label" default="Requisition header"/>
+                <warehouse:message code="default.details.label" default="Requisition"/>
                 <div class="right">
                     <g:if test="${requisition?.id }">
                         <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class=" icon edit">
@@ -110,61 +110,6 @@
                         <span id="destination.id"> ${requisition?.destination?.name }</span>
                     </td>
                 </tr>
-                <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="requisition.requestedBy.label" /></label></td>
-                    <td class="value">
-                        ${requisition?.requestedBy?.name }
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message
-                                code="requisition.createdBy.label" /></label>
-                    </td>
-                    <td class="value">
-                        ${requisition?.createdBy?.name}
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="requisition.reviewedBy.label" /></label></td>
-                    <td class="value">
-                        ${requisition?.reviewedBy?.name }
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="picklist.picker.label" /></label></td>
-                    <td class="value">
-                        ${requisition?.picklist?.picker?.name }
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="requisition.verifiedBy.label" /></label></td>
-                    <td class="value">
-                        ${requisition?.verifiedBy?.name }
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="requisition.receivedBy.label" /></label></td>
-                    <td class="value">
-                        ${requisition?.receivedBy?.name }
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message
-                                code="default.updatedBy.label" /></label>
-                    </td>
-                    <td class="value">
-                        ${requisition?.updatedBy?.name }
-                    </td>
-                </tr>
-
-
                 <g:if test="${requisition.isDepotRequisition()}">
                     <tr>
                         <td class="name"><label><warehouse:message
@@ -186,6 +131,102 @@
                     <td class="value">
                         <g:formatDate date="${requisition?.requestedDeliveryDate }"/>
 
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+
+        <div id="requisition-workflow" class="box dialog">
+            <div style="line-height: 20px;">
+                <h2>
+
+                    <%--
+                    <a class="toggle" href="javascript:void(0);">
+                        <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                    </a>
+                    <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
+                    &nbsp;
+                    --%>
+                    <warehouse:message code="default.workflow.label" default="Requisition workflow"/>
+                </h2>
+            </div>
+            <table>
+
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.requestedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.requestedBy?.name }
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.dateRequested }"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message
+                                code="requisition.createdBy.label" /></label>
+                    </td>
+                    <td class="value">
+                        ${requisition?.createdBy?.name}
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.lastUpdated }"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.verifiedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.verifiedBy?.name }
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.dateVerified }"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="picklist.picker.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.picklist?.picker?.name }
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.picklist?.datePicked }"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.checkedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.checkedBy?.name }
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.dateChecked }"/>
+                        </div>
+                    </td>
+                </tr>
+                <%--
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.receivedBy.label" /></label></td>
+                    <td class="value">
+                        ${requisition?.receivedBy?.name }
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.dateReceived }"/>
+                        </div>
+                    </td>
+                </tr>
+                --%>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message
+                                code="default.updatedBy.label" /></label>
+                    </td>
+                    <td class="value">
+                        ${requisition?.updatedBy?.name }
+                        <div class="fade">
+                            <g:formatDate date="${requisition?.lastUpdated }"/>
+                        </div>
                     </td>
                 </tr>
                 <tr class="prop">

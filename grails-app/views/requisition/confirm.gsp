@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
-    <title><warehouse:message code="picklist.confirm.label" /></title>
+    <title><warehouse:message code="requisition.check.label" /></title>
 </head>
 <body>
 <div class="body">
@@ -21,7 +21,7 @@
         <div class="yui-u">
             <div class="box dialog">
                 <h2>
-                    <warehouse:message code="requisition.confirm.label"/>
+                    <warehouse:message code="requisition.check.label"/>
                 </h2>
 
 
@@ -37,11 +37,11 @@
                             </td>
                             <td class="middle">
                                 <g:if test="${params.edit}">
-                                    <g:selectPerson id="checkedBy" name="reviewedBy.id" value="${requisition?.reviewedBy}"
+                                    <g:selectPerson id="checkedBy" name="checkedBy.id" value="${requisition?.checkedBy}"
                                                     noSelection="['null':'']" size="40"/>
                                 </g:if>
                                 <g:else>
-                                    ${requisition?.verifiedBy?.name}
+                                    ${requisition?.checkedBy?.name}
                                 </g:else>
                             </td>
                             <td class="left middle">
@@ -51,11 +51,11 @@
                             </td>
                             <td class="middle">
                                 <g:if test="${params.edit}">
-                                    <g:datePicker name="dateVerified" value="${requisition?.dateChecked}"/>
+                                    <g:datePicker name="dateChecked" value="${requisition?.dateChecked}"/>
                                 </g:if>
                                 <g:else>
-                                    <g:if test="${requisition.dateVerified}">
-                                        <g:formatDate date="${requisition?.dateVerified}"/>
+                                    <g:if test="${requisition.dateChecked}">
+                                        <g:formatDate date="${requisition?.dateChecked}"/>
                                     </g:if>
                                     <g:else>
                                         ${warehouse.message(code:'default.none.label')}
