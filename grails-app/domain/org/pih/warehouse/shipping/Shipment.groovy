@@ -21,11 +21,17 @@ class Shipment implements Comparable, Serializable {
 
     def beforeInsert = {
         //def currentUser = AuthService.currentUser.get()
-        //if (currentUser) createdBy = currentUser
+        //if (currentUser) {
+        //    createdBy = currentUser
+        //    updatedBy = currentUser
+        //}
+
     }
     def beforeUpdate = {
         //def currentUser = AuthService.currentUser.get()
-        //if (currentUser) updatedBy = currentUser
+        //if (currentUser) {
+        // updatedBy = currentUser
+        //}
     }
 
     String id

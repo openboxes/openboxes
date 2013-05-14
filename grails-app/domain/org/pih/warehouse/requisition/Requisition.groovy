@@ -26,11 +26,16 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
-        if (currentUser) createdBy = currentUser
+        if (currentUser) {
+            createdBy = currentUser
+            updatedBy = currentUser
+        }
     }
     def beforeUpdate = {
         def currentUser = AuthService.currentUser.get()
-        if (currentUser) updatedBy = currentUser
+        if (currentUser) {
+            updatedBy = currentUser
+        }
     }
 
     String id
@@ -42,8 +47,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateRequested = new Date()
     Date dateReviewed
     Date dateVerified
+    Date dateChecked
     Date dateDelivered
+    Date dateIssued
     Date dateReceived
+
     Date requestedDeliveryDate = new Date()
 
     // Frequency - for stock requisitions we should know how often (monthly, weekly, daily)
@@ -68,8 +76,14 @@ class Requisition implements Comparable<Requisition>, Serializable {
     // Pharmacist who verified the requisition before it was issued
     Person verifiedBy
 
+    // Person who reviewed the requisition
+    Person checkedBy
+
     // Pharmacist or nurse who signed for the issued stock
     Person deliveredBy
+
+    // Pharmacist or nurse who signed for the issued stock
+    Person issuedBy
 
     // Pharmacist or nurse who signed for the issued stock
     Person receivedBy
@@ -124,6 +138,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requestedBy(nullable: false)
         reviewedBy(nullable: true)
         verifiedBy(nullable: true)
+        checkedBy(nullable: true)
+        issuedBy(nullable: true)
         deliveredBy(nullable: true)
         receivedBy(nullable: true)
         picklist(nullable: true)
@@ -136,10 +152,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
         //    return value >= tomorrow
         //})
         dateCreated(nullable: true)
+        dateChecked(nullable: true)
         dateReviewed(nullable: true)
         dateVerified(nullable: true)
         dateDelivered(nullable: true)
         dateReceived(nullable: true)
+        dateIssued(nullable: true)
         lastUpdated(nullable: true)
         dateValidFrom(nullable: true)
         dateValidTo(nullable: true)
@@ -215,17 +233,18 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return (type in [RequisitionType.WARD_STOCK, RequisitionType.DEPOT_STOCK])
     }
 
-    Boolean isPending() {
-        return (status in [RequisitionStatus.CREATED]);
+    Boolean isOpen() {
+        return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING])
     }
 
-    Boolean isOpen() {
-        return (status == RequisitionStatus.CREATED)
+    Boolean isPending() {
+        return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING, RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING]);
     }
 
     Boolean isRequested() {
-        return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.ISSUED, RequisitionStatus.RECEIVED, RequisitionStatus.PICKED])
+        return (status in [RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING, RequisitionStatus.ISSUED, RequisitionStatus.RECEIVED])
     }
+
 
     /**
      * Sort by sort order, name
