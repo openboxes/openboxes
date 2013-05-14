@@ -137,10 +137,8 @@
                     <g:set var="pageParams" value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order]"/>
                     <div class="box">
                         <h2>
-                            ${warehouse.message(code:'default.results.label')} -
-                            <span class="fade">
-                                <warehouse:message code="default.showing.message" args="[requisitions.totalCount]"/>
-                            </span>
+                            <warehouse:message code="requisition.list.label" />
+                            <div class="right fade"><warehouse:message code="default.showing.message" args="[requisitions.totalCount]"/></div>
                         </h2>
                         <g:render template="list" model="[requisitions:requisitions,pageParams:pageParams]"/>
                     </div>
