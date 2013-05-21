@@ -15,34 +15,19 @@
 					<tr>
 						<td>
 							<g:render template="alertSummary"/>
+                            <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
+                            <g:render template="tagSummary" model="[tags:tags]"/>
 						</td>
 						<td>
 							<g:render template="expiringSummary"/>
+                            <g:render template="shipmentSummary"/>
+                            <g:render template="receiptSummary"/>
 						</td>
-						<td rowspan="5" width="40%">
+						<td width="40%">
                             <g:render template="activitySummary"/>
 						</td>
 					
 					</tr>
-					<tr>
-						<td rowpan="4">
-                            <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
-						</td>
-						<td>
-                            <g:render template="shipmentSummary"/>
-                            <g:render template="receiptSummary"/>
-						</td>
-                        <td>
-
-                        </td>
-					</tr>
-                    <tr>
-                        <td colspan="2">
-                            <g:render template="tagSummary" model="[tags:tags]"/>
-
-                        </td>
-                    </tr>
-
 				</table>
 	    	</div>
 		</div>
