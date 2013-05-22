@@ -294,11 +294,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             throw new ValidationException("Validation errors on requisition item", errors)
         }
 
-        //def picklistItems = getPicklistItems()
-        //picklistItems.each {
-        //    it.picklist.removeFromPicklistItems(it)
-        //    it.delete()
-        //}
+        // Remove all picklist items
+        def picklistItems = getPicklistItems()
+        picklistItems.each {
+            removeFromPicklistItems(it)
+            it.picklist.removeFromPicklistItems(it)
+            it.delete()
+        }
+
         quantityCanceled = quantity
         cancelReasonCode = reasonCode
         cancelComments = comments

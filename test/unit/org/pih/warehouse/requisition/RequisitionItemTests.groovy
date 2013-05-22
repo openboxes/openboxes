@@ -95,8 +95,29 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         assertFalse requisitionItem.isSubstitution()
         assertFalse requisitionItem.isPartiallyFulfilled()
         assertFalse requisitionItem.isApproved()
-
         assertTrue requisitionItem.validate()
+    }
+
+    @Test
+    void cancelQuantity_shouldRemovePicklistItems() {
+        def requisition = new Requisition()
+        def picklist = new Picklist()
+        def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: requisition)
+        def picklistItem = new PicklistItem(inventoryItem: abc123, quantity: 200, requisitionItem: requisitionItem, picklist: picklist)
+        mockDomain(Requisition, [requisition])
+        mockDomain(Picklist, [picklist])
+        mockDomain(RequisitionItem, [requisitionItem])
+        mockDomain(PicklistItem, [picklistItem])
+
+        requisition.picklist = picklist
+        requisition.picklist.addToPicklistItems(picklistItem)
+        requisitionItem.addToPicklistItems(picklistItem)
+        requisition.addToRequisitionItems(requisitionItem)
+
+        assertEquals 1, requisitionItem.getPicklistItems().size()
+        requisitionItem.cancelQuantity("Not needed", "Because I said so")
+        assertEquals 0, requisitionItem.getPicklistItems().size()
+
     }
 
     @Test
