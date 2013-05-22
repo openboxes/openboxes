@@ -2,12 +2,12 @@
 	<table>
 		<thead>
 			<tr>
-				<th>
+				<th style="width: 1%">
 					${warehouse.message(code: 'default.actions.label')}
 				</th>
-				<th>
+				<th style="width: 1%">
 				</th>
-				<th>
+				<th style="width: 33%">
 					${warehouse.message(code: 'shipping.shipment.label')}
 				</th>
 				<th>

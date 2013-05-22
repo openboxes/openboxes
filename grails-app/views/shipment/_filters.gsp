@@ -1,4 +1,5 @@
 <div>
+    <h2><warehouse:message code="default.filters.label"/></h2>
 	<g:form method="GET" controller="shipment" action="list">
         <g:hiddenField name="type" value="${params.type}"/>
 		<div class="box">
@@ -12,12 +13,13 @@
                         <div>
                             <g:textField name="terms"
                                 value="${params.terms}"
+                                style="width: 100%;"
                                 placeholder="${warehouse.message(code:'shipping.searchTerms.label', default: 'Search by name, shipment number')}"
-                                class="text medium" size="45"/>
+                                class="text medium"/>
                         </div>
 					</td>
 				</tr>
-                <tr class="">
+                <tr class="prop">
                     <td>
                         <div>
                             <div>
@@ -33,7 +35,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr class="">
+                <tr class="prop">
                     <td>
                         <div>
                             <div>
@@ -49,7 +51,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr class="">
+                <tr class="prop">
                     <td>
                         <g:if test="${incoming}">
                             <label>${warehouse.message(code: 'shipping.origin.label')}</label>
@@ -88,17 +90,22 @@
                     </td>
                 </tr>
                 --%>
-                <tr class="">
+                <tr class="prop">
                     <td>
-                        <label>${warehouse.message(code: 'default.lastUpdatedBetween.label', default: 'Last updated between')}</label>
-                            <div>
-                                <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
-                                                    value="${lastUpdatedFrom}" format="MM/dd/yyyy"/>
-
-                                <span class="center" style="padding-right:15px;">-</span>
-                                <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
-                                                    value="${lastUpdatedTo}" format="MM/dd/yyyy"/>
-                            </div>
+                        <label>${warehouse.message(code: 'default.lastUpdatedAfter.label', default: 'Last updated after')}</label>
+                        <div>
+                            <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                                value="${lastUpdatedFrom}" format="MM/dd/yyyy"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td>
+                        <label>${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
+                        <div>
+                            <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                                value="${lastUpdatedTo}" format="MM/dd/yyyy"/>
+                        </div>
 
                     </td>
                 </tr>
@@ -116,7 +123,7 @@
                     </td>
                 </tr>
                 --%>
-                <tr>
+                <tr class="prop">
                     <td>
 						<div class="right">
 							<button type="submit" class="button icon search" name="search" value="true">
