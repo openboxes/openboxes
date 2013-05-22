@@ -1,4 +1,5 @@
-<div class="left">
+<div class="box">
+    <h2>Consume inventory items</h2>
 	<g:form action="saveDebitTransaction">
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
@@ -74,8 +75,8 @@
 															value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="1" autocomplete="off" />
 													</g:if>
 													<g:else>
-														<g:textField name="transactionEntries[${status }].quantity"
-															value="${command?.quantityMap[inventoryItem] }" size="1" autocomplete="off" />
+														<g:textField name="transactionEntries[${status }].quantity" class="text" size="10"
+															value="${command?.quantityMap[inventoryItem] }" autocomplete="off" />
 													</g:else>
 												</td>
 												<td>

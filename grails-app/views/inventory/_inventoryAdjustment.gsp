@@ -1,5 +1,7 @@
-<div class="left">
-	<g:form action="saveInventoryTransaction">
+<div class="box">
+    <h2>Adjust inventory items</h2>
+
+    <g:form action="saveInventoryTransaction">
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
@@ -72,7 +74,7 @@
 											</g:if>
 											<g:else>
 												<g:textField name="transactionEntries[${status }].quantity"
-													value="${command?.quantityMap[inventoryItem]?:0 }" size="1" autocomplete="off" />
+													value="${command?.quantityMap[inventoryItem]?:0 }" size="1" autocomplete="off" class="text" size="10" />
 											</g:else>
 										</td>
 										<td>

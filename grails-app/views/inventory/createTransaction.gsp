@@ -24,8 +24,7 @@
 	            </div>
             </g:hasErrors>    
 
-			<div class="dialog" >
-				<div>
+				<div class="dialog">
 					<g:if test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}">
 						<g:render template="outgoingTransfer"></g:render>
 					</g:if>
@@ -47,9 +46,8 @@
 					<g:else>
 						Unknown transaction type
 					</g:else> 
-					
 				</div>
-			</div>
+                <div class="clear"></div>
 		</div>
 	</body>
 </html>
