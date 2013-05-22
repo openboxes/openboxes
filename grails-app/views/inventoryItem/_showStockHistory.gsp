@@ -55,28 +55,54 @@
 							<table >
 								<thead>
 									<tr class="odd prop">
+                                        <th>
+
+                                        </th>
 										<th>
 											${warehouse.message(code: 'default.date.label')}
 										</th>
+                                        <th>
+                                            ${warehouse.message(code: 'default.time.label')}
+                                        </th>
+                                        <th>
+                                            ${warehouse.message(code: 'transaction.transactionNumber.label')}
+                                        </th>
 										<th>
 											${warehouse.message(code: 'default.type.label')}
 										</th>
-										<th>
-											${warehouse.message(code: 'shipment.label')}
-										</th>
                                         <th>
+                                            ${warehouse.message(code: 'shipment.label')} /
                                             ${warehouse.message(code: 'requisition.label')}
                                         </th>
-										<th>
-											${warehouse.message(code: 'transaction.source.label')}
+										<th class="border-right center">
+											${warehouse.message(code: 'transaction.source.label')} /
+                                            ${warehouse.message(code: 'transaction.destination.label')}
                                         </th>
-                                        <th>
-											${warehouse.message(code: 'transaction.destination.label')}
+                                        <th class="border-right center">
+                                            ${warehouse.message(code: 'transaction.debit.label', default: 'Debit')}
+                                        </th>
+										<th class="border-right center">
+											${warehouse.message(code: 'transaction.credit.label', default: 'Credit')}
 										</th>
-										<th style="text-align: center">
-											${warehouse.message(code: 'transaction.quantityChange.label')}
-										</th>										
+                                        <th >
+                                            ${warehouse.message(code: 'stockCard.balance.label', default: 'Balance')}
+                                        </th>
 									</tr>
+                                    <tr>
+                                        <th colspan="7" class="left border-right">
+                                            <warehouse:message code="stockCard.initialBalance.label" default="Initial balance"/>
+                                        </th>
+                                        <th class="center border-right">
+
+                                        </th>
+                                        <th class="center border-right">
+
+                                        </th>
+                                        <th class="center border-right">
+                                            0
+                                        </th>
+
+                                    </tr>
 			
 								</thead>
 								<!--  Transaction Log -->
@@ -96,74 +122,100 @@
 										</tr>
 									</g:if>
 									<g:else>
-										<g:set var="totalQuantityChange" value="${0 }"/>		
-										<g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate}.reverse() }" status="status">
+                                        <g:set var="balance" value="${0}"/>
+                                        <g:set var="balanceByInventoryItem" value="${[:]}"/>
+										<g:set var="totalQuantityChange" value="${0 }"/>
+                                        <g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate} }" status="status">
 											<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
-												<td style="width: 10%;" nowrap="nowrap">	
+                                                <td style="text-align: center">
+                                                    <g:set var="quantityChange" value="${0 }"/>
+                                                    <g:each var="transactionEntry" in="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())?.get(transaction) }" status="status2">
+                                                        <g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it?.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
+                                                    </g:each>
+                                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
+                                                        <g:set var="balance" value="${balance - quantityChange}"/>
+                                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'decline.png' )}"/>
+                                                    </g:if>
+                                                    <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
+                                                        <g:set var="balance" value="${balance + quantityChange}"/>
+                                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" />
+                                                    </g:elseif>
+                                                    <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.INVENTORY}">
+                                                        <g:set var="balance" value="${balance + quantityChange}"/>
+                                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
+                                                    </g:elseif>
+                                                    <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY}">
+                                                        <g:set var="balance" value="${quantityChange}"/>
+                                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
+                                                    </g:elseif>
+                                                </td>
+												<td style="width: 10%;" nowrap="nowrap">
 													<format:date obj="${transaction?.transactionDate}" format="dd/MMM/yyyy"/>																
-													<format:date obj="${transaction?.transactionDate}" format="hh:mm a"/>																
-												</td>
-												<td>
-													<span>
-														<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
-															<format:metadata obj="${transaction?.transactionType}"/>
-															${transaction?.transactionNumber }
-														</g:link>
-													</span>
-												</td>
-												<td>
-													<g:if test="${transaction?.incomingShipment }">
-														<g:link controller="shipment" action="showDetails" id="${transaction?.incomingShipment?.id }">
-                                                            ${transaction.incomingShipment?.shipmentNumber }
-															${transaction.incomingShipment?.name }
-														</g:link>
-													</g:if>
-													<g:elseif test="${transaction?.outgoingShipment }">
-														<g:link controller="shipment" action="showDetails" id="${transaction?.outgoingShipment?.id }">
-                                                            ${transaction.outgoingShipment?.shipmentNumber }
-															${transaction.outgoingShipment?.name }
-														</g:link>
-													</g:elseif>
-													<g:else>
-														<span class="fade">${warehouse.message(code:'default.none.label') }</span>
-													</g:else>
 												</td>
                                                 <td>
-                                                    <g:if test="${transaction?.requisition }">
-                                                        <g:link controller="requisition" action="show" id="${transaction?.requisition?.id }">
-                                                            ${transaction?.requisition?.requestNumber }
-                                                            ${transaction?.requisition?.name }
-                                                        </g:link>
-                                                    </g:if>
-                                                    <g:else>
-                                                        <span class="fade">${warehouse.message(code:'default.none.label') }</span>
-                                                    </g:else>
+                                                    <format:date obj="${transaction?.transactionDate}" format="hh:mma"/>
+                                                </td>
+                                                <td>
+                                                    <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
+                                                        ${transaction?.transactionNumber }
+                                                    </g:link>
                                                 </td>
 												<td>
+                                                    <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
+                                                        <format:metadata obj="${transaction?.transactionType}"/>
+                                                    </g:link>
+												</td>
+												<td>
+                                                    <div>
+                                                        <g:if test="${transaction?.incomingShipment }">
+                                                            <g:link controller="shipment" action="showDetails" id="${transaction?.incomingShipment?.id }">
+                                                                ${transaction.incomingShipment?.shipmentNumber } |
+                                                                ${transaction.incomingShipment?.name }
+                                                            </g:link>
+                                                        </g:if>
+                                                        <g:elseif test="${transaction?.outgoingShipment }">
+                                                            <g:link controller="shipment" action="showDetails" id="${transaction?.outgoingShipment?.id }">
+                                                                ${transaction.outgoingShipment?.shipmentNumber } |
+                                                                ${transaction.outgoingShipment?.name }
+                                                            </g:link>
+                                                        </g:elseif>
+                                                        <g:elseif test="${transaction?.requisition }">
+                                                            <g:link controller="requisition" action="show" id="${transaction?.requisition?.id }">
+                                                                ${transaction?.requisition?.requestNumber } |
+                                                                ${transaction?.requisition?.name }
+                                                            </g:link>
+                                                        </g:elseif>
+                                                        <g:else>
+                                                            <span class="fade">${warehouse.message(code:'default.none.label') }</span>
+                                                        </g:else>
+                                                    </div>
+                                                </td>
+												<td class="border-right center">
 													<g:if test="${transaction?.source }">
+                                                        ${warehouse.message(code:'default.from.label')}
 														${transaction?.source?.name }
 													</g:if>
-                                                    <g:else>
-                                                        <span class="fade">${warehouse.message(code:'default.none.label') }</span>
-                                                    </g:else>
-                                                </td>
-                                                <td>
-													<g:if test="${transaction?.destination }">
+													<g:elseif test="${transaction?.destination }">
+                                                        ${warehouse.message(code:'default.to.label')}
 														${transaction?.destination?.name }
-													</g:if>
+													</g:elseif>
                                                     <g:else>
                                                         <span class="fade">${warehouse.message(code:'default.none.label') }</span>
                                                     </g:else>
 												</td>
-												<td style="text-align: center">
-													<g:set var="quantityChange" value="${0 }"/>
-													<g:each var="transactionEntry" in="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())?.get(transaction) }" status="status2">
-														<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it?.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
-													</g:each>
-													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-														${quantityChange }
-													</span>
-												</td>												
+                                                <td  class="border-right center">
+                                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
+                                                        ${quantityChange }
+                                                    </g:if>
+                                                </td>
+                                                <td class="border-right center">
+                                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
+                                                        ${quantityChange }
+                                                    </g:if>
+                                                </td>
+                                                <td class="border-right center">
+                                                    ${balance}
+												</td>
 											</tr>
 										</g:each>
 										<%-- 
@@ -180,6 +232,23 @@
 										--%>															
 									</g:else>
 								</tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="7" class="left border-right">
+                                            <warehouse:message code="stockCard.endBalance.label" default="End balance"/>
+                                        </th>
+                                        <th class="center border-right">
+
+                                        </th>
+                                        <th class="center border-right">
+
+                                        </th>
+                                        <th class="center border-right">
+                                            ${balance}
+                                        </th>
+
+                                    </tr>
+                                </tfoot>
 							</table>
 						</td>
 					</tr>

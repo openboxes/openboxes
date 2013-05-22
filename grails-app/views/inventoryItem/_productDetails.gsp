@@ -144,64 +144,51 @@
                             <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity]"/>
 						</span>
 					</td>
-				</tr>	
-				<tr class="prop">	
+				</tr>
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.latestInventoryDate.label"/></label>
+                    </td>
+                    <td class="value">
+                        <span class="">
+                            <g:if test="${latestInventoryDate}">
+                                ${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
+                                <span class="fade">${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }</span>
+                            </g:if>
+                            <g:else>
+                                <span class="fade"><warehouse:message code="default.never.label" /></span>
+                            </g:else>
+                        </span></td>
+                </tr>
+                <tr class="prop">
 					<td class="label">
 						<label><warehouse:message code="product.onHandQuantity.label"/></label>
 					</td>
 					<td class="value">
-						${g.formatNumber(number: totalQuantity, format: '###,###,###') }
-						<g:if test="${productInstance?.unitOfMeasure }">
-							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-						</g:if>
-						<g:else>
-							${warehouse.message(code:'default.each.label') }
-						</g:else>								
-					</td>
-				</tr>
-				<g:if test="${productInstance?.packages }">		
-					<g:each var="productPackage" in="${productInstance?.packages }">
-						<g:if test="${productPackage?.uom?.code != 'EA' }">
-							<tr class="prop">										
-								<td class="label">
-								</td>
-								<td class="value">
-									<span class="fade">
-										<g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
-										${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
-										x ${productPackage?.uom?.code }/${productPackage.quantity }
-									</span>
-								</td>
-							</tr>
-						</g:if>
-					</g:each>
-				</g:if>
-				<g:if test="${productInstance?.pricePerUnit > 0 && totalQuantity > 0 }">
-					<tr class="prop">	
-						<td class="label">
-							<label><warehouse:message code="product.totalValue.label"/></label>
-						</td>
-						<td class="value middle">
-							$${g.formatNumber(number: (totalQuantity*productInstance?.pricePerUnit), format: '###,###,###.00') }
-							<span class="fade">USD</span>
-						</td>
-					</tr>			
-				</g:if>	
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.latestInventoryDate.label"/></label>
-					</td>
-					<td class="value">
-						<span class=""> 						
-							<g:if test="${latestInventoryDate}">
-								${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
-								<span class="fade">${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }</span>
-							</g:if> 
-							<g:else>
-								<span class="fade"><warehouse:message code="default.never.label" /></span>
-							</g:else>
-					</span></td>
-				</tr>				
+                        <div>
+                            ${g.formatNumber(number: totalQuantity, format: '###,###,###') }
+                            <g:if test="${productInstance?.unitOfMeasure }">
+                                <format:metadata obj="${productInstance?.unitOfMeasure}"/>
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.each.label') }
+                            </g:else>
+                        </div>
+                        <g:if test="${productInstance?.packages }">
+                            <g:each var="productPackage" in="${productInstance?.packages }">
+                                <g:if test="${productPackage?.uom?.code != 'EA' }">
+                                    <div>
+                                        <span class="fade">
+                                            <g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
+                                            ${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
+                                            ${productPackage?.uom?.code }/${productPackage.quantity }
+                                        </span>
+                                    </div>
+                                </g:if>
+                            </g:each>
+                        </g:if>
+                    </td>
+                </tr>
 				<tr class="prop">
 					<td class="label">
 						<label><warehouse:message code="inventoryLevel.minQuantity.label"/></label>
@@ -223,9 +210,31 @@
 						</g:else>
 					</td>				
 				</tr>
-				
-				
-				<tr class="prop">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label>
+                    </td>
+                    <td class="value">
+
+                        <g:if test="${inventoryLevelInstance?.reorderQuantity}">
+                            ${inventoryLevelInstance?.reorderQuantity?:'' }
+                            <span class="">
+                                <g:if test="${productInstance?.unitOfMeasure }">
+                                    <format:metadata obj="${productInstance?.unitOfMeasure}"/>
+                                </g:if>
+                                <g:else>
+                                    ${warehouse.message(code:'default.each.label') }
+                                </g:else>
+                            </span>
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.na.label"/></span>
+                        </g:else>
+                    </td>
+                </tr>
+
+
+            <tr class="prop">
 					<td class="label">
 						<label><warehouse:message code="inventoryLevel.maxQuantity.label"/></label>
 					</td>
@@ -248,28 +257,6 @@
 				</tr>
 				<tr class="prop">
 					<td class="label">
-						<label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label>
-					</td>
-					<td class="value">
-						
-						<g:if test="${inventoryLevelInstance?.reorderQuantity}">
-							${inventoryLevelInstance?.reorderQuantity?:'' }
-							<span class="">
-								<g:if test="${productInstance?.unitOfMeasure }">
-									<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-								</g:if>
-								<g:else>
-									${warehouse.message(code:'default.each.label') }
-								</g:else>
-							</span>
-						</g:if>
-						<g:else>
-							<span class="fade"><warehouse:message code="default.na.label"/></span>
-						</g:else>
-					</td>
-				</tr>	
-				<tr class="prop">
-					<td class="label">
 						<label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
 					</td>
 					<td class="value">
@@ -280,8 +267,23 @@
 							<span class="fade"><warehouse:message code="default.na.label"/></span>
 						</g:else>
 					</td>				
-				</tr>									
-				
+				</tr>
+
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.totalValue.label"/></label>
+                    </td>
+                    <td class="value middle">
+                        <g:if test="${productInstance?.pricePerUnit > 0 && totalQuantity > 0 }">
+                            $${g.formatNumber(number: (totalQuantity*productInstance?.pricePerUnit), format: '###,###,###.00') }
+                            <span class="fade">USD</span>
+                        </g:if>
+                        <g:else>
+                            <span class="fade">$0.00 USD</span>
+                        </g:else>
+                    </td>
+                </tr>
+
 			</tbody>
 		</table>			
 	</div>
