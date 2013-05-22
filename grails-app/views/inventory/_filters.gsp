@@ -67,7 +67,7 @@
 						</g:if>
 						<g:else>
 							<div class="empty middle center">
-								${warehouse.message(code: 'tags.empty.label', default:'There are no public tags') }
+								${warehouse.message(code: 'tags.empty.label', default:'No public tags') }
 							</div>
 						</g:else>	
 					</td>
