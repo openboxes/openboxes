@@ -16,27 +16,31 @@
 			<g:else>
                 <table>
                     <g:set var="requisitionMap" value="${requisitions.groupBy { it.status }}"/>
-                    <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list()}" status="i">
+                    <g:set var="i" value="${0}"/>
+                    <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list()}">
+                        <g:set var="requisitionCount" value="${requisitionMap[status]?.size()?:0}"/>
                         <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
-                        <tr class="${i%2?'odd':'even'}">
-                            <td class="center" style="width: 1%">
-                                <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
+                        <g:if test="${requisitionCount}">
+                            <tr class="${i%2?'odd':'even'}">
+                                <td class="center" style="width: 1%">
+                                    <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
 
-                            </td>
-                            <td>
-                                <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                    <warehouse:message code="requisitions.label"/>
-                                    ${format.metadata(obj: status)?.toLowerCase()}
-                                </g:link>
-                            </td>
-                            <td class="right">
+                                </td>
+                                <td>
+                                    <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
+                                        <warehouse:message code="requisitions.label"/>
+                                        ${format.metadata(obj: status)?.toLowerCase()}
+                                    </g:link>
+                                </td>
+                                <td class="right">
 
-                                <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                    ${requisitionMap[status]?.size()?:0}
-                                </g:link>
-                            </td>
-
-                        </tr>
+                                    <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
+                                        ${requisitionMap[status]?.size()?:0}
+                                    </g:link>
+                                </td>
+                            </tr>
+                            <g:set var="i" value="${i+1}"/>
+                        </g:if>
                     </g:each>
                     <tfoot>
                         <tr>
