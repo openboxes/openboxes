@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -55,13 +56,17 @@ class InventoryItemController {
 	/**
 	 * Displays the stock card for a product
 	 */
+    //@Cacheable("showStockCardCache")
 	def showStockCard = { StockCardCommand cmd ->
+        long currentTime = System.currentTimeMillis()
 		// add the current warehouse to the command object
 		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 		
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-		
+
+        println "After get stock card command " + (System.currentTimeMillis() - currentTime) + " ms"
+
 		// populate the pending shipments
 		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
 		// (that is, find a workaround to GRAILS-5080)
@@ -69,7 +74,9 @@ class InventoryItemController {
 		commandInstance.pendingShipmentList = 
 			shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
-		def shipmentItems = 
+        println "After get pending shipments " + (System.currentTimeMillis() - currentTime) + " ms"
+
+        def shipmentItems =
 			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
 		
 		def shipmentMap = shipmentItems.groupBy { it.shipment } 
@@ -80,8 +87,10 @@ class InventoryItemController {
 			}
 		}	
 		commandInstance.shipmentMap = shipmentMap;
-		
-		def orderItems = 
+
+        println "After get pending shipment items " + (System.currentTimeMillis() - currentTime) + " ms"
+
+		def orderItems =
 			orderService.getPendingOrderItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance);
 		def orderMap = orderItems.groupBy { it.order }
 		if (orderMap) {
@@ -91,7 +100,10 @@ class InventoryItemController {
 			}
 		}
 		commandInstance.orderMap = orderMap;
-		
+
+        println "After get pending orders " + (System.currentTimeMillis() - currentTime) + " ms"
+
+
 		//def requestItems =
 		//	requisitionService.getPendingRequisitionItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
 		def requestMap = [:]//requestItems.groupBy { it.requisition }
@@ -102,9 +114,11 @@ class InventoryItemController {
 //			}
 //		}
 		commandInstance.requestMap = requestMap;
+
+        println "After get pending requisitions " + (System.currentTimeMillis() - currentTime) + " ms"
+
 		
-		
-		println commandInstance?.transactionLogMap
+		//println commandInstance?.transactionLogMap
 	
 		// FIXME Hacky implementation of recently viewed products 
 		try { 
@@ -124,7 +138,9 @@ class InventoryItemController {
 		} catch (Exception e) { 
 			log.error("Error while saving recently viewed product", e)
 		}
-					
+
+        println "After setting session productsViewed " + (System.currentTimeMillis() - currentTime) + " ms"
+
 		[ commandInstance: commandInstance ]
 	}
 
@@ -290,7 +306,7 @@ class InventoryItemController {
 			// Need to create a transaction if we want the inventory item 
 			// to show up in the stock card			
 			transactionInstance.transactionDate = new Date();
-			transactionInstance.transactionDate.clearTime(); // we only want to store the date component
+			//transactionInstance.transactionDate.clearTime(); // we only want to store the date component
 			transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
 			def warehouseInstance = Location.get(session.warehouse.id);
 			transactionInstance.source = warehouseInstance;

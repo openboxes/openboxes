@@ -70,7 +70,7 @@ class StockCardCommand {
 	 */
 	Map getTransactionLogMap(Boolean enableFilter) {
 		
-		println "transaction entries " + transactionEntryList
+		//println "transaction entries " + transactionEntryList
 		def filteredTransactionLog = transactionEntryList;
 		/*
 		if (enableFilter) { 

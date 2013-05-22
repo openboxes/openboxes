@@ -22,29 +22,24 @@
 		    	<div id="loggedIn" style="vertical-align:middle;" >
 					<ul>
 					    <g:if test="${session.user}">
+                            <%--
                             <li>
                                 <span>
                                     <warehouse:message code="header.welcome.label" default="Welcome"/>,
                                 </span>
-                                <g:link controller="user" action="show" id="${session.user.id}">
+                                <g:link controller="user" action="show" id="${session.user.id}" class="button icon user">
                                     <span id="username">${session?.user?.name}</span>
                                     <span id="userrole">[<g:userRole user="${session.user}"/>]</span></g:link>
 
                             </li>
-                            <g:if test="${session?.warehouse}">
-                                <li>|</li>
-                                <li>
-                                    <a href="javascript:void(0);" class="warehouse-switch">
-                                        <span id="current-warehouse">${session?.warehouse?.name }</span></a>
-                                </li>
-
-                            </g:if>
-
+                            --%>
                             <li>
                                 <span class="action-menu" >
-                                    <span class="action-btn">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" class="middle"/>
-                                    </span>
+                                    <button class="action-hover-btn button icon user">
+                                        <span id="username">${session?.user?.name}</span>
+                                        <span id="userrole">[<g:userRole user="${session.user}"/>]</span>
+
+                                    </button>
                                     <ul class="actions" style="text-align:left;">
                                         <%--
                                         <li class="action-menu-item">
@@ -74,6 +69,14 @@
                                             </g:link>
                                         </li>
                                         <g:if test="${session?.warehouse}">
+                                            <%--
+                                            <li class="action-menu-item">
+                                                <g:link controller="dashboard" action="chooseLocation" style="color: #666">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
+                                                    <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
+                                                </g:link>
+                                            </li>
+                                            --%>
                                             <li class="action-menu-item">
                                                 <a href="javascript:void(0);" class="warehouse-switch" style="color: #666">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
@@ -155,6 +158,14 @@
                                     </ul>
                                 </span>
                             </li>
+                            <g:if test="${session?.warehouse}">
+                                <li>
+                                    <button class="warehouse-switch button icon pin">
+                                        ${session?.warehouse?.name }</button>
+                                </li>
+
+                            </g:if>
+
                         </g:if>
 						<li>
 							<g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"

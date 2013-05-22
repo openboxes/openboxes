@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
@@ -1033,6 +1034,8 @@ class InventoryService implements ApplicationContextAware {
                         quantityMap[inventoryItem.product][inventoryItem] = 0
                     }
 
+                    //println "Transaction entry " + transactionEntry.id
+                    //println "Transaction " + transactionEntry.transaction
                     // now update quantity as necessary
                     def code = transactionEntry.transaction.transactionType.transactionCode
 
@@ -1334,6 +1337,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param params
 	 * @return
 	 */
+    //@Cacheable("stockCardCommandCache")
 	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
 		log.debug "Params " + params
 
@@ -1374,7 +1378,7 @@ class InventoryService implements ApplicationContextAware {
 
 		// set the default transaction date to today
 		commandInstance.transactionDate = new Date()
-		commandInstance.transactionDate.clearTime()
+		//commandInstance.transactionDate.clearTime()
 
 		if (!commandInstance?.productInstance) {
 			commandInstance.errors.reject("error.product.invalid", "Product does not exist");
@@ -1817,7 +1821,7 @@ class InventoryService implements ApplicationContextAware {
 				// Need to create a transaction if we want the inventory item
 				// to show up in the stock card
 				transactionInstance.transactionDate = new Date();
-				transactionInstance.transactionDate.clearTime();
+				//transactionInstance.transactionDate.clearTime();
 				transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
 				transactionInstance.inventory = inventoryInstance;
 
@@ -2427,7 +2431,7 @@ class InventoryService implements ApplicationContextAware {
 
 	public void processData(ImportDataCommand command) {
 		Date today = new Date()
-		today.clearTime()
+		//today.clearTime()
 		def transactionInstance = new Transaction(transactionDate: today,
 		transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
 		inventory: command?.location?.inventory)
@@ -2570,7 +2574,7 @@ class InventoryService implements ApplicationContextAware {
 			def dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
-			Date today = new Date().clearTime()
+			Date today = new Date()
 
 			def transactionInstance = new Transaction(transactionDate: today,
 			transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
@@ -2720,6 +2724,31 @@ class InventoryService implements ApplicationContextAware {
 	public String generateTransactionNumber() {
 		return identifierService.generateTransactionIdentifier()
 	}
+
+
+    public List<Transaction> getTransferOutBetweenDates(Location fromLocation, List toLocations, Date fromDate, Date toDate) {
+        println "Get transfer out between dates " + fromLocation
+        println "Get transfer out between dates " + toLocations
+        println "Get transfer out between dates " + fromDate
+        println "Get transfer out between dates " + toDate
+
+        def transactions = Transaction.createCriteria().list() {
+            transactionType {
+                eq("transactionCode", TransactionCode.DEBIT)
+            }
+            if (toLocations) {
+                'in'("destination", toLocations)
+            }
+            eq("inventory", fromLocation.inventory)
+            between('transactionDate', fromDate, toDate)
+            //if (products) {
+            //    inventoryItem { 'in'("product", products) }
+            //}
+        }
+
+
+        return transactions
+    }
 
 }
 

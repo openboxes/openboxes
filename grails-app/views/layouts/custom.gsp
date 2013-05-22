@@ -367,6 +367,27 @@
 				// To prevent the action button from POST'ing to the server
 				event.preventDefault();
 			});
+
+            $(".action-hover-btn").click(function(event) {
+                //show the menu directly over the placeholder
+                var actions = $(this).parent().children(".actions");
+
+                // Need to toggle before setting the position
+                actions.toggle();
+
+                // Set the position for the actions menu
+                actions.position({
+                    my: "right top",
+                    at: "right bottom",
+                    of: $(this).closest(".action-hover-btn"),
+                    //offset: "0 0"
+                    collision: "flip"
+                });
+
+                // To prevent the action button from POST'ing to the server
+                event.preventDefault();
+            });
+
 		});
 	</script>
     <script type="text/javascript">

@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.reporting
 
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
@@ -19,7 +20,16 @@ class ReportController {
 	def inventoryService
 	def productService
 	def reportService
-	
+
+
+    def showConsumptionReport = {
+
+        def transactions = Transaction.findAllByTransactionDateBetween(new Date()-10, new Date())
+
+        [transactions: transactions]
+    }
+
+
 	def showProductReport = { ProductReportCommand command -> 	
 		
 		//if (!command?.product) { 

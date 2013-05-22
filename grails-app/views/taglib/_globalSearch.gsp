@@ -31,10 +31,12 @@
       		});
             $("#${attrs.id}").width(300);
             $("#${attrs.id}").focus(function() {
-                $(this).width(400);
+                $(this).animate({"width": "500px"}, "slow");
+                //$(this).width(400);
             });
             $("#${attrs.id}").blur(function() {
-                $(this).width(400);
+                $(this).val('');
+                $(this).animate({"width": "300px"}, "slow");
             });
 
         });
