@@ -70,26 +70,22 @@
 										<th>
 											${warehouse.message(code: 'default.type.label')}
 										</th>
-                                        <th>
+                                        <th class="border-right">
                                             ${warehouse.message(code: 'shipment.label')} /
                                             ${warehouse.message(code: 'requisition.label')}
                                         </th>
-										<th class="border-right center">
-											${warehouse.message(code: 'transaction.source.label')} /
-                                            ${warehouse.message(code: 'transaction.destination.label')}
+                                        <th class="border-right center" width="7%">
+                                            ${warehouse.message(code: 'transaction.credit.label', default: 'Credit')}
                                         </th>
-                                        <th class="border-right center">
+                                        <th class="border-right center" width="7%">
                                             ${warehouse.message(code: 'transaction.debit.label', default: 'Debit')}
                                         </th>
-										<th class="border-right center">
-											${warehouse.message(code: 'transaction.credit.label', default: 'Credit')}
-										</th>
-                                        <th >
+                                        <th class="center" width="7%">
                                             ${warehouse.message(code: 'stockCard.balance.label', default: 'Balance')}
                                         </th>
 									</tr>
                                     <tr>
-                                        <th colspan="7" class="left border-right">
+                                        <th colspan="6" class="left border-right">
                                             <warehouse:message code="stockCard.initialBalance.label" default="Initial balance"/>
                                         </th>
                                         <th class="center border-right">
@@ -126,7 +122,7 @@
                                         <g:set var="balanceByInventoryItem" value="${[:]}"/>
 										<g:set var="totalQuantityChange" value="${0 }"/>
                                         <g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate} }" status="status">
-											<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
+                                            <tr class="transaction ${(status%2==0)?'even':'odd' } prop border-top">
                                                 <td style="text-align: center">
                                                     <g:set var="quantityChange" value="${0 }"/>
                                                     <g:each var="transactionEntry" in="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())?.get(transaction) }" status="status2">
@@ -163,9 +159,18 @@
 												<td>
                                                     <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
                                                         <format:metadata obj="${transaction?.transactionType}"/>
+                                                        <g:if test="${transaction?.source }">
+                                                            ${warehouse.message(code:'default.from.label')}
+                                                            ${transaction?.source?.name }
+                                                        </g:if>
+                                                        <g:elseif test="${transaction?.destination }">
+                                                            ${warehouse.message(code:'default.to.label')}
+                                                            ${transaction?.destination?.name }
+                                                        </g:elseif>
                                                     </g:link>
-												</td>
-												<td>
+
+                                                </td>
+												<td class="border-right">
                                                     <div>
                                                         <g:if test="${transaction?.incomingShipment }">
                                                             <g:link controller="shipment" action="showDetails" id="${transaction?.incomingShipment?.id }">
@@ -190,34 +195,23 @@
                                                         </g:else>
                                                     </div>
                                                 </td>
-												<td class="border-right center">
-													<g:if test="${transaction?.source }">
-                                                        ${warehouse.message(code:'default.from.label')}
-														${transaction?.source?.name }
-													</g:if>
-													<g:elseif test="${transaction?.destination }">
-                                                        ${warehouse.message(code:'default.to.label')}
-														${transaction?.destination?.name }
-													</g:elseif>
-                                                    <g:else>
-                                                        <span class="fade">${warehouse.message(code:'default.none.label') }</span>
-                                                    </g:else>
-												</td>
-                                                <td  class="border-right center">
-                                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
-                                                        ${quantityChange }
-                                                    </g:if>
-                                                </td>
                                                 <td class="border-right center">
                                                     <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
                                                         ${quantityChange }
+                                                    </g:if>
+                                                </td>
+                                                <td  class="border-right center">
+                                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
+                                                        (${quantityChange })
                                                     </g:if>
                                                 </td>
                                                 <td class="border-right center">
                                                     ${balance}
 												</td>
 											</tr>
-										</g:each>
+                                            <g:set var="previousMonth" value="${transaction?.transactionDate?.month}"/>
+
+                                        </g:each>
 										<%-- 
 										<!-- Commented out because it's a little confusing --> 
 										<tr class="prop" style="height: 3em;">
@@ -234,7 +228,7 @@
 								</tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="7" class="left border-right">
+                                        <th colspan="6" class="left border-right">
                                             <warehouse:message code="stockCard.endBalance.label" default="End balance"/>
                                         </th>
                                         <th class="center border-right">
