@@ -28,7 +28,7 @@ class DashboardController {
 
 	def orderService
 	def shipmentService
-	def inventoryService
+	//def inventoryService
 	def productService
     def requisitionService
 	def sessionFactory
