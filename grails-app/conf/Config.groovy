@@ -251,7 +251,6 @@ log4j = {
             'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
 
 	warn	'org.mortbay.log',
-            'org.codehaus.groovy.grails.web.pages',			// GSP
             'org.codehaus.groovy.grails.web.servlet',		// controllers
             'org.codehaus.groovy.grails.web.sitemesh',		// layouts
             'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
@@ -267,6 +266,7 @@ log4j = {
 		
 	info	'org.liquibase',
             'grails.app.controller',
+            'org.codehaus.groovy.grails.web.pages',		// GSP
 			'com.mchange',
 			'org.springframework',
 			'org.hibernate',
@@ -410,3 +410,32 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYearMonthDay, class: org.joda.time.YearMonthDay
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYears, class: org.joda.time.Years
 }
+
+grails.plugins.dynamicController.mixins = [
+    'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.HibernateControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'app.info.custom.example.MyConfigControllerMixin' :
+            'com.burtbeckwith.appinfo_test.AdminManageController'
+]
