@@ -589,16 +589,19 @@ class DocumentService {
 			//sheet.autoSizeColumn(3);
 			//sheet.autoSizeColumn(4);
 			//sheet.autoSizeColumn(5);
-			sheet.setColumnWidth((short)0, (short) ((50 * 8) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)0, (short) ((50 * 5) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)1, (short) ((50 * 2) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)2, (short) ((50 * 8) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)2, (short) ((50 * 2) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)3, (short) ((50 * 2) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)4, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)5, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)6, (short) ((50 * 2) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)4, (short) ((50 * 2) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)5, (short) ((50 * 8) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)6, (short) ((50 * 3) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)7, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)8, (short) ((50 * 5) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)9, (short) ((50 * 10) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)8, (short) ((50 * 2) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)9, (short) ((50 * 2) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)10, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)11, (short) ((50 * 5) / ((double) 1 / 20)))
+            //sheet.setColumnWidth((short)12, (short) ((50 * 10) / ((double) 1 / 20)))
 
 			// Bold font
 			Font boldFont = workbook.createFont();
@@ -812,19 +815,22 @@ class DocumentService {
             row = sheet.createRow((short)counter++);
 
             // Merge cells
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(1, 1, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(11, 11, 1, 2))
-            sheet.addMergedRegion(new CellRangeAddress(12, 13, 1, 9))
+            //first row (0-based)
+            //last row (0-based)
+            //first column (0-based)
+            //last column (0-based)
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 4)) // Name
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 1, 4)) // Shipment type
+            sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 4)) // Empty
+            sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 4)) // Origin
+            sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 4)) // Destination
+            sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 4)) // Empty
+            sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 4)) // Expected shipping date
+            sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 4)) // Actual shipping date
+            sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 4)) // Expected arrival date
+            sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 4)) // Actual delivery date
+            sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 4))   // Empty
+            sheet.addMergedRegion(new CellRangeAddress(11, 12, 1, 4))   // Comments
 
 
 
@@ -841,11 +847,15 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.productCode.label'));
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.label'));
-			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.manufacturerCode.label'));
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.vendorCode.label'));
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
 
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventory.lotNumber.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
@@ -895,11 +905,14 @@ class DocumentService {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode);
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
 
-				row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name);
-				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.manufacturerCode);
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.vendorCode);
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
 
 				row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.lotNumber);
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
