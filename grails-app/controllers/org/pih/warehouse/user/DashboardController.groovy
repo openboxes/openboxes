@@ -10,6 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
@@ -348,7 +349,11 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-	
+    @CacheFlush("dashboardCache")
+    def flushCache = {
+        flash.message = "Cache has been flushed"
+        redirect(action: "index")
+    }
 
 	def chooseLayout = { 
 		
