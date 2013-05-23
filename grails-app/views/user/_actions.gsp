@@ -56,11 +56,12 @@
 		</g:isUserInRole>
 		<div class="action-menu-item">
 			<g:link action="toggleActivation" id="${userInstance?.id}">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;
 				<g:if test="${userInstance?.active}">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;
 					${warehouse.message(code: 'user.deactivate.label')}
 				</g:if>
 				<g:else>
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" class="middle"/>&nbsp;
 					${warehouse.message(code: 'user.activate.label')}
 				</g:else>
 			</g:link>
