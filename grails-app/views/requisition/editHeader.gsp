@@ -138,15 +138,6 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name"><label><warehouse:message
-                                        code="requisition.reviewedBy.label" /></label></td>
-                                <td class="value">
-                                    <g:selectPerson name="reviewedBy.id" value="${requisition?.reviewedBy}"
-                                                    noSelection="['null':'']" size="40"/>
-
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name"><label><warehouse:message
                                         code="requisition.verifiedBy.label" /></label></td>
                                 <td class="value">
                                     <g:selectPerson name="verifiedBy.id" value="${requisition?.verifiedBy}"
@@ -165,6 +156,16 @@
                                     </td>
                                 </tr>
                             </g:if>
+                            <tr class="prop">
+                                <td class="name"><label><warehouse:message
+                                        code="requisition.checkedBy.label" /></label></td>
+                                <td class="value">
+                                    <g:selectPerson name="checkedBy.id" value="${requisition?.checkedBy}"
+                                                    noSelection="['null':'']" size="40"/>
+
+                                </td>
+                            </tr>
+
                             <tr class="prop">
                                 <td class="name"><label><warehouse:message
                                         code="requisition.receivedBy.label" /></label></td>
