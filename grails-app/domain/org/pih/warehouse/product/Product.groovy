@@ -280,14 +280,18 @@ class Product implements Comparable, Serializable {
     }
 
     def getInventoryLevels() {
-        Product.withTransaction {
-            return InventoryLevel.findAllByProduct(this)
+        if (id) {
+            Product.withTransaction {
+                return InventoryLevel.findAllByProduct(this)
+            }
         }
     }
 
     InventoryLevel getInventoryLevel(locationId) {
-        def location = Location.get(locationId)
-        return InventoryLevel.findByProductAndInventory(this, location.inventory)
+        if (id) {
+            def location = Location.get(locationId)
+            return InventoryLevel.findByProductAndInventory(this, location.inventory)
+        }
     }
 
     def getStatus(String locationId, Integer currentQuantity) {

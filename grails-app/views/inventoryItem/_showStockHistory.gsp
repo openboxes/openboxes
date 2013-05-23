@@ -145,8 +145,8 @@
                                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
                                                     </g:elseif>
                                                 </td>
-												<td style="width: 10%;" nowrap="nowrap">
-													<format:date obj="${transaction?.transactionDate}" format="dd/MMM/yyyy"/>																
+												<td nowrap="nowrap">
+													<format:date obj="${transaction?.transactionDate}" format="dd/MMM/yyyy"/>
 												</td>
                                                 <td>
                                                     <format:date obj="${transaction?.transactionDate}" format="hh:mma"/>

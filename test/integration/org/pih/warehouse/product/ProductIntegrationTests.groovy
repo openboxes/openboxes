@@ -9,6 +9,23 @@ class ProductIntegrationTests extends GroovyTestCase{
 
 
     @Test
+    void getInventoryLevels_shouldNotFailOnNonPersistedProduct() {
+        def product = new Product();
+        product.getInventoryLevels()
+    }
+
+    @Test
+    void getInventoryLevel_shouldNotFailOnNonPersistedProduct() {
+        def depotLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
+        def bostonLocation = DbHelper.creatLocationIfNotExist("Boston Location", depotLocationType)
+        def bostonInventory = DbHelper.createInventory(bostonLocation)
+
+        def product = new Product();
+        product.getInventoryLevel(bostonLocation.id)
+    }
+
+
+    @Test
     void testSaveProductProductGroup(){
         def suppliers = Category.findByName("Supplies")
         def name = "Test" + UUID.randomUUID().toString()[0..5]

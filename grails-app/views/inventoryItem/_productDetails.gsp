@@ -292,324 +292,348 @@
 			</tbody>
 		</table>			
 	</div>
-	<div class="box">
-		<table>
-			<tbody>				
-				<tr class="odd">
-					<td colspan="2">
-						<label>${warehouse.message(code: 'product.details.label') }</label>
-					</td>
-				</tr>
-				
-				
-				<tr class="prop">
-					<td class="label">
-						<label>${warehouse.message(code: 'product.productCode.label') }</label>
-					</td>
-					<td>
-						${productInstance?.productCode }
-					</td>
-				</tr>			
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="category.label"/></label>
-					</td>
-					<td class="value" id="productCategory">
-						<span class="">
-							<g:if test="${productInstance?.category?.name }">
-								<g:link controller="inventory" action="browse" params="[subcategoryId:productInstance?.category?.id,showHiddenProducts:'on',showOutOfStockProducts:'on',searchPerformed:true]">
-									<format:category category="${productInstance?.category}"/>
-								</g:link>
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-						<g:each var="category" in="${productInstance?.categories }">						
-							<div>
-								<g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,showHiddenProducts:true,showOutOfStockProducts:true,searchPerformed:true]">
-									<format:category category="${category}"/>
-								</g:link>
-							</div>
-						</g:each>
-						
-					</td>
-				</tr>
-				<g:if test="${productInstance?.productGroups }">
-					<tr class="prop">	
-						<td class="label left">
-							<label><warehouse:message code="productGroup.label"/></label>
-						</td>
-						<td class="value">
-							<g:each var="productGroup" in="${productInstance?.productGroups }">
-								<g:link controller="productGroup" action="edit" id="${productGroup.id }">
-									${productGroup?.description }
-								</g:link>
-							</g:each>			
-						</td>
-					</tr>
-				</g:if>
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.units.label"/></label>
-					</td>
-					<td class="value" id="unitOfMeasure">
-						<span class="">
-							<g:if test="${productInstance?.unitOfMeasure }">
-								<format:metadata obj="${productInstance?.unitOfMeasure}"/>
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>
-				
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.manufacturer.label"/></label>
-					</td>
-					<td class="value" id="manufacturer">
-						<span class="">
-							<g:if test="${productInstance?.manufacturer }">
-								${productInstance?.manufacturer }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.brandName.label"/></label>
-					</td>
-					<td class="value" id="brandName">
-						<span class="">
-							<g:if test="${productInstance?.brandName }">
-								${productInstance?.brandName }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>			
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.modelNumber.label"/></label>
-					</td>
-					<td class="value" id="modelNumber">
-						<span class="">
-							<g:if test="${productInstance?.modelNumber }">
-								${productInstance?.modelNumber }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>			
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.manufacturerCode.label"/></label>
-					</td>
-					<td class="value" id="manufacturerCode">
-						<span class="">
-							<g:if test="${productInstance?.manufacturerCode }">
-								${productInstance?.manufacturerCode }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.vendor.label"/></label>
-					</td>
-					<td class="value">
-						<span class="">
-							<g:if test="${productInstance?.vendor }">
-								${productInstance?.vendor }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>
-				
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.vendorCode.label"/></label>
-					</td>
-					<td class="value">
-						<span class="">
-							<g:if test="${productInstance?.vendorCode }">
-								${productInstance?.vendorCode }
-							</g:if>
-							<g:else>
-								<span class="fade"><warehouse:message code="default.none.label"/></span>
-							</g:else>
-						</span>
-					</td>
-				</tr>
-				<g:if test="${productInstance?.modelNumber }">
-					<tr class="prop">	
-						<td class="label">
-							<label><warehouse:message code="product.modelNumber.label"/></label>
-						</td>
-						<td class="value">
-							<span class="">
-								<g:if test="${productInstance?.modelNumber }">
-									${productInstance?.modelNumber }
-								</g:if>
-								<g:else>
-									<span class="fade"><warehouse:message code="default.none.label"/></span>
-								</g:else>
-							</span>
-						</td>
-					</tr>
-				</g:if>			
-				<g:if test="${productInstance?.upc }">
-					<tr class="prop">	
-						<td class="label">
-							<label><warehouse:message code="product.upc.label"/></label>
-						</td>
-						<td class="value">
-							<span class="">
-								<g:if test="${productInstance?.upc }">
-									${productInstance?.upc }
-								</g:if>
-								<g:else>
-									<span class="fade"><warehouse:message code="default.none.label"/></span>
-								</g:else>
-							</span>
-						</td>
-					</tr>
-				</g:if>			
-				<g:if test="${productInstance?.ndc }">
-					<tr class="prop">	
-						<td class="label">
-							<label><warehouse:message code="product.ndc.label"/></label>
-						</td>
-						<td class="value">
-							<span class="">
-								<g:if test="${productInstance?.ndc }">
-									${productInstance?.ndc }
-								</g:if>
-								<g:else>
-									<span class="fade"><warehouse:message code="default.none.label"/></span>
-								</g:else>
-							</span>
-						</td>
-					</tr>
-				</g:if>			
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.coldChain.label"/></label>
-					</td>
-					<td class="value">
-						<span class="">${productInstance?.coldChain ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
-					</td>
-				</tr>
-				
-				<g:set var="status" value="${0 }"/>
-				<g:each var="productAttribute" in="${productInstance?.attributes}">
-					<tr class="prop">
-						<td class="label left">
-							<label><format:metadata obj="${productAttribute?.attribute}"/></label>
-						</td>
-						<td>
-							<span class="">${productAttribute.value }</span>
-						</td>
-					</tr>													
-				</g:each>
-			</tbody>
-		</table>
-	</div>
-	<g:if test="${productInstance?.packages }">		
-		<div class="box">
-			<table>
-				<tbody>				
-					<tr class="odd">
-						<td colspan="2">
-							<label>${warehouse.message(code: 'product.packaging.label') }</label>
-						</td>
-					</tr>			
-					<g:each var="productPackage" in="${productInstance?.packages?.sort { it.quantity }}">
-						<tr class="prop">	
-							<td class="label">
-								<label>${productPackage?.uom }</label>
-							</td>
-							<td class="value">
-								<span class="">
-									${productPackage?.uom?.code }/${productPackage?.quantity }
-								</span>
-							</td>
-						</tr>			
-					</g:each>	
-				</tbody>
-			</table>
-		</div>
-	</g:if>
-	<div class="box">
-		<table>
-			<tbody>
-				<tr class="odd">
-					<td colspan="2">
-						<label>${warehouse.message(code: 'default.auditing.label') }</label>
-					</td>
-				</tr>
-				
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.createdBy.label"/></label>
-					</td>
-					<td class="value">
-						<span class="fade">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
-					</td>
-				</tr>	
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.modifiedBy.label"/></label>
-					</td>
-					<td class="value">
-						<span class="fade">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
-					</td>
-				</tr>				
-				<tr class="prop">	
-					<td class="label">
-						<label><warehouse:message code="product.createdOn.label"/></label>
-					</td>
-					<td class="value">
-						<span class="fade">
-							${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
-							${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm a')}
-						</span>
-						 
-					</td>
-				</tr>			
-	
-				
-					
-				<tr class="prop">	
-					<td class="label"  >
-						<label><warehouse:message code="product.modifiedOn.label"/></label>
-					</td>
-					<td class="value">
-						<span class="fade">
-							${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
-							${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm a')}
-						</span>
-					</td>
-				</tr>			
-				
-			</tbody>		
-		</table>
-	</div>	
+<div class="box">
+    <table>
+        <tbody>
+            <tr class="odd">
+                <td colspan="2">
+                    <label>${warehouse.message(code: 'product.details.label') }</label>
+                </td>
+            </tr>
+
+
+            <tr class="prop">
+                <td class="label">
+                    <label>${warehouse.message(code: 'product.productCode.label') }</label>
+                </td>
+                <td>
+                    ${productInstance?.productCode }
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="category.label"/></label>
+                </td>
+                <td class="value" id="productCategory">
+                    <span class="">
+                        <g:if test="${productInstance?.category?.name }">
+                            <g:link controller="inventory" action="browse" params="[subcategoryId:productInstance?.category?.id,showHiddenProducts:'on',showOutOfStockProducts:'on',searchPerformed:true]">
+                                <format:category category="${productInstance?.category}"/>
+                            </g:link>
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                    <g:each var="category" in="${productInstance?.categories }">
+                        <div>
+                            <g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,showHiddenProducts:true,showOutOfStockProducts:true,searchPerformed:true]">
+                                <format:category category="${category}"/>
+                            </g:link>
+                        </div>
+                    </g:each>
+
+                </td>
+            </tr>
+            <g:if test="${productInstance?.productGroups }">
+                <tr class="prop">
+                    <td class="label left">
+                        <label><warehouse:message code="productGroup.label"/></label>
+                    </td>
+                    <td class="value">
+                        <g:each var="productGroup" in="${productInstance?.productGroups }">
+                            <g:link controller="productGroup" action="edit" id="${productGroup.id }">
+                                ${productGroup?.description }
+                            </g:link>
+                        </g:each>
+                    </td>
+                </tr>
+            </g:if>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.units.label"/></label>
+                </td>
+                <td class="value" id="unitOfMeasure">
+                    <span class="">
+                        <g:if test="${productInstance?.unitOfMeasure }">
+                            <format:metadata obj="${productInstance?.unitOfMeasure}"/>
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.manufacturer.label"/></label>
+                </td>
+                <td class="value" id="manufacturer">
+                    <span class="">
+                        <g:if test="${productInstance?.manufacturer }">
+                            ${productInstance?.manufacturer }
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.brandName.label"/></label>
+                </td>
+                <td class="value" id="brandName">
+                    <span class="">
+                        <g:if test="${productInstance?.brandName }">
+                            ${productInstance?.brandName }
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.modelNumber.label"/></label>
+                </td>
+                <td class="value" id="modelNumber">
+                    <span class="">
+                        <g:if test="${productInstance?.modelNumber }">
+                            ${productInstance?.modelNumber }
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.manufacturerCode.label"/></label>
+                </td>
+                <td class="value" id="manufacturerCode">
+                    <span class="">
+                        <g:if test="${productInstance?.manufacturerCode }">
+                            ${productInstance?.manufacturerCode }
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.vendor.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">
+                        <g:if test="${productInstance?.vendor }">
+                            ${productInstance?.vendor }
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.vendorCode.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">
+                        <g:if test="${productInstance?.vendorCode }">
+                            ${productInstance?.vendorCode }
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+            <g:if test="${productInstance?.modelNumber }">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.modelNumber.label"/></label>
+                    </td>
+                    <td class="value">
+                        <span class="">
+                            <g:if test="${productInstance?.modelNumber }">
+                                ${productInstance?.modelNumber }
+                            </g:if>
+                            <g:else>
+                                <span class="fade"><warehouse:message code="default.none.label"/></span>
+                            </g:else>
+                        </span>
+                    </td>
+                </tr>
+            </g:if>
+            <g:if test="${productInstance?.upc }">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.upc.label"/></label>
+                    </td>
+                    <td class="value">
+                        <span class="">
+                            <g:if test="${productInstance?.upc }">
+                                ${productInstance?.upc }
+                            </g:if>
+                            <g:else>
+                                <span class="fade"><warehouse:message code="default.none.label"/></span>
+                            </g:else>
+                        </span>
+                    </td>
+                </tr>
+            </g:if>
+            <g:if test="${productInstance?.ndc }">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.ndc.label"/></label>
+                    </td>
+                    <td class="value">
+                        <span class="">
+                            <g:if test="${productInstance?.ndc }">
+                                ${productInstance?.ndc }
+                            </g:if>
+                            <g:else>
+                                <span class="fade"><warehouse:message code="default.none.label"/></span>
+                            </g:else>
+                        </span>
+                    </td>
+                </tr>
+            </g:if>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.coldChain.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">${productInstance?.coldChain ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.controlledSubstance.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">${productInstance?.controlledSubstance ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.hazardousMaterial.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">${productInstance?.hazardousMaterial ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.reconditioned.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">${productInstance?.reconditioned ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
+                </td>
+            </tr>
+
+            <g:set var="status" value="${0 }"/>
+            <g:each var="productAttribute" in="${productInstance?.attributes}">
+                <tr class="prop">
+                    <td class="label left">
+                        <label><format:metadata obj="${productAttribute?.attribute}"/></label>
+                    </td>
+                    <td>
+                        <span class="">${productAttribute.value }</span>
+                    </td>
+                </tr>
+            </g:each>
+        </tbody>
+    </table>
+</div>
+<g:if test="${productInstance?.packages }">
+    <div class="box">
+        <table>
+            <tbody>
+                <tr class="odd">
+                    <td colspan="2">
+                        <label>${warehouse.message(code: 'product.packaging.label') }</label>
+                    </td>
+                </tr>
+                <g:each var="productPackage" in="${productInstance?.packages?.sort { it.quantity }}">
+                    <tr class="prop">
+                        <td class="label">
+                            <label>${productPackage?.uom }</label>
+                        </td>
+                        <td class="value">
+                            <span class="">
+                                ${productPackage?.uom?.code }/${productPackage?.quantity }
+                            </span>
+                        </td>
+                    </tr>
+                </g:each>
+            </tbody>
+        </table>
+    </div>
+</g:if>
+<div class="box">
+    <table>
+        <tbody>
+            <tr class="odd">
+                <td colspan="2">
+                    <label>${warehouse.message(code: 'default.auditing.label') }</label>
+                </td>
+            </tr>
+
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.createdBy.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="fade">${productInstance?.createdBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.modifiedBy.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="fade">${productInstance?.updatedBy?.name?:warehouse.message(code: 'default.unknown.label') }</span> <br/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.createdOn.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="fade">
+                        ${g.formatDate(date: productInstance?.dateCreated, format: 'dd-MMM-yyyy')}
+                        ${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mm a')}
+                    </span>
+
+                </td>
+            </tr>
+
+
+
+            <tr class="prop">
+                <td class="label"  >
+                    <label><warehouse:message code="product.modifiedOn.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="fade">
+                        ${g.formatDate(date: productInstance?.lastUpdated, format: 'dd-MMM-yyyy')}
+                        ${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mm a')}
+                    </span>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
 		
 </div>
 <script>
