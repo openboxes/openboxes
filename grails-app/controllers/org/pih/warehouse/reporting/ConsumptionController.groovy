@@ -22,13 +22,19 @@ class ConsumptionController {
     InventoryService inventoryService
 
     def show = { ShowConsumptionCommand command ->
-
-        println "Params: " + params
-        println "Show consumption command " + command.toLocations
-
-        if (!command.fromLocation) {
-            command.fromLocation = Location.get(session.warehouse.id)
+        log.info "Show consumption " + params
+        println "Bind errors: " + command.errors
+        if (command.hasErrors()) {
+            render(view: "show", model: [command:command])
+            return;
         }
+
+        println "toLocations " + command.toLocations
+        println "fromLocations " + command.fromLocations
+
+        //if (!command.fromLocation) {
+        //    command.fromLocation = Location.get(session.warehouse.id)
+        //}
 
 
         List selectedLocations = [] //= session.invoiceList
@@ -44,24 +50,29 @@ class ConsumptionController {
             }
         }
 
+        println "fromLocations: " + command.fromLocations.size()
         println "toLocations: " + command.toLocations.size()
         println "selectedLocations: " + selectedLocations.size()
         command.selectedLocations = selectedLocations
 
-        command.transactions = inventoryService.getTransferOutBetweenDates(command.fromLocation, selectedLocations, command.fromDate, command.toDate)
+        def fromLocations = []
+        command.fromLocations.each {
+            fromLocations << it
+        }
+
+
+        command.transactions = inventoryService.getTransferOutBetweenDates(fromLocations, selectedLocations, command.fromDate, command.toDate)
         command.transactions.each { transaction ->
             command.toLocations << transaction.destination
             transaction.transactionEntries.each { transactionEntry ->
-                def currentQuantity =
-                    command.productMap[transactionEntry.inventoryItem.product]
-
-                if (!currentQuantity) {
+                def currentProductQuantity = command.productMap[transactionEntry.inventoryItem.product]
+                if (!currentProductQuantity) {
                     command.productMap[transactionEntry.inventoryItem.product] = 0
                 }
-
                 command.productMap[transactionEntry.inventoryItem.product] += transactionEntry.quantity
             }
         }
+
 
         command?.toLocations?.unique()?.sort()
         if (!command?.selectedLocations) {
@@ -79,18 +90,23 @@ class ShowConsumptionCommand {
     Date fromDate
     Date toDate
 
+    List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
-    Location fromLocation
-    Location toLocation
+    //Location fromLocation
+    //Location toLocation
     List<Transaction> transactions = []
     List<TransactionEntry> transactionEntries = []
     def productMap = new TreeMap();
+    def transferOutMap = [:]
 
     static constraints = {
+        fromDate(nullable: false)
+        toDate(nullable: false)
+        fromLocations(nullable: false)
         toLocations(nullable: true)
-        fromLocation(nullable: true)
-        toLocation(nullable: true)
+        //fromLocation(nullable: true)
+        //toLocation(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)
     }

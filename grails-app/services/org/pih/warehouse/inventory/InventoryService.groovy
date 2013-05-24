@@ -2726,11 +2726,12 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
-    public List<Transaction> getTransferOutBetweenDates(Location fromLocation, List toLocations, Date fromDate, Date toDate) {
-        println "Get transfer out between dates " + fromLocation
-        println "Get transfer out between dates " + toLocations
-        println "Get transfer out between dates " + fromDate
-        println "Get transfer out between dates " + toDate
+    public List<Transaction> getTransferOutBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+        println "Get transfer out between dates "
+        println "fromLocations: " + fromLocations
+        println "toLocations: " + toLocations
+        println "fromDate: " + fromDate
+        println "toDate: " + toDate
 
         def transactions = Transaction.createCriteria().list() {
             transactionType {
@@ -2739,7 +2740,10 @@ class InventoryService implements ApplicationContextAware {
             if (toLocations) {
                 'in'("destination", toLocations)
             }
-            eq("inventory", fromLocation.inventory)
+            //eq("inventory", fromLocation.inventory)
+            if (fromLocations) {
+                'in'("inventory", fromLocations.collect { it.inventory })
+            }
             between('transactionDate', fromDate, toDate)
             //if (products) {
             //    inventoryItem { 'in'("product", products) }

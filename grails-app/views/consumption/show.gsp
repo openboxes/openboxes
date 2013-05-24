@@ -22,7 +22,7 @@
             </div>
             <div class="yui-u">
 
-                ${command.productMap?.keySet()?.size()}
+
 
                 <div class="box">
                     <h2><warehouse:message code="consumption.label" default="Consumption"/></h2>
@@ -68,6 +68,15 @@
                                 </tr>
                             </g:each>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5">
+                                    <span class="fade">Returned ${command.productMap?.keySet()?.size()} items</span>
+
+                                </td>
+                            </tr>
+
+                        </tfoot>
                     </table>
                 </div>
             </div>

@@ -2,73 +2,89 @@
 	<g:form method="POST" controller="consumption" action="show">
 		<div class="box">
             <h2><warehouse:message code="default.filters.label"/></h2>
-            <table>
-                <tr>
+            <table border="0">
+                <tr class="prop">
                     <td colspan="2">
                         <label>
-                            <warehouse:message code="consumption.betweenDates.label" default="Between dates"/>
+                            <warehouse:message code="consumption.fromLocations.label" default="From location(s)"/>
                         </label>
                     </td>
                 </tr>
-                <tr>
+                <tr class="">
                     <td colspan="2">
+                        <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="middle">
+                        <label>
+                            <warehouse:message code="consumption.afterDate.label" default="Consumed after"/>
+                        </label>
+                    </td>
+                    <td class="middle">
                         <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td>
+                        <label>
+                            <warehouse:message code="consumption.beforeDate.label" default="Consumed before"/>
+                        </label>
+                    </td>
+                    <td>
                         <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
                     </td>
                 </tr>
-                <tr class="prop">
-                    <td colspan="2">
-                        <label style="display: block;">
-                            <warehouse:message code="consumption.fromLocation.label" default="From location"/>
-                        </label>
-                        <g:selectLocation name="fromLocation.id" value="${command?.fromLocation?.id}" class="chzn-select-deselect"/>
-                    </td>
-                </tr>
 
-                <tr class="prop">
-                    <td colspan="2">
-                        <label style="display: block;">
-                            <warehouse:message code="consumption.toLocation.label" default="To location"/>
-                        </label>
-                        <table>
-                            <g:if test="${command?.toLocations}">
-                                <tr>
-                                    <td class="middle center">
-                                        <g:checkBox id="toggleCheckbox" name="toggleCheckbox"/>
-                                    </td>
-                                    <td class="middle">
-                                        <warehouse:message code="default.selectAll.label" default="Select all"/>
 
-                                    </td>
-                                </tr>
-                                <g:each var="toLocation" in="${command.toLocations}" status="i">
-                                    <tr>
-                                        <td class="center middle">
-                                            <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
-                                            <g:checkBox name="selectedLocation_${toLocation.id}" checked="${selected}"/>
-                                            <g:hiddenField name="toLocations[${i}].id" value="${toLocation?.id}"/>
-                                        </td>
-                                        <td class="left middle">
-                                            <b><format:metadata obj="${toLocation?.locationType}"/></b>
-                                            <format:metadata obj="${toLocation}"/>
-                                        </td>
-                                    </tr>
-                                </g:each>
-                            </g:if>
-                        </table>
-                        <g:unless test="${command.toLocations}">
-                            <div class="empty center">
-                                <warehouse:message code="default.empty.label"/>
+                <g:if test="${command?.toLocations}">
+                    <tr class="prop">
+                        <td colspan="2">
+                            <label>
+                                <warehouse:message code="consumption.toLocation.label" default="To location(s)"/>
+                            </label>
+                            <a id="selectAll">Select all</a>&nbsp;|&nbsp;
+                            <a id="selectNone">Select none</a>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td colspan="2">
+
+
+                            <div style="overflow: auto; max-height: 200px;">
+                                <table>
+                                    <g:each var="toLocation" in="${command.toLocations}" status="i">
+                                        <tr class="prop">
+                                            <td class="center middle">
+                                                <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
+                                                <g:checkBox name="selectedLocation_${toLocation.id}" checked="${selected}"/>
+                                                <g:hiddenField name="toLocations[${i}].id" value="${toLocation?.id}"/>
+                                            </td>
+                                            <td class="left middle">
+                                                <b><format:metadata obj="${toLocation?.locationType}"/></b>
+                                                <format:metadata obj="${toLocation}"/>
+                                            </td>
+                                        </tr>
+                                    </g:each>
+                                </table>
                             </div>
-                        </g:unless>
-                    </td>
-                </tr>
-
+                            <g:unless test="${command.toLocations}">
+                                <div class="empty center">
+                                    <warehouse:message code="default.empty.label"/>
+                                </div>
+                            </g:unless>
+                        </td>
+                    </tr>
+                </g:if>
                 <tr class="prop">
-                    <td colspan="2" class="right">
+                    <td class="center" colspan="2">
                         <button class="button icon search">
                             <warehouse:message code="default.search.label"/>
                         </button>
+
+
+                        <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
+
                     </td>
                 </tr>
             </table>
@@ -78,10 +94,19 @@
 </div>
 <script>
     $(document).ready(function() {
-        $("#toggleCheckbox").click(function(event) {
-            var checked = ($(this).attr("checked") == 'checked');
-            $(".checkbox").attr("checked", checked);
+        $("#selectAll").click(function(event) {
+            //var checked = ($(this).attr("checked") == 'checked');
+            $("input[type='checkbox']").attr("checked", true);
         });
+        $("#selectNone").click(function(event) {
+            //var checked = ($(this).attr("checked") == 'checked');
+            $("input[type='checkbox']").attr("checked", false);
+        });
+        //$("#selectNone").click(function(event) {
+        //    var checked = ($(this).attr("checked") == 'checked');
+        //    $(".checkbox").attr("checked", checked);
+        //});
+
     });
 </script>
 
