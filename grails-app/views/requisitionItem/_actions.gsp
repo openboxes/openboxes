@@ -6,7 +6,7 @@
 	<div class="actions">
 
         <g:if test="${actionName == 'pick'}">
-            <div class="box">
+            <div class="box" style="max-width: 600px;">
                 <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
                 <g:form controller="requisition" action="addToPicklistItems">
                     <g:hiddenField name="requisition.id" value="${requisition?.id}"/>
