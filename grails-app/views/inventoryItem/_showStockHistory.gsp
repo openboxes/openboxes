@@ -137,7 +137,7 @@
                                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" />
                                                     </g:elseif>
                                                     <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.INVENTORY}">
-                                                        <g:set var="balance" value="${balance + quantityChange}"/>
+                                                        <g:set var="balance" value="${quantityChange}"/>
                                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
                                                     </g:elseif>
                                                     <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY}">
