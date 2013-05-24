@@ -47,16 +47,6 @@
                     obj="${transactionInstance?.inventory?.warehouse }" />
             </div></td>
         </tr>
-        <tr id="comment" class="prop">
-            <td class=""><label><warehouse:message
-                    code="transaction.comment.label" /></label>
-            </td>
-            <td>
-
-                <div> <format:metadata
-                        obj="${transactionInstance?.comment }" />
-                </div></td>
-        </tr>
 		<g:if test="${transactionInstance?.outgoingShipment }">
 			<tr class="prop">
 				<td class=""><label><warehouse:message
@@ -101,18 +91,7 @@
 						obj="${transactionInstance?.transactionDate}" />
             </div></td>
 		</tr>
-		<g:if test="${transactionInstance?.comment }">
-			<tr class="prop">
-				<td class=""><label><warehouse:message
-							code="default.comment.label" /></label>
-                </td>
-                <td>
-
-                    <div> ${transactionInstance?.comment }
-                </div></td>
-			</tr>
-		</g:if>
-		<tr class="prop">
+        <tr class="prop">
 			<td class=""><label><warehouse:message
 						code="default.createdBy.label" /></label>
             </td>
@@ -192,6 +171,18 @@
 				</td>
 			</tr>
 		</g:if>
+        <g:if test="${transactionInstance?.comment }">
+            <tr class="prop">
+                <td class=""><label><warehouse:message
+                        code="default.comment.label" /></label>
+                </td>
+                <td>
+                    <div>
+                        ${transactionInstance?.comment }
+                    </div>
+                </td>
+            </tr>
+        </g:if>
 
 	</table>
 </div>
