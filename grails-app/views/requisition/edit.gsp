@@ -43,12 +43,6 @@
                             <thead>
 
                                 <tr class="prop">
-                                    <th>
-
-                                    </th>
-                                    <th class="list-header middle">
-                                        ${warehouse.message(code: 'requisitionItem.status.label')}
-                                    </th>
                                     <th class="list-header">
                                         ${warehouse.message(code: 'requisitionItems.label')}
                                     </th>
@@ -65,6 +59,9 @@
                                             ${warehouse.message(code: 'requisitionItem.recipient.label')}
                                         </th>
                                     </g:if>
+                                    <th class="list-header middle">
+                                        ${warehouse.message(code: 'requisitionItem.status.label')}
+                                    </th>
                                     <%--
                                     <th class="list-header">
                                         ${warehouse.message(code: 'requisitionItem.comment.label')}
@@ -77,12 +74,11 @@
                             <thead>
                             <tbody data-bind="foreach: requisition.requisitionItems">
                                 <tr class="requisitionItemsRow">
+                                    <%--
                                     <td class="middle">
                                         <div data-bind="text: orderIndex()"></div>
                                     </td>
-                                    <td class="middle list-header">
-                                        <div data-bind="text: status"></div>
-                                    </td>
+                                    --%>
                                     <td class="middle list-header">
 
                                         <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
@@ -111,6 +107,9 @@
                                         class="text" />
                                     </td>
                                     --%>
+                                    <td class="middle list-header">
+                                        <div data-bind="text: status"></div>
+                                    </td>
                                     <td class="center middle">
                                         <a href='#' class="button"
                                             data-bind='click: $root.requisition.removeItem' tabindex="-1">
