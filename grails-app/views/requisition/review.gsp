@@ -15,6 +15,11 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
+            <g:hasErrors bean="${requisition}">
+                <div class="errors">
+                    <g:renderErrors bean="${requisition}" as="list" />
+                </div>
+            </g:hasErrors>
 
             <div class="dialog">
             
@@ -62,11 +67,11 @@
                                         </td>
                                         <td class="middle">
                                             <g:if test="${params.edit}">
-                                                <g:datePicker name="dateVerified" value="${requisition?.dateVerified}"/>
+                                                <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="day"/>
                                             </g:if>
                                             <g:else>
                                                 <g:if test="${requisition.dateVerified}">
-                                                    <g:formatDate date="${requisition?.dateVerified}"/>
+                                                    <g:formatDate date="${requisition?.dateVerified}" format="dd MMMMM yyyy"/>
                                                 </g:if>
                                                 <g:else>
                                                     ${warehouse.message(code:'default.none.label')}
@@ -159,17 +164,19 @@
                             </table>
                         </div>
                         <div class="clear"></div>
-                        <div class="buttons">
-                            <div class="center">
-                                <g:link controller="requisition" action="edit" id="${requisition.id }" class="button">
-                                    <warehouse:message code="default.button.back.label"/>
-                                </g:link>
+                        <g:unless test="${params.edit}">
+                            <div class="buttons">
+                                <div class="center">
+                                    <g:link controller="requisition" action="edit" id="${requisition.id }" class="button">
+                                        <warehouse:message code="default.button.back.label"/>
+                                    </g:link>
 
-                                <g:link controller="requisition" action="pick" id="${requisition.id }" class="button">
-                                    <warehouse:message code="default.button.next.label"/>
-                                </g:link>
+                                    <g:link controller="requisition" action="pick" id="${requisition.id }" class="button">
+                                        <warehouse:message code="default.button.next.label"/>
+                                    </g:link>
+                                </div>
                             </div>
-                        </div>
+                        </g:unless>
 			        </div>
                 </div>
             </div>

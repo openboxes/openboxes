@@ -354,9 +354,19 @@ class RequisitionController {
 
 	def pick = {
 		println "Pick " + params
-		
+
+
+
 		def requisition = Requisition.get(params?.id)
 		if (requisition) {
+
+            if (!requisition.verifiedBy) {
+                //requisition.errors.rejectValue("verifiedBy", "Must specify verified by user before continuing")
+                flash.message = "${warehouse.message(code: 'requisition.verifiedBy.invalid.message')}"
+                chain(controller: "requisition", action: "review", id: params.id,  model: [requisition:requisition])
+                //render(view: "review", model: [requisition:requisition])
+                return;
+            }
 
             if (requisition.status < RequisitionStatus.PICKING) {
     			requisition.status = RequisitionStatus.PICKING
