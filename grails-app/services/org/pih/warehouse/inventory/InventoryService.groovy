@@ -2726,7 +2726,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
-    public List<Transaction> getTransferOutBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+    public List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
         println "Get transfer out between dates "
         println "fromLocations: " + fromLocations
         println "toLocations: " + toLocations

@@ -21,7 +21,7 @@
                             <warehouse:message code="consumption.afterDate.label" default="Consumed after"/>
                         </label>
                     </td>
-                    <td class="middle">
+                    <td class="right middle">
                         <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
                     </td>
                 </tr>
@@ -31,7 +31,7 @@
                             <warehouse:message code="consumption.beforeDate.label" default="Consumed before"/>
                         </label>
                     </td>
-                    <td>
+                    <td class="right middle">
                         <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
                     </td>
                 </tr>
@@ -56,17 +56,19 @@
 
                 <g:if test="${command?.toLocations}">
                     <tr class="prop">
-                        <td colspan="2">
+                        <td colspan="2" class="bottom">
                             <label>
                                 <warehouse:message code="consumption.toLocation.label" default="To location(s)"/>
                             </label>
-                            <a id="selectAll">Select all</a>&nbsp;|&nbsp;
-                            <a id="selectNone">Select none</a>
+                            <div class="right">
+                                <a id="selectAll">Select all</a>&nbsp;|&nbsp;
+                                <a id="selectNone">Select none</a>
+                            </div>
                         </td>
                     </tr>
                     <tr class="">
                         <td colspan="2">
-                            <div style="overflow: auto; max-height: 200px;">
+                            <div style="overflow: auto; max-height: 200px;" class="list">
                                 <table>
                                     <g:each var="toLocation" in="${command.toLocations}" status="i">
                                         <tr class="prop">
@@ -91,12 +93,30 @@
                         </td>
                     </tr>
                 </g:if>
+
+                <tr class="prop">
+                    <td>
+                        <label>
+                            <warehouse:message code="consumption.format.label" default="Format"/>
+                        </label>
+                    </td>
+                    <td>
+                        <div class="middle">
+                            <g:radio name="format" value="csv" checked="${params.format=='csv'}" /> CSV
+                        </div>
+                        <div class="middle">
+                            <g:radio name="format" value="html" checked="${params.format=='html'||!params.format}"/> HTML
+                        </div>
+                    </td>
+                </tr>
+
                 <tr class="prop">
                     <td class="center" colspan="2">
                         <button class="button icon search">
                             <warehouse:message code="default.runReport.label" default="Run report"/>
                         </button>
 
+                        <g:link controller="consumption" action="show" class="button icon reload">Reset</g:link>
                         <%--
                         <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
                         --%>
