@@ -35,7 +35,24 @@
                         <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
                     </td>
                 </tr>
+                <%--
+                <tr class="prop">
+                    <td>
+                        <label>
+                            <warehouse:message code="consumption.transactionType.label" default="transaction types"/>
+                        </label>
+                    </td>
+                    <td>
+                        <g:each var="transactionType" in="${command.transactionTypes}">
+                            <div>
+                                <format:metadata obj="${transactionType}"/>
+                            </div>
+                        </g:each>
 
+
+                    </td>
+                </tr>
+                --%>
 
                 <g:if test="${command?.toLocations}">
                     <tr class="prop">
@@ -49,15 +66,13 @@
                     </tr>
                     <tr class="">
                         <td colspan="2">
-
-
                             <div style="overflow: auto; max-height: 200px;">
                                 <table>
                                     <g:each var="toLocation" in="${command.toLocations}" status="i">
                                         <tr class="prop">
                                             <td class="center middle">
                                                 <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
-                                                <g:checkBox name="selectedLocation_${toLocation.id}" checked="${selected}"/>
+                                                <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}"/>
                                                 <g:hiddenField name="toLocations[${i}].id" value="${toLocation?.id}"/>
                                             </td>
                                             <td class="left middle">
@@ -79,12 +94,12 @@
                 <tr class="prop">
                     <td class="center" colspan="2">
                         <button class="button icon search">
-                            <warehouse:message code="default.search.label"/>
+                            <warehouse:message code="default.runReport.label" default="Run report"/>
                         </button>
 
-
+                        <%--
                         <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
-
+                        --%>
                     </td>
                 </tr>
             </table>

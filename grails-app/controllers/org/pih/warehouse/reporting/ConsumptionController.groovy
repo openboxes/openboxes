@@ -12,9 +12,11 @@ package org.pih.warehouse.reporting
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 
 class ConsumptionController {
@@ -60,10 +62,14 @@ class ConsumptionController {
             fromLocations << it
         }
 
-
         command.transactions = inventoryService.getTransferOutBetweenDates(fromLocations, selectedLocations, command.fromDate, command.toDate)
         command.transactions.each { transaction ->
-            command.toLocations << transaction.destination
+
+            // Some transactions don't have a destination (e.g. expired, consumed, etc)
+            if (transaction.destination) {
+                command.toLocations << transaction.destination
+            }
+            command.transactionTypes << transaction.transactionType
             transaction.transactionEntries.each { transactionEntry ->
                 def currentProductQuantity = command.productMap[transactionEntry.inventoryItem.product]
                 if (!currentProductQuantity) {
@@ -73,7 +79,27 @@ class ConsumptionController {
             }
         }
 
+        if (command.fromLocations) {
+            command.fromLocations.each { location ->
+                def products = command.productMap.keySet().asList()
+                def onHandQuantityMap = inventoryService.getQuantityByProductMap(location.inventory, products)
 
+                // For each product, add to the onhand quantity map
+                products.each { product ->
+                    def onHandQuantity = command.onHandQuantityMap[product]
+                    if (!onHandQuantity) {
+                        command.onHandQuantityMap[product] = 0;
+                    }
+
+                    if (onHandQuantityMap[product]) {
+                        command.onHandQuantityMap[product] += onHandQuantityMap[product]
+                    }
+                }
+            }
+        }
+
+
+        command?.transactionTypes?.unique()?.sort()
         command?.toLocations?.unique()?.sort()
         if (!command?.selectedLocations) {
             command.selectedLocations = command.toLocations
@@ -87,6 +113,10 @@ class ConsumptionController {
 
 class ShowConsumptionCommand {
 
+    //
+    List<ShowConsumptionRowCommand> rows = []
+
+    // Filters
     Date fromDate
     Date toDate
 
@@ -97,7 +127,9 @@ class ShowConsumptionCommand {
     //Location toLocation
     List<Transaction> transactions = []
     List<TransactionEntry> transactionEntries = []
+    List<TransactionType> transactionTypes = []
     def productMap = new TreeMap();
+    def onHandQuantityMap = new TreeMap();
     def transferOutMap = [:]
 
     static constraints = {
@@ -109,6 +141,20 @@ class ShowConsumptionCommand {
         //toLocation(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)
+    }
+
+}
+
+class ShowConsumptionRowCommand {
+
+    Product product
+    Integer transferIn
+    Integer transferOut
+    Integer expired
+    Map<Location, Integer> transferOutMap = new TreeMap<Location, Integer>();
+
+    static constraints = {
+
     }
 
 }
