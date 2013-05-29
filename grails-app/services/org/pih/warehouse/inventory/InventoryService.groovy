@@ -15,6 +15,7 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.product.Category
@@ -853,8 +854,17 @@ class InventoryService implements ApplicationContextAware {
 	
 		return products;	
 	}
-	
-	
+
+    /**
+     * Get all products with the given tags.
+     *
+     * @param inputTags
+     * @return
+     */
+    def getProductsByTags(List<String> inputTags) {
+        return getProductsByTags(inputTags, 10, 0)
+    }
+
 
 	/**
 	 * Get all products that have the given tags.
@@ -862,7 +872,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inputTags
 	 * @return
 	 */
-	def getProductsByTags(List inputTags, int max, int offset) {
+	def getProductsByTags(List<String> inputTags, int max, int offset) {
         log.debug "Get products by tags: " + inputTags
 		def products = Product.withCriteria {
 			tags { 'in'('tag', inputTags) }
@@ -2726,8 +2736,9 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
-    public List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+    public List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, List<Product> products, Date fromDate, Date toDate) {
         println "Get transfer out between dates "
+        println "products: " + products?.size()
         println "fromLocations: " + fromLocations
         println "toLocations: " + toLocations
         println "fromDate: " + fromDate
@@ -2745,13 +2756,11 @@ class InventoryService implements ApplicationContextAware {
                 'in'("inventory", fromLocations.collect { it.inventory })
             }
             between('transactionDate', fromDate, toDate)
-            //if (products) {
-            //    inventoryItem { 'in'("product", products) }
-            //}
         }
-
-
         return transactions
+
+
+
     }
 
 }

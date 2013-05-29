@@ -24,66 +24,136 @@
                 <div class="box">
                     <h2><warehouse:message code="consumption.label" default="Consumption"/></h2>
 
-                    <table style="width:auto;">
-                        <tr>
-                            <td class="right" width="15%">
-                                <label><warehouse:message code="consumption.reportingPeriod.label" default="Reporting period"/></label>
-                            </td>
-                            <td>
-                                <g:if test="${command?.toDate && command?.fromDate}">
-                                    <g:formatDate date="${command.fromDate}" format="dd MMM yyyy"/> - <g:formatDate date="${command.toDate}" format="dd MMM yyyy"/>
-                                </g:if>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right">
-                                <label><warehouse:message code="consumption.reportingPeriodDays.label" default="Reporting period days"/></label>
-                            </td>
-                            <td>
-                                <g:if test="${command?.toDate && command?.fromDate}">
+                    <g:if test="${command?.toDate && command?.fromDate && command.fromLocations}">
+                        <table style="width:auto;">
+                            <tr>
+                                <td class="right" width="20%">
+                                    <label><warehouse:message code="consumption.reportingPeriod.label" default="Reporting period"/></label>
+                                </td>
+                                <td>
+                                    <g:if test="${command?.toDate && command?.fromDate}">
+                                        <g:formatDate date="${command.fromDate}" format="dd MMM yyyy"/> - <g:formatDate date="${command.toDate}" format="dd MMM yyyy"/>
+                                    </g:if>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.reportingPeriodDays.label" default="Reporting period days"/></label>
+                                </td>
+                                <td>
                                     <g:set var="numberOfDays" value="${command.numberOfDays}"/>
                                     <g:set var="numberOfWeeks" value="${command.numberOfWeeks}"/>
                                     <g:set var="numberOfMonths" value="${command.numberOfMonths}"/>
                                     ${numberOfDays} days
-                                </g:if>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right">
-                                <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction types"/></label>
-                            </td>
-                            <td>
-                                <g:each var="transactionType" in="${command.transactionTypes}">
-                                    <div>
-                                        <format:metadata obj="${transactionType}"/>
-                                    </div>
-                                </g:each>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction types"/></label>
+                                </td>
+                                <td>
+                                    <g:each var="transactionType" in="${command.transactionTypes}">
+                                        <div>
+                                            <format:metadata obj="${transactionType}"/>
+                                        </div>
+                                    </g:each>
 
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right">
-                                <label><warehouse:message code="consumption.fromLocations.label" default="Transferred from"/></label>
-                            </td>
-                            <td>
-                                <g:each var="fromLocation" in="${command.fromLocations}">
-                                    ${fromLocation.name}
-                                </g:each>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right">
-                                <label><warehouse:message code="consumption.toLocations.label" default="Transferred to"/></label>
-                            </td>
-                            <td>
-                                <g:each var="toLocation" in="${command.selectedLocations}">
-                                    ${toLocation.name}
-                                </g:each>
-                            </td>
-                        </tr>
-
-                    </table>
-
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.fromLocations.label" default="Transferred from"/></label>
+                                </td>
+                                <td>
+                                    <g:each var="fromLocation" in="${command.fromLocations}">
+                                        ${fromLocation.name}
+                                    </g:each>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.toLocations.label" default="Transferred to"/></label>
+                                </td>
+                                <td>
+                                    <g:if test="${command.selectedLocations?.size()<10}">
+                                        <g:each var="toLocation" in="${command.selectedLocations}">
+                                            ${toLocation.name}
+                                        </g:each>
+                                    </g:if>
+                                    <g:else>
+                                        <div>
+                                            <div class="action-menu">
+                                                ${command.selectedLocations?.size()} locations
+                                                <a href="javascript:void(-1);" class="action-btn">view all</a>
+                                                <div class="actions" style="padding:10px; border: 1px solid lightgrey;">
+                                                    <ul>
+                                                        <g:each var="toLocation" in="${command.selectedLocations.sort()}">
+                                                            <li>${toLocation.name}</li>
+                                                        </g:each>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </g:else>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.products.label" default="Products"/></label>
+                                </td>
+                                <td>
+                                    ${command.rows.keySet().size()} products
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.tags.label" default="Tags"/></label>
+                                </td>
+                                <td>
+                                    <g:each var="tag" in="${command.selectedTags}">
+                                        <span class="tag">${tag.tag}</span>
+                                    </g:each>
+                                    <g:unless test="${command?.selectedTags}">
+                                        <span class='fade'><warehouse:message code="default.none.label"/></span>
+                                    </g:unless>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.categories.label" default="Categories"/></label>
+                                </td>
+                                <td>
+                                    <g:each var="category" in="${command.selectedCategories}">
+                                        <format:metadata obj="${category}"/>
+                                    </g:each>
+                                    <g:unless test="${command?.selectedCategories}">
+                                        <span class='fade'><warehouse:message code="default.none.label"/></span>
+                                    </g:unless>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.columns.label" default="Additional columns"/></label>
+                                </td>
+                                <td>
+                                    <g:each var="property" in="${command.selectedProperties}">
+                                        ${property}
+                                    </g:each>
+                                    <g:unless test="${command?.selectedProperties}">
+                                        <span class='fade'><warehouse:message code="default.none.label"/></span>
+                                    </g:unless>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right">
+                                    <label><warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown"/></label>
+                                </td>
+                                <td>
+                                    ${command.includeLocationBreakdown?'yes':'no'}
+                                </td>
+                            </tr>
+                        </table>
+                    </g:if>
                     <hr/>
 
                     <table>
@@ -92,33 +162,45 @@
                                 <td colspan="" class="border-right"></td>
                                 <td colspan="" class="border-right"></td>
                                 <td colspan="" class="border-right"></td>
-                                <td colspan="4" class="center border-right">
-                                    <label>Consumption</label>
+                                <td colspan="" class="border-right"></td>
+                                <td colspan="6" class="center border-right">
+                                    <label>Debit breakdown</label>
                                 </td>
-                                <td colspan="2" class="center">
+                                <td colspan="3" class="center border-right">
+                                    <label>Consumption breakdown</label>
+                                </td>
+                                <td colspan="2" class="center border-right">
                                     <label>Remaining</label>
                                 </td>
+                                <%--
+                                <g:if test="${command.selectedProperties}">
+                                    <td colspan="${command.selectedProperties.size()}">
+                                        <label>Custom columns</label>
+                                    </td>
+                                </g:if>
+                                --%>
                             </tr>
                             <tr>
                                 <th class="center border-right"><warehouse:message code="product.productCode.label"/></th>
                                 <th class="border-right"><warehouse:message code="product.name.label"/></th>
+                                <th class="border-right"><warehouse:message code="category.label"/></th>
                                 <th class="center border-right"><warehouse:message code="product.unitOfMeasure.label"/></th>
-                                <th class="center"><warehouse:message code="consumption.total.label" default="Total"/></th>
+                                <th class="center" colspan="2"><warehouse:message code="consumption.consumed.label" default="Consumed"/></th>
+                                <th class="center" colspan="2"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
+                                <th class="center border-right" colspan="2"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
                                 <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
                                 <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
                                 <th class="center border-right"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
                                 <th class="center"><warehouse:message code="consumption.onHand.label" default="On hand"/></th>
-                                <th class="center"><warehouse:message code="consumption.monthsLeft.label" default="Months left"/></th>
+                                <th class="center border-right"><warehouse:message code="consumption.monthsLeft.label" default="Months left"/></th>
+                                <%--
+                                <g:each var="property" in="${command.selectedProperties}">
+                                    <th>${property}</th>
+                                </g:each>
+                                --%>
                             </tr>
                         </thead>
                         <tbody>
-                            <g:unless test="${command?.rows}">
-                                <tr class="prop">
-                                    <td colspan="9" class="empty center">
-                                        <warehouse:message code="default.empty.label"/>
-                                    </td>
-                                </tr>
-                            </g:unless>
 
                             <g:each var="entry" in="${command.rows}" status="i">
                                 <g:set var="row" value="${entry.value}"/>
@@ -139,11 +221,30 @@
                                             ${product?.name}
                                         </g:link>
                                     </td>
+                                    <td class="border-right">
+                                        <span class="fade"><format:metadata obj="${product.category}"/></span>
+                                    </td>
                                     <td class="center border-right">
                                         ${product?.unitOfMeasure}
                                     </td>
                                     <td class="center">
                                         ${row.transferOutQuantity}
+                                    </td>
+                                    <td class="center">
+                                        <span class="fade">(${row.transferOutTransactions?.size()})</span>
+                                    </td>
+                                    <td class="center">
+                                        ${row.expiredQuantity}
+                                    </td>
+                                    <td class="center">
+                                        <span class="fade">(${row.expiredTransactions?.size()})</span>
+
+                                    </td>
+                                    <td class="center">
+                                        ${row.damagedQuantity}
+                                    </td>
+                                    <td class="center border-right">
+                                        <span class="fade">(${row.damagedTransactions?.size()})</span>
                                     </td>
                                     <td class="center">
                                         ${row.monthlyQuantity}
@@ -157,15 +258,28 @@
                                     <td class="center">
                                         <g:formatNumber number="${row.onHandQuantity}" format="###,###.#" maxFractionDigits="1"/>
                                     </td>
-                                    <td class="center">
+                                    <td class="center border-right">
                                         <g:formatNumber number="${row.numberOfMonthsRemaining}" format="###,###.#" maxFractionDigits="1"/>
                                     </td>
+                                    <%--
+                                    <g:each var="property" in="${params.selectedProperties}">
+                                        <td>${row.product."$property"}</td>
+                                    </g:each>
+                                    --%>
                                 </tr>
                             </g:each>
+                            <g:unless test="${command?.rows}">
+                                <tr class="prop">
+                                    <td colspan="15" class="empty center">
+                                        <warehouse:message code="default.empty.label"/>
+                                    </td>
+                                </tr>
+                            </g:unless>
+
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="9">
+                                <td colspan="15">
                                     <span class="fade">Returned ${command.rows?.keySet()?.size()} items</span>
                                 </td>
                             </tr>
