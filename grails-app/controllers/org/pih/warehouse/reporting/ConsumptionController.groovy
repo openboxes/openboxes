@@ -245,6 +245,12 @@ class ConsumptionController {
 
                 ]
 
+                if (command.selectedProperties) {
+                    command.selectedProperties.each { property ->
+                        csvrow[property] = row.product."$property"
+                    }
+                }
+
                 if (command.includeLocationBreakdown) {
                     command.selectedLocations.each { location ->
                         //println "location " + it.name + " = " + row.transferOutMap[it]
