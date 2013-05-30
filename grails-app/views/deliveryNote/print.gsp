@@ -120,29 +120,28 @@
             <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}" title="Cold chain"/>
             ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsControlled}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>
             ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsHazmat}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" title="Hazardous material"/>
             ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
-
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" title="Other"/>
             ${warehouse.message(code:'product.other.label', default:'Other')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, pageBreakAfter: 'avoid']"/>
     </g:if>
 
 </div>

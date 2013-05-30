@@ -138,7 +138,7 @@
             <label><warehouse:message code="requisition.createdBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.createdBy?.name?:warehouse.message(code:'default.noone.label')}
+            ${requisition?.createdBy?.name}
         </td>
         <td>
 
@@ -155,7 +155,7 @@
             <label><warehouse:message code="requisition.verifiedBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.verifiedBy?.name?:warehouse.message(code:'default.noone.label')}
+            ${requisition?.verifiedBy?.name}
         </td>
         <td>
 
@@ -172,7 +172,7 @@
             <label><warehouse:message code="requisition.pickedBy.label"/></label>
         </td>
         <td class="middle">
-            ${picklist?.picker?.name?:warehouse.message(code:'default.noone.label')}
+            ${picklist?.picker?.name}
         </td>
         <td>
 
@@ -189,16 +189,16 @@
             <label><warehouse:message code="requisition.reviewedBy.label" default="Checked by"/></label>
         </td>
         <td class="middle">
-            ${requisition?.reviewedBy?.name?:warehouse.message(code:'default.noone.label')}
+            ${requisition?.checkedBy?.name}
         </td>
         <td>
 
         </td>
         <td class="middle center">
-            <g:formatDate date="${requisition?.dateReviewed}" format="MMM dd, yyyy"/>
+            <g:formatDate date="${requisition?.dateChecked}" format="MMM dd, yyyy"/>
         </td>
         <td class="middle center">
-            <g:formatDate date="${requisition?.dateReviewed}" format="hh:mm a"/>
+            <g:formatDate date="${requisition?.dateChecked}" format="hh:mm a"/>
         </td>
     </tr>
 </table>
@@ -215,32 +215,32 @@
 <div>
     <g:if test="${requisitionItemsColdChain}">
         <h2>
-            <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}" title="Cold chain"/>
+            <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}" title="Cold chain"/>&nbsp;
             ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsControlled}">
         <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>
+            <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>&nbsp;
             ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsHazmat}">
         <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" title="Hazardous material"/>
+            <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" title="Hazardous material"/>&nbsp;
             ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
 
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" title="Other"/>
-            ${warehouse.message(code:'product.other.label', default:'Other')}
+            <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" title="Everything else"/>&nbsp;
+            ${warehouse.message(code:'default.everythingElse.label', default:'Everything else')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther]"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, pageBreakAfter: 'avoid']"/>
     </g:if>
 </div>
 
