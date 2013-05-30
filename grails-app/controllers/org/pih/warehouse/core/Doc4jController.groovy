@@ -67,7 +67,7 @@ class Doc4jController {
 		// For some reason, this needs to be here or we get a File Not Found error (ERR_FILE_NOT_FOUND)
 		render ""
 		
-		def filename = shipmentInstance?.name + " - Packing List.xls"
+		def filename = "Packing List - " + shipmentInstance?.name?.trim() + ".xls"
 		log.info ("filename " + filename )
 		response.setHeader("Content-disposition", "attachment; filename=" + filename);
 		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
