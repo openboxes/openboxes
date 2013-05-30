@@ -7,7 +7,7 @@
                 <th>${warehouse.message(code: 'product.label')}</th>
                 <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
-                <th class="center">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
+                <th class="center" style="min-width: 150px;">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
                 <th class="center">${warehouse.message(code:'requisition.checkedBy.label')}</th>
