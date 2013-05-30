@@ -590,10 +590,10 @@ class DocumentService {
 			//sheet.autoSizeColumn(4);
 			//sheet.autoSizeColumn(5);
 			sheet.setColumnWidth((short)0, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)1, (short) ((50 * 2) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)2, (short) ((50 * 2) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)3, (short) ((50 * 2) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)4, (short) ((50 * 2) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)1, (short) ((50 * 3) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short)2, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)3, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)4, (short) ((50 * 3) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)5, (short) ((50 * 8) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)6, (short) ((50 * 3) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)7, (short) ((50 * 3) / ((double) 1 / 20)))
@@ -617,13 +617,15 @@ class DocumentService {
 			tableHeaderCenterStyle.setBorderRight((short)1);
 			tableHeaderCenterStyle.setBorderTop((short)1);
 			tableHeaderCenterStyle.setFont(boldFont);
-			
+            tableHeaderCenterStyle.setWrapText(true)
+
 			CellStyle tableHeaderLeftStyle = workbook.createCellStyle();
 			tableHeaderLeftStyle.setBorderBottom((short)1);
 			tableHeaderLeftStyle.setBorderLeft((short)1);
 			tableHeaderLeftStyle.setBorderRight((short)1);
 			tableHeaderLeftStyle.setBorderTop((short)1);
 			tableHeaderLeftStyle.setFont(boldFont);
+            tableHeaderLeftStyle.setWrapText(true)
 
 			// Bold and align center cell style
 			CellStyle boldAndCenterStyle = workbook.createCellStyle();
@@ -634,6 +636,7 @@ class DocumentService {
 			boldAndCenterStyle.setBorderRight((short)1);
 			boldAndCenterStyle.setBorderTop((short)1);
 			boldAndCenterStyle.setFont(boldFont);
+            boldAndCenterStyle.setWrapText(true)
 
 			// Align center cell style
 			CellStyle tableDataCenterStyle = workbook.createCellStyle();
@@ -661,6 +664,7 @@ class DocumentService {
 			tableDataLeftStyle.setBorderLeft((short)1);
 			tableDataLeftStyle.setBorderRight((short)1);
 			tableDataLeftStyle.setBorderTop((short)1);
+            tableDataLeftStyle.setWrapText(true)
 
 			// Align left cell style
 			CellStyle tableDataDateStyle = workbook.createCellStyle();
@@ -841,21 +845,20 @@ class DocumentService {
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'container.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventoryLevel.binLocation.label'));
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'packingList.binLocation.label', default: 'Bin'));
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.productCode.label'));
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'packingList.productCode.label', default:'SKU'));
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.manufacturerCode.label'));
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'packingList.manufacturerCode.label', default: 'Mfg#'));
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.vendorCode.label'));
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'packingList.vendorCode.label', default: 'Vendor#'));
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
-
 
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventory.lotNumber.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
