@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.inventory.Inventory" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -111,8 +112,7 @@
 												<label><warehouse:message code="transaction.inventory.label"/></label>
 											</td>
 											<td class="value">
-												<g:select id="inventoryId" name="inventory.id" from="${locationInstanceList}" 
-						                       		optionKey="id" optionValue="name" value="${transactionInstance?.inventory?.id}" noSelection="['null': '']" />
+                                                <g:selectInventory name="inventory.id" value="${transactionInstance?.inventory?.id}" noSelection="['null': '']" />
 											</td>
 										</tr>
 										<tr class="prop">

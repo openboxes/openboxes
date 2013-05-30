@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.RequisitionStatus;
@@ -210,6 +211,15 @@ class SelectTagLib {
 		}
 		out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
 	}
+
+    def selectInventory = { attrs, body ->
+        //optionKey="id" optionValue="{it.location.name}" value="${transactionInstance?.inventory?.id}"
+        attrs.from = Inventory.list().sort { it.warehouse.name }
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.warehouse.name }
+        out << g.select(attrs)
+
+    }
 
 	
 	def selectLocation = { attrs,body ->
