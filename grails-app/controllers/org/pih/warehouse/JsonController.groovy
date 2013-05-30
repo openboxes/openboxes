@@ -270,6 +270,19 @@ class JsonController {
 		render ((results)?results.size():"0")
 	}
 
+    def findProductCodes = {
+        def searchTerm = params.term + "%";
+        def c = Product.createCriteria()
+        def productCodes = c.list {
+            projections { property "productCode" }
+            ilike("productCode", searchTerm)
+        }
+
+        def results = productCodes.unique().collect { [ value: it, label: it ] }
+        render results as JSON;
+    }
+
+
 	def findTags = {
 		def searchTerm = "%" + params.term + "%";
 		def c = Tag.createCriteria()

@@ -177,19 +177,14 @@
 					                                  <label for="tagsToBeAdded"><warehouse:message code="product.tags.label" /></label>
 					                                </td>
 													<td valign="top" class="value">
-												       	<%--
-												       	<g:render template="tags" model="['productInstance':productInstance]" />
-												       	--%>
-
-												       	<g:textField id="tags1" class="tags" name="tagsToBeAdded"
-												       		value="${productInstance?.tagsToString() }"/>
+												       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
 														<script>
 															$(function() {
 																$('#tags1').tagsInput({
 																	'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
 																	'width': 'auto',
 																	'height': '20px',
-																	'removeWithBackspace' : true,
+																	'removeWithBackspace' : true
 																});
 															});
 														</script>

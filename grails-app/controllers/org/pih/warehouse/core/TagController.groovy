@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.core
 
+import org.pih.warehouse.product.Product
+
 class TagController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -109,4 +111,87 @@ class TagController {
             redirect(action: "list")
         }
     }
+
+    def doSomething = {
+        println "do something " + params
+    }
+
+    def addToProducts = {
+        println "add to products " + params
+        Tag tag = Tag.get(params.id)
+
+        if (tag) {
+            if (params.productCodesToBeAdded) {
+                flash.message = "Added products " + params
+                def productCodes = params.productCodesToBeAdded.split(",")
+                productCodes.each { productCode ->
+                    def product = Product.findByProductCodeLike(productCode)
+                    if (!tag.products.contains(product)) {
+                        tag.addToProducts(product)
+                        tag.save(flush:true)
+                    }
+                }
+
+            }
+            else {
+                flash.message = "Please enter at least one product code " + params
+
+            }
+        }
+        else {
+            flash.message = "Could not find tag with ID " + params.id
+            redirect(action: "list")
+        }
+
+        redirect(action: "edit", id: tag.id)
+
+    }
+
+    def removeFromProducts = {
+        println "remove from products " + params
+        Tag tag = Tag.get(params.id)
+
+        if (tag) {
+            def productIds = params.list("product.id")
+            if (productIds) {
+                flash.message = "Removed product ids " + productIds
+                productIds.each { productId ->
+                    def product = Product.get(productId)
+                    tag.removeFromProducts(product)
+                    tag.save(flush: true)
+                }
+                flash.message = "Removed products " + productIds
+            }
+            else {
+                flash.message = "Please choose at least one product to remove"
+            }
+
+            /*
+            if (params.productCodesToBeAdded) {
+                def productCodes = params.productCodesToBeAdded.split(",")
+                productCodes.each { productCode ->
+                    def product = Product.findByProductCodeLike(productCode)
+                    if (!tag.products.contains(product)) {
+                        tag.addToProducts(product)
+                        tag.save(flush:true)
+                    }
+                }
+
+
+            }
+            else {
+                flash.message = "Please choose at least one product to remove " + params
+            }
+            */
+        }
+        else {
+            flash.message = "Could not find tag with ID " + params.id
+            redirect(action: "list")
+        }
+
+        redirect(action: "edit", id: tag.id)
+
+    }
+
+
 }

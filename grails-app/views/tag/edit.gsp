@@ -6,8 +6,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'tag.label', default: 'Tag')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
+        <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+        <script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
+
     </head>
     <body>
         <div class="body">
@@ -27,6 +28,7 @@
                         <g:hiddenField name="id" value="${tagInstance?.id}" />
                         <g:hiddenField name="version" value="${tagInstance?.version}" />
                         <div class="dialog box">
+                            <h2><warehouse:message code="tag.edit.label" default="Edit tag" /></h2>
                             <table>
                                 <tbody>
 
@@ -93,8 +95,8 @@
                                         <td valign="top"></td>
                                         <td valign="top">
                                             <div class="buttons">
-                                                <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-                                                <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                                <g:actionSubmit class="button icon accept" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+                                                <g:actionSubmit class="button icon trash" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                                             </div>
                                         </td>
                                     </tr>
@@ -104,35 +106,100 @@
                     </g:form>
                 </div>
                 <div class="yui-u">
-                    <div class="box">
-                        <table>
-                            <tbody>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label for="products"><warehouse:message code="tag.products.label" default="Products" /></label>
-                                    </td>
-                                    <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'products', 'errors')}">
-                                        <table id="products">
-                                            <g:each in="${tagInstance.products.sort()}" var="p" status="i">
-                                                <tr class="${i%2?'odd':'even'}">
 
-                                                    <td>
-                                                        <label>${p.productCode }</label>
-                                                        <g:link controller="inventoryItem" action="showStockCard" id="${p.id}">
-                                                            ${p?.encodeAsHTML()}
-                                                        </g:link>
-                                                    </td>
-                                                </tr>
-                                            </g:each>
-                                        </table>
+                    <div class="box">
+                        <h2>
+                            <warehouse:message code="tag.products.label" default="Products" />
+                            (${tagInstance?.products?.size()})
+                        </h2>
+
+                        <g:form method="post" action="addToProducts">
+                            <g:hiddenField name="id" value="${tagInstance?.id}" />
+                            <g:hiddenField name="version" value="${tagInstance?.version}" />
+                            <table>
+                                <tr>
+                                    <td>
+                                        <g:textField id="productCodesInput" name="productCodesToBeAdded" value=""/>
                                     </td>
                                 </tr>
-                            </tbody>
-                        </table>
+                                <tr>
+                                    <td class="right">
+                                        <button class="button icon add">
+                                            ${warehouse.message(code:'tag.addToProducts.label', default: 'Add to products')}
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </g:form>
+
+                        <g:form method="post" action="removeFromProducts">
+                            <g:hiddenField name="id" value="${tagInstance?.id}" />
+                            <g:hiddenField name="version" value="${tagInstance?.version}" />
+                            <table>
+                                <tbody>
+                                    <tr class="prop">
+                                        <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'products', 'errors')}">
+                                            <table id="products">
+                                                <tr>
+                                                    <th><g:checkBox id="selectAllProducts" name="selectAllProducts"/></th>
+                                                    <th>${warehouse.message(code:'product.productCode.label')}</th>
+                                                    <th>${warehouse.message(code:'product.name.label')}</th>
+                                                    <th></th>
+                                                </tr>
+                                                <g:each in="${tagInstance.products.sort { it.name } }" var="p" status="i">
+                                                    <tr class="${i%2?'odd':'even'}">
+                                                        <td class="middle center"><g:checkBox name="product.id" value="${p.id}" checked="${false}" class="select-product"/></td>
+                                                        <td class="center">${p.productCode }</td>
+                                                        <td>
+                                                            <g:link controller="inventoryItem" action="showStockCard" id="${p.id}">
+                                                                ${p?.encodeAsHTML()}
+                                                            </g:link>
+                                                        </td>
+                                                        <td class="right">
+                                                            <g:link controller="tag" action="removeFromProducts" id="${tagInstance?.id}" params="['product.id':p?.id]" class="button icon trash">
+                                                                ${warehouse.message(code:'default.button.delete.label')}
+                                                            </g:link>
+                                                        </td>
+                                                    </tr>
+                                                </g:each>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3">
+                                            <button class="button icon trash">
+                                                ${warehouse.message(code:'tag.removeFromProducts.label', default: 'Remove from products')}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </g:form>
                     </div>
+
                 </div>
 
             </div>
         </div>
+    <script>
+        $(document).ready(function() {
+            $("#selectAllProducts").click(function(event) {
+                var checked = ($(this).attr("checked") == 'checked');
+                $("input.select-product[type='checkbox']").attr("checked", checked);
+            });
+
+            $('#productCodesInput').tagsInput({
+                'autocomplete_url':'${createLink(controller: 'json', action: 'findProductCodes')}',
+                'width': 'auto',
+                'height': 'auto',
+                'removeWithBackspace' : true
+            });
+
+
+        });
+    </script>
     </body>
 </html>

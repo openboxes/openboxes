@@ -347,7 +347,8 @@ class InventoryController {
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
 
         if (params.format == "csv") {
-            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            def filename = "Total stock - " + warehouse.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsv(totalStock))
         }
 
@@ -361,7 +362,8 @@ class InventoryController {
         def inStock = inventoryService.getInStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            def filename = "In stock - " + warehouse.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsv(inStock))
         }
 
@@ -375,7 +377,8 @@ class InventoryController {
         def lowStock = inventoryService.getLowStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            def filename = "Low stock - " + warehouse.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsv(lowStock))
         }
 
@@ -389,7 +392,8 @@ class InventoryController {
         def reorderStock = inventoryService.getReorderStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            def filename = "Reorder stock - " + warehouse.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsv(reorderStock))
         }
 
@@ -403,7 +407,8 @@ class InventoryController {
 		def outOfStock = inventoryService.getOutOfStock(warehouse);
 		//def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            def filename = "Out of stock - " + warehouse.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsv(outOfStock))
         }
 
@@ -417,7 +422,8 @@ class InventoryController {
         def overStock = inventoryService.getOverStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            response.setHeader("Content-disposition", "attachment; filename=export.csv")
+            def filename = "Overstock - " + warehouse.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsv(overStock))
         }
 
