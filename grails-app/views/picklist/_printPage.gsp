@@ -10,7 +10,7 @@
                 <th class="center">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
-                <th width="5%" class="center">${warehouse.message(code:'default.comments.label')}</th>
+                <th class="center">${warehouse.message(code:'requisition.checkedBy.label')}</th>
             </tr>
         </thead>
         <tbody>
