@@ -67,9 +67,14 @@
 											<td class="name">
 												<label><warehouse:message code="transaction.date.label"/></label>
 											</td>
-											<td class="value">													
+											<td class="value">
+                                                <%--
 												<g:jqueryDatePicker id="transactionDate" name="transactionDate"
 														value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+											    --%>
+                                                <g:datePicker id="transactionDate" name="transactionDate"
+                                                              value="${transactionInstance?.transactionDate}"
+                                                                precision="minute"/>
 											</td>
 										</tr>											
 										<tr class="prop">
