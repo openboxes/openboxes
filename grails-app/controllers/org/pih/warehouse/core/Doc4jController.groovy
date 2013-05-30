@@ -29,7 +29,7 @@ class Doc4jController {
 		}
 		
 		def tempFile = fileService.generateLetterAsDocx(shipmentInstance)
-		def filename = shipmentInstance?.name + " - Certificate of Donation.docx"
+		def filename = "Certificate of Donation - " + shipmentInstance?.name?.trim() + ".docx"
 		response.setHeader("Content-disposition", "attachment; filename=" + filename);
 		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 		response.outputStream << tempFile.readBytes()
@@ -43,7 +43,7 @@ class Doc4jController {
 			throw new Exception("Unable to locate shipment with ID ${params.id}")
 		}
 		
-		def filename = shipmentInstance?.name + " - Certificate of Donation.pdf"
+		def filename = "Certificate of Donation - " + shipmentInstance?.name?.trim() + ".pdf"
 		fileService.generateLetterAsPdf(shipmentInstance, response.outputStream)
 	
 		response.setHeader("Content-disposition", "attachment; filename=" + filename);
