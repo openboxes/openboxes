@@ -164,7 +164,7 @@
                                 <td colspan="" class="border-right"></td>
                                 <td colspan="" class="border-right"></td>
                                 <td colspan="6" class="center border-right">
-                                    <label>Debit breakdown</label>
+                                    <label>Debit breakdown </label><div class="fade">(number of transactions)</div>
                                 </td>
                                 <td colspan="3" class="center border-right">
                                     <label>Consumption breakdown</label>

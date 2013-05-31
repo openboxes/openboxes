@@ -35,24 +35,6 @@
                         <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"/>
                     </td>
                 </tr>
-                <tr class="prop">
-                    <td colspan="2">
-                        <label>
-                            <warehouse:message code="consumption.products.label" default="Products"/>
-                        </label>
-                    </td>
-                </tr>
-                <tr class="">
-                    <td colspan="2">
-                        <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"/>
-                    </td>
-                </tr>
-                <tr class="">
-                    <td colspan="2">
-                        <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
-                        style="height: 30px;"/>
-                    </td>
-                </tr>
 
                 <%--
                 <tr class="prop">
@@ -91,18 +73,30 @@
                                 <g:set var="count" value="${0}"/>
                                 <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
                                     <div class="">
-                                        <h3>${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')}</h3>
-                                        <g:each var="toLocation" in="${entry.value}">
-                                            <div>
-                                                <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
-                                                <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
-                                                <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
-                                                <format:metadata obj="${toLocation}"/>
-                                                <span class="fade">
-                                                    <format:metadata obj="${toLocation?.locationType}"/>
-                                                </span>
-                                            </div>
+                                        <fieldset>
+                                        <legend>${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')}</legend>
+                                        <g:each var="locationTypeEntry" in="${entry.value.groupBy{it.locationType}}">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="2"><format:metadata obj="${locationTypeEntry}"/></th>
+                                                    </tr>
+                                                </thead>
+                                                <g:each var="toLocation" in="${locationTypeEntry.value}">
+                                                    <tr>
+                                                        <td class="middle center">
+                                                            <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
+                                                            <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
+                                                            <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
+                                                        </td>
+                                                        <td class="middle">
+                                                            <format:metadata obj="${toLocation}"/>
+                                                        </td>
+                                                    </tr>
+                                                </g:each>
+                                            </table>
                                         </g:each>
+                                        </fieldset>
                                     </div>
                                 </g:each>
                                 <%--
@@ -126,10 +120,51 @@
                         </td>
                     </tr>
                 </g:if>
+            </table>
+        </div>
+        <div class="box">
+            <h2><warehouse:message code="consumption.products.label" default="Products"/></h2>
+            <table>
+                <tr class="prop">
+                    <td colspan="2">
+                        <label>
+                            <warehouse:message code="consumption.filterByTag.label" default="Filter by tag" />
+                        </label>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td colspan="2">
+                        <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td colspan="2">
+                        <label>
+                            <warehouse:message code="consumption.filterByCategory.label" default="Filter by category" />
+                        </label>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td colspan="2">
+                        <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
+                                          style="min-height: 60px;"/>
+                    </td>
+                </tr>
+
+
+
+            </table>
+
+        </div>
+
+
+        <div class="box">
+            <h2><warehouse:message code="consumption.additionalColumns.label" default="Additional columns"/></h2>
+            <table>
                 <tr class="prop">
                     <td>
                         <label>
-                            <warehouse:message code="product.properties.label" default="Additional columns"/>
+                            <warehouse:message code="product.columns.label" default="Product columns"/>
                         </label>
                     </td>
                     <td>
@@ -142,18 +177,23 @@
                 <tr class="">
                     <td colspan="2">
                         <div style="overflow: auto; max-height: 200px;" class="list">
+                            <table>
                             <g:each var="property" in="${command.productDomain.properties}">
                                 <g:if test="${!property.isAssociation()}">
-                                    <div class="middle">
+                                    <tr>
+                                        <td class="middle left">
                                         <g:checkBox name="selectedProperties" value="${property.name}"
                                             checked="${command.selectedProperties?.toList()?.contains(property.name)}"
                                             class="property"/>
+                                        </td>
+                                        <td class="middle left">
                                             ${property.naturalName}
                                             <span class="fade">${property.typePropertyName}</span>
-
+                                        </td>
                                     </div>
                                 </g:if>
                             </g:each>
+                            </table>
                         </div>
                     </td>
                 </tr>
