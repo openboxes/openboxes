@@ -3,7 +3,7 @@
 		<g:renderErrors bean="${transaction}" as="list" />
 	</div>
 </g:hasErrors>
-<div style="border: 1px solid lightgrey;">
+<div>
 	<table>
 		<thead>
 			<tr class="odd">
@@ -13,7 +13,7 @@
 				<th class="center middle" ><warehouse:message code="default.qty.label"/></th>
 			</tr>											
 		</thead>
-		<tbody  >
+		<tbody>
 			<g:set var="count" value="${0 }"/>
 			<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
 				<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}">		
@@ -93,7 +93,7 @@
 			</g:if>
 		</tbody>
 		<tfoot>
-			<tr class="prop odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
+			<tr class="odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
 				<td colspan="3" class="left">
 				</td>
 				<td class="center">

@@ -1,9 +1,10 @@
 <%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
+<%--
 <div class="left smpad">
 	Showing ${commandInstance?.allTransactionLogMap?.keySet()?.size() } of ${commandInstance?.allTransactionLogMap?.keySet()?.size() } transaction(s)
 </div>				
-
+--%>
 <div>		
 
 	<div>
@@ -12,7 +13,7 @@
 
 				<!--  Filter -->
 			
-				<table style="border: 1px solid lightgrey">
+				<table>
 				<%--
 					<tr class="odd">
 						<td>
@@ -50,11 +51,11 @@
 					</tr>
 					 --%>
 					<tr>
-						<td style="padding: 0px;">					
+						<td >
 							<g:set var="enableFilter" value="${!params.disableFilter}"/>
 							<table >
 								<thead>
-									<tr class="odd prop">
+									<tr class="odd">
                                         <th>
 
                                         </th>
@@ -109,6 +110,8 @@
                                         <g:set var="balance" value="${0}"/>
                                         <g:set var="balanceByInventoryItem" value="${[:]}"/>
 										<g:set var="totalQuantityChange" value="${0 }"/>
+                                        <g:set var="totalDebit" value="${0 }"/>
+                                        <g:set var="totalCredit" value="${0 }"/>
                                         <g:set var="count" value="${0}"/>
                                         <g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate} }" status="status">
                                             <g:each var="transactionEntry" in="${transaction.transactionEntries.findAll { it.inventoryItem.product ==  commandInstance?.productInstance}}" status="status2">
@@ -201,11 +204,13 @@
                                                     <td class="border-right center">
                                                         <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
                                                             ${transactionEntry.quantity  }
+                                                            <g:set var="totalCredit" value="${totalCredit + transactionEntry.quantity }"/>
                                                         </g:if>
                                                     </td>
                                                     <td  class="border-right center">
                                                         <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
                                                             (${transactionEntry.quantity })
+                                                            <g:set var="totalDebit" value="${totalDebit + transactionEntry.quantity }"/>
                                                         </g:if>
                                                     </td>
                                                     <td class="center">
@@ -300,22 +305,22 @@
 									</g:else>
 								</tbody>
                                 <tfoot>
-                                    <tr>
-                                        <td colspan="6" class="left border-right">
-                                            <warehouse:message code="stockCard.onHandQuantity.label" default="On hand quantity"/>
-                                        </td>
-                                        <td class="center border-right">
+                                    <tr class="odd">
+                                        <th colspan="6" class="left border-right">
+                                            <warehouse:message code="stockCard.totals.label" default="Totals"/>
+                                        </th>
+                                        <th class="center border-right">
 
-                                        </td>
-                                        <td class="center border-right">
-
-                                        </td>
-                                        <td class="center border-right">
-
-                                        </td>
-                                        <td class="center border-right">
-                                            ${balanceByInventoryItem.values().sum()}
-                                        </td>
+                                        </th>
+                                        <th class="center border-right">
+                                            <g:formatNumber number="${totalCredit}" format="#,###"/>
+                                        </th>
+                                        <th class="center border-right">
+                                            (<g:formatNumber number="${totalDebit}" format="#,###"/>)
+                                        </th>
+                                        <th class="center">
+                                            <g:formatNumber number="${balanceByInventoryItem.values().sum()}" format="#,###"/>
+                                        </th>
 
                                     </tr>
                                 </tfoot>
