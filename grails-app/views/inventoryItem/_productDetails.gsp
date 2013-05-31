@@ -125,8 +125,8 @@
 		</table>
 	</g:if>
 	--%>
-    <g:set var="latestInventoryDate"
-           value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
+<g:set var="latestInventoryDate"
+       value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
 <div class="box">
     <table>
         <tbody>
@@ -141,7 +141,7 @@
                 </td>
                 <td class="value">
                     <span class="">
-                        <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity]"/>
+                        <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity,latestInventoryDate:latestInventoryDate]"/>
                     </span>
                 </td>
             </tr>

@@ -1,7 +1,6 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <g:set var="inventoryLevel" value="${product?.getInventoryLevel(session.warehouse.id)}"/>
-<g:set var="latestInventoryDate" value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
-
+<g:set var="latestInventoryDate" value="${product?.latestInventoryDate(session.warehouse.id)}" />
 <g:if test="${inventoryLevel?.status == InventoryStatus.SUPPORTED}">
     <g:if test="${totalQuantity <= 0}">
         <g:if test="${latestInventoryDate}">
