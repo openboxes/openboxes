@@ -215,7 +215,7 @@
                                                     </td>
                                                     <td class="center">
 
-                                                        ${balanceByInventoryItem.values().sum()}
+                                                        ${balanceByInventoryItem?.values()?.sum()?:0}
                                                     </td>
                                                 </tr>
 
@@ -319,7 +319,7 @@
                                             (<g:formatNumber number="${totalDebit}" format="#,###"/>)
                                         </th>
                                         <th class="center">
-                                            <g:formatNumber number="${balanceByInventoryItem.values().sum()}" format="#,###"/>
+                                            <g:formatNumber number="${balanceByInventoryItem?.values()?.sum()?:0}" format="#,###"/>
                                         </th>
 
                                     </tr>
