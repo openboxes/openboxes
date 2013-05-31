@@ -23,7 +23,8 @@ class StockCardCommand {
 	Location warehouseInstance;
 	Inventory inventoryInstance;
 	InventoryLevel inventoryLevelInstance;
-	
+	Integer totalQuantity
+
 	// Current stock section
 	List<InventoryItem> lotNumberList
 	List<InventoryItem> inventoryItemList;
@@ -53,9 +54,9 @@ class StockCardCommand {
 	 *
 	 * @return 	the sum of quantities across all transaction entries
 	 */
-	Integer getTotalQuantity() {
-		return quantityByInventoryItemMap?.values() ? quantityByInventoryItemMap?.values().sum() : 0
-	}
+	//Integer getTotalQuantity() {
+	//	return quantityByInventoryItemMap?.values() ? quantityByInventoryItemMap?.values().sum() : 0
+	//}
 	
 	Map getAllTransactionLogMap() { 
 		return transactionEntryList.groupBy { it.transaction }

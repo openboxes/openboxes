@@ -1019,10 +1019,10 @@ class InventoryService implements ApplicationContextAware {
 		def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
 		def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
 
-		// first make sure the transaction entries are sorted, with most recent first
-		entries = entries.sort().reverse()
+        // first make sure the transaction entries are sorted, with most recent first
+        entries = entries.sort().reverse()
 
-		entries.each { transactionEntry ->
+        entries.each { transactionEntry ->
 
             // There are cases where the transaction entry might be null, so we need to check for this edge case
             if (transactionEntry) {
@@ -1032,7 +1032,7 @@ class InventoryService implements ApplicationContextAware {
                 // first see if this is an entry we can skip (because we've already reached a product inventory transaction
                 // for this product, or a inventory transaction for this inventory item)
                 if (!(reachedProductInventoryTransaction[inventoryItem.product] && reachedProductInventoryTransaction[inventoryItem.product] != transaction) &&
-                !(reachedInventoryTransaction[inventoryItem.product] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] != transaction)) {
+                        !(reachedInventoryTransaction[inventoryItem.product] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] != transaction)) {
 
                     // check to see if there's an entry in the map for this product and create if needed
                     if (!quantityMap[inventoryItem.product]) {
@@ -1071,8 +1071,8 @@ class InventoryService implements ApplicationContextAware {
                         reachedProductInventoryTransaction[inventoryItem.product] = transaction
                     }
                 }
-			}
-		}
+            }
+        }
         log.debug " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
@@ -1108,7 +1108,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	/**
-	 * Converts  list of passed transactions entries into a quantity
+	 * Converts list of passed transactions entries into a quantity
 	 * map indexed by inventory item
 	 *
 	 * @param entries
@@ -1122,6 +1122,8 @@ class InventoryService implements ApplicationContextAware {
 		def quantityByProductAndInventoryItemMap =
 				getQuantityByProductAndInventoryItemMap(entries)
 
+        //log.info "quantityByProductAndInventoryItemMap: " + quantityByProductAndInventoryItemMap
+
 		// now collapse this down to be by product
 		quantityByProductAndInventoryItemMap.keySet().each { product ->
 			quantityByProductAndInventoryItemMap[product].keySet().each { inventoryItem ->
@@ -1132,6 +1134,7 @@ class InventoryService implements ApplicationContextAware {
 			}
 		}
         log.debug " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        //log.info "quantityMap: " + quantityMap
 		return quantityMap
 	}
 
@@ -1361,6 +1364,8 @@ class InventoryService implements ApplicationContextAware {
 		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
 		cmd.inventoryItemList = inventoryItems as List
 		cmd.inventoryItemList?.sort { it.expirationDate }?.sort { it.lotNumber }
+
+        cmd.totalQuantity = getQuantityOnHand(cmd.warehouseInstance, cmd.productInstance)
 
 		// Get all lot numbers for a given product
 		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.productInstance) as List
@@ -2682,11 +2687,22 @@ class InventoryService implements ApplicationContextAware {
         log.debug "ids: " + ids
 		def result =[:]
 		if (ids) {
-			def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids})"
+            //
+			//def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids}) " +
+            //        "order by te.transaction.transactionDate asc, te.transaction.dateCreated asc"
+
+            def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids})"
             log.debug "SQL: " + sql
 			def transactionEntries = TransactionEntry.executeQuery(sql)
 			log.debug "transactionEntries " + transactionEntries
-			//transactionEntries.each{ println(it)}
+            //transactionEntries.each{ println(it)}
+			//transactionEntries.each{
+            //    println it.transaction.transactionType.transactionCode.toString() + "," +
+            //            it.transaction.transactionDate.toString() + "," +
+            //            it.transaction.dateCreated.toString() + "," +
+            //            it.inventoryItem.lotNumber + "," +
+            //            it.quantity
+            //}
 			def map = getQuantityByProductMap(transactionEntries)
 			map.keySet().each{ result[it.id] = map[it] }
 		}
@@ -2758,9 +2774,6 @@ class InventoryService implements ApplicationContextAware {
             between('transactionDate', fromDate, toDate)
         }
         return transactions
-
-
-
     }
 
 }
