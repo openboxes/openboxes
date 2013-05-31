@@ -8,7 +8,7 @@
 		<div >
 			
 			<div class="box">
-			
+			    <h2>${warehouse.message(code: 'inventory.recordInventory.label', default: 'Record inventory')}</h2>
 				<table>
 					<tr class="prop">
 						<td class="name">
@@ -84,7 +84,8 @@
 										</g:else>
 									</td>
 									<td class="middle center">
-										${recordInventoryRow?.oldQuantity }	
+										${recordInventoryRow?.oldQuantity }
+                                        ${commandInstance?.productInstance?.unitOfMeasure?:"EA" }
 										<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" 
 											value="${recordInventoryRow?.oldQuantity }"/>
 									</td>	
