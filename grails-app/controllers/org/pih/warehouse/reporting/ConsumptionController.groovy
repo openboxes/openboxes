@@ -104,11 +104,12 @@ class ConsumptionController {
                     command.rows[product].transferOutQuantity += transactionEntry.quantity
                     command.rows[product].transferOutTransactions << transaction
 
+                    // Initialize transfer out by location
+                    def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
+                    if (!transferOutQuantity) { command.rows[product].transferOutMap[transaction.destination] = 0 }
 
-                    def transferOutQuantity = command.rows[product].transferOutMap.get(transaction.destination, 0)
-                    if (!transferOutQuantity) {
-                        command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
-                    }
+                    // Add to the total transfer out per location
+                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
                 }
                 else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
                     command.rows[product].expiredQuantity += transactionEntry.quantity
