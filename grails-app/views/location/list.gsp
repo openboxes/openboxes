@@ -62,10 +62,9 @@
                                             <label><warehouse:message code="location.locationType.label"/></label>
                                         </td>
                                         <td>
-                                            <span class="criteria">
-                                                <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
-                                                          optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                          value="${params?.locationType?.id}" noSelection="['null':'']" />
+                                            <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
+                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                                      value="${params?.locationType?.id}" noSelection="['null':'']" />
                                         </td>
                                     </tr>
                                     <tr>
