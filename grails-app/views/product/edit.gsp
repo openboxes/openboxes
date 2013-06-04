@@ -91,7 +91,7 @@
 															value="${productInstance?.category?.id}"/>
 														--%>
 
-                                                        <g:selectCategory_v2 name="category.id" class="chzn-select"
+                                                        <g:selectCategory name="category.id" class="chzn-select"
                                                                              value="${productInstance?.category?.id}" style="width:100%;"/>
 
                                                          <%--
