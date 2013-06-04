@@ -30,6 +30,10 @@ class ErrorsController {
         render(view:"/errors/dataAccess")
     }
 
+    def handleMethodNotAllowed = {
+        render(view:"/errors/methodNotAllowed")
+    }
+
 	def processError = { 		
 		def toList = []
 		def ccList = []
