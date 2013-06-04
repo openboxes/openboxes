@@ -78,7 +78,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2">
+                                        <td colspan="2" class="right">
                                             <button type="submit" class="button icon search">
                                                 ${warehouse.message(code: 'default.button.find.label')}
                                             </button>
@@ -95,7 +95,7 @@
                             <h2>
                                 ${warehouse.message(code: 'default.showing.message', args: [locationInstanceList?.size()?:0]) }
                             </h2>
-                            <table style="border: 1px solid lightgrey;">
+                            <table>
                                 <thead>
                                     <tr style="height: 100px;">
                                         <th></th>
