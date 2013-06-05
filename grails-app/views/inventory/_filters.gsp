@@ -12,13 +12,17 @@
 					<td>
 						<g:hiddenField name="max" value="${params.max?:10 }"/>
 						<g:textField name="searchTerms" 
-							value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}"
-                            class="text medium" size="45"/>
+							value="${commandInstance.searchTerms}"
+                            placeholder="${warehouse.message(code:'inventory.searchTerms.label')}"
+                            class="text medium" style="width:100%;"/>
 					</td>
 				</tr>
                 <tr>
                     <td>
-                        <g:selectCategory_v2 id="subcategoryId" name="subcategoryId" class="chzn-select"
+                        <g:selectCategory id="subcategoryId"
+                            name="subcategoryId"
+                            class="chzn-select"
+                            noSelection="['null':'']"
                             style="width:100%;"
                             value="${commandInstance?.subcategoryInstance?.id}"/>
                     </td>

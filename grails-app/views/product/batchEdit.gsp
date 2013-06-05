@@ -32,7 +32,7 @@
                         <div class="filter">
                             <label><warehouse:message code="category.label"/></label>
                             <div>
-                                <g:selectCategory_v2 name="categoryId" class="chzn-select" value="${categoryInstance?.id}" style="width: 100%;"/>
+                                <g:selectCategory name="categoryId" class="chzn-select" value="${categoryInstance?.id}" style="width: 100%;"/>
                             </div>
                             <div>
                                 <g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}"/>
@@ -386,7 +386,7 @@
                                                     <g:textField name="productInstanceList[${status }].name" value="${productInstance?.name}" size="40" class="text"/>
                                                 </td>
                                                 <td valign="top" class="${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-                                                    <g:selectCategory_v2 name="categoryInstanceList[${status }].id" class="chzn-select" value="${productInstance?.category?.id}"/>
+                                                    <g:selectCategory name="categoryInstanceList[${status }].id" class="chzn-select" value="${productInstance?.category?.id}"/>
                                                 </td>
                                                 <td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
                                                     <g:textField name="productInstanceList[${status }].manufacturer" value="${productInstance?.manufacturer}" size="15" class="text"/>
