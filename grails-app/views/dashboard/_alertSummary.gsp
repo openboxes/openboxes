@@ -1,5 +1,12 @@
 <div class="widget-large">
 	<div class="widget-header">
+
+        <div style="float: right; font-weight: normal; font-size: 10px;" class="fade box">
+            <g:isUserAdmin>
+                <g:link controller="dashboard" action="flushCache">${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}</g:link>
+            </g:isUserAdmin>
+        </div>
+
 		<h2><warehouse:message code="inventory.alerts.label" default="Alerts"/></h2>
 	</div>	    			
 	<div class="widget-content" style="padding:0; margin:0">	    					    			
