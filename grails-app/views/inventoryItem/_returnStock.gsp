@@ -12,11 +12,12 @@
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="inventory.transferFrom.label" default="Transfer from" /></label></td>
                                 <td valign="top" class="value">
-                                    <g:selectLocation name="source.id"
+                                    <g:selectLocation id="transferFrom-${itemInstance?.id}"
+                                                        name="source.id"
                                                       class="chzn-select"
                                                       noSelection="['null':'']"
                                                       data-placeholder="Choose where stock is being returned from ..."
-                                                      value="${null}"
+                                                      value=""
                                                       style="width: 350px" />
 
                                 </td>
@@ -26,9 +27,17 @@
 								<td valign="top" class="value">
                                     ${session.warehouse.name}
 								</td>
-							</tr>  	        
+							</tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"><label><warehouse:message code="inventory.lotNumber.label" /></label></td>
+                                <td valign="top" class="value">
+                                    ${itemInstance.lotNumber}
 
-							<tr class="prop">
+
+                                </td>
+                            </tr>
+
+                        <tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>
 								<td valign="top" class="value">
 									<g:textField name="quantity" size="6" value="" class="text"/>
@@ -40,8 +49,8 @@
 						<tfoot>
 							<tr>
 								<td colspan="2" class="center">
-									<button>
-										<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.returnStock.label" default="Return stock"/>
+									<button class="button icon approve">
+										<warehouse:message code="inventory.returnStock.label" default="Return stock"/>
 									</button>
 									&nbsp;
 									<a href="javascript:void(-1);" id="btnReturnClose-${itemInstance?.id }" class="middle">
