@@ -191,12 +191,12 @@ class InventoryItemController {
 	/**
 	 * Display the Record Inventory form for the product 
 	 */
-	def showRecordInventory = { RecordInventoryCommand commandInstance -> 
-		
-		// We need to set the inventory instance in order to save an 'inventory' transaction
-		if (!commandInstance.inventoryInstance) { 
-			def warehouseInstance = Location.get(session?.warehouse?.id)				
-			commandInstance.inventoryInstance = warehouseInstance?.inventory;		
+	def showRecordInventory = { RecordInventoryCommand commandInstance ->
+
+        // We need to set the inventory instance in order to save an 'inventory' transaction
+		if (!commandInstance.inventoryInstance) {
+            def locationInstance = Location.get(session?.warehouse?.id)
+			commandInstance.inventoryInstance = locationInstance?.inventory;
 		}
 		inventoryService.populateRecordInventoryCommand(commandInstance, params)
 		
@@ -208,6 +208,11 @@ class InventoryItemController {
 		
 		// Compute the total quantity for the given product
 		commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
+
+		// FIXME Use this method instead of getQuantityByProductMap
+        // NEED to add tests before we introduce this change
+		//commandInstance.totalQuantity = inventoryService.getQuantityOnHand(locationInstance, productInstance)
+
 
         Map<Product, List<InventoryItem>> inventoryItems = inventoryService.getInventoryItemsWithQuantity([productInstance], commandInstance.inventoryInstance)
         def result = []
