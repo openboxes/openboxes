@@ -190,16 +190,17 @@
                         </div>
                     </div>
                     <div class="clear"></div>
-                    <div class="buttons center">
-                        <g:link controller="requisition" action="review" id="${requisition.id }" class="button">
-                            <warehouse:message code="default.button.back.label"/>
-                        </g:link>
+                    <g:unless test="${params.edit}">
+                        <div class="buttons center">
+                            <g:link controller="requisition" action="review" id="${requisition.id }" class="button">
+                                <warehouse:message code="default.button.back.label"/>
+                            </g:link>
 
-                        <g:link controller="requisition" action="picked" id="${requisition.id }" class="button">
-                            <warehouse:message code="default.button.next.label"/>
-                        </g:link>
-                    </div>
-
+                            <g:link controller="requisition" action="picked" id="${requisition.id }" class="button">
+                                <warehouse:message code="default.button.next.label"/>
+                            </g:link>
+                        </div>
+                    </g:unless>
                 </div>
 			</div>
 		</div>
