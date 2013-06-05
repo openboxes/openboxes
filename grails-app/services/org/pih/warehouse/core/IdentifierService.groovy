@@ -9,7 +9,13 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.RandomStringUtils
+import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment;
 
 class IdentifierService {
 
@@ -101,5 +107,90 @@ class IdentifierService {
 	def generateTransactionIdentifier() {
 		return generateIdentifier(Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT)
 	}
+
+
+    void assignTransactionIdentifiers() {
+        def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
+        transactions.each { transaction ->
+            try {
+                println "Assigning identifier to transaction " + transaction.id + " " + transaction.dateCreated + " " + transaction.lastUpdated
+                Transaction.withTransaction {
+                    transaction.transactionNumber = generateTransactionIdentifier()
+                    if (!transaction.save(flush: true, validate: false)) {
+                        println transaction.errors
+                    }
+                }
+                println "Assigned identifier to transaction " + transaction.id + " " + transaction.dateCreated + " " + transaction.lastUpdated
+            } catch (ObjectNotFoundException e) {
+                println("Unable to assign identifier to transaction with ID " + transaction?.id + ": " + e.message)
+
+            } catch (Exception e) {
+                println("Unable to assign identifier to transaction with ID " + transaction?.id + ": " + e.message)
+            }
+        }
+    }
+
+
+    void assignProductIdentifiers() {
+        def products = Product.findAll("from Product as p where productCode is null or productCode = ''")
+        products.each { product ->
+            try {
+                println "Assigning identifier to product " + product.id + " " + product.name
+                product.productCode = generateProductIdentifier()
+                if (!product.save(flush: true, validate: false)) {
+                    println product.errors
+                }
+            } catch (Exception e) {
+                println("Unable to assign identifier to product with ID " + product?.id + ": " + e.message)
+            }
+        }
+    }
+
+    void assignShipmentIdentifiers() {
+        def shipments = Shipment.findAll("from Shipment as s where shipmentNumber is null or shipmentNumber = ''")
+        shipments.each { shipment ->
+            println "Assigning identifier to shipment " + shipment.id + " " + shipment.name
+            try {
+                shipment.shipmentNumber = generateShipmentIdentifier()
+                if (!shipment.save(flush: true, validate: false)) {
+                    println shipment.errors
+                }
+            } catch (Exception e) {
+                println("Unable to assign identifier to shipment with ID " + shipment?.id + ": " + e.message)
+            }
+        }
+    }
+
+    void assignRequisitionIdentifiers() {
+        def requisitions = Requisition.findAll("from Requisition as r where requestNumber is null or requestNumber = ''")
+        requisitions.each { requisition ->
+            try {
+                println "Assigning identifier to requisition " + requisition.id + " " + requisition.name
+                requisition.requestNumber = generateRequisitionIdentifier()
+                if (!requisition.save(flush: true, validate: false)) {
+                    println requisition.errors
+                }
+            } catch (Exception e) {
+                println("Unable to assign identifier to requisition with ID " + requisition?.id + ": " + e.message)
+            }
+        }
+    }
+
+    void assignOrderIdentifiers() {
+        def orders = Order.findAll("from Order as o where orderNumber is null or orderNumber = ''")
+        orders.each { order ->
+            try {
+                println "Assigning identifier to order " + order.id + " " + order.name
+                order.orderNumber = generateOrderIdentifier()
+                if (!order.save(flush: true, validate: false)) {
+                    println order.errors
+                }
+            } catch (Exception e) {
+                println("Unable to assign identifier to order with ID " + order?.id + ": " + e.message)
+            }
+        }
+    }
+
+
 
 }
