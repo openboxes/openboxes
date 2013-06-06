@@ -15,6 +15,7 @@ import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.RequisitionStatus;
@@ -35,6 +36,15 @@ class SelectTagLib {
         attrs.optionKey = "id"
         attrs.optionValue = { format.metadata(obj: it) }
         out << g.select(attrs)
+    }
+
+    def selectInventoryItem = { attrs, body ->
+
+        attrs.from = InventoryItem.findAllByProduct(attrs.product)
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.lotNumber }
+        out << g.select(attrs)
+
     }
 
 

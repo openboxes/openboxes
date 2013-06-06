@@ -238,19 +238,19 @@ class InventoryService implements ApplicationContextAware {
         else {
 			// Get all products, including hidden ones
 			def matchCategories = getExplodedCategories(categories)
-            log.debug " * Get all categories: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.info " * Get all categories: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
 			
 			products = getProductsByTermsAndCategories(searchTerms, matchCategories, commandInstance?.showHiddenProducts, commandInstance?.warehouseInstance.inventory, commandInstance?.maxResults, commandInstance?.offset)
-            log.debug " * Get all products: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.info " * Get products by terms and categories: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
-			
+
 			commandInstance.numResults = products.totalCount
 			
 			if (!commandInstance?.showHiddenProducts) {
 				products.removeAll(getHiddenProducts(commandInstance?.warehouseInstance))
 			}
-            log.debug " * After removing all hidden products: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.info " * After removing all hidden products: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
 			
 			// now localize to only match products for the current locale
@@ -264,22 +264,22 @@ class InventoryService implements ApplicationContextAware {
 			// }
 		}
 		products = products?.sort() { map1, map2 -> map1.category <=> map2.category ?: map1.name <=> map2.name };
-        log.debug " * Sort products " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Sort products " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		// Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
 		def quantityOnHandMap = [:]//getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory, products);
-        log.debug " * Get quantity on hand map " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Get quantity on hand map " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		def quantityOutgoingMap = [:] 
 		// getOutgoingQuantityByProduct(commandInstance?.warehouseInstance, products);
-        log.debug " * Get outgoing map " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Get outgoing map " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		def quantityIncomingMap = [:] 
 		// getIncomingQuantityByProduct(commandInstance?.warehouseInstance, products);
-        log.debug " * Get incoming map: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Get incoming map: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		
@@ -314,9 +314,9 @@ class InventoryService implements ApplicationContextAware {
 						quantityOnHand, quantityToReceive, quantityToShip,
 						commandInstance?.showOutOfStockProducts)
 			}
-            log.debug " * process product : " + (System.currentTimeMillis() - innerStartTime) + " ms"
+            log.info " * process product : " + (System.currentTimeMillis() - innerStartTime) + " ms"
 		}
-        log.debug " * process on hand quantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * process on hand quantity: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
 		/*
@@ -345,9 +345,9 @@ class InventoryService implements ApplicationContextAware {
 		
 		commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
 
-        log.debug " * Get category to product map: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Get category to product map: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        log.debug "\n\nGet current inventory: " + (System.currentTimeMillis() - initialStartTime) + " ms"
+        log.info "Total time - Get current inventory: " + (System.currentTimeMillis() - initialStartTime) + " ms"
 		return commandInstance?.categoryToProductMap
 	}
 
@@ -749,7 +749,7 @@ class InventoryService implements ApplicationContextAware {
 			}
 			if(categories) {
 				inList("category", categories)
-			}
+            }
 			if (!showHidden) {
 				not {
 					inList("id", (unsupportedProducts.collect { it.id })?: [""])
@@ -831,25 +831,26 @@ class InventoryService implements ApplicationContextAware {
 					}
 				}
 			}
+
 		}
-        log.debug " * Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
 		
 		
 		//products = products.collect { it }.unique { it.id }
-        log.debug " * Get unique IDs: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Get unique IDs: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
 
-        log.debug "Max " + maxResult
-        log.debug "Offset " + offset
+        log.info "Max " + maxResult
+        log.info "Offset " + offset
 		products = Product.createCriteria().list(max: maxResult, offset: offset) {
 			inList("id", (products.collect { it.id })?: [""])
-			order("category", "desc")
+			order("category", "asc")
 			order("name", "asc")
 		}
-        log.debug " * Re-query for products by ID: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * Re-query for products by ID: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 	
 		return products;	
@@ -1884,8 +1885,16 @@ class InventoryService implements ApplicationContextAware {
                 }
                 if (inventory == destination?.inventory) {
                     //throw new RuntimeException("Destination must be different from source")
-                    transaction.errors.reject("Destination must be different from source")
+                    transaction.errors.reject("Cannot transfer to the same location")
                 }
+
+                // Only check this if the transfer is going out (we don't want to restrict if the stock is being transferred in)
+                if (quantityOnHand < quantity) {
+                    //inventoryItem.errors.reject("inventoryItem.quantity.invalid")
+                    //throw new RuntimeException("Cannot exceed quantity on hand")
+                    transaction.errors.reject("Cannot exceed quantity on hand")
+                }
+
             }
             if (source) {
                 if (!source?.inventory) {
@@ -1894,18 +1903,13 @@ class InventoryService implements ApplicationContextAware {
                 }
                 if (inventory == source?.inventory) {
                     //throw new RuntimeException("Destination must be different from source")
-                    transaction.errors.reject("Source must be different from source")
+                    transaction.errors.reject("Cannot transfer from the same location")
                 }
             }
 
 			if (quantity <= 0) { 
 				//throw new RuntimeException("Quantity must be greater than 0")
 				transaction.errors.reject("Quantity must be greater than 0")
-			}
-			if (quantityOnHand < quantity) { 
-				//inventoryItem.errors.reject("inventoryItem.quantity.invalid")
-				//throw new RuntimeException("Cannot exceed quantity on hand")
-				transaction.errors.reject("Cannot exceed quantity on hand")				
 			}
 
 			

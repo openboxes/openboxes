@@ -3,7 +3,10 @@
 		<tr>
 			<td>
 				<g:form controller="inventoryItem" action="transferStock">
+
+                    <%--
 					<g:hiddenField name="id" value="${itemInstance?.id}"/>
+					--%>
 					<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id}"/>
 					<g:hiddenField name="inventory.id" value="${commandInstance?.inventoryInstance?.id}"/>
 					<table>
@@ -31,7 +34,13 @@
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="inventory.lotNumber.label" /></label></td>
                                 <td valign="top" class="value">
-                                    ${itemInstance.lotNumber}
+                                    <g:selectInventoryItem id="lotNumber-${itemInstance?.id}"
+                                                       name="id"
+                                                       value="${itemInstance?.id}"
+                                                        class="chzn-select"
+                                                        noSelection="['null':'']"
+                                                        product="${commandInstance?.productInstance}"
+                                                        data-placeholder="Choose lot number"/>
 
 
                                 </td>
