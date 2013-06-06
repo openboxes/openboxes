@@ -1,5 +1,5 @@
 
-	<div id="showLotNumbers" class="list">	
+	<div id="showLotNumbers" >
 			<g:form controller="inventoryItem" action="create">	
 						
 			
@@ -45,22 +45,58 @@
 										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 									</button>
 									<div class="actions left">
-										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-										<div class="action-menu-item">					
+
+										<div class="action-menu-item">
 											<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
 												<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
 												<warehouse:message code="inventoryItem.show.label"/>
 											</g:link>
 										</div>
 										
-										<div class="action-menu-item">					
-											<g:link controller="inventoryItem" action="delete" id="${itemInstance?.id}">
-												<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-												<warehouse:message code="inventoryItem.delete.label"/>
-											</g:link>
-										</div>
+                                        <div class="action-menu-item">
+                                            <a href="javascript:void(0);" id="btnEditItem-${itemInstance?.id}">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                            <warehouse:message code="inventory.editItem.label"/>
+                                            </a>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <a  href="javascript:void(0);" id="btnAdjustStock-${itemInstance?.id}">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
+                                            <warehouse:message code="inventory.adjustStock.label"/>
+                                            </a>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <a  href="javascript:void(0);" id="btnTransferStock-${itemInstance?.id}">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'book_next.png')}"/>&nbsp;
+                                            <warehouse:message code="inventory.transferStock.label" default="Issue stock"/>
+                                            </a>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <a  href="javascript:void(0);" id="btnReturnStock-${itemInstance?.id}">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'book_previous.png')}"/>&nbsp;
+                                            <warehouse:message code="inventory.returnStock.label" default="Return stock"/>
+                                            </a>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <a  href="javascript:void(0);" id="btnAddToShipment-${itemInstance?.id}">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
+                                            <warehouse:message code="shipping.addToShipment.label"/>
+                                            </a>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <g:link controller="inventoryItem" action="delete" id="${itemInstance?.id}">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                                                <warehouse:message code="inventoryItem.delete.label"/>
+                                            </g:link>
+                                        </div>
+
+
+                                        <g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
+                                        <g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+                                        <g:render template="transferStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+                                        <g:render template="returnStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+                                        <g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+
 									</div>
 								</div>
 							</td>															
@@ -111,7 +147,7 @@
 								</td>
 								<td>
 									<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-									<g:textField name="lotNumber" class="text" />
+									<g:textField name="lotNumber" class="text lotNumber" />
 								</td>
 								<td>
 									<g:set var="yearStart" value="${new Date().format('yyyy')as int}"/>
