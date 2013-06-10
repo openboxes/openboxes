@@ -21,6 +21,30 @@
 		    <div id="bannerRight" class="yui-u">
 		    	<div id="loggedIn" style="vertical-align:middle;" >
 					<ul>
+
+
+                        <g:isUserAdmin>
+                            <li>
+                                <g:if test="${session._showTime}">
+                                    <span>
+                                        Database load took ${request.actionDuration/1000}s
+                                        Page load took ${request.viewDuration/1000}s
+                                    </span>
+                                    <g:form style="display: inline">
+                                        <g:hiddenField name="showTime" value="off"/>
+                                        <button class="button icon remove">Disable</button>
+                                    </g:form>
+                                </g:if>
+                                <g:else>
+                                    <g:form style="display: inline">
+                                        <g:hiddenField name="showTime" value="on"/>
+                                        <button class="button icon clock">Show time</button>
+                                    </g:form>
+
+                                </g:else>
+                            </li>
+                        </g:isUserAdmin>
+
 					    <g:if test="${session.user}">
                             <%--
                             <li>

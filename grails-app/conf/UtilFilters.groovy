@@ -8,6 +8,11 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
+/**
+ * To give credit where it's due, I borrowed this request profiling code from user deluan.
+ *
+ * https://gist.github.com/deluan/744828
+ */
 class UtilFilters {
 
     def filters = {
@@ -28,6 +33,9 @@ class UtilFilters {
                 if (session._showTime) {
                     def actionDuration = request._timeAfterRequest - request._timeBeforeRequest
                     def viewDuration = System.currentTimeMillis() - request._timeAfterRequest
+
+                    request.actionDuration = actionDuration
+                    request.viewDuration = viewDuration
                     log.info("Request duration for (${controllerName}/${actionName}): ${actionDuration}ms/${viewDuration}ms")
                 }
             }
