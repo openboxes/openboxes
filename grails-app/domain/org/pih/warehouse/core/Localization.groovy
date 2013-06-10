@@ -32,6 +32,7 @@ class Localization implements Serializable {
 
 	static mapping = {
 		id generator: 'uuid'
+        cache true
 	}
 	
 	

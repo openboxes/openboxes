@@ -78,7 +78,7 @@ class Transaction implements Comparable, Serializable {
 
 	static mapping = { 
 		id generator: 'uuid'
-		cache true
+		//cache true
 	}
 	
 	// Transient attributs
