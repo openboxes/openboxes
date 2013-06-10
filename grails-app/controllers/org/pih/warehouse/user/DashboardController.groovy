@@ -284,7 +284,7 @@ class DashboardController {
 		render results as JSON
 	}
 
-    //@Cacheable("dashboarControllerCache")
+    @Cacheable("megamenuCache")
 	def megamenu = {
 
       //   def startTime = System.currentTimeMillis()
