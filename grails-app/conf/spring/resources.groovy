@@ -31,6 +31,17 @@ beans = {
         timeToIdle = 43200        // 12 hours = 60 * 60 * 12
     }
 
+    megamenuCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "megamenuCache"
+        // these are just examples of properties you could set
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+    }
+
 
 	/**
 	 * c3P0 pooled data source that allows 'DB keepalive' queries
