@@ -93,7 +93,7 @@
                 <g:render template="/common/header"/>
             </div>
             <div id="megamenu">
-                <g:include controller="dashboard" action="megamenu"/>
+                <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id]"/>
             </div>
             <div id="breadcrumb">
                 <g:render template="/common/breadcrumb"/>
@@ -107,8 +107,7 @@
         </g:if>
 
 
-    <!-- Body includes the divs for the main body content and left navigation menu -->
-
+        <!-- Body includes the divs for the main body content and left navigation menu -->
         <div id="bd" role="main">
             <div id="yui-main">
                 <div id="content" class="yui-b">
