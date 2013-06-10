@@ -45,7 +45,7 @@ class Picklist implements Serializable {
 	String description 		// a user-defined, searchable name for the order 
 	
 	Requisition requisition
-	Person picker = AuthService.currentUser.get()
+	Person picker
 
 	Date datePicked
 	
