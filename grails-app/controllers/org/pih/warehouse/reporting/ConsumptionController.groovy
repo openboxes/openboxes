@@ -75,11 +75,19 @@ class ConsumptionController {
         def products = tags ? inventoryService.getProductsByTags(tags) : null
 
         // Get all transactions
-        command.transactions = inventoryService.getDebitsBetweenDates(fromLocations, selectedLocations, products, command.fromDate, command.toDate)
+        command.debits = inventoryService.getDebitsBetweenDates(fromLocations, selectedLocations, command.fromDate, command.toDate)
+        command.credits = inventoryService.getCreditsBetweenDates(selectedLocations, fromLocations, command.fromDate, command.toDate)
+
+        println command.credits
+
+        def transactions = []
+        transactions.addAll(command.debits)
+        transactions.addAll(command.credits)
+
 
         //command.toLocations.clear();
         // Iterate over all transactions
-        command.transactions.each { transaction ->
+        transactions.each { transaction ->
 
             // Some transactions don't have a destination (e.g. expired, consumed, etc)
             if (transaction.destination) {
@@ -118,6 +126,10 @@ class ConsumptionController {
                 else if (transaction.transactionType.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
                     command.rows[product].damagedQuantity += transactionEntry.quantity
                     command.rows[product].damagedTransactions << transaction
+                }
+                else if (transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
+                    command.rows[product].transferInQuantity += transactionEntry.quantity
+                    command.rows[product].transferInTransactions << transaction
                 }
 
                 // All transactions
@@ -304,6 +316,7 @@ class ShowConsumptionCommand {
 
     List<Tag> tags = []
     List<Category> categories = []
+    List<Product> products = []
     List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<TransactionType> transactionTypes = []
@@ -319,7 +332,8 @@ class ShowConsumptionCommand {
     def selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class));
 
     // Payload
-    Set<Transaction> transactions = []
+    Set<Transaction> debits = []
+    Set<Transaction> credits = []
     Set<TransactionEntry> transactionEntries = []
     def productMap = new TreeMap();
     def onHandQuantityMap = new TreeMap();
@@ -358,9 +372,9 @@ class ShowConsumptionRowCommand {
     Product product
     ShowConsumptionCommand command
     InventoryLevel inventoryLevel
+
     Integer onHandQuantity = 0
     Integer transferInQuantity = 0
-
     Integer transferOutQuantity = 0
     Integer expiredQuantity = 0
     Integer damagedQuantity = 0
@@ -370,6 +384,7 @@ class ShowConsumptionRowCommand {
     Set<Transaction> expiredTransactions = []
     Set<Transaction> damagedTransactions = []
     Set<Transaction> transactions = []
+    Set<Transaction> transferInTransactions = []
 
 
     Map<Location, Integer> transferOutMap = new TreeMap<Location, Integer>();
