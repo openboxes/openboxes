@@ -3,12 +3,12 @@
 
 	<content tag="title">
 		<%--
-		<warehouse:message code="inventory.currentAndPendingStock.label"/>	
+		<warehouse:message code="inventory.currentAndPendingStock.label"/>
 		 --%>
 		<format:product product="${commandInstance?.productInstance}"/>
 	</content>
-	
-	<content tag="heading">	
+
+	<content tag="heading">
 		<format:product product="${commandInstance?.productInstance}"/>
 	</content>
 

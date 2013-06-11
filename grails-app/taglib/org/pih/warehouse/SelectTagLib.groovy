@@ -151,7 +151,8 @@ class SelectTagLib {
         else {
             attrs.optionValue = { "" + format.metadata(obj: it?.locationType) + " - " + it.name }
         }
-        out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+        //out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+        out << g.select(attrs)
 
     }
 
@@ -219,7 +220,10 @@ class SelectTagLib {
 		else {
 			attrs.optionValue = { "" + format.metadata(obj: it?.locationType) + " - " + it.name }
 		}
-		out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+		//out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+
+
+        out << g.select(attrs)
 	}
 
     def selectInventory = { attrs, body ->
@@ -233,19 +237,29 @@ class SelectTagLib {
 
 	
 	def selectLocation = { attrs,body ->
+
+        long startTime = System.currentTimeMillis()
+
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
+
+        println "get all locations " + (System.currentTimeMillis() - startTime) + " ms"
+
+
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
 		attrs.groupBy = 'locationType'
-		attrs.value = attrs.value ?: currentLocation?.id
+		//attrs.value = attrs.value ?: currentLocation?.id
 		if (attrs.groupBy) { 
 			attrs.optionValue = { it.name }
 		}
 		else { 
 			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		}
-		out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+        println "render select location " + (System.currentTimeMillis() - startTime) + " ms"
+		//out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
+
+        out << g.select(attrs)
 	}
 
 		
