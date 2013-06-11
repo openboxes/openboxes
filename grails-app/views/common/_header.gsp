@@ -26,17 +26,17 @@
                         <g:isUserAdmin>
                             <li>
                                 <g:if test="${session._showTime}">
-                                    <span>
-                                        Database load took ${request.actionDuration/1000}s
+                                    <div>
+                                        Data load took ${request.actionDuration/1000}s
                                         Page load took ${request.viewDuration/1000}s
-                                    </span>
-                                    <g:form style="display: inline">
+                                    </div>
+                                    <g:form controller="${controllerName}" action="${actionName}" id="${params.id}" style="display: inline">
                                         <g:hiddenField name="showTime" value="off"/>
                                         <button class="button icon remove">Disable</button>
                                     </g:form>
                                 </g:if>
                                 <g:else>
-                                    <g:form style="display: inline">
+                                    <g:form controller="${controllerName}" action="${actionName}" id="${params.id}" style="display: inline">
                                         <g:hiddenField name="showTime" value="on"/>
                                         <button class="button icon clock">Show time</button>
                                     </g:form>
