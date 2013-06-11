@@ -595,6 +595,9 @@ class InventoryService implements ApplicationContextAware {
 		return inventoryItemQuantity;
 	}
 
+
+
+
 	/**
 	 * Get all expired inventory items for the given category and location.
 	 * 
@@ -2755,15 +2758,23 @@ class InventoryService implements ApplicationContextAware {
 		return identifierService.generateTransactionIdentifier()
 	}
 
+    public List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+        def transactions = Transaction.createCriteria().list() {
+            transactionType {
+                eq("transactionCode", TransactionCode.CREDIT)
+            }
+            if (fromLocations) {
+                'in'("source", fromLocations)
+            }
+            if (toLocations) {
+                'in'("inventory", toLocations.collect { it.inventory })
+            }
+            between('transactionDate', fromDate, toDate)
+        }
+        return transactions
+    }
 
-    public List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, List<Product> products, Date fromDate, Date toDate) {
-        println "Get transfer out between dates "
-        println "products: " + products?.size()
-        println "fromLocations: " + fromLocations
-        println "toLocations: " + toLocations
-        println "fromDate: " + fromDate
-        println "toDate: " + toDate
-
+    public List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
         def transactions = Transaction.createCriteria().list() {
             transactionType {
                 eq("transactionCode", TransactionCode.DEBIT)
@@ -2779,6 +2790,5 @@ class InventoryService implements ApplicationContextAware {
         }
         return transactions
     }
-
 }
 
