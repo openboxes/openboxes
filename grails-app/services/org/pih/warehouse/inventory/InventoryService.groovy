@@ -26,6 +26,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors;
+import java.util.Random
+
 
 import java.text.SimpleDateFormat
 
@@ -2790,5 +2792,28 @@ class InventoryService implements ApplicationContextAware {
         }
         return transactions
     }
+
+
+    def getInventorySampling(Location location) {
+        def inventoryItems = []
+        Map<InventoryItem, Integer> inventoryItemMap = getQuantityForInventory(location.inventory);
+
+        println inventoryItemMap
+
+        List inventoryItemKeys = inventoryItemMap.keySet().asList()
+        Integer maxSize = inventoryItemKeys.size()
+        Random random = new Random()
+        def randomIntegerList = []
+        (1..10).each {
+            println maxSize = maxSize
+            def randomIndex = random.nextInt(maxSize+1)
+            println "randomIndex " + randomIndex
+            def inventoryItem = inventoryItemKeys.get(randomIndex)
+            println inventoryItem.lotNumber
+            inventoryItems << inventoryItem
+        }
+        return inventoryItems;
+    }
+
 }
 

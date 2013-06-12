@@ -248,20 +248,25 @@
             </div>
 
 			<div class="megaButton">
-				<g:link controller="report" action="showTransactionReport" class="report_inventory"><warehouse:message code="report.showTransactionReport.label"/></g:link>							
+				<g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
 			</div>
             <div class="megaButton">
-                <g:link controller="consumption" action="show" class="new"><warehouse:message code="report.consumption.label" default="Show consumption report"/></g:link>
+                <g:link controller="consumption" action="show"><warehouse:message code="report.consumption.label" default="Consumption report"/></g:link>
             </div>
+            <%--
 			<div class="megaButton">
 				<g:link controller="inventory" action="showConsumption" class="report_consumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
 			</div>
+			--%>
 			<div class="megaButton">
-				<g:link controller="inventory" action="listDailyTransactions" class="report_transactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
+				<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link>
 			</div>
 			<div class="megaButton">
-				<g:link controller="report" action="showShippingReport" class="report_shipping"><warehouse:message code="report.showShippingReport.label"/></g:link>
+				<g:link controller="report" action="showShippingReport"><warehouse:message code="report.showShippingReport.label"/></g:link>
 			</div>
+            <div class="megaButton">
+                <g:link controller="report" action="showInventorySamplingReport"><warehouse:message code="report.showInventorySamplingReport.label"/></g:link>
+            </div>
 			<div>
 				<hr/>
 			</div>

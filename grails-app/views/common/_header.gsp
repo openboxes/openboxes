@@ -26,10 +26,10 @@
                         <g:isUserAdmin>
                             <li>
                                 <g:if test="${session._showTime}">
-                                    <div>
+                                    <span>
                                         Data load took ${request.actionDuration/1000}s
                                         Page load took ${request.viewDuration/1000}s
-                                    </div>
+                                    </span>
                                     <g:form controller="${controllerName}" action="${actionName}" id="${params.id}" style="display: inline">
                                         <g:hiddenField name="showTime" value="off"/>
                                         <button class="button icon remove">Disable</button>

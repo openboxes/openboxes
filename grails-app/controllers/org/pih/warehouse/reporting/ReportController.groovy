@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.reporting
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
@@ -20,6 +21,42 @@ class ReportController {
 	def inventoryService
 	def productService
 	def reportService
+
+
+    def showInventorySamplingReport = {
+
+        def location = Location.get(session.warehouse.id)
+        def inventoryItems = inventoryService.getInventorySampling(location);
+        def sw = new StringWriter()
+        if (inventoryItems) {
+
+            println inventoryItems
+            //sw.append(csvrows[0].keySet().join(",")).append("\n")
+            sw.append("Product").append(",")
+            sw.append("Lot number").append(",")
+            sw.append("Expiration date").append(",")
+            sw.append("Bin location").append(",")
+            sw.append("On hand quantity").append(",")
+            sw.append("\n")
+            inventoryItems.each { inventoryItem ->
+                if (inventoryItem) {
+                    def inventoryLevel = inventoryItem?.product?.getInventoryLevel(location.id)
+                    sw.append('"' + (inventoryItem?.product?.name?:"").toString()?.replace('"','""') + '"').append(",")
+                    sw.append('"' + (inventoryItem?.lotNumber?:"").toString()?.replace('"','""') + '"').append(",")
+                    sw.append('"' + inventoryItem?.expirationDate.toString()?.replace('"','""') + '"').append(",")
+                    sw.append('"' + (inventoryLevel?.binLocation?:"")?.toString()?.replace('"','""') + '"').append(",")
+                    sw.append("\n")
+                }
+            }
+        }
+
+        //render sw.toString()
+
+        response.setHeader("Content-disposition", "attachment; filename=openboxes-inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv")
+        render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
+
+    }
+
 
 
     def showConsumptionReport = {
