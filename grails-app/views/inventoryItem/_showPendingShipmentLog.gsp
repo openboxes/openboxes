@@ -6,22 +6,25 @@
 				<table class="box" style="border-top: 0;">
 					<thead>
 						<tr class="odd">
-							<th style="width: 10%;">
+							<th>
 								${warehouse.message(code: 'default.date.label')}
 							</th>
-							<th style="width: 20%;">
+                            <th>
+                                ${warehouse.message(code: 'shipping.shipmentNumber.label')}
+                            </th>
+							<th>
 								${warehouse.message(code: 'default.name.label')}
 							</th>
-							<th style="width: 15%;">
+							<th>
 								${warehouse.message(code: 'shipping.origin.label', default: 'Origin')}
 							</th>
-							<th style="width: 15%;">
+							<th>
 								${warehouse.message(code: 'shipping.destination.label', default: 'Destination')}
 							</th>
-							<th style="width: 10%; text-align: center">
+							<th class="center">
 								${warehouse.message(code: 'shipping.quantity.label', default: 'Quantity')}
 							</th>
-							<th style="width: 15%; text-align: center;">
+							<th class="center">
 								${warehouse.message(code: 'shipping.status.label', default: 'Status')}
 							</th>
 						</tr>
@@ -35,13 +38,15 @@
 
                             <g:set var="anyPendingShipments" value="${true }"/>
                             <tr class="${(status%2==0)?'even':'odd' } prop">
-                                <td style="width: 10%;" nowrap="nowrap">
+                                <td nowrap="nowrap">
                                     <g:if test="${shipment?.expectedShippingDate }">
                                         <g:formatDate date="${shipment.expectedShippingDate }" format="dd/MMM/yyyy"/>
                                     </g:if>
                                 </td>
                                 <td>
-                                    ${shipment.shipmentNumber}
+                                    <g:link controller="shipment" action="showDetails" id="${shipment?.id }">
+                                        ${shipment.shipmentNumber}
+                                    </g:link>
                                 </td>
                                 <td>
                                     <g:link controller="shipment" action="showDetails" id="${shipment?.id }">
