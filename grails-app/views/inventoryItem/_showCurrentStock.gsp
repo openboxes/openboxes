@@ -4,13 +4,21 @@
 	</div>
 </g:hasErrors>
 <div>
-	<table>
+	<table class="box" style="border-top: 0;">
 		<thead>
 			<tr class="odd">
-				<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												
-				<th><warehouse:message code="default.lotSerialNo.label"/></th>
-				<th><warehouse:message code="default.expires.label"/></th>
-				<th class="center middle" ><warehouse:message code="default.qty.label"/></th>
+				<th class="left" style="">
+                    <warehouse:message code="default.actions.label"/>
+                </th>
+				<th>
+                    <warehouse:message code="default.lotSerialNo.label"/>
+                </th>
+				<th>
+                    <warehouse:message code="default.expires.label"/>
+                </th>
+				<th class="center middle" >
+                    <warehouse:message code="default.qty.label"/>
+                </th>
 			</tr>											
 		</thead>
 		<tbody>

@@ -5,10 +5,10 @@
 		<ul>
 			<li><a href="#tabs-1" id="current-stock-tab"><warehouse:message code="inventory.currentStock.label"/></a></li>
 			<li><a href="#tabs-2"><warehouse:message code="inventory.stockHistory.label"/></a></li>
-			<%-- 
-			<li><a href="#tabs-2"><warehouse:message code="request.pendingRequestLog.label"/></a></li>
-			<li><a href="#tabs-3"><warehouse:message code="order.pendingOrderLog.label"/></a></li>
-			--%>
+			<li><a href="#tabs-3"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>
+            <%--
+            <li><a href="#tabs-3"><warehouse:message code="order.pendingOrderLog.label"/></a></li>
+            --%>
 			<li><a href="#tabs-4" id="pending-shipment-tab"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
 			<%-- 
 			<li><a href="#tabs-5"><warehouse:message code="inventory.currentLotNumbers.label"/></a></li>
@@ -20,10 +20,10 @@
 		<div id="tabs-2">										
 			<g:render template="showStockHistory" />
 		</div>
-		<%-- 
-		<div id="tabs-2">
+		<div id="tabs-3">
 			<g:render template="showPendingRequestLog"/>
 		</div>
+        <%--
 		<div id="tabs-3">
 			<g:render template="showPendingOrderLog"/>
 		</div>

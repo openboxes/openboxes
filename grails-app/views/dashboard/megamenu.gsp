@@ -243,7 +243,7 @@
 
             <div class="megaButton">
                 <g:link controller="inventory" action="show">
-                    <warehouse:message code="inventory.viewCurrentStock.label" default="View current stock"/>
+                    <warehouse:message code="inventory.viewCurrentStock.label" default="Current stock report"/>
                 </g:link>
             </div>
 

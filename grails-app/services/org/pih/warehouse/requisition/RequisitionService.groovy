@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.product.Product
 
 class RequisitionService {
 
@@ -342,6 +343,61 @@ class RequisitionService {
 		requisition.status = RequisitionStatus.PENDING
 		requisition.save(flush: true)
 	}
+
+
+    public List<Requisition> getIssuedRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+        def requisitions = Transaction.createCriteria().list() {
+            eq("status", RequisitionStatus.ISSUED)
+            if (toLocations) {
+                'in'("destination", toLocations)
+            }
+            if (fromLocations) {
+                'in'("origin", fromLocations)
+            }
+            between('dateRequested', fromDate, toDate)
+        }
+        return requisitions
+    }
+
+    public List<Requisition> getPendingRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+        def requisitions = Requisition.createCriteria().list() {
+            lt("status", RequisitionStatus.ISSUED)
+            if (toLocations) {
+                'in'("destination", toLocations)
+            }
+            if (fromLocations) {
+                'in'("origin", fromLocations)
+            }
+            if (fromDate && toDate) {
+                between('dateRequested', fromDate, toDate)
+            }
+            else if (fromDate) {
+                ge("dateRequested", fromDate)
+            }
+            else if (toDate) {
+                le("dateRequested", toDate)
+            }
+        }
+        return requisitions
+    }
+
+    public List<RequisitionItem> getPendingRequisitionItems(Location location, Product product) {
+        def requisitionItems = RequisitionItem.createCriteria().list() {
+            requisition {
+                eq("destination", location)
+                lt("status", RequisitionStatus.ISSUED)
+                not {
+                    eq("status", RequisitionStatus.CANCELED)
+                }
+            }
+            eq("product", product)
+        }
+        //println requisitionItems
+
+        return requisitionItems
+
+    }
+
 
     /*
     def changeQuantity(Integer newQuantity, String reasonCode, String comments) {

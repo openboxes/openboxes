@@ -33,9 +33,9 @@ class StockCardCommand {
 	Map<Transaction, List<TransactionEntry>> transactionEntriesByTransactionMap;
 	Map<InventoryItem, List<TransactionEntry>> transactionEntriesByInventoryItemMap
 	Map<InventoryItem, Integer> quantityByInventoryItemMap
-	Map requestMap 
-	Map orderMap
-	Map shipmentMap 
+	Map requisitionMap = [:]
+	Map orderMap = [:]
+	Map shipmentMap = [:]
 	
 	// Transaction log section
 	Date startDate = new Date() - 60;		// defaults to today - 60d

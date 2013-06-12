@@ -52,20 +52,23 @@ class InventoryItemController {
 		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
 		render inventoryItemList as JSON;
 	}
-	
+
+
 	/**
 	 * Displays the stock card for a product
 	 */
     //@Cacheable("showStockCardCache")
 	def showStockCard = { StockCardCommand cmd ->
+        //log.info "=".multiply(20)
         long currentTime = System.currentTimeMillis()
+        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
 		// add the current warehouse to the command object
 		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 		
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-        println "After get stock card command " + (System.currentTimeMillis() - currentTime) + " ms"
+        //log.info "After get stock card command " + (System.currentTimeMillis() - currentTime) + " ms"
 
 		// populate the pending shipments
 		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
@@ -74,7 +77,7 @@ class InventoryItemController {
 		commandInstance.pendingShipmentList = 
 			shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
-        println "After get pending shipments " + (System.currentTimeMillis() - currentTime) + " ms"
+        //log.info "After get pending shipments " + (System.currentTimeMillis() - currentTime) + " ms"
 
         def shipmentItems =
 			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
@@ -88,7 +91,7 @@ class InventoryItemController {
 		}	
 		commandInstance.shipmentMap = shipmentMap;
 
-        println "After get pending shipment items " + (System.currentTimeMillis() - currentTime) + " ms"
+        //log.info "After get pending shipment items " + (System.currentTimeMillis() - currentTime) + " ms"
 
 		def orderItems =
 			orderService.getPendingOrderItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance);
@@ -101,21 +104,23 @@ class InventoryItemController {
 		}
 		commandInstance.orderMap = orderMap;
 
-        println "After get pending orders " + (System.currentTimeMillis() - currentTime) + " ms"
+        //log.info "After get pending orders " + (System.currentTimeMillis() - currentTime) + " ms"
 
 
-		//def requestItems =
-		//	requisitionService.getPendingRequisitionItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		def requestMap = [:]//requestItems.groupBy { it.requisition }
-//		if (requestMap) {
-//			requestMap.keySet().each {
-//				def quantity = requestMap[it].sum() { it.quantity }
-//				requestMap.put(it, quantity)
-//			}
-//		}
-		commandInstance.requestMap = requestMap;
+		def requisitionItems =
+			requisitionService.getPendingRequisitionItems(commandInstance.warehouseInstance, commandInstance?.productInstance)
+		def requisitionMap = requisitionItems.groupBy { it.requisition }
 
-        println "After get pending requisitions " + (System.currentTimeMillis() - currentTime) + " ms"
+        println "requisitionmap: " + requisitionMap
+		if (requisitionMap) {
+			requisitionMap.keySet().each {
+				def quantity = requisitionMap[it].sum() { it.quantity }
+				requisitionMap.put(it, quantity)
+			}
+		}
+		commandInstance.requisitionMap = requisitionMap;
+
+        //log.info "After get pending requisitions " + (System.currentTimeMillis() - currentTime) + " ms"
 
 		
 		//println commandInstance?.transactionLogMap
@@ -139,7 +144,7 @@ class InventoryItemController {
 			log.error("Error while saving recently viewed product", e)
 		}
 
-        println "After setting session productsViewed " + (System.currentTimeMillis() - currentTime) + " ms"
+        //log.info "After setting session productsViewed " + (System.currentTimeMillis() - currentTime) + " ms"
 
 		[ commandInstance: commandInstance ]
 	}
