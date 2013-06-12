@@ -74,7 +74,7 @@
                             <g:set var="totalCredit" value="${0 }"/>
                             <g:set var="count" value="${0}"/>
                             <g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate} }" status="status">
-                                <g:each var="transactionEntry" in="${transaction.transactionEntries.findAll { it.inventoryItem.product ==  commandInstance?.productInstance}}" status="status2">
+                                <g:each var="transactionEntry" in="${transaction.transactionEntries.findAll { it.inventoryItem.product?.id ==  commandInstance?.productInstance?.id}}" status="status2">
                                     <%
                                         if (!balanceByInventoryItem[transactionEntry.inventoryItem]) {
                                             balanceByInventoryItem[transactionEntry.inventoryItem] = 0
@@ -153,9 +153,27 @@
                                                         ${transaction?.requisition?.name }
                                                     </g:link>
                                                 </g:elseif>
+                                                <g:elseif test="${transaction?.localTransfer?.sourceTransaction?.requisition}">
+                                                    <g:set var="requisition" value="${transaction?.localTransfer?.sourceTransaction?.requisition}"/>
+                                                    <g:link controller="requisition" action="show" id="${requisition?.id }">
+                                                        ${requisition?.requestNumber } |
+                                                        ${requisition?.name }
+                                                    </g:link>
+                                                </g:elseif>
+                                                <g:elseif test="${transaction?.localTransfer?.destinationTransaction?.requisition}">
+                                                    <g:set var="requisition" value="${transaction?.localTransfer?.destinationTransaction?.requisition}"/>
+                                                    <g:link controller="requisition" action="show" id="${requisition?.id }">
+                                                        ${requisition?.requestNumber } |
+                                                        ${requisition?.name }
+                                                    </g:link>
+                                                </g:elseif>
+
                                                 <g:else>
                                                     <span class="fade">${warehouse.message(code:'default.none.label') }</span>
                                                 </g:else>
+
+
+
                                             </div>
                                         </td>
                                         <td class="border-right center">

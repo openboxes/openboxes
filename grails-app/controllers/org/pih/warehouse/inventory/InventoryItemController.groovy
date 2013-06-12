@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
@@ -58,6 +59,7 @@ class InventoryItemController {
 	 * Displays the stock card for a product
 	 */
     //@Cacheable("showStockCardCache")
+    @CacheFlush("megamenuCache")
 	def showStockCard = { StockCardCommand cmd ->
         //log.info "=".multiply(20)
         long currentTime = System.currentTimeMillis()
