@@ -265,7 +265,7 @@
 				<g:link controller="report" action="showShippingReport"><warehouse:message code="report.showShippingReport.label"/></g:link>
 			</div>
             <div class="megaButton">
-                <g:link controller="report" action="showInventorySamplingReport"><warehouse:message code="report.showInventorySamplingReport.label"/></g:link>
+                <g:link controller="report" action="showInventorySamplingReport"><warehouse:message code="report.showInventorySamplingReport.label" default="Inventory sampling report"/></g:link>
             </div>
 			<div>
 				<hr/>

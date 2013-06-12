@@ -2794,7 +2794,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getInventorySampling(Location location) {
+    def getInventorySampling(Location location, Integer n) {
         def inventoryItems = []
         Map<InventoryItem, Integer> inventoryItemMap = getQuantityForInventory(location.inventory);
 
@@ -2804,7 +2804,7 @@ class InventoryService implements ApplicationContextAware {
         Integer maxSize = inventoryItemKeys.size()
         Random random = new Random()
         def randomIntegerList = []
-        (1..10).each {
+        (1..n).each {
             println maxSize = maxSize
             def randomIndex = random.nextInt(maxSize+1)
             println "randomIndex " + randomIndex

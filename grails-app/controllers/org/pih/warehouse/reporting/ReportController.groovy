@@ -25,8 +25,10 @@ class ReportController {
 
     def showInventorySamplingReport = {
 
+        def howMany = (params.n?:10).toInteger()
         def location = Location.get(session.warehouse.id)
-        def inventoryItems = inventoryService.getInventorySampling(location);
+        def inventoryItems = inventoryService.getInventorySampling(location, howMany);
+
         def sw = new StringWriter()
         if (inventoryItems) {
 
