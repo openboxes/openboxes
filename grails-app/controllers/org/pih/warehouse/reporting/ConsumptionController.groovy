@@ -25,6 +25,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductService
+import org.pih.warehouse.requisition.Requisition
 
 class ConsumptionController {
 
@@ -214,12 +215,6 @@ class ConsumptionController {
             command.selectedLocations = command.toLocations
         }
 
-
-        def someValue2 = { param ->
-            if (true) return "true "
-            else return "false "
-        }
-
         // Export as CSV
         if (params.format == "csv") {
 
@@ -240,21 +235,22 @@ class ConsumptionController {
             def csvrows = []
             command.rows.each { key, row ->
                 def csvrow =  [
-                        productCode: row.product.productCode?:'',
-                        name: row.product.name,
-                        category: row.product?.category?.name,
-                        unitOfMeasure: row.product.unitOfMeasure?:'',
-                        transferOutQuantity: g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        transferOutCount: g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
-                        expiredQuantity: g.formatNumber(number: row.expiredQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        expiredCount: g.formatNumber(number: row.expiredTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
-                        damagedQuantity: g.formatNumber(number: row.damagedQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        damagedCount: g.formatNumber(number: row.damagedTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
-                        monthlyQuantity: g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        weeklyQuantity: g.formatNumber(number: row.weeklyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        dailyQuantity: g.formatNumber(number: row.dailyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        onHandQuantity: g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        numberOfMonthsRemaining: g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Product code': row.product.productCode?:'',
+                        'Product': row.product.name,
+                        'Category': row.product?.category?.name,
+                        'UoM': row.product.unitOfMeasure?:'',
+                        'Bin Location': row?.product?.getBinLocation(session.warehouse.id)?:'',
+                        'Qty transfer out': g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Count transfer out': g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
+                        'Qty expired': g.formatNumber(number: row.expiredQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Count expired': g.formatNumber(number: row.expiredTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
+                        'Qty damaged': g.formatNumber(number: row.damagedQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Count damaged': g.formatNumber(number: row.damagedTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
+                        'Consumed monthly': g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Consumed weekly': g.formatNumber(number: row.weeklyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Consumed daily': g.formatNumber(number: row.dailyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Quantity on hand': g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Months remaining': g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1)?:'',
 
                 ]
 
@@ -320,7 +316,6 @@ class ShowConsumptionCommand {
     List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<TransactionType> transactionTypes = []
-    // Fields to allow user to choose
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class));
     List<Tag> selectedTags = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Tag.class));
@@ -334,6 +329,7 @@ class ShowConsumptionCommand {
     // Payload
     Set<Transaction> debits = []
     Set<Transaction> credits = []
+    Set<Requisition> requisitions = []
     Set<TransactionEntry> transactionEntries = []
     def productMap = new TreeMap();
     def onHandQuantityMap = new TreeMap();

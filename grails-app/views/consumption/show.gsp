@@ -171,6 +171,7 @@
                                 <td colspan="" class="border-right"></td>
                                 <td colspan="" class="border-right"></td>
                                 <td colspan="" class="border-right"></td>
+                                <td colspan="" class="border-right"></td>
                                 <td colspan="2" class="border-right">
                                     <label>Credit breakdown </label><div class="fade">(number of transactions)</div>
                                 </td>
@@ -196,6 +197,7 @@
                                 <th class="border-right"><warehouse:message code="product.name.label"/></th>
                                 <th class="border-right"><warehouse:message code="category.label"/></th>
                                 <th class="center border-right"><warehouse:message code="product.unitOfMeasure.label"/></th>
+                                <th class="center border-right"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
                                 <th class="center border-right" colspan="2"><warehouse:message code="consumption.returns.label" default="Returns"/></th>
                                 <th class="center" colspan="2"><warehouse:message code="consumption.consumed.label" default="Consumed"/></th>
                                 <th class="center" colspan="2"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
@@ -238,6 +240,9 @@
                                     </td>
                                     <td class="center border-right">
                                         ${product?.unitOfMeasure}
+                                    </td>
+                                    <td class="center border-right">
+                                        ${product?.getInventoryLevel(session.warehouse.id)?.binLocation}
                                     </td>
                                     <td class="center">
                                         ${row.transferInQuantity}
