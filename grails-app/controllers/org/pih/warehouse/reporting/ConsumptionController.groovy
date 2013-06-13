@@ -72,6 +72,7 @@ class ConsumptionController {
         command.fromLocations.each {
             fromLocations << it
         }
+
         def tags = command.selectedTags.collect { it.tag}.asList()
         def products = tags ? inventoryService.getProductsByTags(tags) : null
 
@@ -240,6 +241,9 @@ class ConsumptionController {
                         'Category': row.product?.category?.name,
                         'UoM': row.product.unitOfMeasure?:'',
                         'Bin Location': row?.product?.getBinLocation(session.warehouse.id)?:'',
+                        'Qty transfer balance':g.formatNumber(number: row.transferBalance, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Qty transfer in': g.formatNumber(number: row.transferInQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Count transfer in': g.formatNumber(number: row.transferInTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
                         'Qty transfer out': g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1)?:'',
                         'Count transfer out': g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
                         'Qty expired': g.formatNumber(number: row.expiredQuantity, format: '###.#', maxFractionDigits: 1)?:'',
@@ -253,7 +257,6 @@ class ConsumptionController {
                         'Months remaining': g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1)?:'',
 
                 ]
-
                 if (command.selectedProperties) {
                     command.selectedProperties.each { property ->
                         csvrow[property] = row.product."$property"
@@ -387,6 +390,10 @@ class ShowConsumptionRowCommand {
 
     static constraints = {
 
+    }
+
+    Integer getTransferBalance() {
+        return transferOutQuantity - transferInQuantity
     }
 
     Float getMonthlyQuantity() {
