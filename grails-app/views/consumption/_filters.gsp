@@ -1,61 +1,91 @@
 <div class="filters">
 	<g:form method="POST" controller="consumption" action="show">
-		<div class="box">
-            <h2><warehouse:message code="default.filters.label"/></h2>
-            <table border="0">
-                <tr class="prop">
-                    <td class="middle">
-                        <label>
-                            <warehouse:message code="consumption.afterDate.label" default="Consumed after"/>
-                        </label>
-                    </td>
-                    <td class="right middle">
-                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td>
-                        <label>
-                            <warehouse:message code="consumption.beforeDate.label" default="Consumed before"/>
-                        </label>
-                    </td>
-                    <td class="right middle">
-                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td colspan="2">
-                        <label>
-                            <warehouse:message code="consumption.fromLocations.label" default="From location(s)"/>
-                        </label>
-                    </td>
-                </tr>
-                <tr class="">
-                    <td colspan="2">
-                        <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"/>
-                    </td>
-                </tr>
 
-                <%--
-                <tr class="prop">
-                    <td>
-                        <label>
-                            <warehouse:message code="consumption.transactionType.label" default="transaction types"/>
-                        </label>
-                    </td>
-                    <td>
-                        <g:each var="transactionType" in="${command.transactionTypes}">
-                            <div>
-                                <format:metadata obj="${transactionType}"/>
-                            </div>
-                        </g:each>
+    <div class="box">
+        <h2><warehouse:message code="consumption.products.label" default="Products"/></h2>
+        <table>
+            <tr class="prop">
+                <td colspan="2">
+                    <label>
+                        <warehouse:message code="consumption.filterByTag.label" default="Filter by tag" />
+                    </label>
+                </td>
+            </tr>
+            <tr class="">
+                <td colspan="2">
+                    <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td colspan="2">
+                    <label>
+                        <warehouse:message code="consumption.filterByCategory.label" default="Filter by category" />
+                    </label>
+                </td>
+            </tr>
+            <tr class="">
+                <td colspan="2">
+                    <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
+                                      style="min-height: 60px;"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="box">
+        <h2><warehouse:message code="default.filters.label"/></h2>
+        <table>
+            <tr class="prop">
+                <td class="middle">
+                    <label>
+                        <warehouse:message code="consumption.afterDate.label" default="Consumed after"/>
+                    </label>
+                </td>
+                <td class="right middle">
+                    <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td>
+                    <label>
+                        <warehouse:message code="consumption.beforeDate.label" default="Consumed before"/>
+                    </label>
+                </td>
+                <td class="right middle">
+                    <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td colspan="2">
+                    <label>
+                        <warehouse:message code="consumption.fromLocations.label" default="From location(s)"/>
+                    </label>
+                </td>
+            </tr>
+            <tr class="">
+                <td colspan="2">
+                    <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"/>
+                </td>
+            </tr>
+
+            <%--
+            <tr class="prop">
+                <td>
+                    <label>
+                        <warehouse:message code="consumption.transactionType.label" default="transaction types"/>
+                    </label>
+                </td>
+                <td>
+                    <g:each var="transactionType" in="${command.transactionTypes}">
+                        <div>
+                            <format:metadata obj="${transactionType}"/>
+                        </div>
+                    </g:each>
 
 
-                    </td>
-                </tr>
-                --%>
+                </td>
+            </tr>
+            --%>
 
-                <g:if test="${command?.toLocations}">
                     <tr class="prop">
                         <td colspan="2" class="bottom">
                             <label>
@@ -69,7 +99,7 @@
                     </tr>
                     <tr class="">
                         <td colspan="2">
-                            <div style="overflow: auto; max-height: 200px;" class="list">
+                            <div>
                                 <g:set var="count" value="${0}"/>
                                 <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
                                     <div class="">
@@ -82,18 +112,20 @@
                                                         <th colspan="2"><format:metadata obj="${locationTypeEntry}"/></th>
                                                     </tr>
                                                 </thead>
-                                                <g:each var="toLocation" in="${locationTypeEntry.value}">
-                                                    <tr>
-                                                        <td class="middle center">
-                                                            <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
-                                                            <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
-                                                            <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
-                                                        </td>
-                                                        <td class="middle">
-                                                            <format:metadata obj="${toLocation}"/>
-                                                        </td>
-                                                    </tr>
-                                                </g:each>
+                                                <tbody>
+                                                    <g:each var="toLocation" in="${locationTypeEntry.value}">
+                                                        <tr>
+                                                            <td class="middle center" width="1%">
+                                                                <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
+                                                                <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
+                                                                <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
+                                                            </td>
+                                                            <td class="middle">
+                                                                <format:metadata obj="${toLocation}"/>
+                                                            </td>
+                                                        </tr>
+                                                    </g:each>
+                                                </tbody>
                                             </table>
                                         </g:each>
                                         </fieldset>
@@ -119,43 +151,9 @@
                             </g:unless>
                         </td>
                     </tr>
-                </g:if>
             </table>
         </div>
-        <div class="box">
-            <h2><warehouse:message code="consumption.products.label" default="Products"/></h2>
-            <table>
-                <tr class="prop">
-                    <td colspan="2">
-                        <label>
-                            <warehouse:message code="consumption.filterByTag.label" default="Filter by tag" />
-                        </label>
-                    </td>
-                </tr>
-                <tr class="">
-                    <td colspan="2">
-                        <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td colspan="2">
-                        <label>
-                            <warehouse:message code="consumption.filterByCategory.label" default="Filter by category" />
-                        </label>
-                    </td>
-                </tr>
-                <tr class="">
-                    <td colspan="2">
-                        <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
-                                          style="min-height: 60px;"/>
-                    </td>
-                </tr>
 
-
-
-            </table>
-
-        </div>
 
 
         <div class="box">

@@ -29,6 +29,7 @@ import org.pih.warehouse.requisition.Requisition
 
 class ConsumptionController {
 
+    def consoleService
     ProductService productService
     InventoryService inventoryService
 
@@ -137,7 +138,6 @@ class ConsumptionController {
                 // All transactions
                 command.rows[product].transactions << transaction
 
-
                 //def currentProductQuantity = command.productMap[transactionEntry.inventoryItem.product]
                 //if (!currentProductQuantity) {
                 //    command.productMap[transactionEntry.inventoryItem.product] = 0
@@ -241,11 +241,11 @@ class ConsumptionController {
                         'Category': row.product?.category?.name,
                         'UoM': row.product.unitOfMeasure?:'',
                         'Bin Location': row?.product?.getBinLocation(session.warehouse.id)?:'',
-                        'Qty transfer balance':g.formatNumber(number: row.transferBalance, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Qty transfer in': g.formatNumber(number: row.transferInQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Count transfer in': g.formatNumber(number: row.transferInTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
                         'Qty transfer out': g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1)?:'',
                         'Count transfer out': g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
+                        'Qty transfer in': g.formatNumber(number: row.transferInQuantity, format: '###.#', maxFractionDigits: 1)?:'',
+                        'Count transfer in': g.formatNumber(number: row.transferInTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
+                        'Qty transfer balance':g.formatNumber(number: row.transferBalance, format: '###.#', maxFractionDigits: 1)?:'',
                         'Qty expired': g.formatNumber(number: row.expiredQuantity, format: '###.#', maxFractionDigits: 1)?:'',
                         'Count expired': g.formatNumber(number: row.expiredTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
                         'Qty damaged': g.formatNumber(number: row.damagedQuantity, format: '###.#', maxFractionDigits: 1)?:'',
@@ -281,7 +281,14 @@ class ConsumptionController {
             if (csvrows) {
                 sw.append(csvrows[0].keySet().join(",")).append("\n")
                 csvrows.each { csvrow ->
-                    def values = csvrow.values().collect { '"' + it.toString().replace('"','""') + '"' }
+                    def values = csvrow.values().collect { value ->
+                        if (value?.toString()?.isNumber()) {
+                            value
+                        }
+                        else {
+                            '"' + value.toString().replace('"','""') + '"'
+                        }
+                    }
                     sw.append(values.join(","))
                     sw.append("\n")
                 }
@@ -292,13 +299,28 @@ class ConsumptionController {
 
             //response.contentType = "text/csv;charset=utf-8"
 
-            response.setHeader("Content-disposition", "attachment; filename=openboxes-consumption-${new Date().format("yyyyMMdd-hhmmss")}.csv")
+            response.setHeader("Content-disposition", "attachment; filename=consumption-${new Date().format("yyyyMMdd-hhmmss")}.csv")
             render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
         }
         else {
             [command:command]
         }
     }
+
+    // Proof of concept to see if we could evalute a string of code
+    // Could be used to create dynamic indicators for the dashboard
+    def evaluate = {
+        String code = """
+            import org.pih.warehouse.product.Product;
+            def products = Product.list();
+            return products.size()
+        """
+
+        // String code, boolean captureStdout, request
+        render consoleService.eval(code, true, request)
+    }
+
+
 
 
 }
@@ -397,15 +419,15 @@ class ShowConsumptionRowCommand {
     }
 
     Float getMonthlyQuantity() {
-        transferOutQuantity / command.numberOfMonths
+        transferBalance / command.numberOfMonths
     }
 
     Float getWeeklyQuantity() {
-        transferOutQuantity / command.numberOfWeeks
+        transferBalance / command.numberOfWeeks
     }
 
     Float getDailyQuantity() {
-        transferOutQuantity / command.numberOfDays
+        transferBalance / command.numberOfDays
     }
 
     Float getNumberOfMonthsRemaining() {
