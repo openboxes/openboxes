@@ -1,34 +1,75 @@
 <div class="widget-large">
 	<div class="widget-header">
 		<h2><warehouse:message code="inventory.label" args="[session.warehouse.name]"/></h2>
-	</div>	    			
-	<div class="widget-content">	    					    			
-		<div id="inventorysummary">	
+	</div>
+    <div class="widget-content" style="padding:0; margin:0">
+        <div id="inventorySummary">
+            <%--
 			<div style="padding-top:0px;">
 				<g:form method="GET" controller="inventory" action="browse">
 					<div>
 							
-						<g:globalSearch id="dashboardSearchBox" cssClass="globalSearch" size="80"
-							name="searchTerms" 
-							value="${params?.searchTerms }" 
-							placehoder="${warehouse.message(code:'inventory.filterByKeyword.label')}"
-							jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-							
-						<%-- 				
-						<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }" 
+						<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }"
 							class="globalSearch"/>						
 						<g:hiddenField name="resetSearch" value="true"/>							
 						<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							
 						<g:hiddenField name="showHiddenProducts" value="on"/>
 						<g:hiddenField name="showOutOfStockProducts" value="on"/>
-						--%>
-						<button type="submit" class="button icon search">					
+						<button type="submit" class="button icon search">
 							<warehouse:message code="default.search.label"/>
 						</button>
 							
 					</div>
 				</g:form>
-			</div>
+            </div>
+            --%>
+            <table>
+                <tbody>
+                    <tr class="even">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/time.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listTotalStock">
+                                <warehouse:message code="inventory.listTotalStock.label" default="Items that have ever been stocked"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="totalStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+
+                    <tr class="odd">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listOutOfStock">
+                                <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="outOfStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                    <tr class="even">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listInStock">
+                                <warehouse:message code="inventory.listInStock.label" default="Items that are currently stocked"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="inStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 		</div>
 	</div>
 </div>	

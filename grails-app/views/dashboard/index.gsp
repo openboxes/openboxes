@@ -14,6 +14,7 @@
 	    		<table>
 					<tr>
 						<td width="30%">
+                            <g:render template="inventorySummary"/>
 							<g:render template="alertSummary"/>
                             <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="tagSummary" model="[tags:tags]"/>

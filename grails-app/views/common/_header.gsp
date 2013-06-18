@@ -24,6 +24,7 @@
 
 
                         <g:isUserAdmin>
+
                             <li>
                                 <g:if test="${session._showTime}">
                                     <span>
@@ -42,6 +43,12 @@
                                     </g:form>
 
                                 </g:else>
+                            </li>
+                            <li>
+                                <g:form controller="dashboard" action="flushCache" style="display: inline">
+                                    <button class="button icon reload">${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}</button>
+                                </g:form>
+
                             </li>
                         </g:isUserAdmin>
 
