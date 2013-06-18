@@ -33,10 +33,10 @@
 							<label><warehouse:message code="inventory.inventoryDate.label"/></label>
 						</td>
 						<td class="value">
-							<g:jqueryDatePicker 
+							<g:jqueryDatePicker
 								id="transactionDate" 
 								name="transactionDate"
-								value="${commandInstance?.transactionDate}" 
+								value="${commandInstance?.transactionDate}"
 								format="MM/dd/yyyy"
 								showTrigger="false" />						
 						
@@ -53,11 +53,11 @@
 				<table id="inventoryItemsTable">
 					<thead>					
 						<tr>	
-							<th><warehouse:message code="default.lotSerialNo.label"/></th>
-							<th><warehouse:message code="default.expires.label"/></th>
-							<th class="center"><warehouse:message code="inventory.oldQty.label"/></th>
-							<th class="center"><warehouse:message code="inventory.newQty.label"/></th>
-							<th class="center"><warehouse:message code="default.actions.label"/></th>
+							<th width="20%"><warehouse:message code="default.lotSerialNo.label"/></th>
+							<th width="20%"><warehouse:message code="default.expires.label"/></th>
+							<th width="20%" class="center"><warehouse:message code="inventory.oldQty.label"/></th>
+							<th width="20%" class="center"><warehouse:message code="inventory.newQty.label"/></th>
+							<th width="20%"  class="center"><warehouse:message code="default.actions.label"/></th>
 						</tr>											
 					</thead>									
 					<tbody>												
@@ -214,7 +214,12 @@
 	}
 
 	$(document).ready(function() {
-		addRow();
+
+        // If there's already at least an existing row we don't want to create a blank row
+        var rows = $("#inventoryItemsTable tbody tr");
+        if (rows.length < 1) {
+            addRow();
+        }
 
 		
 		//$('.addAnother').focus();		
