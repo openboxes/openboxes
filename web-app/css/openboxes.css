@@ -2859,7 +2859,7 @@ ul.filter-list {
     padding: 0 5px 0 0;
 }
 .filter-list-item input {
-    width: 100%;
+
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

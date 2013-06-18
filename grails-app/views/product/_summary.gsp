@@ -1,12 +1,12 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <div id="product-summary" productid="${productInstance?.id}">
-	<table id="product-summary" border="0">
+	<table id="product-summary-table" border="0">
 		<tbody>
 			<tr>						
 				<td class="top" style="width: 1%;">
 					<g:render template="../product/actions" model="[productInstance:productInstance]" />
 				</td>
-				
+
 				<g:if test="${productInstance?.coldChain }">
 					<td style="width: 1%;" class="top">				
 						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}" 

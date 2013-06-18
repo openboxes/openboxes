@@ -390,8 +390,10 @@
 		});
 	</script>
     <script type="text/javascript">
+        var monthNames = [];
 		var monthNamesShort = [];
 		<g:each in="${1..12}" var="monthNum">
+            monthNames[${monthNum-1}] = '<warehouse:message code="month.${monthNum}.label"/>';
 			monthNamesShort[${monthNum-1}] = '<warehouse:message code="month.short.${monthNum}.label"/>';
 		</g:each>
     </script>

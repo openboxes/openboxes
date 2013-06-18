@@ -16,6 +16,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
@@ -29,7 +30,18 @@ class JsonController {
 	def localizationService	
 	def shipmentService
 	def messageSource
+    def consoleService
 
+    def evaluateIndicator = {
+        def indicator = Indicator.get(params.id)
+        if (indicator) {
+            def results = consoleService.eval(indicator.expression, true, request)
+            render results.result
+        }
+        else {
+            render "error"
+        }
+    }
 
     def addToRequisitionItems = {
         log.info "request " + request
@@ -418,7 +430,7 @@ class JsonController {
 				
 		render(text: "", contentType: "text/plain")
 	}
-	
+
 	/**
 	 * Ajax method for the Record Inventory page.
 	 */
@@ -877,12 +889,12 @@ class JsonController {
 			//	}
 			//}
 			//items.addAll(inventoryItemResults)
-			
-			// Get all products that match terms
-			def inventory = Location.get(session.warehouse.id).inventory
-			def productResults = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
-			items.addAll(productResults)
-			
+
+            // Get all products that match terms
+            def inventory = Location.get(session.warehouse.id).inventory
+            def productResults = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
+            items.addAll(productResults)
+
 			// Get all shipments that match terms
 			/*
 			def shipmentResults = Shipment.withCriteria {
