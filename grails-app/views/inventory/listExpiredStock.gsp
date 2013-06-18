@@ -23,21 +23,25 @@
 			
 		            <g:form action="listExpiredStock" method="get">
 						<div class="box">
+
+                            <div class="right middle">
+                            </div>
                             <h2>
                                 <warehouse:message code="default.filters.label" default="Filters"/>
                             </h2>
-		          			<span class="filter-list-item">
+		          			<div class="filter-list-item">
 		           				<label><warehouse:message code="category.label"/></label>            			
-				           		<g:select name="category"
+				           		<g:select name="category" class="chzn-select-deselect"
 												from="${categories}"
 												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
 												noSelection="['': warehouse.message(code:'default.all.label')]" />   
-							</span>
-							<span class="filter-list-item">
-								<button name="filter">
-									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> 
+							</div>
+							<div class="filter-list-item">
+								<button name="filter" class="button icon search">
+                                    <warehouse:message code="default.button.filter.label"/>
 								</button>
-							</span>
+							</div>
+                            <div class="clear"></div>
 						</div>
 
 		
@@ -45,8 +49,14 @@
 				</div>
 				<div class="yui-u">
 		            <div class="box">
+                        <div class="right middle">
+                            <g:link params="[format:'csv',category:params.category]" controller="${controllerName}" action="${actionName}"
+                                    class="button">Download as CSV</g:link>
+
+                        </div>
                         <h2>
                             <warehouse:message code="default.results.label" default="Results"/>
+                            | ${inventoryItems.size()} expiring inventory items
                         </h2>
 						<table>
 							<tr>					
@@ -59,9 +69,10 @@
 							                        	<th class="center">
 							                        		<input type="checkbox" id="toggleCheckbox"/>
 							                        	</th>
-														<th><warehouse:message code="category.label"/></th>
-														<th><warehouse:message code="item.label"/></th>
-														<th><warehouse:message code="inventory.lotNumber.label"/></th>
+                                                        <th><warehouse:message code="product.productCode.label"/></th>
+                                                        <th><warehouse:message code="product.label"/></th>
+                                                        <th><warehouse:message code="category.label"/></th>
+                                                        <th><warehouse:message code="inventory.lotNumber.label"/></th>
 														<th class="center"><warehouse:message code="inventory.expires.label"/></th>
 														<th class="center"><warehouse:message code="default.qty.label"/></th>
 														<th class="center"><warehouse:message code="product.uom.label"/></th>
@@ -80,16 +91,22 @@
 																		value="${inventoryItem?.id }" />
 															
 															</td>
-															<td class="checkable">
-																<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
-															</td>												
+                                                            <td class="checkable">
+                                                                <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+                                                                    ${inventoryItem?.product?.productCode}
+                                                                </g:link>
+
+                                                            </td>
 															<td class="checkable">
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 																	<format:product product="${inventoryItem?.product}"/> 
 																</g:link>
 																
 															</td>
-															<td class="checkable">
+                                                            <td class="checkable">
+                                                                <span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
+                                                            </td>
+                                                            <td class="checkable">
 																<span class="lotNumber">
 																	${inventoryItem?.lotNumber }
 																</span>
@@ -108,22 +125,22 @@
 															</td>									
 														</tr>						
 													</g:each>
-													<g:if test="${!anyExpiredStock }">
+													<g:unless test="${inventoryItems}">
 														<tr>
-															<td colspan="7">
+															<td colspan="8">
 																<div class="padded center fade">
 																	<warehouse:message code="inventory.noExpiredStock.label" />
 																</div>
 															</td>
 														</tr>
-													</g:if>
+													</g:unless>
 												</tbody>
 												<tfoot>
 													<tr style="border-top: 1px solid lightgrey">
-														<td colspan="7">
+														<td colspan="8">
 															<div>
-																<g:render template="./actionsExpiredStock" />									
-															</div>
+																<g:render template="./actionsExpiredStock" />
+                                                            </div>
 														</td>
 													</tr>									
 												</tfoot>

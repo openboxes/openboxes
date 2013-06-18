@@ -25,25 +25,52 @@
                             </h2>
 			           		<div class="filter-list-item">
 		           				<label><warehouse:message code="category.label"/></label>
-				           		<g:select name="category"
+				           		<g:select name="category"  class="chzn-select-deselect"
 												from="${categories}"
-												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-												noSelection="['': warehouse.message(code:'default.all.label')]" />   
+												optionKey="id" optionValue="${{format.category(category:it)}}"
+                                                value="${categorySelected?.id}"
+												noSelection="['': warehouse.message(code:'default.all.label')]" />
 							</div>
+                            <%--
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="inventory.expiresBefore.label" default="Expires before"/></label>
+                                <g:jqueryDatePicker id="expiresBefore" name="expiresBefore" value="${params.expiresBefore}" style="width:100px;"/>
+                            </div>
+                            --%>
+
 							<div class="filter-list-item">
 		           				<label><warehouse:message code="inventory.expiresWithin.label"/></label>
-				           		<g:select name="threshold"
-									from="['7': warehouse.message(code:'default.week.oneWeek.label'), '14': warehouse.message(code:'default.week.twoWeeks.label'),
-										   '30': warehouse.message(code:'default.month.oneMonth.label'), '60': warehouse.message(code:'default.month.twoMonths.label'), 
-										   '90': warehouse.message(code:'default.month.threeMonths.label'), '180': warehouse.message(code:'default.month.sixMonths.label'), 
-										   '365': warehouse.message(code:'default.year.oneYear.label'), '730': warehouse.message(code:'default.year.twoYear.label'), '1825': warehouse.message(code:'default.year.fiveYear.label')]"
+				           		<g:select name="threshold" class="chzn-select-deselect"
+									from="['7': warehouse.message(code:'default.week.oneWeek.label'),
+                                            '14': warehouse.message(code:'default.week.twoWeeks.label'),
+										    '30': warehouse.message(code:'default.month.oneMonth.label'),
+                                            '60': warehouse.message(code:'default.month.twoMonths.label'),
+										    '90': warehouse.message(code:'default.month.threeMonths.label'),
+                                            '120': warehouse.message(code:'default.month.fourMonths.label'),
+                                            '150': warehouse.message(code:'default.month.fiveMonths.label'),
+                                            '180': warehouse.message(code:'default.month.sixMonths.label'),
+                                            '210': warehouse.message(code:'default.month.sevenMonths.label'),
+                                            '240': warehouse.message(code:'default.month.eightMonths.label'),
+                                            '270': warehouse.message(code:'default.month.nineMonths.label'),
+                                            '300': warehouse.message(code:'default.month.tenMonths.label'),
+                                            '330': warehouse.message(code:'default.month.elevenMonths.label'),
+                                            '365': warehouse.message(code:'default.year.oneYear.label'),
+                                            '730': warehouse.message(code:'default.year.twoYears.label'),
+                                            '1095': warehouse.message(code:'default.year.threeYears.label'),
+                                            '1460': warehouse.message(code:'default.year.fourYears.label'),
+                                            '1825': warehouse.message(code:'default.year.fiveYears.label')]"
 									optionKey="key" optionValue="value" value="${thresholdSelected}" 
 									noSelection="['': warehouse.message(code:'default.all.label')]" />   
 				           	</div>
+
 				           	<div class="filter-list-item right">
-								<button name="filter">
-									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
-							</div>
+								<button name="filter" class="button icon search">
+									<warehouse:message code="default.button.filter.label"/> </button>
+
+                                   <g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
+                                           class="button">Download as CSV</g:link>
+
+                            </div>
 							<div class="clear"></div>
 						</div>
 		            </g:form>  
@@ -52,7 +79,7 @@
 		   		
 					<div class="box">
                         <h2>
-                            <warehouse:message code="default.results.label" default="Results"/>
+                            <warehouse:message code="default.results.label" default="Results"/> | ${inventoryItems.size()} expired inventory items
                         </h2>
                         <div class="">
                             <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
@@ -62,8 +89,9 @@
                                             <th class="center" style="width: 50px; text-align: center;">
                                                 <input type="checkbox" id="toggleCheckbox"/>
                                             </th>
+                                            <th><warehouse:message code="product.productCode.label"/></th>
+                                            <th><warehouse:message code="product.label"/></th>
                                             <th><warehouse:message code="category.label"/></th>
-                                            <th><warehouse:message code="item.label"/></th>
                                             <th><warehouse:message code="inventory.lotNumber.label"/></th>
                                             <th class="center"><warehouse:message code="inventory.expires.label"/></th>
                                             <th class="center"><warehouse:message code="default.qty.label"/></th>
@@ -72,10 +100,8 @@
                                     </thead>
                                     <tbody>
                                         <g:set var="counter" value="${0 }" />
-                                        <g:set var="anyExpiringStock" value="${false }"/>
                                         <g:each var="inventoryItem" in="${inventoryItems}" status="i">
-                                            <g:set var="quantity" value=""/>
-                                            <g:set var="anyExpiringStock" value="${true }"/>
+                                            <g:set var="quantity" value="${0 }"/>
                                             <tr class="${(counter++ % 2) == 0 ? 'even' : 'odd'}">
                                                 <td class="center">
                                                     <g:checkBox id="${inventoryItem?.id }" name="inventoryItem.id"
@@ -83,14 +109,20 @@
                                                             value="${inventoryItem?.id }" />
 
                                                 </td>
-                                                <td class="checkable left">
-                                                    <span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
+                                                <td class="checkable" >
+                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+                                                        ${inventoryItem?.product?.productCode}
+                                                    </g:link>
 
                                                 </td>
                                                 <td class="checkable" >
                                                     <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
                                                         <format:product product="${inventoryItem?.product}"/>
                                                     </g:link>
+
+                                                </td>
+                                                <td class="checkable left">
+                                                    <span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
 
                                                 </td>
                                                 <td class="checkable" >
@@ -111,19 +143,19 @@
                                                 </td>
                                             </tr>
                                         </g:each>
-                                        <g:if test="${!anyExpiringStock }">
+                                        <g:unless test="${inventoryItems }">
                                             <tr>
-                                                <td colspan="7">
+                                                <td colspan="8">
                                                     <div class="padded center fade">
                                                         <warehouse:message code="inventory.noExpiringStock.label" />
                                                     </div>
                                                 </td>
                                             </tr>
-                                        </g:if>
+                                        </g:unless>
                                     </tbody>
                                     <tfoot>
                                         <tr style="border-top: 1px solid lightgrey">
-                                            <td colspan="7">
+                                            <td colspan="8">
                                                 <div>
                                                     <g:render template="./actionsExpiringStock" />
                                                 </div>
@@ -159,7 +191,9 @@
 				);
 				
 				$("#toggleCheckbox").click(function(event) {
-					$(".checkbox").attr("checked", $(this).attr("checked"));
+					//$(".checkbox").attr("checked", $(this).attr("checked"));
+                    var checked = ($(this).attr("checked") == 'checked');
+                    $(".checkbox").attr("checked", checked);
 				});	
 			});	
 		</script>	
