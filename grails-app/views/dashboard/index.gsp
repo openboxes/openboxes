@@ -13,13 +13,14 @@
 	    	<div id="dashboard">
 	    		<table>
 					<tr>
-						<td>
+						<td width="30%">
 							<g:render template="alertSummary"/>
                             <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="tagSummary" model="[tags:tags]"/>
 						</td>
-						<td>
+						<td width="30%">
 							<g:render template="expiringSummary"/>
+                            <g:render template="indicatorSummary"/>
                             <g:render template="shipmentSummary"/>
                             <g:render template="receiptSummary"/>
 						</td>

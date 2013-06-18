@@ -46,6 +46,7 @@
     <include file="0.5.x/add-column-requisition-received-by.xml"/>
     <include file="0.5.x/add-column-requisition-checked-by.xml"/>
     <include file="0.5.x/add-column-requisition-issued-by.xml"/>
+    <include file="0.5.x/create-table-indicator.xml"/>
 
     <!--
     <include file="0.5.x/create-table-reason-code.xml"/>

@@ -100,7 +100,6 @@
                             <div id="overStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
-
 				</tbody>
 			</table>
 		</div>

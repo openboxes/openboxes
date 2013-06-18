@@ -307,22 +307,6 @@ class ConsumptionController {
         }
     }
 
-    // Proof of concept to see if we could evalute a string of code
-    // Could be used to create dynamic indicators for the dashboard
-    def evaluate = {
-        String code = """
-            import org.pih.warehouse.product.Product;
-            def products = Product.list();
-            return products.size()
-        """
-
-        // String code, boolean captureStdout, request
-        render consoleService.eval(code, true, request)
-    }
-
-
-
-
 }
 
 
