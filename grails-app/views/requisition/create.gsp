@@ -163,7 +163,7 @@
 										
 									</tr>
 									<g:if test="${requisition.isDepotRequisition()}">
-										<tr>
+										<tr class="prop">
 											<td class="name"><label><warehouse:message
 														code="requisition.program.label" /></label></td>
 											<td class="value">

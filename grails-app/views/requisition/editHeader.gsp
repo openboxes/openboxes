@@ -61,6 +61,13 @@
                                     ${requisition.requestNumber}
                                 </td>
                             </tr>
+                            <tr class="prop">
+                                <td class="name"><label><warehouse:message
+                                        code="default.name.label" /></label></td>
+                                <td class="value">
+                                    <g:textField name="name" value="${requisition.name}" class="text" size="100"/>
+                                </td>
+                            </tr>
                             <g:isUserAdmin>
                                 <tr class="prop">
                                     <td class="name"><label><warehouse:message
