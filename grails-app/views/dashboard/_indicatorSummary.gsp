@@ -10,7 +10,7 @@
                     <g:each in="${org.pih.warehouse.reporting.Indicator.list()}" var="indicator" status="status">
                         <tr class="${status%2?'odd':'even'}">
                             <td class="center" style="width: 1%">
-
+                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'sum.png')}" class="middle"/>
                             </td>
                             <td>
                                 ${indicator.description}
