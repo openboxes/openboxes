@@ -139,7 +139,7 @@
                                     </td>
                                     <td class="center">
                                         <g:if test="${entry?.key?.pricePerUnit}">
-                                            <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/> USD
+                                            <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/>
                                         </g:if>
                                         <g:else>
                                             --
@@ -147,7 +147,7 @@
                                     </td>
                                     <td class="center">
                                         <g:if test="${entry.key.pricePerUnit && entry.value}">
-                                            <g:formatNumber number="${entry.key.pricePerUnit*entry.value}" minFractionDigits="2"/> USD
+                                            <g:formatNumber number="${entry.key.pricePerUnit*entry.value}" minFractionDigits="2"/>
                                         </g:if>
                                         <g:else>
                                             --

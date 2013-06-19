@@ -351,9 +351,7 @@ class InventoryController {
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(reconditionedStock))
         }
-
         render (view: "list", model: [quantityMap:reconditionedStock])
-
     }
 
 
@@ -374,12 +372,12 @@ class InventoryController {
     }
 
     def listInStock = {
-        def warehouse = Location.get(session.warehouse.id)
+        def location = Location.get(session.warehouse.id)
         // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def inStock = inventoryService.getInStock(warehouse);
+        def inStock = inventoryService.getInStock(location);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            def filename = "In stock - " + warehouse.name + ".csv"
+            def filename = "In stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(inStock))
         }
@@ -389,12 +387,12 @@ class InventoryController {
     }
 
     def listLowStock = {
-        def warehouse = Location.get(session.warehouse.id)
+        def location = Location.get(session.warehouse.id)
         // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def lowStock = inventoryService.getLowStock(warehouse);
+        def lowStock = inventoryService.getLowStock(location);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            def filename = "Low stock - " + warehouse.name + ".csv"
+            def filename = "Low stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(lowStock))
         }
@@ -404,12 +402,12 @@ class InventoryController {
     }
 
     def listReorderStock = {
-        def warehouse = Location.get(session.warehouse.id)
+        def location = Location.get(session.warehouse.id)
         // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def reorderStock = inventoryService.getReorderStock(warehouse);
+        def reorderStock = inventoryService.getReorderStock(location);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            def filename = "Reorder stock - " + warehouse.name + ".csv"
+            def filename = "Reorder stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(reorderStock))
         }
@@ -419,12 +417,12 @@ class InventoryController {
     }
 
     def listOutOfStock = {
-		def warehouse = Location.get(session.warehouse.id)
+		def location = Location.get(session.warehouse.id)
 		// def categorySelected = (params.category) ? Category.get(params.category) : null;
-		def outOfStock = inventoryService.getOutOfStock(warehouse);
+		def outOfStock = inventoryService.getOutOfStock(location);
 		//def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            def filename = "Out of stock - " + warehouse.name + ".csv"
+            def filename = "Out of stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
         }
@@ -434,12 +432,12 @@ class InventoryController {
 	}
 
     def listOverStock = {
-        def warehouse = Location.get(session.warehouse.id)
+        def location = Location.get(session.warehouse.id)
         // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def overStock = inventoryService.getOverStock(warehouse);
+        def overStock = inventoryService.getOverStock(location);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
-            def filename = "Overstock - " + warehouse.name + ".csv"
+            def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(overStock))
         }
@@ -503,7 +501,9 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default:'Tags')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturerCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
@@ -528,7 +528,9 @@ class InventoryController {
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
             csv += '"' + (product?.manufacturer?:"")  + '"' + ","
+            csv += '"' + (product?.manufacturerCode?:"")  + '"' + ","
             csv += '"' + (product?.vendor?:"") + '"' + ","
+            csv += '"' + (product?.vendorCode?:"") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation?:"") + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"") + '"' + ","
             csv += (product?.pricePerUnit?:"") + ","
@@ -549,7 +551,9 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default:'Tags')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturerCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}"  + '"' + ","
@@ -569,7 +573,9 @@ class InventoryController {
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
             csv += '"' + (product?.manufacturer?:"")  + '"' + ","
+            csv += '"' + (product?.manufacturerCode?:"")  + '"' + ","
             csv += '"' + (product?.vendor?:"") + '"' + ","
+            csv += '"' + (product?.vendorCode?:"") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation?:"")  + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
             csv += (product?.pricePerUnit?:"") + ","
