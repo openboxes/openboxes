@@ -340,14 +340,31 @@ class InventoryController {
         println "QuantityMap: " + quantityMap
         [quantityMap:quantityMap]
     }
+
+
+    def listReconditionedStock = {
+        def location = Location.get(session.warehouse.id)
+        def reconditionedStock = inventoryService.getReconditionedStock(location)
+
+        if (params.format == "csv") {
+            def filename = "Reconditioned stock - " + location.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
+            render(contentType: "text/csv", text:getCsvForProductMap(reconditionedStock))
+        }
+
+        render (view: "list", model: [quantityMap:reconditionedStock])
+
+    }
+
+
     def listTotalStock = {
-        def warehouse = Location.get(session.warehouse.id)
+        def location = Location.get(session.warehouse.id)
         // def categorySelected = (params.category) ? Category.get(params.category) : null;
         def totalStock = inventoryService.getTotalStock(warehouse);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
 
         if (params.format == "csv") {
-            def filename = "Total stock - " + warehouse.name + ".csv"
+            def filename = "Total stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=" + filename)
             render(contentType: "text/csv", text:getCsvForProductMap(totalStock))
         }

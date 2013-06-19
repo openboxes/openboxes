@@ -38,6 +38,7 @@
         <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
         <script type="text/javascript">
             $(function() {
+                $('#reconditionedStockCount').load('${request.contextPath}/json/getReconditionedStockCount?location.id=${session.warehouse.id}');
                 $('#totalStockCount').load('${request.contextPath}/json/getTotalStockCount?location.id=${session.warehouse.id}');
                 $('#inStockCount').load('${request.contextPath}/json/getInStockCount?location.id=${session.warehouse.id}');
                 $('#outOfStockCount').load('${request.contextPath}/json/getOutOfStockCount?location.id=${session.warehouse.id}');

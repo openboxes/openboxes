@@ -664,6 +664,15 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
+    def getReconditionedStock(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
+        log.debug "Get reconditioned stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        return reconditionedStock
+    }
+
+
     def getTotalStock(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)

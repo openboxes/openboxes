@@ -221,6 +221,14 @@ class JsonController {
 		render (quantityOnHand?:"0")
 	}
 
+
+    @Cacheable("dashboardCache")
+    def getReconditionedStockCount = {
+        def location = Location.get(params?.location?.id)
+        def results = inventoryService.getReconditionedStock(location)
+        render (results?.keySet()?.size()?:"0")
+    }
+
     @Cacheable("dashboardCache")
     def getTotalStockCount = {
         def location = Location.get(params?.location?.id)

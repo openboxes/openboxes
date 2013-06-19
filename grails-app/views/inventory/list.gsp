@@ -52,6 +52,11 @@
                                 <warehouse:message code="inventory.listOverStock.label"/>
                             </g:link>
                         </div>
+                        <div class="filter-list-item">
+                            <g:link controller="inventory" action="listReconditionedStock" class="${'listReconditionedStock'.equals(actionName)?'selected':''}">
+                                <warehouse:message code="inventory.listReconditionedStock.label"/>
+                            </g:link>
+                        </div>
                     </div>
 
                 </div>
@@ -80,7 +85,9 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
+                                <th class="center border-right"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
+                                <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit (USD)"/></th>
+                                <th class="center"><warehouse:message code="product.totalValue.label" default="Total value (USD)"/></th>
                             </tr>
                             <g:each var="entry" in="${quantityMap.sort()}" status="i">
                                 <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
@@ -110,7 +117,6 @@
                                     </td>
                                     <td>
                                         ${entry.key.vendor}
-
                                     </td>
                                     <td class="left">
                                         ${inventoryLevel?.binLocation?:""}
@@ -128,8 +134,24 @@
                                     <td class="center">
                                         ${inventoryLevel?.maxQuantity?:"--"}
                                     </td>
-                                    <td class="center">
+                                    <td class="center border-right">
                                         ${entry.value}
+                                    </td>
+                                    <td class="center">
+                                        <g:if test="${entry?.key?.pricePerUnit}">
+                                            <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/> USD
+                                        </g:if>
+                                        <g:else>
+                                            --
+                                        </g:else>
+                                    </td>
+                                    <td class="center">
+                                        <g:if test="${entry.key.pricePerUnit && entry.value}">
+                                            <g:formatNumber number="${entry.key.pricePerUnit*entry.value}" minFractionDigits="2"/> USD
+                                        </g:if>
+                                        <g:else>
+                                            --
+                                        </g:else>
                                     </td>
                                 </tr>
 
@@ -137,8 +159,10 @@
                             </g:each>
                             <g:unless test="${quantityMap}">
                                 <tr>
-                                    <td colspan="3" class="center">
-                                        <warehouse:message code="default.emptyResults.message" default="No results"/>
+                                    <td colspan="12" class="center">
+                                        <div class="empty fade">
+                                            <warehouse:message code="default.emptyResults.message" default="No results found"/>
+                                        </div>
                                     </td>
 
                                 </tr>

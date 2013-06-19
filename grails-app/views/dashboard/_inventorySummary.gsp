@@ -68,6 +68,21 @@
 
                         </td>
                     </tr>
+                    <tr class="odd">
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'new_blue.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <g:link controller="inventory" action="listReconditionedStock">
+                                <warehouse:message code="inventory.listReconditionedStock.label" default="Items that need to be reconditioned"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="reconditionedStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
 		</div>
