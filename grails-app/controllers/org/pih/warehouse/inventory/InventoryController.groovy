@@ -360,7 +360,7 @@ class InventoryController {
     def listTotalStock = {
         def location = Location.get(session.warehouse.id)
         // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def totalStock = inventoryService.getTotalStock(warehouse);
+        def totalStock = inventoryService.getTotalStock(location);
         //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
 
         if (params.format == "csv") {
