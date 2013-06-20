@@ -93,7 +93,7 @@
 			<g:if test="${commandInstance?.totalQuantity == 0}">
 				<tr>
 					<td colspan="5">
-						<div class="fade empty">
+						<div class="fade empty center">
 							<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
 						</div>
 					</td>
