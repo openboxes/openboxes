@@ -127,7 +127,8 @@
                                                    <g:set var="counter" value="${0 }"/>
                                                    <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
                                                        <g:if test="${inventoryItem.product }">
-                                                           <cache:render cachekey="${inventoryItem?.product?.id}" template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]" />
+                                                           <%--<cache:render cachekey="${inventoryItem?.product?.id}" template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]" />--%>
+                                                            <g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]" />
                                                        </g:if>
                                                        <%--
                                                        <g:elseif test="${inventoryItem.productGroup }">
