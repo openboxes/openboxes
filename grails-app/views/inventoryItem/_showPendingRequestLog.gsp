@@ -66,7 +66,7 @@
 						<g:if test="${!commandInstance?.requisitionMap}">
 							<tr>
 								<td colspan="8" class="even center">
-									<div class="fade padded">
+									<div class="fade empty">
 										<warehouse:message code="requisition.empty.label" default="No pending requisitions"/>
 									</div>
 								</td>

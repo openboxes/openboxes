@@ -70,7 +70,7 @@
 						<g:if test="${!anyPendingShipments }">
 							<tr>
 								<td colspan="7" class="even center">		
-									<div class="fade padded">
+									<div class="fade empty">
 										<warehouse:message code="shipment.noPendingShipments.label"/>
 									</div>
 								</td>

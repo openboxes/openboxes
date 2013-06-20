@@ -56,8 +56,8 @@
                         <g:set var="transactionMap" value="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())}"/>
                         <g:if test="${!transactionMap }">
                             <tr>
-                                <td colspan="6" class="even center">
-                                    <div class="fade padded">
+                                <td colspan="10" class="even center">
+                                    <div class="empty fade">
                                         <warehouse:message code="transaction.noTransactions.label"/>
                                         <%--
                                         <warehouse:message code="transaction.noTransactions.message" args="[format.metadata(obj:commandInstance?.transactionType),commandInstance?.startDate,commandInstance?.endDate]"/>
@@ -291,10 +291,10 @@
 
                             </th>
                             <th class="center border-right">
-                                <g:formatNumber number="${totalCredit}" format="#,###"/>
+                                <g:formatNumber number="${totalCredit?:0}" format="#,###"/>
                             </th>
                             <th class="center border-right">
-                                (<g:formatNumber number="${totalDebit}" format="#,###"/>)
+                                    (<g:formatNumber number="${totalDebit?:0}" format="#,###"/>)
                             </th>
                             <th class="center">
                                 <g:formatNumber number="${balanceByInventoryItem?.values()?.sum()?:0}" format="#,###"/>

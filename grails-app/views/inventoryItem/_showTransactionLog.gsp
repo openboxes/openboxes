@@ -75,7 +75,7 @@
 									<g:set var="transactionMap" value="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())}"/>
 									<g:if test="${!transactionMap }">
 										<tr>
-											<td colspan="6" class="even center">		
+											<td colspan="6" class="even center">
 												<div class="fade padded">
 													<warehouse:message code="transaction.noTransactions.label"/>
 													<%-- 
