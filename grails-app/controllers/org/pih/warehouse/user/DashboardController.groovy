@@ -349,22 +349,20 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-    @CacheFlush("dashboardCache")
+    @CacheFlush(["dashboardCache", "megamenuCache"])
     def flushCache = {
         flash.message = "Cache has been flushed"
         redirect(action: "index")
     }
 
-	def chooseLayout = { 
-		
+	def chooseLayout = {
 		if (params.layout) { 
 			session.layout = params.layout
 		}
 		redirect(controller:'dashboard', action:'index')
 	}
 	
-	def chooseLocation = {			
-		
+	def chooseLocation = {
 		log.info params
 		def warehouse = null;
 			
