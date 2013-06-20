@@ -28,26 +28,14 @@
                             <li>
                                 <g:if test="${session._showTime}">
                                     <span>
-                                        Data load took ${request.actionDuration/1000}s
-                                        Page load took ${request.viewDuration/1000}s
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'database_connect.png')}" class="middle"/>
+                                        Data load took ${(request?.actionDuration?:0)/1000}s
                                     </span>
-                                    <g:form controller="${controllerName}" action="${actionName}" id="${params.id}" style="display: inline">
-                                        <g:hiddenField name="showTime" value="off"/>
-                                        <button class="button icon remove">Disable</button>
-                                    </g:form>
+                                    <span>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'page_refresh.png')}" class="middle"/>
+                                        Page load took ${(request?.viewDuration?:0)/1000}s
+                                    </span>
                                 </g:if>
-                                <g:else>
-                                    <g:form controller="${controllerName}" action="${actionName}" id="${params.id}" style="display: inline">
-                                        <g:hiddenField name="showTime" value="on"/>
-                                        <button class="button icon clock">Show time</button>
-                                    </g:form>
-
-                                </g:else>
-                            </li>
-                            <li>
-                                <g:form controller="dashboard" action="flushCache" style="display: inline">
-                                    <button class="button icon reload">${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}</button>
-                                </g:form>
 
                             </li>
                         </g:isUserAdmin>
@@ -99,6 +87,32 @@
                                                 <warehouse:message code="dashboard.label" default="Dashboard"/>
                                             </g:link>
                                         </li>
+                                        <g:isUserAdmin>
+                                            <g:if test="${session._showTime}">
+                                                <li class="action-menu-item">
+                                                    <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
+                                                        <img src="${resource(dir: 'images/icons/silk', file: 'clock_delete.png')}"/>
+                                                        <warehouse:message code="dashboard.disableShowTime.label" default="Disable show time"/>
+                                                    </g:link>
+                                                </li>
+                                            </g:if>
+                                            <g:else>
+                                                <li class="action-menu-item">
+                                                    <g:link controller="dashboard" action="index" params="[showTime:'on']" style="color: #666;">
+                                                        <img src="${resource(dir: 'images/icons/silk', file: 'clock_add.png')}"/>
+                                                        <warehouse:message code="dashboard.enableShowTime.label" default="Enable show time"/>
+                                                    </g:link>
+                                                </li>
+                                            </g:else>
+                                            <li class="action-menu-item">
+                                                <g:link controller="dashboard" action="flushCache" style="color: #666">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
+                                                    ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
+                                                </g:link>
+                                            </li>
+
+                                        </g:isUserAdmin>
+
                                         <g:if test="${session?.warehouse}">
                                             <%--
                                             <li class="action-menu-item">
