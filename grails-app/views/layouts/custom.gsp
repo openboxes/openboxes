@@ -65,13 +65,37 @@
         </g:if>
          --%>
 
-        <g:if test="${session.useDebugLocale}">
-            <div id="debug-header" class="notice" style="margin-bottom: 0px;">
-                You are in DEBUG mode.
+    <g:if test="${session._showTime}">
+        <g:isUserAdmin>
+            <div class="box">
+                <span style="color: #666;">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'database_connect.png')}" class="middle"/>
+                    Data load took ${(request?.actionDuration?:0)/1000}s
+                </span>
+                <span style="color: #666;">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'page_refresh.png')}" class="middle"/>
+                    Page load took ${(request?.viewDuration?:0)/1000}s
+                </span>
                 <div class="right">
-                    <g:link controller="localization" action="list">Show all localizations</g:link> |
-                    <g:link controller="localization" action="create">Create new localization</g:link> |
-                    <g:link controller="user" action="disableDebugMode">Disable debug mode</g:link>
+                    <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
+                    </g:link>
+                </div>
+
+            </div>
+
+       </g:isUserAdmin>
+    </g:if>
+    <g:if test="${session.useDebugLocale}">
+
+            <div id="debug-header" class="notice box" style="margin-bottom: 0px;">
+                You are in DEBUG mode.
+                <g:link controller="localization" action="list" class="button icon log">Show all localizations</g:link>
+                <g:link controller="localization" action="create" class="button icon add">Create new localization</g:link>
+                <div class="right">
+                    <g:link controller="user" action="disableDebugMode">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
+                    </g:link>
                 </div>
                 <div id="localizations">
                      <!--

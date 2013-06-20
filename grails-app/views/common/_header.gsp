@@ -23,22 +23,11 @@
 					<ul>
 
 
-                        <g:isUserAdmin>
+                        <li>
+                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
+                                            jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
+                        </li>
 
-                            <li>
-                                <g:if test="${session._showTime}">
-                                    <span>
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'database_connect.png')}" class="middle"/>
-                                        Data load took ${(request?.actionDuration?:0)/1000}s
-                                    </span>
-                                    <span>
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'page_refresh.png')}" class="middle"/>
-                                        Page load took ${(request?.viewDuration?:0)/1000}s
-                                    </span>
-                                </g:if>
-
-                            </li>
-                        </g:isUserAdmin>
 
 					    <g:if test="${session.user}">
                             <%--
@@ -104,13 +93,28 @@
                                                     </g:link>
                                                 </li>
                                             </g:else>
+                                            <g:if test="${session.useDebugLocale }">
+                                                <li class="action-menu-item">
+                                                    <g:link controller="user" action="disableDebugMode" style="color: #666;">
+                                                        <img src="${resource(dir: 'images/icons/silk', file: 'bug_delete.png')}"/>
+                                                        ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}
+                                                    </g:link>
+                                                </li>
+                                            </g:if>
+                                            <g:else>
+                                                <li class="action-menu-item">
+                                                    <g:link controller="user" action="enableDebugMode" style="color: #666;">
+                                                        <img src="${resource(dir: 'images/icons/silk', file: 'bug_add.png')}"/>
+                                                        ${warehouse.message(code:'debug.enable.label', default: 'Enable debug mode')}
+                                                    </g:link>
+                                                </li>
+                                            </g:else>
                                             <li class="action-menu-item">
                                                 <g:link controller="dashboard" action="flushCache" style="color: #666">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
                                                     ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
                                                 </g:link>
                                             </li>
-
                                         </g:isUserAdmin>
 
                                         <g:if test="${session?.warehouse}">
@@ -212,11 +216,7 @@
                             </g:if>
 
                         </g:if>
-						<li>
-							<g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
-								jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-						</li>
-					</ul>
+                    </ul>
 				</div>
 		    </div>
 		</div>
