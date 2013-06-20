@@ -290,6 +290,26 @@
 		</a>
 			<div style="min-width: 200px;">
 				<div class="buttonsBar">
+                    <div class="megaButton">
+                        <g:link controller="console" action="index" class="list">
+                            <warehouse:message code="default.console.label" default="Open console" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="admin" action="manage" class="list">
+                            <warehouse:message code="default.appinfo.label" default="Show app-info" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="admin" action="cache" class="list">
+                            <warehouse:message code="default.cache.label" default="Show cache" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="admin" action="clickstream" class="list">
+                            <warehouse:message code="default.clickstream.label" default="Show clickstream" />
+                        </g:link>
+                    </div>
 					<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 						<div class="megaButton">
 							<g:link controller="admin" action="showSettings" class="list">
@@ -298,6 +318,10 @@
 							</g:link>
 						</div>
 					</g:authorize>
+
+                    <div>
+                        <hr/>
+                    </div>
 
 					<div class="megaButton">
 						<g:link controller="locationGroup" action="list" class="site">
@@ -363,7 +387,7 @@
 					<div class="megaButton">									
 						<g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
 					</div>
-					
+					<%--
 					<g:if test="${session.productsViewed }">
 						<div>
 							<g:each var="product" in="${session?.productsViewed?.values() }">
@@ -374,7 +398,8 @@
 								</div>
 							</g:each>
 						</div>
-					</g:if>					
+					</g:if>
+				    --%>
 					<div class="megaButton">									
 						<g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
 					</div>

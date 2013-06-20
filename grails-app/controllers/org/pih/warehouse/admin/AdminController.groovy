@@ -48,7 +48,11 @@ class AdminController {
 		
 		[actionNames:actionNames]
 	}
-	
+
+    def cache = {
+        [cacheStatistics: sessionFactory.getStatistics()]
+    }
+    def clickstream = { }
     def plugins = { } 
     def status = { } 
     
@@ -148,7 +152,6 @@ class AdminController {
 		}
 			
 		[
-            cacheStatistics: sessionFactory.getStatistics(),
 			externalConfigProperties: externalConfigProperties,
 			systemProperties : System.properties,
 			env: GrailsUtil.environment,
