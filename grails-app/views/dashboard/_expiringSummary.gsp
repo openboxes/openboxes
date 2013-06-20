@@ -54,7 +54,7 @@
 					</tr>
 					<tr class="odd">
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/silk', file: 'calendar_select_day.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:180]">
@@ -65,8 +65,21 @@
 							<div id="expiringIn180DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 							
 						</td>
-					</tr>						
-				</tbody>
+					</tr>
+                <tr class="odd">
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/', file: 'calendar_view_month.png')}" class="middle"/>
+                    </td>
+                    <td>
+                        <g:link controller="inventory" action="listExpiringStock" params="[threshold:365]">
+                            <warehouse:message code="inventory.listExpiringStock.label" args="[365]" default="Items that will expire within {0} days"/>
+                        </g:link>
+                    </td>
+                    <td class="right">
+                        <div id="expiringIn365DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                    </td>
+                </tr>
+                </tbody>
 			</table>
 		</div>
 	</div>
