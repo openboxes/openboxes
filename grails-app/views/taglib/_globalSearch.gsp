@@ -29,15 +29,17 @@
 		      		return false;
 			  	}
       		});
-            $("#${attrs.id}").width(300);
+            /*
+            $("#${attrs.id}").width(500);
             $("#${attrs.id}").focus(function() {
-                $(this).animate({"width": "500px"}, "slow");
+                $(this).animate({"width": "500px"}, "fast");
                 //$(this).width(400);
             });
             $("#${attrs.id}").blur(function() {
                 $(this).val('');
-                $(this).animate({"width": "300px"}, "slow");
+                $(this).animate({"width": "300px"}, "fast");
             });
+            */
 
         });
 	</script>
