@@ -180,9 +180,10 @@ log4j = {
 				"Location: %X{location}%n" +
 				"IP address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
-				"Query string: %X{queryString}%n%n" +
-				"Stacktrace:%n%m%n"
-			// The 'alternate' appender is the best, but only works on localhost w/o authentication 
+				"Query string: %X{queryString}%n" +
+                "Clickstream: %X{clickStream}%n" +
+                "Stacktrace:%n%m%n%n"
+			// The 'alternate' appender is the best, but only works on localhost w/o authentication
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
 				smtpAppender = new AlternateSMTPAppender(
 					name: 'smtp',
@@ -263,8 +264,8 @@ log4j = {
 			'org.apache.ddlutils',
 			'org.apache.http.wire',
 			'net.sf.ehcache.hibernate'
-		
-	info	'org.liquibase',
+
+	info    'org.liquibase',
             'grails.app.controller',
             'org.codehaus.groovy.grails.web.pages',		// GSP
 			'com.mchange',
@@ -280,7 +281,7 @@ log4j = {
 			'liquibase',
 			'com.gargoylesoftware.htmlunit'
 
-	debug 	'org.apache.cxf'
+   debug 	 'org.apache.cxf'
             //'org.apache.http.wire',          // shows traffic between htmlunit and server
             //'com.gargoylesoftware.htmlunit'
 

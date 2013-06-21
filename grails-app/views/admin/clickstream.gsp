@@ -91,6 +91,7 @@
                                 <%= session.clickstream.getLastRequest() %>
                             </td>
                         </tr>
+
                         <tr class="prop">
                             <td class="name">
                                 <label>
@@ -98,36 +99,39 @@
                                 </label>
                             </td>
                             <td class="value">
-                                <table style="table-layout: fixed; max-height: 100%; overflow: auto;">
-                                    <thead>
-                                        <tr>
-                                            <th>Link</th>
-                                            <th>Timestamp</th>
-                                            <th>Request URI</th>
-                                            <th>Query string</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <g:each var="entry" in="${session?.clickstream?.stream?.reverse()}" status="i">
-                                            <tr class="${i%2?'odd':'even'}">
-                                                <td width="10%">
-                                                    <a href="http://${entry.toString()}">
-                                                        Go to link
-                                                    </a>
-                                                </td>
-                                                <td width="10%">
-                                                    ${entry.timestamp}
-                                                </td>
-                                                <td style="word-wrap:break-word" width="40%" >
-                                                    ${entry.requestURI}
-                                                </td>
-                                                <td style="word-wrap:break-word" width="40%">
-                                                    ${entry.queryString}
-                                                </td>
-                                            </tr>
-                                        </g:each>
-                                    </tbody>
-                                </table>
+
+                                <g:link controller="admin" action="clickstream" params="[format:'csv']" class="button icon log">
+                                    <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
+                                </g:link>
+
+                                <div class="box">
+                                    <label>Limit</label>
+                                    <a href="?">All</a> |
+                                    <a href="?limit=10">10</a> |
+                                    <a href="?limit=25">25</a> |
+                                    <a href="?limit=50">50</a> |
+                                    <a href="?limit=100">100</a> |
+                                    <a href="?limit=250">250</a> |
+                                    <a href="?limit=500">500</a> |
+                                    <a href="?limit=1000">1000</a>
+                                </div>
+
+                                <g:set var="clickstream" value="${session?.clickstream?.stream?.reverse()}"/>
+                                <g:if test="${params.limit}">
+                                    <g:set var="endIndex" value="${params.int('limit')?:10}"/>
+                                    <g:set var="clickstream" value="${clickstream[0..endIndex-1]}"/>
+                                </g:if>
+                                <ul>
+                                    <g:each var="entry" in="${clickstream}" status="i">
+                                        <li>
+                                            ${++i}
+                                            ${entry.timestamp}
+                                            <a href="http://${entry.toString()}">
+                                                ${entry.toString()}
+                                            </a>
+                                        </li>
+                                    </g:each>
+                                </ul>
                             </td>
                         </tr>
                     </table>

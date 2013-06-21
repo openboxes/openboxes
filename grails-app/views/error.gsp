@@ -42,8 +42,7 @@
 			&nbsp;
 		</button>	
 	</div>  
-  
-  
+
     <h2>Error Details</h2>
   	<div class="message">
 		<strong>Error ${request?.'javax.servlet.error.status_code'}:</strong> 
@@ -119,6 +118,19 @@
 						<span class="fade">${session?.user?.email }</span>
 					</td>
 				</tr>
+                <tr class="prop">
+
+                    <td class="name">
+                        <!-- no label -->
+                    </td>
+                    <td class="value">
+                        <div>
+                            <g:checkBox name="ccMe" value="${true }" />&nbsp;
+                            <warehouse:message code="default.reportCcMe.label" />
+                        </div>
+                    </td>
+                </tr>
+
 				<%-- 
 				<tr class="prop">
 					<td class="name"> 
@@ -158,30 +170,26 @@
 							placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>						
 					</td>
 				</tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message code="error.clickstream.label" default="Clickstream"/></label>
+                    </td>
+                    <td class="value">
+                        <g:if test="${session.clickstream}">
+                            <g:textArea id="clickstream" name="clickstream" cols="120" rows="5"
+                                    placeholder="${warehouse.message(code:'error.clickstream.message')}">${util.ClickstreamUtil.getClickstreamAsString(session.clickstream)}</g:textArea>
+                        </g:if>
+                    </td>
+                </tr>
 				<tr class="prop">
 					<td class="name">
-						<label>Stacktrace</label>			
+						<label><warehouse:message code="error.stacktrace.label" default="Stacktrace"/></label>
 					
 					</td>
 					<td>
 						<g:if test="${exception}">	    
 							<g:textArea name="stacktrace" cols="120" rows="10" readonly="readonly"><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}</g:each></g:textArea>
 						</g:if>
-					</td>
-				</tr>
-				
-				
-				<tr class="prop">
-				
-					<td class="name">
-					
-					</td>
-					<td class="value">
-						<div>
-							<g:checkBox name="ccMe" value="${true }" />&nbsp;
-							<warehouse:message code="default.reportCcMe.label" />						
-						
-						</div>
 					</td>
 				</tr>
 				<tr class="prop">

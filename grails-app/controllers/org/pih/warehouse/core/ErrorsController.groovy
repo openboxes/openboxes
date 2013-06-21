@@ -7,14 +7,16 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
+package org.pih.warehouse.core
+
+import util.ClickstreamUtil;
 
 class ErrorsController {
 
 	def mailService
 	def userService
 	
-	def handleException = { 
+	def handleException = {
 		render(view: "/error")
 	}
 	
@@ -38,9 +40,9 @@ class ErrorsController {
 		def toList = []
 		def ccList = []
 		
-		//toList.add("justin.miranda@gmail.com")
-		toList.add("emr-requests@pih.org")
-		ccList.add("jmiranda@pih.org")
+		toList.add("justin.miranda@gmail.com")
+		//toList.add("emr-requests@pih.org")
+		//ccList.add("jmiranda@pih.org")
 		
 		def reportedBy = User.findByUsername(params.reportedBy)
 		if (params.ccMe && reportedBy) { 
@@ -48,10 +50,15 @@ class ErrorsController {
 		}		
 		
 		def dom = params.remove("dom")
+        //params.clickstream = ClickstreamUtil.getClickstreamAsString(session.clickstream)
 		def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
 		def body = "${g.render(template:'/email/errorReport', params:params)}"
-		mailService.sendHtmlMailWithAttachment(reportedBy, toList, ccList, subject, body.toString(), dom?.bytes, "error.html","text/html");
-		flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [toList])}"
+
+
+        //def clickstreamAsCsv = ClickstreamUtil.getClickstreamAsCsv(session.clickstream)
+		mailService.sendHtmlMailWithAttachment(reportedBy, toList, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html");
+        //mailService.sendHtmlMailWithAttachment(reportedBy, toList, ccList, subject, body.toString(), clickstreamAsCsv, "clickstream.csv", "text/csv");
+        flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [toList])}"
 		redirect(controller: "dashboard", action: "index")
 	}
 	

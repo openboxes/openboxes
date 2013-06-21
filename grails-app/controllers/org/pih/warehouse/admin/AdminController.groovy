@@ -11,6 +11,7 @@ package org.pih.warehouse.admin
 
 import grails.util.GrailsUtil
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import util.ClickstreamUtil
 
 //import java.net.HttpURLConnection;
 //import java.net.URLConnection;
@@ -52,7 +53,17 @@ class AdminController {
     def cache = {
         [cacheStatistics: sessionFactory.getStatistics()]
     }
-    def clickstream = { }
+    def clickstream = {
+        if (params.format == "csv") {
+            def filename = "Clickstream - ${session.user.name}.csv"
+            response.setHeader("Content-disposition", "attachment; filename=" + filename)
+            render(contentType: "text/csv", text: ClickstreamUtil.getClickstreamAsCsv(session.clickstream))
+            return;
+        }
+    }
+
+
+
     def plugins = { } 
     def status = { } 
     
