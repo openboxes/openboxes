@@ -268,6 +268,7 @@ log4j = {
 	info    'org.liquibase',
             'grails.app.controller',
             'org.codehaus.groovy.grails.web.pages',		// GSP
+            'com.opensymphony.clickstream',
 			'com.mchange',
 			'org.springframework',
 			'org.hibernate',
