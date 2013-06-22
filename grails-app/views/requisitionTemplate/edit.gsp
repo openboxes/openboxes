@@ -224,7 +224,6 @@
                                     <th><warehouse:message code="product.label"/></th>
                                     <th><warehouse:message code="default.quantity.label"/></th>
                                     <th><warehouse:message code="unitOfMeasure.label"/></th>
-                                    <th><warehouse:message code="default.sortOrder.label" default="Sort order"/></th>
                                     <th><warehouse:message code="default.actions.label"/></th>
                                 </tr>
                             </thead>
@@ -239,7 +238,9 @@
                                         </td>
                                         <td>
                                             <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
-                                            ${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}
+                                            <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
+                                                ${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}
+                                            </g:link>
                                         </td>
                                         <td>
                                             <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
@@ -247,9 +248,6 @@
                                         <td>
                                             <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id"
                                                 product="${requisitionItem?.product}" value="${requisitionItem?.productPackage?.id}"/>
-                                        </td>
-                                        <td class="center">
-                                            ${requisitionItem.orderIndex}
                                         </td>
                                         <td>
                                             <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
@@ -285,9 +283,6 @@
                                     </td>
                                     <td class="center">
                                         EA/1
-                                    </td>
-                                    <td>
-
                                     </td>
                                     <td>
                                         <button class="button icon add" id="add-requisition-item"><warehouse:message code="default.button.add.label"/></button>
