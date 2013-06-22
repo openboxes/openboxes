@@ -179,7 +179,7 @@ class RequisitionTemplateController {
             productCodes.each { productCode ->
                 def product = Product.findByProductCode(productCode.trim())
                 if (product) {
-                    def requisitionItem = requisition.requisitionItems.find { it.product = product }
+                    def requisitionItem = requisition.requisitionItems.find { it.product == product }
                     if (!requisitionItem) {
                         requisitionItem = new RequisitionItem()
                         requisitionItem.product = product

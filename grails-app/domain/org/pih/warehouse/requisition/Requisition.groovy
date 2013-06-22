@@ -119,7 +119,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     static hasMany = [requisitionItems: RequisitionItem]
     static mapping = {
         id generator: 'uuid'
-        requisitionItems cascade: "all-delete-orphan", sort: "id"
+        requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc'
 //		comments cascade: "all-delete-orphan"
 //		documents cascade: "all-delete-orphan"
         //events cascade: "all-delete-orphan"

@@ -44,17 +44,14 @@ class JsonController {
     }
 
     def addToRequisitionItems = {
-        log.info "request " + request
-        log.info "params " + params
-        log.info "request.id " + request.id
-        log.info "params.id " + params.id
 
         def requisition = Requisition.get(params.requisitionId)
         def product = Product.get(params.productId);
+        def quantity = (params.quantity)?params.int("quantity"):1
         def requisitionItem = new RequisitionItem()
         if (requisition && product) {
             requisitionItem.product = product
-            requisitionItem.quantity = 1;
+            requisitionItem.quantity = quantity
             requisitionItem.substitutable = false
             requisition.addToRequisitionItems(requisitionItem)
             requisition.save(flush: true)
@@ -293,12 +290,12 @@ class JsonController {
     def findProductCodes = {
         def searchTerm = params.term + "%";
         def c = Product.createCriteria()
-        def productCodes = c.list {
-            projections { property "productCode" }
+        def products = c.list {
             ilike("productCode", searchTerm)
         }
 
-        def results = productCodes.unique().collect { [ value: it, label: it ] }
+        //"id": "Netta rufina", "label": "Red-crested Pochard", "value": "Red-crested Pochard" },
+        def results = products.unique().collect { [ value: it.productCode, label: it.productCode + " " + it.name ] }
         render results as JSON;
     }
 
@@ -438,6 +435,21 @@ class JsonController {
 				
 		render(text: "", contentType: "text/plain")
 	}
+
+    def sortRequisitionItems = {
+        println "sort requisition items " + params
+
+        params.get("requisitionItem[]").eachWithIndex { id, index ->
+            def requisitionItem
+            requisitionItem = RequisitionItem.get(id)
+            requisitionItem.orderIndex = index
+            requisitionItem.save(flush:true);
+            println ("requisitionItem " + id + " saved at index " + index)
+        }
+        //container.shipment.refresh()
+
+        render(text: "", contentType: "text/plain")
+    }
 
 	/**
 	 * Ajax method for the Record Inventory page.

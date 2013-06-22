@@ -29,6 +29,16 @@
 	<div class="yui-ga">
 		<div class="yui-u first">
 
+            <g:isUserAdmin>
+                <div class="buttonBar">
+                    <g:link controller="requisitionTemplate" action="list" class="button icon log">
+                        <warehouse:message code="requisitionTemplate.list.label"/>
+                    </g:link>
+                    <g:link controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']" class="button icon add">
+                        <warehouse:message code="requisitionTemplate.create.label" default="Create requisition template"/>
+                    </g:link>
+                </div>
+            </g:isUserAdmin>
 
 			<g:form name="requisitionForm" method="post" action="save">
 
@@ -115,17 +125,6 @@
                                     <g:unless test="${templates}">
                                         <div class="center empty">
                                             <warehouse:message code="requisitionTemplate.noPublishedTemplates.message"/>
-                                        </div>
-                                        <div class="center">
-                                            <g:isUserAdmin>
-                                                <g:link controller="requisitionTemplate" action="list" class="button">
-                                                    <warehouse:message code="requisitionTemplate.list.label"/>
-                                                </g:link>
-                                                <g:link controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']" class="button">
-                                                    <warehouse:message code="requisitionTemplate.create.label"/>
-                                                </g:link>
-
-                                            </g:isUserAdmin>
                                         </div>
                                     </g:unless>
                                 </td>

@@ -38,6 +38,12 @@
 					</g:link>		
 				</div>
                 --%>
+                <div class="action-menu-item">
+                    <g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit requisition template')}
+                    </g:link>
+                </div>
                 <g:if test="${!requisition.isPublished}">
                     <div class="action-menu-item">
                         <g:link controller="requisitionTemplate" action="publish" id="${requisition?.id}">
@@ -55,10 +61,7 @@
                     </div>
                 </g:else>
                 <div class="action-menu-item">
-                    <g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit requisition template')}
-                    </g:link>
+                    <hr/>
                 </div>
 
                 <div class="action-menu-item">
