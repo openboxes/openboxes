@@ -1,0 +1,3 @@
+language: groovy
+script: ./grailsw refresh-dependencies
+     && ./grailsw test-app unit: integration:
