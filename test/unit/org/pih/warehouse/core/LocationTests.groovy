@@ -83,10 +83,11 @@ class LocationTests extends GrailsUnitTestCase {
         assertEquals locations[1], location2
         assertEquals locations[2], location3
         assertEquals locations[3], location4
-
     }
 
-    @Ignore
+
+
+    @Test
     void compareTo_shouldSortBySortOrderThenByName() {
         def locations = [location3, location2, location1, location4]
         location1.sortOrder = 30

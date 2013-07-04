@@ -35,6 +35,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	Inventory inventory							// each warehouse has a single inventory
 	Boolean local = Boolean.TRUE				// indicates whether this warehouse is being managed on the locally deployed system
 	Boolean active = Boolean.TRUE				// indicates whether this warehouse is currently active
+    Integer sortOrder
 
 	Date dateCreated;
 	Date lastUpdated;
@@ -61,6 +62,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		active(nullable:false)
 		dateCreated(display:false)
 		lastUpdated(display:false)
+        sortOrder(nullable: true)
 	}
 	
 	static mapping = {
@@ -81,9 +83,14 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	List getUsers() { return User.findAllByWarehouse(this) }
 	
 	String toString() { return this.name } 
-	
+
+    /**
+     * Compares location by sort order and name.
+     * @param location
+     * @return
+     */
 	int compareTo(Location location) {
-		return name <=> location?.name
+		return sortOrder <=> location?.sortOrder ?: name <=> location?.name
 	}
 	
 	/**

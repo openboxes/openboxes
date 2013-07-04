@@ -45,7 +45,7 @@ class LocationController {
 			locations = Location.findAllByLocationType(locationType, params)
 			locationsTotal = Location.countByLocationType(locationType, params);
 		}
-		else if (params.q) { 
+		else if (params.q) {
 			def terms = "%" + params.q + "%"
 			locations = Location.findAllByNameLike(terms, params)
 			locationsTotal = Location.countByNameLike(terms, params);
