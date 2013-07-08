@@ -181,8 +181,8 @@ log4j = {
 				"IP address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
 				"Query string: %X{queryString}%n" +
-                "Clickstream: %n%X{clickStream}%n" +
-                "Stacktrace: %n%m%n%n"
+                "Stacktrace: %n%m%n%n" +
+                "Clickstream: %n%X{clickStream}%n"
 
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
