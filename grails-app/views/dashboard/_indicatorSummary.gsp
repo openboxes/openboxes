@@ -27,8 +27,8 @@
                     </g:each>
                     <g:unless test="${org.pih.warehouse.reporting.Indicator.list()}">
                         <tr>
-                            <td>
-                                <div class="empty">
+                            <td >
+                                <div class="empty center">
                                     <warehouse:message code="indicators.empty.label" default="No indicators available"/>
                                 </div>
                             </td>

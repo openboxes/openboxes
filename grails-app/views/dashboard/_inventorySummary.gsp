@@ -70,7 +70,7 @@
                     </tr>
                     <tr class="odd">
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'new_blue.png')}" class="middle"/>
+                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'bricks.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listReconditionedStock">

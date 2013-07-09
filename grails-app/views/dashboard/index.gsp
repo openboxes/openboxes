@@ -39,7 +39,7 @@
         <script type="text/javascript">
             //$(function() {
             $(window).load(function(){
-
+                //getIndicator("#reconditionedStockCount", "${request.contextPath}/json/getReconditionedStockCount?location.id=${session.warehouse.id}", 1000, "error");
                 $('#reconditionedStockCount').load('${request.contextPath}/json/getReconditionedStockCount?location.id=${session.warehouse.id}');
                 $('#totalStockCount').load('${request.contextPath}/json/getTotalStockCount?location.id=${session.warehouse.id}');
                 $('#inStockCount').load('${request.contextPath}/json/getInStockCount?location.id=${session.warehouse.id}');
@@ -52,6 +52,8 @@
                 $('#expiringIn90DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=90');
                 $('#expiringIn180DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=180');
                 $('#expiringIn365DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=365');
+
+
 
                 $(".spinner").click(function() {
                     $(this).hide();
@@ -70,6 +72,28 @@
                 });
 
             });
+
+            /*
+            function getIndicator(id, url, timeout, error) {
+                var value = $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "json",
+                    timeout: timeout,
+                    success: function(response) { console.log(response); },
+                    error: function(x, t, m) {
+                        if(t==="timeout") {
+                            console.log("got timeout");
+                        } else {
+                            console.log(t);
+                        }
+                    }
+                });
+                console.log(value);
+                $(id).val(value);
+            }
+            */
+
         </script>
 		
     </body>
