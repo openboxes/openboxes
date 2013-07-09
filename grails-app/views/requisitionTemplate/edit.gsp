@@ -237,7 +237,7 @@
             handle : '.sorthandle',
             axis : "y",
             helper: "clone",
-            //forcePlaceholderSize: true,
+            forcePlaceholderSize: true,
             placeholder: "ui-state-highlight",
             //connectWith: ".connectable",
             update : function() {
@@ -249,7 +249,7 @@
                 location.reload();
             }
         });
-
+        $( ".sortable" ).disableSelection();
         /*
          //$('.selectable').selectable();
          $('.draggable').draggable({

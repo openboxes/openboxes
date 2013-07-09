@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem;
 
@@ -234,6 +235,40 @@ class RequisitionTemplateController {
 
         redirect(action: "edit", id: requisition.id)
     }
+
+    def export = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            def date = new Date();
+            def sw = new StringWriter()
+
+            def csv = new CSVWriter(sw, {
+                "Product Code" {it.productCode}
+                "Product Name" {it.productName}
+                "Quantity" {it.quantity}
+                "UOM" {it.unitOfMeasure}
+            })
+
+            requisition.requisitionItems.each { requisitionItem ->
+                csv << [
+                        productCode: requisitionItem.product.productCode,
+                        productName: requisitionItem.product.name,
+                        quantity: requisitionItem.quantity,
+                        unitOfMeasure: "EA/1"
+                    ]
+            }
+
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=Stock List - ${requisition.origin.name} - ${date.format("yyyyMMdd-hhmmss")}.csv")
+            render(contentType:"text/csv", text: csv.writer.toString())
+            return;
+        }
+        else {
+            render(text: 'No requisition found', status: 404)
+        }
+
+    }
+
 
     /*
     def copy = {

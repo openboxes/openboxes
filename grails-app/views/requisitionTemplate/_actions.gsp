@@ -23,7 +23,7 @@
 					<div class="action-menu-item">
 						<g:link controller="requisitionTemplate" action="list">
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-							&nbsp;${warehouse.message(code: 'requisitionTemplate.list.label', default: 'List requisition templates')}
+							&nbsp;${warehouse.message(code: 'requisitionTemplate.list.label', default: 'List stock lists')}
 						</g:link>
 					</div>
 					<div class="action-menu-item">
@@ -41,14 +41,20 @@
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit requisition template')}
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisitionTemplate" action="export" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list')}
                     </g:link>
                 </div>
                 <g:if test="${!requisition.isPublished}">
                     <div class="action-menu-item">
                         <g:link controller="requisitionTemplate" action="publish" id="${requisition?.id}">
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'page_world.png')}" />
-                            &nbsp;${warehouse.message(code: 'requisitionTemplate.publish.label', default: 'Publish requisition template')}
+                            &nbsp;${warehouse.message(code: 'requisitionTemplate.publish.label', default: 'Publish stock list')}
                         </g:link>
                     </div>
                 </g:if>
@@ -56,7 +62,7 @@
                     <div class="action-menu-item">
                         <g:link controller="requisitionTemplate" action="unpublish" id="${requisition?.id}">
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'page_world.png')}" />
-                            &nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish requisition template')}
+                            &nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
                         </g:link>
                     </div>
                 </g:else>
