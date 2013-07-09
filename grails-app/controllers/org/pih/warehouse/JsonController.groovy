@@ -439,15 +439,14 @@ class JsonController {
     def sortRequisitionItems = {
         println "sort requisition items " + params
 
+        def requisitionItem
         params.get("requisitionItem[]").eachWithIndex { id, index ->
-            def requisitionItem
             requisitionItem = RequisitionItem.get(id)
             requisitionItem.orderIndex = index
             requisitionItem.save(flush:true);
             println ("requisitionItem " + id + " saved at index " + index)
         }
-        //container.shipment.refresh()
-
+        requisitionItem.requisition.refresh()
         render(text: "", contentType: "text/plain")
     }
 

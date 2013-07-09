@@ -3,7 +3,6 @@
 		<table>
 			<tbody>			
 				<tr>
-
                     <td class="top">
                         <g:render template="../requisition/actions" model="[requisition:requisition]" />
                     </td>
@@ -14,7 +13,6 @@
 							</g:if>
 						</div>
 
-						<div class="requisition-number">${requisition?.requestNumber }</div>
 					</td>
 					<td>
 						<div class="title" id="name">

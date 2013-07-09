@@ -9,7 +9,7 @@
                 <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
                 &nbsp;
                 --%>
-                <warehouse:message code="default.details.label" default="Requisition"/>
+                <warehouse:message code="requisition.label" default="Requisition"/>
                 <div class="right">
                     <g:if test="${requisition?.id }">
                         <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class=" icon edit">
@@ -155,6 +155,14 @@
 
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
+                            code="default.version.label" default="Version" /></label>
+                    </td>
+                    <td class="value">
+                        v${requisition?.version }
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
                             code="requisition.requestedBy.label" /></label></td>
                     <td class="value">
                         ${requisition?.requestedBy?.name }
@@ -171,7 +179,7 @@
                     <td class="value">
                         ${requisition?.createdBy?.name}
                         <div class="fade">
-                            <g:formatDate date="${requisition?.lastUpdated }"/>
+                            <g:formatDate date="${requisition?.dateCreated }"/>
                         </div>
                     </td>
                 </tr>

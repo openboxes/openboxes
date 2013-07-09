@@ -105,7 +105,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Fulfillment fulfillment;
 
-    List requisitionItems
+    //List requisitionItems
 
     // Audit fields
     Date dateCreated

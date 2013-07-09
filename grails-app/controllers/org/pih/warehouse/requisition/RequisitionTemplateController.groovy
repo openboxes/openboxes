@@ -57,9 +57,20 @@ class RequisitionTemplateController {
             redirect(action: "list")
         }
         else {
-            [requisition: requisition];
+            [requisition: requisition]
         }
 	}
+
+    def editHeader = {
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            flash.message = "Could not find requisition with ID ${params.id}"
+            redirect(action: "list")
+        }
+        else {
+            [requisition: requisition];
+        }
+    }
 
 	def save = {
         def requisition = new Requisition(params)

@@ -3,7 +3,12 @@
 		<table>
 			<tbody>			
 				<tr>
-					<td class="center">
+
+                    <td class="top">
+                        <g:render template="actions" model="[requisition:requisition]" />
+                    </td>
+                    <%--
+                    <td class="center">
                         <g:if test="${requisition?.requestNumber }">
                             <div>
                                 <img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
@@ -12,10 +17,11 @@
                                 ${requisition?.requestNumber }
                             </div>
                         </g:if>
-					</td>				
+					</td>
+				    --%>
 					<td>
 						<div class="title" id="description">
-							${requisition?.name }
+                            <warehouse:message code="requisitionTemplate.label"/> - ${requisition.origin} - v${requisition.version}
 						</div> 						
 						<div class="clear"></div>
 						<div class="fade">
@@ -29,43 +35,27 @@
 	                            <b>${requisition?.destination?.name?.encodeAsHTML()?:session?.warehouse?.name}</b>
 							</span>							
 							<span class="fade">&nbsp;|&nbsp;</span>
-							<span class="requested-date">
-								<warehouse:message code="requisition.date.label"/>: 
-								<b><format:date obj="${requisition?.dateRequested}"/></b>
-							</span>
-							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="request-items">
-								<warehouse:message code="requisition.requisitionItem.label"/>:
+								<warehouse:message code="requisition.requisitionItems.label"/>:
 								<b>${requisition?.requisitionItems?.size()?:0}</b>
-							</span>
-							
-							<%--
-							<span class="fade">&nbsp;|&nbsp;</span>
-							<span class="requested-by">
-								<warehouse:message code="requisition.processedBy.label"/>:
-								<b>${requisition?.createdBy?.name?:warehouse.message(code: 'default.none.label') }</b>								
-							</span>
-							<span class="fade">&nbsp;|&nbsp;</span>
-							<span class="requested-by">
-								<warehouse:message code="requisition.requestedBy.label"/>:
-								<b>${requisition?.requestedBy?.name?:warehouse.message(code: 'default.none.label') }</b>								
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span id="recipientProgram">
 								<warehouse:message code="requisition.recipientProgram.label"/>:
 	                            <b>${requisition?.recipientProgram?:warehouse.message(code: 'default.none.label') }</b>
 							</span>							
-							<span class="fade">&nbsp;|&nbsp;</span>
-							<span id="recipient">
-								<warehouse:message code="requisition.recipient.label"/>:
-	                           <b>${requisition?.recipient?.name?:warehouse.message(code: 'default.none.label')}</b>
-							</span>							
-							 --%>	
 						</div>
 					</td>
 					<td>
 						<div class="left">	
-							<div class="title">${requisition?.status }</div>
+							<div class="title">
+                                <g:if test="${requisition.isPublished}">
+                                    <warehouse:message code="default.published.label" default="Published"/>
+                                </g:if>
+                                <g:else>
+                                    <warehouse:message code="default.unpublished.label" default="Unpublished"/>
+                                </g:else>
+                            </div>
 							<div class="clear"></div>
 							<div class="fade">
 								<g:formatDate date="${requisition?.lastUpdated }" format="MMM dd, yyyy hh:mma"/>

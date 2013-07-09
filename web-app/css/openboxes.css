@@ -2120,9 +2120,9 @@ div.clear {
    ========================================================================== */
 
 #requisition-header{
-    padding: 0.5em;
+    /*padding: 0.5em;
     margin-left: 0.5em;
-    /*margin-bottom: 2.0em*/
+    margin-bottom: 2.0em*/
 }
 
 #requisition-header .title {
