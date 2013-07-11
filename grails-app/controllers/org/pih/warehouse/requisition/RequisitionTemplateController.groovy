@@ -329,21 +329,24 @@ class RequisitionTemplateController {
                     def quantity = Integer.parseInt(row[2])
                     def unitOfMeasure = row[3]
                     println "Quantity " + quantity
-                    def product = Product.findByProductCode(productCode)
-                    def requisitionItem = requisition.requisitionItems.find { it.product == product }
-                    if (requisitionItem) {
-                        requisitionItem.quantity = quantity
+                    // Ignore if quantity is null or 0
+                    if (quantity) {
+                        def product = Product.findByProductCode(productCode)
+                        def requisitionItem = requisition.requisitionItems.find { it.product == product }
+                        if (requisitionItem) {
+                            requisitionItem.quantity = quantity
+                        }
+                        else {
+                            requisitionItem = new RequisitionItem()
+                            requisitionItem.product = product
+                            requisitionItem.quantity = quantity
+                            requisitionItem.substitutable = false
+                            requisition.addToRequisitionItems(requisitionItem)
+                        }
                     }
-                    else {
-                        requisitionItem = new RequisitionItem()
-                        requisitionItem.product = product
-                        requisitionItem.quantity = quantity
-                        requisitionItem.substitutable = false
-                        requisition.addToRequisitionItems(requisitionItem)
-                    }
-                    requisition.save(flush: true);
                 }
             }
+            requisition.save(flush: true);
             flash.message = "Imported stock list items"
 
         }
