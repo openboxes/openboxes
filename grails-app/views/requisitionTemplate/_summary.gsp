@@ -21,7 +21,7 @@
 				    --%>
 					<td>
 						<div class="title" id="description">
-                            <warehouse:message code="requisitionTemplate.label"/> - ${requisition.origin} - v${requisition.version}
+                            ${requisition.name}
 						</div> 						
 						<div class="clear"></div>
 						<div class="fade">

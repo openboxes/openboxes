@@ -43,11 +43,42 @@
 
 				<div id="requisition-template-details" class="dialog ui-validation box">
 
-                    <h2>${warehouse.message(code:'requisitionTemplate.label')}</h2>
+                    <h2>${warehouse.message(code:'requisitionTemplate.label', default: 'Stock list')}</h2>
 
                     <table id="requisition-template-table">
 
                         <tbody>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="name">
+                                        <warehouse:message code="default.name.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
+                                    <g:textField name="name" value="${requisition.name}" class="text" size="80"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="origin.id">
+                                        <warehouse:message code="requisition.requestingLocation.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                    <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" noSelection="['null':'']"  class="chzn-select-deselect"/>
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="commodityClass">
+                                        <warehouse:message code="requisition.commodityClass.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']" class="chzn-select-deselect"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="destination.id">
@@ -68,26 +99,6 @@
                                 <td class="value">
                                     <g:hiddenField name="type" value="${requisition.type}"/>
                                     ${requisition.type}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="commodityClass">
-                                        <warehouse:message code="requisition.commodityClass.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']" class="chzn-select-deselect"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="origin.id">
-                                        <warehouse:message code="requisition.requestingLocation.label" />
-                                    </label>
-                                </td>
-                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                    <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" noSelection="['null':'']"  class="chzn-select-deselect"/>
                                 </td>
                             </tr>
 

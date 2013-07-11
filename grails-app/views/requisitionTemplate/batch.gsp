@@ -45,30 +45,91 @@
     </div>
     <div class="yui-u">
         <div class="box">
-            <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Add multiple requisition items by product code")}</h2>
+            <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Copy-and-paste CSV/TSV")}</h2>
+            <g:if test="${data}">
+                <g:form method="post" controller="requisitionTemplate" action="doImport">
+                    <g:hiddenField name="id" value="${requisition?.id}" />
+                    <g:hiddenField name="version" value="${requisition?.version}" />
+                    <table>
+                        <g:each var="row" in="${data}" status="count">
+                            <tr class="${count%2?'even':'odd'}">
+                                <td>${count}</td>
+                                <g:each var="column" in="${row}">
+                                    <td>${column}</td>
+                                </g:each>
+                            </tr>
+                        </g:each>
+                        <tr>
+                            <td class="left">
+                                <button class="button icon add">
+                                    ${warehouse.message(code:'requisitionTemplate.import.label', default: 'Import')}
+                                </button>
+                                <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}">
+                                    ${warehouse.message(code:'default.button.clear.label')}
+                                </g:link>
+                            </td>
+                        </tr>
+                    </table>
+                </g:form>
+            </g:if>
+            <g:else>
 
-            <g:form method="post" controller="requisitionTemplate" action="addToRequisitionItems">
+                <g:form method="post" controller="requisitionTemplate" action="importAsString">
+                    <g:hiddenField name="id" value="${requisition?.id}" />
+                    <g:hiddenField name="version" value="${requisition?.version}" />
+                    <table>
+                        <tr>
+                            <td>
+                                <g:textArea name="csv" rows="10" style="width:100%"></g:textArea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="middle">
+                                <g:radio name="delimiter" value="\t" checked="${params.delimiter.equals('\t')||!params.delimiter}"/> Tab
+                                <g:radio name="delimiter" value="," checked="${params.delimiter.equals(',')}"/> Comma
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">
+                                <button class="button icon add">
+                                    ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Process')}
+                                </button>
+                                <g:link controller="requisitionTemplate" action="export" id="${requisition?.id}" class="button icon log">
+                                    ${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list')}
+                                </g:link>
+                                &nbsp;
+                                <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}">
+                                    ${warehouse.message(code:'default.button.clear.label')}
+                                </g:link>
+                            </td>
+                        </tr>
+                    </table>
+                </g:form>
+            </g:else>
+        </div>
+        <%--
+        <div class="box">
+            <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Upload CSV/TSV")}</h2>
+            <g:uploadForm controller="requisitionTemplate" action="importAsFile">
                 <g:hiddenField name="id" value="${requisition?.id}" />
                 <g:hiddenField name="version" value="${requisition?.version}" />
                 <table>
-                    <tr>
-                        <td>
-                            <g:textField id="productCodesInput" name="multipleProductCodes" value=""/>
+                    <tr class="prop">
+                        <td valign="top" class="name"><label><warehouse:message
+                                code="document.selectFile.label" /></label>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="left">
-                            <button class="button icon add">
-                                ${warehouse.message(code:'requisitionTemplate.addToProducts.label', default: 'Add to products')}
-                            </button>
+                        <td valign="top" class="value">
+                            <input name="file" type="file" />
+                            &nbsp;
+                            <!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+                            <button type="submit" class="button icon approve">
+                                ${warehouse.message(code:'default.button.upload.label')}</button>
                         </td>
                     </tr>
                 </table>
-            </g:form>
-
-
+            </g:uploadForm>
         </div>
-
+        --%>
 
         <div class="box">
             <h2>${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}</h2>
@@ -92,7 +153,7 @@
                 <g:hiddenField name="version" value="${requisition.version}"/>
 
                 <div>
-                    <table class="sortable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
+                    <table  class="sortable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
                         <thead>
                         <tr>
                             <th></th>
@@ -188,49 +249,6 @@
 </div>
 <script>
     $(document).ready(function() {
-        $("#product-suggest").focus();
-        $("#add-requisition-item").click(function(event) {
-            event.preventDefault();
-            var productId = $("#product-value").val();
-            var requisitionId = $("#id").val();
-            var quantity = $("#quantity").val();
-            console.log(productId);
-            console.log(requisitionId);
-
-            var jsonData = { "productId": productId, "requisitionId": requisitionId, "quantity": quantity }
-            console.log(jsonData);
-            $.ajax({
-                url: "${request.contextPath}/json/addToRequisitionItems",
-                type: "get",
-                contentType: 'text/json',
-                dataType: "json",
-                data: jsonData,
-                success: function(data) {
-                    console.log("success");
-                    console.log(data);
-                    location.reload();
-                },
-                error: function(data) {
-                    console.log("error");
-                    console.log(data);
-                    location.reload();
-                }
-            });
-
-        });
-
-        $("#selectAllProducts").click(function(event) {
-            var checked = ($(this).attr("checked") == 'checked');
-            $("input.select-product[type='checkbox']").attr("checked", checked);
-        });
-
-        $('#productCodesInput').tagsInput({
-            'autocomplete_url':'${createLink(controller: 'json', action: 'findProductCodes')}',
-            'defaultText': '...',
-            'width': 'auto',
-            'height': 'auto',
-            'removeWithBackspace' : true
-        });
 
 
         $(".sortable tbody").sortable({
@@ -251,51 +269,9 @@
             }
         });
         $( ".sortable" ).disableSelection();
-        /*
-         //$('.selectable').selectable();
-         $('.draggable').draggable({
-         handle		: ".draghandle",
-         helper		: "clone",
-         //helper		: function( event ) { return $("<div class='ui-widget-header'>I'm a custom helper</div>"); },
-         revert		: true,
-         zIndex		: 2700,
-         autoSize	: true,
-         ghosting	: true,
-         onStart		: function ( event ) { alert("started") },
-         onStop		: function() { $('.droppable').each(function() { this.expanded = false; }); }
-         });
-         */
-        /*
-         $('.droppable').droppable( {
-         accept: '.draggable',
-         tolerance: 'intersect',
-         //greedy: true,
-         over: function(event, ui) {
-         $( this ).addClass( "ui-state-highlight" );
-         },
-         out: function(event, ui) {
-         $( this ).removeClass( "ui-state-highlight" );
-         },
-         drop: function( event, ui ) {
-         //alert("dropped");
-         //ui.draggable.hide();
-         ui.draggable.addClass( "strikethrough" );
-         $( this ).removeClass( "ui-state-highlight" );
-         var requisitionItem = ui.draggable.attr("data-requisitionItem");
-         var container = $(this).attr("container");
-         $("#shipmentItemRow-" + shipmentItem).hide();
-         moveShipmentItemToContainer(shipmentItem, container);
-         window.location.reload();
-         //alert("Move item " + shipmentItem + " to container " + container);
-         }
-         });
-         */
+
     });
 
-
-    function refreshTable(id) {
-
-    }
 
 </script>
 </body>

@@ -27,8 +27,13 @@
 
 	
 	
-	<div class="yui-ga">
-		<div class="yui-u first">
+	<div class="yui-gd">
+
+        <div class="yui-u first">
+            <g:render template="header" model="[requisition:requisition]"/>
+
+        </div>
+        <div class="yui-u">
 
 
 			<g:form name="requisitionForm" method="post" action="save">
@@ -55,141 +60,138 @@
 					</div>
 					
 				</g:if>
-                <div class="yui-g">
-                    <div class="yui-u first">
 
 
+                <div id="requisition-template-details" class="dialog ui-validation box">
+                    <h2>${warehouse.message(code:'requisitionTemplate.label')}</h2>
 
-                        <div id="requisition-template-details" class="dialog ui-validation box">
-                            <h2>${warehouse.message(code:'requisitionTemplate.label')}</h2>
+                    <table id="requisition-template-table">
 
-                            <table id="requisition-template-table">
+                        <tbody>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="origin.id">
+                                        <warehouse:message code="requisition.requestingLocation.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                    <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
+                                        class="chzn-select-deselect" noSelection="['null':'']"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="commodityClass">
+                                        <warehouse:message code="requisition.commodityClass.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:selectCommodityClass name="commodityClass" class="chzn-select-deselect" value="${requisition?.commodityClass}" noSelection="['null':'']"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="type">
+                                        <warehouse:message code="requisition.isTemplate.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:hiddenField name="isTemplate" value="${requisition.isTemplate}"/>
+                                    ${requisition.isTemplate}
 
-                                <tbody>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="type">
-                                                <warehouse:message code="requisition.isTemplate.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value">
-                                            <g:hiddenField name="isTemplate" value="${requisition.isTemplate}"/>
-                                            ${requisition.isTemplate}
-
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="type">
-                                                <warehouse:message code="requisition.isPublished.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value">
-                                            <g:checkBox name="isPublished" value="${requisition.isPublished}"/>
-                                            <g:if test="${requisition?.isPublished}">
-                                            ${requisition.datePublished}
-                                            </g:if>
-
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="type">
-                                                <warehouse:message code="requisition.requisitionType.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value">
-                                            <g:hiddenField name="type" value="${requisition.type}"/>
-                                            ${requisition.type}
-
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="commodityClass">
-                                                <warehouse:message code="requisition.commodityClass.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value">
-                                            <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="origin.id">
-                                                <warehouse:message code="requisition.requestingLocation.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" noSelection="['null':'']"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="destination.id">
-                                                <warehouse:message code="requisition.destination.label" />
-                                            </label>
-                                        </td>
-                                        <td class="value">
-                                            <g:hiddenField name="destination.id" value="${requisition?.destination?.id?:session?.warehouse?.id}"/>
-                                            ${requisition?.destination?.name?:session?.warehouse?.name }
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label><warehouse:message
-                                                    code="requisition.createdBy.label" /></label>
-                                        </td>
-                                        <td class="value">
-                                            <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
-                                            ${requisition?.createdBy?.name?:session?.user?.name }
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label><warehouse:message
-                                                    code="requisition.requestedBy.label" /></label>
-                                        </td>
-                                        <td class="value">
-                                            <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
-                                            ${requisition?.requestedBy?.name?:session?.user?.name }
-                                        </td>
-                                    </tr>
-                                    <g:if test="${requisition.isDepotRequisition()}">
-                                        <tr>
-                                            <td class="name"><label><warehouse:message
-                                                        code="requisition.program.label" /></label></td>
-                                            <td class="value">
-
-                                            </td>
-                                        </tr>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="type">
+                                        <warehouse:message code="requisition.isPublished.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:checkBox name="isPublished" value="${requisition.isPublished}"/>
+                                    <g:if test="${requisition?.isPublished}">
+                                    ${requisition.datePublished}
                                     </g:if>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label for="description">
-                                                <warehouse:message code="default.description.label" />
-                                            </label>
-                                        </td>
 
-                                        <td class="value">
-                                            <g:textArea name="description" cols="80" rows="5"
-                                                placeholder="${warehouse.message(code:'requisition.description.message')}"
-                                                class="text">${requisition.description }</g:textArea>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="buttons">
-                            <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                            &nbsp;
-                            <g:link controller="requisitionTemplate" action="list">
-                                <warehouse:message code="default.button.cancel.label"/>
-                            </g:link>
-                        </div>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="type">
+                                        <warehouse:message code="requisition.requisitionType.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:hiddenField name="type" value="${requisition.type}"/>
+                                    ${requisition.type}
 
-					</div>
-				</div>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="destination.id">
+                                        <warehouse:message code="requisition.destination.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:hiddenField name="destination.id" value="${requisition?.destination?.id?:session?.warehouse?.id}"/>
+                                    ${requisition?.destination?.name?:session?.warehouse?.name }
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message
+                                            code="requisition.createdBy.label" /></label>
+                                </td>
+                                <td class="value">
+                                    <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
+                                    ${requisition?.createdBy?.name?:session?.user?.name }
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message
+                                            code="requisition.requestedBy.label" /></label>
+                                </td>
+                                <td class="value">
+                                    <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
+                                    ${requisition?.requestedBy?.name?:session?.user?.name }
+                                </td>
+                            </tr>
+                            <g:if test="${requisition.isDepotRequisition()}">
+                                <tr>
+                                    <td class="name"><label><warehouse:message
+                                                code="requisition.program.label" /></label></td>
+                                    <td class="value">
+
+                                    </td>
+                                </tr>
+                            </g:if>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="description">
+                                        <warehouse:message code="default.description.label" />
+                                    </label>
+                                </td>
+
+                                <td class="value">
+                                    <g:textArea name="description" cols="80" rows="5"
+                                        placeholder="${warehouse.message(code:'requisition.description.message')}"
+                                        class="text">${requisition.description }</g:textArea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="buttons">
+                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+                    &nbsp;
+                    <g:link controller="requisitionTemplate" action="list">
+                        <warehouse:message code="default.button.cancel.label"/>
+                    </g:link>
+                </div>
+
+
 			</g:form>
 		</div>
 	</div>

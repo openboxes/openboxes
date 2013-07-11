@@ -46,8 +46,14 @@
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="export" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
                         &nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisitionTemplate" action="batch" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_go.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.import.label', default: 'Import stock list')}
                     </g:link>
                 </div>
                 <g:if test="${!requisition.isPublished}">
@@ -73,7 +79,7 @@
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="delete" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.delete.label', default: 'Delete requisition template')}
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.delete.label', default: 'Delete stock list')}
                     </g:link>
                 </div>
 

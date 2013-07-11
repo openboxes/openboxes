@@ -140,7 +140,8 @@ class RequisitionTemplateController {
             requisition.properties = params
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action:"list")
+                redirect(action: "edit", id: requisition.id)
+                //redirect(action:"list")
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -269,6 +270,86 @@ class RequisitionTemplateController {
 
     }
 
+    def batch = {
+        def requisition = Requisition.get(params.id)
+
+
+        [requisition:requisition]
+    }
+
+
+    def importAsString = {
+        def lines = []
+        def data = []
+
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            def delimiter = params.delimiter
+            if (delimiter) {
+                if (params.csv) {
+                    //lines = params?.csv?.eachLine
+                    params?.csv?.eachCsvLine { line ->
+                        println "line: " + line
+                        def row = line[0].split(delimiter)
+                        if (row) {
+                            data << row
+                        }
+                    }
+                }
+            }
+            else {
+                flash.message = "Please choose a delimiter"
+            }
+        }
+        session.data = data
+        render (view: "batch", model: [requisition:requisition,data:data])
+    }
+
+    def importAsFile = {
+        def requisition = Requisition.get(params.id)
+
+        if (requisition) {
+            def file = request.getFile('file')
+            def lines = file.inputStream.toCsvReader().readAll()
+
+            println lines
+            render lines
+        }
+    }
+
+    def doImport = {
+
+        def requisition = Requisition.get(params.id)
+        if (session.data) {
+            def data = session.data
+            data.each { row ->
+                // Ignore the first row if the user included header info
+                if (row[0] != "Product Code" && row[2] != "Quantity") {
+                    def productCode = row[0]
+                    def quantity = Integer.parseInt(row[2])
+                    def unitOfMeasure = row[3]
+                    println "Quantity " + quantity
+                    def product = Product.findByProductCode(productCode)
+                    def requisitionItem = requisition.requisitionItems.find { it.product == product }
+                    if (requisitionItem) {
+                        requisitionItem.quantity = quantity
+                    }
+                    else {
+                        requisitionItem = new RequisitionItem()
+                        requisitionItem.product = product
+                        requisitionItem.quantity = quantity
+                        requisitionItem.substitutable = false
+                        requisition.addToRequisitionItems(requisitionItem)
+                    }
+                    requisition.save(flush: true);
+                }
+            }
+            flash.message = "Imported stock list items"
+
+        }
+        redirect(action: "batch", id: params.id)
+
+    }
 
     /*
     def copy = {
