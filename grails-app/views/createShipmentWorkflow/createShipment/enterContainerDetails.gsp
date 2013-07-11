@@ -318,7 +318,8 @@
 											<tr>
 												<th class="middle"><warehouse:message code="default.actions.label"/></th>
 												<th class="left middle"><warehouse:message code="default.qty.label"/></th>
-												<th class="middle"><warehouse:message code="default.item.label"/></th>
+                                                <th class="middle"><warehouse:message code="product.productCode.label"/></th>
+												<th class="middle"><warehouse:message code="product.label"/></th>
 												<th class="center middle"><warehouse:message code="default.lotSerialNo.label"/></th>
 												<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
 												<th class="middle"><warehouse:message code="shipping.recipients.label"/></th>
@@ -352,12 +353,15 @@
 																&nbsp;
 																${shipmentItem?.quantity} 
 																${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-															</span>													
+															</span>
 														</td>
+                                                        <td>
+                                                            ${shipmentItem?.product?.productCode}
+                                                        </td>
 														<td class="middle">
 															<div>
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
-																	<format:product product="${shipmentItem?.inventoryItem?.product}"/> 
+                                                                    <format:product product="${shipmentItem?.inventoryItem?.product}"/>
 																</g:link>
 															</div>
 														</td>
