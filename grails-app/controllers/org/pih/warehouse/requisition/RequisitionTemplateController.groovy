@@ -183,6 +183,24 @@ class RequisitionTemplateController {
         redirect(action: "list", id:params.id)
     }
 
+    def clear = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            try {
+                requisitionService.clearRequisition(requisition)
+                flash.message = "${warehouse.message(code: 'default.cleared.message', default: '{0} cleared', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+        }
+        redirect(action: "list", id:params.id)
+    }
+
+
     def addToRequisitionItems = {
         def requisition = Requisition.get(params.id)
         if (requisition) {
@@ -237,6 +255,7 @@ class RequisitionTemplateController {
         redirect(action: "edit", id: requisition.id)
     }
 
+
     def export = {
         def requisition = Requisition.get(params.id)
         if (requisition) {
@@ -260,7 +279,7 @@ class RequisitionTemplateController {
             }
 
             response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename=Stock List - ${requisition.origin.name} - ${date.format("yyyyMMdd-hhmmss")}.csv")
+            response.setHeader("Content-disposition", "attachment; filename='Stock List - ${requisition.origin.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
             render(contentType:"text/csv", text: csv.writer.toString())
             return;
         }
@@ -288,11 +307,11 @@ class RequisitionTemplateController {
             if (delimiter) {
                 if (params.csv) {
                     //lines = params?.csv?.eachLine
-                    params?.csv?.eachCsvLine { line ->
-                        println "line: " + line
-                        def row = line[0].split(delimiter)
-                        if (row) {
-                            data << row
+                    params?.csv?.toCsvReader('separatorChar':delimiter,'skipLines':params.skipLines?:0).eachLine { tokens ->
+                        println "line: " + tokens + " delimiter=" + delimiter
+                        println "ROW " + tokens
+                        if (tokens) {
+                            data << tokens
                         }
                     }
                 }
@@ -318,7 +337,9 @@ class RequisitionTemplateController {
     }
 
     def doImport = {
-
+        def updateCount = 0
+        def insertCount = 0;
+        def ignoreCount = 0;
         def requisition = Requisition.get(params.id)
         if (session.data) {
             def data = session.data
@@ -334,7 +355,13 @@ class RequisitionTemplateController {
                         def product = Product.findByProductCode(productCode)
                         def requisitionItem = requisition.requisitionItems.find { it.product == product }
                         if (requisitionItem) {
-                            requisitionItem.quantity = quantity
+                            if (requisitionItem.quantity != quantity) {
+                                requisitionItem.quantity = quantity
+                                updateCount++
+                            }
+                            else {
+                                ignoreCount++
+                            }
                         }
                         else {
                             requisitionItem = new RequisitionItem()
@@ -342,12 +369,13 @@ class RequisitionTemplateController {
                             requisitionItem.quantity = quantity
                             requisitionItem.substitutable = false
                             requisition.addToRequisitionItems(requisitionItem)
+                            insertCount++
                         }
                     }
                 }
             }
             requisition.save(flush: true);
-            flash.message = "Imported stock list items"
+            flash.message = "Imported ${insertCount} stock list items; updated ${updateCount} stock list items; ignored ${ignoreCount} stock list items"
 
         }
         redirect(action: "batch", id: params.id)

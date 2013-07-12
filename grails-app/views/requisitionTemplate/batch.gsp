@@ -51,24 +51,37 @@
                     <g:hiddenField name="id" value="${requisition?.id}" />
                     <g:hiddenField name="version" value="${requisition?.version}" />
                     <table>
-                        <g:each var="row" in="${data}" status="count">
-                            <tr class="${count%2?'even':'odd'}">
-                                <td>${count}</td>
-                                <g:each var="column" in="${row}">
-                                    <td>${column}</td>
-                                </g:each>
+                        <thead>
+                            <tr>
+                                <th>${warehouse.message(code:'default.row.label', default: 'Row')}</th>
+                                <th>${warehouse.message(code:'product.productCode.label', default: 'Product code')}</th>
+                                <th>${warehouse.message(code:'product.label', default: 'Product')}</th>
+                                <th>${warehouse.message(code:'default.qty.label', default: 'Qty')}</th>
+                                <th>${warehouse.message(code:'default.uom.label', default: 'UOM')}</th>
                             </tr>
-                        </g:each>
-                        <tr>
-                            <td class="left">
-                                <button class="button icon add">
-                                    ${warehouse.message(code:'requisitionTemplate.import.label', default: 'Import')}
-                                </button>
-                                <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}">
-                                    ${warehouse.message(code:'default.button.clear.label')}
-                                </g:link>
-                            </td>
-                        </tr>
+                        </thead>
+                        <tbody>
+                            <g:each var="row" in="${data}" status="count">
+                                <tr class="${count%2?'even':'odd'}">
+                                    <td>${count+1}</td>
+                                    <g:each var="column" in="${row}">
+                                        <td>${column}</td>
+                                    </g:each>
+                                </tr>
+                            </g:each>
+                        </tbody>
+                        <tfoot>
+                            <tr >
+                                <td class="left" colspan="5">
+                                    <button class="button icon add">
+                                        ${warehouse.message(code:'requisitionTemplate.import.label', default: 'Import stock list')}
+                                    </button>
+                                    <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}" class="button icon arrowleft">
+                                        ${warehouse.message(code:'default.button.back.label')}
+                                    </g:link>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </g:form>
             </g:if>
@@ -78,31 +91,45 @@
                     <g:hiddenField name="id" value="${requisition?.id}" />
                     <g:hiddenField name="version" value="${requisition?.version}" />
                     <table>
-                        <tr>
-                            <td>
-                                <g:textArea name="csv" rows="10" style="width:100%"></g:textArea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="middle">
-                                <g:radio name="delimiter" value="\t" checked="${params.delimiter.equals('\t')||!params.delimiter}"/> Tab
-                                <g:radio name="delimiter" value="," checked="${params.delimiter.equals(',')}"/> Comma
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="left">
-                                <button class="button icon add">
-                                    ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Process')}
-                                </button>
-                                <g:link controller="requisitionTemplate" action="export" id="${requisition?.id}" class="button icon log">
-                                    ${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list')}
-                                </g:link>
-                                &nbsp;
-                                <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}">
-                                    ${warehouse.message(code:'default.button.clear.label')}
-                                </g:link>
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr class="prop">
+                                <td class="top name">
+                                    <label>${warehouse.message(code:'requisitionTemplate.delimiter.label', default: 'Column delimiter')}</label>
+                                </td>
+                                <td class="middle">
+                                    <g:radio name="delimiter" value="\t" checked="${params.delimiter.equals('\t')||!params.delimiter}"/> Tab
+                                    <g:radio name="delimiter" value="," checked="${params.delimiter.equals(',')}"/> Comma
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="top name">
+                                    <label>${warehouse.message(code:'requisitionTemplate.skipLines.label', default: 'Skip lines')}</label>
+                                </td>
+                                <td class="middle">
+                                    <g:textField name="skipLines" value="${params.skipLines?:0}" class="text"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label>${warehouse.message(code:'requisitionTemplate.data.label', default: 'Data')}</label>
+                                </td>
+                                <td class="value">
+                                    <g:textArea name="csv" rows="10" style="width:100%"></g:textArea>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="left" colspan="5">
+                                    <button class="button icon add">
+                                        ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Process stock list')}
+                                    </button>
+                                    <g:link controller="requisitionTemplate" action="edit" id="${requisition.id}" class="button icon arrowleft">
+                                        ${warehouse.message(code:'default.button.back.label')}
+                                    </g:link>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </g:form>
             </g:else>
@@ -131,21 +158,10 @@
         </div>
         --%>
 
+
+        <%--
         <div class="box">
             <h2>${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}</h2>
-        <%--
-        <div class="center">
-            <g:form controller="requisitionTemplate" action="addToRequisitionItems">
-                <g:hiddenField name="id" value="${requisition.id}"/>
-
-                <g:textArea name="multipleProductCodes" cols="75" rows="3"
-                            placeholder="${warehouse.message(code:'requisitionTemplate.enterProductCodes.message', default:'Enter multiple product codes separated by commas')}"></g:textArea>
-
-                <button class="button" id="add-requisition-items"><warehouse:message code="default.button.add.label"/></button>
-            </g:form>
-        </div>
-        --%>
-
             <g:form name="requisitionItemForm" method="post" controller="requisitionTemplate" action="update">
 
 
@@ -244,7 +260,9 @@
                     </table>
                 </div>
             </g:form>
+
         </div>
+        --%>
     </div>
 </div>
 <script>

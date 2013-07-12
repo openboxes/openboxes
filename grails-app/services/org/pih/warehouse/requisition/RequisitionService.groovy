@@ -48,7 +48,7 @@ class RequisitionService {
      * Get requisition template
      */
     def getAllRequisitionTemplates(Location destination) {
-        return getRequisitions(new Requisition(destination:destination, isTemplate: true, isPublished: true), [max: -1, offset: 0])
+        return getRequisitions(new Requisition(destination:destination, isTemplate: true), [max: -1, offset: 0])
     }
 
     def getAllRequisitions(Location destination) {
@@ -89,8 +89,10 @@ class RequisitionService {
         //return Requisition.findAllByDestination(session.warehouse)
 
         def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
+        //def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
         def criteria = Requisition.createCriteria()
 
+        //println commodityClassIsNull
 
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
             and {
@@ -135,6 +137,9 @@ class RequisitionService {
                 if (requisition.commodityClass) {
                     eq("commodityClass", requisition.commodityClass)
                 }
+                //if (commodityClassIsNull) {
+                //    isNull("commodityClass")
+                //}
                 if (requisition.type) {
                     eq("type", requisition.type)
                 }
@@ -334,7 +339,19 @@ class RequisitionService {
 		requisition.delete(flush: true)
 	}
 
-	void cancelRequisition(Requisition requisition) {
+    void clearRequisition(Requisition requisition) {
+        //def ids = requisition.requisitionItems.collect { it }
+        //ids.each { id ->
+        //    def requisitionItem = RequisitionItem.get(id);
+        //    requisition.removeFromRequisitionItems()
+        //}
+        requisition.requisitionItems*.delete()
+        requisition.requisitionItems.clear()
+        requisition.save(flush: true)
+    }
+
+
+    void cancelRequisition(Requisition requisition) {
 		requisition.status = RequisitionStatus.CANCELED
 		requisition.save(flush: true)
 	}

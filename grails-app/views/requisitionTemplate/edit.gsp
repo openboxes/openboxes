@@ -122,7 +122,7 @@
                                     <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
                                 </td>
                                 <td>
-                                    <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id" class="chzn-select-deselect"
+                                    <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id"
                                                            product="${requisitionItem?.product}" value="${requisitionItem?.productPackage?.id}"/>
                                 </td>
                                 <td>
@@ -169,10 +169,10 @@
                         <tr>
                             <td colspan="7">
                                 <div class="buttons">
-                                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                                    &nbsp;
-                                    <g:link controller="requisitionTemplate" action="list">
-                                        <warehouse:message code="default.button.cancel.label"/>
+                                    <button class="button icon approve" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+
+                                    <g:link controller="requisitionTemplate" action="list" class="button icon arrowleft">
+                                        <warehouse:message code="default.button.back.label"/>
                                     </g:link>
                                 </div>
                             </td>

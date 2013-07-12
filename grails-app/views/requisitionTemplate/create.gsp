@@ -70,6 +70,16 @@
                         <tbody>
                             <tr class="prop">
                                 <td class="name">
+                                    <label for="name">
+                                        <warehouse:message code="default.name.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
+                                    <g:textField name="name" value="${requisition.name}" class="text" size="80"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
                                     <label for="origin.id">
                                         <warehouse:message code="requisition.requestingLocation.label" />
                                     </label>
