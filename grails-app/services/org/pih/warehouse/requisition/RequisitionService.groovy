@@ -350,6 +350,38 @@ class RequisitionService {
         requisition.save(flush: true)
     }
 
+    Requisition cloneRequisition(Requisition requisition) {
+        def cloneRequisition = new Requisition()
+        cloneRequisition.name = "Copy of " + requisition.name
+        cloneRequisition.description = requisition.description
+        cloneRequisition.commodityClass = requisition.commodityClass
+        cloneRequisition.type = requisition.type
+        cloneRequisition.status = requisition.status
+        cloneRequisition.dateRequested = requisition.dateRequested
+        cloneRequisition.origin = requisition.origin
+        cloneRequisition.destination = requisition.destination
+        cloneRequisition.requestedBy = requisition.requestedBy
+        cloneRequisition.requestedDeliveryDate = requisition.requestedDeliveryDate
+        cloneRequisition.isPublished = false; //requisition.isPublished
+        cloneRequisition.datePublished = null //requisition.datePublished
+        cloneRequisition.isTemplate = requisition.isTemplate
+
+        requisition.requisitionItems.each { requisitionItem ->
+            def cloneRequisitionItem = new RequisitionItem()
+            cloneRequisitionItem.description = requisitionItem.description
+            cloneRequisitionItem.product = requisitionItem.product
+            cloneRequisitionItem.productPackage = requisitionItem.productPackage
+            cloneRequisitionItem.quantity = requisitionItem.quantity
+            cloneRequisitionItem.orderIndex = requisitionItem.orderIndex
+            cloneRequisition.addToRequisitionItems(cloneRequisitionItem)
+        }
+        cloneRequisition.save(flush: true)
+
+        return cloneRequisition
+
+
+    }
+
 
     void cancelRequisition(Requisition requisition) {
 		requisition.status = RequisitionStatus.CANCELED
