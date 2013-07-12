@@ -200,6 +200,29 @@ class RequisitionTemplateController {
         redirect(action: "list", id:params.id)
     }
 
+    def clone = {
+        def clone
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            try {
+                clone = requisitionService.cloneRequisition(requisition)
+
+                println clone.id
+                println clone.name
+
+                flash.message = "${warehouse.message(code: 'default.cloned.message', default: '{0} cloned', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+        }
+
+        redirect(action: "list")
+    }
+
 
     def addToRequisitionItems = {
         def requisition = Requisition.get(params.id)

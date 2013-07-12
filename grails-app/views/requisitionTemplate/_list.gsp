@@ -20,6 +20,9 @@
             <th>
                 <warehouse:message code="requisition.isPublished.label"/>
             </th>
+            <th>
+                <warehouse:message code="default.name.label"/>
+            </th>
 
 			<g:sortableColumn property="type"
 				title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
@@ -85,6 +88,9 @@
                     <span class="${(requisition?.isPublished)?'active':'inactive'}">
                         <format:metadata obj="${requisition?.isPublished}"/>
                     </span>
+                </td>
+                <td>
+                    <format:metadata obj="${requisition?.name}"/>
                 </td>
 				<td>
 					<format:metadata obj="${requisition?.type}"/>

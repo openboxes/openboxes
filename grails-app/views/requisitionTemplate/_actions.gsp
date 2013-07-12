@@ -62,6 +62,12 @@
                         &nbsp;${warehouse.message(code: 'requisitionTemplate.import.label', default: 'Import stock list')}
                     </g:link>
                 </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisitionTemplate" action="clone" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_copy.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.clone.label', default: 'Clone stock list')}
+                    </g:link>
+                </div>
                 <g:if test="${!requisition.isPublished}">
                     <div class="action-menu-item">
                         <g:link controller="requisitionTemplate" action="publish" id="${requisition?.id}">
