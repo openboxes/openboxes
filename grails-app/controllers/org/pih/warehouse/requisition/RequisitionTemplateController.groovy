@@ -412,12 +412,8 @@ class RequisitionTemplateController {
                     }
                 }
             }
-
-
-            if (!flash.errors) {
-                requisition.save(flush: true);
-                flash.message = "Imported ${insertCount} stock list items; updated ${updateCount} stock list items; ignored ${ignoreCount} stock list items"
-            }
+            requisition.save(flush: true);
+            flash.message = "Imported ${insertCount} stock list items; updated ${updateCount} stock list items; ignored ${ignoreCount} stock list items"
         }
         redirect(action: "batch", id: params.id)
 
