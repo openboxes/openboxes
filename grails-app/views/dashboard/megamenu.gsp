@@ -115,7 +115,7 @@
                     <g:isUserAdmin>
                         <div class="megaButton">
                             <g:link controller="requisitionTemplate" action="list" class="list">
-                                <warehouse:message code="requisitionTemplate.list.label" />
+                                <warehouse:message code="requisitionTemplate.list.label" default="List stock lists" />
                                 (${requisitionTemplates.size()})
                             </g:link>
                         </div>

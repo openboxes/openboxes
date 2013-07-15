@@ -360,46 +360,64 @@ class RequisitionTemplateController {
     }
 
     def doImport = {
+
         def updateCount = 0
         def insertCount = 0;
         def ignoreCount = 0;
         def requisition = Requisition.get(params.id)
         if (session.data) {
+            flash.errors = []
+
             def data = session.data
-            data.each { row ->
+            data.eachWithIndex { row, index ->
                 // Ignore the first row if the user included header info
                 if (row[0] != "Product Code" && row[2] != "Quantity") {
-                    def productCode = row[0]
-                    def quantity = Integer.parseInt(row[2])
-                    def unitOfMeasure = row[3]
-                    println "Quantity " + quantity
-                    // Ignore if quantity is null or 0
-                    if (quantity) {
-                        def product = Product.findByProductCode(productCode)
-                        def requisitionItem = requisition.requisitionItems.find { it.product == product }
-                        if (requisitionItem) {
-                            if (requisitionItem.quantity != quantity) {
-                                requisitionItem.quantity = quantity
-                                updateCount++
+                    try {
+                        def productCode = row[0]
+                        def quantity = Integer.parseInt(row[2])
+                        def unitOfMeasure = row[3]
+                        println "Quantity " + quantity
+                        // Ignore if quantity is null or 0
+                        if (quantity) {
+                            def product = Product.findByProductCode(productCode)
+                            if (product) {
+                                def requisitionItem = requisition.requisitionItems.find { it.product == product }
+                                if (requisitionItem) {
+                                    if (requisitionItem.quantity != quantity) {
+                                        requisitionItem.quantity = quantity
+                                        updateCount++
+                                    }
+                                    else {
+                                        //flash.errors << "${index}: Product with product code '${row[0]}' has the same quantity"
+                                        ignoreCount++
+                                    }
+                                }
+                                else {
+                                    requisitionItem = new RequisitionItem()
+                                    requisitionItem.product = product
+                                    requisitionItem.quantity = quantity
+                                    requisitionItem.substitutable = false
+                                    requisition.addToRequisitionItems(requisitionItem)
+                                    insertCount++
+                                }
                             }
                             else {
+                                flash.errors << "${index+1}: Product with product code '${row[0]}' does not exist"
                                 ignoreCount++
                             }
                         }
-                        else {
-                            requisitionItem = new RequisitionItem()
-                            requisitionItem.product = product
-                            requisitionItem.quantity = quantity
-                            requisitionItem.substitutable = false
-                            requisition.addToRequisitionItems(requisitionItem)
-                            insertCount++
-                        }
+                    } catch (NumberFormatException e) {
+                        flash.errors << "${index+1}: Invalid quantity '${row[2]}' for product code '${row[0]}'"
+                        ignoreCount++
                     }
                 }
             }
-            requisition.save(flush: true);
-            flash.message = "Imported ${insertCount} stock list items; updated ${updateCount} stock list items; ignored ${ignoreCount} stock list items"
 
+
+            if (!flash.errors) {
+                requisition.save(flush: true);
+                flash.message = "Imported ${insertCount} stock list items; updated ${updateCount} stock list items; ignored ${ignoreCount} stock list items"
+            }
         }
         redirect(action: "batch", id: params.id)
 
