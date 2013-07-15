@@ -40,9 +40,9 @@ class ErrorsController {
 		def toList = []
 		def ccList = []
 		
-		toList.add("justin.miranda@gmail.com")
-		//toList.add("emr-requests@pih.org")
-		//ccList.add("jmiranda@pih.org")
+		//toList.add("justin.miranda@gmail.com")
+		toList.add("emr-requests@pih.org")
+		ccList.add("jmiranda@pih.org")
 		
 		def reportedBy = User.findByUsername(params.reportedBy)
 		if (params.ccMe && reportedBy) { 
