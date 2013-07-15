@@ -58,8 +58,8 @@ beans = {
 		jdbcUrl = CH.config.dataSource.url 
 		//connection test settings
 		idleConnectionTestPeriod = 2 * 60 * 60 // 2 hours
-		initialPoolSize = 10
-		maxPoolSize = 30 
+		initialPoolSize = 50
+		maxPoolSize = 100
 		maxStatements = 180
 		// test connections 
 		testConnectionOnCheckin = true
@@ -67,8 +67,6 @@ beans = {
 		maxConnectionAge = 4 * 60 * 60
 		//get rid too many of idle connections after 30 minutes
 		maxIdleTimeExcessConnections = 30 * 60
-
-
 	}
 }
 
