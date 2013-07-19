@@ -42,7 +42,11 @@ class AuthController {
     /**
      * Allows user to log into the system.
      */
-    def login = {			
+    def login = {
+        if (session.user) {
+            flash.message = "You have already logged in."
+            redirect(controller: "dashboard", action: "index")
+        }
 
 	}
 	
@@ -61,13 +65,15 @@ class AuthController {
 		session.timezone = userTimezone;
 		
 		if (userInstance) {
-			
+
+            // Check if user is active -- redirect back to login page
 			if (!userInstance?.active) {
 				flash.message = "${warehouse.message(code: 'auth.accountRequestUnderReview.message')}"	
 				redirect(controller: 'auth', action: 'login');
 				return;
 			}
 
+            // Passwords match
 			// Compare encoded/hashed password as well as in cleartext (support existing cleartext passwords)			
 			if (userInstance.password == params.password.encodeAsPassword() || userInstance.password == params.password) {			
 
@@ -96,6 +102,7 @@ class AuthController {
 				redirect(controller:'dashboard',action:'index')
 			}
 			else {
+                // Invalid password
 				flash.message = "${warehouse.message(code: 'auth.incorrectPassword.label', args: [params.username])}"		
 				userInstance = new User(username:params['username'])				
 				userInstance.errors.rejectValue("version", "default.authentication.failure",

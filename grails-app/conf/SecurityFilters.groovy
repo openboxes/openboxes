@@ -9,6 +9,8 @@
 **/
 
 
+
+import org.apache.http.client.utils.URIBuilder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -74,19 +76,51 @@ class SecurityFilters {
 				// When there's no authenticated user in the session and a request requires authentication 
 				// we redirect to the auth login page.  targetUri is the URI the user was trying to get to.
 				else if(!session.user && !(actionsWithAuthUserNotRequired.contains(actionName))) {
-					def targetUri = (request.forwardURI - request.contextPath);
-					if (request.queryString) 
-						targetUri += "?" + request.queryString
-						
-					// Prevent user from being redirected to invalid pages after re-authenticating
-					if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) { 					
-						log.info "Request requires authentication, saving targetUri = " + targetUri
-						session.targetUri = targetUri
-					}
-					else { 
-						log.info "Not saving targetUri " + targetUri
-					}
-					redirect(controller: 'auth', action:'login')
+                    def targetUri
+                    // We only want to handle GETs because POSTs would be much more difficult
+                    if (request.method == "GET") {
+                        targetUri = (request.forwardURI - request.contextPath);
+                        if (request.queryString)
+                            targetUri += "?" + request.queryString
+                    }
+                    else {
+                        try {
+                            log.info "Using referer as targetUri "
+                            URIBuilder builder = new URIBuilder(request.getHeader("referer"))
+                            //def queryString = builder.getQueryParams().collectEntries{[it.name, it.val]}.inject([]) { result, entry ->
+                            //    result << "${entry.key}=${URLEncoder.encode(entry.value.toString())}"
+                            //}.join('&')
+
+                            def params = builder.getQueryParams().inject([:]) {map, param ->
+                                map << [(param.name): param.value]
+                            }
+
+                            def queryString = params.inject([]) { result, entry ->
+                                result << "${entry.key}=${URLEncoder.encode(entry.value.toString())}"
+                            }
+                            targetUri = (builder.getPath() - request.contextPath);
+                            targetUri += "?" + queryString.join("&")
+
+                            println "targetUri: " + targetUri
+
+                        } catch (Exception e) {
+                            log.error("Error building targetUri based on referer: " + e.message, e)
+                            targetUri = "/dashboard/index?error=true"
+                        }
+                    }
+
+                    // Prevent user from being redirected to invalid pages after re-authenticating
+                    if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) {
+                        log.info "Request requires authentication, saving targetUri = " + targetUri
+                        flash.message = "Your session has timed out.  Please log in again.  We will attempt to return you to the previous page when you have successfully logged in."
+                        session.targetUri = targetUri
+                    }
+                    else {
+                        log.info "Not saving targetUri " + targetUri
+                    }
+
+
+                    redirect(controller: 'auth', action:'login')
 					return false;
 				}
 					
