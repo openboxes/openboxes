@@ -94,13 +94,12 @@ class DocumentService {
 			log.debug "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
 			fileInputStream = new FileInputStream(file)			
 			def builder = new SimpleImageBuilder()
-			// def result = builder.
-				image(stream: fileInputStream) {
-					fit(width: width, height: height) {
-						save(stream: outputStream, format: extension?.toLowerCase())
-					}
-				}
-			//}
+			def result = builder.image(stream: fileInputStream) {
+                fit(width: width, height: height) {
+                    save(stream: outputStream, format: extension?.toLowerCase())
+                }
+            }
+
 		} catch (Exception e) { 
 			log.error("Error scaling image " + document?.filename + ": " + e.message)
 			e.printStackTrace();
