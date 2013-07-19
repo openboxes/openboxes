@@ -299,7 +299,7 @@ class ConsumptionController {
 
             //response.contentType = "text/csv;charset=utf-8"
 
-            response.setHeader("Content-disposition", "attachment; filename=consumption-${new Date().format("yyyyMMdd-hhmmss")}.csv")
+            response.setHeader("Content-disposition", "attachment; filename='Consumption-${new Date().format("yyyyMMdd-hhmmss")}.csv'")
             render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
         }
         else {

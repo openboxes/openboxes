@@ -54,7 +54,7 @@ class ReportController {
 
         //render sw.toString()
 
-        response.setHeader("Content-disposition", "attachment; filename=openboxes-inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv")
+        response.setHeader("Content-disposition", "attachment; filename='Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv'")
         render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
 
     }

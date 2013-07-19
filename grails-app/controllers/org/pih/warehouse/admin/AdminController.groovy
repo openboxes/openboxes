@@ -56,13 +56,11 @@ class AdminController {
     def clickstream = {
         if (params.format == "csv") {
             def filename = "Clickstream - ${session.user.name}.csv"
-            response.setHeader("Content-disposition", "attachment; filename=" + filename)
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text: ClickstreamUtil.getClickstreamAsCsv(session.clickstream))
             return;
         }
     }
-
-
 
     def plugins = { } 
     def status = { } 
