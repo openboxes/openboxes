@@ -1,6 +1,11 @@
 <%@page import="org.pih.warehouse.core.ActivityCode"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
+    <li>
+        <g:link controller="dashboard" action="index">
+            <warehouse:message code="dashboard.label" />&nbsp;
+        </g:link>
+    </li>
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 		<li>
 			<g:link controller="inventory" action="browse">
