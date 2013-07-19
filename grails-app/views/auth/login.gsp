@@ -21,7 +21,7 @@
 			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
 			<g:hiddenField id="browserTimezone" name="browserTimezone" />
 			  
-		    <div class="dialog">
+		    <div id="loginContainer" class="dialog">
 				<div id="loginForm">
 					<g:if test="${flash.message}">
 					    <div class="message">${flash.message}</div>
@@ -49,16 +49,31 @@
                                 </tr>
 								<tr>
 									<td class="center middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="text" id="username" name="username" value="${userInstance?.username}" size="35" style="font-size: 1.5em" />
+										<g:textField class="text" id="username" name="username" value="${userInstance?.username}" style="font-size:2em" />
 									</td>
 								</tr>
 								<tr>
 									<td class="center middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" size="35" style="font-size: 1.5em" />
+										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" style="font-size:2em" />
 									</td>
 								</tr>
+
+                                <%--
+                                <tr>
+                                    <td class="left middle ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
+                                        <g:select name="location.id" value="${userInstance?.warehouse}" from="${session.loginLocations}"
+                                            noSelection="['null':'']" class="chzn-select-deselect"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="left middle ${hasErrors(bean: userInstance, field: 'rememberLastLocation', 'errors')}">
+                                        <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}"/>
+                                        <label for="rememberLastLocation">${warehouse.message(code:'user.rememberLastLocation.label', default: 'Remember my location and log me in automatically.')}</label>
+                                    </td>
+                                </tr>
+                                --%>
 								<tr>
-									<td class="middle center">
+									<td class="middle left">
 										<button type="submit" class="button icon lock big" id="loginButton">
 											<g:message code="auth.login.label"/>
 										</button> 

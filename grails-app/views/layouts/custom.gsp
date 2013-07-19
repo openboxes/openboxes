@@ -85,9 +85,7 @@
                     </g:link>
                 </div>
                 <div class="clear"></div>
-
             </div>
-
        </g:isUserAdmin>
     </g:if>
     <g:if test="${session.useDebugLocale}">
@@ -150,9 +148,11 @@
 
 
         <!-- YUI "footer" block that includes footer information -->
-        <div id="ft" role="contentinfo">
-            <g:render template="/common/footer" />
-        </div>
+        <g:if test="${session?.user && session?.warehouse}">
+            <div id="ft" role="contentinfo">
+                <g:render template="/common/footer" />
+            </div>
+        </g:if>
 	</div>
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
