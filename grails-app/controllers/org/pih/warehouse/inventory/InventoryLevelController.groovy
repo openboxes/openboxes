@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.inventory
 
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
@@ -197,8 +198,49 @@ class InventoryLevelController {
 			inventoryLevel.status = inventoryStatus
 			inventoryLevel.save()
 		}
-
-		
 	}
-		
+
+    def export = {
+        def product = Product.get(params.id)
+        if (product) {
+            def date = new Date();
+            def sw = new StringWriter()
+
+            def csv = new CSVWriter(sw, {
+                "Product Code" {it.productCode}
+                "Product Name" {it.productName}
+                "Inventory" {it.inventory}
+                "Status" {it.status}
+                "Bin Location" {it.binLocation}
+                "Max Quantity" {it.maxQuantity}
+                "Min Quantity" {it.maxQuantity}
+                "Reorder Quantity" {it.maxQuantity}
+                "UOM" {it.unitOfMeasure}
+            })
+            product.inventoryLevels.each { inventoryLevel ->
+                csv << [
+                        productCode: inventoryLevel.product.productCode,
+                        productName: inventoryLevel.product.name,
+                        inventory: inventoryLevel.inventory.warehouse.name,
+                        status: inventoryLevel.status,
+                        binLocation: inventoryLevel.binLocation,
+                        maxQuantity: inventoryLevel.maxQuantity,
+                        reorderQuantity: inventoryLevel.maxQuantity,
+                        minQuantity: inventoryLevel.minQuantity,
+                        unitOfMeasure: "EA/1"
+                ]
+            }
+            println csv.writer.toString()
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename='Stock Levels - ${product.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
+            render(contentType:"text/csv", text: csv.writer.toString())
+            return;
+        }
+        else {
+            render(text: 'No product found', status: 404)
+        }
+
+    }
+
+
 }
