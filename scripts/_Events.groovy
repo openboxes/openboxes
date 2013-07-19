@@ -113,3 +113,10 @@ eventJasminFailed = { msg ->
     println msg
     System.exit(1)
 }
+
+eventCompileEnd = {
+    println "classesDirPath: " + classesDirPath
+    ant.copy(todir:classesDirPath) {
+        fileset(file:"${basedir}/grails-app/conf/clickstream.xml")
+    }
+}
