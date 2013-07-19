@@ -8,7 +8,7 @@
 		<div >
 			
 			<div class="box">
-			    <h2>${warehouse.message(code: 'inventory.recordInventory.label', default: 'Record inventory')}</h2>
+			    <h2>${warehouse.message(code: 'default.details.label', default: 'Details')}</h2>
 				<table>
 					<tr class="prop">
 						<td class="name">
@@ -50,6 +50,9 @@
 
 			
 			<div class="box">
+                <h2>
+                    ${warehouse.message(code: 'inventoryItems.label', default: 'Inventory items')}
+                </h2>
 				<table id="inventoryItemsTable">
 					<thead>					
 						<tr>	
@@ -102,9 +105,9 @@
 							</g:each>
 						</g:if>
 						<g:else>
-							<tr id="emptyRow" class="odd">
+							<tr id="emptyRow">
 								<td colspan="5" class="center">
-									<div class="fade">
+									<div class="fade empty center">
 										<warehouse:message code="inventory.addNewInventoryItem.message"/>
 																	
 									</div>
@@ -134,7 +137,9 @@
 			</button>
 			&nbsp;
 			<g:link controller="inventoryItem" action="showStockCard" 
-				params="['product.id':commandInstance.productInstance?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
+				params="['product.id':commandInstance.productInstance?.id]" class="button icon arrowleft">
+                <warehouse:message code="default.button.cancel.label"/>
+            </g:link>
 		
 		</div>
 		
@@ -217,7 +222,8 @@
 
         // If there's already at least an existing row we don't want to create a blank row
         var rows = $("#inventoryItemsTable tbody tr");
-        if (rows.length < 1) {
+        console.log(rows);
+        if (inventory.InventoryItems.length < 1) {
             addRow();
         }
 
