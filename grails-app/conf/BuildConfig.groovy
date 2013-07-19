@@ -25,12 +25,15 @@ grails.project.dependency.resolution = {
 	}
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 	repositories {
-		grailsPlugins()
+        //grailsRepo "http://grails.org/plugins"
+        grailsPlugins()
 		grailsHome()
 		grailsCentral()
 
 		mavenLocal()
 		mavenCentral()
+        //mavenRepo "http://download.java.net/maven/2/"
+        //mavenRepo "http://repo.grails.org/grails/plugins-releases/"
 	}
 	
 	dependencies {
@@ -83,6 +86,10 @@ grails.project.dependency.resolution = {
 		//compile ':quartz:1.0-RC4'
 		
         test (name:'geb', version:'0.6.3')
-		
+
+        compile ":rendering:0.4.3"
+        //compile ":burning-image:0.5.1"
+        //compile ":settings:1.4"
+
 	}
 }

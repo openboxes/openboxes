@@ -22,6 +22,11 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.w3c.dom.Document
+import org.xml.sax.InputSource
+
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 class ReportService implements ApplicationContextAware {
 	
@@ -259,17 +264,49 @@ class ReportService implements ApplicationContextAware {
 		}		
 	}
 
-	void generatePdf(String url, OutputStream outputStream) { 
+	void generatePdf(String url, OutputStream outputStream) {
+        def html = ""
 		log.info "Generate PDF for URL " + url
-		try { 
-			ITextRenderer renderer = new ITextRenderer();
-			renderer.setDocument(url);
+		try {
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            //Document document = loadXMLFromString(html)
+            //Document document = builder.parse(new StringBufferInputStream(html));
+
+            html = getHtmlContent(url)
+
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(html);
+
+            //renderer.setDocument(document, url);
 			renderer.layout();
 			renderer.createPDF(outputStream);
+
+            outputStream.close();
+            outputStream = null;
+
 		} catch (Exception e) { 
-			log.error("Cannot generate pdf due to error " + e.message)
-		}
+			log.error("Cannot generate pdf due to error: " + e.message, e);
+            log.error "Error caused by: " + html
+
+		} finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                // ignore
+                }
+            }
+        }
 	}
+
+    public static Document loadXMLFromString(String xml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(xml));
+        return builder.parse(is);
+    }
 
 	private getHtmlContent(String url) { 
 		
@@ -279,6 +316,7 @@ class ReportService implements ApplicationContextAware {
 			// Create a response handler
 			ResponseHandler<String> responseHandler = new BasicResponseHandler();
 			String responseBody = httpclient.execute(httpget, responseHandler);
+            println responseBody
 			return responseBody;
 			
 			
@@ -290,5 +328,13 @@ class ReportService implements ApplicationContextAware {
 		}
 	}
 
-	
+    private byte[] buildPdf(url) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocument(url);
+        renderer.layout();
+        renderer.createPDF(baos);
+        return baos.toByteArray();
+    }
+
 }

@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
+import org.xml.sax.SAXParseException
 
 class PicklistController {
 
@@ -38,6 +39,18 @@ class PicklistController {
 		def picklist = Picklist.findByRequisition(requisition)
 		def location = Location.get(session.warehouse.id)
 		[requisition:requisition, picklist: picklist, location:location]
-	}
-	
+    }
+
+    def renderPdf = {
+        def requisition = Requisition.get(params.id)
+        def picklist = Picklist.findByRequisition(requisition)
+        def location = Location.get(session.warehouse.id)
+        //[requisition:requisition, picklist: picklist, location:location]
+
+        println location
+        renderPdf(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location], filename: "picklist")
+
+
+    }
+
 }

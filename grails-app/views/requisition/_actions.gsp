@@ -50,7 +50,7 @@
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="review" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_attach.png')}" />
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom_in.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.review.label', default: 'Review requisition')}
                     </g:link>
                 </div>
@@ -61,15 +61,30 @@
                     </g:link>
                 </div>
                 <div class="action-menu-item">
+                    <g:link controller="requisition" action="confirm" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_edit.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.confirm.label', default: 'Confirm requisition')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisition" action="issue" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_go.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue requisition')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <hr/>
+                </div>
+                <div class="action-menu-item">
                     <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
                         &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
-                    <g:link controller="requisition" action="confirm" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_edit.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisition.confirm.label', default: 'Confirm requisition')}
+                    <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank">
+                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />
+                        &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Download picklist PDF')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
@@ -79,11 +94,9 @@
                     </g:link>
                 </div>
                 <div class="action-menu-item">
-                    <g:link controller="requisition" action="issue" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_go.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue requisition')}
-                    </g:link>
+                    <hr/>
                 </div>
+
 
     <%--
     <div class="action-menu-item">

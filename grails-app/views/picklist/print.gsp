@@ -18,58 +18,26 @@
     <%--<img id="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>--%>
     <span class="title"><warehouse:message code="picklist.print.label"/></span>
     <span style="float: right;">
-        <button type="button" id="print-button" onclick="window.print()">
+        <button type="button" id="print-button" onclick="window.print();">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>
-            ${warehouse.message(code: "default.print.label")}
+            ${warehouse.message(code: "default.button.print.label", default: 'Print')}
         </button>
         &nbsp;
-        <a href="javascript:window.close();">Close</a>
+        <g:link controller="picklist" action="renderPdf" id="${requisition?.id}">
+            <img src="${resource(dir: 'images/icons', file: 'pdf.png')}"/>
+            ${warehouse.message(code: "default.button.download.label", default: 'Download')}
+        </g:link>
+        <a href="javascript:window.close();">
+            <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+            ${warehouse.message(code: "default.button.close.label", default: 'Close')}
+        </a>
     </span>
     <hr/>
 </div>
 
 <div class="clear"></div>
 
-<div class="right">
-    <table style="width:auto;" border="0">
-        <tr class="header">
-            <td>
-                <label><warehouse:message code="requisition.depot.label"/>:</label>
-            </td>
-            <td class="right">
-                ${requisition.destination?.name}
-            </td>
-        </tr>
-        <tr class="header">
-            <td>
-                <label><warehouse:message code="requisition.ward.label"/>:</label>
-            </td>
-            <td class="right">
-                ${requisition.origin?.name}
-            </td>
-        </tr>
 
-        <tr class="header">
-            <td>
-                <label><warehouse:message code="requisition.date.label"/>:</label>
-            </td>
-            <td class="right">
-                <g:formatDate
-                        date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
-            </td>
-        </tr>
-        <tr class="header">
-            <td>
-                <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
-            </td>
-            <td class="right">
-                <g:formatDate
-                        date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
-            </td>
-        </tr>
-
-    </table>
-</div>
 
 <table border="0">
     <tr>
@@ -107,6 +75,47 @@
 
 
 <div class="clear"></div>
+
+<div>
+    <table border="0" class="signature-table">
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="requisition.depot.label"/>:</label>
+            </td>
+            <td>
+                ${requisition.destination?.name}
+            </td>
+        </tr>
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="requisition.ward.label"/>:</label>
+            </td>
+            <td>
+                ${requisition.origin?.name}
+            </td>
+        </tr>
+
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="requisition.date.label"/>:</label>
+            </td>
+            <td>
+                <g:formatDate
+                        date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
+            </td>
+        </tr>
+        <tr class="header">
+            <td>
+                <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
+            </td>
+            <td>
+                <g:formatDate
+                        date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
+            </td>
+        </tr>
+
+    </table>
+</div>
 
 <table class="signature-table" border="0">
     <tr class="theader">
@@ -190,6 +199,7 @@
         </td>
         <td class="middle">
             ${requisition?.checkedBy?.name}
+            ${location.id}
         </td>
         <td>
 
@@ -218,14 +228,14 @@
             <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}" title="Cold chain"/>&nbsp;
             ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, location:location, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsControlled}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>&nbsp;
             ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, location:location, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsHazmat}">
         <h2>
@@ -233,14 +243,14 @@
             ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
 
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, location:location, pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" title="Everything else"/>&nbsp;
             ${warehouse.message(code:'default.everythingElse.label', default:'Everything else')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, pageBreakAfter: 'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, location:location, pageBreakAfter: 'avoid']"/>
     </g:if>
 </div>
 
