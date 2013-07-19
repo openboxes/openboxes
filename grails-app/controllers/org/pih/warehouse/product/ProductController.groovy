@@ -309,18 +309,9 @@ class ProductController {
 				existingAtts.put(it.attribute.id, it)
 			}
 
-			try {
-				if (params.tagsToBeAdded) {
-					productInstance.tags.clear()
-					params.tagsToBeAdded.split(",").each { tagText ->
-						Tag tag = Tag.findByTag(tagText)
-						if (!tag) tag = new Tag(tag:tagText)
-						productInstance.addToTags(tag)
-					}
-				}
-			} catch (Exception e) {
-				log.error("Error occurred: " + e.message)
-			}
+
+
+            // Process attributes
 			Attribute.list().each() {
 				String attVal = params["productAttributes." + it.id + ".value"]
 				if (attVal == "_other" || attVal == null || attVal == '') {
@@ -397,6 +388,37 @@ class ProductController {
 
 		}
 	}
+
+    def updateTags = {
+        def productInstance = Product.get(params.id)
+        // Process product tags
+        try {
+
+            def tagList = []
+            if (params.tagsToBeAdded) {
+                params.tagsToBeAdded.split(",").each { tagText ->
+                    Tag tag = Tag.findByTag(tagText)
+                    if (!tag) tag = new Tag(tag:tagText)
+                    //productInstance.addToTags(tag)
+                    tagList << tag
+                }
+            }
+            println "product.tags: " + productInstance.tags
+            println "tagsToBeAdded: " + params.tagsToBeAdded
+            println "tags to be persisted " + tagList
+            productInstance?.tags?.clear()
+            tagList.each { tag ->
+                productInstance?.addToTags(tag)
+            }
+            productInstance?.save()
+            println "product.tags: " + productInstance.tags
+
+        } catch (Exception e) {
+            log.error("Error occurred: " + e.message)
+        }
+        redirect(action: "edit", id: productInstance?.id)
+    }
+
 
 	def delete = {
 		def productInstance = Product.get(params.id)
@@ -764,7 +786,7 @@ class ProductController {
 		if (products) { 
 			def date = new Date();
 			response.setHeader("Content-disposition",
-					"attachment; filename=products-${date.format("yyyyMMdd-hhmmss")}.csv")
+					"attachment; filename='Products-${date.format("yyyyMMdd-hhmmss")}.csv'")
 			response.contentType = "text/csv"
 			def csv = productService.exportProducts(products)
 			println "export products: " + csv
@@ -784,7 +806,7 @@ class ProductController {
 		if (products) {
 			def date = new Date();
 			response.setHeader("Content-disposition",
-					"attachment; filename=products-${date.format("yyyyMMdd-hhmmss")}.csv")
+					"attachment; filename='Products-${date.format("yyyyMMdd-hhmmss")}.csv'")
 			response.contentType = "text/csv"
 			def csv = productService.exportProducts(products)
 			println "export products: " + csv
@@ -889,7 +911,7 @@ class ProductController {
 		}
 		render(view: 'importAsCsv', model: [command:command, tags: tags, existingProductsMap: existingProductsMap, columns:columns, productsHaveBeenImported: true])
 		
-	}
+    }
 
 
 
