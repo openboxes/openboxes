@@ -108,7 +108,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
-		mail.error.debug = true
+		mail.error.debug = false
 	}
 	test {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
