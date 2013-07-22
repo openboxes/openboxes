@@ -112,7 +112,9 @@ class SecurityFilters {
                     // Prevent user from being redirected to invalid pages after re-authenticating
                     if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) {
                         log.info "Request requires authentication, saving targetUri = " + targetUri
-                        flash.message = "Your session has timed out.  Please log in again.  We will attempt to return you to the previous page when you have successfully logged in."
+                        if (targetUri != "/") {
+                            flash.message = "Your session has timed out."
+                        }
                         session.targetUri = targetUri
                     }
                     else {
