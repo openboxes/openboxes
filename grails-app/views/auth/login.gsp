@@ -8,13 +8,6 @@
     <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
 </head>
 <body>
-	<style>
-		
-		#hd { display: none; }
-	</style>
-	
-
-
 	<div class="body">
 		<g:form controller="auth" action="handleLogin" method="post">	
 		
@@ -73,7 +66,7 @@
                                 </tr>
                                 --%>
 								<tr>
-									<td class="middle left">
+									<td class="middle center">
 										<button type="submit" class="button icon lock big" id="loginButton">
 											<g:message code="auth.login.label"/>
 										</button> 

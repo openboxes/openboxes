@@ -24,17 +24,46 @@
     <body>        
 		<div class="body">		
 			<div id="chooseLocation">
+
 				<g:if test="${flash.message}">
 			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  
 			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
-				</g:if>		
-				
+				</g:if>
+                <div class="right">
+                    <span>Logged in as ${session.user.name}</span>
+                    <g:link class="list" controller="auth" action="logout" style="color:#666">
+                        <warehouse:message code="default.logout.label"/>
+                    </g:link>
+                </div>
+                <div class="clear"></div>
+
+
 				<g:form controller="dashboard" action="chooseLocation">
 					<div class="box">
+
+
                         <h2>
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                             ${warehouse.message(code: 'dashboard.chooseLocation.label')}
                         </h2>
+                        <%--
+                        <div style="padding: 50px;">
+                            <div>
+                                <g:select name="id" value="${session.user.warehouse}" from="${session?.loginLocations?.sort()}"
+                                    optionKey="id" optionValue="name"
+                                      noSelection="['null':'']" class="chzn-select-deselect"/>
+                            </div>
+                            <div>
+                                <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}"/>
+                                <label for="rememberLastLocation">${warehouse.message(code:'user.rememberLastLocation.label', default: 'Remember my location and log me in automatically.')}</label>
+                            </div>
+
+                            <div class="right">
+                                <button class="button icon arrowright">${warehouse.message(code:'default.button.go.label', default: 'Go')}</button>
+                            </div>
+
+                        </div>
+                        --%>
 						<div id="chooseLocationSelect">
 							<table>
 								<tbody>
@@ -48,15 +77,17 @@
 										</tr>
 										<tr class="">
 											<td>	
-												<div class="button-group">
+												<div class="" >
 													<g:set var="locationGroup" value="${entry.key }"/>
 													<g:each var="warehouse" in="${entry.value.sort() }" status="status">
+                                                        <div class="left" style="margin: 2px;">
 														<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-															${warehouse.name}
+                                                            ${warehouse.name}
 														</a>
+                                                        </div>
 													</g:each>
 												</div>
-												
+
 											</td>
 										</tr>										
 									</g:each>
@@ -67,11 +98,13 @@
 									</tr>
 									<tr class="">
 										<td>
-											<div class="button-group">											
+											<div class="">
 												<g:each var="warehouse" in="${nullLocationGroup }" status="status">
-													<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-														${warehouse.name}
-													</a>
+                                                    <div class="left" style="margin: 1px;">
+                                                        <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
+		    												${warehouse.name}
+			    										</a>
+                                                    </div>
 												</g:each>
 											</div>
 										</td>										
@@ -108,7 +141,7 @@
 								</tbody>
 							</table>
 						</div>
-						<%-- 	
+						<%--
 						<table>
 							<tr>
 								<td class="left middle" colspan="2">

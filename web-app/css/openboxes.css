@@ -1195,11 +1195,11 @@ a:hover {
 }
 
 #chooseLocation {
-    width: 1000px;
+    width: 500px;
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -500px;
+    margin-left: -250px;
 }
 #chooseLocationSelect {
     max-height: 400px;
@@ -1207,12 +1207,18 @@ a:hover {
 }
 
 #loginForm {
-    width:500px;
+    width:400px;
     position: absolute;
     top: 20%;
     left: 50%;
-    margin-left: -250px;
+    margin-left: -200px;
 }
+
+#loginContainer {
+    margin: 50px auto;
+    width: 640px;
+}
+
 #loginFormBox {
     border: 1px solid lightgrey;
     padding: 20px;
@@ -1508,8 +1514,12 @@ h2 {
 	padding: 0 0 0 10px;
 }
 */
+/*
 .chzn-select, .chzn-select-deselect { width: 100%; }
-
+*/
+.chzn-container {
+    width: 100% !important;
+}
 .logo {
     /*
     font-size: 2em;
