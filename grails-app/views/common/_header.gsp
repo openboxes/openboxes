@@ -157,12 +157,14 @@
                                                                     </tr>
                                                                     <tr>
                                                                         <td>
-                                                                            <div class="button-group">
+                                                                            <div>
                                                                                 <g:each var="warehouse" in="${entry.value.sort() }">
-                                                                                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                                                                    <a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                                                                        ${warehouse.name}
-                                                                                    </a>
+                                                                                    <div class="left" style="margin: 1px;">
+                                                                                        <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+                                                                                        <a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+                                                                                            ${warehouse.name}
+                                                                                        </a>
+                                                                                    </div>
                                                                                 </g:each>
                                                                             </div>
                                                                         </td>

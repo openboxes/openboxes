@@ -382,7 +382,7 @@ class DashboardController {
 			session.warehouse = warehouse;
 			
 			// Save the warehouse selection for "last logged into" information
-			if (session.user) { 
+			if (session.user) {
 				def userInstance = User.get(session.user.id);
 				userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
 				userInstance.lastLoginDate = new Date();

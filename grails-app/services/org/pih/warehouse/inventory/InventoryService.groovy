@@ -697,6 +697,52 @@ class InventoryService implements ApplicationContextAware {
         return stockOut
     }
 
+
+
+
+    def getDashboardAlerts(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        println inventoryLevelMap.keySet().size()
+
+        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
+        def totalStock = quantityMap
+        def stockOut = quantityMap.findAll { it.value <= 0 }
+        def inStock = quantityMap.findAll { it.value > 0 }
+
+
+        //def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
+        def lowStock = quantityMap.findAll { product,quantity ->
+            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
+            minQuantity && quantity <= minQuantity
+        }
+
+        def reorderStock = quantityMap.findAll { product, quantity ->
+            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
+            reorderQuantity && quantity <= reorderQuantity
+        }
+
+        def overStock = quantityMap.findAll { product, quantity ->
+            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
+            maxQuantity && quantity > maxQuantity
+        }
+
+
+        //println lowStock.keySet().size()
+        log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        //return lowStock
+
+        [lowStock: lowStock.keySet().size(),
+                reorderStock: reorderStock.keySet().size(),
+                overStock: overStock.keySet().size(),
+                totalStock: totalStock.keySet().size(),
+                reconditionedStock: reconditionedStock.keySet().size(),
+                stockOut:stockOut.keySet().size(),
+                inStock:inStock.keySet().size() ]
+    }
+
+
 	def getLowStock(Location location) {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
@@ -1042,6 +1088,7 @@ class InventoryService implements ApplicationContextAware {
             // There are cases where the transaction entry might be null, so we need to check for this edge case
             if (transactionEntry) {
                 def inventoryItem = transactionEntry.inventoryItem
+                //def product = inventoryItem.product
                 def transaction = transactionEntry.transaction
 
                 // first see if this is an entry we can skip (because we've already reached a product inventory transaction
@@ -1395,6 +1442,11 @@ class InventoryService implements ApplicationContextAware {
 
 		return cmd
 	}
+
+
+    def getStockHistory(Inventory inventory, Product product) {
+        return getTransactionEntriesByInventoryAndProduct(inventory, [product]);
+    }
 
 	/**
 	 * Fetches and populates a RecordInventory Command object

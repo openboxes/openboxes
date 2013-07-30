@@ -64,6 +64,7 @@
 
                         </div>
                         --%>
+
 						<div id="chooseLocationSelect">
 							<table>
 								<tbody>
@@ -77,16 +78,14 @@
 										</tr>
 										<tr class="">
 											<td>	
-												<div class="" >
-													<g:set var="locationGroup" value="${entry.key }"/>
-													<g:each var="warehouse" in="${entry.value.sort() }" status="status">
-                                                        <div class="left" style="margin: 2px;">
-														<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-                                                            ${warehouse.name}
-														</a>
-                                                        </div>
-													</g:each>
-												</div>
+                                                <g:set var="locationGroup" value="${entry.key }"/>
+                                                <g:each var="warehouse" in="${entry.value.sort() }" status="status">
+                                                    <div class="left" style="margin: 2px;">
+                                                    <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
+                                                        ${warehouse.name}
+                                                    </a>
+                                                    </div>
+                                                </g:each>
 
 											</td>
 										</tr>										
@@ -98,16 +97,14 @@
 									</tr>
 									<tr class="">
 										<td>
-											<div class="">
-												<g:each var="warehouse" in="${nullLocationGroup }" status="status">
-                                                    <div class="left" style="margin: 1px;">
-                                                        <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-		    												${warehouse.name}
-			    										</a>
-                                                    </div>
-												</g:each>
-											</div>
-										</td>										
+                                            <g:each var="warehouse" in="${nullLocationGroup }" status="status">
+                                                <div class="left" style="margin: 1px;">
+                                                    <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
+                                                        ${warehouse.name}
+                                                    </a>
+                                                </div>
+                                            </g:each>
+										</td>
 									</tr>
 									<%--
 									<tr class="prop">
@@ -167,6 +164,13 @@
 				</g:form>				
 			</div>
 		</div>
+        <script>
+            $(function() {
+                $( ".accordion" ).accordion();
+            });
+
+        </script>
+
     </body>
 </html>
 

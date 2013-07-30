@@ -218,6 +218,14 @@ class JsonController {
 		render (quantityOnHand?:"0")
 	}
 
+    @Cacheable("dashboardCache")
+    def getDashboardAlerts = {
+        def location = Location.get(params?.location?.id)
+        def map = inventoryService.getDashboardAlerts(location)
+        //throw new Exception("yikes!")
+        render map as JSON
+    }
+
 
     @Cacheable("dashboardCache")
     def getReconditionedStockCount = {
