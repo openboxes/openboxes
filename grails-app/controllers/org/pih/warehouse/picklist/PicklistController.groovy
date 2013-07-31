@@ -48,7 +48,7 @@ class PicklistController {
         //[requisition:requisition, picklist: picklist, location:location]
 
         println location
-        renderPdf(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location], filename: "picklist")
+        renderPdf(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location], filename: "Picklist - ${requisition.requestNumber}")
 
 
     }
