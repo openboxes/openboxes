@@ -555,7 +555,7 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
