@@ -275,6 +275,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             requisitionItem.product = it.product
             requisitionItem.productPackage = it.productPackage
             requisitionItem.quantity = it.quantity
+            requisitionItem.orderIndex = it.orderIndex
             requisition.addToRequisitionItems(requisitionItem)
         }
 

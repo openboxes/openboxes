@@ -113,17 +113,22 @@ class RequisitionController {
             requisition.dateRequested = new Date()
 
             requisitionTemplate.requisitionItems.each {
+                println "Adding requisition item " + it.product.name + " [" + it.orderIndex + "]"
                 def requisitionItem = new RequisitionItem()
                 requisitionItem.inventoryItem = it.inventoryItem
                 requisitionItem.quantity = it.quantity
                 requisitionItem.product = it.product
                 requisitionItem.productPackage = it.productPackage
+                requisitionItem.orderIndex = it.orderIndex
                 requisition.addToRequisitionItems(requisitionItem)
             }
         }
         else {
             flash.message = "Could not find requisition template"
         }
+
+
+        println "redirecting to create stock page " + requisition.id
         render(view:"createStock", model:[requisition:requisition])
 
 

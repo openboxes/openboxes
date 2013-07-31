@@ -223,6 +223,18 @@ class RequisitionTemplateController {
         redirect(action: "list")
     }
 
+    def changeSortOrder = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            def sortedItems = requisition.requisitionItems.sort { it.product.name }
+            sortedItems.eachWithIndex { requisitionItem, orderIndex ->
+                requisitionItem.orderIndex = orderIndex
+            }
+            requisition.save(flush: true)
+        }
+        redirect(action: "edit", id: requisition.id)
+    }
+
 
     def addToRequisitionItems = {
         def requisition = Requisition.get(params.id)

@@ -502,7 +502,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     int compareTo(RequisitionItem requisitionItem) {
         return orderIndex <=> requisitionItem.orderIndex ?:
-            requisitionItem?.requisitionItemType <=> requisitionItemType
+            id <=> requisitionItem?.id
+            //requisitionItem?.requisitionItemType <=> requisitionItemType
     }
 
 

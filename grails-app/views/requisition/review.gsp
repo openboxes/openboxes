@@ -134,9 +134,9 @@
                                                     code="requisition.noRequisitionItems.message" /></td>
                                         </tr>
                                     </g:if>
-                                    <g:each var="requisitionItem" in="${requisition?.requisitionItems.findAll { !it.parentRequisitionItem }}" status="i">
+                                    <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
                                         <g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:i]"/>
-                                        <g:if test="${selectedRequisitionItem && requisitionItem == selectedRequisitionItem && params?.actionType}">
+                                        <g:if test="${!requisitionItem.parentRequisitionItem && selectedRequisitionItem && requisitionItem == selectedRequisitionItem && params?.actionType}">
                                             <tr>
                                                 <td colspan="9">
                                                     <g:if test="${params?.actionType=='changeQuantity'}">
@@ -167,11 +167,11 @@
                         <g:unless test="${params.edit}">
                             <div class="buttons">
                                 <div class="center">
-                                    <g:link controller="requisition" action="edit" id="${requisition.id }" class="button">
+                                    <g:link controller="requisition" action="edit" id="${requisition.id }" class="button icon arrowleft">
                                         <warehouse:message code="default.button.back.label"/>
                                     </g:link>
 
-                                    <g:link controller="requisition" action="pick" id="${requisition.id }" class="button">
+                                    <g:link controller="requisition" action="pick" id="${requisition.id }" class="button icon arrowright">
                                         <warehouse:message code="default.button.next.label"/>
                                     </g:link>
                                 </div>

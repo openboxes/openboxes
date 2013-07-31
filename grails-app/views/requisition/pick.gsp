@@ -175,8 +175,8 @@
 
                                     <tbody>
                                         <g:set var="status" value="${0}"/>
-                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems.findAll { !it.parentRequisitionItem }}" status="i">
-                                            <g:if test="${!requisitionItem?.isChanged() && !requisitionItem?.isCanceled()}">
+                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
+                                            <g:if test="${!requisitionItem.parentRequisitionItem && !requisitionItem?.isChanged() && !requisitionItem?.isCanceled()}">
                                                 <g:render template="pickRequisitionItem"
                                                           model="[i:i,requisitionItem:requisitionItem,selectedRequisitionItem:selectedRequisitionItem]"/>
                                             </g:if>
@@ -192,11 +192,11 @@
                     <div class="clear"></div>
                     <g:unless test="${params.edit}">
                         <div class="buttons center">
-                            <g:link controller="requisition" action="review" id="${requisition.id }" class="button">
+                            <g:link controller="requisition" action="review" id="${requisition.id }" class="button icon arrowleft">
                                 <warehouse:message code="default.button.back.label"/>
                             </g:link>
 
-                            <g:link controller="requisition" action="picked" id="${requisition.id }" class="button">
+                            <g:link controller="requisition" action="picked" id="${requisition.id }" class="button icon arrowright">
                                 <warehouse:message code="default.button.next.label"/>
                             </g:link>
                         </div>
