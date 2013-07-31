@@ -31,7 +31,7 @@
 			</g:if>
 			
 			<div style="padding: 10px">
-				<div class="tabs">					
+				<div class="tabs tabs-ui">
 					<ul>
 						<li><a href="#tabs-details"><warehouse:message code="product.details.label"/></a></li>
 						<%-- Only show these tabs if the product has been created --%>
@@ -45,7 +45,7 @@
 
 						</g:if>
 					</ul>	
-					<div id="tabs-details" style="padding: 10px;">
+					<div id="tabs-details" style="padding: 10px;" class="ui-tabs-hide">
 
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
                         <g:form action="${formAction}" method="post">
@@ -281,7 +281,7 @@
 
 					<%-- Only show these tabs if the product has been created --%>
 					<g:if test="${productInstance?.id }">
-                        <div id="tabs-tags" style="padding: 10px;">
+                        <div id="tabs-tags" style="padding: 10px;" class="ui-tabs-hide">
                             <g:form controller="product" action="updateTags" method="post">
                                 <g:hiddenField name="action" value="save"/>
                                 <g:hiddenField name="id" value="${productInstance?.id}" />
@@ -339,7 +339,7 @@
                         </g:form>
 
 
-                        <div id="tabs-manufacturer" style="padding: 10px;">
+                        <div id="tabs-manufacturer" style="padding: 10px;" class="ui-tabs-hide">
 
                             <g:form action="update" method="post">
                                 <g:hiddenField name="action" value="save"/>
@@ -508,7 +508,7 @@
                             </g:form>
                         </div>
 
-                        <div id="tabs-attributes" style="padding: 10px;">
+                        <div id="tabs-attributes" style="padding: 10px;" class="ui-tabs-hide">
                             <g:form action="update" method="post">
                                 <g:hiddenField name="action" value="save"/>
                                 <g:hiddenField name="id" value="${productInstance?.id}" />
@@ -590,7 +590,7 @@
                         </div>
 
 
-                        <div id="tabs-status" style="padding: 10px;">
+                        <div id="tabs-status" style="padding: 10px;" class="ui-tabs-hide">
 				            <g:hasErrors bean="${inventoryLevelInstance}">
 					            <div class="errors">
 					                <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
@@ -610,6 +610,7 @@
                                                 <th><warehouse:message code="product.label"/></th>
                                                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
                                                 <th><warehouse:message code="inventoryLevel.binLocation.label"/></th>
+                                                <th><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                                                 <th><warehouse:message code="inventoryLevel.minQuantity.label"/></th>
                                                 <th><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
                                                 <th><warehouse:message code="inventoryLevel.maxQuantity.label"/></th>
@@ -647,20 +648,23 @@
                                                         --%>
                                                         ${inventoryLevelInstance?.binLocation}
                                                     </td>
+                                                    <td class="center">
+                                                        ${inventoryLevelInstance?.abcClass?:warehouse.message(code:'default.none.label')}
+                                                    </td>
 
                                                     <td>
                                                         <%--<g:textField name="inventoryLevels[${i}].minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>--%>
-                                                        ${inventoryLevelInstance?.minQuantity }
+                                                        ${inventoryLevelInstance?.minQuantity?:0 }
                                                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
                                                     <td>
                                                         <%--<g:textField name="inventoryLevels[${i}].reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>--%>
-                                                        ${inventoryLevelInstance?.reorderQuantity }
+                                                        ${inventoryLevelInstance?.reorderQuantity?:0 }
                                                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
                                                     <td>
                                                         <%--<g:textField name="inventoryLevels[${i}].maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="10" class="text"/>--%>
-                                                        ${inventoryLevelInstance?.maxQuantity }
+                                                        ${inventoryLevelInstance?.maxQuantity?:0 }
                                                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
 
@@ -686,7 +690,7 @@
                                             </g:each>
                                             <g:unless test="${productInstance?.inventoryLevels}">
                                                 <tr>
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="9" class="center">
                                                         <div class="empty center">
                                                             <warehouse:message code="product.hasNoInventoryLevels.label" default="There are no stock levels"/>
                                                         </div>
@@ -696,7 +700,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr class="prop">
-                                                <td colspan="8" class="center">
+                                                <td colspan="9" class="center">
 
                                                     <a href="javascript:void(0);" class="open-dialog create button icon add" dialog-id="inventory-level-dialog">
                                                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create new stock level')}</a>
@@ -717,7 +721,7 @@
 							</g:form>
 						</div>
 
-						<div id="tabs-documents" style="padding: 10px;">
+						<div id="tabs-documents" style="padding: 10px;" class="ui-tabs-hide">
 
                             <div class="box">
                                 <h2>
@@ -825,7 +829,7 @@
 						</div>
 
 
-						<div id="tabs-packages" style="padding: 10px;">
+						<div id="tabs-packages" style="padding: 10px;" class="ui-tabs-hide">
 				            <%-- <g:if test="${flash.message}">
 				            	<div class="message">${flash.message}</div>
 				            </g:if>

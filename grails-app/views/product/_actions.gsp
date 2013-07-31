@@ -167,6 +167,7 @@
 <g:form id="inventoryActionForm" name="inventoryActionForm" controller="inventory" action="createTransaction" method="POST">
 	<g:hiddenField name="product.id" value="${productInstance?.id }"/>
 </g:form>
+<%--
 <div class="dialog-form" id="dialog-linkProductToProductGroup">
 	<g:form controller="product" action="saveGenericProduct" method="post">
 		<table>
@@ -212,7 +213,7 @@
 		</table>
 	</g:form>
 </div>
-
+--%>
 <script>
 	$(document).ready(function() {		
 		// Form Actions 

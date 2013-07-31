@@ -25,7 +25,7 @@ class InventoryLevel {
 	//Integer idealQuantity;			// Should warn user when the quantity is below this value
 	Integer maxQuantity;			// Should warn user when quantity is above this value
 	String binLocation
-	
+	String abcClass                 // ABC analysis class
 	
 	// Auditing
 	Date dateCreated;
@@ -50,5 +50,6 @@ class InventoryLevel {
 		//idealQuantity(nullable:true)
 		maxQuantity(nullable:true, range: 0..2147483646)
 		binLocation(nullable:true)
+        abcClass(nullable: true)
 	}
 }

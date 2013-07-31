@@ -30,7 +30,7 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
-                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-inventory-id" name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
+                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-inventory-id" name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
                                 style="width: 300px;"
                                 noSelection="['null':warehouse.message(code:'inventoryLevel.chooseInventory.label',default:'Choose inventory')]"
                                 value="${inventoryLevelInstance?.inventory?.id}" class="chzn-select-deselect" />
@@ -42,7 +42,7 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'product', 'errors')}">
                     <g:select name="status"
-                              id="${inventoryLevelInstance?.id?'edit':'save'}-status"
+                              id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-status"
                               from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
                               class="chzn-select"
                               optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance?.status}"
@@ -55,6 +55,14 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'binLocation', 'errors')}">
                     <g:textField name="binLocation" value="${inventoryLevelInstance?.binLocation }" size="20" class="text"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="inventory.id"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class" /></label>
+                </td>
+                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'abcClass', 'errors')}">
+                    <g:textField name="abcClass" value="${inventoryLevelInstance?.abcClass }" size="20" class="text"/>
                 </td>
             </tr>
 

@@ -201,9 +201,28 @@ class InventoryLevelController {
 	}
 
     def export = {
+        def date = new Date();
+        def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
+        def inventoryLevels = []
         def product = Product.get(params.id)
+        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+        def filename = "Stock Levels - ${dateFormatted}"
+
         if (product) {
-            def date = new Date();
+            filename = "Stock Levels - ${product?.name} - ${dateFormatted}"
+            inventoryLevels = product.inventoryLevels
+        }
+        else if (location) {
+            filename = "Stock Levels - ${location?.name} - ${dateFormatted}"
+            inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
+        }
+        else if (location) {
+            filename = "Stock Levels - ${dateFormatted}"
+            inventoryLevels = InventoryLevel.findAll()
+        }
+
+
+        if (inventoryLevels) {
             def sw = new StringWriter()
 
             def csv = new CSVWriter(sw, {
@@ -212,32 +231,34 @@ class InventoryLevelController {
                 "Inventory" {it.inventory}
                 "Status" {it.status}
                 "Bin Location" {it.binLocation}
+                "ABC Class" {it.abcClass}
                 "Max Quantity" {it.maxQuantity}
                 "Min Quantity" {it.maxQuantity}
                 "Reorder Quantity" {it.maxQuantity}
                 "UOM" {it.unitOfMeasure}
             })
-            product.inventoryLevels.each { inventoryLevel ->
+            inventoryLevels.each { inventoryLevel ->
                 csv << [
                         productCode: inventoryLevel.product.productCode,
                         productName: inventoryLevel.product.name,
                         inventory: inventoryLevel.inventory.warehouse.name,
                         status: inventoryLevel.status,
-                        binLocation: inventoryLevel.binLocation,
-                        maxQuantity: inventoryLevel.maxQuantity,
-                        reorderQuantity: inventoryLevel.maxQuantity,
-                        minQuantity: inventoryLevel.minQuantity,
+                        binLocation: inventoryLevel.binLocation?:"",
+                        abcClass: inventoryLevel.abcClass?:"",
+                        maxQuantity: inventoryLevel.maxQuantity?:"",
+                        reorderQuantity: inventoryLevel.maxQuantity?:"",
+                        minQuantity: inventoryLevel.minQuantity?:"",
                         unitOfMeasure: "EA/1"
                 ]
             }
             println csv.writer.toString()
             response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename='Stock Levels - ${product.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename='${filename}.csv'")
             render(contentType:"text/csv", text: csv.writer.toString())
             return;
         }
         else {
-            render(text: 'No product found', status: 404)
+            render(text: 'No inventory levels found', status: 404)
         }
 
     }

@@ -445,10 +445,16 @@
 						<div class="megaButton">
 							<g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
 						</div>
+                        <div>
+                            <hr/>
+                        </div>
 						<div class="megaButton">
 							<g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link> 
 						</div>
-					
+                        <div class="megaButton">
+                            <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
+                        </div>
+
 					</g:isUserAdmin>						
 				</div>
 			</div>

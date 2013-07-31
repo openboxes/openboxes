@@ -81,6 +81,7 @@
                                 <th><warehouse:message code="product.manufacturer.label"/></th>
                                 <th><warehouse:message code="product.vendor.label"/></th>
                                 <th class="left"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
+                                <th class="left"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></th>
                                 <th><warehouse:message code="product.unitOfMeasure.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
@@ -120,6 +121,9 @@
                                     </td>
                                     <td class="left">
                                         ${inventoryLevel?.binLocation?:""}
+                                    </td>
+                                    <td class="center">
+                                        ${inventoryLevel?.abcClass?:""}
                                     </td>
                                     <td class="center">
                                         ${entry?.key?.unitOfMeasure}
