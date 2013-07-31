@@ -58,7 +58,7 @@
         }
         .page-content {
             page-break-before: always;
-        page-break-after: avoid;
+            page-break-after: avoid;
 
         }
 
@@ -66,7 +66,7 @@
             page-break-before: avoid;
         }
 
-            /* forces a page break */
+        /* forces a page break */
         .break {page-break-after:always}
 
         span.page:before { content: counter(page); }
@@ -87,6 +87,7 @@
 <div style="-fs-page-sequence: start; page-break-before: avoid;">
     <div style="position: running(header);" class="header">
         <div id="page-header" class="small">
+            ${requisition.requestNumber} | ${requisition?.name }
         </div>
     </div>
 

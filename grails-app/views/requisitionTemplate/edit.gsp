@@ -171,6 +171,10 @@
                                 <div class="buttons">
                                     <button class="button icon approve" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
 
+                                    <g:link controller="requisitionTemplate" action="changeSortOrder" class="button icon arrowleft" id="${requisition.id}">
+                                        <warehouse:message code="requisitionTemplate.button.sortAlphabetically.label" default="Sort alphabetically"/>
+                                    </g:link>
+
                                     <g:link controller="requisitionTemplate" action="list" class="button icon arrowleft">
                                         <warehouse:message code="default.button.back.label"/>
                                     </g:link>

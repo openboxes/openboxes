@@ -211,10 +211,10 @@
 			<div class="clear"></div>	
 			
 			<div class="buttons center">
-                <g:link controller="requisition" action="pick" id="${requisition.id }" class="button">
+                <g:link controller="requisition" action="pick" id="${requisition.id }" class="button icon arrowleft">
                     <warehouse:message code="default.button.back.label"/>
                 </g:link>
-                <g:link controller="requisition" action="transfer" id="${requisition.id }" class="button">
+                <g:link controller="requisition" action="transfer" id="${requisition.id }" class="button icon arrowright">
                     <warehouse:message code="default.button.next.label"/>
                 </g:link>
 			</div>

@@ -116,7 +116,12 @@
                                             <g:each var="template" in="${entry.value}">
                                                 <div>
                                                     <g:link controller="requisition" action="createStockFromTemplate" id="${template?.id}" class="button">
-                                                        ${template.origin} - ${format.metadata(obj:template?.commodityClass)} - ${format.metadata(obj:template?.type)}
+                                                        <g:if test="${template.name}">
+                                                            ${template.name}
+                                                        </g:if>
+                                                        <g:else>
+                                                            ${template.origin} - ${format.metadata(obj:template?.commodityClass)} - ${format.metadata(obj:template?.type)}
+                                                        </g:else>
                                                     </g:link>
                                                 </div>
                                             </g:each>

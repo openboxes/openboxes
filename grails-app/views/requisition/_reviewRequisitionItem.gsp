@@ -87,10 +87,17 @@
     </td>
     <td class="center">
         <g:if test="${isAvailable||isAvailableForSubstitution}">
-            <div class="available">${warehouse.message(code:'inventory.available.label', default:'Available')}</div>
+            <div class="available">
+                ${warehouse.message(code:'inventory.available.label', default:'Available')}
+            </div>
         </g:if>
         <g:else>
-            <div class="unavailable">${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}</div>
+            <div class="unavailable">
+                <%--
+                <img src="${resource(dir: 'images/icons/silk', file: 'emoticon_unhappy.png')}" />
+                --%>
+                ${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}
+            </div>
         </g:else>
         <g:if test="${requisitionItem?.hasSubstitution()}">
             <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0} EA/1</div>

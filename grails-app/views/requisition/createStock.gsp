@@ -22,8 +22,8 @@
 	</g:hasErrors>	
 
 	<g:render template="summary" model="[requisition:requisition]"/>
-	
-	
+
+
 	<div class="yui-ga">
 		<div class="yui-u first">
 
@@ -50,8 +50,10 @@
 							</g:else>
 						</g:if>
 					</div>
-					
 				</g:if>
+                <g:else>
+                    <h2>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h2>
+                </g:else>
 				<div id="requisition-template-details" class="dialog ui-validation box">
 
 						
@@ -76,7 +78,9 @@
                                     </label>
                                 </td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'commodityClass', 'errors')}">
-                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['':'']"/>
+                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}"
+                                                            class="chzn-select-deselect"
+                                                            noSelection="['null':'']"/>
                                 </td>
                             </tr>
                             <g:if test="${requisition.isWardRequisition()}">
@@ -87,7 +91,7 @@
                                         </label>
                                     </td>
                                     <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}"
+                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
                                                  noSelection="['null':'']"/>
                                     </td>
                                 </tr>
@@ -115,7 +119,7 @@
                                     <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
                                     ${requisition?.requestedBy?.name?:session?.user?.name }
                                     --%>
-                                    <g:selectPerson name="requestedBy.id" value="${requisition?.requestedBy?.id}"
+                                    <g:selectPerson name="requestedBy.id" value="${requisition?.requestedBy?.id}" size="60"
                                         noSelection="['null':'']"/>
 
 
@@ -170,11 +174,12 @@
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">
-                                        <warehouse:message code="default.description.label" />
+                                        <warehouse:message code="requisition.requisitionItems.label" />
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <table>
+
+                                    <table class="box">
                                         <tr>
                                             <th>
                                                 ${warehouse.message(code: 'product.label')}
@@ -182,16 +187,32 @@
                                             <th>
                                                 ${warehouse.message(code: 'requisitionItem.quantity.label')}
                                             </th>
+                                            <th>
+                                                ${warehouse.message(code: 'requisitionItem.productPackage.label')}
+                                            </th>
+                                            <th>
+                                                ${warehouse.message(code: 'requisitionItem.orderIndex.label', default: 'Sort order')}
+                                            </th>
                                         </tr>
-                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
-                                            <tr>
+                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems.sort()}" status="i">
+                                            <tr class="${i%2?'even':'odd'}">
                                                 <td>
                                                     <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
+                                                    ${requisitionItem?.product?.productCode}
                                                     ${requisitionItem?.product}
                                                 </td>
                                                 <td>
                                                     <g:hiddenField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}"/>
                                                     ${requisitionItem?.quantity}
+                                                </td>
+                                                <td>
+                                                    EA/1
+
+
+                                                </td>
+                                                <td>
+                                                    <g:hiddenField name="requisitionItems[${i}].orderIndex" value="${requisitionItem?.orderIndex}"/>
+                                                    ${requisitionItem?.orderIndex}
                                                 </td>
                                             </tr>
                                         </g:each>

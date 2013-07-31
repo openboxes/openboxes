@@ -46,6 +46,7 @@
 		</div>
 	</div>
 
+    <%--
     <div class="right">
         <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
@@ -55,9 +56,7 @@
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
             ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
         </g:link>
-
-
     </div>
-
+    --%>
 </div>
 </g:if>

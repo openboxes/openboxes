@@ -45,21 +45,27 @@
                     </g:link>
                 </div>
                 <div class="action-menu-item">
-                    <g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}">
+                    <g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list')}
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.editHeader.label', default: 'Edit stock list')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
-                    <g:link controller="requisitionTemplate" action="export" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list')}
+                    <g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Add stock list items')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="batch" id="${requisition?.id}">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'page_go.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.import.label', default: 'Import stock list')}
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.import.label', default: 'Import stock list items')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="requisitionTemplate" action="export" id="${requisition?.id}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list items')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
@@ -92,7 +98,7 @@
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="clear" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'erase.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.clear.label', default: 'Clear stock list')}
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.clear.label', default: 'Clear stock list items')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">

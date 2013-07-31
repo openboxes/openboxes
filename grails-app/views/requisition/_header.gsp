@@ -152,7 +152,7 @@
                 </h2>
             </div>
             <table>
-
+                <%--
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="default.version.label" default="Version" /></label>
@@ -161,6 +161,7 @@
                         v${requisition?.version }
                     </td>
                 </tr>
+                --%>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="requisition.requestedBy.label" /></label></td>

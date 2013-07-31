@@ -123,8 +123,6 @@
                                             <warehouse:message code="requisitionItem.availability.label" default="Availability" /><br/>
                                             <warehouse:message code="requisitionItem.quantityAvailable.label" default="Quantity available" />
                                         </th>
-                                        <th class="center">
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
