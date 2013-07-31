@@ -9,7 +9,7 @@
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
 			<g:if test="${!requisitions}">
-				<div style="margin:10px;" class="center">
+				<div style="margin:10px;" class="center empty">
 					<span class="fade"><warehouse:message code="requisition.noRecent.label"/></span>
                 </div>
 			</g:if>
