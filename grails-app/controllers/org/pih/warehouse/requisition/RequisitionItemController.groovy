@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
@@ -29,9 +30,38 @@ class RequisitionItemController {
     }
 
     def list = {
+        println "List requisition items " + params
+        //params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        //[requisitionItemInstanceList: RequisitionItem.list(params), requisitionItemInstanceTotal: RequisitionItem.count()]
+
+        def dateRequestedFrom = params.dateRequestedFrom ? Date.parse("MM/dd/yyyy", params.dateRequestedFrom) : null
+        def dateRequestedTo = params.dateRequestedTo ? Date.parse("MM/dd/yyyy", params.dateRequestedTo) : null
+
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [requisitionItemInstanceList: RequisitionItem.list(params), requisitionItemInstanceTotal: RequisitionItem.count()]
+        params.offset = params.offset?:0
+        def location = Location.get(session.warehouse.id)
+        def requisitionItemInstanceList = requisitionService.getCanceledRequisitionItems(location, params.list("cancelReasonCode"), dateRequestedFrom, dateRequestedTo, params.max, params.offset)
+
+        render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.totalCount])
+
     }
+
+    def listCanceled = {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.offset = params.offset?:0
+        def location = Location.get(session.warehouse.id)
+        def requisitionItemInstanceList = requisitionService.getCanceledRequisitionItems(location, params.cancelReasonCode, null, null, params.max, params.offset)
+
+        render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.totalCount])
+    }
+
+    def listPending = {
+        def location = Location.get(session.warehouse.id)
+        def requisitionItemInstanceList = requisitionService.getPendingRequisitionItems(location)
+
+        render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.size()])
+    }
+
 
     def create = {
         def requisitionItemInstance = new RequisitionItem()
@@ -423,5 +453,73 @@ class RequisitionItemController {
 
         chain(action: "pick", id: requisition.id, params: ['requisitionItem.id':requisitionItem.id])
     }
+
+
+    def export = {
+        def date = new Date();
+        def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
+        def requisitionItems = []
+        //def product = Product.get(params.id)
+        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+        def filename = "Requisition items - ${dateFormatted}"
+
+        if (location) {
+            filename = "Requisition items - ${location?.name} - ${dateFormatted}"
+
+            //params.max = Math.min(params.max ? params.int('max') : 10, 100)
+            //params.offset = params.offset?:0
+            //def requisitionItemInstanceList
+            def dateRequestedFrom = params.dateRequestedFrom ? Date.parse("MM/dd/yyyy", params.dateRequestedFrom) : null
+            def dateRequestedTo = params.dateRequestedTo ? Date.parse("MM/dd/yyyy", params.dateRequestedTo) : null
+
+
+            requisitionItems = requisitionService.getCanceledRequisitionItems(location, params.list("cancelReasonCode"), dateRequestedFrom, dateRequestedTo, null, null)
+            //requisitionItems = requisitionItemInstanceList.collect { it }
+
+        }
+
+
+        if (requisitionItems) {
+            def sw = new StringWriter()
+
+            def csv = new CSVWriter(sw, {
+
+                "Requisition number" {it.requisitionNumber}
+                "Requisition name" {it.requisitionName}
+                "Requested date" {it.requisitionDate}
+                "Requested by" {it.requestedBy}
+                "Product code" {it.productCode}
+                "Product name" {it.productName}
+                "Reason code" { it.cancelReasonCode }
+                "Quantity canceled" { it.quantityCanceled }
+                "Quantity requested" { it.quantityRequested }
+                "UOM" {it.unitOfMeasure}
+            })
+            requisitionItems.each { requisitionItem ->
+                csv << [
+                        requisitionNumber: requisitionItem.requisition.requestNumber,
+                        requisitionName: requisitionItem.requisition.name,
+                        requisitionDate: requisitionItem.requisition.dateRequested,
+                        requestedBy: requisitionItem.requisition.requestedBy.name,
+                        productCode: requisitionItem.product.productCode,
+                        productName: requisitionItem.product.name,
+                        cancelReasonCode: requisitionItem.cancelReasonCode,
+                        quantityCanceled: requisitionItem.quantityCanceled?:"",
+                        quantityRequested: requisitionItem.quantity?:"",
+                        unitOfMeasure: "EA/1"
+                ]
+            }
+            println csv.writer.toString()
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename='${filename}.csv'")
+            render(contentType:"text/csv", text: csv.writer.toString())
+            return;
+        }
+        else {
+            render(text: 'No requisition items found', status: 404)
+        }
+
+    }
+
 
 }

@@ -442,9 +442,7 @@ class RequisitionService {
             eq("product", product)
         }
         //println requisitionItems
-
         return requisitionItems
-
     }
 
 
@@ -482,6 +480,85 @@ class RequisitionService {
         }
     }
     */
+
+    public List<RequisitionItem> getPendingRequisitionItems(Location location) {
+        def requisitionItems = RequisitionItem.createCriteria().list() {
+            requisition {
+                eq("destination", location)
+                lt("status", RequisitionStatus.ISSUED)
+                not {
+                    eq("status", RequisitionStatus.CANCELED)
+                }
+            }
+        }
+        //println requisitionItems
+
+        return requisitionItems
+
+    }
+
+    public List<RequisitionItem> getCanceledRequisitionItems(Location location, List cancelReasonCodes, Date dateRequestedFrom, Date dateRequestedTo, max, offset) {
+        println "Get canceled items " + cancelReasonCodes + " " + max + " " + offset
+        def requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
+            requisition {
+                eq("destination", location)
+                eq("status", RequisitionStatus.ISSUED)
+                //not {
+                //    eq("status", RequisitionStatus.CANCELED)
+                //
+                //}
+                if (dateRequestedFrom && dateRequestedTo) {
+                    between("dateRequested", dateRequestedFrom, dateRequestedTo)
+                }
+                else if (dateRequestedFrom) {
+                    ge("dateRequested", dateRequestedFrom)
+                }
+                else if (dateRequestedTo) {
+                    le("dateRequested", dateRequestedTo)
+                }
+                order("dateRequested", "desc")
+            }
+            /*
+            or {
+                gt("quantityCanceled", 0)
+                isNotNull("cancelReasonCode")
+                isNotNull("cancelComments")
+            }*/
+            if (cancelReasonCodes) {
+                'in'("cancelReasonCode", cancelReasonCodes)
+            }
+
+            //eq("cancelReasonCode", "STOCKOUT")
+            //eq("status", RequisitionItemStatus.CANCELED)
+            //firstResult(offset)
+            //maxResults(max)
+        }
+        println requisitionItems
+
+        return requisitionItems
+
+    }
+
+    public List<RequisitionItem> getRequisitionItemsByReasonCode(Location location,  max, offset) {
+        println "get canceled items "
+        def requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
+            requisition {
+                eq("destination", location)
+                eq("status", RequisitionStatus.ISSUED)
+                //not {
+                //    eq("status", RequisitionStatus.CANCELED)
+                //
+                //}
+            }
+            eq("cancelReasonCode", "STOCKOUT")
+        }
+        println requisitionItems
+
+        return requisitionItems
+
+    }
+
+
 
 
 
