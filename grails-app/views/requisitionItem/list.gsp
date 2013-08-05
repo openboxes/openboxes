@@ -8,6 +8,7 @@
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
+
     </head>
     <body>
         <div class="body">
@@ -37,17 +38,17 @@
 
 
                                     --%>
-                                    <div>
-                                    <g:select name="cancelReasonCode" from="${org.pih.warehouse.core.ReasonCode.values()}" noSelection="['null':'']"
-                                              class="chzn-select-deselect" keys="${org.pih.warehouse.core.ReasonCode.values()*.name()}"
-                                              multiple="true" value="${params.list('cancelReasonCode')}"/>
+                                    <div class="chzn-field">
+                                        <g:select name="cancelReasonCode" from="${org.pih.warehouse.core.ReasonCode.values()}" noSelection="['null':'']"
+                                                  class="chzn-select-deselect" keys="${org.pih.warehouse.core.ReasonCode.values()*.name()}"
+                                                  multiple="true" value="${params.list('cancelReasonCode')}" data-placeholder=" "/>
                                     </div>
                                 </div>
                                 <div class="filter-list-item">
                                     <hr/>
                                 </div>
                                 <div class="filter-list-item">
-                                    <g:submitButton name="search" class="button icon search" value="${warehouse.message(code:'default.search.label')}"/>
+                                    <button name="search" class="button icon search">${warehouse.message(code:'default.search.label')}</button>
                                 </div>
                             </div>
                         </g:form>
