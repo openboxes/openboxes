@@ -76,15 +76,15 @@
                     <hr/>
                 </div>
                 <div class="action-menu-item">
-                    <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-                        &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
-                    </g:link>
-                </div>
-                <div class="action-menu-item">
                     <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />
                         &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Download picklist PDF')}
+                    </g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
+                        &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">

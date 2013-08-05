@@ -2388,6 +2388,10 @@ blockquote {
     user-select: none;
 }
 
+table.zebra tbody > tr:nth-child(even)        { background-color: #f7f7f7; }
+table.zebra tbody > tr:nth-child(odd)        { background-color: #fff; }
+
+
 /*
 #requisition-items tbody > tr:nth-child(even)        { background-color: #f7f7f7; }
 #requisition-items tbody > tr:nth-child(odd)        { background-color: #fff; }

@@ -14,19 +14,19 @@
 	    		<table>
 					<tr>
 						<td width="30%">
-                            <g:render template="inventorySummary"/>
-							<g:render template="alertSummary"/>
                             <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
-                            <g:render template="tagSummary" model="[tags:tags]"/>
-						</td>
-						<td width="30%">
-							<g:render template="expiringSummary"/>
-                            <g:render template="indicatorSummary"/>
-                            <g:render template="shipmentSummary"/>
                             <g:render template="receiptSummary"/>
+                            <g:render template="shipmentSummary"/>
 						</td>
+                        <td width="30%">
+                            <g:render template="alertSummary"/>
+                            <g:render template="inventorySummary"/>
+                            <g:render template="expiringSummary"/>
+                            <g:render template="indicatorSummary"/>
+                        </td>
 						<td width="40%">
                             <g:render template="activitySummary"/>
+                            <g:render template="tagSummary" model="[tags:tags]"/>
 						</td>
 					
 					</tr>
@@ -53,7 +53,8 @@
                         $('#reconditionedStockCount').html(data.reconditionedStock);
                         $('#totalStockCount').html(data.totalStock);
                         $('#inStockCount').html(data.inStock);
-                        $('#outOfStockCount').html(data.stockOut);
+                        $('#onHandQuantityZeroCount').html(data.onHandQuantityZero);
+                        $('#outOfStockCount').html(data.outOfStock);
                         $('#reorderStockCount').html(data.reorderStock);
                     },
                     error: function(xhr, status, error) {
@@ -63,6 +64,7 @@
                         $('#lowStockCount').html("ERROR: " + error);
                         $('#overStockCount').html("ERROR: " + error);
                         $('#reconditionedStockCount').html("ERROR: " + error);
+                        $('#onHandQuantityZeroCount').html("ERROR: " + error);
                         $('#totalStockCount').html("ERROR: " + error);
                         $('#inStockCount').html("ERROR: " + error);
                         $('#outOfStockCount').html("ERROR: " + error);

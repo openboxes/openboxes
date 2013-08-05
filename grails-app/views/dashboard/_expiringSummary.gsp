@@ -5,10 +5,10 @@
 	<div class="widget-content" style="padding:0; margin:0">	    					    			
 		<div id="alertSummary">	
 
-    		<table>
+    		<table class="zebra">
     			<tbody>
 
-                    <tr class="even">
+                    <tr>
                         <td class="center" style="width: 1%">
                             <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
                         </td>
@@ -24,7 +24,7 @@
                         </td>
                     </tr>
 
-					<tr class="odd">
+					<tr>
 						<td class="center" style="width: 1%">
 							<img src="${createLinkTo(dir:'images/icons/silk/clock_red.png')}" class="middle"/>
 						</td>
@@ -38,7 +38,7 @@
 							<div id="expiringIn30DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 						</td>
 					</tr>
-					<tr class="even">
+					<tr>
 						<td class="center" style="width: 1%">
 							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
 						</td>
@@ -52,7 +52,7 @@
 						
 						</td>
 					</tr>
-					<tr class="odd">
+					<tr>
 						<td class="center" style="width: 1%">
 							<img src="${createLinkTo(dir:'images/icons/silk', file: 'calendar_select_day.png')}" class="middle"/>
 						</td>
@@ -66,7 +66,7 @@
 							
 						</td>
 					</tr>
-                    <tr class="even">
+                    <tr>
                         <td class="center" style="width: 1%">
                             <img src="${createLinkTo(dir:'images/icons/silk/', file: 'calendar_view_month.png')}" class="middle"/>
                         </td>

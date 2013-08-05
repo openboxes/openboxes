@@ -706,9 +706,10 @@ class InventoryService implements ApplicationContextAware {
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
         println inventoryLevelMap.keySet().size()
 
-        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
         def totalStock = quantityMap
-        def stockOut = quantityMap.findAll { it.value <= 0 }
+        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
+        def outOfStock = quantityMap.findAll { it.value <= 0 }
+        def onHandQuantityZero = quantityMap.findAll { it.value <= 0 }
         def inStock = quantityMap.findAll { it.value > 0 }
 
 
@@ -733,13 +734,15 @@ class InventoryService implements ApplicationContextAware {
         log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
         //return lowStock
 
-        [lowStock: lowStock.keySet().size(),
-                reorderStock: reorderStock.keySet().size(),
-                overStock: overStock.keySet().size(),
-                totalStock: totalStock.keySet().size(),
-                reconditionedStock: reconditionedStock.keySet().size(),
-                stockOut:stockOut.keySet().size(),
-                inStock:inStock.keySet().size() ]
+        [   lowStock: lowStock.keySet().size(),
+            reorderStock: reorderStock.keySet().size(),
+            overStock: overStock.keySet().size(),
+            totalStock: totalStock.keySet().size(),
+            reconditionedStock: reconditionedStock.keySet().size(),
+            outOfStock:outOfStock.keySet().size(),
+            onHandQuantityZero:onHandQuantityZero.keySet().size(),
+            inStock:inStock.keySet().size()
+        ]
     }
 
 
@@ -1308,7 +1311,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return	get quantity by location and product
 	 */
 	Integer getQuantityOnHand(Location location, Product product) {
-		log.info "location " + location + " product " + product
+		log.info "quantity on hand for location " + location + " product " + product
 		def quantityMap = getQuantityForProducts(location.inventory, [product.id])
         log.debug "quantity map " + quantityMap;
 		def quantity = quantityMap[product.id]

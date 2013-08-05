@@ -26,58 +26,38 @@
 	                <div class="dialog">
 	                    <table>
 	                        <tbody>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="description"><warehouse:message code="requisitionItem.description.label" default="Description" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'description', 'errors')}">
-	                                    <g:textField name="description" value="${requisitionItemInstance?.description}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="category"><warehouse:message code="requisitionItem.category.label" default="Category" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'category', 'errors')}">
-	                                    <g:select name="category.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${requisitionItemInstance?.category?.id}" noSelection="['null': '']" />
-	                                </td>
-	                            </tr>
-	                        
+
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="requisition"><warehouse:message code="requisitionItem.requisition.label" default="Requisition" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'requisition', 'errors')}">
+                                        <g:hiddenField name="requisition.id" value="${requisitionItemInstance?.requisition?.id}"  />
+                                        ${requisitionItemInstance?.requisition?.name}
+                                        ${requisitionItemInstance?.requisition?.id}
+                                    </td>
+                                </tr>
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="product"><warehouse:message code="requisitionItem.product.label" default="Product" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'product', 'errors')}">
-	                                    <g:select name="product.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${requisitionItemInstance?.product?.id}"  />
+                                        <g:hiddenField name="product.id" value="${requisitionItemInstance?.product?.id}"  />
+                                        ${requisitionItemInstance?.product}
+                                        ${requisitionItemInstance?.product?.id}
 	                                </td>
 	                            </tr>
 	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="productGroup"><warehouse:message code="requisitionItem.productGroup.label" default="Product Group" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'productGroup', 'errors')}">
-	                                    <g:select name="productGroup.id" from="${org.pih.warehouse.product.ProductGroup.list()}" optionKey="id" value="${requisitionItemInstance?.productGroup?.id}" noSelection="['null': '']" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="inventoryItem"><warehouse:message code="requisitionItem.inventoryItem.label" default="Inventory Item" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'inventoryItem', 'errors')}">
-	                                    <g:select name="inventoryItem.id" from="${org.pih.warehouse.inventory.InventoryItem.list()}" optionKey="id" value="${requisitionItemInstance?.inventoryItem?.id}" noSelection="['null': '']" />
-	                                </td>
-	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="requestedBy"><warehouse:message code="requisitionItem.requestedBy.label" default="Requested By" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'requestedBy', 'errors')}">
-	                                    <g:select name="requestedBy.id" from="${org.pih.warehouse.core.Person.list()}" optionKey="id" value="${requisitionItemInstance?.requestedBy?.id}" noSelection="['null': '']" />
+                                        <g:hiddenField name="requestedBy.id" value="${requisitionItemInstance?.requestedBy?.id}"  />
+                                        ${requisitionItemInstance?.requestedBy?.id}
 	                                </td>
 	                            </tr>
 	                        
@@ -90,24 +70,7 @@
 	                                </td>
 	                            </tr>
 	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="unitPrice"><warehouse:message code="requisitionItem.unitPrice.label" default="Unit Price" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'unitPrice', 'errors')}">
-	                                    <g:textField name="unitPrice" value="${fieldValue(bean: requisitionItemInstance, field: 'unitPrice')}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="substitutable"><warehouse:message code="requisitionItem.substitutable.label" default="Substitutable" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'substitutable', 'errors')}">
-	                                    <g:checkBox name="substitutable" value="${requisitionItemInstance?.substitutable}" />
-	                                </td>
-	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="comment"><warehouse:message code="requisitionItem.comment.label" default="Comment" /></label>
@@ -153,21 +116,13 @@
 	                                </td>
 	                            </tr>
 	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="requisition"><warehouse:message code="requisitionItem.requisition.label" default="Requisition" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: requisitionItemInstance, field: 'requisition', 'errors')}">
-	                                    <g:select name="requisition.id" from="${org.pih.warehouse.requisition.Requisition.list()}" optionKey="id" value="${requisitionItemInstance?.requisition?.id}"  />
-	                                </td>
-	                            </tr>
-	                        	                        
+
                             	<tr class="prop">
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	
 						                <div class="buttons">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+						                    <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+						                    <g:actionSubmit class="button icon delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
 		    						</td>                    	
 	                        	</tr>	                        

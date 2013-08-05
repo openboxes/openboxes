@@ -20,6 +20,8 @@ import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.SimpleEmail
 import org.apache.commons.mail.HtmlEmail
 
+import javax.mail.internet.InternetAddress
+
 class MailService {
 
 	boolean transactional = false
@@ -269,7 +271,7 @@ class MailService {
         sendHtmlMailWithAttachment(fromUser, toList, ccList, subject, body, bytes, name, mimeType, null)
     }
 
-	/**
+    /**
 	 * 
 	 * @param toList
 	 * @param ccList
@@ -328,9 +330,54 @@ class MailService {
 				//flash.message = “Confirmation email NOT sent”
 			}
 		}
-	}	
-	
-	/**
+	}
+
+    /**
+     *
+     * @param toList
+     * @param ccList
+     * @param subject
+     * @param body
+     * @param bytes
+     * @param name
+     * @param mimeType
+     * @return
+     */
+    def sendHtmlMailWithAttachment(message) {
+        log.info ("Sending email with attachment " + message.to)
+
+        //def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
+        if (isMailEnabled()) {
+            try {
+                // Create the email message
+                HtmlEmail email = new HtmlEmail();
+                email.setCharset("UTF-8");
+                email.setHostName(message.host?:host);
+                email.setSmtpPort(message.port?:port)
+
+                // Set from, to, cc, subject, and body
+                email.setFrom(message.from?:from)
+                email.setSubject("${prefix} ${message.subject}");
+                email.setHtmlMsg(message.body);
+                email.setTo(message.to.collect{new InternetAddress(it)})
+                if (message.cc) email.setCc(message.cc.collect{new InternetAddress(it)})
+                if (message.bcc) email.setBcc(message.bcc.collect{new InternetAddress(it)})
+
+                // add the attachment
+                email.attach(new ByteArrayDataSource(message.attachment, message.mimeType),
+                        message.attachmentName, message.attachmentName, EmailAttachment.ATTACHMENT);
+
+                // send the email
+                email.send();
+            } catch(Exception e) {
+                log.error "Problem sending email $e.message", e
+                //flash.message = “Confirmation email NOT sent”
+            }
+        }
+    }
+
+
+    /**
 	 * 
 	 * @param subject
 	 * @param throwable

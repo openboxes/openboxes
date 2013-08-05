@@ -245,7 +245,6 @@
 			<warehouse:message code="report.label" />
 		</a>
 		<div class="buttonsBar" style="min-width: 200px;">
-
             <div class="megaButton">
                 <g:link controller="inventory" action="show">
                     <warehouse:message code="inventory.viewCurrentStock.label" default="Current stock report"/>
@@ -276,22 +275,32 @@
 				<hr/>
 			</div>
 			<div class="megaButton">
-				<g:link controller="inventory" action="listExpiredStock" class="report_expired"><warehouse:message code="inventory.expiredStock.label"/></g:link> 
+				<g:link controller="inventory" action="listExpiredStock" class="report-expired"><warehouse:message code="inventory.expiredStock.label"/></g:link>
 			</div>
 			<div class="megaButton">
-				<g:link controller="inventory" action="listExpiringStock" class="report_expiring"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
+				<g:link controller="inventory" action="listExpiringStock" class="report-expiring"><warehouse:message code="inventory.expiringStock.label"/></g:link>
 			</div>
 			<div class="megaButton">
-				<g:link controller="inventory" action="listLowStock" class="report_low"><warehouse:message code="inventory.lowStock.label"/></g:link> 
+				<g:link controller="inventory" action="listLowStock" class="report-low"><warehouse:message code="inventory.lowStock.label"/></g:link>
 			</div>
 			<div class="megaButton">
-				<g:link controller="inventory" action="listReorderStock" class="report_reorder"><warehouse:message code="inventory.reorderStock.label"/></g:link> 
+				<g:link controller="inventory" action="listReorderStock" class="report-reorder"><warehouse:message code="inventory.reorderStock.label"/></g:link>
 			</div>
-		</div>					
+            <div>
+                <hr/>
+            </div>
+            <%--
+            <div class="megaButton">
+                <g:link controller="requisitionItem" action="listPending" class=""><warehouse:message code="requisitionItem.listPending.label" default="List pending items"/></g:link>
+            </div>
+            --%>
+            <div class="megaButton">
+                <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="List canceled items"/></g:link>
+            </div>
+		</div>
 	</li>
 	<g:isUserAdmin>
-		<li><a href="javascript:void(0)"> <warehouse:message
-					code="admin.label" />
+		<li><a href="javascript:void(0)"> <warehouse:message code="admin.label" />
 		</a>
 			<div style="min-width: 200px;">
 				<div class="buttonsBar">

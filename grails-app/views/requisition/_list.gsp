@@ -1,6 +1,12 @@
 <table>
 	<thead>
 		<tr>
+            <th>
+                <warehouse:message code="default.numItems.label"/>
+            </th>
+            <th>
+                
+            </th>
 			<th>
 				<warehouse:message code="default.actions.label"/>
 			</th>
@@ -49,10 +55,6 @@
                               title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
             --%>
 
-            <th>
-                <warehouse:message code="default.numItems.label"/>
-            </th>
-            <th></th>
 
 		</tr>
 	</thead>
@@ -68,46 +70,6 @@
 		</g:unless>	
 		<g:each in="${requisitions}" status="i" var="requisition">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>			
-					<g:render template="/requisition/actions" model="[requisition:requisition]"/>
-				</td>
-				<td>
-					<label class="status"><format:metadata obj="${requisition?.status}"/></label>
-				</td>
-                <td>
-                    ${requisition.requestNumber }
-                </td>
-                <td>
-                    <format:date obj="${requisition.dateRequested}"/>
-                </td>
-                <%--
-                <td>
-                    <format:metadata obj="${requisition?.type}"/>
-                </td>
-                <td>
-                    <format:metadata obj="${requisition?.commodityClass?:warehouse.message(code:'default.none.label')}"/>
-                </td>
-                --%>
-				<td>
-					<g:link action="show" id="${requisition.id}">						
-						${fieldValue(bean: requisition, field: "name")}
-					</g:link>
-				</td>
-                <td>
-                    ${requisition?.origin?.name}
-
-                </td>
-				<td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
-                <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
-                <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
-
-                <%--
-                <td>${requisition.createdBy}</td>
-                <td>${requisition.updatedBy}</td>
-				<td><format:datetime obj="${requisition.dateCreated}" /></td>
-                <td><format:datetime obj="${requisition.lastUpdated}" /></td>
-                --%>
-
                 <td class="left bottom">
                     <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
 
@@ -120,7 +82,7 @@
                     <img src="${resource(dir:'images/icons/silk', file: 'zoom.png')}" class="dialog-trigger" data-id="#dialog-box-${requisition?.id}"/>
 
 
-                    <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}">
+                    <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}" style="display:none;">
                         <%--
                         <div class="summary">
                             <g:render template="header" model="[requisition:requisition]"/>
@@ -246,6 +208,47 @@
                     </div>
 
                 </td>
+				<td>			
+					<g:render template="/requisition/actions" model="[requisition:requisition]"/>
+				</td>
+				<td>
+					<label class="status"><format:metadata obj="${requisition?.status}"/></label>
+				</td>
+                <td>
+                    ${requisition.requestNumber }
+                </td>
+                <td>
+                    <format:date obj="${requisition.dateRequested}"/>
+                </td>
+                <%--
+                <td>
+                    <format:metadata obj="${requisition?.type}"/>
+                </td>
+                <td>
+                    <format:metadata obj="${requisition?.commodityClass?:warehouse.message(code:'default.none.label')}"/>
+                </td>
+                --%>
+				<td>
+					<g:link action="show" id="${requisition.id}">						
+						${fieldValue(bean: requisition, field: "name")}
+					</g:link>
+				</td>
+                <td>
+                    ${requisition?.origin?.name}
+
+                </td>
+				<td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
+                <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
+                <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
+
+                <%--
+                <td>${requisition.createdBy}</td>
+                <td>${requisition.updatedBy}</td>
+				<td><format:datetime obj="${requisition.dateCreated}" /></td>
+                <td><format:datetime obj="${requisition.lastUpdated}" /></td>
+                --%>
+
+
 			</tr>
 		</g:each>
 	</tbody>

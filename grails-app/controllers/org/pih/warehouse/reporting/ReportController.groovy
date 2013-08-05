@@ -22,7 +22,6 @@ class ReportController {
 	def productService
 	def reportService
 
-
     def showInventorySamplingReport = {
 
         def howMany = (params.n?:10).toInteger()
@@ -193,8 +192,4 @@ class ReportController {
 		}
 	}
 
-
-	
-	
-		
 }

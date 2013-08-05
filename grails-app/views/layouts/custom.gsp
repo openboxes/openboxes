@@ -15,6 +15,7 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${createLinkTo(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />
 
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -178,8 +179,12 @@
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
+    <script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
 
 	<script type="text/javascript">
+
+
+
         <g:if test="${session.useDebugLocale}">
             // Define the localization
             if(typeof openboxes === "undefined") openboxes = {};
@@ -201,7 +206,16 @@
         </g:if>
 
 
-		$(function() {
+        $(document).ready(function() {
+
+            Feedback({
+                h2cPath: "${createLinkTo(dir:'js/html2canvas/', file:'html2canvas.js')}",
+                url: '${createLink(controller: 'errors', action: 'sendFeedback')}',
+                label: "Send feedback",
+                header: "Send us your feedback!",
+                messageSuccess: "Your issue has been submitted.  Thank you!",
+                messageError: "Uh oh... something went wrong. Please try again."
+            });
 
             // Instantiate megamenu
             $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});

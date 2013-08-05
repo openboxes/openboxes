@@ -4,7 +4,7 @@
 
 <div class="widget-small">
 	<div class="widget-header">
-		<h2><warehouse:message code="requisitions.label"/></h2>
+		<h2><warehouse:message code="requisitions.label"/> (all-time)</h2>
 	</div>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
@@ -33,7 +33,6 @@
                                     </g:link>
                                 </td>
                                 <td class="right">
-
                                     <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
                                         ${requisitionMap[status]?.size()?:0}
                                     </g:link>
@@ -43,7 +42,7 @@
                         </g:if>
                     </g:each>
                     <tfoot>
-                        <tr>
+                        <tr class="odd">
                             <th colspan="2">
                                 <label>${warehouse.message(code:'default.total.label')}</label>
                             </th>

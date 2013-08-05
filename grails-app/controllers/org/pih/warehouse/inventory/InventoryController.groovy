@@ -27,8 +27,9 @@ import org.pih.warehouse.util.DateUtil
 class InventoryController {
 	
 	def dataSource
-    def productService;	
-	def inventoryService;
+    def productService
+	def inventoryService
+    def requisitionService
 
     def index = {
 		redirect(action: "browse");
@@ -331,7 +332,6 @@ class InventoryController {
 
 
     def list = {
-
         println "List " + params
         def warehouse = Location.get(session.warehouse.id)
         //def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
@@ -416,20 +416,20 @@ class InventoryController {
         render (view: "list", model: [quantityMap:reorderStock])
     }
 
-    def listOutOfStock = {
-		def location = Location.get(session.warehouse.id)
-		// def categorySelected = (params.category) ? Category.get(params.category) : null;
-		def outOfStock = inventoryService.getOutOfStock(location);
-		//def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+    def listQuantityOnHandZero = {
+        def location = Location.get(session.warehouse.id)
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
+        def outOfStock = inventoryService.getOutOfStock(location);
+        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
         if (params.format == "csv") {
             def filename = "Out of stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
         }
 
-		//[inventoryItems:lowStock, quantityMap:quantityMap]
+        //[inventoryItems:lowStock, quantityMap:quantityMap]
         render (view: "list", model: [quantityMap:outOfStock])
-	}
+    }
 
     def listOverStock = {
         def location = Location.get(session.warehouse.id)
@@ -445,6 +445,31 @@ class InventoryController {
         //[inventoryItems:lowStock, quantityMap:quantityMap]
         render (view: "list", model: [quantityMap:overStock])
     }
+
+    def listOutOfStock = {
+        def location = Location.get(session.warehouse.id)
+        // def categorySelected = (params.category) ? Category.get(params.category) : null;
+        //def outOfStock = inventoryService.getOutOfStock(location);
+        def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
+
+        /*
+        if (params.format == "csv") {
+            def filename = "Out of stock - " + location.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
+        }
+        */
+
+        def requisitionItems = requisitionService.getPendingRequisitionItems(location)
+        def pendingProducts = requisitionItems.collect { it.product }
+
+        quantityMap = quantityMap.findAll { pendingProducts.contains(it.key) }
+
+        render quantityMap
+        //[inventoryItems:lowStock, quantityMap:quantityMap]
+        render (view: "list", model: [quantityMap:quantityMap])
+    }
+
 
 
 	def listExpiredStock = { 

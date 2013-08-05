@@ -9,6 +9,9 @@
 **/ 
 package org.pih.warehouse.core
 
+import grails.converters.JSON
+import org.apache.catalina.util.Base64
+import org.apache.commons.io.FileUtils
 import util.ClickstreamUtil;
 
 class ErrorsController {
@@ -35,6 +38,29 @@ class ErrorsController {
     def handleMethodNotAllowed = {
         render(view:"/errors/methodNotAllowed")
     }
+
+    def sendFeedback = {
+        def jsonObject = JSON.parse(params.data)
+
+        byte[] attachment = jsonObject[1].replace("data:image/png;base64,","").decodeBase64()
+
+        def emailMessage = [
+            from: session?.user?.email,
+            to: ["emr-requests@pih.org"],
+            cc: [],
+            bcc: [],
+            subject: jsonObject[0]["summary"],
+            body: jsonObject[0]["description"],
+            attachment: attachment,
+            attachmentName: "screenshot.png",
+            mimeType: "image/png"
+
+        ]
+        mailService.sendHtmlMailWithAttachment(emailMessage);
+        render "OK"
+
+    }
+
 
 	def processError = { 		
 		def toList = []

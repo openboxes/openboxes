@@ -26,10 +26,10 @@
 				<g:set var="incomingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
 
 					
-	    		<table>
+	    		<table class="zebra">
 	    			
 	    			<tbody>
-						<tr class="even">
+						<tr>
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>						
 							</td>
@@ -44,7 +44,7 @@
 								</g:link>
 							</td>
 						</tr>				
-						<tr class="odd">
+						<tr>
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>						
 							</td>
@@ -59,7 +59,7 @@
 								</g:link>
 							</td>
 						</tr>				
-						<tr class="even">
+						<tr>
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>						
 							</td>
@@ -77,7 +77,7 @@
 						</tr>							
 			    	</tbody>
 			    	<tfoot>
-						<tr class="even prop" style="height: 30px;">
+						<tr class="odd">
 							<th colspan="2">
 								<warehouse:message code="default.total.label"/>
 							</th>

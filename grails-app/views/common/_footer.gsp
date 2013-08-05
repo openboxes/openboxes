@@ -28,7 +28,11 @@
 			</a>
 			${session.useDebugLocale?"on":"off" }
 		</g:isUserInRole>
-		
+        &nbsp;&nbsp; | &nbsp;&nbsp;
+        <span>
+            <warehouse:message code="default.ipAddress.label" default="IP Address"/>: &nbsp;
+            ${request.getRemoteAddr()}
+		</span>
 		<%-- 
 		&nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="default.layout.label"/>: &nbsp; 
