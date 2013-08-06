@@ -11,6 +11,7 @@ package org.pih.warehouse.reporting
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.apache.commons.lang3.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Constants
@@ -279,14 +280,16 @@ class ConsumptionController {
 
             def sw = new StringWriter()
             if (csvrows) {
-                sw.append(csvrows[0].keySet().join(",")).append("\n")
+                def columnHeaders = csvrows[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
+                sw.append(columnHeaders.join(",")).append("\n")
                 csvrows.each { csvrow ->
                     def values = csvrow.values().collect { value ->
                         if (value?.toString()?.isNumber()) {
                             value
                         }
                         else {
-                            '"' + value.toString().replace('"','""') + '"'
+                            //'"' + value.toString().replace('"','""') + '"'
+                            StringEscapeUtils.escapeCsv(value)
                         }
                     }
                     sw.append(values.join(","))
@@ -299,7 +302,7 @@ class ConsumptionController {
 
             //response.contentType = "text/csv;charset=utf-8"
 
-            response.setHeader("Content-disposition", "attachment; filename='Consumption-${new Date().format("yyyyMMdd-hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename='Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
             render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
         }
         else {
