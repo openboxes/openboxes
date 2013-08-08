@@ -8,6 +8,11 @@
         </g:if>
     </td>
     <td>
+        <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
+            ${requisitionItem.status}
+        </div>
+    </td>
+    <td>
         ${requisitionItem?.product?.productCode}
     </td>
     <td>
@@ -47,5 +52,9 @@
     <td>
         ${formatNumber(number: value, maxFractionDigits: 0)}%
     </td>
+    <td class="center">
+        ${requisitionItem.orderIndex+1}
+    </td>
+
 </tr>
 

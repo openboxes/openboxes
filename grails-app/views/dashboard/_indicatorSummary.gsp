@@ -16,12 +16,12 @@
                                 ${indicator.description}
                             </td>
                             <td class="right">
-                                <div id="${indicator.name}"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                <div id="${indicator.id}"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
                             </td>
                         </tr>
                         <script type="text/javascript">
                             $(function() {
-                                $('#${indicator.name}').load('${request.contextPath}/json/evaluateIndicator?id=${indicator.id}');
+                                $('#${indicator.id}').load('${request.contextPath}/json/evaluateIndicator?id=${indicator.id}');
                             });
                         </script>
                     </g:each>

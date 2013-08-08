@@ -143,6 +143,9 @@
                                             <th>
                                                 ${warehouse.message(code: 'default.actions.label')}
                                             </th>
+                                            <th class="center">
+                                                <warehouse:message code="requisitionItem.status.label" default="Status" />
+                                            </th>
                                             <th>
                                                 ${warehouse.message(code: 'product.productCode.label')}
                                             </th>
@@ -170,6 +173,10 @@
                                             <th>
                                                 %
                                             </th>
+                                            <th class="center">
+                                                <warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" />
+                                            </th>
+
                                         </tr>
                                     </thead>
 

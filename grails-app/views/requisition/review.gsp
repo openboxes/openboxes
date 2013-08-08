@@ -111,6 +111,9 @@
                                             <warehouse:message code="requisitionItem.status.label" default="Status" />
                                         </th>
                                         <th>
+                                            <warehouse:message code="product.productCode.label" />
+                                        </th>
+                                        <th>
                                             <warehouse:message code="requisitionItem.product.label" />
                                         </th>
                                         <th class="center ">
@@ -120,8 +123,10 @@
                                             <warehouse:message code="requisitionItem.totalQuantity.label" default="Quantity total" />
                                         </th>
                                         <th class="center">
-                                            <warehouse:message code="requisitionItem.availability.label" default="Availability" /><br/>
                                             <warehouse:message code="requisitionItem.quantityAvailable.label" default="Quantity available" />
+                                        </th>
+                                        <th class="center">
+                                            <warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" />
                                         </th>
                                     </tr>
                                 </thead>

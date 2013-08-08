@@ -2,10 +2,10 @@
 	<thead>
 		<tr>
             <th>
-                <warehouse:message code="default.numItems.label"/>
+
             </th>
             <th>
-                
+                <warehouse:message code="default.numItems.label"/>
             </th>
 			<th>
 				<warehouse:message code="default.actions.label"/>
@@ -70,13 +70,7 @@
 		</g:unless>	
 		<g:each in="${requisitions}" status="i" var="requisition">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                <td class="left bottom">
-                    <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
 
-                    <%--
-                    ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
-                    --%>
-                </td>
 
                 <td class="middle">
                     <img src="${resource(dir:'images/icons/silk', file: 'zoom.png')}" class="dialog-trigger" data-id="#dialog-box-${requisition?.id}"/>
@@ -207,6 +201,13 @@
                         </div>
                     </div>
 
+                </td>
+                <td class="left bottom">
+                    <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
+
+                    <%--
+                    ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
+                    --%>
                 </td>
 				<td>			
 					<g:render template="/requisition/actions" model="[requisition:requisition]"/>

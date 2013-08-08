@@ -50,7 +50,11 @@ class SelectTagLib {
 
     def selectReasonCode = { attrs, body ->
         attrs.from = ReasonCode.list()
-        attrs.optionValue = { format.metadata(obj: it) }
+
+        attrs.optionValue = { format.metadata(obj: it) + " [" + it.toString()  + "]" }
+
+
+
         out << g.select(attrs)
     }
 

@@ -1,3 +1,4 @@
+<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
 <div class="page" style="page-break-after: ${pageBreakAfter};">
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead>
@@ -54,7 +55,7 @@
                         </td>
                         <td class="middle">
                             <g:if test="${j==0}">
-                                ${requisitionItem?.product?.name}
+                                ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
                             </g:if>
                         </td>
                         <td class="center middle">

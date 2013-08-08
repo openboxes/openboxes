@@ -41,6 +41,9 @@
         </g:else>
         --%>
     </td>
+    <td class="center">
+        ${requisitionItem?.product?.productCode}
+    </td>
 
 
     <td class="product">
@@ -107,6 +110,10 @@
             ${quantityOnHand?:0} EA/1
         </g:else>
     </td>
+    <td class="center">
+        ${requisitionItem.orderIndex+1}
+    </td>
+
     <%--
     <td class="quantity center">
         <label>${requisitionItem?.totalQuantityCanceled()} EA</label>

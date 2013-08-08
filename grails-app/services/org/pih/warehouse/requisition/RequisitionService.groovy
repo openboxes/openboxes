@@ -85,14 +85,16 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Requisition requisition, Map params) {
+        println "Get requisitions: " + params
+
         //def getRequisitions(Location destination, Location origin, User createdBy, RequisitionType requisitionType, RequisitionStatus status, CommodityClass commodityClass, String query, Map params) {
         //return Requisition.findAllByDestination(session.warehouse)
 
         def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
-        //def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
-        def criteria = Requisition.createCriteria()
 
-        //println commodityClassIsNull
+        def criteria = Requisition.createCriteria()
+        def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
+        println commodityClassIsNull
 
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
             and {
@@ -108,7 +110,9 @@ class RequisitionService {
                 }
                 if (requisition.isPublished) {
                     eq("isPublished", requisition.isPublished)
-
+                }
+                if (commodityClassIsNull) {
+                    isNull("commodityClass")
                 }
 
                 if (requisition.destination) {
@@ -154,6 +158,9 @@ class RequisitionService {
                 }
                 if (params?.sort) {
                     order(params?.sort, params?.order?:'desc')
+                }
+                else {
+                    order("dateRequested", "desc")
                 }
                 //maxResults(10)
                 //eq("isPublished", false)

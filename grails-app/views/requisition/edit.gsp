@@ -62,6 +62,9 @@
                                     <th class="list-header middle">
                                         ${warehouse.message(code: 'requisitionItem.status.label')}
                                     </th>
+                                    <th class="list-header middle center">
+                                        ${warehouse.message(code: 'requisitionItem.orderIndex.label', default: 'Sort order')}
+                                    </th>
                                     <%--
                                     <th class="list-header">
                                         ${warehouse.message(code: 'requisitionItem.comment.label')}
@@ -74,11 +77,6 @@
                             <thead>
                             <tbody data-bind="foreach: requisition.requisitionItems">
                                 <tr class="requisitionItemsRow">
-                                    <%--
-                                    <td class="middle">
-                                        <div data-bind="text: orderIndex()"></div>
-                                    </td>
-                                    --%>
                                     <td class="middle list-header">
 
                                         <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
@@ -110,6 +108,9 @@
                                     <td class="middle list-header">
                                         <div data-bind="text: status"></div>
                                     </td>
+                                    <td class="middle center">
+                                        <div data-bind="text: orderIndex()+1"></div>
+                                    </td>
                                     <td class="center middle">
                                         <a href='#' class="button"
                                             data-bind='click: $root.requisition.removeItem' tabindex="-1">
@@ -140,11 +141,11 @@
                 </g:if>
 				<div class="buttons">
 					<div class="center">
-						<g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button">
+						<g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button icon arrowleft">
 							<warehouse:message code="default.button.back.label"/>
 						</g:link>
 						<input type="hidden" data-bind="value: requisition.id" />
-						<button id="save-requisition" class="button">
+						<button id="save-requisition" class="button icon arrowright">
 							${warehouse.message(code: 'default.button.next.label')}</button>
 					</div>
 
@@ -223,16 +224,16 @@
 		$(".value").change(updateDescription);
 
 		// Set the interval to save locally every 3 seconds
-		setInterval(function () {
-			openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
-		}, 3000);
+		//setInterval(function () {
+		//	openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
+		//}, 3000);
 
-		$("#cancelRequisition").click(function() {
-			if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
-				openboxes.requisition.deleteRequisitionFromLocal(requisitionFromServer.id);
-				return true;
-			}
-		});
+		//$("#cancelRequisition").click(function() {
+		//	if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
+		//		openboxes.requisition.deleteRequisitionFromLocal(requisitionFromServer.id);
+		//		return true;
+		//	}
+		//});
 
         // Make sure quantity is a digit
 		$("input.quantity").keyup(function(){

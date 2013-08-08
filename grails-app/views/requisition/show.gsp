@@ -36,6 +36,7 @@
                                             <th class="center"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.quantityRemaining.label" /></th>
                                             <th class="center"><warehouse:message code="product.uom.label" /></th>
+                                            <th class="center"><warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" /></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -45,7 +46,7 @@
                                                         code="requisition.noRequisitionItems.message" /></td>
                                             </tr>
                                         </g:if>
-                                        <g:each var="requisitionItem" in="${requisition?.getInitialRequisitionItems()}" status="i">
+                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
                                             <g:render template="showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
                                             <g:each var="childRequisitionItem" in="${requisitionItem?.requisitionItems}" status="j">
                                                 <g:render template="showRequisitionItem" model="[i:j,requisitionItem:childRequisitionItem]"/>

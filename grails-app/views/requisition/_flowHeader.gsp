@@ -46,17 +46,16 @@
 		</div>
 	</div>
 
-    <%--
-    <div class="right">
+    <div class="right button-group">
         <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-            ${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
+            ${warehouse.message(code: 'picklist.button.print.label', default: 'View pick list')}
         </g:link>
         <g:link controller="deliveryNote" action="print" id="${requisition?.id}" target="_blank" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-            ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
+            ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'View delivery note')}
         </g:link>
     </div>
-    --%>
+
 </div>
 </g:if>

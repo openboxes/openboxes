@@ -10,6 +10,7 @@
 						<div>
 							<g:if test="${requisition?.requestNumber }">
 								<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
+                                <div class="barcode">${requisition.requestNumber}</div>
 							</g:if>
 						</div>
 
@@ -98,6 +99,8 @@
                                 </div>
 							<div class="clear"></div>
 						</div>
+
+                        <%--
                         <g:if test="${requisition?.status == org.pih.warehouse.requisition.RequisitionStatus.VERIFYING}">
                             <div class="clear"></div>
                             <div>
@@ -119,6 +122,7 @@
                                 ${value}%
                             </div>
                         </g:if>
+                        --%>
                     </td>
 					
 										

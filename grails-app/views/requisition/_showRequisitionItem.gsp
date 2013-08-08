@@ -60,5 +60,9 @@
     <td>
         ${requisitionItem?.product?.unitOfMeasure?:"EA" }
     </td>
+    <td class="center">
+        ${requisitionItem.orderIndex+1}
+    </td>
+
 </tr>
 

@@ -113,14 +113,14 @@
                 <div class="buttonsBar" style="min-width: 200px;">
                     <div class="megaButton">
                         <g:link controller="requisition" action="list" class="list">
-                            <warehouse:message code="requisition.list.label" />
+                            <warehouse:message code="requisitions.label" default="Requisitions" />
                             (${incomingRequests?.values()?.flatten()?.size()?:0 })
                         </g:link>
                     </div>
                     <g:isUserAdmin>
                         <div class="megaButton">
                             <g:link controller="requisitionTemplate" action="list" class="list">
-                                <warehouse:message code="requisitionTemplate.list.label" default="List stock lists" />
+                                <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
                                 (${requisitionTemplates.size()})
                             </g:link>
                         </div>
@@ -295,7 +295,7 @@
             </div>
             --%>
             <div class="megaButton">
-                <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="List canceled items"/></g:link>
+                <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="Cancelled items"/></g:link>
             </div>
 		</div>
 	</li>

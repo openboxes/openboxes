@@ -25,7 +25,7 @@
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="default.search.label"/></label>
                                     <p>
-                                        <g:textField name="q" size="30" class="text" value="${params.q}" placeholder="Search by requisition number, name, etc"/>
+                                        <g:textField name="q" style="width:100%" class="text" value="${params.q}" placeholder="Search by requisition number, name, etc"/>
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
@@ -54,6 +54,10 @@
                                     <p>
                                         <g:selectCommodityClass name="commodityClass" value="${params?.commodityClass}"
                                                                 noSelection="['null':'']" class="chzn-select-deselect"/>
+                                    </p>
+                                    <p>
+                                        <g:checkBox name="commodityClassIsNull" value="${params?.commodityClassIsNull}"/>
+                                        <label><warehouse:message code="requisition.commodityClassIsNull" default="Commodity class is null"/></label>
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
@@ -86,7 +90,9 @@
                                 </div>
                                 <hr/>
                                 <div class="filter-list-item">
-                                    <g:submitButton name="search" class="button" value="${warehouse.message(code:'default.search.label')}"/>
+                                    <button class="button icon search" name="search" class="button">
+                                        ${warehouse.message(code:'default.search.label')}
+                                    </button>
                                 </div>
 
                                 <div class="clear"></div>
@@ -138,7 +144,7 @@
                     <div class="box">
                         <h2>
                             <warehouse:message code="requisition.list.label" />
-                            <div class="right fade"><warehouse:message code="default.showing.message" args="[requisitions.totalCount]"/></div>
+                            <div class="fade"><warehouse:message code="default.showing.message" args="[requisitions.totalCount]"/></div>
                         </h2>
                         <g:render template="list" model="[requisitions:requisitions,pageParams:pageParams]"/>
                     </div>

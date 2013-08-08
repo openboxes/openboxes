@@ -12,11 +12,12 @@
                 <warehouse:message code="requisition.label" default="Requisition"/>
                 <div class="right">
                     <g:if test="${requisition?.id }">
-                        <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class=" icon edit">
-                            ${warehouse.message(code:'requisition.button.edit.label')}
+                        <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button icon edit">
+                            ${warehouse.message(code:'requisition.button.edit.label', default: 'Edit header')}
                         </g:link>
                     </g:if>
                 </div>
+                <div class="clear-all"></div>
             </h2>
         </div>
 
