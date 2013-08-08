@@ -71,7 +71,18 @@
 
 
         <div class="box">
-            <h2>${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}</h2>
+            <h2>
+                ${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}
+                <div class="button-group right">
+                    <g:link controller="requisitionTemplate" action="changeSortOrderAlpha" class="button" id="${requisition.id}">
+                        <warehouse:message code="requisitionTemplate.button.sortAlphabetically.label" default="Sort alphabetically"/>
+                    </g:link>
+                    <g:link controller="requisitionTemplate" action="changeSortOrderChrono" class="button" id="${requisition.id}">
+                        <warehouse:message code="requisitionTemplate.button.sortChronologically.label" default="Sort chronologically"/>
+                    </g:link>
+                </div>
+                <div class="clear"></div>
+            </h2>
         <%--
         <div class="center">
             <g:form controller="requisitionTemplate" action="addToRequisitionItems">
@@ -85,6 +96,8 @@
         </div>
         --%>
 
+
+
             <g:form name="requisitionItemForm" method="post" controller="requisitionTemplate" action="update">
 
 
@@ -96,10 +109,11 @@
                         <thead>
                         <tr>
                             <th></th>
-                            <th><warehouse:message code="product.productCode.label" default="#"/></th>
+                            <th class="center"><warehouse:message code="product.productCode.label" default="#"/></th>
                             <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="default.quantity.label"/></th>
-                            <th><warehouse:message code="unitOfMeasure.label"/></th>
+                            <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                            <th class="center"><warehouse:message code="unitOfMeasure.label"/></th>
+                            <th class="center"><warehouse:message code="requisitionItem.sortOrder.label" default="Sort order"/></th>
                             <th><warehouse:message code="default.actions.label"/></th>
                         </tr>
                         </thead>
@@ -109,7 +123,7 @@
                                 <td>
                                     <span class="sorthandle"></span>
                                 </td>
-                                <td>
+                                <td class="center">
                                     ${requisitionItem?.product?.productCode}
                                 </td>
                                 <td>
@@ -118,12 +132,15 @@
                                         ${requisitionItem?.product?.name}
                                     </g:link>
                                 </td>
-                                <td>
+                                <td class="center">
                                     <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
                                 </td>
-                                <td>
+                                <td class="center middle">
                                     <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id"
                                                            product="${requisitionItem?.product}" value="${requisitionItem?.productPackage?.id}"/>
+                                </td>
+                                <td class="center middle">
+                                    ${(requisitionItem?.orderIndex?:0)+1}
                                 </td>
                                 <td>
                                     <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
@@ -143,46 +160,45 @@
                         </g:unless>
                         </tbody>
                         <tfoot>
-                        <tr>
-                            <td>
+                            <tr>
+                                <td>
 
-                            </td>
-                            <td>
+                                </td>
+                                <td>
 
-                            </td>
-                            <td>
-                                <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
-                                               width="350" styleClass="text"/>
-                            </td>
-                            <td>
-                                <g:textField name="quantity" value="" class="text" size="6"/>
-                            </td>
-                            <td class="left">
-                                EA/1
-                            </td>
-                            <td>
-                                <button class="button icon add" id="add-requisition-item"><warehouse:message code="default.button.add.label"/></button>
+                                </td>
+                                <td>
+                                    <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
+                                                   width="350" styleClass="text"/>
+                                </td>
+                                <td class="center">
+                                    <g:textField name="quantity" value="" class="text" size="6"/>
+                                </td>
+                                <td class="center">
+                                    EA/1
+                                </td>
+                                <td class="center">
+                                    <g:set var="orderIndex" value="${requisition.requisitionItems.size()}"/>
+                                    <g:hiddenField id="orderIndex" name="orderIndex" value="${orderIndex}"/>
+                                    ${orderIndex+1}
+                                </td>
+                                <td>
+                                    <button class="button icon add" id="add-requisition-item"><warehouse:message code="default.button.add.label"/></button>
 
-                            </td>
+                                </td>
 
-                        </tr>
-                        <tr>
-                            <td colspan="7">
-                                <div class="buttons">
-                                    <button class="button icon approve" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+                            </tr>
+                            <tr>
+                                <td colspan="7">
+                                    <div class="buttons">
+                                        <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+                                        <g:link controller="requisitionTemplate" action="list" class="button">
+                                            <warehouse:message code="default.button.done.label" default="Done"/>
+                                        </g:link>
+                                    </div>
 
-                                    <g:link controller="requisitionTemplate" action="changeSortOrder" class="button icon arrowleft" id="${requisition.id}">
-                                        <warehouse:message code="requisitionTemplate.button.sortAlphabetically.label" default="Sort alphabetically"/>
-                                    </g:link>
-
-                                    <g:link controller="requisitionTemplate" action="list" class="button icon arrowleft">
-                                        <warehouse:message code="default.button.back.label"/>
-                                    </g:link>
-                                </div>
-                            </td>
-                        </tr>
-
-
+                                </td>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
@@ -198,10 +214,11 @@
             var productId = $("#product-value").val();
             var requisitionId = $("#id").val();
             var quantity = $("#quantity").val();
+            var orderIndex = $("#orderIndex").val();
             console.log(productId);
             console.log(requisitionId);
 
-            var jsonData = { "productId": productId, "requisitionId": requisitionId, "quantity": quantity }
+            var jsonData = { "productId": productId, "requisitionId": requisitionId, "quantity": quantity, "orderIndex": orderIndex }
             console.log(jsonData);
             $.ajax({
                 url: "${request.contextPath}/json/addToRequisitionItems",

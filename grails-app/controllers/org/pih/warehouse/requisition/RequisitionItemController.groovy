@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
+import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
@@ -498,7 +499,7 @@ class RequisitionItemController {
             requisitionItems.each { requisitionItem ->
                 csv << [
                         requisitionNumber: requisitionItem.requisition.requestNumber,
-                        requisitionName: requisitionItem.requisition.name,
+                        requisitionName: StringEscapeUtils.escapeCsv(requisitionItem.requisition.name),
                         requisitionDate: requisitionItem.requisition.dateRequested,
                         requestedBy: requisitionItem.requisition.requestedBy.name,
                         productCode: requisitionItem.product.productCode,

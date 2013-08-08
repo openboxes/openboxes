@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem;
@@ -223,10 +224,22 @@ class RequisitionTemplateController {
         redirect(action: "list")
     }
 
-    def changeSortOrder = {
+    def changeSortOrderAlpha = {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             def sortedItems = requisition.requisitionItems.sort { it.product.name }
+            sortedItems.eachWithIndex { requisitionItem, orderIndex ->
+                requisitionItem.orderIndex = orderIndex
+            }
+            requisition.save(flush: true)
+        }
+        redirect(action: "edit", id: requisition.id)
+    }
+
+    def changeSortOrderChrono = {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            def sortedItems = requisition.requisitionItems.sort { it.id }
             sortedItems.eachWithIndex { requisitionItem, orderIndex ->
                 requisitionItem.orderIndex = orderIndex
             }
@@ -242,7 +255,8 @@ class RequisitionTemplateController {
             def productCodes = params.multipleProductCodes.split(",")
             def processedProductCodes = []
             def ignoredProductCodes = []
-            productCodes.each { productCode ->
+            def count = requisition.requisitionItems.size()?:0
+            productCodes.eachWithIndex { productCode, index ->
                 def product = Product.findByProductCode(productCode.trim())
                 if (product) {
                     def requisitionItem = requisition.requisitionItems.find { it.product == product }
@@ -251,6 +265,7 @@ class RequisitionTemplateController {
                         requisitionItem.product = product
                         requisitionItem.quantity = 1;
                         requisitionItem.substitutable = false
+                        requisitionItem.orderIndex = count + index
                         requisition.addToRequisitionItems(requisitionItem)
                         requisition.save(flush: true, failOnError: true)
                         processedProductCodes << productCode
@@ -307,7 +322,7 @@ class RequisitionTemplateController {
             requisition.requisitionItems.each { requisitionItem ->
                 csv << [
                         productCode: requisitionItem.product.productCode,
-                        productName: requisitionItem.product.name,
+                        productName:  StringEscapeUtils.escapeCsv(requisitionItem.product.name),
                         quantity: requisitionItem.quantity,
                         unitOfMeasure: "EA/1"
                     ]
@@ -341,6 +356,8 @@ class RequisitionTemplateController {
             def delimiter = params.delimiter
             if (delimiter) {
                 if (params.csv) {
+
+                    println "CSV " + params.csv
                     //lines = params?.csv?.eachLine
                     params?.csv?.toCsvReader('separatorChar':delimiter,'skipLines':params.skipLines?:0).eachLine { tokens ->
                         println "line: " + tokens + " delimiter=" + delimiter
@@ -407,6 +424,7 @@ class RequisitionTemplateController {
                                 else {
                                     requisitionItem = new RequisitionItem()
                                     requisitionItem.product = product
+                                    requisitionItem.orderIndex = index
                                     requisitionItem.quantity = quantity
                                     requisitionItem.substitutable = false
                                     requisition.addToRequisitionItems(requisitionItem)

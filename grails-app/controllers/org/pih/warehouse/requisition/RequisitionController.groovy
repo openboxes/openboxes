@@ -37,11 +37,8 @@ class RequisitionController {
 
         def requisition = new Requisition(params)
         requisition.destination = session?.warehouse
-        //requisition.origin = Location.get(params?.origin?.id)
-        //createdBy = User.get(params?.createdBy?.id)
-        //println requisition.status
+
         def requisitions = []
-		//requisitions = requisitionService.getRequisitions(session?.warehouse, origin, createdBy, requisition?.type, requisition?.status, requisition?.commodityClass, params.q, params)
         requisitions = requisitionService.getRequisitions(requisition, params)
         def requisitionsMap = [:]
 
@@ -57,8 +54,6 @@ class RequisitionController {
             requisitionsMap[k] = v.size()?:0
         }
         requisitionsMap["relatedToMe"] = requisitionsRelatedToMe.size()?:0
-        //requisitionsMap["updatedByMe"] = requisitionsLocal.findAll { it.updatedBy == session.user }.size()?:0
-        //requisitionsMap["submittedByMe"] = requisitionsLocal.findAll { it.requestedBy == session.user }.size()?:0
 
         //requisitions = requisitions.sort()
         render(view:"list", model:[requisitions: requisitions, requisitionsMap:requisitionsMap])

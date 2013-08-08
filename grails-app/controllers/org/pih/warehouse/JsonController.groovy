@@ -48,11 +48,13 @@ class JsonController {
         def requisition = Requisition.get(params.requisitionId)
         def product = Product.get(params.productId);
         def quantity = (params.quantity)?params.int("quantity"):1
+        def orderIndex = (params.orderIndex)?params.int("orderIndex"):0
         def requisitionItem = new RequisitionItem()
         if (requisition && product) {
             requisitionItem.product = product
             requisitionItem.quantity = quantity
             requisitionItem.substitutable = false
+            requisitionItem.orderIndex = orderIndex
             requisition.addToRequisitionItems(requisitionItem)
             requisition.save(flush: true)
         }

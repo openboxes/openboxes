@@ -62,6 +62,7 @@
                             <th><warehouse:message code="product.label"/></th>
                             <th><warehouse:message code="default.quantity.label"/></th>
                             <th><warehouse:message code="unitOfMeasure.label"/></th>
+                            <th><warehouse:message code="requisitionItem.orderIndex.label" default="Sort order"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -80,6 +81,9 @@
                                 </td>
                                 <td>
                                     EA/1
+                                </td>
+                                <td>
+                                    ${requisitionItem?.orderIndex}
                                 </td>
                             </tr>
                         </g:each>

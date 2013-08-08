@@ -82,12 +82,12 @@
                         <tfoot>
                             <tr >
                                 <td class="left" colspan="5">
-                                    <button class="button icon add">
-                                        ${warehouse.message(code:'requisitionTemplate.import.label', default: 'Import stock list')}
-                                    </button>
                                     <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}" class="button icon arrowleft">
                                         ${warehouse.message(code:'default.button.back.label')}
                                     </g:link>
+                                    <button class="button icon add">
+                                        ${warehouse.message(code:'requisitionTemplate.import.label', default: 'Import stock list')}
+                                    </button>
                                 </td>
                             </tr>
                         </tfoot>
@@ -130,12 +130,12 @@
                         <tfoot>
                             <tr>
                                 <td class="left" colspan="5">
-                                    <button class="button icon add">
-                                        ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Process stock list')}
-                                    </button>
                                     <g:link controller="requisitionTemplate" action="edit" id="${requisition.id}" class="button icon arrowleft">
                                         ${warehouse.message(code:'default.button.back.label')}
                                     </g:link>
+                                    <button class="button icon add">
+                                        ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Process stock list')}
+                                    </button>
                                 </td>
                             </tr>
                         </tfoot>

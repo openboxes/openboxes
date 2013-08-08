@@ -31,31 +31,30 @@
 			<g:form name="requisitionForm" method="post" action="saveStock">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
 
-				<g:if test="${requisition?.id }">
-					<div class="box">
-						<a class="toggle" href="javascript:void(0);">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
-						</a>
-						<h3 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h3>
-						<g:if test="${requisition?.id }">
-							<g:if test="${!params.editHeader }">
-								<g:link controller="requisition" action="editHeader" id="${requisition?.id }">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
-								</g:link>
-							</g:if>
-							<g:else>
-								<g:link controller="requisition" action="edit" id="${requisition?.id }">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
-								</g:link>									
-							</g:else>
-						</g:if>
-					</div>
-				</g:if>
-                <g:else>
-                    <h2>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h2>
-                </g:else>
 				<div id="requisition-template-details" class="dialog ui-validation box">
-
+                    <g:if test="${requisition?.id }">
+                        <div class="box">
+                            <a class="toggle" href="javascript:void(0);">
+                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                            </a>
+                            <h3 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h3>
+                            <g:if test="${requisition?.id }">
+                                <g:if test="${!params.editHeader }">
+                                    <g:link controller="requisition" action="editHeader" id="${requisition?.id }">
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
+                                    </g:link>
+                                </g:if>
+                                <g:else>
+                                    <g:link controller="requisition" action="edit" id="${requisition?.id }">
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
+                                    </g:link>
+                                </g:else>
+                            </g:if>
+                        </div>
+                    </g:if>
+                    <g:else>
+                        <h2>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h2>
+                    </g:else>
 						
                     <table id="requisition-template-table">
 
@@ -229,7 +228,7 @@
                     <g:link controller="requisition" action="chooseTemplate" class="button">
                         ${warehouse.message(code:'default.button.back.label', default: 'Back')}
                     </g:link>
-                    <button class="button" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
+                    <button class="button icon approve" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
 
                     <%--
                     <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
