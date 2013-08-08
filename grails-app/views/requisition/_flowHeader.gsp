@@ -47,13 +47,17 @@
 	</div>
 
     <div class="right button-group">
+        <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank" class="button">
+            <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
+            ${warehouse.message(code: 'picklist.button.print.label', default: 'Download pick list')}
+        </g:link>
         <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-            ${warehouse.message(code: 'picklist.button.print.label', default: 'View pick list')}
+            ${warehouse.message(code: 'picklist.button.print.label', default: 'Print pick list')}
         </g:link>
         <g:link controller="deliveryNote" action="print" id="${requisition?.id}" target="_blank" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-            ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'View delivery note')}
+            ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
         </g:link>
     </div>
 
