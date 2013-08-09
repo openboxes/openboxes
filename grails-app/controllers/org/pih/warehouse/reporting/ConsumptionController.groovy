@@ -11,7 +11,7 @@ package org.pih.warehouse.reporting
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.apache.commons.lang3.StringEscapeUtils
+import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Constants
