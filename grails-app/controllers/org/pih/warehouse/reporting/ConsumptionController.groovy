@@ -256,11 +256,16 @@ class ConsumptionController {
                         'Consumed daily': g.formatNumber(number: row.dailyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
                         'Quantity on hand': g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1)?:'',
                         'Months remaining': g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1)?:'',
-
                 ]
+
                 if (command.selectedProperties) {
-                    command.selectedProperties.each { property ->
-                        csvrow[property] = row.product."$property"
+                    if (command.selectedProperties instanceof String) {
+                        csvrow[property] = row.product."${command.selectedProperties}"
+
+                    } else {
+                        command.selectedProperties.each { property ->
+                            csvrow[property] = row.product."${property}"
+                        }
                     }
                 }
 
@@ -289,7 +294,7 @@ class ConsumptionController {
                         }
                         else {
                             //'"' + value.toString().replace('"','""') + '"'
-                            StringEscapeUtils.escapeCsv(value)
+                            StringEscapeUtils.escapeCsv(value.toString())
                         }
                     }
                     sw.append(values.join(","))
@@ -402,7 +407,7 @@ class ShowConsumptionRowCommand {
     }
 
     Integer getTransferBalance() {
-        return transferOutQuantity - transferInQuantity
+        transferOutQuantity - transferInQuantity
     }
 
     Float getMonthlyQuantity() {

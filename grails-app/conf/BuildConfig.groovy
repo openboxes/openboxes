@@ -46,6 +46,7 @@ grails.project.dependency.resolution = {
         compile 'com.google.zxing:javase:2.0'
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
         compile 'org.apache.commons:commons-email:1.2'
+        compile 'commons-lang:commons-lang:2.6'
 		compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
         compile "org.jadira.usertype:usertype.jodatime:1.9"
 
@@ -90,6 +91,7 @@ grails.project.dependency.resolution = {
         compile ":rendering:0.4.3"
         //compile ":burning-image:0.5.1"
         //compile ":settings:1.4"
+        //compile ":symmetricds:2.4.0"
 
 	}
 }

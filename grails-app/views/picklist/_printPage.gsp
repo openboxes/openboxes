@@ -1,4 +1,4 @@
-<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <div class="page" style="page-break-after: ${pageBreakAfter};">
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead>
