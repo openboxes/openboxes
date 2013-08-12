@@ -13,20 +13,7 @@
             <tr class="prop">
                 <td colspan="2">
                     <label>
-                        <warehouse:message code="consumption.filterByTag.label" default="Filter by tag" />
-                    </label>
-                </td>
-            </tr>
-            <tr class="">
-                <td colspan="2">
-                    <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"
-                        data-placeholder=" "/>
-                </td>
-            </tr>
-            <tr class="prop">
-                <td colspan="2">
-                    <label>
-                        <warehouse:message code="consumption.filterByCategory.label" default="Filter by category"/>
+                        <warehouse:message code="consumption.includeProductsWithCategory.label" default="Include products with category"/>
                     </label>
                 </td>
             </tr>
@@ -34,6 +21,19 @@
                 <td colspan="2">
                     <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
                                       style="min-height: 60px;" data-placeholder=" "/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td colspan="2">
+                    <label>
+                        <warehouse:message code="consumption.includeProductsWithTag.label" default="Include products with tag" />
+                    </label>
+                </td>
+            </tr>
+            <tr class="">
+                <td colspan="2">
+                    <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"
+                        data-placeholder=" "/>
                 </td>
             </tr>
         </table>
@@ -71,7 +71,8 @@
             </tr>
             <tr class="">
                 <td colspan="2">
-                    <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"/>
+                    <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"
+                        data-placeholder=" "/>
                 </td>
             </tr>
 

@@ -189,23 +189,23 @@
                                     <td colspan="" class="border-right"></td>
                                     --%>
                                     <td colspan="6" class="center border-right">
-                                        <label>${warehouse.message(code:'default.debits.label', default: 'Debits')}  </label>
-                                        <div class="fade">(debit count)</div>
+                                        <b>${warehouse.message(code:'consumption.debit.breakdown.label', default: 'Debit breakdown')}  </b>
+                                        <div class="fade">(count)</div>
                                     </td>
 
                                     <td colspan="2" class="center border-right">
-                                        <label>${warehouse.message(code:'default.credits.label', default: 'Credits')} </label>
-                                        <div class="fade">(credit count)</div>
+                                        <b>${warehouse.message(code:'consumption.credit.breakdown.label', default: 'Credit breakdown')} </b>
+                                        <div class="fade">(count)</div>
                                     </td>
 
                                     <td colspan="1" class="border-right"></td>
 
                                     <td colspan="3" class="center border-right">
-                                        <label>Consumption breakdown</label>
+                                        <label>${warehouse.message(code:'consumption.breakdown.label', default: 'Consumption breakdown')} </label>
                                     </td>
 
                                     <td colspan="2" class="center border-right">
-                                        <label>Remaining</label>
+                                        <label>${warehouse.message(code:'consumption.remaining.label', default: 'Remaining')} </label>
                                     </td>
                                     <%--
                                     <g:if test="${command.selectedProperties}">
