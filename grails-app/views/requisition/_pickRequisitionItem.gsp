@@ -53,7 +53,7 @@
         ${formatNumber(number: value, maxFractionDigits: 0)}%
     </td>
     <td class="center">
-        ${requisitionItem.orderIndex+1}
+        ${requisitionItem.orderIndex}
     </td>
 
 </tr>

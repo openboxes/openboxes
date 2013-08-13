@@ -111,7 +111,7 @@
         </g:else>
     </td>
     <td class="center">
-        ${requisitionItem.orderIndex+1}
+        ${requisitionItem.orderIndex}
     </td>
 
     <%--

@@ -65,7 +65,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 	Boolean substitutable = false
     String recipient
     String comment
-    Integer orderIndex
+    Integer orderIndex = 0
 
 	// Parent requisition item
 	RequisitionItem parentRequisitionItem
