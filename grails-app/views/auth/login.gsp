@@ -42,12 +42,12 @@
                                 </tr>
 								<tr>
 									<td class="center middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="text" id="username" name="username" value="${userInstance?.username}" style="font-size:2em" />
+										<g:textField class="text" id="username" name="username" value="${userInstance?.username?:params.username}" style="font-size:2em" />
 									</td>
 								</tr>
 								<tr>
 									<td class="center middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" style="font-size:2em" />
+										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password?:params.password}" style="font-size:2em" />
 									</td>
 								</tr>
 
