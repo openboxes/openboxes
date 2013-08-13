@@ -26,9 +26,9 @@
                     <h2><warehouse:message code="consumption.parameters.label" default="Parameters"/></h2>
                     <g:if test="${command?.toDate && command?.fromDate && command.fromLocations}">
                         <div class="left" style="width:50%">
-                            <table>
+                            <table border="1">
                                 <tr>
-                                    <td class="left">
+                                    <td class="right" width="33%">
                                         <label><warehouse:message code="consumption.reportingPeriod.label" default="Reporting period"/></label>
                                     </td>
                                     <td>
@@ -38,7 +38,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.reportingPeriodDays.label" default="Reporting period days"/></label>
                                     </td>
                                     <td>
@@ -49,34 +49,34 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction types"/></label>
                                     </td>
                                     <td>
                                         <g:each var="transactionType" in="${command.transactionTypes}">
-                                            <span class="tag"><format:metadata obj="${transactionType}"/></span>
+                                            <span><format:metadata obj="${transactionType}"/></span>
                                         </g:each>
 
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.fromLocations.label" default="Transferred from"/></label>
                                     </td>
                                     <td>
                                         <g:each var="fromLocation" in="${command.fromLocations}">
-                                            <span class="tag">${fromLocation.name}</span>
+                                            <span>${fromLocation.name}</span>
                                         </g:each>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.toLocations.label" default="Transferred to"/></label>
                                     </td>
                                     <td>
                                         <g:if test="${command.selectedLocations?.size()<10}">
                                             <g:each var="toLocation" in="${command.selectedLocations}">
-                                                <span class="tag">${toLocation.name}</span>
+                                                <span>${toLocation.name}</span>
                                             </g:each>
                                         </g:if>
                                         <g:else>
@@ -84,10 +84,12 @@
                                                 <div class="action-menu">
                                                     ${command.selectedLocations?.size()} locations
                                                     <a href="javascript:void(-1);" class="action-btn">view all</a>
-                                                    <div class="actions" style="padding:10px; border: 1px solid lightgrey; width: 600px;">
+                                                    <div class="actions" style="padding:10px; border: 1px solid lightgrey; max-width: 600px; max-height:300px; overflow-y: scroll">
+                                                        <ul>
                                                             <g:each var="toLocation" in="${command.selectedLocations.sort()}">
-                                                                <span class="tag">${toLocation.name}</span>
+                                                                <li>${toLocation.name}</li>
                                                             </g:each>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             </div>
@@ -97,9 +99,9 @@
                             </table>
                         </div>
                         <div class="right" style="width:50%;">
-                            <table>
+                            <table border="1">
                                 <tr>
-                                    <td class="left">
+                                    <td class="right" width="25%">
                                         <label><warehouse:message code="consumption.products.label" default="Products"/></label>
                                     </td>
                                     <td>
@@ -107,20 +109,20 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.tags.label" default="Tags"/></label>
                                     </td>
                                     <td>
                                         <g:each var="tag" in="${command.selectedTags}">
-                                            <span class="tag">${tag.tag}</span>
+                                            <span>${tag.tag}</span>
                                         </g:each>
                                         <g:unless test="${command?.selectedTags}">
-                                            <span class='fade'><warehouse:message code="default.none.label"/></span>
+                                            <span><warehouse:message code="default.none.label"/></span>
                                         </g:unless>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.categories.label" default="Categories"/></label>
                                     </td>
                                     <td>
@@ -128,12 +130,12 @@
                                             <format:metadata obj="${category}"/>
                                         </g:each>
                                         <g:unless test="${command?.selectedCategories}">
-                                            <span class='fade'><warehouse:message code="default.none.label"/></span>
+                                            <span><warehouse:message code="default.none.label"/></span>
                                         </g:unless>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.columns.label" default="Additional columns"/></label>
                                     </td>
                                     <td>
@@ -141,12 +143,12 @@
                                             ${property}
                                         </g:each>
                                         <g:unless test="${command?.selectedProperties}">
-                                            <span class='fade'><warehouse:message code="default.none.label"/></span>
+                                            <span><warehouse:message code="default.none.label"/></span>
                                         </g:unless>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="left">
+                                    <td class="right">
                                         <label><warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown"/></label>
                                     </td>
                                     <td>
