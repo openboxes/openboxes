@@ -8,19 +8,39 @@
 	<g:form method="POST" controller="consumption" action="show">
 
     <div class="box">
-        <h2><warehouse:message code="consumption.products.label" default="Choose products"/></h2>
+        <h2><warehouse:message code="default.filters.label"/></h2>
         <table>
+            <tr class="prop">
+                <td class="middle">
+                    <label>
+                        <warehouse:message code="consumption.afterDate.label" default="Issued after midnight on"/>
+                    </label>
+                </td>
+                <td>
+                    <div>
+                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
+                    </div>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td>
+                    <label>
+                        <warehouse:message code="consumption.beforeDate.label" default="Issued before midnight on"/>
+                    </label>
+                </td>
+                <td>
+                    <div>
+                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
+                    </div>
+                </td>
+            </tr>
             <tr class="prop">
                 <td colspan="2">
                     <label>
                         <warehouse:message code="consumption.includeProductsWithCategory.label" default="Include products with category"/>
                     </label>
-                </td>
-            </tr>
-            <tr class="">
-                <td colspan="2">
                     <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
-                                      style="min-height: 60px;" data-placeholder=" "/>
+                                      style="padding: 5px;" data-placeholder=" "/>
                 </td>
             </tr>
             <tr class="prop">
@@ -28,38 +48,8 @@
                     <label>
                         <warehouse:message code="consumption.includeProductsWithTag.label" default="Include products with tag" />
                     </label>
-                </td>
-            </tr>
-            <tr class="">
-                <td colspan="2">
                     <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"
                         data-placeholder=" "/>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="box">
-        <h2><warehouse:message code="default.filters.label"/></h2>
-        <table>
-            <tr class="prop">
-                <td class="middle">
-                    <label>
-                        <warehouse:message code="consumption.afterDate.label" default="Issued on or after"/>
-                    </label>
-                </td>
-                <td class="right middle">
-                    <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
-                </td>
-            </tr>
-            <tr class="prop">
-                <td>
-                    <label>
-                        <warehouse:message code="consumption.beforeDate.label" default="Issued on or before"/>
-                    </label>
-                </td>
-                <td class="right middle">
-                    <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -67,14 +57,11 @@
                     <label>
                         <warehouse:message code="consumption.fromLocations.label" default="Source(s)"/>
                     </label>
-                </td>
-            </tr>
-            <tr class="">
-                <td colspan="2">
                     <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"
-                        data-placeholder=" "/>
+                                      data-placeholder=" "/>
                 </td>
             </tr>
+
 
             <%--
             <tr class="prop">
@@ -94,7 +81,7 @@
                 </td>
             </tr>
             --%>
-                <g:if test="${command.toLocations}">
+
                     <tr class="prop">
                         <td colspan="2" class="bottom">
                             <label>
@@ -104,9 +91,9 @@
                                 <a id="selectAllLocations">Select all</a>&nbsp;|&nbsp;
                                 <a id="selectNoLocations">Select none</a>
                             </div>
+
                         </td>
                     </tr>
-
                     <tr class="">
                         <td colspan="2">
                             <div>
@@ -156,23 +143,56 @@
 
                             </div>
                             <g:unless test="${command.toLocations}">
-                                <div class="empty center">
-                                    <warehouse:message code="default.empty.label"/>
+                                <div class="center">
+                                    <warehouse:message code="consumption.destinations.message" default=""/>
                                 </div>
                             </g:unless>
                         </td>
                     </tr>
-                </g:if>
-            </table>
-        </div>
-
-
-
-
-        <div class="box">
-            <h2><warehouse:message code="consumption.additionalSettings.label" default="Choose additional settings"/></h2>
-            <table>
                 <tr class="">
+                    <td colspan="2">
+                        <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
+                        <label>
+                            <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown"/>
+                        </label>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td colspan="2">
+                        <label><warehouse:message code="consumption.additionalColumns.label" default="Choose additional columns"/></label>
+                        <select name="selectedProperties" multiple="true" class="chzn-select-deselect" style="height: 100px;">
+                            <g:each var="property" in="${command.productDomain.properties}">
+                                <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
+                                    <option value="${property.name}" ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}>
+                                        ${property.naturalName} (${property.typePropertyName})
+                                    </option>
+                                </g:if>
+                            </g:each>
+                        </select>
+                        <%--
+                    <div style="overflow: auto; max-height: 200px;" class="list">
+                        <table>
+                        <g:each var="property" in="${command.productDomain.properties}">
+                            <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
+                                <tr>
+                                    <td class="middle left">
+                                    <g:checkBox name="selectedProperties" value="${property.name}"
+                                        checked="${command.selectedProperties?.toList()?.contains(property.name)}"
+                                        class="property"/>
+                                    </td>
+                                    <td class="middle left">
+                                        ${property.naturalName}
+                                        <span class="fade">${property.typePropertyName}</span>
+                                    </td>
+                                </div>
+                            </g:if>
+                        </g:each>
+                        </table>
+                    </div>
+                        --%>
+                    </td>
+                </tr>
+                <tr class="prop">
                     <td>
                         <label>
                             <warehouse:message code="consumption.format.label" default="Format"/>
@@ -185,50 +205,6 @@
                         <span class="middle">
                             <g:radio name="format" value="csv" checked="${false}" /> CSV
                         </span>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td colspan="2">
-                        <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
-                        <label>
-                            <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown"/>
-                        </label>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td colspan="2">
-
-                        <label><warehouse:message code="consumption.additionalColumns.label" default="Choose additional columns"/></label>
-                        <select name="selectedProperties" multiple="true" class="chzn-select-deselect" style="height: 100px;">
-                            <g:each var="property" in="${command.productDomain.properties}">
-                                <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
-                                    <option value="${property.name}" ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}>
-                                        ${property.naturalName} (${property.typePropertyName})
-                                    </option>
-                                </g:if>
-                            </g:each>
-                        </select>
-                            <%--
-                        <div style="overflow: auto; max-height: 200px;" class="list">
-                            <table>
-                            <g:each var="property" in="${command.productDomain.properties}">
-                                <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
-                                    <tr>
-                                        <td class="middle left">
-                                        <g:checkBox name="selectedProperties" value="${property.name}"
-                                            checked="${command.selectedProperties?.toList()?.contains(property.name)}"
-                                            class="property"/>
-                                        </td>
-                                        <td class="middle left">
-                                            ${property.naturalName}
-                                            <span class="fade">${property.typePropertyName}</span>
-                                        </td>
-                                    </div>
-                                </g:if>
-                            </g:each>
-                            </table>
-                        </div>
-                            --%>
                     </td>
                 </tr>
 

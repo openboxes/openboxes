@@ -74,7 +74,7 @@ class ConsumptionController {
             }
         }
 
-            println "fromLocations: " + command.fromLocations.size()
+        println "fromLocations: " + command.fromLocations.size()
         println "toLocations: " + command.toLocations.size()
         println "selectedLocations: " + selectedLocations.size()
         command.selectedLocations = selectedLocations
