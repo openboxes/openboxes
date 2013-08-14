@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -547,9 +548,9 @@ class InventoryController {
             def expirationDate = formatDate(date: inventoryItem?.expirationDate, format: "dd/MMM/yyyy");
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
-            csv += '"' + (product?.name?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product?.name?:"") + ","
             csv += '"' + (inventoryItem?.lotNumber?:"")  + '"' + ","
-            csv += '"' + (expirationDate)  + '"' + ","
+            csv += '"' + formatDate(date:'expirationDate',format: 'dd/MM/yyyy')  + '"' + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
             csv += '"' + (product?.manufacturer?:"")  + '"' + ","
@@ -595,7 +596,7 @@ class InventoryController {
             def statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
-            csv += '"' + (product?.name?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
             csv += '"' + (product?.manufacturer?:"")  + '"' + ","
