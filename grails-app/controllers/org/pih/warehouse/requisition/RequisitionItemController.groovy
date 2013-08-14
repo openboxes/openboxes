@@ -500,17 +500,17 @@ class RequisitionItemController {
                 csv << [
                         requisitionNumber: requisitionItem.requisition.requestNumber,
                         requisitionName: StringEscapeUtils.escapeCsv(requisitionItem.requisition.name),
-                        requisitionDate: requisitionItem.requisition.dateRequested,
+                        requisitionDate: formatDate(date:requisitionItem.requisition.dateRequested, format: "dd/MMM/yyyy"),
                         requestedBy: requisitionItem.requisition.requestedBy.name,
                         productCode: requisitionItem.product.productCode,
-                        productName: requisitionItem.product.name,
-                        cancelReasonCode: requisitionItem.cancelReasonCode,
+                        productName: StringEscapeUtils.escapeCsv(requisitionItem.product.name),
+                        cancelReasonCode: requisitionItem.cancelReasonCode?:"",
                         quantityCanceled: requisitionItem.quantityCanceled?:"",
                         quantityRequested: requisitionItem.quantity?:"",
                         unitOfMeasure: "EA/1"
                 ]
             }
-            println csv.writer.toString()
+            //println csv.writer.toString()
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename='${filename}.csv'")
             render(contentType:"text/csv", text: csv.writer.toString())
