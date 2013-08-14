@@ -58,7 +58,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     Integer quantityCanceled
 	String cancelReasonCode
 	String cancelComments
-	
+
 	// Miscellaneous information
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
@@ -226,6 +226,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             newRequisitionItem.product = product
             newRequisitionItem.productPackage = newProductPackage?:productPackage
             //newRequisitionItem.parentRequisitionItem = this
+            newRequisitionItem.orderIndex = orderIndex
             newRequisitionItem.quantity = newQuantity
             newRequisitionItem.quantityApproved = newQuantity
 
@@ -267,8 +268,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         newRequisitionItem.product = newProduct
         newRequisitionItem.productPackage = newProductPackage?:productPackage
         newRequisitionItem.quantity = newQuantity
-        newRequisitionItem.parentRequisitionItem = this
         newRequisitionItem.quantityApproved = newQuantity
+        newRequisitionItem.parentRequisitionItem = this
+        newRequisitionItem.orderIndex = orderIndex
 
         // Need to add to both to get the unit test to pass
         addToRequisitionItems(newRequisitionItem)

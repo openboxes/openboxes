@@ -1,6 +1,6 @@
 <g:set var="selected" value="${requisitionItem == selectedRequisitionItem }"/>
 <g:set var="noneSelected" value="${!selectedRequisitionItem }"/>
-<tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled()||requisitionItem?.isChanged())?'canceled':''} ${selected ?'selected-middle':'unselected'}">
+<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled()||requisitionItem?.isChanged())?'canceled':''} ${selected ?'selected-middle':'unselected'}">
     <td class="left">
         <a name="${selectedRequisitionItem?.id}"></a>
         <g:if test="${!isChild }">

@@ -21,7 +21,7 @@
                     </td>
                 </tr>
             </g:unless>
-            <g:each in="${requisitionItems}" status="i" var="requisitionItem">
+            <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
                     <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
                     <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>

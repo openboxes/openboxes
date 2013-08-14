@@ -43,6 +43,26 @@
                                     <tr>
                                         <td class="left middle">
                                             <label>
+                                                ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
+                                            </label>
+                                        </td>
+                                        <td class="middle">
+                                            <g:if test="${params.edit}">
+                                                <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="day"/>
+                                            </g:if>
+                                            <g:else>
+                                                <g:if test="${requisition.dateVerified}">
+                                                    <g:formatDate date="${requisition?.dateVerified}" format="dd MMMMM yyyy"/>
+                                                </g:if>
+                                                <g:else>
+                                                    ${warehouse.message(code:'default.none.label')}
+                                                </g:else>
+                                            </g:else>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="left middle">
+                                            <label>
                                                 ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
                                             </label>
                                         </td>
@@ -54,24 +74,6 @@
                                             <g:else>
                                                 <g:if test="${requisition.verifiedBy}">
                                                     ${requisition?.verifiedBy?.name}
-                                                </g:if>
-                                                <g:else>
-                                                    ${warehouse.message(code:'default.none.label')}
-                                                </g:else>
-                                            </g:else>
-                                        </td>
-                                        <td class="left middle">
-                                            <label>
-                                                ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
-                                            </label>
-                                        </td>
-                                        <td class="middle">
-                                            <g:if test="${params.edit}">
-                                                <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="day"/>
-                                            </g:if>
-                                            <g:else>
-                                                <g:if test="${requisition.dateVerified}">
-                                                    <g:formatDate date="${requisition?.dateVerified}" format="dd MMMMM yyyy"/>
                                                 </g:if>
                                                 <g:else>
                                                     ${warehouse.message(code:'default.none.label')}
@@ -97,11 +99,13 @@
                                         </td>
                                     </tr>
 
+
                                 </table>
                             </g:form>
 
-
-                            <table>
+                            <hr/>
+                            <br/>
+                            <table class="zebra">
                                 <thead>
                                     <tr class="odd">
                                         <th class='center'>
@@ -137,9 +141,14 @@
                                                     code="requisition.noRequisitionItems.message" /></td>
                                         </tr>
                                     </g:if>
+                                    <g:set var="count" value="${0}"/>
                                     <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
-                                        <g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:i]"/>
-                                        <g:if test="${!requisitionItem.parentRequisitionItem && selectedRequisitionItem && requisitionItem == selectedRequisitionItem && params?.actionType}">
+                                        <g:if test="${!requisitionItem.parentRequisitionItem}">
+                                            <g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:count++]"/>
+                                        </g:if>
+
+                                        <g:if test="${!requisitionItem.parentRequisitionItem && selectedRequisitionItem &&
+                                                requisitionItem == selectedRequisitionItem && params?.actionType}">
                                             <tr>
                                                 <td colspan="9">
                                                     <g:if test="${params?.actionType=='changeQuantity'}">

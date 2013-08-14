@@ -205,7 +205,7 @@ class RequisitionItemController {
             //render(view: "../requisition/review", model: [requisition:requisition, selectedRequisitionItem: requisitionItem])
             return;
         }
-        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
+        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id':requisitionItem?.id])
     }
 
     /**

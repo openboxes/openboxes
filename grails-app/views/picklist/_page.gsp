@@ -27,7 +27,7 @@
             </tr>
 
         </g:unless>
-        <g:each in="${requisitionItems}" status="i" var="requisitionItem">
+        <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
             <g:if test="${picklist}">
                 <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
                 <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
@@ -73,7 +73,7 @@
                             ${binLocationPart}<br/>
                         </g:each>
                     </td>
-                    <td class="middle center">
+                    <td class="middle center" width="25%">
                         <g:if test="${picklistItems}">
                             <span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
                         </g:if>

@@ -67,7 +67,6 @@
                             <span class="fade">
                                 ${warehouse.message(code:'default.none.label')}
                             </span>
-
                         </g:else>
                     </td>
                 </tr>
@@ -189,30 +188,53 @@
                     <td class="name"><label><warehouse:message
                             code="requisition.verifiedBy.label" /></label></td>
                     <td class="value">
-                        ${requisition?.verifiedBy?.name }
-                        <div class="fade">
-                            <g:formatDate date="${requisition?.dateVerified }"/>
-                        </div>
+                        <g:if test="${requisition?.verifiedBy?.name }">
+                            ${requisition?.verifiedBy?.name }
+                            <div class="fade">
+                                <g:formatDate date="${requisition?.dateVerified }"/>
+                            </div>
+                        </g:if>
+                        <g:else>
+                            <span class="fade">
+                                ${warehouse.message(code:'default.none.label')}
+                            </span>
+                        </g:else>
+
                     </td>
                 </tr>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="picklist.picker.label" /></label></td>
                     <td class="value">
-                        ${requisition?.picklist?.picker?.name }
-                        <div class="fade">
-                            <g:formatDate date="${requisition?.picklist?.datePicked }"/>
-                        </div>
+                        <g:if test="${requisition?.picklist?.picker }">
+                            ${requisition?.picklist?.picker?.name }
+                            <div class="fade">
+                                <g:formatDate date="${requisition?.picklist?.datePicked }"/>
+                            </div>
+                        </g:if>
+                        <g:else>
+                            <span class="fade">
+                                ${warehouse.message(code:'default.none.label')}
+                            </span>
+                        </g:else>
                     </td>
                 </tr>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="requisition.checkedBy.label" /></label></td>
                     <td class="value">
-                        ${requisition?.checkedBy?.name }
-                        <div class="fade">
-                            <g:formatDate date="${requisition?.dateChecked }"/>
-                        </div>
+
+                        <g:if test="${requisition?.checkedBy}">
+                            ${requisition?.checkedBy?.name }
+                            <div class="fade">
+                                <g:formatDate date="${requisition?.dateChecked }"/>
+                            </div>
+                        </g:if>
+                        <g:else>
+                            <span class="fade">
+                                ${warehouse.message(code:'default.none.label')}
+                            </span>
+                        </g:else>
                     </td>
                 </tr>
                 <%--
@@ -250,7 +272,7 @@
                             </div>
                         </g:each>
                         <g:unless test="${requisition?.transactions}">
-                            <warehouse:message code="default.none.label"/>
+                            <span class="fade"><warehouse:message code="default.none.label"/></span>
                         </g:unless>
 
 

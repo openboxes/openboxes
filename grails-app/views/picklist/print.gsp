@@ -147,7 +147,7 @@
             <label><warehouse:message code="requisition.createdBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.createdBy?.name}
+            ${requisition?.createdBy?.name?:warehouse.message(code:'default.none.label')}
         </td>
         <td>
 
@@ -164,7 +164,7 @@
             <label><warehouse:message code="requisition.verifiedBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.verifiedBy?.name}
+            ${requisition?.verifiedBy?.name?:warehouse.message(code:'default.none.label')}
         </td>
         <td>
 
@@ -181,7 +181,7 @@
             <label><warehouse:message code="requisition.pickedBy.label"/></label>
         </td>
         <td class="middle">
-            ${picklist?.picker?.name}
+            ${picklist?.picker?.name?:warehouse.message(code:'default.none.label')}
         </td>
         <td>
 
@@ -198,8 +198,7 @@
             <label><warehouse:message code="requisition.reviewedBy.label" default="Checked by"/></label>
         </td>
         <td class="middle">
-            ${requisition?.checkedBy?.name}
-            ${location.id}
+            ${requisition?.checkedBy?.name?:warehouse.message(code:'default.none.label')}
         </td>
         <td>
 

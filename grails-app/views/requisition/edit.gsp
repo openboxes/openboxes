@@ -38,7 +38,7 @@
                             <warehouse:message code="requisition.addRequisitionItems.label" default="Add requisition items"/>
                         </h2>
 
-                        <table id="requisition-items" class="ui-validation-items"
+                        <table id="requisition-items" class="ui-validation-items zebra"
                             data-bind="visible: requisition.requisitionItems().length">
                             <thead>
 
@@ -76,7 +76,7 @@
                                 </tr>
                             <thead>
                             <tbody data-bind="foreach: requisition.requisitionItems">
-                                <tr class="requisitionItemsRow">
+                                <tr class="requisitionItemsRow prop">
                                     <td class="middle list-header">
 
                                         <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
@@ -109,7 +109,7 @@
                                         <div data-bind="text: status"></div>
                                     </td>
                                     <td class="middle center">
-                                        <div data-bind="text: orderIndex()+1"></div>
+                                        <div data-bind="text: orderIndex()"></div>
                                     </td>
                                     <td class="center middle">
                                         <a href='#' class="button"

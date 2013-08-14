@@ -144,7 +144,7 @@
                     <div class="box">
                         <h2>
                             <warehouse:message code="requisition.list.label" />
-                            <div class="fade"><warehouse:message code="default.showing.message" args="[requisitions.totalCount]"/></div>
+                            <span class="fade">(${requisitions.totalCount})</span>
                         </h2>
                         <g:render template="list" model="[requisitions:requisitions,pageParams:pageParams]"/>
                     </div>

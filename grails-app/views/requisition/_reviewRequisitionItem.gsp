@@ -10,10 +10,10 @@
 <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
 <g:set var="isAvailableForSubstitution" value="${hasSubstitution && (quantityOnHandForSubstitution > 0) && (quantityOnHandForSubstitution >= requisitionItem?.substitution?.totalQuantity()) }"/>
 <%--<tr class="${(i % 2) == 0 ? 'even' : 'odd'} ${!selectedRequisitionItem?'':selected?'selected':'unselected'} ${isAvailable?'':'error'}">--%>
-<tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled())?'canceled':''} ())?'canceled':''}">
+<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled()?'canceled':'')} ${!selectedRequisitionItem?'':selected?'selected':'unselected'}">
     <%--${isAvailable?'success':'error'}--%>
     <td class="left">
-        <a name="${selectedRequisitionItem?.id}"></a>
+    <a name="${selectedRequisitionItem?.id}"></a>
         <g:if test="${!isChild }">
             <g:render template="/requisitionItem/actions" model="[requisition:requisition,requisitionItem:requisitionItem]"/>
         </g:if>

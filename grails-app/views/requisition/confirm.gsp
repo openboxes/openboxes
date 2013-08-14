@@ -86,7 +86,7 @@
                 <hr/>
 
 
-                <table border="0">
+                <table border="0" class="zebra">
                     <thead>
                         <tr>
                             <th></th>
@@ -110,7 +110,7 @@
                             <g:if test="${picklistItems}">
                                 <g:each var="picklistItem" in="${picklistItems }">
                                     <g:set var="isSubstitution" value="${picklistItem?.inventoryItem?.product!=picklistItem?.requisitionItem?.product }"/>
-                                    <tr class="${(isSubstitution)?'notice':'success' }">
+                                    <tr class="prop ${(isSubstitution)?'notice':'success' }">
                                         <td>
                                             ${status++ }
                                         </td>

@@ -137,7 +137,7 @@
 
 
 
-                                <table border="0">
+                                <table class="zebra">
                                     <thead>
                                         <tr class="odd">
                                             <th>
