@@ -4,6 +4,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
     <title><warehouse:message code="requisition.check.label" /></title>
+    <style>
+    .selected { color: #666; }
+    .unselected { color: #ccc; }
+    </style>
+
 </head>
 <body>
 <div class="body">
@@ -110,7 +115,7 @@
                             <g:if test="${picklistItems}">
                                 <g:each var="picklistItem" in="${picklistItems }">
                                     <g:set var="isSubstitution" value="${picklistItem?.inventoryItem?.product!=picklistItem?.requisitionItem?.product }"/>
-                                    <tr class="prop ${(isSubstitution)?'notice':'success' }">
+                                    <tr class="prop selected">
                                         <td>
                                             ${status++ }
                                         </td>
@@ -171,7 +176,7 @@
                                 </g:each>
                             </g:if>
                             <g:else>
-                                <tr class="error">
+                                <tr class="prop unselected">
                                     <td>${status++ }</td>
                                     <td>
                                         Canceled
