@@ -305,12 +305,7 @@ class Product implements Comparable, Serializable {
 
         if (inventoryLevel?.status == InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
             if (currentQuantity <= 0) {
-                if (latestInventoryDate) {
-                    status = "STOCK_OUT"
-                }
-                else {
-                    status = "SUPPORTED_NON_INVENTORY"
-                }
+                status = "STOCK_OUT"
             }
             else if (inventoryLevel?.maxQuantity && currentQuantity >= inventoryLevel?.maxQuantity) {
                 status = "OVERSTOCK"

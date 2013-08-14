@@ -141,7 +141,11 @@
                 </td>
                 <td class="value">
                     <span class="">
+                        <g:set var="status" value="${productInstance.getStatus(session.warehouse.id, totalQuantity?:0)}"/>
+                        ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
+                        <%--
                         <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity,latestInventoryDate:latestInventoryDate]"/>
+                        --%>
                     </span>
                 </td>
             </tr>

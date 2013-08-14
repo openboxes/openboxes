@@ -370,7 +370,7 @@ th.desc a {
 .prop .name {
     text-align: left;
     width: 10%;
-    white-space: nowrap;
+    /*white-space: nowrap;*/ /* it makes the sidebar tables look really bad */
 }
 .prop .value {
     text-align: left;
