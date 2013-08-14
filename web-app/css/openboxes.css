@@ -369,12 +369,12 @@ th.desc a {
 }
 .prop .name {
     text-align: left;
-    width: 10%;
+    width: 25%;
     /*white-space: nowrap;*/ /* it makes the sidebar tables look really bad */
 }
 .prop .value {
     text-align: left;
-    width: 90%;
+    width: 75%;
 }
 /* allows table to be flush with its parent table cell */
 .prop .table {
@@ -1826,7 +1826,7 @@ div#dashboard li {
 }
 
 .prop .name {
-    width: 10%;
+    width: 25%;
     background-color: #F7F7F7;
     text-align: right;
 }

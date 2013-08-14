@@ -81,12 +81,13 @@
                         </tbody>
                         <tfoot>
                             <tr >
-                                <td class="left" colspan="5">
+                                <td></td>
+                                <td class="left" colspan="4">
                                     <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}" class="button icon arrowleft">
                                         ${warehouse.message(code:'default.button.back.label')}
                                     </g:link>
-                                    <button class="button icon add">
-                                        ${warehouse.message(code:'requisitionTemplate.import.label', default: 'Import stock list')}
+                                    <button class="button icon approve">
+                                        ${warehouse.message(code:'requisitionTemplate.save.label', default: 'Save')}
                                     </button>
                                 </td>
                             </tr>
@@ -129,12 +130,13 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td class="left" colspan="5">
+                                <td></td>
+                                <td class="left" colspan="4">
                                     <g:link controller="requisitionTemplate" action="edit" id="${requisition.id}" class="button icon arrowleft">
                                         ${warehouse.message(code:'default.button.back.label')}
                                     </g:link>
                                     <button class="button icon add">
-                                        ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Process stock list')}
+                                        ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Import')}
                                     </button>
                                 </td>
                             </tr>
