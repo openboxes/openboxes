@@ -117,14 +117,6 @@
                             (${incomingRequests?.values()?.flatten()?.size()?:0 })
                         </g:link>
                     </div>
-                    <g:isUserAdmin>
-                        <div class="megaButton">
-                            <g:link controller="requisitionTemplate" action="list" class="list">
-                                <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
-                                (${requisitionTemplates.size()})
-                            </g:link>
-                        </div>
-                    </g:isUserAdmin>
                     <div class="megaButton">
                         <hr/>
                     </div>
@@ -141,15 +133,15 @@
                 </div>
                 --%>
 	                <div class="megaButton">
-	                    <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
-	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
-	                    </g:link>
-	                </div>
-	                <div class="megaButton">
 	                    <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'WARD_STOCK']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
 	                    </g:link>
 	                </div>
+                    <div class="megaButton">
+                        <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
+                            <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
+                        </g:link>
+                    </div>
 	                <div class="megaButton">
 	                    <g:link controller="requisition" action="createAdhoc" class="create" params="[type:'WARD_ADHOC']">
 	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
@@ -358,6 +350,13 @@
 							<warehouse:message code="location.locationTypes.label" />
 						</g:link>
 					</div>
+                    <div class="megaButton">
+                        <g:link controller="requisitionTemplate" action="list" class="list">
+                            <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
+                            (${requisitionTemplates.size()})
+                        </g:link>
+                    </div>
+
 					<div>
 						<hr/>
 					</div>
@@ -463,7 +462,6 @@
                         <div class="megaButton">
                             <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
                         </div>
-
 					</g:isUserAdmin>						
 				</div>
 			</div>

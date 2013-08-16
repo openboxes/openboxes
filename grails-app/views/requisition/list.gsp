@@ -88,6 +88,12 @@
                                                       noSelection="['null':'']" class="chzn-select-deselect"/>
                                     </p>
                                 </div>
+                                <div class="filter-list-item">
+                                    <p>
+                                        <g:checkBox name="relatedToMe" value="${params?.relatedToMe}"/>
+                                        <label><warehouse:message code="requisition.relatedToMe" default="Only include requisitions related to me"/></label>
+                                    </p>
+                                </div>
                                 <hr/>
                                 <div class="filter-list-item">
                                     <button class="button icon search" name="search" class="button">
@@ -103,6 +109,12 @@
                 </div>
                 <div class="yui-u">
                     <div class="buttonBar button-group">
+                        <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
+                            ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
+                            (${requisitionsMap["relatedToMe"]?:0 })
+                        </g:link>
+                    </div>
+                    <div class="buttonBar button-group">
                         <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
                             <warehouse:message code="default.all.label"/>
                         </g:link>
@@ -115,12 +127,6 @@
                                 </g:link>
                             </g:if>
                         </g:each>
-                    </div>
-                    <div class="buttonBar button-group right">
-                        <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
-                            ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'Related to me')}
-                            (${requisitionsMap["relatedToMe"]?:0 })
-                        </g:link>
                     </div>
                     <%--
                     <div class="buttonBar button-group">
@@ -140,7 +146,8 @@
                     --%>
 
 
-                    <g:set var="pageParams" value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order]"/>
+                    <g:set var="pageParams"
+                           value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order,relatedToMe:params.relatedToMe]"/>
                     <div class="box">
                         <h2>
                             <warehouse:message code="requisition.list.label" />

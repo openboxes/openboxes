@@ -53,7 +53,7 @@
                         </div>
                     </g:if>
                     <g:else>
-                        <h2>${requisition?.name?:warehouse.message(code: 'requisition.new.label') }</h2>
+                        <h2>${warehouse.message(code: 'requisition.details.label', default: 'Requisition details') }</h2>
                     </g:else>
 						
                     <table id="requisition-template-table">
@@ -125,15 +125,27 @@
                                 </td>
                             </tr>
                             <g:if test="${requisition.isDepotRequisition()}">
-                                <tr>
+                                <tr class="prop">
                                     <td class="name"><label><warehouse:message
                                                 code="requisition.program.label" /></label></td>
                                     <td class="value">
+                                        <input id="recipientProgram"
+                                               name="recipientProgram" class="autocomplete text" size="60"
+                                               placeholder="${warehouse.message(code:'requisition.program.label')}"
+                                               data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram" />
 
                                     </td>
                                 </tr>
                             </g:if>
-
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message
+                                            code="requisition.dateRequested.label" /></label></td>
+                                <td class="value">
+                                    <g:jqueryDatePicker id="dateRequested" name="dateRequested"
+                                                        value="${requisition?.dateRequested}" format="MM/dd/yyyy"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="destination.id">
@@ -165,23 +177,32 @@
                                 </td>
 
                                 <td class="value">
-                                    <g:textArea name="description" cols="80" rows="5"
+                                    <g:textArea name="description" cols="80" rows="5" style="width:100%"
                                         placeholder="${warehouse.message(code:'requisition.description.message')}"
-                                        class="text">${requisition.description }</g:textArea>
+                                        class="text large">${requisition.description }</g:textArea>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="description">
-                                        <warehouse:message code="requisition.requisitionItems.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-
-                                    <table class="box">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box">
+                    <h2>
+                        <warehouse:message code="requisition.requisitionItems.label" />
+                    </h2>
+                    <table id="requisition-item-template-table">
+                        <tbody>
+                            <tr>
+                                <td >
+                                    <table >
                                         <tr>
                                             <th>
+                                                ${warehouse.message(code: 'product.productCode.label')}
+                                            </th>
+                                            <th>
                                                 ${warehouse.message(code: 'product.label')}
+                                            </th>
+                                            <th>
+                                                ${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}
                                             </th>
                                             <th>
                                                 ${warehouse.message(code: 'requisitionItem.quantity.label')}
@@ -196,18 +217,20 @@
                                         <g:each var="requisitionItem" in="${requisition?.requisitionItems.sort()}" status="i">
                                             <tr class="${i%2?'even':'odd'}">
                                                 <td>
-                                                    <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
                                                     ${requisitionItem?.product?.productCode}
+                                                </td>
+                                                <td>
+                                                    <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
                                                     ${requisitionItem?.product}
                                                 </td>
                                                 <td>
-                                                    <g:hiddenField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}"/>
                                                     ${requisitionItem?.quantity}
                                                 </td>
                                                 <td>
+                                                    <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="large text" size="5"/>
+                                                </td>
+                                                <td>
                                                     EA/1
-
-
                                                 </td>
                                                 <td>
                                                     <g:hiddenField name="requisitionItems[${i}].orderIndex" value="${requisitionItem?.orderIndex}"/>
@@ -225,7 +248,7 @@
 
 				</div>
 				<div class="buttons">
-                    <g:link controller="requisition" action="chooseTemplate" class="button">
+                    <g:link controller="requisition" action="chooseTemplate" class="button icon arrowleft">
                         ${warehouse.message(code:'default.button.back.label', default: 'Back')}
                     </g:link>
                     <button class="button icon approve" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
@@ -234,7 +257,7 @@
                     <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
                     --%>
                     &nbsp;
-                    <g:link controller="requisitionTemplate" action="list">
+                    <g:link controller="requisitionTemplate" action="list" class="button icon remove">
                         <warehouse:message code="default.button.cancel.label"/>
                     </g:link>
 				</div>

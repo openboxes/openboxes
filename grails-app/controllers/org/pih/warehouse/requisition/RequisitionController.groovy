@@ -35,20 +35,28 @@ class RequisitionController {
 
     def list = {
 
+        println "commodityClassIsNull: " + params.commodityClassIsNull
+
         def requisition = new Requisition(params)
         requisition.destination = session?.warehouse
 
+
+        // Requisitions to display in the table
         def requisitions = []
         requisitions = requisitionService.getRequisitions(requisition, params)
         def requisitionsMap = [:]
 
-        // Used to display the counts
+        println "requisitions from server " + requisitions.size() + " => " + requisitions.collect { it.id }
+
+        // Used to display the counts of requisitions
         def requisitionsLocal = Requisition.findAllByDestination(session.warehouse)
         println "requisitionsLocal: " + requisitionsLocal.size()
 
         // Hack to get requisitions that are related to me
-        def requisitionsRelatedToMe = requisitionsLocal.findAll { it?.updatedBy?.id == session?.user?.id || it?.createdBy?.id == session?.user?.id || it?.requestedBy?.id == session?.user?.id }
-        println "requisitionsRelatedToMe: " + requisitionsRelatedToMe.size()
+        def requisitionsRelatedToMe = requisitionsLocal.findAll {
+            (it?.updatedBy?.id == session?.user?.id || it?.createdBy?.id == session?.user?.id || it?.requestedBy?.id == session?.user?.id) && !it.isTemplate
+        }
+        println "requisitionsRelatedToMe: " + requisitionsRelatedToMe.size() + " => " + requisitionsRelatedToMe.collect { it.id }
 
         requisitionsLocal.groupBy { it.status }.each { k, v ->
             requisitionsMap[k] = v.size()?:0
@@ -99,7 +107,6 @@ class RequisitionController {
         def requisition = new Requisition()
         def requisitionTemplate = Requisition.get(params.id)
         if (requisitionTemplate) {
-
             requisition.type = requisitionTemplate.type
             requisition.origin = requisitionTemplate.origin
             requisition.destination = requisitionTemplate.destination
@@ -121,7 +128,6 @@ class RequisitionController {
         else {
             flash.message = "Could not find requisition template"
         }
-
 
         println "redirecting to create stock page " + requisition.id
         render(view:"createStock", model:[requisition:requisition])
@@ -174,6 +180,9 @@ class RequisitionController {
     }
 
     def saveStock = {
+
+        println "Save stock requisition " + params
+
         def requisition = new Requisition(params)
 
 
@@ -182,12 +191,15 @@ class RequisitionController {
             requisition.commodityClass = params.commodityClass as CommodityClass
         }
         requisition.name = getName(requisition)
+        def value = requisitionService.saveRequisition(requisition)
+        println "Value = " + value
 
-        if (requisitionService.saveRequisition(requisition)) {
-            redirect(controller: "requisition", action: "edit", id: requisition?.id)
+        if (value.hasErrors()) {
+            println "There are errors " + requisition.errors
+            render(view: "createStock", model: [requisition:requisition])
         }
         else {
-            render(view: "createNonStock", model: [requisition:requisition])
+            redirect(controller: "requisition", action: "show", id: requisition?.id)
         }
 
     }

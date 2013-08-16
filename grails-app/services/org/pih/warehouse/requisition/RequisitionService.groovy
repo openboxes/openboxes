@@ -91,11 +91,11 @@ class RequisitionService {
         //return Requisition.findAllByDestination(session.warehouse)
 
         def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
+        println "params.commodityClass = " + params.commodityClassIsNull
+        def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
+        println "commodityClassIsNull = " + commodityClassIsNull
 
         def criteria = Requisition.createCriteria()
-        def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
-        println commodityClassIsNull
-
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
             and {
                 // Base query needs to include the following
@@ -111,7 +111,7 @@ class RequisitionService {
                 if (requisition.isPublished) {
                     eq("isPublished", requisition.isPublished)
                 }
-                if (commodityClassIsNull) {
+                if (params.commodityClassIsNull) {
                     isNull("commodityClass")
                 }
 
@@ -182,9 +182,19 @@ class RequisitionService {
         if (!requisition.requestNumber) {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
+
+
         //requisition.name = generateRequisitionName(requisition)
-        requisition.save(flush: true)
-        return requisition
+        def savedRequisition = requisition.save(flush: true)
+        println "requisition = " + savedRequisition
+        println "requisition.errors = " + requisition.errors
+        if (savedRequisition) {
+            return savedRequisition
+        }
+        else {
+            return requisition
+        }
+
     }
 
     /**
