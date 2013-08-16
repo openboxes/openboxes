@@ -269,7 +269,7 @@ class RequisitionItemController {
             def redirectAction = params?.redirectAction ?: "review"
             // For now we don't need to choose the selected requisition item (e.g. params:['requisitionItem.id':requisitionItem.id])
             redirect(controller: "requisition", action: redirectAction,
-                    id: requisitionItem?.requisition?.id)
+                    id: requisitionItem?.requisition?.id, params: ['requisitionItem.id':requisitionItem.id])
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"

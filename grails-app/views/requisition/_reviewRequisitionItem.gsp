@@ -19,29 +19,6 @@
         </g:if>
     </td>
     <td class="center">
-        <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
-            ${requisitionItem.status}
-        </div>
-        <%--
-        <g:if test="${requisitonItem?.isApproved()}">
-            <warehouse:message code="enum.RequisitionItemStatus.APPROVED" default="Approved"/>
-        </g:if>
-
-        <g:if test="${requisitionItem?.isCanceled()}">
-            <warehouse:message code="enum.RequisitionItemStatus.CANCELLED" default="Cancelled"/>
-            <g:if test="${requisitionItem?.isSubstitution()}">
-                <warehouse:message code="enum.requisitionItemStatus.SUBSTITUTED" default="Substituted"/>
-            </g:if>
-        </g:if>
-        <g:elseif test="${requisitionItem?.isChanged()}">
-            <warehouse:message code="enum.requisitionItemStatus.CHANGED" default="Changed"/>
-        </g:elseif>
-        <g:else>
-            ${warehouse.message(code:'default.pending.label')}
-        </g:else>
-        --%>
-    </td>
-    <td class="center">
         ${requisitionItem?.product?.productCode}
     </td>
 
@@ -54,61 +31,101 @@
         --%>
         <g:if test="${isCanceled||hasSubstitution}">
             <div class="canceled">
-                ${requisitionItem?.product?.productCode}
                 <format:metadata obj="${requisitionItem?.product?.name}" />
             </div>
             <div class="">
-                ${requisitionItem?.change?.product?.productCode}
                 <format:metadata obj="${requisitionItem?.change?.product?.name}" />
             </div>
         </g:if>
         <g:else>
             <div>
-                ${requisitionItem?.product?.productCode}
                 <format:metadata obj="${requisitionItem?.product?.name}" />
             </div>
         </g:else>
 
     </td>
+    <td class="center" style="width: 10%;">
+        <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
+            ${requisitionItem.status}
+        </div>
+        <g:if test="${requisitionItem?.cancelReasonCode}">
+            <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</p>
+            <p class="fade">${requisitionItem?.cancelComments}</p>
+        </g:if>
+    <%--
+    <g:if test="${requisitonItem?.isApproved()}">
+        <warehouse:message code="enum.RequisitionItemStatus.APPROVED" default="Approved"/>
+    </g:if>
+
+    <g:if test="${requisitionItem?.isCanceled()}">
+        <warehouse:message code="enum.RequisitionItemStatus.CANCELLED" default="Cancelled"/>
+        <g:if test="${requisitionItem?.isSubstitution()}">
+            <warehouse:message code="enum.requisitionItemStatus.SUBSTITUTED" default="Substituted"/>
+        </g:if>
+    </g:if>
+    <g:elseif test="${requisitionItem?.isChanged()}">
+        <warehouse:message code="enum.requisitionItemStatus.CHANGED" default="Changed"/>
+    </g:elseif>
+    <g:else>
+        ${warehouse.message(code:'default.pending.label')}
+    </g:else>
+    --%>
+    </td>
     <td class="quantity center">
         <div class="${isCanceled||isChanged?'canceled':''}">
             ${requisitionItem?.quantity}
+            <%--
             ${requisitionItem?.productPackage?.uom?.code?:"EA" }/${requisitionItem?.productPackage?.quantity?:"1" }
+            --%>
         </div>
         <g:if test="${requisitionItem?.change}">
             ${requisitionItem?.change?.quantity}
+            <%--
             ${requisitionItem?.change?.productPackage?.uom?.code?:"EA"}/${requisitionItem?.change?.productPackage?.quantity?:"1"}
+            --%>
         </g:if>
+
+
     </td>
     <td class="center">
         <div class="${isCanceled||isChanged?'canceled':''}">
-            ${requisitionItem?.totalQuantity()} EA/1
+            ${requisitionItem?.totalQuantity()}
         </div>
         <g:if test="${requisitionItem?.change}">
-            ${requisitionItem?.change?.totalQuantity()} EA/1
+            ${requisitionItem?.change?.totalQuantity()}
         </g:if>
     </td>
     <td class="center">
-        <g:if test="${isAvailable||isAvailableForSubstitution}">
-            <div class="available">
-                ${warehouse.message(code:'inventory.available.label', default:'Available')}
-            </div>
-        </g:if>
-        <g:else>
-            <div class="unavailable">
+
+        <div class="box">
+
+            <g:if test="${isAvailable||isAvailableForSubstitution}">
+                <g:if test="${requisitionItem?.hasSubstitution()}">
+                    <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0}</div>
+                    ${quantityOnHandForSubstitution?:0}
+                </g:if>
+                <g:else>
+                    ${quantityOnHand?:0}
+                </g:else>
                 <%--
-                <img src="${resource(dir: 'images/icons/silk', file: 'emoticon_unhappy.png')}" />
+                <div class="available">
+                    ${warehouse.message(code:'inventory.available.label', default:'Available')}
+                </div>
                 --%>
-                ${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}
-            </div>
-        </g:else>
-        <g:if test="${requisitionItem?.hasSubstitution()}">
-            <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0} EA/1</div>
-            ${quantityOnHandForSubstitution?:0} EA/1
-        </g:if>
-        <g:else>
-            ${quantityOnHand?:0} EA/1
-        </g:else>
+            </g:if>
+            <g:else>
+                <div class="unavailable">
+                    <%--
+                    <img src="${resource(dir: 'images/icons/silk', file: 'emoticon_unhappy.png')}" />
+                    --%>
+                    ${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}
+                </div>
+            </g:else>
+
+        </div>
+    </td>
+    <td class="center">
+        EA/1
     </td>
     <td class="center">
         ${requisitionItem.orderIndex}

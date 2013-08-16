@@ -7,7 +7,7 @@
         <title><warehouse:message code="default.review.label" args="[entityName]" /></title>
         <style>
             .selected { color: #666; }
-            .unselected { color: #ccc; }
+            .unselected { color: #ccc;}
         </style>
     </head>
     <body>
@@ -111,14 +111,14 @@
                                         <th class='center'>
                                             <warehouse:message code="default.actions.label"/>
                                         </th>
-                                        <th class="center">
-                                            <warehouse:message code="requisitionItem.status.label" default="Status" />
-                                        </th>
                                         <th>
                                             <warehouse:message code="product.productCode.label" />
                                         </th>
                                         <th>
                                             <warehouse:message code="requisitionItem.product.label" />
+                                        </th>
+                                        <th class="center">
+                                            <warehouse:message code="requisitionItem.status.label" default="Status" />
                                         </th>
                                         <th class="center ">
                                             <warehouse:message code="requisitionItem.quantityRequested.label" />
@@ -128,6 +128,9 @@
                                         </th>
                                         <th class="center">
                                             <warehouse:message code="requisitionItem.quantityAvailable.label" default="Quantity available" />
+                                        </th>
+                                        <th class="center">
+                                            <warehouse:message code="requisitionItem.productPackage.label" default="UOM" />
                                         </th>
                                         <th class="center">
                                             <warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" />

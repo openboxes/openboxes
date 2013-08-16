@@ -77,9 +77,6 @@
                                 <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}</p>
                                 <p class="fade">${requisitionItem?.parentRequisitionItem?.cancelComments}</p>
                             </g:if>
-                            <g:else>
-                                ${warehouse.message(code:'default.ok.label', default:'Ok')}
-                            </g:else>
                         </td>
                         <% j++ %>
                     </tr>
