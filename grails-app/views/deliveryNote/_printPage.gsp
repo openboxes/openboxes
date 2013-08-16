@@ -39,22 +39,22 @@
                         </td>
                         <td class="center middle">
                             <g:if test="${j==0}">
-                                ${requisitionItem?.product?.productCode}
                                 <g:if test="${requisitionItem?.parentRequisitionItem}">
                                     <div class="canceled">
                                         ${requisitionItem?.parentRequisitionItem?.product?.productCode}
                                     </div>
                                 </g:if>
+                                ${requisitionItem?.product?.productCode}
                             </g:if>
                         </td>
                         <td class="middle">
                             <g:if test="${j==0}">
-                                ${requisitionItem?.product?.name}
                                 <g:if test="${requisitionItem?.parentRequisitionItem}">
                                     <div class="canceled">
                                         ${requisitionItem?.parentRequisitionItem?.product?.name}
                                     </div>
                                 </g:if>
+                                ${requisitionItem?.product?.name}
                             </g:if>
                         </td>
                         <td class="middle center">
@@ -64,18 +64,22 @@
                             <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
                         </td>
                         <td class="center middle">
-                            ${picklistItems[j]?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
-
                             <g:if test="${requisitionItem?.parentRequisitionItem}">
                                 <div class="canceled">
                                     ${requisitionItem?.parentRequisitionItem?.quantity}
                                     ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
                                 </div>
                             </g:if>
+                            ${picklistItems[j]?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                         </td>
                         <td class="center middle">
-                            ${requisitionItem?.parentRequisitionItem?.cancelReasonCode}
-                            <span class="fade">${requisitionItem?.parentRequisitionItem?.cancelComments}</span>
+                            <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
+                                <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}</p>
+                                <p class="fade">${requisitionItem?.parentRequisitionItem?.cancelComments}</p>
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.ok.label', default:'Ok')}
+                            </g:else>
                         </td>
                         <% j++ %>
                     </tr>

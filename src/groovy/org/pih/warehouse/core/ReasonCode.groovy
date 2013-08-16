@@ -47,7 +47,10 @@ public enum ReasonCode {
     COULD_NOT_LOCATE(14),
     DIFFERENT_LOCATION(15),
     DATA_ENTRY_ERROR(16),
-    OTHER(17)
+    SUPPLY_MAX_QUANTITY(17),
+    NOT_ON_STOCK_LIST(18),
+    INSUFFICIENT_QUANTITY_RECONDITIONED(19),
+    OTHER(19)
 
 
     final Integer sortOrder
@@ -73,34 +76,46 @@ public enum ReasonCode {
                 COULD_NOT_LOCATE,
                 DIFFERENT_LOCATION,
                 DATA_ENTRY_ERROR,
+                SUPPLY_MAX_QUANTITY,
+                NOT_ON_STOCK_LIST,
+                INSUFFICIENT_QUANTITY_RECONDITIONED,
                 OTHER]
     }
 
-	static listRequisitionQuantityChangeReasonCodes() {
+
+    static listRequisitionQuantityChangeReasonCodes() {
 		[       STOCKOUT,
                 LOW_STOCK,
-                EXPIRED,
                 DAMAGED,
+                EXPIRED,
+                INSUFFICIENT_CONSUMPTION,
                 PACKAGE_SIZE,
                 CANCELED_BY_REQUESTER,
-                INSUFFICIENT_CONSUMPTION,
                 NON_FORMULARY_NO_SUBSTITUTION,
                 NOT_STOCKED,
                 AVAILABLE_STOCK_RESERVED,
                 DATA_ENTRY_ERROR,
+                SUPPLY_MAX_QUANTITY,
+                NOT_ON_STOCK_LIST,
+                INSUFFICIENT_QUANTITY_RECONDITIONED,
                 OTHER
         ]
 	}
+
+
     static listRequisitionSubstitutionReasonCodes() {
         [
+                SUBSTITUTION,
+                REPLACED_BY_FORMULARY_ITEM,
                 STOCKOUT,
                 LOW_STOCK,
                 EXPIRED,
                 DAMAGED,
-                SUBSTITUTION,
-                REPLACED_BY_FORMULARY_ITEM,
                 AVAILABLE_STOCK_RESERVED,
                 DATA_ENTRY_ERROR,
+                SUPPLY_MAX_QUANTITY,
+                NOT_ON_STOCK_LIST,
+                INSUFFICIENT_QUANTITY_RECONDITIONED,
                 OTHER
         ]
     }
@@ -112,6 +127,9 @@ public enum ReasonCode {
                 DAMAGED,
                 COULD_NOT_LOCATE,
                 DATA_ENTRY_ERROR,
+                SUPPLY_MAX_QUANTITY,
+                NOT_ON_STOCK_LIST,
+                INSUFFICIENT_QUANTITY_RECONDITIONED,
                 OTHER
         ]
     }

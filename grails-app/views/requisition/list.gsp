@@ -108,13 +108,7 @@
                     </div>
                 </div>
                 <div class="yui-u">
-                    <div class="buttonBar button-group">
-                        <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
-                            ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
-                            (${requisitionsMap["relatedToMe"]?:0 })
-                        </g:link>
-                    </div>
-                    <div class="buttonBar button-group">
+                    <div class="button-group">
                         <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
                             <warehouse:message code="default.all.label"/>
                         </g:link>
@@ -127,6 +121,12 @@
                                 </g:link>
                             </g:if>
                         </g:each>
+                    </div>
+                    <div class="button-group">
+                        <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
+                            ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
+                            (${requisitionsMap["relatedToMe"]?:0 })
+                        </g:link>
                     </div>
                     <%--
                     <div class="buttonBar button-group">
