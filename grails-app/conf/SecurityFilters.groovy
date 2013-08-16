@@ -7,9 +7,6 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
-
-
-
 import org.apache.http.client.utils.URIBuilder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
@@ -36,6 +33,7 @@ class SecurityFilters {
 					if (!AuthService.currentUser) {  
 						AuthService.currentUser = new ThreadLocal<User>()
 					}
+                    //println "Setting current user " + session.warehouse.id
 					AuthService.currentUser.set(User.get(session.user.id))
 				}
 				
@@ -44,7 +42,7 @@ class SecurityFilters {
 						AuthService.currentLocation = new ThreadLocal<Location>()
 					}
 					
-					//println "Setting currentLocation " + session.warehouse.id
+					//println "Setting current location " + session.warehouse.id
 					AuthService.currentLocation.set(Location.get(session.warehouse.id))
 					//println "Getting currentLocation " + AuthService.currentLocation.get()
 				}
@@ -76,13 +74,15 @@ class SecurityFilters {
 				// When there's no authenticated user in the session and a request requires authentication 
 				// we redirect to the auth login page.  targetUri is the URI the user was trying to get to.
 				else if(!session.user && !(actionsWithAuthUserNotRequired.contains(actionName))) {
-                    def targetUri
+                    def targetUri = ""
                     // We only want to handle GETs because POSTs would be much more difficult
                     if (request.method == "GET") {
                         targetUri = (request.forwardURI - request.contextPath);
                         if (request.queryString)
                             targetUri += "?" + request.queryString
                     }
+                    /*
+                    // Handle post
                     else {
                         try {
                             log.info "Using referer as targetUri "
@@ -108,6 +108,7 @@ class SecurityFilters {
                             targetUri = "/dashboard/index?error=true"
                         }
                     }
+                    */
 
                     // Prevent user from being redirected to invalid pages after re-authenticating
                     if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) {
@@ -153,7 +154,7 @@ class SecurityFilters {
 					}
 					
 					session.warehouseStillNotSelected = true;
-					log.info "Warehouse has not been selected, redirect to chooseLocation"
+					log.info "Location has not been selected, redirecting to chooseLocation ..."
 					//redirect(controller: 'dashboard', action: 'chooseLocation', params: ['targetUri': targetUri])
 					redirect(controller: 'dashboard', action: 'chooseLocation')
 					return false;
