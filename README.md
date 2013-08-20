@@ -53,23 +53,23 @@ mysql -u root -p -e 'grant all on openboxes_test.* to openboxes@localhost identi
 #dataSource.url=jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
 dataSource.username=openboxes
 dataSource.password=openboxes
-
+#
 # OpenBoxes mail settings - disabled by default
 grails.mail.enabled=false
-
+#
 # Application settings
 #inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
 #openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
-
+#
 # Google Product Search
 #google.api.key=<Google API key>
-
+#
 # Hipaaspace.com API (NDC Lookup)
 #hipaaspace.api.key=<hipaaspace API key>
-
+#
 # RXNorm API
 #rxnorm.api.key=<RxNorm API key>
-
+#
 # Google analytics
 #google.analytics.enabled = false
 #google.analytics.webPropertyID = <Google Analytics Key>
