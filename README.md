@@ -42,6 +42,7 @@ mysql -u root -p -e 'create database openboxes_dev default charset utf8;'
 mysql -u root -p -e 'create database openboxes_test default charset utf8;'       
 ```
 * Create openboxes user for databases
+```
 mysql -u root -p -e 'grant all on openboxes_dev.* to openboxes@localhost identified by "openboxes";'
 mysql -u root -p -e 'grant all on openboxes_test.* to openboxes@localhost identified by "openboxes";'      
 ```
