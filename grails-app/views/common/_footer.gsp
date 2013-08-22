@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
-<div id="footer" class="box">
+<div id="footer">
 	<div style="line-height: 3em; " class="middle">
 		&copy; 2013 <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.version.label"/>: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp; 

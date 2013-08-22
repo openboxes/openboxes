@@ -44,7 +44,6 @@
                     <g:select name="status"
                               id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-status"
                               from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
-                              class="chzn-select"
                               optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance?.status}"
                               noSelection="['null':warehouse.message(code:'inventoryLevel.chooseStatus.label',default:'Choose status')]" />
                 </td>
@@ -54,7 +53,7 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'binLocation', 'errors')}">
-                    <g:textField name="binLocation" value="${inventoryLevelInstance?.binLocation }" size="20" class="text"/>
+                    <g:textArea name="binLocation" value="${inventoryLevelInstance?.binLocation }" rows="4" class="large text"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -62,7 +61,7 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'abcClass', 'errors')}">
-                    <g:textField name="abcClass" value="${inventoryLevelInstance?.abcClass }" size="20" class="text"/>
+                    <g:textField name="abcClass" value="${inventoryLevelInstance?.abcClass }" size="5" class="text"/>
                 </td>
             </tr>
 
@@ -98,6 +97,7 @@
             </tbody>
         </table>
     </div>
+    <hr/>
     <div class="buttons">
 
         <g:if test="${!inventoryLevelInstance?.id}">
