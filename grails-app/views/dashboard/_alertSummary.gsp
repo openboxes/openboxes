@@ -12,7 +12,7 @@
                             <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
                         </td>
                         <td>
-                            <g:link controller="report" action="listOutOfStock">
+                            <g:link controller="inventory" action="listOutOfStock">
                                 <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
                             </g:link>
                         </td>
@@ -26,7 +26,7 @@
                             <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
                         </td>
                         <td>
-                            <g:link controller="report" action="listLowStock">
+                            <g:link controller="inventory" action="listLowStock">
                                 <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
                             </g:link>
                         </td>
@@ -40,7 +40,7 @@
                             <img src="${createLinkTo(dir:'images/icons/silk/creditcards.png')}" class="middle"/>
 						</td>
 						<td>
-                            <g:link controller="report" action="listReorderStock">
+                            <g:link controller="inventory" action="listReorderStock">
                                 <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
 							</g:link>
 						</td>
@@ -53,7 +53,7 @@
                             <img src="${createLinkTo(dir:'images/icons/silk/package.png')}" class="middle"/>
                         </td>
                         <td>
-                            <g:link controller="report" action="listOverStock">
+                            <g:link controller="inventory" action="listOverStock">
                                 <warehouse:message code="inventory.listOverStock.label" default="Items that are over stocked"/>
                             </g:link>
                         </td>
@@ -66,7 +66,7 @@
                             <img src="${createLinkTo(dir:'images/icons/silk/box.png')}" class="middle"/>
                         </td>
                         <td>
-                            <g:link controller="report" action="listQuantityOnHandZero">
+                            <g:link controller="inventory" action="listQuantityOnHandZero">
                                 <warehouse:message code="inventory.listQuantityOnHandZero.label" default="Items that have QoH equal to zero"/>
                             </g:link>
                         </td>
