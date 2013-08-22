@@ -8,7 +8,7 @@
 	</g:link>
 	
 	<h3>${warehouse.message(code:'shipping.details.label') }</h3>
-	<table border="1" cellpadding="2">
+	<table border="1">
 		<tr>
 			<td><label>${warehouse.message(code: 'shipping.origin.label') }</label></td>
 			<td>${shipmentInstance?.origin?.name }</td>			
@@ -78,12 +78,15 @@
 	</table>
 
 	<h3>${warehouse.message(code:'shipping.contents.label') }</h3>
-	<table border="1" style="width: 100%;" cellpadding="2">
+	<table border="1">
 		<thead>
 			<tr>
 				<th style="text-align: left;">
 					${warehouse.message(code: 'container.label')}
 				</th>
+                <th style="text-align: left;">
+                    ${warehouse.message(code: 'product.productCode.label')}
+                </th>
 				<th style="text-align: left;">
 					${warehouse.message(code: 'default.item.label')}
 				</th>
@@ -99,6 +102,9 @@
 				<th>
 					${warehouse.message(code: 'default.units.label')}
 				</th>
+                <th>
+                    ${warehouse.message(code: 'product.coldChain.label')}
+                </th>
 				<th>
 					${warehouse.message(code: 'shipping.recipient.label')}
 				</th>
@@ -111,6 +117,9 @@
 						<td>
 							${shipmentItem?.container?.name?:warehouse.message(code:'shipping.unpackedItems.label') }
 						</td>
+                        <td>
+                            ${shipmentItem?.inventoryItem?.product?.productCode}
+                        </td>
 						<td>
 							${format.product(product: shipmentItem?.inventoryItem?.product) }
 						</td>
@@ -126,6 +135,14 @@
 						<td class="center">
 							${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
 						</td>
+                        <td class="center">
+                            <g:if test="${shipmentItem?.inventoryItem?.product?.coldChain}">
+                                ${warehouse.message(code:'default.yes.label')}
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.no.label')}
+                            </g:else>
+                        </td>
 						<td class="center">
 							${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}
 						</td>

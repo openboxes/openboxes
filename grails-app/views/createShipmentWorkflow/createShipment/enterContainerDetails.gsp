@@ -320,7 +320,7 @@
 												<th class="left middle"><warehouse:message code="default.qty.label"/></th>
                                                 <th class="middle"><warehouse:message code="product.productCode.label"/></th>
 												<th class="middle"><warehouse:message code="product.label"/></th>
-												<th class="center middle"><warehouse:message code="default.lotSerialNo.label"/></th>
+												<th class="middle"><warehouse:message code="default.lotSerialNo.label"/></th>
 												<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
 												<th class="middle"><warehouse:message code="shipping.recipients.label"/></th>
 											</tr>
@@ -351,8 +351,10 @@
 															<span class="draggable draghandle" shipmentItem="${shipmentItem?.id }">
 																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
 																&nbsp;
+                                                                <span class="box">
 																${shipmentItem?.quantity} 
 																${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                                                                </span>
 															</span>
 														</td>
                                                         <td>
@@ -365,7 +367,7 @@
 																</g:link>
 															</div>
 														</td>
-														<td class="center middle">
+														<td class="middle">
 															<div class="lotNumber">
 															${shipmentItem?.inventoryItem?.lotNumber}
 															</div>

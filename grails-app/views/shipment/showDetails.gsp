@@ -620,7 +620,7 @@
 								<th><warehouse:message code="shipping.container.label"/></th>
                                 <th><warehouse:message code="product.productCode.label"/></th>
 								<th><warehouse:message code="product.label"/></th>
-								<th class="center"><warehouse:message code="default.lotSerialNo.label"/></th>
+								<th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
 								<th class="center"><warehouse:message code="default.expires.label"/></th>
 								<th class="center"><warehouse:message code="shipping.shipped.label"/></th>
 								<g:if test="${shipmentInstance?.wasReceived()}">
@@ -653,16 +653,27 @@
 												<format:product product="${shipmentItem?.inventoryItem?.product}"/>
 											</g:link>
 										</td>
-										<td class="center lotNumber">
+										<td class="lotNumber">
 											${shipmentItem?.inventoryItem?.lotNumber}
 										</td>
 										<td class="center expirationDate">
 											<g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+
+                                            <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
+                                            <span class="expirationDate">
+                                                <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="MMMMM yyyy"/>
+                                            </span>
+                                            </g:if>
+                                            <g:else>
+                                                <span class="fade">
+                                                    ${warehouse.message(code: 'default.never.label')}
+                                                </span>
+                                            </g:else>
+
 										</td>
 										<td class="center quantity">
 											<g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
 											${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-											
 										</td>
 										<g:if test="${shipmentInstance?.wasReceived()}">
 											<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
