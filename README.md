@@ -38,13 +38,11 @@ You must not remove this notice, or any other, from this software.
   otherwise, replace git url with the one of your forked repository
 * Create openboxes database for dev and test environments
 ```
-mysql -u root -p -e 'create database openboxes_dev default charset utf8;'
-mysql -u root -p -e 'create database openboxes_test default charset utf8;'       
+mysql -u root -p -e 'create database openboxes default charset utf8;'
 ```
 * Create openboxes user for databases
 ```
-mysql -u root -p -e 'grant all on openboxes_dev.* to openboxes@localhost identified by "openboxes";'
-mysql -u root -p -e 'grant all on openboxes_test.* to openboxes@localhost identified by "openboxes";'      
+mysql -u root -p -e 'grant all on openboxes.* to 'openboxes'@'localhost' identified by "openboxes";'
 ```
 * Create new openboxes-config.properties file under $HOME/.grails (not sure if the quickCategories will work as the default system categories might be different from ours)
 ```
