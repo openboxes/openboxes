@@ -96,33 +96,25 @@
         </g:if>
     </td>
     <td class="center">
-
-        <div class="box">
-
-            <g:if test="${isAvailable||isAvailableForSubstitution}">
+        <g:if test="${isAvailable||isAvailableForSubstitution}">
+            <div class="box available">
                 <g:if test="${requisitionItem?.hasSubstitution()}">
-                    <div class="${isCanceled||isChanged?'canceled':''}">${quantityOnHand?:0}</div>
+                    <div class="${isCanceled||isChanged?'canceled':''}">
+                        ${quantityOnHand?:0}
+                    </div>
                     ${quantityOnHandForSubstitution?:0}
                 </g:if>
                 <g:else>
                     ${quantityOnHand?:0}
                 </g:else>
-                <%--
-                <div class="available">
-                    ${warehouse.message(code:'inventory.available.label', default:'Available')}
-                </div>
-                --%>
-            </g:if>
-            <g:else>
-                <div class="unavailable">
-                    <%--
-                    <img src="${resource(dir: 'images/icons/silk', file: 'emoticon_unhappy.png')}" />
-                    --%>
-                    ${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}
-                </div>
-            </g:else>
-
-        </div>
+            </div>
+        </g:if>
+        <g:else>
+            <div class="box unavailable">
+                ${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}
+                ${quantityOnHand?:0}
+            </div>
+        </g:else>
     </td>
     <td class="center">
         EA/1

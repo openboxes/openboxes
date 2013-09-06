@@ -35,22 +35,25 @@ class RequisitionController {
 
     def list = {
 
-        println "commodityClassIsNull: " + params.commodityClassIsNull
-
         def requisition = new Requisition(params)
         requisition.destination = session?.warehouse
-
+        //def startTime = System.currentTimeMillis()
 
         // Requisitions to display in the table
-        def requisitions = []
-        requisitions = requisitionService.getRequisitions(requisition, params)
-        def requisitionsMap = [:]
+        def requisitions = requisitionService.getRequisitions(requisition, params)
 
+
+        def requisitionsMap = [:]
+        //def requisitionsMap = requisitionService.countRequisitions(session.warehouse)
         println "requisitions from server " + requisitions.size() + " => " + requisitions.collect { it.id }
+
+        //println "Time: " + (System.currentTimeMillis() - startTime) / 1000 + "ms"
 
         // Used to display the counts of requisitions
         def requisitionsLocal = Requisition.findAllByDestination(session.warehouse)
+        //def requisitionsLocal = requisitionService.getRequisitionsByDestination(session.warehouse)
         println "requisitionsLocal: " + requisitionsLocal.size()
+        //println "Time: " + (System.currentTimeMillis() - startTime) / 1000 + "ms"
 
         // Hack to get requisitions that are related to me
         def requisitionsRelatedToMe = requisitionsLocal.findAll {
@@ -66,7 +69,7 @@ class RequisitionController {
         //requisitions = requisitions.sort()
         render(view:"list", model:[requisitions: requisitions, requisitionsMap:requisitionsMap])
     }
-	
+
 	def listStock = {
         def requisitions = []
         def destination = Location.get(session.warehouse.id)
@@ -274,13 +277,17 @@ class RequisitionController {
             def quantityAvailableToPromiseMap = [:]
             def quantityOnHandMap = [:]
 
+            def products = requisition.requisitionItems.collect { it.product }
+
+            def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
 
             requisition?.requisitionItems?.each { requisitionItem ->
-                quantityOnHandMap[requisitionItem?.product?.id] =
-                    inventoryService.getQuantityOnHand(location, requisitionItem?.product)
-                quantityAvailableToPromiseMap[requisitionItem?.product?.id] =
-                    inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
+                quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
+                    //inventoryService.getQuantityOnHand(location, requisitionItem?.product)
+                quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
+                    //inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
             }
+
 
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
             def quantityOnHand = (requisitionItem)?inventoryService.getQuantityOnHand(location, requisitionItem?.product):0

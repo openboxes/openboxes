@@ -232,6 +232,8 @@
                 </g:link>
             </div>
             --%>
+
+            <%--
             <g:isUserAdmin>
                 <div class="action-menu-item">
                     <hr/>
@@ -244,6 +246,7 @@
                     </g:link>
                 </div>
             </g:isUserAdmin>
+            --%>
         </g:elseif>
         <%--
 		<div class="action-menu-item">
