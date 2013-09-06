@@ -688,19 +688,7 @@ select, input, textarea {
 /* Fix for footer creep
 ----------------------------------------------------------*/
 
-#ft {
-    /*background: #555;
-    color:#ddd;*/
-    font-size:0.8em;
-    height:30px;
-    left:0;
-    bottom:0;
-    padding:0;
-    position:fixed;
-    white-space:nowrap;
-    width:100%;
-    z-index:99;
-}
+
 
 
 /* WIZARD
@@ -1735,6 +1723,7 @@ ul.megamenu {
 
 /* not sure if these are needed any longer, so we should look into getting rid of these
 -------------------------------------------------------------*/
+/*
 #footer {
     position:absolute;
     vertical-align: middle;
@@ -1744,8 +1733,19 @@ ul.megamenu {
     padding-top: 5px;
     width:100%;
     text-align: center;
-    height: 30px;   /* Height of the footer */
+    height: 30px;
     background: #fff;
+}
+*/
+#footer {
+    position: relative;
+    margin-top: 40px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #777;
+    border-top: 1px solid #eee;
 }
 
 #header {
