@@ -52,4 +52,15 @@ class PicklistController {
 
     }
 
+    def renderHtml = {
+        def requisition = Requisition.get(params.id)
+        def picklist = Picklist.findByRequisition(requisition)
+        def location = Location.get(session.warehouse.id)
+        //[requisition:requisition, picklist: picklist, location:location]
+
+        println location
+        render(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location])
+
+    }
+
 }
