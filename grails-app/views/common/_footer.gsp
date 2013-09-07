@@ -1,11 +1,13 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <div id="footer">
-	<div style="line-height: 3em; " class="middle">
+	<div style="line-height: 2em;" class="center middle">
 		&copy; 2013 <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.version.label"/>: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp; 
 		<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;					
 		<warehouse:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+		<warehouse:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
+    </div>
+    <div class="center" style="line-height: 2em;">
 		<warehouse:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<%-- <warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;--%>
 		<warehouse:message code="default.locale.label"/>: &nbsp;  	
@@ -26,12 +28,12 @@
 				params: ['locale':'debug','targetUri':targetUri])}">
 				<warehouse:message code="admin.debug.label"/>:
 			</a>
-			${session.useDebugLocale?"on":"off" }
+			<b>${session.useDebugLocale?"on":"off" }</b>
 		</g:isUserInRole>
         &nbsp;&nbsp; | &nbsp;&nbsp;
         <span>
             <warehouse:message code="default.ipAddress.label" default="IP Address"/>: &nbsp;
-            ${request.getRemoteAddr()}
+            <b>${request.getRemoteAddr()}</b>
 		</span>
 		<%-- 
 		&nbsp;&nbsp; | &nbsp;&nbsp;

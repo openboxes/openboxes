@@ -1739,9 +1739,9 @@ ul.megamenu {
 */
 #footer {
     position: relative;
-    margin-top: 40px;
-    padding-top: 40px;
-    padding-bottom: 40px;
+    margin-top: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     font-size: 12px;
     line-height: 1.5;
     color: #777;
