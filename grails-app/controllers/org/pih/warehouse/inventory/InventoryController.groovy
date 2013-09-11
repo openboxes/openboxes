@@ -550,7 +550,7 @@ class InventoryController {
             csv += '"' + (product.productCode?:"")  + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name?:"") + ","
             csv += '"' + (inventoryItem?.lotNumber?:"")  + '"' + ","
-            csv += '"' + formatDate(date:'expirationDate',format: 'dd/MM/yyyy')  + '"' + ","
+            csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy')  + '"' + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
             csv += '"' + (product?.manufacturer?:"")  + '"' + ","
