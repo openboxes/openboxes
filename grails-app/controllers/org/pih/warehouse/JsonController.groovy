@@ -938,8 +938,11 @@ class JsonController {
 		items.unique{ it.id }
 		def json = items.collect{
 			def type = it.class.simpleName.toLowerCase()
-			[id: it.id, type: it.class, url: request.contextPath + "/" + type  + "/redirect/" + it.id, 
-				value: it.name,  label: it.productCode + " " + it.name ]
+			[   id: it.id,
+                type: it.class,
+                url: request.contextPath + "/" + type  + "/redirect/" + it.id,
+				value: it.name,
+                label: it.productCode + " " + it.name + " [" + (it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}") + "]" ]
 		}
 		render json as JSON
 	}
