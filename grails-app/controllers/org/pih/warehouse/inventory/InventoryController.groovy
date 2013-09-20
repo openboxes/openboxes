@@ -174,6 +174,13 @@ class InventoryController {
         def elapsedTime = (System.currentTimeMillis() - startTime)
         log.info("Show current inventory: " + elapsedTime + " ms");
 
+        if (params.format == "csv") {
+            def filename = "Current stock - " + location.name + " - ${new Date()}.csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text:getCsvForProductMap(productQuantityMap))
+            return
+        }
+
         //def inventoryMapping = inventoryInstance.inventoryItems.groupBy{ it?.product }
         [
             //inventoryMapping: inventoryMapping,
@@ -184,7 +191,7 @@ class InventoryController {
         ]
 
 	}
-	
+
 	
 
 	
