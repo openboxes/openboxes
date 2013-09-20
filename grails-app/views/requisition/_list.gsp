@@ -76,130 +76,130 @@
                     <img src="${resource(dir:'images/icons/silk', file: 'zoom.png')}" class="dialog-trigger" data-id="#dialog-box-${requisition?.id}"/>
 
 
-                    <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}" style="display:none;">
-                        <%--
-                        <div class="summary">
-                            <g:render template="header" model="[requisition:requisition]"/>
-                        </div>
-                        --%>
-                        <table class="box">
-                            <tr class="prop">
-                                <td class="name"><label><warehouse:message
-                                        code="requisition.requestedBy.label" /></label></td>
-                                <td class="value">
-                                    <g:if test="${requisition?.requestedBy}">
-                                        ${requisition?.requestedBy?.name } &nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.dateRequested }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
+                <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}" style="display:none;">
+                    <%--
+                       <div class="summary">
+                           <g:render template="header" model="[requisition:requisition]"/>
+                       </div>
+                    --%>
+                    <table class="box">
+                        <tr class="prop">
+                            <td class="name"><label><warehouse:message
+                                    code="requisition.requestedBy.label" /></label></td>
+                            <td class="value">
+                                <g:if test="${requisition?.requestedBy}">
+                                    ${requisition?.requestedBy?.name } &nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.dateRequested }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <label><warehouse:message
+                                        code="requisition.createdBy.label" /></label>
+                            </td>
+                            <td class="value">
+                                <g:if test="${requisition?.createdBy}">
+                                    ${requisition?.createdBy?.name} &nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.dateCreated }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name"><label><warehouse:message
+                                    code="requisition.verifiedBy.label" /></label></td>
+                            <td class="value">
+                                <g:if test="${requisition?.verifiedBy}">
+                                    ${requisition?.verifiedBy?.name } &nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.dateVerified }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name"><label><warehouse:message
+                                    code="picklist.picker.label" /></label></td>
+                            <td class="value">
+                                <g:if test="${requisition?.picklist?.picker}">
+                                    ${requisition?.picklist?.picker?.name } &nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.picklist?.datePicked }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name"><label><warehouse:message
+                                    code="requisition.checkedBy.label" /></label></td>
+                            <td class="value">
+                                <g:if test="${requisition?.reviewedBy}">
+                                    ${requisition?.reviewedBy?.name }&nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.dateReviewed }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name"><label><warehouse:message
+                                    code="requisition.receivedBy.label" /></label></td>
+                            <td class="value">
+                                <g:if test="${requisition?.receivedBy}">
+                                    ${requisition?.receivedBy?.name }&nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.dateReviewed }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <label><warehouse:message
+                                        code="default.updatedBy.label" /></label>
+                            </td>
+                            <td class="value">
+                                <g:if test="${requisition.updatedBy}">
+                                    ${requisition?.updatedBy?.name }&nbsp;&bull;&nbsp;
+                                    <g:formatDate date="${requisition?.lastUpdated }" format="MMMMM dd, yyyy hh:mma"/>
+                                </g:if>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="box">
+                        <table>
+                            <tr>
+                                <th><warehouse:message code="default.quantity.label"/></th>
+                                <th><warehouse:message code="product.productCode.label"/></th>
+                                <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="requisitionItem.productPackage.label"/></th>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="requisition.createdBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:if test="${requisition?.createdBy}">
-                                        ${requisition?.createdBy?.name} &nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.dateCreated }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name"><label><warehouse:message
-                                        code="requisition.verifiedBy.label" /></label></td>
-                                <td class="value">
-                                    <g:if test="${requisition?.verifiedBy}">
-                                        ${requisition?.verifiedBy?.name } &nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.dateVerified }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name"><label><warehouse:message
-                                        code="picklist.picker.label" /></label></td>
-                                <td class="value">
-                                    <g:if test="${requisition?.picklist?.picker}">
-                                        ${requisition?.picklist?.picker?.name } &nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.picklist?.datePicked }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name"><label><warehouse:message
-                                        code="requisition.checkedBy.label" /></label></td>
-                                <td class="value">
-                                    <g:if test="${requisition?.reviewedBy}">
-                                        ${requisition?.reviewedBy?.name }&nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.dateReviewed }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name"><label><warehouse:message
-                                        code="requisition.receivedBy.label" /></label></td>
-                                <td class="value">
-                                    <g:if test="${requisition?.receivedBy}">
-                                        ${requisition?.receivedBy?.name }&nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.dateReviewed }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="default.updatedBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:if test="${requisition.updatedBy}">
-                                        ${requisition?.updatedBy?.name }&nbsp;&bull;&nbsp;
-                                        <g:formatDate date="${requisition?.lastUpdated }" format="MMMMM dd, yyyy hh:mma"/>
-                                    </g:if>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="box">
-                            <table>
+                            <g:unless test="${requisition?.requisitionItems}">
                                 <tr>
-                                    <th><warehouse:message code="default.quantity.label"/></th>
-                                    <th><warehouse:message code="product.productCode.label"/></th>
-                                    <th><warehouse:message code="product.label"/></th>
-                                    <th><warehouse:message code="requisitionItem.productPackage.label"/></th>
+                                    <td colspan="4">
+                                        <div class="empty center">
+                                            <warehouse:message code="default.none.label"/>
+                                        </div>
+                                    </td>
                                 </tr>
-                                <g:unless test="${requisition?.requisitionItems}">
-                                    <tr>
-                                        <td colspan="4">
-                                            <div class="empty center">
-                                                <warehouse:message code="default.none.label"/>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </g:unless>
-                                <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="status">
-                                    <tr class="${status%2?'even':'odd'}">
-                                        <td>
-                                            ${requisitionItem?.product?.productCode}
-                                        </td>
-                                        <td>
-                                            ${requisitionItem?.product}
-                                        </td>
-                                        <td>
-                                            ${requisitionItem?.quantity}
-                                        </td>
-                                        <td>
-                                            <g:if test="${requisitionItem?.productPackage}">
-                                                ${requisitionItem?.productPackage?.uom?.code}/
-                                                ${requisitionItem?.productPackage?.quantity}
-                                            </g:if>
-                                            <g:else>
-                                                ${requisitionItem?.product?.unitOfMeasure}
-                                            </g:else>
-                                        </td>
-                                    </tr>
-                                </g:each>
-                            </table>
-                        </div>
+                            </g:unless>
+                            <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="status">
+                                <tr class="${status%2?'even':'odd'}">
+                                    <td>
+                                        ${requisitionItem?.product?.productCode}
+                                    </td>
+                                    <td>
+                                        ${requisitionItem?.product}
+                                    </td>
+                                    <td>
+                                        ${requisitionItem?.quantity}
+                                    </td>
+                                    <td>
+                                        <g:if test="${requisitionItem?.productPackage}">
+                                            ${requisitionItem?.productPackage?.uom?.code}/
+                                            ${requisitionItem?.productPackage?.quantity}
+                                        </g:if>
+                                        <g:else>
+                                            ${requisitionItem?.product?.unitOfMeasure}
+                                        </g:else>
+                                    </td>
+                                </tr>
+                            </g:each>
+                        </table>
                     </div>
+                </div>
 
                 </td>
                 <td class="left bottom">
@@ -209,8 +209,8 @@
                     ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
                     --%>
                 </td>
-				<td>			
-					<g:render template="/requisition/actions" model="[requisition:requisition]"/>
+				<td>
+                    <g:render template="/requisition/actions" model="[requisition:requisition]"/>
 				</td>
 				<td>
 					<label class="status"><format:metadata obj="${requisition?.status}"/></label>

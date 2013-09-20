@@ -15,15 +15,75 @@
     <td class="left">
     <a name="${selectedRequisitionItem?.id}"></a>
         <g:if test="${!isChild }">
+
+            <%--
             <g:render template="/requisitionItem/actions" model="[requisition:requisition,requisitionItem:requisitionItem]"/>
+            --%>
+
+            <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+            <div class="action-menu">
+                <button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+                </button>
+                <div class="actions">
+                    <g:if test="${requisitionItem?.canApproveQuantity()}">
+                        <div class="action-menu-item">
+                            <g:link controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                                <warehouse:message code="requisitionItem.approveQuantity.label" default="Approve quantity"/>
+                            </g:link>
+                        </div>
+                    </g:if>
+                    <g:if test="${requisitionItem.canChangeQuantity()}">
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                                    params="['requisitionItem.id':requisitionItem?.id, actionType:'changeQuantity']" fragment="${requisitionItem?.id}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                <warehouse:message code="requisitionItem.changeQuantity.label" default="Change quantity"/>
+                            </g:link>
+                        </div>
+                    </g:if>
+
+                    <g:if test="${requisitionItem.canChooseSubstitute()}">
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }" fragment="${requisitionItem?.id}"
+                                    params="['requisitionItem.id':requisitionItem?.id, actionType:'chooseSubstitute']" >
+                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch.png')}"/>&nbsp;
+                                <warehouse:message code="requisitionItem.substitute.label" default="Choose substitute"/>
+                            </g:link>
+                        </div>
+                    </g:if>
+                    <g:if test="${requisitionItem.canChangeQuantity()}">
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                                    params="['requisitionItem.id':requisitionItem?.id, actionType:'cancelQuantity']" fragment="${requisitionItem?.id}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>&nbsp;
+                                <warehouse:message code="requisitionItem.cancel.label" default="Cancel requisition item"/>
+                            </g:link>
+                        </div>
+                    </g:if>
+                    <g:if test="${requisitionItem.canUndoChanges()}">
+                        <div class="action-menu-item">
+                            <g:link controller="requisitionItem" action="undoChanges" id="${requisitionItem?.id }" params="[redirectAction:'review']" fragment="${requisitionItem?.id}"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
+                                <warehouse:message code="requisitionItem.undoChange.label" default="Undo changes"/>
+                            </g:link>
+                        </div>
+                    </g:if>
+                </div>
+            </div>
+
+
+
         </g:if>
     </td>
-    <td class="center">
+    <td class="center middle">
         ${requisitionItem?.product?.productCode}
     </td>
 
 
-    <td class="product">
+    <td class="product middle">
         <%--
 		<g:if test="${isChild }">
 			<img src="${resource(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>
@@ -44,7 +104,7 @@
         </g:else>
 
     </td>
-    <td class="center" style="width: 10%;">
+    <td class="center middle" style="width: 10%;">
         <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
             ${requisitionItem.status}
         </div>
@@ -71,7 +131,7 @@
     </g:else>
     --%>
     </td>
-    <td class="quantity center">
+    <td class="quantity center middle">
         <div class="${isCanceled||isChanged?'canceled':''}">
             ${requisitionItem?.quantity}
             <%--
@@ -87,7 +147,7 @@
 
 
     </td>
-    <td class="center">
+    <td class="center middle">
         <div class="${isCanceled||isChanged?'canceled':''}">
             ${requisitionItem?.totalQuantity()}
         </div>
@@ -95,7 +155,7 @@
             ${requisitionItem?.change?.totalQuantity()}
         </g:if>
     </td>
-    <td class="center">
+    <td class="center middle">
         <g:if test="${isAvailable||isAvailableForSubstitution}">
             <div class="box available">
                 <g:if test="${requisitionItem?.hasSubstitution()}">
@@ -116,10 +176,10 @@
             </div>
         </g:else>
     </td>
-    <td class="center">
+    <td class="center middle">
         EA/1
     </td>
-    <td class="center">
+    <td class="center middle">
         ${requisitionItem.orderIndex}
     </td>
 
@@ -134,9 +194,9 @@
     </td>
     --%>
 
-	<%-- 
+	<%--
 	<td class="quantity right">
-		${quantityAvailableToPromiseMap[requisitionItem?.product?.id]} 
+		${quantityAvailableToPromiseMap[requisitionItem?.product?.id]}
 		${requisitionItem?.product.unitOfMeasure?:"EA" }
 	</td>
 	--%>

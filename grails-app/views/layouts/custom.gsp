@@ -66,30 +66,7 @@
         </g:if>
          --%>
 
-    <g:if test="${session._showTime}">
-        <g:isUserAdmin>
-            <div class="box">
-                <div class="left">
-                    <span class="title">${request.requestURI}${request.queryString?"?"+request.queryString:""}</span>
-                </div>
-                <div class="right">
-                    <span style="color: #666;">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'database_connect.png')}" class="middle"/>
-                        Data load took ${(request?.actionDuration?:0)/1000}s
-                    </span>
-                    <span style="color: #666;">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'page_refresh.png')}" class="middle"/>
-                        Page load took ${(request?.viewDuration?:0)/1000}s
-                    </span>
-                    <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
-                    </g:link>
-                </div>
-                <div class="clear"></div>
-            </div>
-       </g:isUserAdmin>
-    </g:if>
-    <g:if test="${session.useDebugLocale}">
+        <g:if test="${session.useDebugLocale}">
 
             <div id="debug-header" class="notice box" style="margin-bottom: 0px;">
                 You are in DEBUG mode.
@@ -131,6 +108,27 @@
                                 jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
             </div>
             --%>
+        </g:if>
+        <g:if test="${session._showTime}">
+            <div class="box">
+                <div class="left">
+                    <span class="title">${request.requestURI}${request.queryString?"?"+request.queryString:""}</span>
+                </div>
+                <div class="right">
+                    <span style="color: #666;">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'database_connect.png')}" class="middle"/>
+                        Data load took ${(request?.actionDuration?:0)/1000}s
+                    </span>
+                    <span style="color: #666;">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_refresh.png')}" class="middle"/>
+                        Page load took ${(request?.viewDuration?:0)/1000}s
+                    </span>
+                    <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
+                    </g:link>
+                </div>
+                <div class="clear"></div>
+            </div>
         </g:if>
 
 
