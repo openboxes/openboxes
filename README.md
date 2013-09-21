@@ -26,7 +26,9 @@ You must not remove this notice, or any other, from this software.
 * Tomcat 6 or 7 (optional for dev envrionment)
  
 
-####Setup Instructions
+#### Basic setup instructions for developers
+
+If you are a user/implementer, please check out our [Installation](wiki/Installation) page.
 
 * Install dependencies above
 * Download/install Grails 1.3.7
@@ -36,48 +38,19 @@ You must not remove this notice, or any other, from this software.
 
         git clone git@github.com:PIH/openboxes.git      
   otherwise, replace git url with the one of your forked repository
-* Create openboxes database for dev and test environments
+* Create openboxes database 
 ```
 mysql -u root -p -e 'create database openboxes default charset utf8;'
 ```
-* Create openboxes user for databases
+* Create openboxes user 
 ```
-mysql -u root -p -e 'grant all on openboxes.* to 'openboxes'@'localhost' identified by "openboxes";'
+mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
 ```
-* Create new openboxes-config.properties file under $HOME/.grails (not sure if the quickCategories will work as the default system categories might be different from ours)
-```
-# Database connection settings
-# You can use dataSource.url when you are using a non-dev/non-test database (test-app may not run properly)
-#dataSource.url=jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
-dataSource.username=openboxes
-dataSource.password=openboxes
-#
-# OpenBoxes mail settings - disabled by default
-grails.mail.enabled=false
-#
-# Application settings
-#inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
-#openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
-#
-# Google Product Search
-#google.api.key=<Google API key>
-#
-# Hipaaspace.com API (NDC Lookup)
-#hipaaspace.api.key=<hipaaspace API key>
-#
-# RXNorm API
-#rxnorm.api.key=<RxNorm API key>
-#
-# Google analytics
-#google.analytics.enabled = false
-#google.analytics.webPropertyID = <Google Analytics Key>
-```
-
+* Create new `$HOME/.grails/openboxes-config.properties` -- see http://pastebin.com/i4gDemnu for an example
 * Upgrade grails version and plugins for grails
 ```    
 grails upgrade
 ```
-
 * Start application in development mode (you may need to run 'grails run-app' several times in order to download all dependencies).
 ```
 grails run-app
