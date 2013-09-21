@@ -30,33 +30,50 @@ You must not remove this notice, or any other, from this software.
 
 If you are a user/implementer, please check out our [Installation](wiki/Installation) page.
 
+##### Install dependencies
+
 * Install dependencies above
-* Download/install Grails 1.3.7
-* Add grails to your PATH variable
+* Install latest version of GVM (http://gvmtool.net/)
+* Install Grails 1.3.7
+```
+gvm install grails 1.3.7
+```
+
+##### Clone repository 
 * If you are a not core contributor, fork [openboxes git repository](https://github.com/PIH/openboxes)
 * If you are a core contributor:
-
+```
         git clone git@github.com:PIH/openboxes.git      
-  otherwise, replace git url with the one of your forked repository
-* Create openboxes database 
+```
+Otherwise, replace git url with the one of your forked repository
+
+##### Create openboxes database 
 ```
 mysql -u root -p -e 'create database openboxes default charset utf8;'
 ```
-* Create openboxes user 
+##### Create openboxes user 
 ```
 mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
 ```
-* Create new `$HOME/.grails/openboxes-config.properties` -- see http://pastebin.com/i4gDemnu for an example
-* Upgrade grails version and plugins for grails
+
+##### Create Openboxes configuration file 
+Add `$HOME/.grails/openboxes-config.properties` -- see http://pastebin.com/i4gDemnu for an example.
+
+##### Upgrade grails version and plugins for grails -- does some basic cleanup / dependency resolution.
 ```    
 grails upgrade
 ```
-* Start application in development mode (you may need to run 'grails run-app' several times in order to download all dependencies).
+##### Start application 
+The application can be run in development mode.  This starts the application running in an instance of Tomcat within the Grails console.
+You may need to run 'grails run-app' several times in order to download all dependencies.
 ```
 grails run-app
 ```
-* Open Chrome 
+
+##### Open application in Google Chrome 
 ```
 http://localhost:8080/openboxes
 ```
-* Login with username/password (manager:password OR admin:password)
+
+##### Log into OpenBoxes 
+You can use the default accounts (manager:password OR admin:password) and create your own accounts.
