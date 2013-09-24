@@ -358,6 +358,7 @@ class InventoryController {
             def filename = "Reconditioned stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(reconditionedStock))
+            return;
         }
         render (view: "list", model: [quantityMap:reconditionedStock])
     }
@@ -373,6 +374,7 @@ class InventoryController {
             def filename = "Total stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(totalStock))
+            return;
         }
 
         render (view: "list", model: [quantityMap:totalStock])
@@ -388,6 +390,7 @@ class InventoryController {
             def filename = "In stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(inStock))
+            return;
         }
 
         render (view: "list", model: [quantityMap:inStock])
@@ -403,6 +406,7 @@ class InventoryController {
             def filename = "Low stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(lowStock))
+            return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
@@ -418,6 +422,7 @@ class InventoryController {
             def filename = "Reorder stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(reorderStock))
+            return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
@@ -433,6 +438,7 @@ class InventoryController {
             def filename = "Out of stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
+            return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
@@ -448,6 +454,7 @@ class InventoryController {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(overStock))
+            return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
@@ -456,26 +463,16 @@ class InventoryController {
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        //def outOfStock = inventoryService.getOutOfStock(location);
-        def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
+        def outOfStock = inventoryService.getOutOfStock(location);
 
-        /*
         if (params.format == "csv") {
             def filename = "Out of stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
+            return;
         }
-        */
 
-        def requisitionItems = requisitionService.getPendingRequisitionItems(location)
-        def pendingProducts = requisitionItems.collect { it.product }
-
-        quantityMap = quantityMap.findAll { pendingProducts.contains(it.key) }
-
-        render quantityMap
-        //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:quantityMap])
+        render (view: "list", model: [quantityMap:outOfStock])
     }
 
 
