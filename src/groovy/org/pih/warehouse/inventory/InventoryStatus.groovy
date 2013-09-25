@@ -12,9 +12,9 @@ package org.pih.warehouse.inventory
 public enum InventoryStatus {
 
 	INACTIVE(0),
-	SUPPORTED(1),
+    NOT_SUPPORTED(1),
 	SUPPORTED_NON_INVENTORY(2),
-	NOT_SUPPORTED(3),
+    SUPPORTED(3),
 	STOCK(4),
 	FORMULARY(5)
 	

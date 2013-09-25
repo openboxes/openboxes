@@ -688,15 +688,6 @@ class InventoryService implements ApplicationContextAware {
         return inStock
     }
 
-    def getOutOfStock(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getQuantityByProductMap(location.inventory)
-        def stockOut = quantityMap.findAll { it.value <= 0 }
-
-        log.debug "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
-        return stockOut
-    }
-
 
 
 
@@ -708,25 +699,32 @@ class InventoryService implements ApplicationContextAware {
 
         def totalStock = quantityMap
         def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
-        def outOfStock = quantityMap.findAll { it.value <= 0 }
         def onHandQuantityZero = quantityMap.findAll { it.value <= 0 }
         def inStock = quantityMap.findAll { it.value > 0 }
 
 
         //def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
+        def outOfStock = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
+        }
+
         def lowStock = quantityMap.findAll { product,quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
             def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            minQuantity && quantity <= minQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
         }
 
         def reorderStock = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
             def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            reorderQuantity && quantity <= reorderQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
 
         def overStock = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
             def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            maxQuantity && quantity > maxQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
         }
 
 
@@ -745,16 +743,49 @@ class InventoryService implements ApplicationContextAware {
         ]
     }
 
+    def getQuantityOnHandZero(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        //def stockOut = quantityMap.findAll { it.value <= 0 }
 
-	def getLowStock(Location location) {
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def stockOut = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            quantity <= 0
+        }
+
+        log.debug "Get quantity on hand zero: " + (System.currentTimeMillis() - startTime) + " ms"
+        return stockOut
+
+    }
+
+
+    def getOutOfStock(Location location) {
+        long startTime = System.currentTimeMillis()
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        //def stockOut = quantityMap.findAll { it.value <= 0 }
+
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def stockOut = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
+        }
+
+        log.debug "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
+        return stockOut
+    }
+
+
+    def getLowStock(Location location) {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
         println inventoryLevelMap.keySet().size()
 		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
         def lowStock = quantityMap.findAll { product,quantity ->
-           def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            minQuantity && quantity <= minQuantity
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
         }
         println lowStock.keySet().size()
         log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -766,8 +797,9 @@ class InventoryService implements ApplicationContextAware {
 		def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
 		def reorderStock = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
             def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            reorderQuantity && quantity <= reorderQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
         log.debug "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return reorderStock
@@ -779,8 +811,9 @@ class InventoryService implements ApplicationContextAware {
         //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
         def overStock = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
             def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            maxQuantity && quantity > maxQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
         }
         log.debug "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return overStock

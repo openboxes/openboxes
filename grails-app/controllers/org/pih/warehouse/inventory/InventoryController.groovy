@@ -429,13 +429,12 @@ class InventoryController {
         render (view: "list", model: [quantityMap:reorderStock])
     }
 
+
     def listQuantityOnHandZero = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def outOfStock = inventoryService.getOutOfStock(location);
-        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        def outOfStock = inventoryService.getQuantityOnHandZero(location);
         if (params.format == "csv") {
-            def filename = "Out of stock - " + location.name + ".csv"
+            def filename = "QoH zero - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
             return;
@@ -444,6 +443,7 @@ class InventoryController {
         //[inventoryItems:lowStock, quantityMap:quantityMap]
         render (view: "list", model: [quantityMap:outOfStock])
     }
+
 
     def listOverStock = {
         def location = Location.get(session.warehouse.id)

@@ -16,51 +16,47 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 
-            <div class="yui-gf">
+            <div class="yui-ga">
                 <div class="yui-u first">
                     <div class="box">
                         <h2>
                             <warehouse:message code="default.filters.label" default="Filters"/>
                         </h2>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listTotalStock" class="${'listTotalStock'.equals(actionName)?'selected':''}">
+                        <div class="button-group" styl>
+                            <g:link controller="inventory" action="listTotalStock" class="button ${'listTotalStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listTotalStock.label"/>
                             </g:link>
-                        </div>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listInStock" class="${'listInStock'.equals(actionName)?'selected':''}">
+
+                            <g:link controller="inventory" action="listInStock" class="button ${'listInStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listInStock.label"/>
                             </g:link>
-                        </div>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listOutOfStock" class="${'listOutOfStock'.equals(actionName)?'selected':''}">
+
+                            <g:link controller="inventory" action="listOutOfStock" class="button ${'listOutOfStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listOutOfStock.label"/>
                             </g:link>
-                        </div>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listLowStock" class="${'listLowStock'.equals(actionName)?'selected':''}">
+
+                            <g:link controller="inventory" action="listQuantityOnHandZero" class="button ${'listQuantityOnHandZero'.equals(actionName)?'primary':''}">
+                                <warehouse:message code="inventory.listQuantityOnHandZero.label"/>
+                            </g:link>
+
+                            <g:link controller="inventory" action="listLowStock" class="button ${'listLowStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listLowStock.label"/>
                             </g:link>
-                        </div>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listReorderStock" class="${'listReorderStock'.equals(actionName)?'selected':''}">
+
+                            <g:link controller="inventory" action="listReorderStock" class="button ${'listReorderStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listReorderStock.label"/>
                             </g:link>
-                        </div>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listOverStock" class="${'listOverStock'.equals(actionName)?'selected':''}">
+
+                            <g:link controller="inventory" action="listOverStock" class="button ${'listOverStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listOverStock.label"/>
                             </g:link>
-                        </div>
-                        <div class="filter-list-item">
-                            <g:link controller="inventory" action="listReconditionedStock" class="${'listReconditionedStock'.equals(actionName)?'selected':''}">
+
+                            <g:link controller="inventory" action="listReconditionedStock" class="button ${'listReconditionedStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listReconditionedStock.label"/>
                             </g:link>
                         </div>
                     </div>
 
-                </div>
-                <div class="yui-u">
 
 
 

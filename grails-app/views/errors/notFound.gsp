@@ -25,14 +25,14 @@
 				<warehouse:message code="errors.accessDenied.message" default="Apologies, but I can't find that page."/>
 				 
 			</div>
-			<div style="padding-left: 45px;" class="nailthumb-container">
+			<div style="padding-left: 45px;" >
 				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 	</div>
 	<script>
-		$(function() { 		
-			$('.nailthumb-container img').nailthumb({width : 100, height : 100});
-		});
+		//$(function() {
+			//$('.nailthumb-container img').nailthumb({width : 100, height : 100});
+		//});
 	</script>	
 </body>
