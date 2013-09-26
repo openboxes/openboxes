@@ -22,21 +22,30 @@ class UserService {
 	}
 
     Boolean isUserAdmin(User u) {
-        def user = User.get(u.id)
-        def roles = [RoleType.ROLE_ADMIN]
-        return effectRoles(user).any { roles.contains(it.roleType) }
+        if (u) {
+            def user = User.get(u.id)
+            def roles = [RoleType.ROLE_ADMIN]
+            return effectRoles(user).any { roles.contains(it.roleType) }
+        }
+        return false;
     }
 
     Boolean isUserManager(User u) {
-        def user = User.get(u.id)
-        def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
-        return effectRoles(user).any { roles.contains(it.roleType) }
+        if (u) {
+            def user = User.get(u.id)
+            def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
+            return effectRoles(user).any { roles.contains(it.roleType) }
+        }
+        return false;
     }
 
     Boolean canUserBrowse(User u) {
-        def user = User.get(u.id)
-        def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
-        return effectRoles(user).any { roles.contains(it.roleType) }
+        if (u) {
+            def user = User.get(u.id)
+            def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
+            return effectRoles(user).any { roles.contains(it.roleType) }
+        }
+        return false;
     }
 
     Boolean isUserInRole(String userId, Collection roles) {
