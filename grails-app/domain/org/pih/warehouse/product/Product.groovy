@@ -253,7 +253,6 @@ class Product implements Comparable, Serializable {
         pricePerUnit(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-
     }
 
     def getCategoriesList() {
@@ -307,14 +306,14 @@ class Product implements Comparable, Serializable {
             if (currentQuantity <= 0) {
                 status = "STOCK_OUT"
             }
-            else if (inventoryLevel?.maxQuantity && currentQuantity >= inventoryLevel?.maxQuantity) {
-                status = "OVERSTOCK"
-            }
             else if (inventoryLevel?.minQuantity && currentQuantity <= inventoryLevel?.minQuantity) {
                 status = "LOW_STOCK"
             }
             else if (inventoryLevel?.reorderQuantity && currentQuantity <= inventoryLevel?.reorderQuantity ) {
                 status = "REORDER"
+            }
+            else if (inventoryLevel?.maxQuantity && currentQuantity > inventoryLevel?.maxQuantity) {
+                status = "OVERSTOCK"
             }
             else {
                 status = "IN_STOCK"
