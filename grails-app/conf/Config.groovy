@@ -31,8 +31,8 @@ grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
-// Default mail settings 
-grails { 
+// Default mail settings
+grails {
 	mail { 		
 		// By default we enable email.  You can enable/disable email using environment settings below or in your 
 		// ${user.home}/openboxes-config.properties file 
@@ -43,6 +43,28 @@ grails {
 		port = "25"
 	}
 }
+
+/*
+grails {
+    mail {
+        enabled = true
+        from = "openboxes@pih.org"
+        prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
+        host = "smtp.gmail.com"
+        port = 587
+        username = "justin.miranda@gmail.com"
+        password = "kaphu5ra"
+        props = ["mail.debug": "true",
+                "mail.smtp.protocol": "smtps",
+                "mail.smtp.auth": "true",
+                "mail.smtp.starttls.enable": "true",
+                "mail.smtp.host": "smtp.gmail.com",
+                "mail.smtp.user": "justin.miranda@gmail.com",
+                "mail.smtp.password": "kaphu5ra"]
+    }
+}
+*/
+
 /* Indicates which activities are required for a location to allow logins */
 openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
@@ -68,6 +90,7 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 // The default codec used to encode data with ${}
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
+//grails.views.gsp.keepgenerateddir="/home/jmiranda/git/openboxes/target/generated"
 grails.converters.encoding="UTF-8"
 grails.views.enable.jsessionid = true
 // enable Sitemesh preprocessing of GSP pages
@@ -108,7 +131,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
-		mail.error.debug = false
+		mail.error.debug = true
 	}
 	test {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
@@ -124,7 +147,8 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
 		grails.mail.enabled = true
-	}
+        grails.mail.prefix = "[OpenBoxes]"
+    }
 	staging {  
 		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
@@ -145,7 +169,7 @@ environments {
 		uiperformance.enabled = false
 		grails.mail.enabled = true
 	}
-	
+
 }
 
 
@@ -176,13 +200,14 @@ log4j = {
 			def conversionPattern = 
 				"Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
 				"Thread: [%t]%n" +
-				"Username: %X{username}%n" +
-				"Location: %X{location}%n" +
+                "Username: %X{username}%n" +
+                "Location: %X{location}%n" +
+				//"Locale: %X{locale}%n" +
 				"IP address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
 				"Query string: %X{queryString}%n" +
-                "Stacktrace: %n%m%n%n" +
-                "Clickstream: %n%X{clickStream}%n"
+                "Stacktrace: %n%m%n"
+                //"Clickstream: %X{clickStream}%n"
 
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
@@ -251,6 +276,7 @@ log4j = {
             'org.hibernate.impl.SessionFactoryObjectFactory',  
             'com.gargoylesoftware.htmlunit.DefaultCssErrorHandler',
             'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
+            //'org.jumpmind.symmetric.config.PropertiesFactoryBean'
 
 	warn	'org.mortbay.log',
             'org.codehaus.groovy.grails.web.servlet',		// controllers
@@ -264,11 +290,13 @@ log4j = {
 			'org.apache.http.headers',
 			'org.apache.ddlutils',
 			'org.apache.http.wire',
-			'net.sf.ehcache.hibernate'
+			'net.sf.ehcache.hibernate',
+            'org.apache.ddlutils'
+            //'org.jumpmind.symmetric.service.impl.PurgeService'
 
 	info    'org.liquibase',
-            'grails.app.controller',
             'org.codehaus.groovy.grails.web.pages',		// GSP
+            'grails.app.controller',
             'com.opensymphony.clickstream',
 			'com.mchange',
 			'org.springframework',
@@ -282,8 +310,10 @@ log4j = {
 			'BootStrap',
 			'liquibase',
 			'com.gargoylesoftware.htmlunit'
+            //'org.jumpmind'
 
    debug 	 'org.apache.cxf'
+
             //'org.apache.http.wire',          // shows traffic between htmlunit and server
             //'com.gargoylesoftware.htmlunit'
 

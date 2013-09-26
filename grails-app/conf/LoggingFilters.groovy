@@ -17,25 +17,27 @@ class LoggingFilters {
 			before = {
 				
 				String sessionId = session?.user?.username//RequestContextHolder.getRequestAttributes()?.getSessionId()
-                String clickstreamAsString = ClickstreamUtil.getClickstreamAsString(session.clickstream)
+                //String clickstreamAsString = ClickstreamUtil.getClickstreamAsString(session.clickstream)
 				//log.info "SessionID " + sessionId
 				MDC.put('username', session?.user?.username?:"Anonymous")
 				MDC.put('location', session?.warehouse?.name?:"No location")
+                //MDC.put('locale', session?.user?.locale?.toString()?:"No locale")
 				MDC.put('ipAddress', request?.remoteAddr?:"No IP address")
 				MDC.put('requestUri', request?.requestURI?:"No request URI")
                 //MDC.put('requestUrl', request?.requestURL?:"No request URL")
 				MDC.put('queryString', request?.queryString?:"No query string")
-                MDC.put('clickStream', clickstreamAsString?:"No clickstream")
+                //MDC.put('clickStream', clickstreamAsString?:"No clickstream")
 			}
 			after = {
 			}
 			afterView = {
 				MDC.remove('username')
 				MDC.remove('location')
+                //MDC.remove('locale')
 				MDC.remove('ipAddress')
 				MDC.remove('requestUri')
 				MDC.remove('queryString')
-                MDC.remove('clickStream')
+                //MDC.remove('clickStream')
 			}
 		}
 	}
