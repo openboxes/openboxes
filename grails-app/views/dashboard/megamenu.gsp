@@ -1,4 +1,4 @@
-<%@page import="org.pih.warehouse.core.ActivityCode"%>
+<%@page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.core.ActivityCode"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
     <li>
@@ -114,9 +114,20 @@
                     <div class="megaButton">
                         <g:link controller="requisition" action="list" class="list">
                             <warehouse:message code="requisitions.label" default="Requisitions" />
-                            (${incomingRequests?.values()?.flatten()?.size()?:0 })
+                            (${requisitionStatistics["ALL"]})
                         </g:link>
                     </div>
+                    <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
+                        <g:if test="${requisitionStatistics[requisitionStatus]>0}">
+                            <div class="megaButton">
+                                <g:link controller="requisition" action="list" params="[status:requisitionStatus]">
+                                    <format:metadata obj="${requisitionStatus}"/>
+                                    (${requisitionStatistics[requisitionStatus]?:0 })
+                                </g:link>
+                            </div>
+                        </g:if>
+                    </g:each>
+
                     <div class="megaButton">
                         <hr/>
                     </div>
@@ -353,7 +364,7 @@
                     <div class="megaButton">
                         <g:link controller="requisitionTemplate" action="list" class="list">
                             <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
-                            (${requisitionTemplates.size()})
+                            <%--(${requisitionTemplates.size()})--%>
                         </g:link>
                     </div>
 

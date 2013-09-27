@@ -39,8 +39,16 @@ class DashboardController {
 		log.info(statistics)
 		render statistics
 	}
-	
-	def globalSearch = { 
+
+    def showRequisitionStatistics = {
+        def user = User.get(session.user.id)
+        def location = Location.get(session?.warehouse?.id);
+        def statistics = requisitionService.getRequisitionStatistics(location,null,user)
+        render statistics
+    }
+
+
+    def globalSearch = {
 		
 		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
 		if (transaction) { 
@@ -70,16 +78,19 @@ class DashboardController {
 			
 	}
 
+
     //@Cacheable("dashboardControllerCache")
 	def index = {
-		if (!session.warehouse) {		
+
+        def startTime = System.currentTimeMillis()
+		if (!session.warehouse) {
 			log.info "Location not selected, redirect to chooseLocation"	
 			redirect(action: "chooseLocation")			
 		}
 		
+	    def currentUser = User.get(session?.user?.id)
 		
-		
-		Location location = Location.get(session?.warehouse?.id);
+		def location = Location.get(session?.warehouse?.id);
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
 		//def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
@@ -96,7 +107,6 @@ class DashboardController {
         // Days to include for activity list
         def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
         def activityList = []
-
 
         // Find recent requisition activity
         def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
@@ -231,6 +241,8 @@ class DashboardController {
     		activityList = activityList[startIndex..endIndex]
         }
 
+
+        log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 		//def outgoingOrders = orderService.getOutgoingOrders(location)
 		//def incomingOrders = orderService.getIncomingOrders(location)
 		
@@ -248,9 +260,12 @@ class DashboardController {
 			//lowStock: lowStock,
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
-            requisitions:  requisitionService.getAllRequisitions(session.warehouse),
-            //requisitions:  requisitionService.getRequisitions(session.warehouse),
-			//outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
+
+            requisitionStatistics: requisitionService.getRequisitionStatistics(location, null, currentUser),
+            requisitions: [],
+            //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
+
+            //outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
 			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
 			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentIncomingShipments),
@@ -287,28 +302,31 @@ class DashboardController {
     @Cacheable("megamenuCache")
 	def megamenu = {
 
+        def user = User.get(session?.user?.id)
+        def location = Location.get(session?.warehouse?.id)
+
       //   def startTime = System.currentTimeMillis()
 
         // Shipments
-		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()
-        def incomingShipmentsCount = Shipment.countByDestination(session?.warehouse)
+		def incomingShipments = Shipment.findAllByDestination(location).groupBy{it.status.code}.sort()
+        def incomingShipmentsCount = Shipment.countByDestination(location)
 
-		def outgoingShipments = Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort();
-        def outgoingShipmentsCount = Shipment.countByOrigin(session?.warehouse)
+		def outgoingShipments = Shipment.findAllByOrigin(location).groupBy{it.status.code}.sort();
+        def outgoingShipmentsCount = Shipment.countByOrigin(location)
         // Orders
-		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
+		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
 
         // Requisitions
         //def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
 		//def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-        def incomingRequests = requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
-        def outgoingRequests = []
-        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(session.warehouse)
+        //def incomingRequests = [:] //requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
+        //def outgoingRequests = []
+        //def requisitionTemplates = [] //requisitionService.getAllRequisitionTemplates(session.warehouse)
         //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
         //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
-		
-		def categories = []
+        def requisitionStatistics = requisitionService.getRequisitionStatistics(location,null,user)
 
+        def categories = []
 		def category = productService.getRootCategory()		
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
@@ -322,9 +340,10 @@ class DashboardController {
             outgoingShipments: outgoingShipments,
 			outgoingShipmentsCount: outgoingShipmentsCount,
 			incomingOrders: incomingOrders,
-			incomingRequests: incomingRequests,
-			outgoingRequests: outgoingRequests,
-            requisitionTemplates: requisitionTemplates,
+                requisitionStatistics: requisitionStatistics,
+			//incomingRequests: incomingRequests,
+			//outgoingRequests: outgoingRequests,
+            //requisitionTemplates: requisitionTemplates,
             //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()

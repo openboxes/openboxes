@@ -8,17 +8,17 @@
 	</div>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
-			<g:if test="${!requisitions}">
+			<g:if test="${!requisitionStatistics}">
 				<div style="margin:10px;" class="center empty">
 					<span class="fade"><warehouse:message code="requisition.noRecent.label"/></span>
                 </div>
 			</g:if>
 			<g:else>
                 <table>
-                    <g:set var="requisitionMap" value="${requisitions.groupBy { it.status }}"/>
+
                     <g:set var="i" value="${0}"/>
                     <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list()}">
-                        <g:set var="requisitionCount" value="${requisitionMap[status]?.size()?:0}"/>
+                        <g:set var="requisitionCount" value="${requisitionStatistics[status]?:0}"/>
                         <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
                         <g:if test="${requisitionCount}">
                             <tr class="${i%2?'odd':'even'}">
@@ -34,7 +34,7 @@
                                 </td>
                                 <td class="right">
                                     <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                        ${requisitionMap[status]?.size()?:0}
+                                        ${requisitionStatistics[status]?:0}
                                     </g:link>
                                 </td>
                             </tr>
@@ -48,7 +48,7 @@
                             </th>
                             <th class="right">
                                 <g:link controller="requisition" action="list">
-                                    ${requisitions?.size()?:0}
+                                    ${requisitionStatistics["ALL"]?:0}
                                 </g:link>
                             </th>
                         </tr>

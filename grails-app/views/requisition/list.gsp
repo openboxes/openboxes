@@ -111,13 +111,14 @@
                     <div class="button-group">
                         <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
                             <warehouse:message code="default.all.label"/>
+                            (${requisitionStatistics["ALL"]})
                         </g:link>
                         <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
-                            <g:if test="${requisitionsMap[requisitionStatus]>0}">
+                            <g:if test="${requisitionStatistics[requisitionStatus]>0}">
                                 <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
                                 <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
                                     <format:metadata obj="${requisitionStatus}"/>
-                                    (${requisitionsMap[requisitionStatus]?:0 })
+                                    (${requisitionStatistics[requisitionStatus]?:0 })
                                 </g:link>
                             </g:if>
                         </g:each>
@@ -125,7 +126,7 @@
                     <div class="button-group">
                         <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
                             ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
-                            (${requisitionsMap["relatedToMe"]?:0 })
+                            (${requisitionStatistics["MINE"]?:0 })
                         </g:link>
                     </div>
                     <%--

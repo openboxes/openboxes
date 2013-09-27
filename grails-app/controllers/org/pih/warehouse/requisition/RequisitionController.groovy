@@ -34,40 +34,17 @@ class RequisitionController {
     }
 
     def list = {
-
+        def user = User.get(session?.user?.id)
+        def location = Location.get(session?.warehouse?.id)
         def requisition = new Requisition(params)
-        requisition.destination = session?.warehouse
+        requisition.destination = Location.get(session?.warehouse?.id)
         //def startTime = System.currentTimeMillis()
 
         // Requisitions to display in the table
         def requisitions = requisitionService.getRequisitions(requisition, params)
+        def requisitionStatistics = requisitionService.getRequisitionStatistics(requisition.destination, null, user)
 
-
-        def requisitionsMap = [:]
-        //def requisitionsMap = requisitionService.countRequisitions(session.warehouse)
-        println "requisitions from server " + requisitions.size() + " => " + requisitions.collect { it.id }
-
-        //println "Time: " + (System.currentTimeMillis() - startTime) / 1000 + "ms"
-
-        // Used to display the counts of requisitions
-        def requisitionsLocal = Requisition.findAllByDestination(session.warehouse)
-        //def requisitionsLocal = requisitionService.getRequisitionsByDestination(session.warehouse)
-        println "requisitionsLocal: " + requisitionsLocal.size()
-        //println "Time: " + (System.currentTimeMillis() - startTime) / 1000 + "ms"
-
-        // Hack to get requisitions that are related to me
-        def requisitionsRelatedToMe = requisitionsLocal.findAll {
-            (it?.updatedBy?.id == session?.user?.id || it?.createdBy?.id == session?.user?.id || it?.requestedBy?.id == session?.user?.id) && !it.isTemplate
-        }
-        println "requisitionsRelatedToMe: " + requisitionsRelatedToMe.size() + " => " + requisitionsRelatedToMe.collect { it.id }
-
-        requisitionsLocal.groupBy { it.status }.each { k, v ->
-            requisitionsMap[k] = v.size()?:0
-        }
-        requisitionsMap["relatedToMe"] = requisitionsRelatedToMe.size()?:0
-
-        //requisitions = requisitions.sort()
-        render(view:"list", model:[requisitions: requisitions, requisitionsMap:requisitionsMap])
+        render(view:"list", model:[requisitions: requisitions, requisitionStatistics:requisitionStatistics])
     }
 
 	def listStock = {

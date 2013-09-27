@@ -30,6 +30,79 @@ class RequisitionService {
 	def shipmentService;
 	def inventoryService;
 
+    /*
+    def getRequisitionStats(requisition, params) {
+        def criteria = Requisition.createCriteria()
+        def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
+    }
+    */
+
+    def getRequisitionStatistics(destination, origin) {
+        return getRequisitionStatistics(destination, origin, null)
+    }
+
+    def getRequisitionStatistics(destination, origin, user) {
+        def statistics = [:]
+
+        def criteria = Requisition.createCriteria()
+        def results = criteria.list {
+            projections {
+                groupProperty('status')
+                rowCount()
+            }
+            and {
+                or {
+                    eq("isTemplate", false)
+                    isNull("isTemplate")
+                }
+
+                or {
+
+                    if (destination) eq("destination", destination)
+                    if (origin) eq("origin", origin)
+                }
+            }
+            isNotNull("status")
+        }
+
+
+
+        results.each {
+            statistics[it[0]] = it[1]
+        }
+        statistics["ALL"] = results.collect { it[1] }.sum()
+
+        if (user) {
+            def criteria2 = Requisition.createCriteria()
+            results = criteria2.get {
+                projections {
+                    countDistinct("id")
+                }
+                and {
+                    or {
+                        eq("isTemplate", false)
+                        isNull("isTemplate")
+                    }
+                    or {
+                        eq("createdBy", user)
+                        eq("updatedBy", user)
+                        eq("requestedBy", user)
+                    }
+                    or {
+
+                        if (destination) eq("destination", destination)
+                        if (origin) eq("origin", origin)
+                    }
+                }
+            }
+
+            statistics["MINE"] = results
+        }
+
+
+        return statistics;
+    }
+
     /**
      * Get recent requisitions
      */
@@ -91,9 +164,7 @@ class RequisitionService {
         //return Requisition.findAllByDestination(session.warehouse)
 
         def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
-        println "params.commodityClass = " + params.commodityClassIsNull
         def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
-        println "commodityClassIsNull = " + commodityClassIsNull
 
         def criteria = Requisition.createCriteria()
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
@@ -169,6 +240,38 @@ class RequisitionService {
 
         return results
 
+    }
+
+    def getRequisitionsByDestination(destination) {
+        //return Requisition.findAllByDestination(destination)
+
+        def criteria = Requisition.createCriteria()
+        def results = criteria.list() {
+            eq("destination", destination)
+        }
+        return results
+    }
+
+
+    def countRequisitions(destination) {
+        def criteria = Requisition.createCriteria()
+        def results = criteria.list {
+
+            createAlias('status','statusAlias')
+
+            projections {
+                groupProperty('statusAlias')
+                rowCount()
+            }
+            eq("destination", destination)
+        }
+
+        println results
+
+        // HQL
+        //results = Work.executeQuery('select w.artist.style, count(w) from Work as w group by w.artist.style')
+        //println results
+        return results
     }
 
 
