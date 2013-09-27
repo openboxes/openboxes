@@ -16,11 +16,19 @@
                 <g:renderErrors bean="${command}" as="list" />
             </div>
         </g:hasErrors>
-        <div class="yui-gf">
-            <div class="yui-u first">
+
+
+
+    <div class="yui-gf">
+
+
+
+
+        <div class="yui-u first">
                 <g:render template="filters" model="[command:command]"/>
             </div>
             <div class="yui-u">
+
 
                 <div class="box" id="parameters-box" style="display: none;">
                     <h2><warehouse:message code="consumption.parameters.label" default="Parameters"/></h2>
@@ -175,11 +183,10 @@
 
                 <div class="box">
                     <h2>
-                        <warehouse:message code="consumption.results.label" default="Results"/>
-
+                        Returned ${command.rows?.keySet()?.size()} results
                     </h2>
 
-                    <div style="max-width:100%; overflow-x: scroll; max-height: 500px; overflow-y: scroll; white-space: nowrap; " class="list">
+                    <div style="max-width:100%; overflow-x: scroll; min-height: 450px; max-height: 450px; overflow-y: scroll; white-space: nowrap; " class="list">
                         <table>
                             <thead>
                                 <tr>
@@ -345,16 +352,10 @@
                                 </g:unless>
 
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="20">
-                                        <span class="fade">Returned ${command.rows?.keySet()?.size()} items</span>
-                                    </td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
+
             <%--
                 <div class="right">
                     <table style="width:auto;" class="box">

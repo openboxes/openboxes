@@ -1,9 +1,3 @@
-<div class="button-group">
-    <g:link controller="consumption" action="show" class="button icon reload">${warehouse.message(code:'consumption.parameters.reset.label', default: 'Reset parameters')}</g:link>
-    <a href="#" id="parameters-toggle" class="button icon settings">
-        <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>
-</div>
-
 <div class="filters">
 	<g:form method="POST" controller="consumption" action="show">
 
@@ -11,26 +5,22 @@
         <h2><warehouse:message code="default.filters.label"/></h2>
         <table>
             <tr class="prop">
-                <td class="middle">
+                <td colspan="2" class="middle">
                     <label>
                         <warehouse:message code="consumption.afterDate.label" default="Issued after midnight on"/>
                     </label>
-                </td>
-                <td>
                     <div>
-                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
+                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy" size="30"/>
                     </div>
                 </td>
             </tr>
             <tr class="prop">
-                <td>
+                <td colspan="2">
                     <label>
                         <warehouse:message code="consumption.beforeDate.label" default="Issued before midnight on"/>
                     </label>
-                </td>
-                <td>
                     <div>
-                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
+                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" size="30"/>
                     </div>
                 </td>
             </tr>
@@ -48,8 +38,18 @@
                     <label>
                         <warehouse:message code="consumption.includeProductsWithTag.label" default="Include products with tag" />
                     </label>
-                    <g:selectTag name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"
+                    <g:selectTags name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"
                         data-placeholder=" "/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td colspan="2">
+                    <label>
+                        <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
+                    </label>
+                    <div>
+                        <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
+                    </div>
                 </td>
             </tr>
             <tr class="prop">
@@ -149,14 +149,6 @@
                             </g:unless>
                         </td>
                     </tr>
-                <tr class="">
-                    <td colspan="2">
-                        <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
-                        <label>
-                            <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown"/>
-                        </label>
-                    </td>
-                </tr>
                 <tr class="prop">
                     <td colspan="2">
                         <label><warehouse:message code="consumption.additionalColumns.label" default="Choose additional columns"/></label>
@@ -210,9 +202,16 @@
 
                 <tr class="prop">
                     <td class="center" colspan="2">
-                        <button class="button icon search">
-                            <warehouse:message code="default.runReport.label" default="Run report"/>
-                        </button>
+                        <div>
+                            <button class="button icon search">
+                                <warehouse:message code="default.runReport.label" default="Run report"/>
+                            </button>
+                            <g:link controller="consumption" action="show" class="button icon trash">${warehouse.message(code:'consumption.parameters.reset.label', default: 'Reset parameters')}</g:link>
+                            <%--
+                            <a href="#" id="parameters-toggle" class="button icon settings">
+                                <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>
+                                --%>
+                        </div>
 
                         <%--
                         <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
