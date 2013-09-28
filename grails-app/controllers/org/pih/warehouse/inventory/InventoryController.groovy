@@ -15,6 +15,7 @@ import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -31,6 +32,8 @@ class InventoryController {
     def productService
 	def inventoryService
     def requisitionService
+
+    static allowedMethods = [show: "GET", search: "POST", download: "GET"];
 
     def index = {
 		redirect(action: "browse");
@@ -153,7 +156,7 @@ class InventoryController {
 	 * 
 	 */
 	def show = {
-
+        def quantityMap = [:]
         long startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
 		def inventoryInstance = Inventory.get(params.id)
@@ -166,33 +169,56 @@ class InventoryController {
             return
         }
 
-        def transactions = Transaction.findAllByInventory(inventoryInstance)
-        def transactionEntries = (transactions*.transactionEntries).flatten()
-        log.info "transactionEntries: " + transactionEntries.size()
 
-        def productQuantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
         def elapsedTime = (System.currentTimeMillis() - startTime)
-        log.info("Show current inventory: " + elapsedTime + " ms");
-
-        if (params.format == "csv") {
-            def filename = "Current stock - " + location.name + " - ${new Date()}.csv"
-            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(productQuantityMap))
-            return
-        }
-
+        log.info("Show current inventory: " + (System.currentTimeMillis() - startTime) + " ms");
         //def inventoryMapping = inventoryInstance.inventoryItems.groupBy{ it?.product }
         [
             //inventoryMapping: inventoryMapping,
             location: location,
             elapsedTime: elapsedTime,
-            productQuantityMap: productQuantityMap,
-
+            quantityMap: quantityMap
         ]
 
 	}
 
-	
+	def search = { QuantityOnHandReportCommand command ->
+        println "search " + params
+
+        //def location = Location.get(params.location)
+        if (!command?.startDate) command.startDate = new Date();
+        if (!command?.location) command.location = Location.get(session.location.id)
+        //def transactions = Transaction.findAllByInventory(location.inventory)
+        //def transactionEntries = (transactions*.transactionEntries).flatten()
+        //log.info "transactionEntries: " + transactionEntries.size()
+        //def quantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
+        println command?.location?.name + " " + command?.startDate + " " + command.tag
+        def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tag)
+
+        println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
+        render(view: "show", model: [location: command.location, quantityMap: quantityMap, command: command])
+
+    }
+
+    def download = { QuantityOnHandReportCommand command ->
+
+        println "search " + params
+        println "search " + command.location + " " + command.startDate
+        def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tag)
+        if (quantityMap) {
+            def statusMap = inventoryService.getInventoryStatus(command.location)
+            def filename = "Stock report - " +
+                    (command?.tag?command?.tag?.tag:"All Products") + " - " +
+                    command?.location?.name + " - " +
+                    command?.startDate?.format("yyyyMMMdd") + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
+            return;
+        }
+        flash.message = "There are no search results available to download - please try again."
+        redirect(action: "show")
+
+    }
 
 	
 	
@@ -341,138 +367,131 @@ class InventoryController {
 
     def list = {
         println "List " + params
-        def warehouse = Location.get(session.warehouse.id)
-        //def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
-        def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
-
+        def location = Location.get(session.warehouse.id)
+        def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
+        def statusMap = inventoryService.getInventoryStatus(location)
         println "QuantityMap: " + quantityMap
-        [quantityMap:quantityMap]
+        [quantityMap:quantityMap,statusMap: statusMap]
     }
 
 
     def listReconditionedStock = {
         def location = Location.get(session.warehouse.id)
-        def reconditionedStock = inventoryService.getReconditionedStock(location)
-
+        def quantityMap = inventoryService.getReconditionedStock(location)
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Reconditioned stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(reconditionedStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
-        render (view: "list", model: [quantityMap:reconditionedStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
 
     def listTotalStock = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def totalStock = inventoryService.getTotalStock(location);
-        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
-
+        def quantityMap = inventoryService.getTotalStock(location);
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Total stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(totalStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
-        render (view: "list", model: [quantityMap:totalStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
 
     }
 
     def listInStock = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def inStock = inventoryService.getInStock(location);
-        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        def quantityMap = inventoryService.getInStock(location);
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "In stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(inStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
-        render (view: "list", model: [quantityMap:inStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
 
     }
 
     def listLowStock = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def lowStock = inventoryService.getLowStock(location);
-        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        def quantityMap = inventoryService.getLowStock(location);
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Low stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(lowStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:lowStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
     def listReorderStock = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def reorderStock = inventoryService.getReorderStock(location);
-        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        def quantityMap = inventoryService.getReorderStock(location);
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Reorder stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(reorderStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
-        //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:reorderStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
 
     def listQuantityOnHandZero = {
         def location = Location.get(session.warehouse.id)
-        def outOfStock = inventoryService.getQuantityOnHandZero(location);
+        def quantityMap = inventoryService.getQuantityOnHandZero(location);
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
-            def filename = "QoH zero - " + location.name + ".csv"
+            def filename = "Out of stock  - all - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:outOfStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
 
     def listOverStock = {
         def location = Location.get(session.warehouse.id)
-        // def categorySelected = (params.category) ? Category.get(params.category) : null;
-        def overStock = inventoryService.getOverStock(location);
-        //def quantityMap = inventoryService.getQuantityByProductMap(warehouse.inventory)
+        def quantityMap = inventoryService.getOverStock(location)
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(overStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
         //[inventoryItems:lowStock, quantityMap:quantityMap]
-        render (view: "list", model: [quantityMap:overStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        def outOfStock = inventoryService.getOutOfStock(location);
-
+        def quantityMap = inventoryService.getOutOfStock(location);
+        def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
-            def filename = "Out of stock - " + location.name + ".csv"
+            def filename = "Out of stock - supported - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-            render(contentType: "text/csv", text:getCsvForProductMap(outOfStock))
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
 
-        render (view: "list", model: [quantityMap:outOfStock])
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
 
@@ -521,7 +540,12 @@ class InventoryController {
 			categorySelected:category, thresholdSelected:threshold ]
 	}
 
+
     def getCsvForInventoryMap(map) {
+        return getCsvForInventoryMap(map, [:])
+    }
+
+    def getCsvForInventoryMap(map, statusMap) {
         def csv = "";
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
@@ -547,7 +571,10 @@ class InventoryController {
 
             def product = inventoryItem?.product
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
+            def status = statusMap[product]
+            if (!status) {
+                status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
+            }
             def statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
             def expirationDate = formatDate(date: inventoryItem?.expirationDate, format: "dd/MMM/yyyy");
             csv += '"' + (statusMessage?:"")  + '"' + ","
@@ -574,6 +601,10 @@ class InventoryController {
     }
 
     def getCsvForProductMap(map) {
+        return getCsvForProductMap(map, [:])
+    }
+
+    def getCsvForProductMap(map, statusMap) {
         def csv = "";
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
@@ -594,9 +625,13 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
 
-        map.each { product, quantity ->
+        map.sort().each { product, quantity ->
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
+            def status = statusMap[product]
+            if (!status) {
+                status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
+            }
+
             def statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
@@ -1477,4 +1512,14 @@ class ConsumptionCommand {
 		}
 	}
 
+class QuantityOnHandReportCommand {
+    Location location
+    Tag tag
+    Date startDate
+    Date endDate
+
+    static constraints = {
+
+    }
+}
 

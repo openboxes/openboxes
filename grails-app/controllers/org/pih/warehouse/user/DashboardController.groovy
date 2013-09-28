@@ -275,7 +275,7 @@ class DashboardController {
 			startIndex: startIndex,
 			endIndex: endIndex,
 			daysToInclude: daysToInclude,
-            tags:productService.getAllTags()
+            tags:productService?.getAllTags()?.sort { it.tag }
 		]
 	}
 
@@ -284,7 +284,7 @@ class DashboardController {
         Tag tag = Tag.get(params.id)
         tag.isActive = false
         tag.save(flush:true)
-        redirect(controller: "dashboard", action: "index")
+        redirect(controller: "dashboard", action: "index", params: [editTags:true])
     }
 	
 	def status = { 

@@ -743,6 +743,52 @@ class InventoryService implements ApplicationContextAware {
         ]
     }
 
+
+    def getInventoryStatus(Location location) {
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryStatusMap = [:]
+        quantityMap.each { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryStatusMap[product] = getInventoryStatus(inventoryLevel, quantity)
+
+        }
+        return inventoryStatusMap
+    }
+
+    def getInventoryStatus(inventoryLevel, quantity) {
+        def status = ""
+        if (inventoryLevel?.status >= InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
+            if (quantity <= 0) {
+                status = "STOCK_OUT"
+            }
+            else if (inventoryLevel?.minQuantity && quantity <= inventoryLevel?.minQuantity) {
+                status = "LOW_STOCK"
+            }
+            else if (inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity ) {
+                status = "REORDER"
+            }
+            else if (inventoryLevel?.maxQuantity && quantity > inventoryLevel?.maxQuantity) {
+                status = "OVERSTOCK"
+            }
+            else {
+                status = "IN_STOCK"
+            }
+        }
+        else if (inventoryLevel?.status == InventoryStatus.NOT_SUPPORTED) {
+            status = "NOT_SUPPORTED"
+        }
+        else if (inventoryLevel?.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
+            status = "SUPPORTED_NON_INVENTORY"
+        }
+        else {
+            status = "UNAVAILABLE"
+        }
+        return status
+    }
+
+
+
     def getQuantityOnHandZero(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)
@@ -2911,6 +2957,84 @@ class InventoryService implements ApplicationContextAware {
         }
         return inventoryItems;
     }
+
+
+    /**
+     *  Returns the quantity on hand of each product at the given location as of the given date.
+     */
+    def getQuantityOnHandAsOfDate(location, date) {
+        //def transactionEntries = getTransactionEntriesBeforeDate(location, date)
+        //return getQuantityByProductMap(transactionEntries)
+        return getQuantityOnHandAsOfDate(location, date, null)
+    }
+
+    /**
+     *  Returns the quantity on hand of each product for the given tag at the given location as of the given date.
+     */
+    def getQuantityOnHandAsOfDate(location, date, tag) {
+        def transactionEntries = getTransactionEntriesBeforeDate(location, date, tag)
+        def quantityMap = getQuantityByProductMap(transactionEntries)
+
+        // Make sure that ALL products in the tag are represented
+        if (tag) {
+            tag.products.each { p ->
+                def product = Product.get(p.id)
+                def quantity = quantityMap[product]
+                if (!quantity) {
+                    quantityMap[product] = 0
+                }
+            }
+        }
+        return quantityMap
+
+
+
+    }
+
+
+    def getTransactionEntriesBeforeDate(location, date) {
+        return getTransactionEntriesBeforeDate(location, date, null)
+    }
+
+
+    def getTransactionEntriesBeforeDate(location, date, tag) {
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = []
+        if (date) {
+            def products = Tag.get(tag?.id)?.products
+            println "Products: " + products
+            transactionEntries = criteria.list {
+                if (products) {
+                    inventoryItem {
+                        'in'("product", products)
+                    }
+                }
+                transaction {
+                    // All transactions before given date
+                    lt("transactionDate", date)
+                    eq("inventory", location?.inventory)
+                    order("transactionDate", "asc")
+                    order("dateCreated", "asc")
+
+                }
+            }
+        }
+        return transactionEntries;
+    }
+
+
+/*
+    def getQuantityOnHandAsOfDate(location, date, tag) {
+        def transactionEntries = getTransactionEntriesBeforeDate(location, date)
+
+    }
+
+
+    def getQuantityOnHandBetweenDates(location, afterDate, beforeDate) {
+
+    }
+*/
+
 
 }
 

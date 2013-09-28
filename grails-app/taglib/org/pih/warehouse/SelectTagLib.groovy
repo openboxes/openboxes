@@ -78,12 +78,21 @@ class SelectTagLib {
 
     def selectTag = { attrs, body ->
         attrs.from = Tag.list()
+        //attrs.multiple = true
+        attrs.value = attrs.value
+        attrs.optionKey = "id"
+        attrs.optionValue = { it?.tag + " (" + it?.products?.size() + ")" }
+        out << g.select(attrs)
+    }
+    def selectTags = { attrs, body ->
+        attrs.from = Tag.list()
         attrs.multiple = true
         attrs.value = attrs.value
         attrs.optionKey = "id"
-        attrs.optionValue = { it?.tag }
+        attrs.optionValue = { it?.tag + " (" + it?.products?.size() + ")" }
         out << g.select(attrs)
     }
+
 
     def selectRequisitionStatus = { attrs, body ->
         attrs.from = RequisitionStatus.list()

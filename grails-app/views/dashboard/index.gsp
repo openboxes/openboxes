@@ -93,13 +93,13 @@
 
                 $("#tagcloud a").tagcloud({
                     size: {
-                        start: 10,
-                        end: 25,
-                        unit: 'px'
+                        start:1.0,
+                        end: 1.5,
+                        unit: 'em'
                     },
                     color: {
-                        start: "#CDE",
-                        end: "#FS2"
+                        start: "#aaa", // "#CDE"
+                        end: "#F52"//"#FS2"
                     }
                 });
 

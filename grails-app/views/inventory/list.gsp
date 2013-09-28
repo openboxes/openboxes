@@ -22,7 +22,7 @@
                         <h2>
                             <warehouse:message code="default.filters.label" default="Filters"/>
                         </h2>
-                        <div class="button-group" styl>
+                        <div class="button-group" style="padding:15px;">
                             <g:link controller="inventory" action="listTotalStock" class="button ${'listTotalStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listTotalStock.label"/>
                             </g:link>
@@ -31,13 +31,14 @@
                                 <warehouse:message code="inventory.listInStock.label"/>
                             </g:link>
 
+                            <g:link controller="inventory" action="listQuantityOnHandZero" class="button ${'listQuantityOnHandZero'.equals(actionName)?'primary':''}">
+                                <warehouse:message code="inventory.listQuantityOnHandZero.label"/>
+                            </g:link>
+
                             <g:link controller="inventory" action="listOutOfStock" class="button ${'listOutOfStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listOutOfStock.label"/>
                             </g:link>
 
-                            <g:link controller="inventory" action="listQuantityOnHandZero" class="button ${'listQuantityOnHandZero'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listQuantityOnHandZero.label"/>
-                            </g:link>
 
                             <g:link controller="inventory" action="listLowStock" class="button ${'listLowStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listLowStock.label"/>
@@ -93,8 +94,15 @@
                                         <%--
                                         <g:render template="../product/status" model="[product:entry?.key,totalQuantity:entry?.value]"/>
                                         --%>
-                                        <g:set var="status" value="${entry?.key?.getStatus(session.warehouse.id, entry?.value?:0 as int)}"/>
+
+                                        <g:if test="${statusMap}">
+                                            <g:set var="status" value="${statusMap[entry?.key]}"/>
+                                        </g:if>
+                                        <g:else>
+                                            <g:set var="status" value="${entry?.key?.getStatus(session.warehouse.id, entry?.value?:0 as int)}"/>
+                                        </g:else>
                                         ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
+
                                     </td>
                                     <td>
                                         ${entry.key.productCode}
