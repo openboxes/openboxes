@@ -33,7 +33,7 @@ grails.project.dependency.resolution = {
 		mavenLocal()
 		mavenCentral()
         //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repo.grails.org/grails/plugins-releases/"
+        mavenRepo "http://repo.grails.org/grails/plugins-releases/"
 	}
 	
 	dependencies {
@@ -60,16 +60,16 @@ grails.project.dependency.resolution = {
         test ('org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0')  { excludes "htmlunit" }
 		test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
-        test 'org.seleniumhq.selenium:selenium-support:2.25.0'	
+        test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 		test 'dumbster:dumbster:1.6'
 	
 	}
 	plugins {
         runtime( ':constraints:0.6.0' )
-        runtime( ':jquery-validation:1.7.3' ) {
+        runtime( ':jquery-validation:1.9' ) { // 1.7.3
             excludes ([ name: 'constraints'])
         }
-        runtime( ':jquery-validation-ui:1.1.1' ) {
+        runtime( ':jquery-validation-ui:1.4.7' ) { // 1.1.1
             excludes ([ name: 'constraints'])
         }
         /* spock from the grails repo doesn't work with grails 1.3
@@ -86,14 +86,16 @@ grails.project.dependency.resolution = {
 		runtime ':quartz2:0.2.2'
 		//runtime ':quartz:1.0-RC4'
 		//compile ':quartz:1.0-RC4'
-		
+
         test (name:'geb', version:'0.6.3')
 
         compile ":rendering:0.4.3"
-        //compile ":standalone:1.2.1"
+        //compile ":standalone:1.0"
         //compile ":burning-image:0.5.1"
         //compile ":settings:1.4"
         //compile ":symmetricds:2.4.0"
+
+        //compile ":grails-melody:1.46"
 
 	}
 }
