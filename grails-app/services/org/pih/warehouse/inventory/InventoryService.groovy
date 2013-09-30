@@ -152,14 +152,16 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List findInventoryItems(String searchTerm) {
-		return InventoryItem.withCriteria {
-			or {
-				ilike("lotNumber", "%" + searchTerm + "%")
-				product {
-					ilike("name", "%" + searchTerm + "%")
-				}
-			}
-		}
+
+        def results = InventoryItem.withCriteria {
+            createAlias('product', 'p', CriteriaSpecification.LEFT_JOIN)
+            or {
+                ilike("lotNumber", "%" + searchTerm + "%")
+                ilike("p.name", "%" + searchTerm + "%")
+                ilike("p.productCode", "%" + searchTerm + "%")
+            }
+        }
+        return results
 	}
 
 	List findInventoryItemsByProducts(List<Product> products) {

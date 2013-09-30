@@ -492,7 +492,7 @@ class JsonController {
 					quantity = (quantity) ?: 0
 					
 					def localizedName = localizationService.getLocalizedString(it.product.name)
-					
+					localizedName = (it.product.productCode?:"----") + " " + localizedName
 					if (quantity > 0) { 
 						inventoryItems << [
 							id: it.id,
