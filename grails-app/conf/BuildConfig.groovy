@@ -67,10 +67,10 @@ grails.project.dependency.resolution = {
 	plugins {
         runtime( ':constraints:0.6.0' )
         runtime( ':jquery-validation:1.9' ) { // 1.7.3
-            excludes ([ name: 'constraints'])
+            excludes 'constraints'
         }
         runtime( ':jquery-validation-ui:1.4.7' ) { // 1.1.1
-            excludes ([ name: 'constraints'])
+            excludes 'constraints', 'spock'
         }
         /* spock from the grails repo doesn't work with grails 1.3
            we've included our own build of it.
