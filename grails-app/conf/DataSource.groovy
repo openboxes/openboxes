@@ -34,7 +34,7 @@ dataSource {
 hibernate {
     generate_statistics=true
     cache.use_second_level_cache=true
-    cache.use_query_cache=true
+    cache.use_query_cache=false
     cache.provider_class='org.hibernate.cache.EhCacheProvider'
 }
 
@@ -86,5 +86,22 @@ environments {
 			url = "jdbc:mysql://localhost:3306/openboxes_client?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
+    aws {
+        dataSource {
+            pooled = true
+            driverClassName = "com.mysql.jdbc.Driver"
+            url = System.getProperty("JDBC_CONNECTION_STRING")
+            dialect = org.hibernate.dialect.MySQL5InnoDBDialect
+            properties {
+                validationQuery = "SELECT 1"
+                testOnBorrow = true
+                testOnReturn = true
+                testWhileIdle = true
+                timeBetweenEvictionRunsMillis = 1000 * 60 * 30
+                numTestsPerEvictionRun = 3
+                minEvictableIdleTimeMillis = 1000 * 60 * 30
+            }
+        }
+    }
 
 }
