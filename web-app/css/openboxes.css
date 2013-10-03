@@ -1000,6 +1000,12 @@ button.action-btn, button.previous, button.next {
 .actions .action-menu-item a {
     display: block;
     padding: 5px;
+    font-weight: normal;
+    color: #666;
+    font-size: 0.9em;
+    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
+    line-height: 12px;
+    text-align: left;
 }
 .actions .action-menu-item a:hover {
     display: block;
