@@ -67,7 +67,8 @@ class InventoryItem implements Serializable {
             "lotNumber":lotNumber,
             "expirationDate": expirationDate?.format("MM/dd/yyyy"),
             "quantityOnHand": quantity?: 0,
-            "quantityATP": quantity?: 0       //todo: quantity available to promise will coming soon
+            "quantityATP": quantity?: 0,       //todo: quantity available to promise will coming soon
+            "expires": expirationStatus
         ]
     }
 
@@ -90,6 +91,37 @@ class InventoryItem implements Serializable {
 		}
 		return false;
 	}
-	
+
+    def getExpirationStatus() {
+        def today = new Date()
+
+
+        if (expirationDate) {
+            def daysToExpiry = expirationDate - today
+            if (daysToExpiry <= 0) {
+                return "expired"
+            }
+            else if (daysToExpiry <= 30) {
+                return "within30Days"
+            }
+            else if (daysToExpiry <= 60) {
+                return "within60Days"
+            }
+            else if (daysToExpiry <= 90) {
+                return "within90Days"
+            }
+            else if (daysToExpiry <= 180) {
+                return "within180Days"
+            }
+            else if (daysToExpiry <= 365) {
+                return "within365Days"
+            }
+            else if (daysToExpiry > 365) {
+                return "greaterThan365Days"
+            }
+        }
+        return "never"
+    }
+
 	
 }
