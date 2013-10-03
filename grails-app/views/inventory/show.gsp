@@ -8,25 +8,7 @@
 <body>
     <div class="body">
 
-        <h2 class="middle">
-            Quantity On Hand Report
-            <g:if test="${command?.location}">
-                &rsaquo; ${command?.location?.name}
-            </g:if>
-            <g:if test="${command?.tag}">
-                &rsaquo; ${command?.tag?.tag}
-            </g:if>
-            <g:if test="${command?.startDate}">
-                &rsaquo; ${command?.startDate.format("MMM dd yyyy")}
-            </g:if>
-            <g:if test="${quantityMap}">
-                &rsaquo; ${quantityMap.keySet().size()} results
-            </g:if>
 
-
-
-
-        </h2>
 
 
         <%--
@@ -52,7 +34,7 @@
         <div class="yui-gf">
             <div class="yui-u first">
 
-                <div class="border-right" style="height:100%;">
+                <div class="box" style="height:100%;">
                     <g:form controller="inventory" action="search">
                         <div class="filters">
                             <div class="prop">
@@ -82,15 +64,30 @@
 
             </div>
             <div class="yui-u">
-                <div class="left">
-                    <g:if test="${quantityMap}">
-                        <g:link class="button icon log" controller="inventory" action="download" params="[startDate:command.startDate.format('MM/dd/yyyy'), location: command?.location?.id, tag: command?.tag?.id]">
-                            Download CSV
-                        </g:link>
-                    </g:if>
-                </div>
-                <div class="clear"></div>
+
                 <div class="box">
+                    <h2 class="middle">
+                        Quantity On Hand Report
+                        <g:if test="${command?.location}">
+                            &rsaquo; ${command?.location?.name}
+                        </g:if>
+                        <g:if test="${command?.tag}">
+                            &rsaquo; ${command?.tag?.tag}
+                        </g:if>
+                        <g:if test="${command?.startDate}">
+                            &rsaquo; ${command?.startDate.format("MMM dd yyyy")}
+                        </g:if>
+                        <g:if test="${quantityMap}">
+                            &rsaquo; ${quantityMap.keySet().size()} results
+                        </g:if>
+                    </h2>
+                    <div class="right" style="padding: 15px;">
+                        <g:if test="${quantityMap}">
+                            <g:link class="button icon log" controller="inventory" action="download" params="[startDate:command.startDate.format('MM/dd/yyyy'), location: command?.location?.id, tag: command?.tag?.id]">
+                                Download CSV
+                            </g:link>
+                        </g:if>
+                    </div>
                     <table>
                         <thead>
                         <tr>
@@ -128,13 +125,14 @@
                             </tr>
                         </g:each>
                     </table>
+                    <g:unless test="${quantityMap}">
+                        <div class="empty center">
+                            <warehouse:message code="default.noresults.label" default="No results"/>
+                        </div>
+                    </g:unless>
                 </div>
-                <g:unless test="${quantityMap}">
-                    <div class="empty box center">
-                        <warehouse:message code="default.noresults.label" default="No results"/>
-                    </div>
-                </g:unless>
             </div>
+        </div>
 
     </div>
     </div>
