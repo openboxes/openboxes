@@ -6,33 +6,29 @@
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
 		<table>
 			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="transaction.date.label"/></label>
-				</td>
 				<td class="value">
-					<span>
+					<label><warehouse:message code="transaction.date.label"/></label>
+					<div>
 						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
 								value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>								
+					</div>
 				</td>
 			</tr>	
 			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="transaction.comment.label"/></label>
-				</td>
 				<td class="value">
-					<span class="value">
-						<g:textArea cols="80" rows="1" name="transactionInstance.comment" 
+					<label><warehouse:message code="transaction.comment.label"/></label>
+					<div class="value">
+						<g:textArea cols="80" rows="5" name="transactionInstance.comment"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
-					</span>								
+					</div>
 				</td>
 			</tr>				
 			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="transaction.transactionEntries.label"/></label>
-				</td>
 				<td style="padding: 0px;">
+                    <%--
+                    <label><warehouse:message code="transaction.transactionEntries.label"/></label>
+					--%>
 					<div>
 						<table id="inventoryTable">
 							<thead>
@@ -146,12 +142,12 @@
 			<tr class="prop">
 				<td colspan="7">
 					<div class="center">
-						<button type="submit" name="save">								
+						<button type="submit" name="save" class="button icon approve">
 							<warehouse:message code="default.button.save.label"/>
 						</button>
 						&nbsp;
-						<g:link controller="inventory" action="browse">
-							${warehouse.message(code: 'default.button.back.label')}
+						<g:link controller="inventory" action="browse" class="button icon trash">
+							${warehouse.message(code: 'default.button.cancel.label')}
 						</g:link>
 					</div>
 				</td>
