@@ -29,7 +29,7 @@ class DashboardController {
 
 	def orderService
 	def shipmentService
-	//def inventoryService
+	def inventoryService
 	def productService
     def requisitionService
 	def sessionFactory
@@ -280,6 +280,13 @@ class DashboardController {
 	}
 
 
+    def expirationSummary = {
+        def location = Location.get(session.warehouse.id)
+        def results = inventoryService.getExpirationSummary(location)
+
+        render results as JSON
+    }
+
     def hideTag = {
         Tag tag = Tag.get(params.id)
         tag.isActive = false
@@ -340,7 +347,7 @@ class DashboardController {
             outgoingShipments: outgoingShipments,
 			outgoingShipmentsCount: outgoingShipmentsCount,
 			incomingOrders: incomingOrders,
-                requisitionStatistics: requisitionStatistics,
+            requisitionStatistics: requisitionStatistics,
 			//incomingRequests: incomingRequests,
 			//outgoingRequests: outgoingRequests,
             //requisitionTemplates: requisitionTemplates,

@@ -48,14 +48,22 @@
                     success: function (data) {
                         console.log(data);
                         // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
-                        $('#lowStockCount').html(data.lowStock);
-                        $('#overStockCount').html(data.overStock);
-                        $('#reconditionedStockCount').html(data.reconditionedStock);
-                        $('#totalStockCount').html(data.totalStock);
-                        $('#inStockCount').html(data.inStock);
-                        $('#onHandQuantityZeroCount').html(data.onHandQuantityZero);
-                        $('#outOfStockCount').html(data.outOfStock);
-                        $('#reorderStockCount').html(data.reorderStock);
+                        $('#lowStockCount').html(data.lowStock?data.lowStock:0);
+                        $('#overStockCount').html(data.overStock?data.overStock:0);
+                        $('#reconditionedStockCount').html(data.reconditionedStock?data.reconditionedStock:0);
+                        $('#totalStockCount').html(data.totalStock?data.totalStock:0);
+                        $('#inStockCount').html(data.inStock?data.inStock:0);
+                        $('#onHandQuantityZeroCount').html(data.onHandQuantityZero?data.onHandQuantityZero:0);
+                        $('#outOfStockCount').html(data.outOfStock?data.outOfStock:0);
+                        $('#reorderStockCount').html(data.reorderStock?data.reorderStock:0);
+                        // Expiration
+                        $('#expiredStockCount').html(data.expired?data.expired:0);
+                        $('#expiringIn30DaysStockCount').html(data.within30Days?data.within30Days:0);
+                        $('#expiringIn60DaysStockCount').html(data.within60Days?data.within60Days:0);
+                        $('#expiringIn90DaysStockCount').html(data.within90Days?data.within90Days:0);
+                        $('#expiringIn180DaysStockCount').html(data.within180Days?data.within180Days:0);
+                        $('#expiringIn365DaysStockCount').html(data.within365Days?data.within365Days:0);
+
                     },
                     error: function(xhr, status, error) {
                         console.log(xhr);
@@ -69,6 +77,13 @@
                         $('#inStockCount').html("ERROR: " + error);
                         $('#outOfStockCount').html("ERROR: " + error);
                         $('#reorderStockCount').html("ERROR: " + error);
+                        // Expiration
+                        $('#expiredStockCount').html("");
+                        $('#expiringIn30DaysStockCount').html("");
+                        $('#expiringIn60DaysStockCount').html("");
+                        $('#expiringIn90DaysStockCount').html("");
+                        $('#expiringIn180DaysStockCount').html("");
+                        $('#expiringIn365DaysStockCount').html("");
 
                     }
                 });
@@ -81,11 +96,11 @@
                 //$('#lowStockCount').load('${request.contextPath}/json/getLowStockCount?location.id=${session.warehouse.id}');
                 //$('#overStockCount').load('${request.contextPath}/json/getOverStockCount?location.id=${session.warehouse.id}');
                 //$('#reorderStockCount').load('${request.contextPath}/json/getReorderStockCount?location.id=${session.warehouse.id}');
-                $('#expiredStockCount').load('${request.contextPath}/json/getExpiredStockCount?location.id=${session.warehouse.id}');
-                $('#expiringIn30DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=30');
-                $('#expiringIn90DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=90');
-                $('#expiringIn180DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=180');
-                $('#expiringIn365DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=365');
+                //$('#expiredStockCount').load('${request.contextPath}/json/getExpiredStockCount?location.id=${session.warehouse.id}');
+                //$('#expiringIn30DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=30');
+                //$('#expiringIn90DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=90');
+                //$('#expiringIn180DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=180');
+                //$('#expiringIn365DaysStockCount').load('${request.contextPath}/json/getExpiringStockCount?location.id=${session.warehouse.id}&daysUntilExpiry=365');
 
                 $(".spinner").click(function() {
                     $(this).hide();

@@ -222,9 +222,21 @@ class JsonController {
 
     @Cacheable("dashboardCache")
     def getDashboardAlerts = {
-        def location = Location.get(params?.location?.id)
-        def map = inventoryService.getDashboardAlerts(location)
-        //throw new Exception("yikes!")
+        def location = Location.get(session?.warehouse?.id)
+        def dashboardAlerts = inventoryService.getDashboardAlerts(location)
+
+        def expirationSummary = inventoryService.getExpirationSummary(location)
+        expirationSummary.each { key, value ->
+            dashboardAlerts[key] = value;
+        }
+
+        render dashboardAlerts as JSON
+    }
+
+    @Cacheable("dashboardCache")
+    def getDashboardExpiryAlerts = {
+        def location = Location.get(session?.warehouse?.id)
+        def map = inventoryService.getExpirationAlerts(location)
         render map as JSON
     }
 

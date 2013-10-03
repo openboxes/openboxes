@@ -600,6 +600,39 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
+    def getExpirationSummary(location) {
+        def expirationSummary = [:]
+        def expirationAlerts = getExpirationAlerts(location)
+        expirationAlerts.groupBy { it?.inventoryItem?.expires }.each { key, value ->
+            expirationSummary[key] = value.size()
+
+        }
+        return expirationSummary
+    }
+
+    def getExpirationAlerts(location) {
+        def startTime = System.currentTimeMillis()
+
+        def expirationAlerts = []
+        def today = new Date()
+        def quantityMap = getQuantityForInventory(location.inventory)
+
+        quantityMap.each { key, value ->
+            if (value > 0) {
+                def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
+                expirationAlerts << [ id:  key.id, lotNumber: key.lotNumber, quantity: value,
+                    expirationDate: key.expirationDate, daysToExpiry: daysToExpiry,
+                    product: key.product.toJson(), inventoryItem: key.toJson()
+                ]
+            }
+        }
+
+        println "Expiration alerts: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        return expirationAlerts
+
+    }
+
 
 
 	/**

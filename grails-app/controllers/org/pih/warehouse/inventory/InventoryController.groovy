@@ -44,8 +44,6 @@ class InventoryController {
 	 */
     //@Cacheable("inventoryControllerCache")
 	def browse = { InventoryCommand cmd ->
-
-
         if(!params.max) params.max = 10
         if(!params.offset) params.offset = 0
 
