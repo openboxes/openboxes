@@ -318,7 +318,8 @@ class ShipmentService {
 	 */
 	List<ShipmentItem> getPendingShipmentItemsWithProduct(Location location, Product product) {
 		def shipmentItems = []
-		def shipments = getPendingShipments(location);		
+		def shipments = getPendingShipments(location);
+        shipments.addAll(getIncomingShipments(location));
 		
 		shipments.each { 
 			def shipmentItemList = it.shipmentItems.findAll { it.product == product }

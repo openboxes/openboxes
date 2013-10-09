@@ -33,7 +33,7 @@
 					<!--  Shipment Log -->
 					<tbody>			
 						<g:set var="anyPendingShipments" value="${false }"/>							
-						<g:each var="entry" in="${shipmentMap}" status="status">
+						<g:each var="entry" in="${commandInstance?.shipmentMap}" status="status">
 							<g:set var="shipment" value="${entry.key }"/>
 
                             <g:set var="anyPendingShipments" value="${true }"/>
@@ -60,7 +60,7 @@
                                     ${shipment?.destination?.name }
                                 </td>
                                 <td class="center">
-                                    ${entry.value}
+                                    ${entry.value} ${commandInstance?.productInstance?.unitOfMeasure}
                                 </td>
                                 <td class="center">
                                     ${shipment.status }
