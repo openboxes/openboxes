@@ -40,7 +40,7 @@
                             <div class="prop">
                                 <label>Select a location</label>
                                 <div>
-                                    <g:selectLocation name="location" class="chzn-select-deselect" value="${command?.location?.id}" noSelection="['':'']"/>
+                                    <g:selectLocation name="location.id" multiple="true" class="chzn-select-deselect" value="${command?.locations?.id}" noSelection="['':'']"/>
                                 </div>
                             </div>
                             <div class="prop">
@@ -50,9 +50,21 @@
                                 </div>
                             </div>
                             <div class="prop">
-                                <label>Select a date</label>
+                                <label>Select a start date</label>
                                 <div>
                                     <g:jqueryDatePicker id="startDate" name="startDate" value="${command?.startDate}" format="MM/dd/yyyy" size="30"/>
+                                </div>
+                            </div>
+                            <div class="prop">
+                                <label>Select an end date</label>
+                                <div>
+                                    <g:jqueryDatePicker id="endDate" name="endDate" value="${command?.endDate}" format="MM/dd/yyyy" size="30"/>
+                                </div>
+                            </div>
+                            <div class="prop">
+                                <label>Frequency</label>
+                                <div>
+                                    <g:select name="frequency" value="${command?.frequency}" from="['','Daily','Weekly','Monthly','Quarterly','Annually']" class="chzn-select-deselect" />
                                 </div>
                             </div>
                             <div class="prop">
@@ -68,8 +80,11 @@
                 <div class="box">
                     <h2 class="middle">
                         Quantity On Hand Report
-                        <g:if test="${command?.location}">
-                            &rsaquo; ${command?.location?.name}
+                        <%--
+                        <g:if test="${command?.locations}">
+                            <g:each var="location" in="${command?.locations}">
+                                &rsaquo; ${location?.name}
+                            </g:each>
                         </g:if>
                         <g:if test="${command?.tag}">
                             &rsaquo; ${command?.tag?.tag}
@@ -77,36 +92,44 @@
                         <g:if test="${command?.startDate}">
                             &rsaquo; ${command?.startDate.format("MMM dd yyyy")}
                         </g:if>
-                        <g:if test="${quantityMap}">
-                            &rsaquo; ${quantityMap.keySet().size()} results
+                        --%>
+                        <g:if test="${command?.products}">
+                            (${command?.products.size()} results)
                         </g:if>
                     </h2>
                     <div class="right" style="padding: 15px;">
+                        <%--
                         <g:if test="${quantityMap}">
                             <g:link class="button icon log" controller="inventory" action="download" params="[startDate:command.startDate.format('MM/dd/yyyy'), location: command?.location?.id, tag: command?.tag?.id]">
                                 Download CSV
                             </g:link>
                         </g:if>
+                        --%>
                     </div>
                     <table>
                         <thead>
-                        <tr>
-                            <th width="25px;"><warehouse:message code="product.productCode.label"/></th>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="product.manufacturer.label"/></th>
-                            <th><warehouse:message code="product.vendor.label"/></th>
-                            <th class="right"><warehouse:message code="default.quantity.label"/></th>
-                            <th><warehouse:message code="product.uom.label"/></th>
-                        </tr>
+                            <tr>
+                                <th width="25px;"><warehouse:message code="product.productCode.label"/></th>
+                                <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="product.uom.label"/></th>
+                                <th><warehouse:message code="product.manufacturer.label"/></th>
+                                <th><warehouse:message code="product.vendor.label"/></th>
+                                <g:each var="date" in="${command?.dates}">
+                                    <th class="right"><g:formatDate date="${date}" format="MMM dd"/></th>
+                                </g:each>
+                            </tr>
                         </thead>
-                        <g:each var="entry" in="${quantityMap.sort()}" status="i">
-                            <g:set var="product" value='${entry?.key}'/>
+                        <g:each var="product" in="${command?.products}" status="i">
+
                             <tr class="${i%2?'even':'odd'} prop">
                                 <td>
                                     ${product?.productCode}
                                 </td>
                                 <td>
                                     <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">${product?.name}</g:link>
+                                </td>
+                                <td>
+                                    ${product?.unitOfMeasure}
                                 </td>
                                 <td>
                                     ${product?.manufacturer}
@@ -116,16 +139,15 @@
                                     ${product?.vendor}
                                     ${product?.vendorCode}
                                 </td>
-                                <td class="right">
-                                    <g:formatNumber number="${entry.value}"/>
-                                </td>
-                                <td>
-                                    ${product?.unitOfMeasure}
-                                </td>
+                                <g:each var="date" in="${command.dates}">
+                                    <td class="right">
+                                        <g:formatNumber number="${quantityMapByDate[date][product]}"/>
+                                    </td>
+                                </g:each>
                             </tr>
                         </g:each>
                     </table>
-                    <g:unless test="${quantityMap}">
+                    <g:unless test="${quantityMapByDate}">
                         <div class="empty center">
                             <warehouse:message code="default.noresults.label" default="No results"/>
                         </div>

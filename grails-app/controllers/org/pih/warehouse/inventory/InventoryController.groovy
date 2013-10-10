@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -181,20 +182,78 @@ class InventoryController {
 	}
 
 	def search = { QuantityOnHandReportCommand command ->
+        def startTime = System.currentTimeMillis()
         println "search " + params
 
-        //def location = Location.get(params.location)
         if (!command?.startDate) command.startDate = new Date();
-        if (!command?.location) command.location = Location.get(session.location.id)
+        if (!command?.locations) {
+            command.locations = [Location.get(session?.warehouse?.id)]
+        }
         //def transactions = Transaction.findAllByInventory(location.inventory)
         //def transactionEntries = (transactions*.transactionEntries).flatten()
         //log.info "transactionEntries: " + transactionEntries.size()
         //def quantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
-        println command?.location?.name + " " + command?.startDate + " " + command.tag
-        def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tag)
+        println command?.locations?.toString() + " " + command?.startDate + " " + command.tag
+        def quantityMapByDate = [:]
+        if (command.startDate && command.endDate) {
+            //def duration = command?.endDate - command?.startDate
+            //command.dates = new Date[duration+1]
+            //(command?.startDate .. command?.endDate).eachWithIndex { date, i ->
+            //    println "Date " + date + " i " + i
+            //    command.dates[i] = date
+            //}
 
-        println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
-        render(view: "show", model: [location: command.location, quantityMap: quantityMap, command: command])
+
+            def date = command?.startDate
+            def count = 0;
+            while(date < command?.endDate || count > 10) {
+                command?.dates << date
+                if (params.frequency in ['Daily','Weekly']) {
+                    def daysToAdd = (params.frequency=='Weekly')?7:1
+                    date += daysToAdd
+                }
+                else if (params.frequency in ['Monthly']) {
+                    use(TimeCategory) {
+                        date = date.plus(1.month)
+                    }
+                }
+                else if (params.frequency in ['Quarterly']) {
+                    use(TimeCategory) {
+                        date = date.plus(3.month)
+                    }
+                }
+                count++
+            }
+
+            println "dates : " + command?.dates
+
+        }
+
+        else if (command.startDate) {
+            command?.dates << command?.startDate
+        }
+        else if (command.endDate) {
+            command?.dates << command?.endDate
+        }
+
+        println "dates: " + command?.dates
+
+        command.locations.each { location ->
+            for (date in command?.dates) {
+                println "Get quantity map " + date + " location = " + location
+                def quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tag)
+                quantityMapByDate[date] = quantityMap
+                println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
+                println "Time " + (System.currentTimeMillis() - startTime) + " ms"
+            }
+        }
+
+        def keys = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
+        println "keys: " + keys
+        keys.each { product ->
+            command.products << product
+        }
+        render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
 
     }
 
@@ -1511,10 +1570,15 @@ class ConsumptionCommand {
 	}
 
 class QuantityOnHandReportCommand {
-    Location location
+    //Location location
+    List locations = []
+    List dates = []
+    List products = []
     Tag tag
     Date startDate
     Date endDate
+    String frequency
+
 
     static constraints = {
 
