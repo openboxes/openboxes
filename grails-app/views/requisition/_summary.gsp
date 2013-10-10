@@ -1,4 +1,5 @@
-<div id="requisition-summary">
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemType" %>
+<div id="requisition-summary" xmlns="http://www.w3.org/1999/html">
 	<g:if test="${requisition?.id}">
 		<table>
 			<tbody>			
@@ -60,6 +61,17 @@
                                 <warehouse:message code="default.createdBy.label"/>:
                                 <b>${requisition?.createdBy?.name}</b>
                             </span>
+                            <span class="fade">&nbsp;|&nbsp;</span>
+                            <span id="requisition-items">
+                                <warehouse:message code="requisition.requisitionItems.label"/>:
+                                <b>${requisition?.requisitionItems?.size()?:0}</b>
+                            </span>
+                            <span class="fade">&nbsp;|&nbsp;</span>
+                            <span id="requisition-items">
+                                <warehouse:message code="picklist.picklistItems.label"/>:
+                                <b><g:link controller="picklist" action="show" id="${picklist?.id}">${picklist?.picklistItems?.size()?:0}</g:link></b>
+                            </span>
+
 
 							<%--
 							<span class="fade">&nbsp;|&nbsp;</span>
@@ -82,21 +94,22 @@
 								<warehouse:message code="requisition.recipient.label"/>:
 	                           <b>${requisition?.recipient?.name?:warehouse.message(code: 'default.none.label')}</b>
 							</span>							
-							 --%>	
+							 --%>
 						</div>
 					</td>
 					<td class="middle">
 						<div class="center">
-                                <div class="box">
-                                    <div class="title ">
-                                        <format:metadata obj="${requisition?.status }"/>
-                                    </div>
-                                    <g:if test="${requisition.lastUpdated}">
-                                        <span class="fade">
-                                            <format:datetime obj="${requisition.lastUpdated}"/>
-                                        </span>
-                                    </g:if>
+                            <div class="box">
+                                <div class="title ">
+                                    <format:metadata obj="${requisition?.status }"/>
                                 </div>
+                                <g:if test="${requisition.lastUpdated}">
+                                    <span class="fade">
+                                        <warehouse:message code="default.lastUpdated.label" default="Last updated"/>
+                                        <g:prettyDateFormat date="${requisition.lastUpdated}"/>
+                                    </span>
+                                </g:if>
+                            </div>
 							<div class="clear"></div>
 						</div>
 

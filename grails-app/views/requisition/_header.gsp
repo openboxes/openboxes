@@ -41,6 +41,20 @@
 
                     </td>
                 </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message
+                                code="requisition.requisitionItemsByStatus.label" default="Item status"/></label>
+                    </td>
+                    <td class="value">
+                        <g:set var="itemsByStatus" value="${requisition.requisitionItems.groupBy { it.status }}"/>
+                        <g:each var="status" in="${itemsByStatus.keySet()}">
+                            <div>
+                                <format:metadata obj="${status}"/> <span class="circle">${itemsByStatus[status].size()}</span>
+                            </div>
+                        </g:each>
+                    </td>
+                </tr>
 
                 <tr class="prop">
                     <td class="name"><label><warehouse:message

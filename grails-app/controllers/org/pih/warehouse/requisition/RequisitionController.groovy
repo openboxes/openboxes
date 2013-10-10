@@ -235,15 +235,52 @@ class RequisitionController {
 		
 	}
 	
-	
+    def normalize = {
+        def requisition = Requisition.get(params.id)
+        requisition?.requisitionItems?.each { requisitionItem ->
+            if (requisitionItem.requisitionItems) {
+                if (requisitionItem.requisitionItems.size() > 1) {
+                    throw new Exception("Cannot have more than one change per requisition item")
+                }
+                else {
+                    requisitionItem.requisitionItems.each { childItem ->
+                        println "Requisition item of type " + childItem.requisitionItemType + " is being normalized."
+
+                        if (childItem.requisitionItemType == RequisitionItemType.SUBSTITUTION) {
+                            requisitionItem.substitutionItem = childItem
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.PACKAGE_CHANGE) {
+                            requisitionItem.modificationItem = childItem
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.QUANTITY_CHANGE) {
+                            requisitionItem.modificationItem = childItem
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.ORIGINAL) {
+                            throw new Exception("Original requisition item cannot be modified")
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.ADDITION) {
+                            throw new Exception("Addition operation not supported")
+                        }
+                        else {
+                            throw new Exception("Operation not supported")
+                        }
+                    }
+                }
+            }
+        }
+        redirect(action: "review", id: requisition.id)
+
+    }
+
+
 	def review = {
 		def requisition = Requisition.get(params.id)
+
         if (requisition.status < RequisitionStatus.VERIFYING) {
             requisition.status = RequisitionStatus.VERIFYING
             requisition.save(flush:true)
         }
 
-		
 		if (!requisition) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
@@ -255,29 +292,25 @@ class RequisitionController {
             def quantityOnHandMap = [:]
 
             def products = requisition.requisitionItems.collect { it.product }
-
             def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
 
             requisition?.requisitionItems?.each { requisitionItem ->
                 quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
                     //inventoryService.getQuantityOnHand(location, requisitionItem?.product)
-                quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
+                //quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
                     //inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
             }
 
-
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-            def quantityOnHand = (requisitionItem)?inventoryService.getQuantityOnHand(location, requisitionItem?.product):0
-            def quantityOutgoing = (requisitionItem)?inventoryService.getQuantityToShip(location, requisitionItem?.product):0
-     //       def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
+            //def quantityOnHand = (requisitionItem)?inventoryService.getQuantityOnHand(location, requisitionItem?.product):0
+            //def quantityOutgoing = (requisitionItem)?inventoryService.getQuantityToShip(location, requisitionItem?.product):0
+            //def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
+
 
 			println "Requisition Status: " + requisition.id + " [" + requisition.status + "]"
-			return [requisition: requisition,
+			[requisition: requisition,
                     quantityOnHandMap:quantityOnHandMap,
-                    quantityAvailableToPromiseMap:quantityAvailableToPromiseMap,
-                    selectedRequisitionItem: requisitionItem,
-                    quantityOnHand: quantityOnHand,
-                    quantityOutgoing:quantityOutgoing]
+                    selectedRequisitionItem: requisitionItem]
 		}
     }
 
@@ -421,7 +454,19 @@ class RequisitionController {
 			response.sendError(404)
 		}
 	}
-	
+
+    def generatePicklist = {
+        def requisition = Requisition.get(params?.id)
+        requisitionService.generatePicklist(requisition)
+
+        redirect(action:  "pick", id:  requisition?.id)
+    }
+
+    def clearPicklist = {
+        def requisition = Requisition.get(params?.id)
+        requisitionService.clearPicklist(requisition)
+        redirect(action:  "pick", id:  requisition?.id)
+    }
 	
 	def pickNextItem = {
         def nextItem

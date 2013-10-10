@@ -151,14 +151,15 @@ class RequisitionItemController {
     def delete = {
 		
 		println "Delete requisition item " + params
+        def requisitionItemId = 0
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (requisitionItemInstance) {
             try {
 				def requisition = requisitionItemInstance.requisition
-				
-				if (requisitionItemInstance.parentRequisitionItem) { 
-					requisitionItemInstance.parentRequisitionItem.removeFromRequisitionItems(requisitionItemInstance)
-				}
+                requisitionItemId = requisitionItemInstance.parentRequisitionItem
+				//if (requisitionItemInstance.parentRequisitionItem) {
+					//requisitionItemInstance.parentRequisitionItem.removeFromRequisitionItems(requisitionItemInstance)
+				//}
 				
     			requisition.removeFromRequisitionItems(requisitionItemInstance)
 	            requisitionItemInstance.delete(flush: true)
@@ -169,14 +170,14 @@ class RequisitionItemController {
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
                 //redirect(action: "list", id: params.id)
-				redirect(controller: "requisition", action: "review", id: requisition?.id)
+				redirect(controller: "requisition", action: "review", id: requisition?.id, params: ['requisitionItem.id':requisitionItemId])
 				
             }
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
             //redirect(action: "list")
-			redirect(controller: "requisition", action: "review", id: requisition?.id)
+			redirect(controller: "requisition", action: "review", id: requisition?.id, params: ['requisitionItem.id':requisitionItemId])
         }
     }
 
@@ -237,7 +238,7 @@ class RequisitionItemController {
             redirect(controller: "requisition", action: "list")
             return
         }
-        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
+        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id':requisitionItem?.id])
     }
 
     /**
@@ -250,7 +251,7 @@ class RequisitionItemController {
             requisitionItem.approveQuantity()
             def redirectAction = params?.redirectAction ?: "review"
             // params:['requisitionItem.id':requisitionItem.id]
-            redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id)
+            redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id, params: ['requisitionItem.id':requisitionItem.id])
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
@@ -310,12 +311,12 @@ class RequisitionItemController {
             redirect(controller: "requisition", action: "list")
             return;
         }
-        redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id)
+        redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id, params: ['requisitionItem.id':requisitionItem.id])
 
     }
 
 
-    /** ========================================================================================================================= */
+    /** =========================================================================================================================,  */
 
     /**
      *
@@ -421,7 +422,7 @@ class RequisitionItemController {
             requisitionItem.cancelComments = null
             requisitionItem.cancelReasonCode = null
             requisitionItem.quantityCanceled = 0
-            requisitionItem.requisitionItems.clear();
+            //requisitionItem.requisitionItems.clear();
             requisitionItem.save(flush: true)
         } catch(Exception e) {
             flash.message = "Unable to undo quantity change: " + e.message

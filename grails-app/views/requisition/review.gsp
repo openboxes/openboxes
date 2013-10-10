@@ -1,4 +1,5 @@
-
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<g:set var="startTime" value="${System.currentTimeMillis()}"/>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -6,11 +7,20 @@
         <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition').toLowerCase()}" />
         <title><warehouse:message code="default.review.label" args="[entityName]" /></title>
         <style>
-            .selected { color: #666; }
-            .unselected { color: #ccc;}
+
+        tr.selected-top { border-top: 5px solid #f3961c; border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }
+        /*tr.selected, tr.selected a:not(.button) { color: black; font-size: 1.2em; font-weight: bold; }*/
+        tr.selected-middle { border-left: 5px solid #f3961c; }
+        tr.selected-bottom { border-bottom: 5px solid #f3961c; border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }
+
+            /*.selected { color: #666; background-color: #fff2a8; border-left: 5px solid #a8d1ff;}*/
+            /*.unselected { color: #ccc;}*/
+            /*.unavailable { background: #FBE3E4; color: #8a1f11; border-color: #FBC2C4;}
+            .available { background: #E6EFC2; color: #264409; border-color: #C6D880; }*/
             .unavailable { background: #FBE3E4; color: #8a1f11; border-color: #FBC2C4;}
-            .available { background: #E6EFC2; color: #264409; border-color: #C6D880; }
-        </style>
+            .available { background: #a8d1ff; color: #264409; border-color: black; } /* border-color: #C6D880; */
+
+            </style>
     </head>
     <body>
         <div class="body">
@@ -24,10 +34,7 @@
             </g:hasErrors>
 
             <div class="dialog">
-            
                 <g:render template="summary" model="[requisition:requisition]"/>
-
-
                 <div class="yui-gf">
                     <div class="yui-u first">
                         <g:render template="header" model="[requisition:requisition]"/>
@@ -41,19 +48,19 @@
                             <g:form controller="requisition" action="saveDetails">
                                 <g:hiddenField name="redirectAction" value="review"/>
                                 <g:hiddenField name="id" value="${requisition?.id}"/>
-                                <table style="width:auto;">
+                                <div class="box">
+                                <table>
                                     <tr>
-                                        <td class="left middle">
+                                        <td class="left bottom">
                                             <label>
                                                 ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
                                             </label>
-                                        </td>
-                                        <td class="middle">
+
                                             <g:if test="${params.edit}">
                                                 <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="day"/>
                                             </g:if>
                                             <g:else>
-                                                <g:if test="${requisition.dateVerified}">
+                                                <g:if test="${requisition?.dateVerified}">
                                                     <g:formatDate date="${requisition?.dateVerified}" format="dd MMMMM yyyy"/>
                                                 </g:if>
                                                 <g:else>
@@ -61,17 +68,13 @@
                                                 </g:else>
                                             </g:else>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="left middle">
+                                        <td class="left bottom">
                                             <label>
                                                 ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
                                             </label>
-                                        </td>
-                                        <td class="middle">
                                             <g:if test="${params.edit}">
-                                                <g:selectPerson id="verifiedBy" name="verifiedBy.id" value="${requisition?.verifiedBy}"
-                                                                noSelection="['null':'']" size="40"/>
+                                                    <g:selectPerson id="verifiedBy" name="verifiedBy.id" value="${requisition?.verifiedBy}"
+                                                                    noSelection="['null':'']" size="40"/>
                                             </g:if>
                                             <g:else>
                                                 <g:if test="${requisition.verifiedBy}">
@@ -82,7 +85,8 @@
                                                 </g:else>
                                             </g:else>
                                         </td>
-                                        <td>
+                                        <td class="left middle">
+
                                             <g:if test="${params.edit}">
                                                 <button class="button icon approve">
                                                     ${warehouse.message(code:'default.button.save.label')}
@@ -95,7 +99,7 @@
                                             <g:else>
                                                 <g:link controller="requisition" action="review" id="${requisition?.id}"
                                                         params="[edit:'on']" class="button icon edit">
-                                                    ${warehouse.message(code:'default.button.edit.label')}
+                                                    ${warehouse.message(code:'default.button.edit.label', default: 'Edit')}
                                                 </g:link>
                                             </g:else>
                                         </td>
@@ -103,15 +107,21 @@
 
 
                                 </table>
+                                </div>
                             </g:form>
-
                             <hr/>
                             <br/>
-                            <table class="zebra">
+                            <table id="requisitionItems">
                                 <thead>
                                     <tr class="odd">
+                                        <th>
+
+                                        </th>
                                         <th class='center'>
                                             <warehouse:message code="default.actions.label"/>
+                                        </th>
+                                        <th>
+                                            <warehouse:message code="requisitionItem.status.label" default="Status" />
                                         </th>
                                         <th>
                                             <warehouse:message code="product.productCode.label" />
@@ -119,20 +129,17 @@
                                         <th>
                                             <warehouse:message code="requisitionItem.product.label" />
                                         </th>
+                                        <th>
+                                            <warehouse:message code="product.unitOfMeasure.label" />
+                                        </th>
                                         <th class="center">
-                                            <warehouse:message code="requisitionItem.status.label" default="Status" />
+                                            <warehouse:message code="requisitionItem.reasonCode.label" default="Reason Code" />
                                         </th>
                                         <th class="center ">
                                             <warehouse:message code="requisitionItem.quantityRequested.label" />
                                         </th>
                                         <th class="center">
-                                            <warehouse:message code="requisitionItem.totalQuantity.label" default="Quantity total" />
-                                        </th>
-                                        <th class="center">
                                             <warehouse:message code="requisitionItem.quantityAvailable.label" default="Quantity available" />
-                                        </th>
-                                        <th class="center">
-                                            <warehouse:message code="requisitionItem.productPackage.label" default="UOM" />
                                         </th>
                                         <th class="center">
                                             <warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" />
@@ -147,36 +154,725 @@
                                         </tr>
                                     </g:if>
                                     <g:set var="count" value="${0}"/>
+                                <% System.out.println("Time 0: " + (System.currentTimeMillis() - startTime) + " ms") %>
+                                <g:set var="startTime" value="${System.currentTimeMillis()}"/>
                                     <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
+
+                                        <g:set var="requisitionStartTime" value="${System.currentTimeMillis()}"/>
+
                                         <g:if test="${!requisitionItem.parentRequisitionItem}">
+                                            <%--
                                             <g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:count++]"/>
+                                            --%>
+                                                        <g:set var="selected" value="${requisitionItem == selectedRequisitionItem}"/>
+                                                        <g:set var="quantityOnHand" value="${quantityOnHandMap[requisitionItem?.product?.id]} "/>
+                                                        <g:set var="substitution" value="${requisitionItem?.substitution}"/>
+                                                        <g:set var="quantityOnHandForSubstitution" value="${quantityOnHandMap[substitution?.product?.id]} "/>
+                                                        <g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
+                                                        <%-- Need to hack this in since the quantityOnHand value was a String --%>
+                                                        <g:set var="isCanceled" value="${requisitionItem?.isCanceled()}"/>
+                                                        <g:set var="isChanged" value="${requisitionItem?.isChanged()}"/>
+                                                        <g:set var="hasSubstitution" value="${requisitionItem?.hasSubstitution()}"/>
+                                                        <g:set var="quantityOnHand" value="${quantityOnHand.toInteger()}"/>
+                                                        <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
+                                                        <g:set var="isAvailableForSubstitution" value="${hasSubstitution && (quantityOnHandForSubstitution > 0) && (quantityOnHandForSubstitution >= requisitionItem?.substitution?.totalQuantity()) }"/>
+                                                        <tr class="prop ${(count++ % 2) == 0 ? 'odd' : 'even'} ${!selectedRequisitionItem?'':selected?'selected':'unselected'}">
+
+                                                            <td class="middle left">
+                                                                <div class="action-menu">
+                                                                    <span class="action-btn">
+                                                                        <g:if test="${requisitionItem?.isCanceled()}">
+                                                                            <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
+                                                                        </g:if>
+                                                                        <g:elseif test="${requisitionItem?.isSubstituted()}">
+                                                                            <img src="${resource(dir:'images/icons/silk', file: 'arrow_switch.png')}"/>
+                                                                        </g:elseif>
+                                                                        <g:elseif test="${requisitionItem?.isApproved()}">
+                                                                            <img src="${resource(dir:'images/icons/silk', file: 'accept.png')}"/>
+                                                                        </g:elseif>
+                                                                        <g:elseif test="${requisitionItem?.isChanged()}">
+                                                                            <img src="${resource(dir:'images/icons/silk', file: 'pencil.png')}"/>
+                                                                        </g:elseif>
+                                                                        <g:elseif test="${requisitionItem?.isPending()}">
+                                                                            <img src="${resource(dir:'images/icons/silk', file: 'hourglass.png')}"/>
+                                                                        </g:elseif>
+                                                                        <g:else>
+                                                                            <img src="${resource(dir:'images/icons/silk', file: 'information.png')}"/>
+                                                                        </g:else>
+                                                                    </span>
+                                                                    <div class="actions">
+                                                                        <div class="box" style="width:450px;">
+                                                                            <div>
+                                                                                <label>Requisition item:</label>
+                                                                                ${requisitionItem.toJson()}
+                                                                                ${requisitionItem.calculatePercentageCompleted()}
+                                                                            </div>
+                                                                            <div>
+                                                                                <%--
+                                                                            Requisition items: ${requisitionItem?.requisitionItems?.size()}
+
+                                                                            --%>
+                                                                            </div>
+                                                                            <div>
+                                                                                <label>Substitution:</label>
+                                                                                ${requisitionItem?.substitutionItem?.toJson()}
+                                                                            </div>
+                                                                            <div>
+                                                                                <label>Modification:</label>
+                                                                                ${requisitionItem?.modificationItem?.toJson()}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="left">
+                                                                <a name="${requisitionItem?.id}"></a>
+
+
+                                                                <%--
+                                                                <g:render template="/requisitionItem/actions" model="[requisition:requisition,requisitionItem:requisitionItem]"/>
+                                                                --%>
+
+                                                                        <div class="action-menu">
+                                                                            <button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
+                                                                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+                                                                            </button>
+                                                                            <div class="actions">
+                                                                                <g:if test="${!requisitionItem.parentRequisitionItem}">
+                                                                                    <g:if test="${requisitionItem?.canApproveQuantity()}">
+                                                                                        <div class="action-menu-item">
+                                                                                            <g:link controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.id }" fragment="${requisitionItem?.id}">
+                                                                                                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                                                                                                <warehouse:message code="requisitionItem.approveQuantity.label" default="Approve quantity"/>
+                                                                                            </g:link>
+                                                                                        </div>
+                                                                                        <% System.out.println("Time 1: " + (System.currentTimeMillis() - startTime) + " ms") %>
+                                                                                    </g:if>
+                                                                                    <g:if test="${requisitionItem.canChangeQuantity()}">
+                                                                                        <div class="action-menu-item">
+                                                                                            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                                                                                                    params="['requisitionItem.id':requisitionItem?.id, actionType:'changeQuantity']" fragment="${requisitionItem?.id}">
+                                                                                                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                                                                                <warehouse:message code="requisitionItem.changeQuantity.label" default="Change quantity"/>
+                                                                                            </g:link>
+                                                                                        </div>
+                                                                                        <% System.out.println("Time 2: " + (System.currentTimeMillis() - startTime) + " ms") %>
+                                                                                    </g:if>
+                                                                                    <g:if test="${requisitionItem.canChooseSubstitute()}">
+                                                                                        <div class="action-menu-item">
+                                                                                            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }" fragment="${requisitionItem?.id}"
+                                                                                                    params="['requisitionItem.id':requisitionItem?.id, actionType:'chooseSubstitute']" >
+                                                                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch.png')}"/>&nbsp;
+                                                                                                <warehouse:message code="requisitionItem.substitute.label" default="Choose substitute"/>
+                                                                                            </g:link>
+                                                                                        </div>
+                                                                                        <% System.out.println("Time 3: " + (System.currentTimeMillis() - startTime) + " ms") %>
+                                                                                    </g:if>
+                                                                                    <g:if test="${requisitionItem.canChangeQuantity()}">
+                                                                                        <div class="action-menu-item">
+                                                                                            <g:link controller="requisition" action="review" id="${requisitionItem?.requisition?.id }"
+                                                                                                    params="['requisitionItem.id':requisitionItem?.id, actionType:'cancelQuantity']" fragment="${requisitionItem?.id}">
+                                                                                                <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>&nbsp;
+                                                                                                <warehouse:message code="requisitionItem.cancel.label" default="Cancel requisition item"/>
+                                                                                            </g:link>
+                                                                                        </div>
+                                                                                    </g:if>
+                                                                                    <g:if test="${requisitionItem.canUndoChanges()}">
+                                                                                        <div class="action-menu-item">
+                                                                                            <g:link controller="requisitionItem" action="undoChanges" id="${requisitionItem?.id }" params="[redirectAction:'review']" fragment="${requisitionItem?.id}"
+                                                                                                    onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
+                                                                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
+                                                                                                <warehouse:message code="requisitionItem.undoChange.label" default="Undo changes"/>
+                                                                                            </g:link>
+                                                                                        </div>
+                                                                                        <% System.out.println("Time 4: " + (System.currentTimeMillis() - startTime) + " ms") %>
+
+                                                                                    </g:if>
+                                                                                </g:if>
+                                                                                <g:else>
+                                                                                    <div class="action-menu-item">
+                                                                                        <g:link controller="requisitionItem" action="delete" id="${requisitionItem?.id }" params="[redirectAction:'review']" fragment="${requisitionItem?.id}"
+                                                                                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                                                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                                                                                            <warehouse:message code="requisitionItem.delete.label" default="Delete requisition item"/>
+                                                                                        </g:link>
+                                                                                    </div>
+                                                                                </g:else>
+
+
+
+                                                                            </div>
+                                                                        </div>
+
+                                                            </td>
+                                                            <td class="center middle">
+                                                                <%--
+                                                                <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
+                                                                    <format:metadata obj="${requisitionItem.status}" />
+                                                                </div>
+                                                                --%>
+                                                                <format:metadata obj="${requisitionItem.status}" />
+                                                            </td>
+                                                            <td class="center middle">
+                                                                <g:if test="${isCanceled||hasSubstitution}">
+                                                                    <div class="canceled">
+                                                                        ${requisitionItem?.product?.productCode}
+                                                                    </div>
+                                                                    <div class="">
+                                                                        ${requisitionItem?.change?.product?.productCode}
+                                                                    </div>
+                                                                </g:if>
+                                                                <g:else>
+                                                                    <div>
+                                                                        ${requisitionItem?.product?.productCode}
+                                                                    </div>
+                                                                </g:else>
+
+
+                                                            </td>
+
+
+                                                            <td class="product middle">
+                                                                <%--
+                                                                <g:if test="${isChild }">
+                                                                    <img src="${resource(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>
+                                                                </g:if>
+                                                                --%>
+                                                                <g:if test="${isCanceled||hasSubstitution}">
+                                                                    <div class="canceled">
+                                                                        <format:metadata obj="${requisitionItem?.product?.name}" />
+                                                                    </div>
+                                                                    <div class="">
+                                                                        <format:metadata obj="${requisitionItem?.change?.product?.name}" />
+                                                                    </div>
+                                                                </g:if>
+                                                                <g:else>
+                                                                    <div>
+                                                                        <format:metadata obj="${requisitionItem?.product?.name}" />
+                                                                    </div>
+                                                                </g:else>
+
+                                                            </td>
+                                                            <td class="center middle">
+                                                                ${requisitionItem?.product?.unitOfMeasure}
+                                                            </td>
+
+                                                            <td class="center middle" style="width: 10%;">
+                                                                <g:if test="${requisitionItem?.cancelReasonCode}">
+                                                                    <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</p>
+                                                                    <p class="fade">${requisitionItem?.cancelComments}</p>
+                                                                </g:if>
+
+                                                            <%--
+                                                            <g:if test="${requisitonItem?.isApproved()}">
+                                                                <warehouse:message code="enum.RequisitionItemStatus.APPROVED" default="Approved"/>
+                                                            </g:if>
+
+                                                            <g:if test="${requisitionItem?.isCanceled()}">
+                                                                <warehouse:message code="enum.RequisitionItemStatus.CANCELLED" default="Cancelled"/>
+                                                                <g:if test="${requisitionItem?.isSubstitution()}">
+                                                                    <warehouse:message code="enum.requisitionItemStatus.SUBSTITUTED" default="Substituted"/>
+                                                                </g:if>
+                                                            </g:if>
+                                                            <g:elseif test="${requisitionItem?.isChanged()}">
+                                                                <warehouse:message code="enum.requisitionItemStatus.CHANGED" default="Changed"/>
+                                                            </g:elseif>
+                                                            <g:else>
+                                                                ${warehouse.message(code:'default.pending.label')}
+                                                            </g:else>
+                                                            --%>
+                                                            </td>
+                                                            <td class="quantity center middle">
+                                                                <div class="${isCanceled||isChanged?'canceled':''}">
+                                                                    ${requisitionItem?.quantity} EA/1
+                                                                    <%--
+                                                                    ${requisitionItem?.productPackage?.uom?.code?:"EA" }/${requisitionItem?.productPackage?.quantity?:"1" }
+                                                                    --%>
+                                                                </div>
+                                                                <g:if test="${requisitionItem?.change}">
+                                                                    ${requisitionItem?.change?.quantity}
+                                                                    EA/1
+                                                                    <%--
+                                                                    ${requisitionItem?.change?.productPackage?.uom?.code?:"EA"}/${requisitionItem?.change?.productPackage?.quantity?:"1"}
+                                                                    --%>
+                                                                </g:if>
+
+
+                                                            </td>
+                                                            <%--
+                                                            <td class="center middle">
+                                                                <div class="${isCanceled||isChanged?'canceled':''}">
+                                                                    ${requisitionItem?.totalQuantity()}
+                                                                </div>
+                                                                <g:if test="${requisitionItem?.change}">
+                                                                    ${requisitionItem?.change?.totalQuantity()}
+                                                                </g:if>
+                                                            </td>
+                                                            --%>
+                                                            <td class="center middle">
+                                                                <g:if test="${isAvailable||isAvailableForSubstitution}">
+                                                                    <div class="box available">
+                                                                        <g:if test="${requisitionItem?.hasSubstitution()}">
+                                                                            <div class="${isCanceled||isChanged?'canceled':''}">
+                                                                                ${quantityOnHand?:0} EA/1
+                                                                            </div>
+                                                                            ${quantityOnHandForSubstitution?:0} EA/1
+                                                                        </g:if>
+                                                                        <g:else>
+                                                                            ${quantityOnHand?:0} EA/1
+                                                                        </g:else>
+                                                                    </div>
+                                                                </g:if>
+                                                                <g:else>
+                                                                    <div class="box unavailable">
+                                                                        <div>${warehouse.message(code:'inventory.unavailable.label',default:'Unavailable')}</div>
+                                                                        ${quantityOnHand?:0} EA/1
+                                                                    </div>
+                                                                </g:else>
+                                                            </td>
+
+                                                            <td class="center middle">
+                                                                ${requisitionItem.orderIndex}
+                                                            </td>
+
+                                                        </tr>
+
                                         </g:if>
 
                                         <g:if test="${!requisitionItem.parentRequisitionItem && selectedRequisitionItem &&
                                                 requisitionItem == selectedRequisitionItem && params?.actionType}">
-                                            <tr>
+                                            <tr class="${!selectedRequisitionItem?'':selected?'selected':'unselected'}">
                                                 <td colspan="9">
                                                     <g:if test="${params?.actionType=='changeQuantity'}">
-                                                        <g:render template="changeQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                        <%--<g:render template="changeQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
+                                                        <div class="box" id="changeQuantity">
+                                                            <h2>${warehouse.message(code:'requisitionItem.changeQuantity.label', default:'Change quantity')}</h2>
+
+                                                            <g:hasErrors bean="${flash.errors}">
+                                                                <div class="errors">
+                                                                    <g:renderErrors bean="${flash.errors}" as="list" />
+                                                                </div>
+                                                            </g:hasErrors>
+
+
+                                                            <g:form controller="requisitionItem" action="changeQuantity" fragment="${selectedRequisitionItem?.id}">
+
+                                                                <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
+                                                                <g:hiddenField name="requisitionItem.id" value="${selectedRequisitionItem?.id }"/>
+                                                                <g:hiddenField name="actionType" value="${params.actionType }"/>
+                                                                <table>
+                                                                    <tr>
+                                                                        <td class="middle right">
+                                                                            <label><warehouse:message code="requisitionItem.quantity.label"/></label>
+                                                                        </td>
+                                                                        <td class="middle">
+                                                                            <g:textField id="quantity" name="quantity" value="" class="text" size="5"/>
+                                                                            <%--
+                                                                            <g:selectUnitOfMeasure name="productPackage.id" product="${selectedRequisitionItem?.product}" class="chzn-select" style="width:300px;"/>
+                                                                            --%>
+                                                                            EA/1
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="middle right">
+                                                                            <label><warehouse:message code="requisitionItem.product.label"/></label>
+                                                                        </td>
+                                                                        <td class="middle">
+                                                                            ${selectedRequisitionItem?.product?.productCode}
+                                                                            ${selectedRequisitionItem?.product}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="middle right">
+                                                                            <label><warehouse:message code="requisitionItem.cancelReasonCode.label" default="Reason code"/></label>
+                                                                        </td>
+                                                                        <td class="middle">
+                                                                            <g:selectChangeQuantityReasonCode
+                                                                                    name="reasonCode"
+                                                                                    class="chzn-select"
+                                                                                    style="width:450px;"
+                                                                                    data-placeholder="Choose a reason code ..."
+                                                                                    noSelection="['':'']"
+                                                                                    value="${selectedRequisitionItem?.cancelReasonCode }"/>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="top right">
+                                                                            <label style="display: block;"><warehouse:message code="requisitionItem.comments.label" default="Comments"/></label>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:textField name="comments" value="${selectedRequisitionItem.cancelComments}"
+                                                                                         size="60" class="text" placeholder="${warehouse.message(code:'requisitionItem.comments.placeholder', default:'Any additional information')}"/>
+
+                                                                        </td>
+
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="middle center" colspan="2">
+                                                                            <button class="button icon approve">
+                                                                                ${warehouse.message(code:'default.button.save.label') }
+                                                                            </button>
+
+                                                                            <g:link controller="requisition" action="review" id="${selectedRequisitionItem?.requisition?.id}" class="button icon trash">
+                                                                                ${warehouse.message(code:'default.button.cancel.label') }
+                                                                            </g:link>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </g:form>
+                                                        </div>
+                                                        <script type="text/javascript">
+                                                            $(function() {
+                                                                $("#newQuantity").focus();
+                                                            });
+                                                        </script>
+
                                                     </g:if>
                                                     <g:elseif test="${params?.actionType=='changePackageSize'}">
-                                                        <g:render template="changePackageSize" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    <%--<g:render template="changePackageSize" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
+                                                        <div class="box">
+                                                            <h2>${warehouse.message(code:'requisitionItem.changePackageSize.label', default:'Change package size')}</h2>
+                                                            <g:form controller="requisition" action="changeQuantity" fragment="${selectedRequisitionItem?.id}">
+                                                                <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
+                                                                <g:hiddenField name="requisitionItem.id" value="${selectedRequisitionItem?.id }"/>
+                                                                <g:hiddenField name="actionType" value="${params.actionType }"/>
+
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <g:textField name="quantityChange" value="${selectedRequisitionItem?.quantity}" class="text center" size="5"/>
+                                                                        </td>
+                                                                        <td>
+                                                                            ${selectedRequisitionItem?.product?.productCode}
+                                                                            ${selectedRequisitionItem?.product}
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:selectUnitOfMeasure product="${selectedRequisitionItem?.product}"/>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:select name="cancelReasonCode"
+                                                                                      from="['Package size',
+                                                                                              'Stock out',
+                                                                                              'Substituted',
+                                                                                              'Damaged','Expired',
+                                                                                              'Reserved',
+                                                                                              'Cancelled by requestor',
+                                                                                              'Clinical adjustment',
+                                                                                              'Other']"
+
+                                                                                      noSelection="['null':'']" value="${selectedRequisitionItem.cancelReasonCode?:'Package size' }"/>
+                                                                        </td>
+                                                                        <td>
+                                                                            <button class="button">
+                                                                                ${warehouse.message(code:'default.button.save.label') }
+                                                                            </button>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:link controller="requisition" action="review" id="${selectedRequisitionItem?.requisition?.id}">
+                                                                                ${warehouse.message(code:'default.button.cancel.label') }
+                                                                            </g:link>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan="8">
+                                                                            <label style="display: block;"><warehouse:message code="requisitionItem.comments.label" default="Comments"/></label>
+                                                                            <g:textArea name="comments" cols="100" rows="5"></g:textArea>
+                                                                        </td>
+
+                                                                    </tr>
+                                                                </table>
+                                                            </g:form>
+                                                        </div>
+                                                        <script type="text/javascript">
+                                                            $(function() {
+                                                                $("#reasonCode").focus();
+                                                            });
+                                                        </script>
                                                     </g:elseif>
                                                     <g:elseif test="${params?.actionType=='cancelQuantity'}">
-                                                        <g:render template="cancelQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    <%--<g:render template="cancelQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
+                                                        <div class="box" class="cancelQuantity">
+                                                            <h2>${warehouse.message(code:'requisitionItem.cancel.label', default:'Cancel requisition item')}</h2>
+
+
+                                                            <g:hasErrors bean="${flash.errors}">
+                                                                <div class="errors">
+                                                                    <g:renderErrors bean="${flash.errors}" as="list" />
+                                                                </div>
+                                                            </g:hasErrors>
+
+
+                                                            <g:form controller="requisitionItem" action="cancelQuantity" fragment="${selectedRequisitionItem?.id}">
+                                                            <%--
+                                                            <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
+                                                            --%>
+                                                                <g:hiddenField name="id" value="${selectedRequisitionItem?.id }"/>
+                                                                <g:hiddenField name="redirectAction" value="${actionName}"/>
+                                                                <g:hiddenField name="actionType" value="${params.actionType }"/>
+
+
+                                                                <table>
+
+                                                                    <tr>
+                                                                        <td class="right top">
+                                                                            <label><warehouse:message code="requisitionItem.product.label" default="Product"/></label>
+                                                                        </td>
+                                                                        <td>
+                                                                            ${selectedRequisitionItem?.product?.productCode}
+                                                                            ${selectedRequisitionItem?.product}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="right top">
+                                                                            <label><warehouse:message code="requisitionItem.cancelQuantity.label" default="Cancel quantity"/></label>
+                                                                        </td>
+                                                                        <td>
+                                                                            ${selectedRequisitionItem?.quantity}
+                                                                            ${selectedRequisitionItem?.productPackage?:"EA/1"}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="right top">
+                                                                            <label><warehouse:message code="requisitionItem.reasonCode.label" default="Reason code"/></label>
+                                                                        </td>
+                                                                        <td>
+
+                                                                            <g:selectCancelReasonCode
+                                                                                    name="reasonCode"
+                                                                                    class="chzn-select"
+                                                                                    style="width:450px;"
+                                                                                    data-placeholder="Choose a reason code ..."
+                                                                                    noSelection="['':'']"
+                                                                                    value="${selectedRequisitionItem?.cancelReasonCode }"/>
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="right top">
+                                                                            <label><warehouse:message code="requisitionItem.comments.label" default="Comments"/></label>
+
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:textField name="comments" value="${selectedRequisitionItem.cancelComments}"
+                                                                                         size="60" class="text" placeholder="${warehouse.message(code:'requisitionItem.comments.placeholder', default:'Any additional information')}"/>
+                                                                        </td>
+
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td></td>
+                                                                        <td class="left">
+                                                                        <button class="button icon approve">
+                                                                            ${warehouse.message(code:'default.button.save.label') }
+                                                                        </button>
+                                                                        &nbsp;
+                                                                        <g:link controller="requisition" action="review" id="${selectedRequisitionItem?.requisition?.id}" class="button icon trash">
+                                                                            ${warehouse.message(code:'default.button.cancel.label') }
+                                                                        </g:link>
+                                                                    </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </g:form>
+                                                        </div>
+                                                        <script type="text/javascript">
+                                                            $(function() {
+                                                                $("#reasonCode").focus();
+                                                            });
+                                                        </script>
                                                     </g:elseif>
                                                     <g:elseif test="${params?.actionType=='chooseSubstitute'}">
-                                                        <g:render template="chooseSubstitute" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    <%--<g:render template="chooseSubstitute" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
+                                                        <div class="box" id="chooseSubstitute">
+                                                            <h2>${warehouse.message(code:'requisitionItem.chooseSubstitute.label', default: 'Choose substitute') }</h2>
+                                                            <div class="dialog">
+                                                                <g:hasErrors bean="${flash.errors}">
+                                                                    <div class="errors">
+                                                                        <g:renderErrors bean="${flash.errors}" as="list" />
+                                                                    </div>
+                                                                </g:hasErrors>
+
+
+                                                                <g:form controller="requisitionItem" action="chooseSubstitute" fragment="${selectedRequisitionItem?.id}">
+                                                                    <g:hiddenField name="id" value="${selectedRequisitionItem?.id }"/>
+                                                                    <g:hiddenField name="actionType" value="${params.actionType }"/>
+                                                                    <table>
+                                                                        <tr class="">
+                                                                            <td class="middle right">
+                                                                                <label><warehouse:message code="requisitionItem.product.label"/></label>
+                                                                            </td>
+                                                                            <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'product', 'errors')} ${hasErrors(bean: selectedRequisitionItem, field: 'productPackage', 'errors')}">
+
+
+
+                                                                                <g:chooseSubstitute id="substitutionId"
+                                                                                                    name="substitutionId"
+                                                                                                    data-placeholder="Choose a product package ..."
+                                                                                                    jsonUrl="${request.contextPath }/json/searchProductPackages"
+                                                                                                    width="400"
+                                                                                                    styleClass="text"/>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr class="">
+                                                                            <td class="name middle right">
+                                                                                <label><warehouse:message code="requisitionItem.quantity.label" default="Quantity"/></label>
+                                                                            </td>
+                                                                            <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'quantity', 'errors')}">
+                                                                                <g:textField id="quantity" name="quantity" value="" class="text"
+                                                                                             placeholder="${warehouse.message(code:'default.quantity.label') }"/> EA/1
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="name middle right">
+                                                                                <label><warehouse:message code="requisitionItem.totalQuantity.label" default="Total quantity"/></label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <span id="totalQuantity">0</span>
+                                                                                <span id="unitOfMeasure">EA</span>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="middle right">
+                                                                                <label><warehouse:message code="requisitionItem.reasonCode.label" default="Reason code"/></label>
+                                                                            </td>
+                                                                            <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'cancelReasonCode', 'errors')}">
+
+                                                                                <g:selectSubstitutionReasonCode
+                                                                                        name="reasonCode"
+                                                                                        class="chzn-select"
+                                                                                        style="width:450px;"
+                                                                                        data-placeholder="Choose a reason code ..."
+                                                                                        noSelection="['':'']"
+                                                                                        value="${selectedRequisitionItem?.cancelReasonCode }"/>
+
+                                                                                <%--
+                                                                                <g:select name="reasonCode"
+                                                                                          style="width: 450px"
+                                                                                          class="chzn-select"
+                                                                                          from="['Package size',
+                                                                                                  'Stock out',
+                                                                                                  'Substituted',
+                                                                                                  'Damaged',
+                                                                                                  'Expired',
+                                                                                                  'Reserved',
+                                                                                                  'Cancelled by requestor',
+                                                                                                  'Clinical adjustment',
+                                                                                                  'Other']"
+                                                                                          noSelection="['':'']"
+                                                                                          value="${selectedRequisitionItem.cancelReasonCode?:'Substituted' }"/>
+                                                                                --%>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="top right">
+                                                                                <label><warehouse:message code="requisitionItem.comments.label" default="Comments"/></label>
+                                                                            </td>
+                                                                            <td class="${hasErrors(bean: selectedRequisitionItem, field: 'comments', 'errors')}">
+                                                                                <g:textField name="comments" value="${selectedRequisitionItem.cancelComments}"
+                                                                                             size="60" class="text" placeholder="${warehouse.message(code:'requisitionItem.comments.placeholder', default:'Any additional information')}"/>
+
+
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td colspan="2" class="center">
+                                                                                <button class="button icon approve">
+                                                                                    ${warehouse.message(code:'default.button.save.label') }
+                                                                                </button>
+                                                                                &nbsp;
+                                                                                <g:link controller="requisition" action="review" id="${selectedRequisitionItem?.requisition?.id}" class="button icon trash">
+                                                                                    ${warehouse.message(code:'default.button.cancel.label') }
+                                                                                </g:link>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </g:form>
+
+                                                            </div>
+                                                        </div>
+                                                        <script language="javascript">
+                                                            $(document).ready(function() {
+
+                                                                $("#productPackageQty,#quantity").change(function() {
+                                                                    var totalQuantity = 0;
+                                                                    var productPackageQty = $("#productPackageQty").val();
+                                                                    productPackageQty = productPackageQty ? productPackageQty : 1;
+                                                                    var quantity = $("#quantity").val();
+                                                                    console.log(productPackageQty);
+                                                                    console.log(quantity);
+                                                                    if(productPackageQty && quantity) {
+                                                                        totalQuantity = addCommas(productPackageQty * quantity);
+                                                                    }
+                                                                    else {
+                                                                        totalQuantity = 0
+                                                                    }
+                                                                    $("#totalQuantity").html(totalQuantity);
+                                                                });
+
+                                                                /**
+                                                                 * Borrowed from
+                                                                 * http://www.mredkj.com/javascript/numberFormat.html
+                                                                 *
+                                                                 * @param nStr
+                                                                 * @return {*}
+                                                                 */
+                                                                function addCommas(nStr) {
+                                                                    nStr += '';
+                                                                    x = nStr.split('.');
+                                                                    x1 = x[0];
+                                                                    x2 = x.length > 1 ? '.' + x[1] : '';
+                                                                    var rgx = /(\d+)(\d{3})/;
+                                                                    while (rgx.test(x1)) {
+                                                                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                                                    }
+                                                                    return x1 + x2;
+                                                                }
+
+                                                            });
+                                                        </script>
                                                     </g:elseif>
                                                     <g:elseif test="${params?.actionType=='supplementProduct'}">
-                                                        <g:render template="supplementProduct" model="[selectedRequisitionItem:selectedRequisitionItem]"/>
+                                                    <%--<g:render template="supplementProduct" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
+                                                        <div class="box">
+                                                            <h2>${warehouse.message(code:'requisitionItem.addAddition.label') }</h2>
+                                                            <div class="dialog">
+                                                                <g:form controller="requisition" action="addAddition" fragment="${selectedRequisitionItem?.id}">
+                                                                    <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
+                                                                    <g:hiddenField name="requisitionItem.id" value="${selectedRequisitionItem?.id }"/>
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
+                                                                                               width="200" valueId="" valueName="" styleClass="text"/>
+                                                                            </td>
+                                                                            <td>
+                                                                                <g:textField name="quantity" value="" class="text" placeholder="${warehouse.message(code:'default.quantity.label') }"/>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button class="button">
+                                                                                    ${warehouse.message(code:'default.button.save.label') }
+                                                                                </button>
+                                                                            </td>
+                                                                            <td>
+                                                                                <g:link controller="requisition" action="review" id="${selectedRequisitionItem?.requisition?.id}">
+                                                                                    ${warehouse.message(code:'default.button.cancel.label') }
+                                                                                </g:link>
+                                                                            </td>
+                                                                        </tr>
+
+                                                                    </table>
+
+                                                                </g:form>
+                                                            </div>
+                                                        </div>
                                                     </g:elseif>
                                                 </td>
 
                                             </tr>
                                         </g:if>
+                                        <% System.out.println("Requisition item ${requisitionItem.id} " + (System.currentTimeMillis() - requisitionStartTime) + " ms") %>
+                                        <g:set var="requisitionStartTime" value="${System.currentTimeMillis()}"/>
 
                                     </g:each>
+                                    <% System.out.println("Total for all rows: " + (System.currentTimeMillis() - startTime) + " ms") %>
                                 </tbody>
                             </table>
                         </div>
@@ -209,8 +905,7 @@
 						$(".selectItem").attr("checked", false);
 					}
 				});
-			}); 		
-		</script>
-            
+			});
+        </script>
     </body>
 </html>

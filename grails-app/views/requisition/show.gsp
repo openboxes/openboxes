@@ -48,10 +48,11 @@
                                         </g:if>
                                         <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
                                             <g:render template="showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
+                                            <%--
                                             <g:each var="childRequisitionItem" in="${requisitionItem?.requisitionItems}" status="j">
                                                 <g:render template="showRequisitionItem" model="[i:j,requisitionItem:childRequisitionItem]"/>
                                             </g:each>
-
+                                            --%>
 
                                         </g:each>
                                     </tbody>

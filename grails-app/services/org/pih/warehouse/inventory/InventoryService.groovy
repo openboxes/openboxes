@@ -1252,7 +1252,7 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }
-        log.debug " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1281,7 +1281,7 @@ class InventoryService implements ApplicationContextAware {
 			quantityMapByProductAndInventoryItem[product].values().each { quantityMap[product] += it }
 		}
 
-        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1312,7 +1312,7 @@ class InventoryService implements ApplicationContextAware {
 				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
 		}
-        log.debug " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
         //log.info "quantityMap: " + quantityMap
 		return quantityMap
 	}
@@ -1331,7 +1331,7 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
 
-        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return quantityMap
 	}
@@ -1351,7 +1351,7 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
 
-        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1391,7 +1391,7 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 		}
-        log.debug "getProductsBelowMinimumAndReorderQuantities(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getProductsBelowMinimumAndReorderQuantities(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return [minimumProductsQuantityMap: minimumProductsQuantityMap, reorderProductsQuantityMap: reorderProductsQuantityMap]
 	}
 	/**
@@ -1454,7 +1454,7 @@ class InventoryService implements ApplicationContextAware {
 		def startTime = System.currentTimeMillis()
 		def currentLocation = getCurrentLocation()
 		def quantity = getQuantity(currentLocation.inventory, inventoryItem)
-        log.debug "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantity
 	}
 

@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 
 class RequisitionService {
@@ -678,6 +679,55 @@ class RequisitionService {
 
     }
 
+
+
+    void generatePicklist(Requisition requisition) {
+        requisition.requisitionItems.each { requisitionItem ->
+            // If the requisition item has been changed, we'll use the modified item
+            if (requisitionItem.isChanged()) {
+                println "generate picklist for changed items "
+                generatePicklistItem(requisitionItem.modificationItem)
+            }
+            // if the requisition item has been canceled, we'll ignore it
+            else if (requisitionItem.isCanceled()) {
+                println "ignore picklist for canceled items "
+                // ignore
+            }
+            // if the requisition item has been substituted we'll use the substituted item
+            else if (requisitionItem.isSubstituted()) {
+                println "generate picklist for substituted items "
+                generatePicklistItem(requisitionItem.substitutionItem)
+            }
+            else if (requisitionItem.isApproved()) {
+                println "generate picklist for approved items "
+            }
+            else {
+                throw new UnsupportedOperationException("Unknown ")
+            }
+        }
+    }
+
+    void generatePicklistItem(RequisitionItem requisitionItem) {
+        println "generate picklist for requisition item " + requisitionItem
+
+
+
+    }
+
+
+    void clearPicklist(Requisition requisition) {
+        if (requisition.picklist) {
+            def picklistItems = requisition.picklist.picklistItems.collect { it.id }
+
+            picklistItems.each {
+                def picklistItem = PicklistItem.get(it)
+                requisition.picklist.removeFromPicklistItems(picklistItem)
+                picklistItem.delete()
+            }
+            requisition.save();
+        }
+
+    }
 
 
 

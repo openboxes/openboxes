@@ -49,6 +49,7 @@
     <include file="0.5.x/create-table-indicator.xml"/>
     <include file="0.5.x/add-column-location-sort-order.xml"/>
     <include file="0.5.x/add-inventory-level-abc-class.xml"/>
+    <include file="0.5.x/add-column-requisition-item-children.xml"/>
 
     <!--
     <include file="0.5.x/create-table-reason-code.xml"/>

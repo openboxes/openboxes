@@ -135,6 +135,12 @@
 						</g:else>
 					</g:isUserManager>
 					<g:isUserAdmin>
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="normalize" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" />
+                                &nbsp;${warehouse.message(code: 'request.normalize.label', default: 'Normalize requisition')}
+                            </g:link>
+                        </div>
 			            <div class="action-menu-item">
 			                <g:link controller="requisition" action="delete" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 			                    <img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
@@ -147,7 +153,21 @@
                                 &nbsp;${warehouse.message(code: 'request.rollback.label', default: 'Rollback requisition')}
                             </g:link>
                         </div>
-		            </g:isUserAdmin>
+                        <hr/>
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="generatePicklist" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'text_list_numbers.png')}" />
+                                &nbsp;${warehouse.message(code: 'picklist.generate.label', default: 'Generate picklist')}
+                            </g:link>
+                        </div>
+                        <div class="action-menu-item">
+                            <g:link controller="requisition" action="clearPicklist" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                                &nbsp;${warehouse.message(code: 'picklist.clear.label', default: 'Clear picklist')}
+                            </g:link>
+                        </div>
+
+                    </g:isUserAdmin>
 
 					<%--
 					<div class="action-menu-item">

@@ -69,6 +69,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
 	// Parent requisition item
 	RequisitionItem parentRequisitionItem
+    RequisitionItem substitutionItem
+    RequisitionItem modificationItem
+
 
 	// Audit fields
 	Date dateCreated
@@ -80,14 +83,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     static transients = [ "type" ]
 	
 	static belongsTo = [ requisition: Requisition ]	
-	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ]
+	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
 	
 	static mapping = {
 		id generator: 'uuid'
         picklistItems cascade: "all-delete-orphan", sort: "id"
 		requisitionItems cascade: "all-delete-orphan", sort: "id"
 	}
-		
+
+    static mappedBy = [requisitionItems:'parentRequisitionItem']
+
     static constraints = {
         requisitionItemType(nullable:true)
     	description(nullable:true)
@@ -126,13 +131,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def getStatus() {
         if (isApproved() || parentRequisitionItem) { return RequisitionItemStatus.APPROVED }
-        else if (isSubstitution()||isChanged()) { return RequisitionItemStatus.CHANGED }
+        else if (isSubstituted()) { return RequisitionItemStatus.SUBSTITUTED }
+        else if (isChanged()) { return RequisitionItemStatus.CHANGED }
         else if (isCanceled()) { return RequisitionItemStatus.CANCELED }
         else if (isCompleted()) { return RequisitionItemStatus.COMPLETED }
-        else {
-            return RequisitionItemStatus.PENDING
-
-        }
+        else { return RequisitionItemStatus.PENDING }
     }
 
 
@@ -143,7 +146,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return the child requisition item that represents the quantity change
      */
     def getChange() {
-        return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
+        //return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
+        return modificationItem?:substitutionItem
     }
 
     /**
@@ -153,7 +157,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return the child requisition item that represents the substitution
      */
     def getSubstitution() {
-        return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
+        //return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
+        return substitutionItem?:modificationItem
     }
     /**
      * Undo any changes made to this requisition item.
@@ -164,11 +169,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         cancelComments = null
         cancelReasonCode = null
 
+        //if (substitutionItem) substitutionItem.delete()
+        //if (modificationItem) modificationItem.delete()
+
+        substitutionItem = null
+        modificationItem = null
         // Need to remove from both associations
-        requisitionItems.each {
-            requisition.removeFromRequisitionItems(it)
-            removeFromRequisitionItems(it)
-        }
+        //requisitionItems.each {
+        //    requisition.removeFromRequisitionItems(it)
+        //    removeFromRequisitionItems(it)
+        //}
     }
 
     /**
@@ -219,20 +229,18 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             // TODO Refactor the following logic into a business method
 
             // And then create a new requisition item to represent the new quantity
-            def newRequisitionItem = new RequisitionItem()
-            newRequisitionItem.requisitionItemType =
+            modificationItem = new RequisitionItem()
+            modificationItem.requisitionItemType =
                 newProductPackage?RequisitionItemType.PACKAGE_CHANGE:RequisitionItemType.QUANTITY_CHANGE
 
-            newRequisitionItem.product = product
-            newRequisitionItem.productPackage = newProductPackage?:productPackage
-            //newRequisitionItem.parentRequisitionItem = this
-            newRequisitionItem.orderIndex = orderIndex
-            newRequisitionItem.quantity = newQuantity
-            newRequisitionItem.quantityApproved = newQuantity
-
-            // Need to add to both to get the unit test to pass
-            addToRequisitionItems(newRequisitionItem)
-            requisition.addToRequisitionItems(newRequisitionItem)
+            modificationItem.requisition = requisition
+            modificationItem.product = product
+            modificationItem.productPackage = newProductPackage?:productPackage
+            modificationItem.parentRequisitionItem = this
+            modificationItem.orderIndex = orderIndex
+            modificationItem.quantity = newQuantity
+            modificationItem.quantityApproved = newQuantity
+            modificationItem.save(flush: true, failOnError: true)
         }
     }
 
@@ -263,19 +271,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         cancelQuantity(reasonCode, comments)
 
         // And then create a new requisition item to represent the new quantity
-        def newRequisitionItem = new RequisitionItem()
-        newRequisitionItem.requisitionItemType = RequisitionItemType.SUBSTITUTION
-        newRequisitionItem.product = newProduct
-        newRequisitionItem.productPackage = newProductPackage?:productPackage
-        newRequisitionItem.quantity = newQuantity
-        newRequisitionItem.quantityApproved = newQuantity
-        newRequisitionItem.parentRequisitionItem = this
-        newRequisitionItem.orderIndex = orderIndex
-
-        // Need to add to both to get the unit test to pass
-        addToRequisitionItems(newRequisitionItem)
-        requisition.addToRequisitionItems(newRequisitionItem)
-
+        substitutionItem = new RequisitionItem()
+        substitutionItem.requisition = requisition
+        substitutionItem.requisitionItemType = RequisitionItemType.SUBSTITUTION
+        substitutionItem.product = newProduct
+        substitutionItem.productPackage = newProductPackage?:productPackage
+        substitutionItem.quantity = newQuantity
+        substitutionItem.quantityApproved = newQuantity
+        substitutionItem.parentRequisitionItem = this
+        substitutionItem.orderIndex = orderIndex
+        substitutionItem.save(flush: true, failOnError: true)
     }
 
     /**
@@ -358,24 +363,32 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     /**
-     * @return true if the requisition item has been completed canceled
+     * @return true if the requisition item has been completely canceled
      */
     def isCanceled() {
-        return totalQuantityCanceled() == totalQuantity() && !requisitionItems
+        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem
+        //&& !requisitionItems
     }
 
     /**
      * @return true if the requisition item has any child requisition items or has any quantity canceled
      */
     def isChanged() {
-        return (quantityCanceled > 0 && requisitionItems)
+        def startTime = System.currentTimeMillis()
+        def isChanged = quantityCanceled > 0 && (modificationItem || substitutionItem) //&& requisitionItems)
+
     }
 
     /**
      * @return  true if this child requisition item's parent is canceled and the child product and product package is different from its parent
      */
     def isSubstituted() {
-        return requisitionItems.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        //return requisitionItems.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        return (quantityCanceled > 0 && substitutionItem)
+    }
+
+    def isCanceledOrSubstituted() {
+        return isCanceled() || isSubstituted()
     }
 
 
@@ -397,6 +410,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def isSubstitution() {
         return parentRequisitionItem?.isChanged() && (parentRequisitionItem?.product != product) && (parentRequisitionItem?.productPackage != productPackage)
+        //return substitutionItem != null
     }
 
     def isPartiallyFulfilled() {
@@ -415,49 +429,85 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return  true if the item has been completed cancelled and has some child items that are substitutes
      */
     def hasSubstitution() {
-        return requisitionItems?.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        //return requisitionItems?.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        return substitutionItem!=null
     }
 
     def canUndoChanges() {
-        return isChanged() || isApproved() || isCanceled()
+        def startTime = System.currentTimeMillis()
+        def canUndoChanges = isChanged() || isApproved() || isCanceled()
+
+        println "canUndoChanges: " + (System.currentTimeMillis() - startTime) + " ms"
+        return canUndoChanges
     }
 
     def canApproveQuantity() {
-        return !isChanged() && !isApproved() && !isCanceled()
+        def startTime = System.currentTimeMillis()
+        def canChangeQuantity = !isChanged() && !isApproved() && !isCanceled()
+
+        println "canChangeQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        return canChangeQuantity
     }
 
     def canChangeQuantity() {
-        return !isChanged() && !isApproved() && !isCanceled()
+        def startTime = System.currentTimeMillis()
+        def canChangeQuantity = !isChanged() && !isApproved() && !isCanceled()
+
+        println "canChangeQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        return canChangeQuantity
     }
 
     def canCancelQuantity() {
-        return !isChanged() && !isApproved() && !isCanceled()
+        def startTime = System.currentTimeMillis()
+        def canCancelQuantity = !isChanged() && !isApproved() && !isCanceled()
+
+        println "canCancelQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        return canCancelQuantity
     }
 
     def canChooseSubstitute() {
-        return !isChanged() && !isApproved() && !isCanceled()
+        def startTime = System.currentTimeMillis()
+        def canChooseSubstitute = !isChanged() && !isApproved() && !isCanceled()
+
+        println "canChooseSubstitute: " + (System.currentTimeMillis() - startTime) + " ms"
+        return canChooseSubstitute
     }
 
     def calculateQuantityPicked() {
+        long startTime = System.currentTimeMillis()
         def quantityPicked = 0
         try {
             quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
         } catch (Exception e) {
             println "Error: " + e.message
         }
+
+        println "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
+
         return quantityPicked?:0
     }
 
 	def calculateQuantityRemaining() {
-		return totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
+        long startTime = System.currentTimeMillis()
+		def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
+
+
+        println "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
+        return quantityRemaining
 	}
 
     def calculateNumInventoryItem(Inventory inventory) {
-        InventoryItem.findAllByProduct(product).size()
+        long startTime = System.currentTimeMillis()
+        def numInventoryItem = InventoryItem.findAllByProduct(product).size()
+        println "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
+        return numInventoryItem
     }
 
     def retrievePicklistItems() {
-        return PicklistItem.findAllByRequisitionItem(this)
+        long startTime = System.currentTimeMillis()
+        def picklistItems = PicklistItem.findAllByRequisitionItem(this)
+        println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
+        return picklistItems
     }
 
     def availableInventoryItems() {
@@ -479,7 +529,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def calculatePercentageRemaining() {
         return totalQuantity()?(totalQuantityRemaining()/totalQuantity())*100:0
     }
-
+    /*
     def getNextRequisitionItem() {
         def currentIndex = requisition.requisitionItems.findIndexOf { it == this }
         def nextItem = requisition?.requisitionItems[currentIndex+1]?:requisition?.requisitionItems[0]
@@ -492,7 +542,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def previousItem = requisition?.requisitionItems[currentIndex-1]?:requisition?.requisitionItems[lastIndex]
         return previousItem
     }
-
+    */
     RequisitionItem newInstance() {
         return new RequisitionItem()
     }
@@ -520,6 +570,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             productPackageQuantity: productPackage?.quantity?:1,
             unitOfMeasure: product?.unitOfMeasure?:"EA",
             quantity:quantity,
+            requisitionItemType: requisitionItemType,
             status: getStatus(),
             totalQuantity:totalQuantity(),
             quantityCanceled:quantityCanceled,
@@ -527,6 +578,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             comment: comment,
             recipient: recipient,
             substitutable: substitutable,
+            isChanged: isChanged(),
+            isSubstituted: isSubstituted(),
+            isPending: isPending(),
+            isSubstitution: isSubstitution(),
+            isCompleted: isCompleted(),
+            isApproved: isApproved(),
+            isCanceled: isCanceled(),
             orderIndex: orderIndex
         ]
     }
