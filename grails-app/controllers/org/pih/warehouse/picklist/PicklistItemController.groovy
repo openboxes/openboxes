@@ -11,6 +11,8 @@ package org.pih.warehouse.picklist
 
 class PicklistItemController {
 
+    def scaffold = PicklistItem
+
 	def picklistService
 
 	def delete = {
