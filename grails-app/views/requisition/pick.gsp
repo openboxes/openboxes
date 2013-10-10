@@ -295,7 +295,9 @@
                                                                                 <g:if test="${requisitionItem.isCanceled() || requisitionItem?.isSubstituted() || requisitionItem?.isChanged()}">
                                                                                     <div class="box" style="max-width: 600px;">
 
-                                                                                        <span class="fade">${warehouse.message(code: 'requisitionItem.noInventoryItems.label', default: 'No available items')}</span>
+                                                                                        <span class="fade">
+                                                                                            <format:metadata obj="${requisitionItem.status}"/>: ${warehouse.message(code: 'requisitionItem.cannotPickItems.label', default: 'Cannot pick stock for this requisition item.')}
+                                                                                        </span>
                                                                                     </div>
                                                                                 </g:if>
                                                                                 <g:else>
@@ -487,7 +489,6 @@
                                                                     <g:link controller="requisition" action="pick" id="${requisition.id }" params="['requisitionItem.id':requisitionItem?.id]">
                                                                         <format:product product="${requisitionItem?.product}"/>
                                                                     </g:link>
-                                                                    ${requisitionItem?.retrievePicklistItems()}
                                                                 </td>
                                                                 <td>
                                                                     <g:if test="${requisitionItem?.productPackage}">
