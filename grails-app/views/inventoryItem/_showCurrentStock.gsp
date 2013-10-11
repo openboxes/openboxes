@@ -139,6 +139,7 @@
     <table>
         <thead>
             <tr>
+                <th>${warehouse.message(code:'locationGroup.label')}</th>
                 <th>${warehouse.message(code:'location.label')}</th>
                 <th>${warehouse.message(code:'location.locationType.label')}</th>
                 <th>${warehouse.message(code:'default.quantity.label')}</th>
@@ -147,12 +148,15 @@
         <g:if test="${quantityMap}">
             <tbody>
                 <g:each in="${quantityMap}" var="entry" status="i">
-                    <tr class="prop ${i%2?'even':'odd'}" >
+                    <tr class="prop ${i%2?'even':'odd'} ${entry?.key?.isWarehouse()?'':'canceled'}">
                         <td>
-                            ${entry.key}
+                            ${entry?.key?.locationGroup?.name}
                         </td>
                         <td>
-                            <format:metadata obj="${entry.key.locationType.name}"/>
+                            ${entry?.key}
+                        </td>
+                        <td>
+                            <format:metadata obj="${entry?.key?.locationType?.name}"/>
                         </td>
                         <td>
                             ${entry.value} ${commandInstance?.productInstance?.unitOfMeasure}
@@ -162,7 +166,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="3">
+                    <th colspan="4">
                         <div class="fade">*Cannot guarantee quantities at locations that are not managed inventories (like Wards and Pharmacies).</div>
 
                     </th>
@@ -171,10 +175,13 @@
         </g:if>
         <g:unless test="${quantityMap}">
             <tr>
+                <td>
+                    <div class="empty center fade">
+                        <warehouse:message code="inventory.quantityOnHand.unavailable.label" default="There is no quantity on hand at any locations."/>
+                    </div>
+                </td>
 
             </tr>
-
-
         </g:unless>
     </table>
 </div>

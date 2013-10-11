@@ -13,11 +13,12 @@
 			<%-- 
 			<li><a href="#tabs-5"><warehouse:message code="inventory.currentLotNumbers.label"/></a></li>
 			--%>
-		</ul>		
-		<div id="tabs-1">										
+            <li><a href="#tabs-5"><warehouse:message code="inventory.showConsumption.label"/></a></li>
+		</ul>
+		<div id="tabs-1">
 			<g:render template="showCurrentStock"/>
 		</div>
-		<div id="tabs-2">										
+		<div id="tabs-2">
 			<g:render template="showStockHistory" />
 		</div>
 		<div id="tabs-3">
@@ -31,7 +32,10 @@
 		<div id="tabs-4">
 			<g:render template="showPendingShipmentLog" model="[shipmentMap:commandInstance?.shipmentMap]"/>
 		</div>
-		<%-- 
+        <div id="tabs-5">
+            <g:render template="showConsumption"/>
+        </div>
+		<%--
 		<div id="tabs-5" style="padding: 0px;">
 			<g:render template="showLotNumbers"/>
 		</div>

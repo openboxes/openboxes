@@ -551,13 +551,54 @@ class RequisitionService {
         return requisitions
     }
 
+    public List<RequisitionItem> getCanceledRequisitionItems(Location location, Product product) {
+        def requisitionItems = RequisitionItem.createCriteria().list() {
+            requisition {
+                or {
+                    eq("destination", location)
+                    eq("origin", location)
+                }
+                and {
+                    eq("isTemplate", false)
+                    eq("status", RequisitionStatus.CANCELED)
+                }
+            }
+            eq("product", product)
+        }
+        //println requisitionItems
+        return requisitionItems
+    }
+
+
+    public List<RequisitionItem> getIssuedRequisitionItems(Location location, Product product) {
+        def requisitionItems = RequisitionItem.createCriteria().list() {
+            requisition {
+                or {
+                    eq("destination", location)
+                    eq("origin", location)
+                }
+                and {
+                    eq("isTemplate", false)
+                    eq("status", RequisitionStatus.ISSUED)
+                }
+            }
+            eq("product", product)
+        }
+        //println requisitionItems
+        return requisitionItems
+    }
+
+
     public List<RequisitionItem> getPendingRequisitionItems(Location location, Product product) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
-                eq("destination", location)
-                lt("status", RequisitionStatus.ISSUED)
-                not {
-                    eq("status", RequisitionStatus.CANCELED)
+                or {
+                    eq("destination", location)
+                    eq("origin", location)
+                }
+                and {
+                    eq("isTemplate", false)
+                    'in'("status", [RequisitionStatus.CHECKING, RequisitionStatus.EDITING, RequisitionStatus.CONFIRMING, RequisitionStatus.PICKED, RequisitionStatus.PICKING])
                 }
             }
             eq("product", product)

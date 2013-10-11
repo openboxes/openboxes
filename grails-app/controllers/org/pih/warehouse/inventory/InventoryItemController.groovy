@@ -150,7 +150,9 @@ class InventoryItemController {
 
         def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.productInstance)
 
-		[ commandInstance: commandInstance, requisitionItems: requisitionItems, quantityMap: quantityMap ]
+        def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
+
+		[ commandInstance: commandInstance, requisitionItems: requisitionItems, quantityMap: quantityMap, issuedRequisitionItems:issuedRequisitionItems ]
 	}
 
     /*

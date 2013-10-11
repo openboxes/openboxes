@@ -30,6 +30,7 @@ import org.pih.warehouse.requisition.Requisition
 
 class ConsumptionController {
 
+    def dataService
     def consoleService
     ProductService productService
     InventoryService inventoryService
@@ -288,32 +289,14 @@ class ConsumptionController {
             }
             //println "CSV: " + sw.toString()
 
-            def sw = new StringWriter()
-            if (csvrows) {
-                def columnHeaders = csvrows[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
-                sw.append(columnHeaders.join(",")).append("\n")
-                csvrows.each { csvrow ->
-                    def values = csvrow.values().collect { value ->
-                        if (value?.toString()?.isNumber()) {
-                            value
-                        }
-                        else {
-                            //'"' + value.toString().replace('"','""') + '"'
-                            StringEscapeUtils.escapeCsv(value.toString())
-                        }
-                    }
-                    sw.append(values.join(","))
-                    sw.append("\n")
-                }
-            }
-
+            def csv = dataService.generateCsv(csvrows)
             println "Location breakdown " + (command.includeLocationBreakdown?'yes':'no')
             println "Selected locations " + command.selectedLocations
 
             //response.contentType = "text/csv;charset=utf-8"
 
             response.setHeader("Content-disposition", "attachment; filename='Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
-            render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
+            render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
         }
         else {
             [command:command]

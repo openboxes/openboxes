@@ -20,6 +20,7 @@
 								<warehouse:message code="inventory.browseByCategory.label"/>
 							</g:link>
 						</div>
+                        <hr/>
 						<div style="max-height: 400px; overflow: auto;">
 							<g:if test='${quickCategories }'>
 								<g:each var="category" in="${quickCategories}">
@@ -86,7 +87,13 @@
 				<warehouse:message code="orders.label"/>
 			</g:link>
 			<div class="buttonsBar" style="min-width: 200px;">
-				<div class="megaButton">
+                <div class="megaButton">
+                    <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                        <warehouse:message code="order.create.label"/>
+                    </g:link>
+                </div>
+                <hr/>
+                <div class="megaButton">
 					<g:link controller="order" action="list" params="[status:'PENDING']" class="list"><warehouse:message code="order.list.label"/></g:link>
 				</div>
 				<g:each in="${incomingOrders}" var="orderStatusRow">
@@ -96,20 +103,36 @@
 						</g:link>
 					</div>					
 				</g:each>
-				<div class="megaButton">							
-					<g:link controller="purchaseOrderWorkflow" action="index" class="create">
-						<warehouse:message code="order.create.label"/>
-					</g:link>
-				</div>										
 			</div>
 		</li>
 	</g:authorize>
 	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
 		<li>
-			<g:link controller="requisition" action="list">
-				<warehouse:message code="requests.label"/>
-			</g:link>
-			<div>
+                <g:link controller="requisition" action="list">
+                    <warehouse:message code="requests.label"/>
+                </g:link>
+                <div>
+                <div class="megaButton">
+                    <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'WARD_STOCK']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
+                    </g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
+                    </g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="requisition" action="createAdhoc" class="create" params="[type:'WARD_ADHOC']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
+                    </g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="requisition" action="createDepot" class="create" params="[type:'DEPOT_TO_DEPOT']">
+                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depotToDepot.label')]" />
+                    </g:link>
+                </div>
+                <hr/>
                 <div class="buttonsBar" style="min-width: 200px;">
                     <div class="megaButton">
                         <g:link controller="requisition" action="list" class="list">
@@ -128,9 +151,6 @@
                         </g:if>
                     </g:each>
 
-                    <div class="megaButton">
-                        <hr/>
-                    </div>
                 <%--
                 <div class="megaButton">
                     <g:link controller="requisition" action="list" class="list" >
@@ -143,26 +163,6 @@
                     </g:link>
                 </div>
                 --%>
-	                <div class="megaButton">
-	                    <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'WARD_STOCK']">
-	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
-	                    </g:link>
-	                </div>
-                    <div class="megaButton">
-                        <g:link controller="requisition" action="createNonStock" class="create" params="[type:'WARD_NON_STOCK']">
-                            <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
-                        </g:link>
-                    </div>
-	                <div class="megaButton">
-	                    <g:link controller="requisition" action="createAdhoc" class="create" params="[type:'WARD_ADHOC']">
-	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
-	                    </g:link>
-	                </div>
-	                <div class="megaButton">
-	                    <g:link controller="requisition" action="createDepot" class="create" params="[type:'DEPOT_TO_DEPOT']">
-	                        <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.depotToDepot.label')]" />
-	                    </g:link>
-	                </div>
 					<%--
 	                <div class="megaButton">
 	                    <g:link controller="requisition" action="create" class="create" params="[type:'DEPOT_STOCK']">
@@ -190,6 +190,7 @@
                 <div class="megaButton">
                     <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
                 </div>
+                <hr/>
                 <div class="megaButton">
    					<g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
                             <warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/>
@@ -208,7 +209,8 @@
 					</div>
 				</g:each>
 			</div>
-		</li>
+
+        </li>
 	</g:authorize>		
 	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
 		<li>
@@ -220,6 +222,7 @@
                 <div class="megaButton">
                     <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
                 </div>
+                <hr/>
                 <div class="megaButton">
 					<g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
                         <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
@@ -231,8 +234,6 @@
                         All (${incomingShipmentsCount})
                     </g:link>
                 </div>
-
-
 				<g:each in="${incomingShipments}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="shipment-status-${statusRow.key }">
@@ -250,7 +251,7 @@
 		<div class="buttonsBar" style="min-width: 200px;">
             <div class="megaButton">
                 <g:link controller="inventory" action="show">
-                    <warehouse:message code="inventory.viewCurrentStock.label" default="Current stock report"/>
+                    <warehouse:message code="report.quantityOnHand.label" default="Quantity on-hand report"/>
                 </g:link>
             </div>
 
@@ -464,9 +465,6 @@
 						<div class="megaButton">
 							<g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
 						</div>
-                        <div>
-                            <hr/>
-                        </div>
 						<div class="megaButton">
 							<g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link> 
 						</div>

@@ -2,8 +2,8 @@
 	<div style="text-align: center;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-			<div >
-				<table class="box" style="border-top: 0;">
+			<div>
+				<table class="box">
 					<thead>
 						<tr class="odd">
 							<th>

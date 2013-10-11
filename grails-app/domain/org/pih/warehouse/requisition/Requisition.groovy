@@ -112,6 +112,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date lastUpdated
     User createdBy
     User updatedBy
+    //String weekRequested
+    //String monthRequested
+    String monthRequested
+    String yearRequested
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
@@ -120,6 +124,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
     static mapping = {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc'
+
+        //week formula('WEEK(date_requested)')    //provide the exact column name of the date field
+        //month formula('MONTH(date_requested)')
+        monthRequested formula: "date_format(date_requested, '%M-%Y')"
+        yearRequested formula: "date_format(date_requested, '%Y')"
 //		comments cascade: "all-delete-orphan"
 //		documents cascade: "all-delete-orphan"
         //events cascade: "all-delete-orphan"
