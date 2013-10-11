@@ -240,7 +240,13 @@ class InventoryController {
                     println "Get quantity map " + date + " location = " + location
                     def quantityMap = [:]
                     quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tag)
-                    quantityMapByDate[date] = quantityMap
+                    def existingQuantityMap = quantityMapByDate[date]
+                    if (existingQuantityMap) {
+                        quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)
+                    }
+                    else {
+                        quantityMapByDate[date] = quantityMap
+                    }
                     println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
                     println "Time " + (System.currentTimeMillis() - startTime) + " ms"
                 }
@@ -273,6 +279,16 @@ class InventoryController {
         render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
 
     }
+
+    def mergeQuantityMap(oldQuantityMap, newQuantityMap) {
+        oldQuantityMap.each { product, oldQuantity ->
+            def newQuantity = newQuantityMap[product]?:0
+            oldQuantityMap[product] =  newQuantity + oldQuantity
+
+        }
+        return oldQuantityMap
+    }
+
 
     def getDatesBetween(startDate, endDate, frequency) {
 

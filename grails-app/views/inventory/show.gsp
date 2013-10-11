@@ -45,31 +45,31 @@
                                 </div>
                             </div>
                             <div class="prop">
-                                <label>Select products by tag</label>
+                                <label><warehouse:message code="tag.label"/></label>
                                 <div>
                                     <g:selectTag name="tag" class="chzn-select-deselect" value="${command?.tag?.id}" noSelection="['':'']"/>
                                 </div>
                             </div>
                             <div class="prop">
-                                <label>Select a start date</label>
+                                <label><warehouse:message code="reporting.startDate.label" default="Start date"/></label>
                                 <div>
                                     <g:jqueryDatePicker id="startDate" name="startDate" value="${command?.startDate}" format="MM/dd/yyyy" size="30"/>
                                 </div>
                             </div>
                             <div class="prop">
-                                <label>Select an end date</label>
+                                <label><warehouse:message code="reporting.endDate.label" default="End date"/></label>
                                 <div>
                                     <g:jqueryDatePicker id="endDate" name="endDate" value="${command?.endDate}" format="MM/dd/yyyy" size="30"/>
                                 </div>
                             </div>
                             <div class="prop">
-                                <label>Frequency</label>
+                                <label><warehouse:message code="reporting.frequency.label" default="Frequency"/></label>
                                 <div>
                                     <g:select name="frequency" value="${command?.frequency}" from="['','Daily','Weekly','Monthly','Quarterly','Annually']" class="chzn-select-deselect" />
                                 </div>
                             </div>
                             <div class="prop">
-                                <div class="right">
+                                <div class="center">
                                     <button name="button" value="search" class="button icon search">View</button>
                                     <button name="button" value="download" class="button icon log">Download</button>
                                     <g:link controller="inventory" action="show" class="button icon reload">Reset</g:link>
