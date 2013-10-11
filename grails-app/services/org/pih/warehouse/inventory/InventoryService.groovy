@@ -3089,6 +3089,27 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+    def getQuantityOnHand(product) {
+        def quantityMap = [:]
+        def locations = Location.list()
+        locations.each { location ->
+            if (location.inventory) {
+                def quantity = getQuantityOnHand(location, product)
+                if (quantity) {
+                    quantityMap[location] = quantity
+                }
+            }
+        }
+        return quantityMap
+    }
+
+
+    def calculateConsumption(product) {
+
+
+    }
+
+
 
 /*
     def getQuantityOnHandAsOfDate(location, date, tag) {

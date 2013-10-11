@@ -59,7 +59,7 @@ class InventoryItemController {
 	 * Displays the stock card for a product
 	 */
     //@Cacheable("showStockCardCache")
-    @CacheFlush("megamenuCache")
+    //@CacheFlush("megamenuCache")
 	def showStockCard = { StockCardCommand cmd ->
         //log.info "=".multiply(20)
         long currentTime = System.currentTimeMillis()
@@ -83,8 +83,8 @@ class InventoryItemController {
 
         def shipmentItems =
 			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		
-		def shipmentMap = shipmentItems.groupBy { it.shipment } 
+
+		def shipmentMap = shipmentItems.groupBy { it.shipment }
 		if (shipmentMap) { 
 			shipmentMap.keySet().each { 
 				def quantity = shipmentMap[it].sum() { it.quantity } 
@@ -126,7 +126,7 @@ class InventoryItemController {
 
 		
 		//println commandInstance?.transactionLogMap
-	
+	    /*
 		// FIXME Hacky implementation of recently viewed products 
 		try { 
 			if (!session.productsViewed) { 
@@ -145,11 +145,26 @@ class InventoryItemController {
 		} catch (Exception e) { 
 			log.error("Error while saving recently viewed product", e)
 		}
-
+        */
         //log.info "After setting session productsViewed " + (System.currentTimeMillis() - currentTime) + " ms"
 
-		[ commandInstance: commandInstance ]
+        def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.productInstance)
+
+		[ commandInstance: commandInstance, requisitionItems: requisitionItems, quantityMap: quantityMap ]
 	}
+
+    /*
+    def exportStockHistory = {
+        def location = Location.get(session.warehouse.id)
+        def product = Product.get(params.id)
+        def stockHistory = inventoryService.getStockHistory(location.inventory, product)
+
+
+        render stockHistory
+        //[stockHistory : stockHistory]
+    }
+    */
+
 
 	/**
 	 * Displays the stock card for a product
