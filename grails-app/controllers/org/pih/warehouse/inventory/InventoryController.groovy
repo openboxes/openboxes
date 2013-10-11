@@ -10,9 +10,13 @@
 
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.ListUtils
+import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -182,35 +186,113 @@ class InventoryController {
 	}
 
 	def search = { QuantityOnHandReportCommand command ->
+        def quantityMapByDate = [:]
         def startTime = System.currentTimeMillis()
         println "search " + params
 
-        if (!command?.startDate) command.startDate = new Date();
-        if (!command?.locations) {
-            command.locations = [Location.get(session?.warehouse?.id)]
+        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tag
+
+        if (command.validate()) {
+
+            if (!command?.locations) {
+                command.locations = [Location.get(session?.warehouse?.id)]
+            }
+            //def transactions = Transaction.findAllByInventory(location.inventory)
+            //def transactionEntries = (transactions*.transactionEntries).flatten()
+            //log.info "transactionEntries: " + transactionEntries.size()
+            //def quantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
+
+            if (command.startDate && command.endDate) {
+                //def duration = command?.endDate - command?.startDate
+                //command.dates = new Date[duration+1]
+                //(command?.startDate .. command?.endDate).eachWithIndex { date, i ->
+                //    println "Date " + date + " i " + i
+                //    command.dates[i] = date
+                //}
+
+                //def duration = command.endDate - command.endDate
+                def count = 0;
+
+                command.dates = getDatesBetween(command.startDate, command.endDate, command.frequency)
+                if (command.dates.size() > 12) {
+                    command.dates = []
+                    //throw new Exception("Choose a different frequency")
+                    command.errors.rejectValue("frequency","errors.frequency.code","default error message")
+                    render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
+                    return
+                }
+
+                println "dates : " + command?.dates
+
+            }
+
+            else if (command.startDate) {
+                command?.dates << command?.startDate
+            }
+            else if (command.endDate) {
+                command?.dates << command?.endDate
+            }
+
+            println "dates: " + command?.dates
+
+            command.locations.each { location ->
+                for (date in command?.dates) {
+                    println "Get quantity map " + date + " location = " + location
+                    def quantityMap = [:]
+                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tag)
+                    quantityMapByDate[date] = quantityMap
+                    println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
+                    println "Time " + (System.currentTimeMillis() - startTime) + " ms"
+                }
+            }
+
+
+            def keys = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
+            println "keys: " + keys
+            keys.each { product ->
+                command.products << product
+            }
         }
-        //def transactions = Transaction.findAllByInventory(location.inventory)
-        //def transactionEntries = (transactions*.transactionEntries).flatten()
-        //log.info "transactionEntries: " + transactionEntries.size()
-        //def quantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
-        println command?.locations?.toString() + " " + command?.startDate + " " + command.tag
-        def quantityMapByDate = [:]
-        if (command.startDate && command.endDate) {
-            //def duration = command?.endDate - command?.startDate
-            //command.dates = new Date[duration+1]
-            //(command?.startDate .. command?.endDate).eachWithIndex { date, i ->
-            //    println "Date " + date + " i " + i
-            //    command.dates[i] = date
-            //}
+
+        if (params.button == 'download') {
+            if (command.products) {
+                def date = new Date();
+                response.setHeader("Content-disposition", "attachment; filename='Baseline-QoH-${date.format("yyyyMMdd-hhmmss")}.csv'")
+                response.contentType = "text/csv"
+                def csv = inventoryService.exportBaselineQoH(command.products, quantityMapByDate)
+                println "export products: " + csv
+                render csv
+            }
+            else {
+                render(text: 'No products found', status: 404)
+            }
+            return;
+        }
 
 
-            def date = command?.startDate
-            def count = 0;
-            while(date < command?.endDate || count > 10) {
-                command?.dates << date
-                if (params.frequency in ['Daily','Weekly']) {
-                    def daysToAdd = (params.frequency=='Weekly')?7:1
-                    date += daysToAdd
+        render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
+
+    }
+
+    def getDatesBetween(startDate, endDate, frequency) {
+
+        def count = 0
+        def dates = []
+        if (startDate.before(endDate)) {
+            def date = startDate
+            while(date.before(endDate)) {
+                println "Start date = " + date + " endDate = " + endDate
+
+                dates << date
+                if (params.frequency in ['Daily']) {
+                    use(TimeCategory) {
+                        date = date.plus(1.day)
+                    }
+                }
+                else if (params.frequency in ['Weekly']) {
+                    use(TimeCategory) {
+                        date = date.plus(1.week)
+                    }
                 }
                 else if (params.frequency in ['Monthly']) {
                     use(TimeCategory) {
@@ -222,40 +304,23 @@ class InventoryController {
                         date = date.plus(3.month)
                     }
                 }
+                else if (params.frequency in ['Annually']) {
+                    use(TimeCategory) {
+                        date = date.plus(1.year)
+                    }
+                }
+                else {
+                    use(TimeCategory) {
+                        date = date.plus(1.day)
+                    }
+
+                }
                 count++
             }
-
-            println "dates : " + command?.dates
-
         }
-
-        else if (command.startDate) {
-            command?.dates << command?.startDate
-        }
-        else if (command.endDate) {
-            command?.dates << command?.endDate
-        }
-
-        println "dates: " + command?.dates
-
-        command.locations.each { location ->
-            for (date in command?.dates) {
-                println "Get quantity map " + date + " location = " + location
-                def quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tag)
-                quantityMapByDate[date] = quantityMap
-                println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
-                println "Time " + (System.currentTimeMillis() - startTime) + " ms"
-            }
-        }
-
-        def keys = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
-        println "keys: " + keys
-        keys.each { product ->
-            command.products << product
-        }
-        render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
-
+        return dates
     }
+
 
     def download = { QuantityOnHandReportCommand command ->
 
@@ -1496,8 +1561,6 @@ class InventoryController {
 		}			
 	}
 
-	
-	
 	def editTransaction = {
         def startTime = System.currentTimeMillis()
 		log.info "edit transaction: " + params
@@ -1571,17 +1634,23 @@ class ConsumptionCommand {
 
 class QuantityOnHandReportCommand {
     //Location location
-    List locations = []
+    //def locations = ListUtils.lazyList([], FactoryUtils.instantiateFactory(Location))
+    List<Location> locations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List dates = []
     List products = []
     Tag tag
-    Date startDate
+    Date startDate = new Date()
     Date endDate
     String frequency
 
 
     static constraints = {
-
+        locations(nullable: false,
+                validator: { value, obj-> value?.size() >= 1 })
+        startDate(nullable:false,
+                validator: { value, obj-> !obj.endDate || value.before(obj.endDate) })
+        endDate(nullable: false)
+        frequency(nullable: false, blank: false)
     }
 }
 

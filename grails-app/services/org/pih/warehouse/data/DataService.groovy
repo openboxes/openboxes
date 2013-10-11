@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.data
 
+import org.apache.commons.lang.StringEscapeUtils
+
 class DataService {
 	
 	static transactional = true
@@ -35,5 +37,27 @@ class DataService {
 		}
 		
 	}
+
+    String generateCsv(csvrows) {
+        def sw = new StringWriter()
+        if (csvrows) {
+            def columnHeaders = csvrows[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
+            sw.append(columnHeaders.join(",")).append("\n")
+            csvrows.each { row ->
+                def values = row.values().collect { value ->
+                    if (value?.toString()?.isNumber()) {
+                        value
+                    }
+                    else {
+                        //'"' + value.toString().replace('"','""') + '"'
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                }
+                sw.append(values.join(","))
+                sw.append("\n")
+            }
+        }
+        return sw.toString()
+    }
 	
 }

@@ -38,9 +38,10 @@
                     <g:form controller="inventory" action="search">
                         <div class="filters">
                             <div class="prop">
-                                <label>Select a location</label>
+                                <label>${warehouse.message(code:'locations.label')}</label>
                                 <div>
-                                    <g:selectLocation name="location.id" multiple="true" class="chzn-select-deselect" value="${command?.locations?.id}" noSelection="['':'']"/>
+                                    <g:selectLocation name="locations" multiple="true" class="chzn-select-deselect" value="${command?.locations?.id}" noSelection="['':'']" data-placeholder=" " />
+
                                 </div>
                             </div>
                             <div class="prop">
@@ -68,7 +69,11 @@
                                 </div>
                             </div>
                             <div class="prop">
-                                <button class="button icon search">Search</button>
+                                <div class="right">
+                                    <button name="button" value="search" class="button icon search">View</button>
+                                    <button name="button" value="download" class="button icon log">Download</button>
+                                    <g:link controller="inventory" action="show" class="button icon reload">Reset</g:link>
+                                </div>
                             </div>
                         </div>
                     </g:form>
@@ -77,6 +82,16 @@
             </div>
             <div class="yui-u">
 
+                <g:hasErrors bean="${command}">
+                    <div class="errors">
+                        <g:renderErrors bean="${command}" as="list" />
+                    </div>
+                </g:hasErrors>
+
+                <g:if test="${session.quantityMapByDate}">
+                    <g:link controller="inventory" action="export" class="button icon log">Export as CSV</g:link>
+
+                </g:if>
                 <div class="box">
                     <h2 class="middle">
                         Quantity On Hand Report

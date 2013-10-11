@@ -11,6 +11,8 @@ package org.pih.warehouse.inventory
 
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import org.apache.commons.lang.StringEscapeUtils
+import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -33,6 +35,7 @@ import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
 
+    def dataService
 	def sessionFactory
 	def productService
 	def identifierService
@@ -3056,6 +3059,35 @@ class InventoryService implements ApplicationContextAware {
         }
         return transactionEntries;
     }
+
+    /**
+     * Export given products.
+     * @param products
+     * @return
+     */
+    String exportBaselineQoH(products, quantityMapByDate) {
+        def csvrows = []
+        products.each { product ->
+            def csvrow = [
+                'Product code': product.productCode?:'',
+                'Product': product.name,
+                'UOM': product.unitOfMeasure,
+                'Category': product?.category?.name,
+                'Manufacturer': product?.manufacturer,
+                'Vendor': product?.vendor
+            ]
+
+            if (quantityMapByDate) {
+                quantityMapByDate.each { key, value ->
+                    csvrow[key.format("dd-MMM-yyyy")] = quantityMapByDate[key][product]
+                }
+            }
+
+            csvrows << csvrow
+        }
+        return dataService.generateCsv(csvrows)
+    }
+
 
 
 /*
