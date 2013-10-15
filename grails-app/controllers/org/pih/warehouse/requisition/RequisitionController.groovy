@@ -19,10 +19,12 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
 import org.springframework.orm.hibernate3.HibernateSystemException
 
 class RequisitionController {
 
+    def dataService
     def requisitionService
     def inventoryService
 	def productService
@@ -705,7 +707,24 @@ class RequisitionController {
     }
 
 
-	
+    def export = {
+        def location = Location.get(session.warehouse.id)
+        def requisitions = Requisition.list()
+        if (requisitions) {
+            def date = new Date();
+            response.setHeader("Content-disposition",
+                    "attachment; filename='Requisitions-${date?date.format("yyyyMMdd-hhmmss"):""}.csv'")
+            response.contentType = "text/csv"
+            def csv = dataService.exportRequisitions(requisitions)
+            println "export requisitions: " + csv
+            render csv
+        }
+        else {
+            render(text: 'No requisitions found', status: 404)
+        }
+
+    }
+
 }
 
 

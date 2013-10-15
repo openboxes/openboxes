@@ -251,7 +251,7 @@
 		<div class="buttonsBar" style="min-width: 200px;">
             <div class="megaButton">
                 <g:link controller="inventory" action="show">
-                    <warehouse:message code="report.quantityOnHand.label" default="Quantity on-hand report"/>
+                    <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH report"/>
                 </g:link>
             </div>
 
@@ -275,9 +275,7 @@
             <div class="megaButton">
                 <g:link controller="report" action="showInventorySamplingReport"><warehouse:message code="report.showInventorySamplingReport.label" default="Inventory sampling report"/></g:link>
             </div>
-			<div>
-				<hr/>
-			</div>
+            <hr/>
 			<div class="megaButton">
 				<g:link controller="inventory" action="listExpiredStock" class="report-expired"><warehouse:message code="inventory.expiredStock.label"/></g:link>
 			</div>
@@ -290,8 +288,9 @@
 			<div class="megaButton">
 				<g:link controller="inventory" action="listReorderStock" class="report-reorder"><warehouse:message code="inventory.reorderStock.label"/></g:link>
 			</div>
-            <div>
-                <hr/>
+            <hr/>
+            <div class="megaButton">
+                <g:link controller="requisition" action="export" class="list"><warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/></g:link>
             </div>
             <%--
             <div class="megaButton">

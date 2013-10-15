@@ -441,8 +441,6 @@
                             params="${pageParams.findAll {it.value}}"/>
 
                     </div>
-
-
 				</div>
 			</div>		
         </div>

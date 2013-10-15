@@ -3068,6 +3068,7 @@ class InventoryService implements ApplicationContextAware {
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
         products.each { product ->
+            //def inventoryLevel = inventoryLevelMap[product]
             def csvrow = [
                 'Product code': product.productCode?:'',
                 'Product': product.name,
@@ -3075,6 +3076,10 @@ class InventoryService implements ApplicationContextAware {
                 'Category': product?.category?.name,
                 'Manufacturer': product?.manufacturer,
                 'Vendor': product?.vendor
+                //'Bin Location': inventoryLevel?.binLocation?:"",
+                //'Min': inventoryLevel?.minQuantity?:"",
+                //'Reorder': inventoryLevel?.reorderQuantity?:"",
+                //'Max': inventoryLevel?.maxQuantity?:""
             ]
 
             if (quantityMapByDate) {

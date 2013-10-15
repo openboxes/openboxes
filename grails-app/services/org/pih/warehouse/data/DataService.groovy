@@ -10,6 +10,10 @@
 package org.pih.warehouse.data
 
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.plugins.csv.CSVWriter
+import org.pih.warehouse.core.Constants
+
+import java.text.SimpleDateFormat
 
 class DataService {
 	
@@ -35,8 +39,148 @@ class DataService {
 		people.each { 
 			log.info it;
 		}
-		
 	}
+
+
+    String exportProducts(products) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+        def csvWriter = new CSVWriter(sw, {
+            "ID" { it.id }
+            "SKU" { it.productCode }
+            "Name" { it.name }
+            org.pih.warehouse.product.Category { it.category }
+            "Description" { it.description }
+            "Unit of Measure" { it.unitOfMeasure }
+            "Manufacturer" { it.manufacturer }
+            "Brand" { it.brandName }
+            "Manufacturer Code" { it.manufacturerCode }
+            "Manufacturer Name" { it.manufacturerName }
+            "Vendor" { it.vendor }
+            "Vendor Code" { it.vendorCode }
+            "Vendor Name" { it.vendorName }
+            "Cold Chain" { it.coldChain }
+            "UPC" { it.upc }
+            "NDC" { it.ndc }
+            "Date Created" { it.dateCreated }
+            "Date Updated" { it.lastUpdated }
+        })
+
+        products.each { product ->
+            def row =  [
+                    id: product?.id,
+                    productCode: product.productCode?:'',
+                    name: product.name,
+                    category: product?.category?.name,
+                    description: product?.description?:'',
+                    unitOfMeasure: product.unitOfMeasure?:'',
+                    manufacturer: product.manufacturer?:'',
+                    brandName: product.brandName?:'',
+                    manufacturerCode: product.manufacturerCode?:'',
+                    manufacturerName: product.manufacturerName?:'',
+                    vendor: product.vendor?:'',
+                    vendorCode: product.vendorCode?:'',
+                    vendorName: product.vendorName?:'',
+                    coldChain: product.coldChain?:Boolean.FALSE,
+                    upc: product.upc?:'',
+                    ndc: product.ndc?:'',
+                    dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
+                    lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
+            ]
+            // We just want to make sure that these match because we use the same format to
+            // FIXME It would be better if we could drive the export off of this array of columns,
+            // but I'm not sure how.  It's possible that the constant could be a map of column
+            // names to closures (that might work)
+            assert row.keySet().size() == Constants.EXPORT_PRODUCT_COLUMNS.size()
+            csvWriter << row
+        }
+        return sw.toString()
+    }
+
+
+    String exportRequisitions(requisitions) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+        def csvWriter = new CSVWriter(sw, {
+            "ID" { it.id }
+            "Requisition Number" { it.requisitionNumber }
+            "Status" { it.status }
+            "Type" { it.type }
+            "Class" { it.commodityClass }
+            "Name" { it.name }
+            "Requesting ward" { it.origin }
+            "Processing depot" { it.destination }
+
+            "Requested by" { it?.requestedBy?.name }
+            "Date Requested" { it.dateRequested }
+
+            "Verified" { it?.verifiedBy?.name }
+            "Date Verified" { it.dateVerified }
+
+            "Picked" { it?.pickedBy?.name }
+            "Date Picked" { it.datePicked }
+
+            "Checked" { it?.checkedBy?.name }
+            "Date Checked" { it.dateChecked }
+
+            "Issued" { it?.issuedBy?.name }
+            "Date Issued" { it.dateIssued }
+
+            "Created" { it?.createdBy?.name }
+            "Date Created" { it.dateCreated }
+
+            "Updated" { it?.updatedBy?.name }
+            "Date Updated" { it.lastUpdated }
+        })
+
+        requisitions.each { requisition ->
+            def row =  [
+                    id: requisition?.id,
+                    requisitionNumber: requisition.requestNumber,
+                    type: requisition?.type,
+                    commodityClass: requisition?.commodityClass,
+                    status: requisition.status,
+                    name: requisition.name,
+                    origin: requisition.origin,
+                    destination: requisition.destination,
+
+                    requestedBy: requisition.requestedBy,
+                    dateRequested: requisition.dateRequested,
+
+                    reviewedBy: requisition.reviewedBy,
+                    dateReviewed: requisition.dateReviewed,
+
+                    verifiedBy: requisition.verifiedBy,
+                    dateVerified: requisition.dateVerified,
+
+                    checkedBy: requisition.checkedBy,
+                    dateChecked: requisition.dateChecked,
+
+                    deliveredBy: requisition.deliveredBy,
+                    dateDelivered: requisition.dateDelivered,
+
+                    pickedBy: requisition?.picklist?.picker,
+                    datePicked: requisition?.picklist?.datePicked,
+
+                    issuedBy: requisition.issuedBy,
+                    dateIssued: requisition.dateIssued,
+
+                    receivedBy: requisition.receivedBy,
+                    dateReceived: requisition.dateReceived,
+
+                    createdBy: requisition.createdBy,
+                    dateCreated: requisition.dateCreated?"${formatDate.format(requisition.dateCreated)}":"",
+
+                    updatedBy: requisition.updatedBy,
+                    lastUpdated: requisition.lastUpdated?"${formatDate.format(requisition.lastUpdated)}":"",
+            ]
+            csvWriter << row
+        }
+        return sw.toString()
+    }
+
 
     String generateCsv(csvrows) {
         def sw = new StringWriter()
