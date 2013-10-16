@@ -75,6 +75,13 @@ class InventoryServiceUnitTests extends BaseUnitTest {
 		
 		mockDomain(TransactionEntry, transactionEntries)
 	}
+
+
+    void test_getQuantityByProductAndInventoryItemMap_shouldReturnEmptyMapOnNullParameter() {
+        def inventoryService = new InventoryService();
+        def map = inventoryService.getQuantityByProductAndInventoryItemMap(null)
+        assertEquals [:],map
+    }
 	
 	void test_getQuantityByProductAndInventoryItemMap() {
 		

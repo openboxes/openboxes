@@ -1197,60 +1197,63 @@ class InventoryService implements ApplicationContextAware {
 	Map<Product, Map<InventoryItem, Integer>> getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries) {
 		def startTime = System.currentTimeMillis()
 		def quantityMap = [:]
-		def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
-		def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
+        def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
+        def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
 
         // first make sure the transaction entries are sorted, with most recent first
-        entries = entries.sort().reverse()
+        if (entries) {
 
-        entries.each { transactionEntry ->
+            entries = entries.sort().reverse()
 
-            // There are cases where the transaction entry might be null, so we need to check for this edge case
-            if (transactionEntry) {
-                def inventoryItem = transactionEntry.inventoryItem
-                //def product = inventoryItem.product
-                def transaction = transactionEntry.transaction
+            entries.each { transactionEntry ->
 
-                // first see if this is an entry we can skip (because we've already reached a product inventory transaction
-                // for this product, or a inventory transaction for this inventory item)
-                if (!(reachedProductInventoryTransaction[inventoryItem.product] && reachedProductInventoryTransaction[inventoryItem.product] != transaction) &&
-                        !(reachedInventoryTransaction[inventoryItem.product] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] != transaction)) {
+                // There are cases where the transaction entry might be null, so we need to check for this edge case
+                if (transactionEntry) {
+                    def inventoryItem = transactionEntry.inventoryItem
+                    //def product = inventoryItem.product
+                    def transaction = transactionEntry.transaction
 
-                    // check to see if there's an entry in the map for this product and create if needed
-                    if (!quantityMap[inventoryItem.product]) {
-                        quantityMap[inventoryItem.product] = [:]
-                    }
+                    // first see if this is an entry we can skip (because we've already reached a product inventory transaction
+                    // for this product, or a inventory transaction for this inventory item)
+                    if (!(reachedProductInventoryTransaction[inventoryItem.product] && reachedProductInventoryTransaction[inventoryItem.product] != transaction) &&
+                            !(reachedInventoryTransaction[inventoryItem.product] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] != transaction)) {
 
-                    // check to see if there's an entry for this inventory item in the map and create if needed
-                    if (!quantityMap[inventoryItem.product][inventoryItem]) {
-                        quantityMap[inventoryItem.product][inventoryItem] = 0
-                    }
-
-                    //println "Transaction entry " + transactionEntry.id
-                    //println "Transaction " + transactionEntry.transaction
-                    // now update quantity as necessary
-                    def code = transactionEntry.transaction.transactionType.transactionCode
-
-                    if (code == TransactionCode.CREDIT) {
-                        quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
-                    }
-                    if (code == TransactionCode.DEBIT) {
-                        quantityMap[inventoryItem.product][inventoryItem] -= transactionEntry.quantity
-                    }
-                    if (code == TransactionCode.INVENTORY) {
-                        quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
-
-                        // mark that we are done with this inventory item (after this transaction)
-                        if (!reachedInventoryTransaction[inventoryItem.product]) {
-                            reachedInventoryTransaction[inventoryItem.product] = [:]
+                        // check to see if there's an entry in the map for this product and create if needed
+                        if (!quantityMap[inventoryItem.product]) {
+                            quantityMap[inventoryItem.product] = [:]
                         }
-                        reachedInventoryTransaction[inventoryItem.product][inventoryItem] = transaction
-                    }
-                    if (code == TransactionCode.PRODUCT_INVENTORY) {
-                        quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
 
-                        // mark that we are done with this product (after this transaction)
-                        reachedProductInventoryTransaction[inventoryItem.product] = transaction
+                        // check to see if there's an entry for this inventory item in the map and create if needed
+                        if (!quantityMap[inventoryItem.product][inventoryItem]) {
+                            quantityMap[inventoryItem.product][inventoryItem] = 0
+                        }
+
+                        //println "Transaction entry " + transactionEntry.id
+                        //println "Transaction " + transactionEntry.transaction
+                        // now update quantity as necessary
+                        def code = transactionEntry.transaction.transactionType.transactionCode
+
+                        if (code == TransactionCode.CREDIT) {
+                            quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
+                        }
+                        if (code == TransactionCode.DEBIT) {
+                            quantityMap[inventoryItem.product][inventoryItem] -= transactionEntry.quantity
+                        }
+                        if (code == TransactionCode.INVENTORY) {
+                            quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
+
+                            // mark that we are done with this inventory item (after this transaction)
+                            if (!reachedInventoryTransaction[inventoryItem.product]) {
+                                reachedInventoryTransaction[inventoryItem.product] = [:]
+                            }
+                            reachedInventoryTransaction[inventoryItem.product][inventoryItem] = transaction
+                        }
+                        if (code == TransactionCode.PRODUCT_INVENTORY) {
+                            quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
+
+                            // mark that we are done with this product (after this transaction)
+                            reachedProductInventoryTransaction[inventoryItem.product] = transaction
+                        }
                     }
                 }
             }
