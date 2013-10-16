@@ -214,13 +214,13 @@ class InventoryController {
                 def count = 0;
 
                 command.dates = getDatesBetween(command.startDate, command.endDate, command.frequency)
-                if (command.dates.size() > 12) {
-                    command.dates = []
+                //if (command.dates.size() >= 61) {
+                //    command.dates = []
                     //throw new Exception("Choose a different frequency")
-                    command.errors.rejectValue("frequency","errors.frequency.code","default error message")
-                    render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
-                    return
-                }
+                //    command.errors.rejectValue("frequency","errors.frequency.code","Cannot run report for more than 60 days")
+                //    render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
+                //    return
+                //}
 
                 println "dates : " + command?.dates
 
