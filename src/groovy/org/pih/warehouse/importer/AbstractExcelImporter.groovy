@@ -22,6 +22,7 @@ public abstract class AbstractExcelImporter {
 	HSSFSheet sheet = null
 
 	HSSFFormulaEvaluator evaluator = null;
+
 	public AbstractExcelImporter(String fileName) {
 		this.inFile = fileName
 		inStr = new FileInputStream(inFile)

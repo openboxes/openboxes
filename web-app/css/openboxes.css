@@ -2369,7 +2369,7 @@ blockquote {
     border-left: 3px solid #ccc;
 }
 
-.modified { color: red; }
+.modified { color: blue; }
 
 .tooltip {
     position: absolute;

@@ -274,6 +274,12 @@ class Product implements Comparable, Serializable {
         return this?.images ? this.images?.sort()?.first() : null
     }
 
+    ProductPackage getProductPackage(uomCode) {
+        def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
+        return ProductPackage.findByProductAndUom(this, unitOfMeasure)
+    }
+
+
     ProductGroup getGenericProduct() {
         return this?.productGroups ? this?.productGroups?.sort()?.first() : null
     }

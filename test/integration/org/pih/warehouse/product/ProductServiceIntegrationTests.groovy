@@ -199,6 +199,52 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 
     @Test
+    void importProducts_shouldAddExistingTags() {
+        def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
+        def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
+        def productBefore = DbHelper.createProductIfNotExists("Sudafed");
+
+        assertNotNull productBefore.id
+        assertEquals 0, productBefore?.tags?.size()?:0
+
+        def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        def tags = ["tag1", "tag2"] as List
+        productService.importProducts(csv, tags, true)
+
+        def productAfter = Product.get(productBefore.id)
+        println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
+
+        assertEquals productBefore.id, productAfter.id
+        assertEquals 2, productAfter?.tags?.size()
+
+    }
+
+    @Test
+    void importProducts_shouldAddNewTags() {
+        def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
+        def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
+
+        def product = DbHelper.createProductIfNotExists("Sudafed");
+
+        assertNotNull product.id
+        assertEquals 0, product?.tags?.size()?:0
+
+        def row1 = ["${product.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        def tags = ["tag3", "tag4", "tag1", "tag2"] as List
+        productService.importProducts(csv, tags, true)
+
+        def result = Product.get(product.id)
+        println ("Get product " + result.name + " " + result.id + " " + result.productCode)
+
+        assertEquals product.id, result.id
+        assertEquals 4, result?.tags?.size()
+
+    }
+
+
+    @Test
 	void getDelimiter_shouldDetectCommaDelimiter() {
 		// def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed description","EA","Acme","Brand X","ACME-249248","Vendor Y","Y-1284","Sudafed","true","UPC-1202323","NDC-122929-39292","",""]

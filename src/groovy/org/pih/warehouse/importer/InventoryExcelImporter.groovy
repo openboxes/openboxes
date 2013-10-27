@@ -20,8 +20,7 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 
 	def inventoryService
 
-	static Map cellMap = [
-		sheet:'Sheet1', startRow: 1, cellMap: [ ]]
+	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
 
 	static Map columnMap = [
 		sheet:'Sheet1',

@@ -26,7 +26,7 @@ import org.grails.plugins.csv.CSVWriter
  */
 class ProductService {
 
-	def sessionFactory 
+	def sessionFactory
 	def grailsApplication
 	def identifierService
 	
@@ -541,8 +541,7 @@ class ProductService {
 	 * @param csv
 	 */
 	public List<Product> importProducts(String csv) {
-		def delimiter = getDelimiter(csv)
-		return importProducts(csv, delimiter, null, false)
+		return importProducts(csv, getDelimiter(csv), null, false)
 	}
 
 	/**
@@ -552,8 +551,7 @@ class ProductService {
 	 * @return
 	 */
 	public List<Product> importProducts(String csv, boolean saveToDatabase) {
-		def delimiter = getDelimiter(csv)
-		return importProducts(csv, delimiter, null, saveToDatabase)
+		return importProducts(csv, getDelimiter(csv), null, saveToDatabase)
 	}
 
 	/**
@@ -563,8 +561,7 @@ class ProductService {
 	 * @return
 	 */
 	public List<Product> importProducts(String csv, List tags, boolean saveToDatabase) {
-		def delimiter = getDelimiter(csv)
-		return importProducts(csv, delimiter, tags, saveToDatabase)
+		return importProducts(csv, getDelimiter(csv), tags, saveToDatabase)
 	}
 
 	
@@ -683,21 +680,23 @@ class ProductService {
 				println "Product: " + product.name + " " + product.id + " " + product.productCode
 				println "Product tags: " + product.tags
 				println "Product productGroup: " + product.productGroups
+                product.save(flush: true)
 
 				if(!product.productGroups) {
 					ProductGroup productGroup = ProductGroup.findByDescription(product.name)
 					if (!productGroup) {  
 						println "Creating new product group " + product.name
 						productGroup = new ProductGroup(name: product.name, description: product.name, category: product.category)
-						if (!productGroup.save(flush:true,failOnError:true)) {
+						if (!productGroup.save(flush: true)) {
 							throw new ValidationException("Could not create generic product '" + product.name + "'", productGroup.errors)
 						}
 					}
 					product.addToProductGroups(productGroup)
-				}				
-				addTagsToProduct(product, tags)
-				product.save(flush:true, failOnError:true)
-			}
+                    product.save(flush: true)
+				}
+                addTagsToProduct(product, tags)
+                product.save(flush: true)
+            }
 		}
 
 			
@@ -844,18 +843,31 @@ class ProductService {
 	 * @param product
 	 * @param tags
 	 */
-	def addTagsToProduct(product, tags) { 
+	def addTagsToProduct(product, tags) {
 		if (tags) {
 			tags.each { tagName ->
-				Tag tag = Tag.findByTagAndIsActive(tagName, true)
-				if (!tag) {
-					tag = new Tag(tag: tagName)
-					tag.save()
-				}
-				product.addToTags(tag)
+                if (tagName) {
+                    addTagToProduct(product, tagName)
+                }
 			}
 		}
 	}
+
+    /**
+     * Add the single tag to the
+     * @param product
+     * @param tagName
+     * @return
+     */
+    def addTagToProduct(product, tagName) {
+        Tag tag = Tag.findByTag(tagName)
+        if (!tag) {
+            tag = new Tag(tag: tagName)
+            tag.save()
+        }
+        product.addToTags(tag)
+        product.save();
+    }
 
     /**
      * Add a list of tags to each of the given products.
