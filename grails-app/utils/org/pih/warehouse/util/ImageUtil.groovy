@@ -22,8 +22,8 @@ class ImageUtil {
 		int width = ai.getWidth( null )
 		int height = ai.getHeight( null )
 	
-		def limits = 300..2000
-		assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
+		//def limits = 300..2000
+		//assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
 	
 		float aspectRatio = width / height
 		float requiredAspectRatio = maxW / maxH
@@ -44,4 +44,5 @@ class ImageUtil {
 	
 		IIO.write( bi, 'JPEG', out )
 	}
+
 }

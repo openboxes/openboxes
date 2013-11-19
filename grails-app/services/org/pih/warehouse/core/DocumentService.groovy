@@ -71,7 +71,7 @@ class DocumentService {
 	}
 
 	
-	public File writeImage(org.pih.warehouse.core.Document document, String filename) { 
+	public File writeImage(org.pih.warehouse.core.Document document) {
 		File file
 		try { 
 			file = new File(document.filename)
@@ -79,7 +79,7 @@ class DocumentService {
 			fos << document?.fileContents
 			fos.close()
 		} catch (Exception e) { 
-			log.error("Error occurred while writing file " + document.filename)
+			log.error("Error occurred while writing file " + document.filename, e)
 		}
 		return file;
 	}
@@ -89,7 +89,7 @@ class DocumentService {
 		File file
 		FileInputStream fileInputStream
 		try { 
-			file = writeImage(document, document.filename)
+			file = writeImage(document)
 			def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".")+1)
 			log.debug "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
 			fileInputStream = new FileInputStream(file)			
@@ -101,7 +101,7 @@ class DocumentService {
             }
 
 		} catch (Exception e) { 
-			log.error("Error scaling image " + document?.filename + ": " + e.message)
+			log.error("Error scaling image " + document?.filename + ": " + e.message, e)
 			e.printStackTrace();
 		} finally { 
 			fileInputStream?.close();
