@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
@@ -42,15 +43,29 @@ class DataService {
 
 	static transactional = true
 
-    def importInventoryLevels(location, fileName) {
+    /**
+     *
+     */
+    def validateInventoryLevels(ImportDataCommand command) {
+        println "validate inventory levels " + command.filename
+        validateInventoryLevels(command.location, command.filename)
+    }
+
+    /**
+     *
+     * @param location
+     * @param fileName
+     * @return
+     */
+    def validateInventoryLevels(location, fileName) {
         InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(fileName);
-        def inventoryLevelList = importer.getInventoryLevels();
-        inventoryLevelList.subList(0,100).each { row ->
-            if (validateInventoryLevel(row)) {
-                importInventoryLevel(location, row)
+        def inventoryLevelList = importer.getData();
+        inventoryLevelList.each { row ->
+            if (!validateInventoryLevel(row)) {
+                return false
             }
         }
-        return inventoryLevelList
+        return true
     }
 
     def validateInventoryLevel(row) {
@@ -76,7 +91,41 @@ class DataService {
         return true
     }
 
+    def importInventoryLevels(ImportDataCommand command) {
+        println "Import inventory levels " + command.filename
+        importInventoryLevels(command.location, command.filename)
+    }
+
+
+    /**
+     * Import all inventory levels found in the file with the given fileName
+     *
+     * @param location
+     * @param fileName
+     * @return
+     */
+    def importInventoryLevels(location, filename) {
+        println "Import inventory levels " + location + " filename " + filename
+        InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(filename);
+        def inventoryLevelList = importer.getData();
+        inventoryLevelList.each { row ->
+            if (validateInventoryLevel(row)) {
+                importInventoryLevel(location, row)
+            }
+        }
+        return inventoryLevelList
+    }
+
+
+    /**
+     * Import a single row from the XLS file
+     *
+     * @param location
+     * @param fileName
+     * @return
+     */
     def importInventoryLevel(location, row) {
+        println "Import inventory levels " + location + " row " + row
         def product = findOrCreateProduct(row)
 
         // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
@@ -98,10 +147,30 @@ class DataService {
         product.save(failOnError:true)
     }
 
+    /**
+     * Add inventory level to product
+     *
+     * @param product
+     * @param inventory
+     * @param binLocation
+     * @param minQuantity
+     * @param reorderQuantity
+     * @param maxQuantity
+     * @return
+     */
     def addInventoryLevelToProduct(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity) {
         findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity)
     }
 
+    /**
+     * Add product package to product
+     *
+     * @param product
+     * @param uomCode
+     * @param quantity
+     * @param price
+     * @return
+     */
     def addProductPackageToProduct(product, uomCode, quantity, price) {
         println "Add product package to product: " + uomCode + " " + quantity + " " + price
         if (uomCode) {
@@ -111,6 +180,12 @@ class DataService {
         }
     }
 
+    /**
+     * Find or create a unit of measure with the given parameters.
+     *
+     * @param uomCode
+     * @return
+     */
     def findOrCreateUnitOfMeasure(uomCode) {
         def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
         if (!unitOfMeasure) {
@@ -125,6 +200,11 @@ class DataService {
 
     }
 
+    /**
+     * Find or create a unit of measure class -- we only care about Quantity.
+     *
+     * @return
+     */
     def findOrCreateQuantityUnitOfMeasureClass() {
         def unitOfMeasureClass = UnitOfMeasureClass.findByType(UnitOfMeasureType.QUANTITY)
         if (!unitOfMeasureClass) {
@@ -139,6 +219,17 @@ class DataService {
         return unitOfMeasureClass
     }
 
+    /**
+     * Find or create an inventory level with the given parameters.
+     *
+     * @param product
+     * @param inventory
+     * @param binLocation
+     * @param minQuantity
+     * @param reorderQuantity
+     * @param maxQuantity
+     * @return
+     */
     def findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity) {
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
@@ -156,8 +247,15 @@ class DataService {
         return inventoryLevel
     }
 
-
-
+    /**
+     * Find or create a product package with the given parameters.
+     *
+     * @param product
+     * @param uomCode
+     * @param quantity
+     * @param price
+     * @return
+     */
     def findOrCreateProductPackage(product, uomCode, quantity, price) {
         def unitOfMeasure = findOrCreateUnitOfMeasure(uomCode)
         def criteria = ProductPackage.createCriteria()
@@ -181,6 +279,15 @@ class DataService {
         return productPackage
     }
 
+    /**
+     * Find or create a product with the given parameters.
+     *
+     * @param product
+     * @param uomCode
+     * @param quantity
+     * @param price
+     * @return
+     */
     def findOrCreateProduct(row) {
         def category = findOrCreateCategory(row.category)
         def product = Product.findByProductCode(row.productCode)
@@ -200,6 +307,16 @@ class DataService {
         return product
     }
 
+
+    /**
+     * Find or create a category with the given categoryName.
+     *
+     * @param product
+     * @param uomCode
+     * @param quantity
+     * @param price
+     * @return
+     */
     def findOrCreateCategory(categoryName) {
         def category = Category.findByName(categoryName)
         if (!category) {
@@ -211,7 +328,15 @@ class DataService {
     }
 
 
-
+    /**
+     * Update an existing product with the data in the given row.
+     *
+     * @param product
+     * @param uomCode
+     * @param quantity
+     * @param price
+     * @return
+     */
     def updateProduct(product, row) {
         // Change category
         def category = productService.findOrCreateCategory(row.category)
@@ -245,14 +370,29 @@ class DataService {
         }
     }
 
+    /**
+     * Should use the apache library to handle this.
+     * @param str
+     * @return
+     */
     def getFloat(str) {
         try {
             return str.toFloat()
-        } catch (NumberFormatException e) { }
+        } catch (NumberFormatException e) {
+            log.error("Error converting string ${str} to float.")
+
+            throw e;
+        }
         return 0.0
     }
 
-
+    /**
+     * FIXME This should be a method on product.
+     *
+     * @param product
+     * @param categoryName
+     * @return
+     */
     def changeCategory(product, categoryName) {
         def category = productService.findOrCreateCategory(categoryName)
         if (product.category != category && category) {
@@ -260,17 +400,22 @@ class DataService {
         }
     }
 
+    /**
+     * FIXME This should be a method on product.
+     *
+     * @param product
+     * @param tags
+     * @return
+     */
     def addTagsToProduct(product, tags) {
         productService.addTagsToProduct(product, tags.split(","))
     }
 
-
-
-
-
-
-
-
+    /**
+     * Testing CSV data import functionality using Sql
+     *
+     * @return
+     */
 	def importData() { 
 		def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
 		def people = sql.dataSet("PERSON")
@@ -283,7 +428,9 @@ class DataService {
 		}
 	}
 
-	
+    /**
+     * Export data to CSV using groovy Sql classes.
+     */
 	def exportData() { 
 		def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
 		def people = sql.dataSet("PERSON")
@@ -293,7 +440,12 @@ class DataService {
 		}
 	}
 
-
+    /**
+     * Export the given products to CSV
+     *
+     * @param products
+     * @return
+     */
     String exportProducts(products) {
         def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
         def sw = new StringWriter()
@@ -350,7 +502,12 @@ class DataService {
         return sw.toString()
     }
 
-
+    /**
+     * Export the given requisitions to CSV.
+     *
+     * @param requisitions
+     * @return
+     */
     String exportRequisitions(requisitions) {
         def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
         def sw = new StringWriter()
@@ -433,7 +590,11 @@ class DataService {
         return sw.toString()
     }
 
-
+    /**
+     * Generic method to generate CSV string based on given csvrows map.
+     * @param csvrows
+     * @return
+     */
     String generateCsv(csvrows) {
         def sw = new StringWriter()
         if (csvrows) {
@@ -456,7 +617,12 @@ class DataService {
         return sw.toString()
     }
 
-
+    /**
+     * Utility method to retrieve basic properties for an upload file.
+     *
+     * @param uploadFile
+     * @return
+     */
     def getFileProperties(uploadFile) {
         def fileProps = [:]
         println "content type:        " + uploadFile.contentType
@@ -480,6 +646,14 @@ class DataService {
         return fileProps
     }
 
+    /**
+     * Converts an XLS file to a hash map.
+     *
+     * @param inputStream
+     * @param columTypes
+     * @param ignoredRows
+     * @return
+     */
     def xlsToSimpleHash(inputStream, columTypes, ignoredRows) {
         Workbook wb = new HSSFWorkbook(inputStream)
         //so this is just going to get sheet 1 .. who uses more than 1?
@@ -512,6 +686,12 @@ class DataService {
         return xlsData
     }
 
+    /**
+     * Saves an uploaded file to disk.
+     *
+     * @param uploadFile
+     * @return
+     */
     def saveFileToDisk(uploadFile) {
         def localFile
         try {

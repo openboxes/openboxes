@@ -184,5 +184,90 @@ class DataServiceTests extends GroovyTestCase {
      }
 
 
+    @Test
+    void importProductGroups() {
+        def startTime = System.currentTimeMillis()
+
+        // Get the
+        def location = Location.findByName("Boston Headquarters");
+        assertNotNull location
+        if (!location.inventory) {
+            location.inventory = new Inventory();
+            location.save(flush: true, failOnError: true)
+        }
+
+        Resource resource = new ClassPathResource("resources/inventoryLevelImportData.xls")
+        def file = resource.getFile()
+        assert file.exists()
+
+        def inventoryLevelList = dataService.importInventoryLevels(location, file.getAbsolutePath())
+        assertNotNull inventoryLevelList
+
+        def product = Product.findByProductCode("NM89")
+        assertNotNull product
+        assertEquals "X- Ray Digitizer", product.name
+        assertEquals "Diagnostic imaging products", product.category.name
+        assertEquals "HUM All Products", product.tagsToString()
+        assertEquals "Vidair", product.manufacturer
+        assertEquals "3D Systems Corporation", product.vendor
+        assertEquals "each", product.unitOfMeasure
+
+        product = Product.findByProductCode("PK77")
+        assertNotNull product
+        assertEquals "Burette Set (micro dropper), 150ml, w/ automatic shutoff", product.name
+        assertEquals "Intravenous (IV) and arterial administration products", product.category.name
+        assertTrue product.tagsToString().contains("HUM McKesson Consumables")
+        assertTrue product.tagsToString().contains("HUM All Products")
+        assertEquals "Braun", product.manufacturer
+        assertEquals "375113", product.manufacturerCode
+        assertEquals "AAA Wholesale", product.vendor
+        assertEquals "B-375113-EA", product.vendorCode
+        assertEquals "each", product.unitOfMeasure
+        assertEquals "BP2-02", product.getInventoryLevel(location.id).binLocation
+
+        product = Product.findByProductCode("NT75")
+        assertNotNull product
+        assertEquals "Applicator stick", product.name
+        assertEquals "Laboratory supplies", product.category.name
+        assertTrue product.tagsToString().contains("HUM All Products")
+        assertTrue product.tagsToString().contains("HUM Fisher Lab Order")
+        assertTrue product.tagsToString().contains("HUM Lab Reagents and Accessories")
+        assertEquals "Puritan", product.manufacturer
+        assertEquals "807", product.manufacturerCode
+        assertEquals "Fisher Scientific", product.vendor
+        assertEquals "22 029 491", product.vendorCode
+        assertEquals "each", product.unitOfMeasure
+
+        assertEquals 0.08591, product.pricePerUnit, 0.0001
+        assertEquals "B2-01-C2", product.getInventoryLevel(location.id).binLocation
+        assertEquals 5000, product.getInventoryLevel(location.id).minQuantity
+        assertEquals 10000, product.getInventoryLevel(location.id).reorderQuantity
+        assertEquals 20000, product.getInventoryLevel(location.id).maxQuantity
+
+        def productPackage = product.getProductPackage("CS")
+        assertNotNull productPackage
+        assertEquals 1000, productPackage.quantity
+        assertEquals 85.91, productPackage.price, 0.0001
+
+        /*
+        product = Product.findByProductCode("QM56")
+        assertNotNull product
+        assertEquals "Carvedilol, 12.5mg, tablet ", product.name
+        assertEquals "Drugs and pharmaceutical products", product.category.name
+        assertTrue product.tagsToString().contains("HUM Formulary")
+        assertTrue product.tagsToString().contains("HUM All Products")
+        assertEquals "Holden Medical Laboratories ", product.manufacturer
+        assertEquals "36075", product.manufacturerCode
+        assertEquals "each", product.unitOfMeasure
+        assertEquals "B13-02-B2", product.getInventoryLevel(location.id).binLocation
+        assertEquals 22000, product.getInventoryLevel(location.id).minQuantity
+        assertEquals 44000, product.getInventoryLevel(location.id).reorderQuantity
+        assertEquals 88000, product.getInventoryLevel(location.id).maxQuantity
+        */
+
+        //println inventoryLevelList
+        println "products after: " + Product.list()?.size()
+        println "Time to import ${inventoryLevelList.size()} items: " + (System.currentTimeMillis() - startTime) + " ms"
+    }
 
 }

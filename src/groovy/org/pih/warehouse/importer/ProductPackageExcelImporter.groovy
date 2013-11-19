@@ -9,14 +9,13 @@
 **/ 
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.ExcelImportUtils
-import org.grails.plugins.excelimport.*
+
 // import java.text.ParseException;
 // import java.text.SimpleDateFormat;
-class InventoryLevelExcelImporter extends AbstractExcelImporter {
+class ProductPackageExcelImporter extends AbstractExcelImporter {
 
-	def dataService
+	def inventoryService
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
 
@@ -74,9 +73,9 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 
 
-	public InventoryLevelExcelImporter(String fileName) {
+	public ProductPackageExcelImporter(String fileName) {
 		super(fileName)
-		dataService = ApplicationHolder.getApplication().getMainContext().getBean("dataService")
+		//inventoryService = ApplicationHolder.getApplication().getMainContext().getBean("inventoryService")
 	}
 
 
@@ -88,13 +87,10 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 	public void validateData(ImportDataCommand command) { 
 		//inventoryService.validateData(command)
-        dataService.validateInventoryLevels(command)
-
-    }
+	}
 
 	public void importData(ImportDataCommand command) { 
 		//inventoryService.importData(command)
-        dataService.importInventoryLevels(command)
 	}
 
 
