@@ -108,6 +108,12 @@ class BootStrap {
         assignOrderIdentifiers()
         assignRequisitionIdentifiers()
         assignTransactionIdentifiers()
+
+        //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
+        //TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+        //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
+
+
     }
 
 
