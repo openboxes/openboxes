@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
 
         compile ('org.docx4j:docx4j:2.8.1') { excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'}
         compile 'c3p0:c3p0:0.9.1.2'
-        compile 'mysql:mysql-connector-java:5.1.5'
+        compile 'mysql:mysql-connector-java:5.1.26'
 
         compile 'com.google.zxing:javase:2.0'
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
@@ -77,9 +77,9 @@ grails.project.dependency.resolution = {
         test(name:'spock', version:'0.6')
         */
 
-        runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
+        //runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
 
-        runtime( ':excel-import:0.3' ) { excludes 'poi', 'poi-contrib', 'poi-scratchpad' }
+        runtime( ':excel-import:0.3' ) { excludes 'poi-contrib', 'poi-scratchpad' }
 
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
 		
