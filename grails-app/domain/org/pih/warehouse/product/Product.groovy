@@ -206,6 +206,7 @@ class Product implements Comparable, Serializable {
             documents: Document,
             productGroups: ProductGroup,
             packages: ProductPackage,
+            synonyms: Synonym,
             inventoryItems: InventoryItem
     ]
 
@@ -217,6 +218,7 @@ class Product implements Comparable, Serializable {
         attributes joinTable: [name: 'product_attribute', column: 'attribute_id', key: 'product_id']
         documents joinTable: [name: 'product_document', column: 'document_id', key: 'product_id']
         productGroups joinTable: [name: 'product_group_product', column: 'product_group_id', key: 'product_id']
+        synonyms joinTable: [name: 'product_synonym', column: 'synonym_id', key: 'product_id']
     }
 
     static constraints = {

@@ -51,6 +51,9 @@
     <include file="0.5.x/add-inventory-level-abc-class.xml"/>
     <include file="0.5.x/add-column-requisition-item-children.xml"/>
     <include file="0.5.x/add-column-product-package-price.xml"/>
+    <include file="0.5.x/add-product-synonyms.xml"/>
+    <include file="0.5.x/modify-column-product-price-per-unit.xml"/>
+    <include file="0.5.x/modify-column-product-package-price.xml"/>
 
     <!--
     <include file="0.5.x/create-table-reason-code.xml"/>

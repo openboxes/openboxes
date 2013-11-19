@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1383796978266-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="product" columnName="price_per_unit" />
+        </preConditions>
+        <modifyColumn tableName="product">
+            <column name="price_per_unit" type="DECIMAL(19,4)">
+                <constraints nullable="true"/>
+            </column>
+        </modifyColumn>
+    </changeSet>
+
+</databaseChangeLog>

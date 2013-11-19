@@ -9,9 +9,11 @@
  **/ 
 package org.pih.warehouse.product
 
+import grails.converters.JSON
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
@@ -29,6 +31,7 @@ import com.google.zxing.BarcodeFormat
 
 class ProductController {
 
+    def dataService
 	def userService;
 	def mailService;
 	def productService;
@@ -181,6 +184,8 @@ class ProductController {
 		def productInstance = new Product();
 		productInstance.properties = params
 
+        updateTags(productInstance, params)
+
         /*
 		if (!productInstance.productCode) { 
 			productInstance.productCode = productService.generateProductIdentifier();
@@ -243,14 +248,14 @@ class ProductController {
 
 
 	def show = {
-		def productInstance = Product.get(params.id)
-		if (!productInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-			redirect(controller: "inventoryItem", action: "browse")
-		}
-		else {
-			[productInstance: productInstance]
-		}
+		//def productInstance = Product.get(params.id)
+		//if (!productInstance) {
+		//	flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+		//	redirect(controller: "inventoryItem", action: "browse")
+		//}
+		//else {
+		//	[productInstance: productInstance]
+		//}
 	}
 
 
@@ -304,31 +309,8 @@ class ProductController {
 			}
 			*/
 			
-			Map existingAtts = new HashMap();
-			productInstance.attributes.each() {
-				existingAtts.put(it.attribute.id, it)
-			}
+            updateTags(productInstance, params)
 
-
-
-            // Process attributes
-			Attribute.list().each() {
-				String attVal = params["productAttributes." + it.id + ".value"]
-				if (attVal == "_other" || attVal == null || attVal == '') {
-					attVal = params["productAttributes." + it.id + ".otherValue"]
-				}
-				ProductAttribute existing = existingAtts.get(it.id)
-				if (attVal != null && attVal != '') {
-					if (!existing) {
-						existing = new ProductAttribute(["attribute":it])
-						productInstance.attributes.add(existing)
-					}
-					existing.value = attVal;
-				}
-				else {
-					productInstance.attributes.remove(existing)
-				}
-			}
 
 			log.info("Categories " + productInstance?.categories);
 
@@ -350,17 +332,7 @@ class ProductController {
                 }
             }
 
-			/*
-			 productInstance?.categories?.clear();		
-			 params.each {
-			 println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))
-			 if (it.key.startsWith("category_")) {
-			 def category = Category.get((it.key - "category_"));
-			 log.info "adding " + category?.name
-			 productInstance.addToCategories(category)
-			 }
-			 }
-			 */
+
 			if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
 				//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
@@ -389,8 +361,8 @@ class ProductController {
 		}
 	}
 
-    def updateTags = {
-        def productInstance = Product.get(params.id)
+    def updateTags(productInstance, params) {
+        //def productInstance = Product.get(params.id)
         // Process product tags
         try {
 
@@ -420,6 +392,33 @@ class ProductController {
     }
 
 
+    def updateAttributes(productInstance, params)  {
+        Map existingAtts = new HashMap();
+        productInstance.attributes.each() {
+            existingAtts.put(it.attribute.id, it)
+        }
+
+        // Process attributes
+        Attribute.list().each() {
+            String attVal = params["productAttributes." + it.id + ".value"]
+            if (attVal == "_other" || attVal == null || attVal == '') {
+                attVal = params["productAttributes." + it.id + ".otherValue"]
+            }
+            ProductAttribute existing = existingAtts.get(it.id)
+            if (attVal != null && attVal != '') {
+                if (!existing) {
+                    existing = new ProductAttribute(["attribute":it])
+                    productInstance.attributes.add(existing)
+                }
+                existing.value = attVal;
+            }
+            else {
+                productInstance.attributes.remove(existing)
+            }
+        }
+    }
+
+
 	def delete = {
 		def productInstance = Product.get(params.id)
 		if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
@@ -444,6 +443,21 @@ class ProductController {
 			redirect(action: "edit", id: params.id)
 		}
 	}
+
+
+    def deleteProducts = {
+        println "Delete products: " + params
+        //def productIds = params.list('product.id')
+        def productIds = request.getParameterValues("product.id")
+
+        def products = productService.getProducts(productIds)
+        if (products) {
+            products.each { product ->
+                product.delete()
+            }
+        }
+        redirect(controller: "inventory", action: "browse")
+    }
 
 
 	def removePackage = {
@@ -537,7 +551,6 @@ class ProductController {
 		}
 	}
 
-
 	def barcode = {
 		BarcodeFormat format = BarcodeFormat.valueOf(params.format)
 		File file = File.createTempFile("barcode-", ".png")
@@ -556,42 +569,50 @@ class ProductController {
 		
 		// HACK - for some reason the Product in document command is not getting bound
 		command.product = Product.get(params.product.id)
-		
-		
-		
-		if (params.url) { 		
-			println "URL: " + params.url
-			def filename = params.url.tokenize("/")[-1]
-			println "Filename: " + filename	
-			def fileOutputStream = new FileOutputStream(filename)
-			println "FileOutputStream: " + fileOutputStream
-			def out = new BufferedOutputStream(fileOutputStream)
-			out << new URL(params.url).openStream()			
-			out.close()
-			
-			File file = new File(filename)
-			println "Path: " + file.absolutePath
-			
-			Document documentInstance = new Document(
-				size: file.size(),
-				name: file.name,
-				filename: file.name,
-				fileContents: file.bytes,
-				contentType: "image")
-			
-			if (documentInstance.validate() && !documentInstance.hasErrors()) {
-				log.info "Saving document " + documentInstance;
-				command.product.addToDocuments(documentInstance).save(flush:true)
-				flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
-			}
-			// If there are errors, we need to redisplay the document form
-			else {
-				log.info "Document did not save " + documentInstance.errors;
-				flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
-				redirect(controller: "product", action: "edit", id: command?.product?.id,
-				model: [productInstance: command?.product, documentInstance : documentInstance])
-				return;
-			}
+
+		if (params.url) {
+
+            Document documentInstance
+            try {
+                println "URL: " + params.url
+                def filename = params.url.tokenize("/")[-1]
+                println "Filename: " + filename
+                def fileOutputStream = new FileOutputStream(filename)
+                println "FileOutputStream: " + fileOutputStream
+                def out = new BufferedOutputStream(fileOutputStream)
+                out << new URL(params.url).openStream()
+                out.close()
+
+                File file = new File(filename)
+                println "Path: " + file.absolutePath
+
+                documentInstance = new Document(
+                    size: file.size(),
+                    name: file.name,
+                    filename: file.name,
+                    fileContents: file.bytes,
+                    contentType: "image")
+
+                if (documentInstance?.validate() && !documentInstance?.hasErrors()) {
+                    log.info "Saving document " + documentInstance;
+                    command.product.addToDocuments(documentInstance).save(flush:true)
+                    flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
+                }
+                // If there are errors, we need to redisplay the document form
+                else {
+                    log.info "Document did not save " + documentInstance.errors;
+                    flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
+                    redirect(controller: "product", action: "edit", id: command?.product?.id,
+                    model: [productInstance: command?.product, documentInstance : documentInstance])
+                    return;
+                }
+
+            } catch (IOException e) {
+                flash.message = "An error occurred while uploading image: " + e.message
+                redirect(controller: "product", action: "edit", id: command?.product?.id, model: [productInstance: command?.product])
+                return
+            }
+
 
 		}
 		else { 
@@ -744,6 +765,7 @@ class ProductController {
 	 * View user's profile photo
 	 */
 	def viewImage = {
+        log.info "viewImage: " + params
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {
 			documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
@@ -752,7 +774,7 @@ class ProductController {
 			 println params
 			 byte[] bytes = documentInstance.fileContents
 			 println documentInstance.contentType
-			 resize(bytes, response.outputStream, params.width as int, params.height as int)
+			 resizeImage(bytes, response.outputStream, params.width as int, params.height as int)
 			 //response.outputStream << bytes
 			 */
 		}
@@ -764,19 +786,24 @@ class ProductController {
 
 
 	def viewThumbnail = {
+        log.info "viewThumbnail: " + params
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {
 			documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
 			//byte[] bytes = documentInstance.fileContents
-			//resize(bytes, response.outputStream, width, height)
+			//resizeImage(bytes, response.outputStream, width, height)
 		}
 		else {
 			//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
 			response.sendError(404)
 		}
 	}
-	
-	
+
+    /**
+     * Export all products identified by the product.id parameter.
+     *
+     * @params product.id
+     */
 	def exportProducts = { 
 		println params
 		def productIds = params.list('product.id')
@@ -800,6 +827,9 @@ class ProductController {
 		
 	}
 
+    /**
+     * Export all products as CSV
+     */
 	def exportAsCsv = {
 		def products = Product.list()
 
@@ -817,12 +847,16 @@ class ProductController {
 		}
 	}
 
-
+    /**
+     * Renders form to begin the import process
+     */
 	def importAsCsv = { 
 		// renders the initial form
 	}
-	
-	
+
+    /**
+     * Upload CSV file
+     */
 	def uploadCsv = { ImportDataCommand command ->
 		
 		log.info "uploadCsv " + params
@@ -866,6 +900,9 @@ class ProductController {
 					command.products = productService.importProducts(csv, false)
 					
 					flash.message = "Uploaded file ${uploadFile?.originalFilename}"
+
+                    //dataService.getFileProperties(uploadFile)
+                    //def localFile = dataService.saveFile(uploadFile)
 					//render localFile.getText()
 					//response.outputStream << localFile.newInputStream()
 				} catch (RuntimeException e) {
@@ -883,7 +920,10 @@ class ProductController {
 		
 		render(view: 'importAsCsv', model: [command:command, columns:columns, existingProductsMap:existingProductsMap, tag: tag])
 	}
-	
+
+    /**
+     * Perform import of CSV
+     */
 	def importCsv = { ImportDataCommand command ->
 		
 		log.info "import " + params
@@ -895,15 +935,22 @@ class ProductController {
 		if (params.importNow && session.localFile) {
 			println "import now"
 			def csv = session.localFile.getText()
+
+            // Get any existing products
 			def existingProducts = productService.getExistingProducts(csv)
-			existingProducts.each { product ->				
-				existingProductsMap[product.id] = product.discard()
-			}
+            existingProducts.each { product ->
+                existingProductsMap[product.id] = product.discard()
+            }
+
+            // Get columns
 			columns = productService.getColumns(csv)
+
 			//println existingProductsMap
 			tags = params?.tagsToBeAdded?.split(",") as List
 			println "\n\nTAGS " + tags + " " + tags.class
-			command.products = productService.importProducts(csv, tags, true)			
+
+            // Import products
+            command.products = productService.importProducts(csv, tags, true)
 			//session.localFile = null
 			flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
 			
@@ -913,37 +960,63 @@ class ProductController {
 		
     }
 
+    /**
+     * Add a synonym to existing product
+     *
+     * @return
+     */
+    def addSynonymToProduct = {
+        println "addSynonymToProduct() " + request.JSON
+        /*
+        def product = Product.get(params.id)
+        def synonym = Synonym.findBySynonym(params.synonym)
+        if (!synonym) {
+            synonym = new Synonym(synonym: params.synonym)
+        }
 
+        if (product && synonym) {
+            product.addToSynonyms(synonym)
+            product.save()
+            render("saved synonym to product")
+        }
+        else {
+            render("unable to add synonym to product")
+        }
+        */
 
+        def synonym = new Synonym(synonym : request.JSON.synonym).save( failOnError : true )
+        //def product = Product.get(request.JSON.productId)
+        //if (product) {
+        //    product.addToSynonyms(synonym)
+        //    product.save(failOnError: true)
+        //}
 
-	static resize = { bytes, out, maxW, maxH ->
-		AWTImage ai = new ImageIcon(bytes).image
-		int width = ai.getWidth( null )
-		int height = ai.getHeight( null )
+        //render synonyms as JSON
+        redirect(action: "getSynonyms")
+    }
 
-		//def limits = 300..2000
-		//assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
+    /**
+     * Get synonyms associated with the given product.
+     */
+    def getSynonyms = {
+        println "getSynonyms() " + params
+        //def product = Product.get(params.productId)
+        def synonyms = Synonym.list()
 
-		float aspectRatio = width / height
-		float requiredAspectRatio = maxW / maxH
+        render synonyms as JSON
+    }
 
-		int dstW = 0
-		int dstH = 0
-		if (requiredAspectRatio < aspectRatio) {
-			dstW = maxW
-			dstH = Math.round( maxW / aspectRatio)
-		} else {
-			dstH = maxH
-			dstW = Math.round(maxH * aspectRatio)
-		}
-
-		BufferedImage bi = new BufferedImage(dstW, dstH, BufferedImage.TYPE_INT_RGB)
-		Graphics2D g2d = bi.createGraphics()
-		g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
-
-		IIO.write( bi, 'JPEG', out )
-	}
-
+    /**
+     * Delete synonym from database
+     */
+    def deleteSynonym = {
+        println "deleteSynonym() " + params
+        def synonym = Synonym.get(params.id)
+        if (synonym) {
+            synonym.delete()
+        }
+        redirect(action: "getSynonyms")
+    }
 }
 
 

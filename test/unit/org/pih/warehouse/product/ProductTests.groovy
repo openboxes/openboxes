@@ -11,11 +11,21 @@ package org.pih.warehouse.product
 
 import grails.test.*
 import org.junit.Test
+import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.inventory.InventoryItem
 
+
 class ProductTests extends GrailsUnitTestCase {
+
+
     protected void setUp() {
         super.setUp()
+
+        mockDomain(Synonym)
+        mockDomain(Product)
+        mockDomain(Category)
+
+
     }
 
     protected void tearDown() {
@@ -41,6 +51,15 @@ class ProductTests extends GrailsUnitTestCase {
 //        assert map.inventoryItems.any { it.inventoryItemId == item2.id }
 //        assert map.inventoryItems.any { it.inventoryItemId == item3.id }
 //        assert map.inventoryItems.any { it.inventoryItemId == item4.id }
+
+    }
+
+    @Test
+    void addToSynonyms_shouldAddNewSynonym() {
+        def product = new Product(name: "Product 1")
+        product.addToSynonyms(new Synonym(synonym: "synonym"))
+        product.save(flush: true)
+        assertEquals 1, product.synonyms
 
     }
 
