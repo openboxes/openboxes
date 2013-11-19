@@ -94,7 +94,7 @@
                 </g:if>
                 <div class="box">
                     <h2 class="middle">
-                        Quantity On Hand Report
+                        Baseline Quantity On Hand
                         <%--
                         <g:if test="${command?.locations}">
                             <g:each var="location" in="${command?.locations}">
@@ -109,8 +109,10 @@
                         </g:if>
                         --%>
                         <g:if test="${command?.products}">
-                            (${command?.products.size()} results)
+                            - Returned ${command?.products.size()} results in ${elapsedTime/1000} seconds
                         </g:if>
+
+
                     </h2>
                     <div class="right" style="padding: 15px;">
                         <%--
@@ -124,13 +126,13 @@
                     <table>
                         <thead>
                             <tr>
-                                <th width="25px;"><warehouse:message code="product.productCode.label"/></th>
+                                <th><warehouse:message code="product.productCode.label"/></th>
                                 <th><warehouse:message code="product.label"/></th>
                                 <th><warehouse:message code="product.uom.label"/></th>
                                 <th><warehouse:message code="product.manufacturer.label"/></th>
                                 <th><warehouse:message code="product.vendor.label"/></th>
                                 <g:each var="date" in="${command?.dates}">
-                                    <th class="right"><g:formatDate date="${date}" format="MMM dd"/></th>
+                                    <th class="center"><g:formatDate date="${date}" format="MMM dd"/></th>
                                 </g:each>
                             </tr>
                         </thead>
@@ -148,14 +150,14 @@
                                 </td>
                                 <td>
                                     ${product?.manufacturer}
-                                    ${product?.manufacturerCode}
+                                    <div class="fade">${product?.manufacturerCode}</div>
                                 </td>
                                 <td>
                                     ${product?.vendor}
-                                    ${product?.vendorCode}
+                                    <div class="fade">${product?.vendorCode}</div>
                                 </td>
                                 <g:each var="date" in="${command.dates}">
-                                    <td class="right">
+                                    <td class="center">
                                         <g:formatNumber number="${quantityMapByDate[date][product]}"/>
                                     </td>
                                 </g:each>

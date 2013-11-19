@@ -160,7 +160,7 @@ class InventoryController {
 	 */
 	def show = {
         def quantityMap = [:]
-        long startTime = System.currentTimeMillis()
+        def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
 		def inventoryInstance = Inventory.get(params.id)
         if (!inventoryInstance) {
@@ -276,7 +276,9 @@ class InventoryController {
         }
 
 
-        render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
+
+
+        render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command, elapsedTime:  (System.currentTimeMillis() - startTime)])
 
     }
 
@@ -1635,7 +1637,7 @@ class InventoryController {
 			session.inventorySearchTerms.remove(params.searchTerm);
 		redirect(action: browse);
 	}
-	
+
 }
 
 class ConsumptionCommand {
