@@ -727,6 +727,29 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+    def getTotalStockValue(Location location) {
+        def hitCount = 0;
+        def missCount = 0;
+        def totalCount = 0;
+        def totalStockValue = 0.0
+
+        if (location.inventory) {
+            def quantityMap = getQuantityByProductMap(location.inventory)
+            quantityMap.each { product, quantity ->
+                if (product.pricePerUnit) {
+                    def stockValueForProduct = product.pricePerUnit * quantity
+                    totalStockValue += stockValueForProduct
+                    hitCount++
+                }
+                else {
+                    missCount++
+                }
+            }
+            totalCount = quantityMap?.keySet()?.size()
+        }
+        return [totalStockValue:totalStockValue, hitCount: hitCount, missCount: missCount, totalCount:totalCount]
+
+    }
 
 
     def getDashboardAlerts(Location location) {
@@ -771,16 +794,32 @@ class InventoryService implements ApplicationContextAware {
         //return lowStock
 
         [   lowStock: lowStock.keySet().size(),
+                lowStockCost: getTotalCost(lowStock),
             reorderStock: reorderStock.keySet().size(),
+                reorderStockCost: getTotalCost(reorderStock),
             overStock: overStock.keySet().size(),
+                overStockCost: getTotalCost(overStock),
             totalStock: totalStock.keySet().size(),
+                totalStockCost: getTotalCost(totalStock),
             reconditionedStock: reconditionedStock.keySet().size(),
+                reconditionedStockCost: getTotalCost(reconditionedStock),
             outOfStock:outOfStock.keySet().size(),
+                outOfStockCost: getTotalCost(outOfStock),
             onHandQuantityZero:onHandQuantityZero.keySet().size(),
-            inStock:inStock.keySet().size()
+                onHandQuantityZeroCost: getTotalCost(onHandQuantityZero),
+            inStock:inStock.keySet().size(),
+                inStockCost: getTotalCost(inStock),
         ]
     }
 
+
+    def getTotalCost(quantityMap) {
+        def totalCost = 0;
+        quantityMap.each { k,v ->
+            totalCost += k.pricePerUnit?:0 * v?:0
+        }
+        return totalCost;
+    }
 
     def getInventoryStatus(Location location) {
         def quantityMap = getQuantityByProductMap(location.inventory)

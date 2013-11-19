@@ -137,7 +137,7 @@
 			</button>
 			&nbsp;
 			<g:link controller="inventoryItem" action="showStockCard" 
-				params="['product.id':commandInstance.productInstance?.id]" class="button icon arrowleft">
+				params="['product.id':commandInstance.productInstance?.id]" class="button icon trash">
                 <warehouse:message code="default.button.cancel.label"/>
             </g:link>
 		

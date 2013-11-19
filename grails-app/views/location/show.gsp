@@ -67,7 +67,7 @@
 					</g:isUserInRole>
 				</ul>		
 				<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
-					<div id="tabs-transactions">	
+					<div id="tabs-transactions" class="dialog">
 						<table>
 							<tr>
 								<th>Actions</th>							
@@ -100,7 +100,7 @@
 							</g:each>
 						</table>
 					</div>
-					<div id="tabs-shipments">	
+					<div id="tabs-shipments" class="dialog">
 						<table>
 							<tr>
 								<th>Actions</th>							
@@ -131,7 +131,7 @@
 							</g:each>
 						</table>
 					</div>
-					<div id="tabs-events">	
+					<div id="tabs-events" class="dialog">
 						<table>
 							<g:each var="event" in="${locationInstance?.events }">
 								<tr>
@@ -148,7 +148,7 @@
 							</g:each>
 						</table>
 					</div>
-					<div id="tabs-requests">	
+					<div id="tabs-requests" class="dialog">
 						<table>
 							<g:each var="requestInstance" in="${locationInstance?.requests }">
 								<tr>
@@ -163,7 +163,7 @@
 							</g:each>
 						</table>
 					</div>
-					<div id="tabs-orders">	
+					<div id="tabs-orders" class="dialog">
 						<table>
 							<g:each var="order" in="${locationInstance?.orders }">
 								<tr>
@@ -178,7 +178,7 @@
 							</g:each>
 						</table>
 					</div>
-					<div id="tabs-users">	
+					<div id="tabs-users" class="dialog">
 						<table>
 							<g:each var="user" in="${locationInstance?.users }">
 								<tr>
@@ -195,7 +195,7 @@
 	
 					</div>				
 				</g:isUserInRole>
-				<div id="tabs-details">			   			
+				<div id="tabs-details" class="dialog">
 		            <g:form method="post" action="update">
 		                <g:hiddenField name="id" value="${locationInstance?.id}" />
 		                <g:hiddenField name="version" value="${locationInstance?.version}" />
@@ -212,7 +212,7 @@
 		                            </tr>
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
-											<label for="name"><warehouse:message code="location.locationType.label" /></label>
+											<label for="type"><warehouse:message code="location.locationType.label" /></label>
 			
 		                                </td>
 		                                <td valign="top" class="value">
@@ -223,7 +223,7 @@
 		                            </tr>
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
-											<label for="name"><warehouse:message code="location.locationGroup.label" /></label>
+											<label for="locationGroup"><warehouse:message code="location.locationGroup.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value">
 											${locationInstance?.locationGroup?.name?:warehouse.message(code:'default.none.label') }

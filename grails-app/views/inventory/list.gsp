@@ -58,7 +58,7 @@
                         </div>
                     </div>
 
-
+                    <g:set var="totalStockValue" value="${0.00}"/>
 
 
                     <div class="box">
@@ -155,7 +155,9 @@
                                     </td>
                                     <td class="center">
                                         <g:if test="${entry.key.pricePerUnit && entry.value}">
-                                            <g:formatNumber number="${entry.key.pricePerUnit*entry.value}" minFractionDigits="2"/>
+                                            <g:set var="stockValue" value="${entry.key.pricePerUnit*entry.value}"/>
+                                            <g:formatNumber number="${stockValue}" minFractionDigits="2"/>
+                                            <g:set var="totalStockValue" value="${totalStockValue + stockValue}"/>
                                         </g:if>
                                         <g:else>
                                             --
@@ -176,7 +178,21 @@
                                 </tr>
 
                             </g:unless>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="15">
+                                        <div class="title right middle">
+                                            <warehouse:message code="inventory.totalValue.label" default="Total value"/>
+                                            <g:formatNumber number="${totalStockValue}" type="currency" currencyCode="USD"/>
+                                        </div>
+
+                                    </th>
+
+                                </tr>
+                            </tfoot>
                         </table>
+
+
                     </div>
                 </div>
             </div>

@@ -2,21 +2,34 @@
 <div class="widget-large">
 	<div class="widget-header">
 
-        <g:isUserAdmin>
-            <div style="float: right; font-weight: normal; font-size: 10px;" class="fade box">
-                <g:if test="${!params.editTags}">
-                    <g:link controller="dashboard" action="index" params="[editTags:true]">
-                        <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
-                    </g:link>
-                </g:if>
-                <g:else>
-                    <g:link controller="dashboard" action="index">
-                        <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
-                    </g:link>
-                </g:else>
-            </div>
-        </g:isUserAdmin>
         <h2>
+            <g:isUserAdmin>
+
+                <span class="action-menu">
+                    <button class="action-btn">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+                    </button>
+                    <div class="actions">
+                        <div class="action-menu-item">
+
+                            <g:if test="${!params.editTags}">
+                                <g:link controller="dashboard" action="index" params="[editTags:true]">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle" />
+                                    <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
+                                </g:link>
+                            </g:if>
+                            <g:else>
+                                <g:link controller="dashboard" action="index">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'control_end.png')}" style="vertical-align: middle" />
+                                    <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
+                                </g:link>
+                            </g:else>
+                        </div>
+                    </div>
+                </span>
+            </g:isUserAdmin>
+
+
             <warehouse:message code="tags.label" default="Tags"/>
         </h2>
 	</div>

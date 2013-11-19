@@ -18,51 +18,53 @@
 		</g:if>
 
 
-		<fieldset>
+            <g:render template="summary" />
 
-			<div class="dialog">
+			<div class="dialog box">
 				<table>
-					<thead>
-						<tr>
-							<td colspan="2">
-								<g:render template="summary" />
-							</td>
-						</tr>
-					</thead>
 					<tbody>
 						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="user.username.label" /></td>
+							<td valign="top" class="name"><label><warehouse:message
+									code="user.username.label" /></label></td>
 							<td valign="top" class="value">
 								${fieldValue(bean: userInstance, field: "username")}
 							</td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="default.name.label" /></td>
+							<td valign="top" class="name"><label><warehouse:message
+									code="default.name.label" /></label></td>
 							<td valign="top" class="value">
 								${fieldValue(bean: userInstance, field: "name")}
 							</td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="user.email.label" /></td>
+							<td valign="top" class="name"><label><warehouse:message
+									code="user.email.label" /></label></td>
 							<td valign="top" class="value">
 								${fieldValue(bean: userInstance, field: "email")}								
 							</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="default.locale.label" /></td>
+							<td valign="top" class="name"><label><warehouse:message
+									code="default.locale.label" /></label></td>
 							<td valign="top" class="value">
 								${fieldValue(bean: userInstance, field: "locale.displayName")}
 							</td>
 						</tr>
+                        <tr class="prop">
+                            <td valign="top" class="name"><label><warehouse:message
+                                    code="default.timezone.label" default="Timezone" /></label></td>
+                            <td valign="top" class="value">
+                                ${session?.timezone?.ID}
+                                ${session?.timezone?.displayName}
+                            </td>
+                        </tr>
 						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="user.roles.label" default="Roles" /></td>
+							<td valign="top" class="name">
+                                <label><warehouse:message
+									code="user.roles.label" default="Roles" /></label></td>
 							<td valign="top" class="value">
 								<g:if test="${userInstance?.roles}">
 									${fieldValue(bean: userInstance, field: "roles")}
@@ -76,9 +78,9 @@
 						</tr>
                         <tr class="prop" id="locationRoles">
                              <td valign="top" class="name">
-                                <warehouse:message code="user.locationRoles.label" />
+                                <label><warehouse:message code="user.locationRoles.label" /></label>
                              </td>
-                             <td valign="top" >
+                             <td valign="top" class="value">
                                  <g:if test="${userInstance?.locationRoles}">
                                     ${userInstance?.locationRolesDescription()}
                                  </g:if>
@@ -88,8 +90,8 @@
                              </td>
                          </tr>
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message
-                                    code="user.defaultLocation.label" /></td>
+                            <td valign="top" class="name"><label><warehouse:message
+                                    code="user.defaultLocation.label" /></label></td>
                             <td valign="top" class="value">
                                 <g:if test="${userInstance?.warehouse}">
                                     ${fieldValue(bean: userInstance, field: "warehouse")}
@@ -104,7 +106,7 @@
 
 						<tr class="prop">
 							<td valign="top" class="name">
-                                <warehouse:message code="user.rememberLastLocation.label" />
+                                <label><warehouse:message code="user.rememberLastLocation.label" /></label>
 							</td>
 							<td valign="top" class="value">
                                 <g:if test="${userInstance.rememberLastLocation }">
@@ -119,7 +121,7 @@
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">
-								<warehouse:message code="user.lastLoginDate.label" />
+                                <label><warehouse:message code="user.lastLoginDate.label" /></label>
 							</td>
 							<td valign="top" class="value">
 								<g:if test="${userInstance.lastLoginDate }">
@@ -132,9 +134,24 @@
 								</g:else>
 							</td>
 						</tr>
+                        <tr class="prop">
+                            <td valign="top" class="name">
+                                <label><warehouse:message code="default.lastUpdated.label" /></label>
+                            </td>
+                            <td valign="top" class="value">
+                                <g:if test="${userInstance.lastUpdated }">
+                                    <format:datetime obj="${userInstance.lastUpdated}"></format:datetime>
+                                </g:if>
+                                <g:else>
+                                    <span class="fade">
+                                        <warehouse:message code="default.never.label" />
+                                    </span>
+                                </g:else>
+                            </td>
+                        </tr>
 						<tr class="prop">
 							<td valign="top" class="name">
-								<warehouse:message code="default.dateCreated.label" />
+								<label><warehouse:message code="default.dateCreated.label" /></label>
 							</td>
 							<td valign="top" class="value">
 								<g:if test="${userInstance.dateCreated }">
@@ -147,22 +164,7 @@
 								</g:else>
 							</td>
 						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">
-								<warehouse:message code="default.lastUpdated.label" />
-							</td>
-							<td valign="top" class="value">
-								<g:if test="${userInstance.lastUpdated }">
-									<format:datetime obj="${userInstance.lastUpdated}"></format:datetime>
-								</g:if>
-								<g:else>
-									<span class="fade">
-										<warehouse:message code="default.never.label" />
-									</span>
-								</g:else>
-							</td>
-						</tr>
-						<%-- 
+						<%--
 						<tr class="prop">
 							<td valign="top" class="name"><warehouse:message
 									code="user.photo.label" /></td>
@@ -210,7 +212,6 @@
 					</tbody>
 				</table>
 			</div>
-		</fieldset>
 	</div>
 </body>
 </html>

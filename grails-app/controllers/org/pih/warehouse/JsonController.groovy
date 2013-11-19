@@ -217,6 +217,7 @@ class JsonController {
 		def location = Location.get(params?.location?.id)
 		def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
 		//println "quantityOnHand(" + params + "): " + quantityOnHand
+        //println "${createLink(controller:'inventoryItem', action: 'showStockCard', id: product.id)}"
 		render (quantityOnHand?:"0")
 	}
 
@@ -225,10 +226,17 @@ class JsonController {
         def location = Location.get(session?.warehouse?.id)
         def dashboardAlerts = inventoryService.getDashboardAlerts(location)
 
-        def expirationSummary = inventoryService.getExpirationSummary(location)
-        expirationSummary.each { key, value ->
-            dashboardAlerts[key] = value;
-        }
+        //def expirationSummary = inventoryService.getExpirationSummary(location)
+        //expirationSummary.each { key, value ->
+        //    dashboardAlerts[key] = value;
+        //}
+
+        //def totalStockSummary = inventoryService.getTotalStockValue(location)
+        //dashboardAlerts['totalStockValue'] = g.formatNumber(number: totalStockSummary.totalStockValue, type: 'currency', currencyCode: 'USD')
+        //dashboardAlerts['totalStockValue'] = totalStockSummary.totalStockValue
+        //dashboardAlerts['hitCount'] = totalStockSummary.hitCount
+        //dashboardAlerts['missCount'] = totalStockSummary.missCount
+        //dashboardAlerts['totalCount'] = totalStockSummary.totalCount
 
         render dashboardAlerts as JSON
     }
@@ -236,10 +244,19 @@ class JsonController {
     @Cacheable("dashboardCache")
     def getDashboardExpiryAlerts = {
         def location = Location.get(session?.warehouse?.id)
-        def map = inventoryService.getExpirationAlerts(location)
+        def map = inventoryService.getExpirationSummary(location)
         render map as JSON
     }
 
+    @Cacheable("dashboardCache")
+    def getTotalStockValue = {
+        def location = Location.get(session?.warehouse?.id)
+        def result = inventoryService.getTotalStockValue(location)
+        def totalValue = g.formatNumber(number: result.totalStockValue, type: 'currency', currencyCode: 'USD')
+
+        def map = [totalStockValue:result.totalStockValue, hitCount: result.hitCount, missCount: result.missCount, totalCount: result.totalCount]
+        render map as JSON
+    }
 
     @Cacheable("dashboardCache")
     def getReconditionedStockCount = {

@@ -186,7 +186,7 @@
                         Returned ${command.rows?.keySet()?.size()} results
                     </h2>
 
-                    <div style="max-width:100%; overflow-x: scroll; min-height: 450px; max-height: 450px; overflow-y: scroll; white-space: nowrap; " class="list">
+                    <div style="max-width:100%; overflow-x: scroll; min-height: 450px; max-height: 450px; overflow-y: scroll; white-space: nowrap; ">
                         <table>
                             <thead>
                                 <tr>
@@ -345,7 +345,7 @@
                                 </g:each>
                                 <g:unless test="${command?.rows}">
                                     <tr class="prop">
-                                        <td colspan="20" class="empty center">
+                                        <td colspan="20" class="empty center" style="display: inline-block; vertical-align: middle; line-height: normal;">
                                             <warehouse:message code="default.data.empty.label" default="No data to be displayed"/>
                                         </td>
                                     </tr>

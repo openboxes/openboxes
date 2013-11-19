@@ -302,9 +302,93 @@
             </div>
 		</div>
 	</li>
-	<g:isUserAdmin>
-		<li><a href="javascript:void(0)"> <warehouse:message code="admin.label" />
-		</a>
+
+<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+    <li>
+        <a href="javascript:void(0)">
+            <warehouse:message code="products.label" />
+        </a>
+        <div>
+            <div class="buttonsBar" style="min-width: 200px;">
+                <div class="megaButton">
+                    <g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
+                </div>
+                <%--
+                <g:if test="${session.productsViewed }">
+                    <div>
+                        <g:each var="product" in="${session?.productsViewed?.values() }">
+                            <div class="megaButton">
+                                <g:link controller="inventoryItem" action="showStockCard" id="${product.id }" class="product">
+                                    ${product.name }
+                                </g:link>
+                            </div>
+                        </g:each>
+                    </div>
+                </g:if>
+                --%>
+                <div class="megaButton">
+                    <g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="category" action="tree" class="list"><warehouse:message code="categories.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="tag" action="list" class="list"><warehouse:message code="product.tags.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="unitOfMeasure" action="list" class="list"><warehouse:message code="unitOfMeasure.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="unitOfMeasureClass" action="list" class="list"><warehouse:message code="unitOfMeasureClass.label"/></g:link>
+                </div>
+                <g:isUserAdmin>
+                    <div>
+                        <hr/>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="product" action="batchEdit" class="create"><warehouse:message code="product.batchEdit.label"/></g:link>
+                    </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'data.label', default: 'data')]"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
+                    </div>
+                <%--
+                <div class="megaButton">
+                    <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'product.label')]"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'productPrice.label')]"/></g:link>
+                </div>
+                --%>
+
+                </g:isUserAdmin>
+            </div>
+        </div>
+    </li>
+</g:authorize>
+<g:isUserAdmin>
+		<li><a href="javascript:void(0)"> <warehouse:message code="admin.label" /></a>
 			<div style="min-width: 200px;">
 				<div class="buttonsBar">
                     <div class="megaButton">
@@ -381,99 +465,19 @@
 							<warehouse:message code="users.label" />
 						</g:link>
 					</div>
-					<div>
-						<hr/>
-					</div>
+                    <hr/>
 					<div class="megaButton">
 						<g:link controller="inventory" action="listAllTransactions" class="list"><warehouse:message code="transactions.label"/></g:link> 
 					</div>										
 					<div class="megaButton">
 						<g:link controller="inventory" action="editTransaction" class="create"><warehouse:message code="transaction.add.label"/></g:link> 				
-					</div>										
-					<div class="megaButton">
-						<g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label')]"/></g:link> 				
-					</div>					
-					
-					
-				</div>
+					</div>
+                </div>
 			</div>
 		</li>
 	</g:isUserAdmin>
 
 
-	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
-		<li>
-			<a href="javascript:void(0)">
-				<warehouse:message code="products.label" />
-			</a>				
-			<div>				
-				<div class="buttonsBar" style="min-width: 200px;">						
-					<div class="megaButton">									
-						<g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
-					</div>
-					<%--
-					<g:if test="${session.productsViewed }">
-						<div>
-							<g:each var="product" in="${session?.productsViewed?.values() }">
-								<div class="megaButton">
-									<g:link controller="inventoryItem" action="showStockCard" id="${product.id }" class="product">
-										${product.name }
-									</g:link>					
-								</div>
-							</g:each>
-						</div>
-					</g:if>
-				    --%>
-					<div class="megaButton">									
-						<g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
-					</div>
-					<div class="megaButton">									
-						<g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
-					</div>
-					<div class="megaButton">									
-						<g:link controller="category" action="tree" class="list"><warehouse:message code="categories.label"/></g:link>
-					</div>
-					<div class="megaButton">									
-						<g:link controller="tag" action="list" class="list"><warehouse:message code="product.tags.label"/></g:link>
-					</div>					
-					<div class="megaButton">
-						<g:link controller="unitOfMeasure" action="list" class="list"><warehouse:message code="unitOfMeasure.label"/></g:link> 				
-					</div>										
-					<div class="megaButton">
-						<g:link controller="unitOfMeasureClass" action="list" class="list"><warehouse:message code="unitOfMeasureClass.label"/></g:link> 				
-					</div>		
-					<g:isUserAdmin>
-						<div>
-							<hr/>
-						</div>
-						<div class="megaButton">
-							<g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
-						</div>
-						<div class="megaButton">
-							<g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
-						</div>
-						<div class="megaButton">
-							<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
-						</div>
-                        <div class="megaButton">
-                            <g:link controller="product" action="batchEdit" class="create"><warehouse:message code="product.batchEdit.label"/></g:link>
-                        </div>
-						<div>
-							<hr/>
-						</div>
-						<div class="megaButton">
-							<g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
-						</div>
-						<div class="megaButton">
-							<g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link> 
-						</div>
-                        <div class="megaButton">
-                            <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
-                        </div>
-					</g:isUserAdmin>						
-				</div>
-			</div>
-		</li>
-	</g:authorize>	
+
 </ul>
 <!--MegaMenu Ends-->

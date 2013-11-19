@@ -91,16 +91,19 @@
 
 
 
-                                    <tr class="prop">
-                                        <td valign="top"></td>
-                                        <td valign="top">
-                                            <div class="buttons">
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="center">
                                                 <g:actionSubmit class="button icon accept" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
                                                 <g:actionSubmit class="button icon trash" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                                &nbsp;
+                                                <g:link controller="tag" action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                             </div>
                                         </td>
                                     </tr>
-                                </tbody>
+                                </tfoot>
                             </table>
                         </div>
                     </g:form>
@@ -169,9 +172,9 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="3">
+                                        <td colspan="3" class="center">
                                             <button class="button icon trash">
-                                                ${warehouse.message(code:'tag.removeFromProducts.label', default: 'Remove from products')}
+                                                ${warehouse.message(code:'tag.removeSelectedProducts.label', default: 'Remove selected products')}
                                             </button>
                                         </td>
                                     </tr>

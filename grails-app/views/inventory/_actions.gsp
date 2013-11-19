@@ -127,6 +127,14 @@
 						code="product.exportAsCsv.label" />
 				</a>
 			</div>
+            <div class="action-menu-item">
+                <a href="javascript:void(0);" class="actionButton"
+                   id="deleteProductsBtn"> <img
+                        src="${createLinkTo(dir:'images/icons/silk',file:'table_delete.png')}"
+                        alt="${warehouse.message(code: 'products.delete.label', default: 'Delete selected products') }"
+                        style="vertical-align: middle" /> &nbsp;<warehouse:message code="products.button.delete.label" default="Delete selected products" />
+                </a>
+            </div>
 
 
 		</g:isUserManager>
@@ -207,6 +215,9 @@
 		$("#markAsNonInventoried").click(function(event) { 
 			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsNonInventoried").submit();
 		});
+        $("#deleteProductsBtn").click(function(event) {
+            $("#inventoryActionForm").attr("action", "${request.contextPath }/product/deleteProducts").submit();
+        });
 
 	});
 </script>

@@ -175,9 +175,9 @@
         </g:if>
         <g:unless test="${quantityMap}">
             <tr>
-                <td>
+                <td colspan="4">
                     <div class="empty center fade">
-                        <warehouse:message code="inventory.quantityOnHand.unavailable.label" default="There is no quantity on hand at any locations."/>
+                        <warehouse:message code="inventory.quantityOnHand.unavailable.label" default="No quantity on hand at any locations."/>
                     </div>
                 </td>
 

@@ -44,9 +44,15 @@ class DashboardController {
         def user = User.get(session.user.id)
         def location = Location.get(session?.warehouse?.id);
         def statistics = requisitionService.getRequisitionStatistics(location,null,user)
-        render statistics
+        render statistics as JSON
     }
 
+    def showRequisitionMadeStatistics = {
+        def user = User.get(session.user.id)
+        def location = Location.get(session?.warehouse?.id);
+        def statistics = requisitionService.getRequisitionStatistics(null,location,user)
+        render statistics as JSON
+    }
 
     def globalSearch = {
 		
@@ -261,7 +267,7 @@ class DashboardController {
 			//reorderStock: reorderStock,
 			rootCategory : productService.getRootCategory(),
 
-            requisitionStatistics: requisitionService.getRequisitionStatistics(location, null, currentUser),
+            requisitionStatistics: requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine?currentUser:null),
             requisitions: [],
             //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
 

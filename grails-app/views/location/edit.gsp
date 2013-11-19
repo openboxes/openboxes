@@ -22,12 +22,12 @@
 	                <g:renderErrors bean="${locationInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-                        
-			<g:render template="summary"/>			            			
+            <g:render template="summary"/>
+
             <g:form method="post" action="update">
                 <g:hiddenField name="id" value="${locationInstance?.id}" />
                 <g:hiddenField name="version" value="${locationInstance?.version}" />
-                <div class="dialog">
+                <div class="dialog box">
                     <table>
                         <tbody>
                             <tr class="prop">
@@ -152,28 +152,20 @@
                                 </td>
                             </tr>
                             --%>
-                            <tr class="prop">
-                            
-                            	<td valign="top" class="name">
-                            	
-                            	</td>
-                            	<td class="value">
-									<div class="buttons left">
-					                   <button type="submit" class="button icon approve">								
-											<warehouse:message code="default.button.save.label"/>
-										</button>
-										&nbsp;
-										<g:link action="list">
-											${warehouse.message(code: 'default.button.cancel.label')}						
-										</g:link>			
-									</div>
-								</td>
-							</tr>
-                            
+
                         </tbody>
                     </table>
                 </div>
-	                
+                <div class="buttons center">
+                    <button type="submit" class="button icon approve">
+                        <warehouse:message code="default.button.save.label"/>
+                    </button>
+                    &nbsp;
+                    <g:link action="list">
+                        ${warehouse.message(code: 'default.button.cancel.label')}
+                    </g:link>
+                </div>
+
                
             </g:form>
         </div>

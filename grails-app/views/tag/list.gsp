@@ -15,10 +15,9 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
-				<div>            	
-	            	<span class="linkButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['tag']"/></g:link>
-	            	</span>
+				<div class="buttonBar">
+                    <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="['tag']"/></g:link>
+
             	</div>
                 <table>
                     <thead>
@@ -27,6 +26,8 @@
                             <g:sortableColumn property="id" title="${warehouse.message(code: 'tag.id.label', default: 'Id')}" />
                         
                             <g:sortableColumn property="tag" title="${warehouse.message(code: 'tag.tag.label', default: 'Tag')}" />
+
+                            <th><warehouse:message code="tag.products.label" default="Products"/></th>
 
                             <th><warehouse:message code="tag.isActive.label" default="Is active?"/></th>
 
@@ -46,7 +47,10 @@
                         
                             <td><g:link action="edit" id="${tagInstance.id}">${fieldValue(bean: tagInstance, field: "id")}</g:link></td>
                         
-                            <td>${fieldValue(bean: tagInstance, field: "tag")}</td>
+                            <td><g:link action="edit" id="${tagInstance.id}">${fieldValue(bean: tagInstance, field: "tag")}</g:link></td>
+
+                            <td>${tagInstance?.products?.size()} </td>
+
                             <td>${fieldValue(bean: tagInstance, field: "isActive")}</td>
 
                             <td>${fieldValue(bean: tagInstance, field: "updatedBy")}</td>

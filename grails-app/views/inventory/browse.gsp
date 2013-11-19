@@ -35,11 +35,6 @@
                         <div>
                             <g:form method="GET" controller="inventory" action="browse">
                                 <div class="box">
-                                    <div style="float: right; vertical-align:middle">
-                                        <g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">
-                                            <warehouse:message code="inventoryBrowser.resetAll.label" default="Reset all"/>
-                                        </g:link>
-                                    </div>
                                     <h2><warehouse:message code="inventory.filterByProduct.label"/></h2>
                                     <table>
                                         <tr>
@@ -78,10 +73,15 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <div class="left">
+                                                <div class="center">
                                                     <button type="submit" class="button icon search" name="searchPerformed" value="true">
                                                         <warehouse:message code="default.search.label"/>
                                                     </button>
+
+
+                                                    <g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]" class="button icon reload">
+                                                        <warehouse:message code="inventoryBrowser.resetAll.label" default="Reset all"/>
+                                                    </g:link>
                                                 </div>
                                             </td>
                                         </tr>

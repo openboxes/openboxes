@@ -17,12 +17,13 @@
                             <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="receiptSummary"/>
                             <g:render template="shipmentSummary"/>
+                            <g:render template="indicatorSummary"/>
 						</td>
                         <td width="30%">
+                            <g:render template="valueSummary"/>
                             <g:render template="alertSummary"/>
                             <g:render template="inventorySummary"/>
                             <g:render template="expiringSummary"/>
-                            <g:render template="indicatorSummary"/>
                         </td>
 						<td width="40%">
                             <g:render template="activitySummary"/>
@@ -56,13 +57,6 @@
                         $('#onHandQuantityZeroCount').html(data.onHandQuantityZero?data.onHandQuantityZero:0);
                         $('#outOfStockCount').html(data.outOfStock?data.outOfStock:0);
                         $('#reorderStockCount').html(data.reorderStock?data.reorderStock:0);
-                        // Expiration
-                        $('#expiredStockCount').html(data.expired?data.expired:0);
-                        $('#expiringIn30DaysStockCount').html(data.within30Days?data.within30Days:0);
-                        $('#expiringIn60DaysStockCount').html(data.within60Days?data.within60Days:0);
-                        $('#expiringIn90DaysStockCount').html(data.within90Days?data.within90Days:0);
-                        $('#expiringIn180DaysStockCount').html(data.within180Days?data.within180Days:0);
-                        $('#expiringIn365DaysStockCount').html(data.within365Days?data.within365Days:0);
 
                     },
                     error: function(xhr, status, error) {
@@ -77,16 +71,91 @@
                         $('#inStockCount').html("ERROR: " + error);
                         $('#outOfStockCount').html("ERROR: " + error);
                         $('#reorderStockCount').html("ERROR: " + error);
-                        // Expiration
-                        $('#expiredStockCount').html("");
-                        $('#expiringIn30DaysStockCount').html("");
-                        $('#expiringIn60DaysStockCount').html("");
-                        $('#expiringIn90DaysStockCount').html("");
-                        $('#expiringIn180DaysStockCount').html("");
-                        $('#expiringIn365DaysStockCount').html("");
 
                     }
                 });
+
+                $.ajax({
+                    dataType: "json",
+                    timeout: 60000,
+                    url: "${request.contextPath}/json/getDashboardExpiryAlerts?location.id=${session.warehouse.id}",
+                    //data: data,
+                    success: function (data) {
+                        console.log(data);
+                        // Expiration
+                        $('#expiredStockCount').html(data.expired?data.expired:0);
+                        $('#expiringIn30DaysStockCount').html(data.within30Days?data.within30Days:0);
+                        $('#expiringIn60DaysStockCount').html(data.within60Days?data.within60Days:0);
+                        $('#expiringIn90DaysStockCount').html(data.within90Days?data.within90Days:0);
+                        $('#expiringIn180DaysStockCount').html(data.within180Days?data.within180Days:0);
+                        $('#expiringIn365DaysStockCount').html(data.within365Days?data.within365Days:0);
+
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        // Expiration
+                        $('#expiredStockCount').html("ERROR: " + error);
+                        $('#expiringIn30DaysStockCount').html("ERROR: " + error);
+                        $('#expiringIn60DaysStockCount').html("ERROR: " + error);
+                        $('#expiringIn90DaysStockCount').html("ERROR: " + error);
+                        $('#expiringIn180DaysStockCount').html("ERROR: " + error);
+                        $('#expiringIn365DaysStockCount').html("ERROR: " + error);
+                    }
+                });
+
+                $( "#progressbar" ).progressbar({ value: 0 });
+                $( "#progressPercentage").html('Loading...')
+                $.ajax({
+                    dataType: "json",
+                    timeout: 60000,
+                    url: "${request.contextPath}/json/getTotalStockValue?location.id=${session.warehouse.id}",
+                    //data: data,
+                    success: function (data) {
+                        console.log(data);
+                        var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
+                        var progress = data.hitCount / data.totalCount
+                        $('#totalStockValue').html(value);
+                        if (progress < 0.1) {
+                            $("#totalStockSummary").html("* Pricing data is available for less than 10% of all products");
+                        }
+                        else if (progress < 0.25) {
+                            $("#totalStockSummary").html("* Pricing data is available for less than 25% of all products");
+                        }
+                        else if (progress < 0.5) {
+                            $("#totalStockSummary").html("* Pricing data is available for less than 50% of all products");
+                        }
+                        else if (progress < 0.75) {
+                            $("#totalStockSummary").html("* Pricing data is available for less than 75% of all products");
+                        }
+                        else if (progress < 0.90) {
+                            $("#totalStockSummary").html("* Pricing data is available for less than 90% of all products");
+                        }
+                        else {
+                            $("#totalStockSummary").html("* Pricing data is available for more than 90% of all products");
+                        }
+                        var progressSummary = data.hitCount + " out of " + data.totalCount;
+                        var progressPercentage = progress*100;
+                        $( "#progressbar" ).progressbar({ value: progressPercentage });
+                        $( "#progressPercentage").html("<span title='" + progressSummary + "'>" + formatPercentage(progressPercentage) + "</span>");
+
+                    },
+                    error: function(xhr, status, error) {
+                        //console.log(xhr);
+                        //console.log(status);
+                        //console.log(error);
+                        $('#totalStockValue').html('<span class="error" title="' + error + '">N/A</span>');
+                        $("#totalStockSummary").html('Unable to calculate total value due to error: ' + error + " " + status + " " + xhr);
+                    }
+                });
+                function formatPercentage(x) {
+                    return x.toFixed(0) + "%"
+                }
+
+                function formatCurrency(x) {
+                    return "$" + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
 
                 //getIndicator("#reconditionedStockCount", "${request.contextPath}/json/getReconditionedStockCount?location.id=${session.warehouse.id}", 1000, "error");
                 //$('#reconditionedStockCount').load('${request.contextPath}/json/getReconditionedStockCount?location.id=${session.warehouse.id}');

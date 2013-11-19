@@ -15,9 +15,8 @@
 		            				${fieldValue(bean: userInstance, field: "lastName")}
 		            			</span>
 		            			
-								<div >
-									<warehouse:message code="default.status.label"/>:
-									<b>${userInstance?.active ? warehouse.message(code: 'user.active.label') : warehouse.message(code: 'user.inactive.label')}</b>
+								<div class="fade">
+									${userInstance?.email}
 								</div>
 							
 								<%-- 
@@ -36,7 +35,11 @@
 							</td>							
 						
 							<td class="top right">
-
+                                <div class="right">
+                                    <span class="tag">
+                                        ${userInstance?.active ? warehouse.message(code:'user.active.label') : warehouse.message(code:'user.inactive.label')}
+                                    </span>
+                                </div>
 	            			</td>
 							
 						</tr>

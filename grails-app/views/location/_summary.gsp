@@ -1,5 +1,5 @@
 <div>
-	<table>
+	<table style="width:auto;">
 		<tr>
 			<td class="middle" width="1%">
 				<g:render template="actions"/>
