@@ -131,7 +131,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
-		mail.error.debug = true
+		mail.error.debug = false
 	}
 	test {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
@@ -269,7 +269,9 @@ log4j = {
 		additivity = false
 	}
 
-	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter'
+
+	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter',
+            'org.grails.plugin.resource.ResourceMeta'
 
 	// We get some annoying stack trace when cleaning this class up after functional tests
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
@@ -283,26 +285,29 @@ log4j = {
             'org.codehaus.groovy.grails.web.sitemesh',		// layouts
             'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
 			'org.codehaus.groovy.grails.web.mapping', 		// URL mapping
+            'org.codehaus.groovy.grails.orm.hibernate',
 			'org.codehaus.groovy.grails.commons', 			// core / classloading
 			'org.codehaus.groovy.grails.plugins',			// plugins
-			'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
+			//'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
 			'org.docx4j',
 			'org.apache.http.headers',
 			'org.apache.ddlutils',
 			'org.apache.http.wire',
 			'net.sf.ehcache.hibernate',
+            'org.hibernate.SQL',
+            //'org.hibernate.type',
+            'org.hibernate.cache'
             'org.apache.ddlutils'
             //'org.jumpmind.symmetric.service.impl.PurgeService'
 
 	info    'org.liquibase',
-            'org.codehaus.groovy.grails.web.pages',		// GSP
-            'grails.app.controller',
             'com.opensymphony.clickstream',
-			'com.mchange',
-			'org.springframework',
+            'org.codehaus.groovy.grails.web.pages',		// GSP			'com.mchange',
+            'org.springframework',
 			'org.hibernate',
 			'org.pih.warehouse',
 			'grails.app',
+            'grails.app.controller',
 			'grails.app.bootstrap',
 			'grails.app.service',
 			'grails.app.task',
@@ -312,12 +317,12 @@ log4j = {
 			'com.gargoylesoftware.htmlunit'
             //'org.jumpmind'
 
-   debug 	 'org.apache.cxf'
+   debug 	'org.apache.cxf',
 
-            //'org.apache.http.wire',          // shows traffic between htmlunit and server
-            //'com.gargoylesoftware.htmlunit'
+           //'com.gargoylesoftware.htmlunit',
+            'org.apache.http.wire'        // shows traffic between htmlunit and server
 
-    //trace 'org.hibernate.cache'
+   trace    'org.hibernate.type.descriptor.sql.BasicBinder'
 
 }
 

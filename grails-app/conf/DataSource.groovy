@@ -12,11 +12,11 @@ dataSource {
 	pooled = true
 	driverClassName = "com.mysql.jdbc.Driver"
 	dialect = org.hibernate.dialect.MySQL5InnoDBDialect
-	loggingSql = false
 	username = "root"
 	password = "root"
-	format_sql = true
-	use_sql_comments = true
+    loggingSql = false
+	format_sql = false
+	use_sql_comments = false
     properties {
         maxActive = 100
         maxIdle = 25
@@ -32,17 +32,19 @@ dataSource {
 
 // Hibernate caching properties
 hibernate {
-    generate_statistics=true
+    generate_statistics=false
     cache.use_second_level_cache=true
     cache.use_query_cache=false
     cache.provider_class='org.hibernate.cache.EhCacheProvider'
+    //default_batch_fetch_size = 16
+    //max_fetch_depth = 5
 }
 
 // Environment specific settings
 environments {
 	development {
 		dataSource {	
-			//dbCreate = "update"			
+			//dbCreate = "update"
 			url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
