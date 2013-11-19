@@ -59,7 +59,7 @@ class ProductTests extends GrailsUnitTestCase {
         def product = new Product(name: "Product 1")
         product.addToSynonyms(new Synonym(synonym: "synonym"))
         product.save(flush: true)
-        assertEquals 1, product.synonyms
+        assertEquals 1, product.synonyms.size()
 
     }
 
