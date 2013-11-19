@@ -17,10 +17,11 @@ class InitializationFilters {
 
 		sessionCheck(controller:'*', action:'*') {
 			before = {
-				try { 
+				try {
 					// Make sure all session variables are initialized
 					if (!session.warehouse) { 
 						Location currentLocation = Location.get(session?.warehouse?.id)
+                        session._showTime = true
 						session.loginLocations = locationService.getLoginLocations(currentLocation) 			
 						session.loginLocationsMap = locationService.getLoginLocationsMap(currentLocation)			
 					}

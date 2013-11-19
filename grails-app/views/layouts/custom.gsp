@@ -1,6 +1,6 @@
 <%@ page import="java.util.Locale" %>
 <?xml version="1.0" encoding="UTF-8"?>
-<html lang="en" ng-app>
+<html lang="en">
 <head>
     <!-- Include default page title -->
     <title><g:layoutTitle default="OpenBoxes" /></title>
@@ -111,18 +111,20 @@
     </div>
     --%>
     </g:if>
-    <g:if test="${session._showTime}">
+    <g:if test="${session.warehouse && session.user && session._showTime}">
         <div class="box">
             <div class="left">
-                <span class="title">${request.requestURI}${request.queryString?"?"+request.queryString:""}</span>
+                <span class="title">
+                    <g:set var="currentUri">${request.requestURI}${request.queryString?"?"+request.queryString:""}</g:set>
+                    <g:link url="${currentUri}">${currentUri}</g:link>
+                </span>
             </div>
             <div class="right">
                 <span style="color: #666;">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'database_connect.png')}" class="middle"/>
                     Data load took ${(request?.actionDuration?:0)/1000}s
                 </span>
+                /
                 <span style="color: #666;">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'page_refresh.png')}" class="middle"/>
                     Page load took ${(request?.viewDuration?:0)/1000}s
                 </span>
                 <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
@@ -166,7 +168,6 @@
 <script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
 <script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'angular.min.js')}" type="text/javascript"></script>
 <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 
 <g:if test="${System.getenv().get('headless') != 'false'}" env="test">
