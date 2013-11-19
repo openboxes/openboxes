@@ -28,6 +28,7 @@ class ShipmentController {
 	
 	def scaffold = Shipment
 	def shipmentService
+    def userService
 	def reportService;
 	def inventoryService;
 	def mailService
@@ -346,10 +347,9 @@ class ShipmentController {
 	
 	def receiveShipment = { ReceiveShipmentCommand command -> 
 		log.info "params: " + params
-		
-		 
 		def receiptInstance
-		def shipmentInstance = Shipment.get(params.id)		
+		def shipmentInstance = Shipment.get(params.id)
+        def userInstance = User.get(session.user.id)
 		def shipmentItems = []
 		
 		
@@ -379,8 +379,12 @@ class ShipmentController {
 			def creditStockOnReceipt = true
 			// actually process the receipt
 			shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse, creditStockOnReceipt);
-			
+
+
 			if (!shipmentInstance.hasErrors()) {
+                def recipients = new HashSet()
+                triggerReceiveShipmentEmails(shipmentInstance, userInstance, recipients)
+
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(action: "showDetails", id: shipmentInstance?.id)
 				return
@@ -427,7 +431,51 @@ class ShipmentController {
 		render(view: "receiveShipment", model: [
 			shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
 	}
-	
+
+
+    /**
+     *
+     * @param shipmentInstance
+     * @param userInstance
+     * @param recipients
+     */
+    void triggerReceiveShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
+        if (!recipients) recipients = new HashSet<Person>()
+
+        // Add all admins to the email
+        def adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
+        adminList.each { adminUser ->
+            if (adminUser?.email) {
+                recipients.add(adminUser);
+            }
+        }
+
+        // add the current user to the list of email recipients
+        if (userInstance) {
+            recipients.add(userInstance)
+        }
+
+        if (!shipmentInstance.hasErrors()) {
+
+            if (!userInstance) userInstance = User.get(session.user.id)
+            def shipmentName = "${shipmentInstance.name}"
+            def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
+            def shipmentDate = "${formatDate(date:shipmentInstance?.actualDeliveryDate, format: 'MMMMM dd yyyy')}"
+            def subject = "${warehouse.message(code:'shipment.hasBeenReceived.message',args:[shipmentType, shipmentName, shipmentDate])}"
+            def body = g.render(template:"/email/shipmentReceived", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
+            //def toList = recipients?.collect { it?.email }?.unique()
+            def toList = ["jmiranda@pih.org"]
+            log.info("Mailing shipment emails to ${toList} with body:\n" + body)
+
+            try {
+                mailService.sendHtmlMail(subject, body.toString(), toList)
+            } catch (Exception e) {
+                log.error "Error triggering receive shipment emails " + e.message
+            }
+        }
+    }
+
+
 	def showPackingList = { 
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
