@@ -153,9 +153,9 @@
 			</div>
 		</g:isUserManager>		
 		<g:isUserAdmin>		
-			<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
+			<g:if test="${productInstance.id}">
 				<div class="action-menu-item">
-					<g:link action="delete" id="${productInstance.id}"
+					<g:link colection="product" action="delete" id="${productInstance.id}"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="${warehouse.message(code: 'default.button.delete.label') }"
                             style="vertical-align: middle" />&nbsp;
