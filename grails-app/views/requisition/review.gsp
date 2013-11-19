@@ -716,7 +716,7 @@
                                                                                 <label><warehouse:message code="requisitionItem.quantity.label" default="Quantity"/></label>
                                                                             </td>
                                                                             <td class="value ${hasErrors(bean: selectedRequisitionItem, field: 'quantity', 'errors')}">
-                                                                                <g:textField id="quantity" name="quantity" value="" class="text"
+                                                                                <g:textField id="quantity" name="quantity" value="${selectedRequisitionItem?.quantity}" class="text"
                                                                                              placeholder="${warehouse.message(code:'default.quantity.label') }"/> EA/1
                                                                             </td>
                                                                         </tr>

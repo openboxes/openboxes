@@ -1861,6 +1861,7 @@ fieldset .prop { margin: 10px; }
 .progressbar { width: 250px; height: 20px; }
 #progressbar {  padding: 10px; margin: 10px; }
 #progressbar .step { padding-left: 0; border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
+#progressbar .caption​ { width: 50px; margin: 0 auto; }​
 .step.selected { font-weight: bold; text-decoration: underline; background-color: #f7f7f7 /*#F8F7EF*/; }
 span.right { float: left; }
 span.left { width: 10%;  float: left; text-align: center; }
@@ -2882,7 +2883,6 @@ ul.filter-list {
     padding: 0 5px 0 0;
 }
 .filter-list-item input {
-
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -2909,3 +2909,14 @@ ul.filter-list {
 .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
 .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
 .ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+
+/* =============================================================================
+    Footable CSS
+   ========================================================================== */
+
+.footable > tbody > tr > td, .footable > thead > tr > th {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}

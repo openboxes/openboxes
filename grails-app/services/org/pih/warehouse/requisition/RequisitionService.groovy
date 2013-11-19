@@ -62,6 +62,13 @@ class RequisitionService {
                     if (destination) eq("destination", destination)
                     if (origin) eq("origin", origin)
                 }
+                //if (user) {
+                //    or {
+                //        eq("createdBy", user)
+                //        eq("updatedBy", user)
+                //        eq("requestedBy", user)
+                //    }
+                //}
             }
             isNotNull("status")
         }

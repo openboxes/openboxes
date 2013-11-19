@@ -88,7 +88,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 	static mapping = {
 		id generator: 'uuid'
         picklistItems cascade: "all-delete-orphan", sort: "id"
-		requisitionItems cascade: "all-delete-orphan", sort: "id"
+		requisitionItems cascade: "all-delete-orphan", sort: "id", batchSize: 100
 	}
 
     static mappedBy = [requisitionItems:'parentRequisitionItem']
@@ -366,8 +366,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return true if the requisition item has been completely canceled
      */
     def isCanceled() {
-        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem
-        //&& !requisitionItems
+        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems
     }
 
     /**
@@ -375,7 +374,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def isChanged() {
         def startTime = System.currentTimeMillis()
-        def isChanged = quantityCanceled > 0 && (modificationItem || substitutionItem) //&& requisitionItems)
+        def isChanged = quantityCanceled > 0 && (modificationItem || substitutionItem || requisitionItems)
 
     }
 
@@ -383,8 +382,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return  true if this child requisition item's parent is canceled and the child product and product package is different from its parent
      */
     def isSubstituted() {
-        //return requisitionItems.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
-        return (quantityCanceled > 0 && substitutionItem)
+        def isSubstituted = requisitionItems.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        return isSubstituted || (quantityCanceled > 0 && substitutionItem)
     }
 
     def isCanceledOrSubstituted() {
@@ -410,7 +409,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def isSubstitution() {
         return parentRequisitionItem?.isChanged() && (parentRequisitionItem?.product != product) && (parentRequisitionItem?.productPackage != productPackage)
-        //return substitutionItem != null
     }
 
     def isPartiallyFulfilled() {
@@ -429,8 +427,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return  true if the item has been completed cancelled and has some child items that are substitutes
      */
     def hasSubstitution() {
-        //return requisitionItems?.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
-        return substitutionItem!=null
+        def hasSubstitution = requisitionItems?.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        return hasSubstitution || substitutionItem!=null
     }
 
     def canUndoChanges() {

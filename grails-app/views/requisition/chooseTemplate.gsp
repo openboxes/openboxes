@@ -67,7 +67,12 @@
 
                     <h2>${warehouse.message(code:'requisition.chooseTemplate.label', default:'Choose stock requisition template')}</h2>
                     <table id="requisition-template-table">
-
+                        <thead>
+                            <tr>
+                                <th width="33%"><warehouse:message code="location.label" /></th>
+                                <th><warehouse:message code="requisitionTemplates.label" /></th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <%--
                             <tr class="prop">
@@ -106,34 +111,35 @@
                             </g:if>
                             --%>
 
-                            <tr class="prop">
-                                <td class="value">
-                                    <g:each var="entry" in="${templates?.groupBy {it.origin}}">
-                                        <div>
-                                            <div>
-                                                <label>${entry.key}</label>
-                                            </div>
-                                            <g:each var="template" in="${entry.value}">
-                                                <div>
-                                                    <g:link controller="requisition" action="createStockFromTemplate" id="${template?.id}" class="button">
+                                    <g:each var="entry" in="${templates?.groupBy {it.origin}?.sort()}" status="i">
+                                        <tr class="prop ${i%2?'odd':'even'}">
+                                            <td>
+                                                ${entry.key}
+                                            </td>
+                                            <td>
+                                                <g:each var="template" in="${entry.value}">
+                                                    <g:link controller="requisition" action="createStockFromTemplate" id="${template?.id}" class="button icon arrowright">
                                                         <g:if test="${template.name}">
                                                             ${template.name}
                                                         </g:if>
                                                         <g:else>
-                                                            ${template.origin} - ${format.metadata(obj:template?.commodityClass)} - ${format.metadata(obj:template?.type)}
+                                                            ${format.metadata(obj:template?.type)} ${format.metadata(obj:template?.commodityClass)}
                                                         </g:else>
                                                     </g:link>
-                                                </div>
-                                            </g:each>
-                                        </div>
+                                                </g:each>
+                                            </td>
+                                        </tr>
+
                                     </g:each>
                                     <g:unless test="${templates}">
-                                        <div class="center empty">
-                                            <warehouse:message code="requisitionTemplate.noPublishedTemplates.message"/>
-                                        </div>
+                                        <tr>
+                                            <td>
+                                                <div class="center empty">
+                                                    <warehouse:message code="requisitionTemplate.noPublishedTemplates.message"/>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </g:unless>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>

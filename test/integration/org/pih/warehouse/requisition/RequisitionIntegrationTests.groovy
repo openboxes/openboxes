@@ -1,5 +1,8 @@
 package org.pih.warehouse.requisition
 
+import org.junit.After
+import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -7,10 +10,23 @@ import org.pih.warehouse.product.Product
 
 class RequisitionIntegrationTests extends GroovyTestCase {
 
+    def sessionFactory
 
 
+    @Before
+    void setUp() {
+        assertNotNull sessionFactory
+        println sessionFactory.getStatistics()
+    }
 
-    @Test
+    @After
+    void tearDown() {
+        assertNotNull sessionFactory
+        println sessionFactory.getStatistics()
+    }
+
+
+    @Ignore
     void save_shouldReturnErrors() {
         def requisition = new Requisition()
         requisition.save()
@@ -23,7 +39,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         assertTrue requisition.errors.hasFieldErrors("requestedBy")
     }
 
-    @Test
+    @Ignore
     void save_shouldSaveRequisition() {
         def location = Location.list().first()
         def product1 = Product.findByName("Advil 200mg")
@@ -52,7 +68,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
     }
 
-    @Test
+    @Ignore
     void save_shouldSaveRequisitionItemOnly(){
         def location = Location.list().first()
         def person = Person.list().first()
@@ -74,6 +90,26 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 		
 		assert requisition.save(flush:true)
 		assertEquals 1, requisition.requisitionItems.size()
+
+    }
+
+    /**
+     * Temporary unit test created for performance tuning that should be @Ignored when committed to github.
+     */
+    @Ignore
+    void getStockRequisition() {
+        def startTime = System.currentTimeMillis()
+
+        def requisition = Requisition.findByRequestNumber("508BSK")
+        requisition.requisitionItems.each { requisitionItem ->
+            println " * " + requisitionItem.toJson()
+            requisitionItem.requisitionItems.each { grandchild ->
+                println " \t* " + grandchild.toJson()
+            }
+        }
+
+
+        println "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 
     }
 

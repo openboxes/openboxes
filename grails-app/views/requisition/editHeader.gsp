@@ -41,7 +41,7 @@
 
                         <div class="right">
                             <g:if test="${requisition?.id }">
-                                <g:link controller="requisition" action="edit" id="${requisition?.id }">
+                                <g:link controller="requisition" action="edit" id="${requisition?.id }" class="button icon trash">
                                     <warehouse:message code="default.button.cancel.label"/>
                                 </g:link>
 
