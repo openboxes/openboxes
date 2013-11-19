@@ -370,7 +370,11 @@ class ProductService {
 		return quickCategories;
 	}
 
-
+    /**
+     * Validate the data in the given import command object.
+     *
+     * @param command
+     */
 	public void validateData(ImportDataCommand command) {
 		log.info "validate data test "
 		// Iterate over each row and validate values
@@ -395,7 +399,10 @@ class ProductService {
 
 	}
 
-
+    /**
+     * Import the data in the given import command object
+     * @param command
+     */
 	public void importData(ImportDataCommand command) {
 		log.info "import data"
 
@@ -432,13 +439,19 @@ class ProductService {
 
 	}
 
-
+    /**
+     * Search product and product groups by name.
+     *
+     * @param term
+     * @return
+     */
     public def searchProductAndProductGroup(String term) {
         return searchProductAndProductGroup(term, false)
     }
 
 	/**
-	 * 
+	 * Search product and product groups by name using wildcard search.
+     *
 	 * @param term
 	 * @return
 	 */
@@ -457,6 +470,8 @@ class ProductService {
 	}
 
 	/**
+     * Get the column delimiter used in the given data set.
+     *
 	 * @param data
 	 * @return
 	 */
@@ -474,6 +489,8 @@ class ProductService {
 	}
 	
 	/**
+     * Get a list of columns for the data set using the default column delimiter.
+     *
 	 * @param csv
 	 * @return
 	 */
@@ -483,6 +500,8 @@ class ProductService {
 	}
 	
 	/**
+     * Get a list of columns for the data set using the given column delimiter.
+     *
 	 * @param csv
 	 * @param delimiter
 	 * @return
@@ -499,7 +518,7 @@ class ProductService {
 
 
 	/**
-	 * 
+	 * Gets a list of products that already exist in the database
 	 * @param csv
 	 * @return
 	 */
@@ -509,7 +528,8 @@ class ProductService {
 	}
 	
 	/**
-	 * 
+	 * Gets a list of products that already exist in the database.
+     *
 	 * @param csv
 	 * @param delimiter
 	 * @return
@@ -705,7 +725,8 @@ class ProductService {
 
 
 	/**
-	 * Export all products.
+	 * Export all products in the database.
+     *
 	 * @return
 	 */
 	String exportProducts() {
@@ -715,6 +736,7 @@ class ProductService {
 	
 	/**
 	 * Export given products.
+     *
 	 * @param products
 	 * @return
 	 */
@@ -776,7 +798,8 @@ class ProductService {
 
 	
 	/**
-	 *
+	 * Find or create a category with the given name.
+     *
 	 * @param categoryName
 	 * @return
 	 */
@@ -795,7 +818,8 @@ class ProductService {
 	}
 	
 	/**
-	 * 
+	 * Find all top-level categories (e.g. children of the root category)
+     *
 	 * @return
 	 */
 	def getTopLevelCategories() {
@@ -804,6 +828,9 @@ class ProductService {
 	}
 
 	/**
+     *
+     * Get all unique and active tags in the database.
+     *
 	 * @return all tag labels
 	 */
 	def getAllTagLabels() {
@@ -811,6 +838,8 @@ class ProductService {
 	}
 
 	/**
+     * Get all active tags in the database.
+     *
 	 * @return	all tags
 	 */
 	def getAllTags() { 
@@ -819,6 +848,8 @@ class ProductService {
 	}
 	
 	/**
+     * Get all popular tags
+     *
 	 * @return  all tags that have a product
 	 */
 	def getPopularTags() {
@@ -854,19 +885,30 @@ class ProductService {
 	}
 
     /**
-     * Add the single tag to the
+     * Add the given tag to the given product.
+     *
      * @param product
      * @param tagName
      * @return
      */
     def addTagToProduct(product, tagName) {
-        Tag tag = Tag.findByTag(tagName)
+
+        // Check if the product already has the given tag
+        def tag = product.tags.find { it.tag == tagName }
         if (!tag) {
-            tag = new Tag(tag: tagName)
-            tag.save()
+            // Otherwise try to find an existing tag that matches the tag
+            tag = Tag.findByTag(tagName)
+
+            // Or create a brand new one
+            if (!tag) {
+                tag = new Tag(tag: tagName)
+                tag.save()
+            }
+
+            // Then add the tag and save the product
+            product.addToTags(tag)
+            product.save();
         }
-        product.addToTags(tag)
-        product.save();
     }
 
     /**
@@ -884,7 +926,8 @@ class ProductService {
     }
 	
 	/**
-	 * 
+	 * Delete a tag from the given product and delete the tag.
+     *
 	 * @param product
 	 * @param tag
 	 * @return
@@ -896,6 +939,7 @@ class ProductService {
 
     /**
      * Ensure that the given product code does not exist
+     *
      * @param productCode
      * @return
      */
@@ -907,6 +951,7 @@ class ProductService {
 	
 	/**
 	 * Generate a product identifier.
+     *
 	 * @return
 	 */
 	def generateProductIdentifier() {
@@ -923,16 +968,19 @@ class ProductService {
         }
         return productCode
 	}
-	
-	
-		
-	
+
+    /**
+     * Download a document at the given URL.
+     *
+     * @param url
+     */
 	def downloadDocument(url) { 
 		// move code from ProductController		
 	}
 
     /**
      * Save the given product
+     *
      * @param product
      * @return
      */
@@ -1031,11 +1079,14 @@ class ProductService {
         }
         return tag;
     }
-	
-	
+
+    /**
+     * Find products that are similar to the given product.
+     *
+     * @param product
+     * @return
+     */
 	def findSimilarProducts(Product product) { 
-		
-		
 		def similarProducts = []
 		/*
 		def productsInSameProductGroup = ProductGroup.findByProduct(product).products
