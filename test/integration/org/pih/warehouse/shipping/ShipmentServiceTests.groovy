@@ -128,12 +128,14 @@ class ShipmentServiceTests extends GroovyTestCase {
 		def pallet1 = new Container(id: "1", name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
 		shipment1.addToContainers(pallet1);
 		shipment1.save(flush:true)
-		
-	
-		// Preconditions
+
+
+        println "shipment2 Containers: " + shipment2.containers
+
+        // Preconditions
 		assertNotNull "Shipment should exist", shipment2 
 		assertEquals "Should have 1 container", 1, shipment1.containers.size()
-		assertNull "Should have 0 containers", shipment2.containers
+		assertEquals "Should have 0 containers",0, shipment2.containers.size()
 
 		printContainer("Before move", pallet1)
 		printShipment("Before move", shipment1)
@@ -241,17 +243,20 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   shipment1.addToContainers(pallet1);
 	   shipment1.save(flush:true)
 
-	   def testShipment = Shipment.findByName("New Shipment 1")
-	   assertEquals 1, testShipment.shipmentItems.size()
-	   assertEquals 1, testShipment.containers.size()
-	   assertEquals 1, testShipment.containers.toArray()[0].shipmentItems.size()
+       def shipmentId = shipment1.id
+
+	   //def testShipment = Shipment.findByName("New Shipment 1")
+	   assertEquals 1, shipment1.shipmentItems.size()
+	   assertEquals 1, shipment1.containers.size()
+	   //assertEquals 1, shipment1.containers.toArray()[0].shipmentItems.size()
 	   def numberOfShipmentsBeforeDelete = Shipment.count()
-	   def numberOfContainersBeforeDelete = Container.count()	   
-	   shipmentService.deleteShipment(testShipment)
-	   
-	   def deletedShipment = Shipment.findByName("New Shipment 1")
-	   
-	   assertNull "Should be null", deletedShipment
+	   def numberOfContainersBeforeDelete = Container.count()
+       def shipmentToDelete = Shipment.get(shipmentId)
+       assertNotNull shipmentToDelete
+       shipmentService.deleteShipment(shipment1)
+
+       def deletedShipment = Shipment.get(shipmentId)
+       assertNull "Should be null", deletedShipment
 	   assertEquals "Should be equal to # of shipments before delete minus 1", numberOfShipmentsBeforeDelete-1, Shipment.count()
 	   assertEquals "Should be equal to # of containers before delete minus 1", numberOfContainersBeforeDelete-1, Container.count()
 	   

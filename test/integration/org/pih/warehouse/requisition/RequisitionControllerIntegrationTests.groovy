@@ -29,6 +29,37 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
         println sessionFactory.getStatistics()
     }
 
+    @Test
+    void list_shouldListRequisitions() {
+        def location = Location.findByName("Boston Headquarters")
+        def product1 = Product.findByName("Advil 200mg")
+        def product2 = Product.findByName("Tylenol 325mg")
+        def item1 = new RequisitionItem(product: product1, quantity: 10)
+        def item2 = new RequisitionItem(product: product2, quantity: 20)
+        def person = Person.list().first()
+        def requisition = new Requisition(
+                name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
+                commodityClass: CommodityClass.MEDICATION,
+                type:  RequisitionType.WARD_NON_STOCK,
+                origin: location,
+                destination: location,
+                requestedBy: person,
+                dateRequested: new Date(),
+                requestedDeliveryDate: new Date().plus(1))
+
+        requisition.addToRequisitionItems(item1)
+        requisition.addToRequisitionItems(item2)
+        requisition.save(flush:true, failOnError: true)
+
+        def controller = new RequisitionController();
+        controller.session.warehouse = location
+        controller.session.user = User.list().first()
+        controller.list()
+
+        assertTrue controller.modelAndView.viewName.contains("list")
+        assertEquals 1, controller.modelAndView.model.requisitions.size()
+
+    }
 
 
 

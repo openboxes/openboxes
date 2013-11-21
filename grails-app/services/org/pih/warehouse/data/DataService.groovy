@@ -44,7 +44,7 @@ class DataService {
 	static transactional = true
 
     /**
-     *
+     * Validate inventory levels
      */
     def validateInventoryLevels(ImportDataCommand command) {
         println "validate inventory levels " + command.filename

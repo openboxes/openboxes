@@ -19,13 +19,14 @@ import org.pih.warehouse.receiving.ReceiptItem
 
 class ShipmentService {
 
-	def mailService;
+    boolean transactional = true
+
+    def mailService;
 	def sessionFactory;
 	def productService
 	def inventoryService;
 	def identifierService
-	boolean transactional = true
-   
+
 	
 	/**
 	 * Returns the shipment referenced by the passed id parameter;
@@ -667,7 +668,7 @@ class ShipmentService {
 	 * @param shipment
 	 */
 	void deleteShipment(Shipment shipment) { 
-		shipment.delete()
+		shipment.delete(flush:true)
 	}
 	
 	/**

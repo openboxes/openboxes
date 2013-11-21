@@ -26,7 +26,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
     }
 
 
-    @Ignore
+    @Test
     void save_shouldReturnErrors() {
         def requisition = new Requisition()
         requisition.save()
@@ -39,7 +39,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         assertTrue requisition.errors.hasFieldErrors("requestedBy")
     }
 
-    @Ignore
+    @Test
     void save_shouldSaveRequisition() {
         def location = Location.list().first()
         def product1 = Product.findByName("Advil 200mg")
@@ -68,7 +68,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
     }
 
-    @Ignore
+    @Test
     void save_shouldSaveRequisitionItemOnly(){
         def location = Location.list().first()
         def person = Person.list().first()

@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
@@ -97,7 +98,7 @@ class DataServiceTests extends GroovyTestCase {
 
 
 
-    @Test
+    @Ignore
     void importInventoryLevels() {
         def startTime = System.currentTimeMillis()
 
@@ -109,7 +110,7 @@ class DataServiceTests extends GroovyTestCase {
             location.save(flush: true, failOnError: true)
         }
 
-        Resource resource = new ClassPathResource("resources/inventoryLevelImportData.xls")
+        Resource resource = new ClassPathResource("resources/inventoryLevelImportData-partial.xls")
         def file = resource.getFile()
         assert file.exists()
 
@@ -183,8 +184,7 @@ class DataServiceTests extends GroovyTestCase {
         println "Time to import ${inventoryLevelList.size()} items: " + (System.currentTimeMillis() - startTime) + " ms"
      }
 
-
-    @Test
+    @Ignore
     void importProductGroups() {
         def startTime = System.currentTimeMillis()
 
@@ -196,7 +196,7 @@ class DataServiceTests extends GroovyTestCase {
             location.save(flush: true, failOnError: true)
         }
 
-        Resource resource = new ClassPathResource("resources/inventoryLevelImportData.xls")
+        Resource resource = new ClassPathResource("resources/inventoryLevelImportData-partial.xls")
         def file = resource.getFile()
         assert file.exists()
 
