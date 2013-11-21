@@ -135,7 +135,7 @@ class ShipmentServiceTests extends GroovyTestCase {
         // Preconditions
 		assertNotNull "Shipment should exist", shipment2 
 		assertEquals "Should have 1 container", 1, shipment1.containers.size()
-		assertEquals "Should have 0 containers",0, shipment2.containers.size()
+		assertEquals "Should have 0 containers",0, shipment2.containers?.size()?:0
 
 		printContainer("Before move", pallet1)
 		printShipment("Before move", shipment1)
