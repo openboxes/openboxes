@@ -90,10 +90,7 @@ environments {
 	}
     aws {
         dataSource {
-            pooled = true
-            driverClassName = "com.mysql.jdbc.Driver"
             url = System.getProperty("JDBC_CONNECTION_STRING")
-            dialect = org.hibernate.dialect.MySQL5InnoDBDialect
             properties {
                 validationQuery = "SELECT 1"
                 testOnBorrow = true
