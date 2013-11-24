@@ -128,13 +128,11 @@
 <g:set var="latestInventoryDate"
        value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
 <div class="box">
+    <h2>
+        ${warehouse.message(code: 'product.status.label') }
+    </h2>
     <table>
         <tbody>
-            <tr class="odd">
-                <td colspan="2">
-                    <label>${warehouse.message(code: 'product.status.label') }</label>
-                </td>
-            </tr>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="default.status.label"/></label>
@@ -297,15 +295,11 @@
 		</table>			
 	</div>
 <div class="box">
+    <h2>
+        ${warehouse.message(code: 'product.details.label') }
+    </h2>
     <table>
         <tbody>
-            <tr class="odd">
-                <td colspan="2">
-                    <label>${warehouse.message(code: 'product.details.label') }</label>
-                </td>
-            </tr>
-
-
             <tr class="prop">
                 <td class="label">
                     <label>${warehouse.message(code: 'product.productCode.label') }</label>
@@ -560,13 +554,11 @@
 </div>
 <g:if test="${productInstance?.packages }">
     <div class="box">
+        <h2>
+            ${warehouse.message(code: 'product.packaging.label') }
+        </h2>
         <table>
             <tbody>
-                <tr class="odd">
-                    <td colspan="2">
-                        <label>${warehouse.message(code: 'product.packaging.label') }</label>
-                    </td>
-                </tr>
                 <g:each var="productPackage" in="${productInstance?.packages?.sort { it.quantity }}">
                     <tr class="prop">
                         <td class="label">
@@ -584,14 +576,11 @@
     </div>
 </g:if>
 <div class="box">
+    <h2>
+        ${warehouse.message(code: 'default.auditing.label') }
+    </h2>
     <table>
         <tbody>
-            <tr class="odd">
-                <td colspan="2">
-                    <label>${warehouse.message(code: 'default.auditing.label') }</label>
-                </td>
-            </tr>
-
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.createdBy.label"/></label>

@@ -17,6 +17,9 @@
             </tr>
         </thead>
         <tbody>
+
+
+
             <g:each var="entry" in="${issuedRequisitionItems.groupBy { it.requisition.monthRequested } }" status="i">
 
                 <g:set var="monthlyQuantityRequested" value="${entry?.value?.collect { it?.quantity?:0 }?.sum()?:0 }"/>

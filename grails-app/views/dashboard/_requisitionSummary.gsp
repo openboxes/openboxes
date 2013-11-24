@@ -5,7 +5,7 @@
 <div class="widget-small">
 	<div class="widget-header">
         <h2>
-
+            <%--
             <span class="action-menu">
                 <button class="action-btn">
                     <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
@@ -26,6 +26,7 @@
                     </div>
                 </div>
             </span>
+            --%>
             <warehouse:message code="requisitions.label"/>
         </h2>
 

@@ -426,7 +426,7 @@ th.desc a {
     padding-left: 15px;
 }
 .linkButton a.alert {
-    background: url(../images/icons/silk/alert.png) center left no-repeat;
+    background: url(../images/icons/silk/bell.png) center left no-repeat;
 }
 .linkButton a.error {
     background: url(../images/icons/silk/error.png) center left no-repeat;
@@ -468,7 +468,7 @@ th.desc a {
     background: url(../images/icons/silk/table_add.png) center left no-repeat;
 }
 .linkButton a.menu {
-    background: url(../images/icons/silk/document.png) center left no-repeat;
+    background: url(../images/icons/silk/text_list_bullets.png) center left no-repeat;
 }
 .linkButton a.account {
     background: url(../images/icons/document.png) center left no-repeat;
@@ -517,10 +517,10 @@ th.desc a {
     background: url(../images/icons/silk/package.png) center left no-repeat;
 }
 .linkButton a.order {
-    background: url(../images/icons/silk/order.png) center left no-repeat;
+    background: url(../images/icons/silk/text_list_numbers.png) center left no-repeat;
 }
 .linkButton a.transactionentry {
-    background: url(../images/icons/silk/document.png) center left no-repeat;
+    background: url(../images/icons/silk/text_list_numbers.png) center left no-repeat;
 }
 .linkButton a.documentupload {
     background: url(../images/icons/document.png) center left no-repeat;
@@ -598,9 +598,9 @@ th.desc a {
 -------------------------------------------------------------- */
 
 
-label       { font-weight: none; }
+label       { font-weight: normal; }
 fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
-legend      { font-weight: none; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
+legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
 legend span {
 	position: absolute;
@@ -851,7 +851,7 @@ label.error {
 }
 
 button.action-btn, button.previous, button.next {
-    padding: 0px;
+
 }
 
 .sorthandle {
@@ -879,8 +879,7 @@ button.action-btn, button.previous, button.next {
 }
 
 .action-btn {
-    width: 40px;
-    margin: 1px;
+
 }
 #banner {
     padding: 0px;
@@ -903,15 +902,16 @@ button.action-btn, button.previous, button.next {
     height: 2em;
 }
 
+/*
 .edit {
     background-image: url('/openboxes/images/icons/silk/pencil.png') no-repeat right center;
 }
-
+*/
 .box {
     border: 1px solid lightgrey;
-    margin: 1px;
+    margin: 5px;
     background-color: #fcfcfc;
-    padding: 7px;
+    padding: 0px;
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
@@ -1092,6 +1092,16 @@ button.action-btn, button.previous, button.next {
 
 /* Product Details box */
 /*#product-details-box { width: 260px;}*/
+.summary {
+    padding: 10px 10px 5px 10px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #aaa;
+}
+.summary-actions {
+    padding: 10px;
+
+}
+
 #product-details-box span.name {   }
 #product-details-box span.value { font-size: 1.0em; }
 #product-details-box span.name:after { content: ": " }
@@ -1144,9 +1154,12 @@ body {
     font-family: "Lucida Grande", arial, verdana;
 }
 
+
 #content {
-    padding: 5px 35px 5px 5px;
+    /*padding: 5px 35px 5px 5px;*/
+    padding: 0px;
 }
+
 
 #dashboard {
     margin: 0px;
@@ -1380,16 +1393,16 @@ input.button {
     cursor: pointer;*/
 }
 .menu .menuSection a {
-    font-weight: none;
+    font-weight: normal;
     text-decoration: none;
 }
 .menu .menuSection a:hover {
     text-decoration: underline;
-    font-weight: none;
+    font-weight: normal;
 }
 .menu .menuSection a:visited {
     text-decoration: none;
-    font-weight: none;
+    font-weight: normal;
 }
 .ui-widget-content a {
     color: #666;
@@ -1405,6 +1418,12 @@ input.button {
     background-color: #F7F7F7;
 }
 .buttonBar {
+    background-color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.button-bar {
     background-color: white;
     padding: 10px;
     text-align: left;
@@ -1430,15 +1449,48 @@ label.clear {
 
 /* TODO figure out what this was meant for */
 h2 {
-    font-size: 1.2em;
-    font-weight: normal;
-    background-color: #F7F7F7;
-    color: #666;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    font-weight: bold;
+    top: 0;
+    position: relative;
+    padding-left: 10px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #555;
+    line-height: 18px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 
+
+
+
+    position: relative;
+    height: 40px;
+    line-height: 40px;
+    background: #E9E9E9;
+    background: -moz-linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+    /* FF3.6+ */
+
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(100%, #e9e9e9));
+    /* Chrome,Safari4+ */
+
+    background: -webkit-linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+    /* Chrome10+,Safari5.1+ */
+
+    background: -o-linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+    /* Opera11.10+ */
+
+    background: -ms-linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+    /* IE10+ */
+
+    background: linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+    /* W3C */
+
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FAFAFA', endColorstr='#E9E9E9');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#FAFAFA', endColorstr='#E9E9E9')";
+    border: 1px solid #D5D5D5;
+
+    -webkit-background-clip: padding-box;
 }
+
+
 .category-header {
     font-size: 1.2em;
     text-align: left;
@@ -1530,7 +1582,8 @@ h2 {
 
 
 .title {
-    font-size: 1.2em;
+    font-size: 1.5em;
+    line-height: 1.6em;
     font-weight: bold;
     color: #666;
 }
@@ -2033,6 +2086,7 @@ img.photo_tiny {
 
  */
 
+.ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 0em 0em; background: none; }
 
 #transactionLogTabs {
     background: transparent;
@@ -2115,11 +2169,11 @@ img.photo_tiny {
 }
 
 span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}
-span.tag a { font-weight: none; color: #82ad2b; text-decoration:none; font-size: 11px;  }
+span.tag a { font-weight: normal; color: #82ad2b; text-decoration:none; font-size: 11px;  }
 
 /*span.lotNumber { 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; color: black; font-weight: bold; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px; }*/
 .lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
-.barcode { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; letter-spacing: .5em; font-weight: bold; font-size: 14px; line-height: 20px}
+.barcode { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; letter-spacing: .1em; font-weight: normal; font-size: 11px; line-height: 20px}
 .genericName { text-transform: uppercase; }
 #more { background-color: #ddd; padding: 10px; }
 
@@ -2321,9 +2375,8 @@ div.clear {
 }
 
 .accordion-content .quantity-picked input{
-
     text-align: center;
-    float: center;
+    float: left;
 }
 
 #picklist{
@@ -2486,7 +2539,7 @@ span.canceled, div.canceled {
     background-image: -ms-linear-gradient(#f4f4f4, #ececec);
     background-image: -o-linear-gradient(#f4f4f4, #ececec);
     background-image: linear-gradient(#f4f4f4, #ececec);
-    -moz-background-clip: padding; /* for Firefox 3.6 */
+    /*-moz-background-clip: padding;  for Firefox 3.6 */
     background-clip: padding-box;
     border-radius: 0.2em;
     /* IE hacks */
@@ -2527,7 +2580,6 @@ span.canceled, div.canceled {
     padding: 0;
     border: 0;
 }
-
 
 /* =============================================================================
    Button icons

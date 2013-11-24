@@ -21,7 +21,22 @@
             </g:hasErrors>   
             
             
-			<div>
+			<div class="dialog">
+                <div id="inventory-summary" class="summary">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="top">
+                                    <div class="title">
+                                        <warehouse:message code="inventory.browse.label" default="Browse inventory"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
 				<!-- Inventory Browser -->
 	        	<g:set var="varStatus" value="${0}"/>
 	        	<g:set var="totalProducts" value="${0}"/> 							        	
@@ -138,28 +153,26 @@
 								<warehouse:message code="inventory.tooManyProducts.message"></warehouse:message>
 							</div>
 						</g:if>
-						<div class="box">
+                        <div class="box">
                             <h2>
-                                <a href="#tabs-1">
-                                    <g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
-                                    <g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
-                                    <g:set var="totalResults" value="${numProducts }"/>
+                                <g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
+                                <g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
+                                <g:set var="totalResults" value="${numProducts }"/>
 
-                                    <g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
-                                        <g:set var="rangeEnd" value="${totalResults }"/>
-                                    </g:if>
-                                    <g:if test="${totalResults > 0 }">
-                                        <warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
-                                    </g:if>
-                                    <g:else>
-                                        <warehouse:message code="inventory.showingNoResults.label" default="Showing 0 results"/>
-                                    </g:else>
-                                    <g:if test="${commandInstance?.searchTerms}">
-                                        "${commandInstance.searchTerms }"
-                                    </g:if>
-                                </a>
+                                <g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
+                                    <g:set var="rangeEnd" value="${totalResults }"/>
+                                </g:if>
+                                <g:if test="${totalResults > 0 }">
+                                    <warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
+                                </g:if>
+                                <g:else>
+                                    <warehouse:message code="inventory.showingNoResults.label" default="Showing 0 results"/>
+                                </g:else>
+                                <g:if test="${commandInstance?.searchTerms}">
+                                    "${commandInstance.searchTerms }"
+                                </g:if>
                             </h2>
-							<div id="tabs-1" style="padding: 0px;">
+                            <div id="tabs-1" style="padding: 0px;">
 					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 					                <table id="inventory-browser-table" border="0"> 
 										<thead> 

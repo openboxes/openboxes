@@ -16,6 +16,60 @@
             	<div class="message">${flash.message}</div>
             </g:if>
 
+            <div class="summary">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="top" width="1%">
+                                <div class="title">
+                                    <warehouse:message code="requisition.list.label" /> <span class="fade">(${requisitions.totalCount})</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonBar">
+                <div class="button-group">
+                    <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
+                        <warehouse:message code="default.all.label"/>
+                        (${requisitionStatistics["ALL"]})
+                    </g:link>
+                    <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
+                        <g:if test="${requisitionStatistics[requisitionStatus]>0}">
+                            <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
+                            <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
+                                <format:metadata obj="${requisitionStatus}"/>
+                                (${requisitionStatistics[requisitionStatus]?:0 })
+                            </g:link>
+                        </g:if>
+                    </g:each>
+                </div>
+                <div class="button-group">
+                    <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
+                        ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
+                        (${requisitionStatistics["MINE"]?:0 })
+                    </g:link>
+                </div>
+                <%--
+                <div class="buttonBar button-group">
+                    <g:link controller="requisition" action="list" params="['requestedBy.id':session.user.id]" class="button">
+                        ${warehouse.message(code:'requisitions.submittedByMe.label', default: 'Submitted by me')}
+                        (${requisitionsMap["submittedByMe"]?:0 })
+                    </g:link>
+                    <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="button">
+                        ${warehouse.message(code:'requisitions.createdByMe.label', default: 'Created by me')}
+                        (${requisitionsMap["createdByMe"]?:0 })
+                    </g:link>
+                    <g:link controller="requisition" action="list" params="['updatedBy.id':session.user.id]" class="button">
+                        ${warehouse.message(code:'requisitions.updatedByMe.label', default: 'Updated by me')}
+                        (${requisitionsMap["updatedByMe"]?:0 })
+                    </g:link>
+                </div>
+                --%>
+
+            </div>
+
             <div class="yui-gf">
 				<div class="yui-u first">
                     <div class="box">
@@ -108,65 +162,19 @@
                     </div>
                 </div>
                 <div class="yui-u">
-                    <div class="button-group">
-                        <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
-                            <warehouse:message code="default.all.label"/>
-                            (${requisitionStatistics["ALL"]})
-                        </g:link>
-                        <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
-                            <g:if test="${requisitionStatistics[requisitionStatus]>0}">
-                                <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
-                                <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
-                                    <format:metadata obj="${requisitionStatus}"/>
-                                    (${requisitionStatistics[requisitionStatus]?:0 })
-                                </g:link>
-                            </g:if>
-                        </g:each>
-                    </div>
-                    <div class="button-group">
-                        <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
-                            ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
-                            (${requisitionStatistics["MINE"]?:0 })
-                        </g:link>
-                    </div>
-                    <%--
-                    <div class="buttonBar button-group">
-                        <g:link controller="requisition" action="list" params="['requestedBy.id':session.user.id]" class="button">
-                            ${warehouse.message(code:'requisitions.submittedByMe.label', default: 'Submitted by me')}
-                            (${requisitionsMap["submittedByMe"]?:0 })
-                        </g:link>
-                        <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="button">
-                            ${warehouse.message(code:'requisitions.createdByMe.label', default: 'Created by me')}
-                            (${requisitionsMap["createdByMe"]?:0 })
-                        </g:link>
-                        <g:link controller="requisition" action="list" params="['updatedBy.id':session.user.id]" class="button">
-                            ${warehouse.message(code:'requisitions.updatedByMe.label', default: 'Updated by me')}
-                            (${requisitionsMap["updatedByMe"]?:0 })
-                        </g:link>
-                    </div>
-                    --%>
-
-
                     <g:set var="pageParams"
                            value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order,relatedToMe:params.relatedToMe]"/>
                     <div class="box">
-                        <h2>
-                            <warehouse:message code="requisition.list.label" />
-                            <span class="fade">(${requisitions.totalCount})</span>
-                        </h2>
                         <%--<g:render template="list" model="[requisitions:requisitions,pageParams:pageParams]"/>--%>
 
                                     <table>
                                     <thead>
                                     <tr>
                                         <th>
-
+                                            <warehouse:message code="default.actions.label"/>
                                         </th>
                                         <th>
                                             <warehouse:message code="default.numItems.label"/>
-                                        </th>
-                                        <th>
-                                            <warehouse:message code="default.actions.label"/>
                                         </th>
                                         <g:sortableColumn property="status" params="${pageParams}"
                                                           title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
@@ -191,12 +199,12 @@
                                                           title="${warehouse.message(code: 'requisition.origin.label', default: 'Origin')}" />
 
                                         <g:sortableColumn property="requestedBy" params="${pageParams}"
-                                                          title="${warehouse.message(code: 'requisition.requestedBy.label', default: 'Requested by')}" />
+                                                          title="${warehouse.message(code: 'requisition.requested.label', default: 'Requested')}" />
                                         <th>
-                                            <warehouse:message code="default.createdBy.label"/>
+                                            <warehouse:message code="default.created.label"/>
                                         </th>
                                         <th>
-                                            <warehouse:message code="default.updatedBy.label"/>
+                                            <warehouse:message code="default.updated.label"/>
                                         </th>
                                         <%--
 
@@ -212,6 +220,9 @@
                                         <g:sortableColumn property="lastUpdated" params="${pageParams}"
                                                           title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
                                         --%>
+                                        <th>
+
+                                        </th>
 
 
                                     </tr>
@@ -228,11 +239,63 @@
                                     </g:unless>
                                     <g:each in="${requisitions}" status="i" var="requisition">
                                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                                            <td style="width: 60px; text-align: center;">
+                                                <g:render template="/requisition/actions" model="[requisition:requisition]"/>
 
+
+                                                <button class="dialog-trigger" data-id="#dialog-box-${requisition?.id}">
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
+                                                </button>
+
+                                            </td>
+
+
+
+                                            <td class="left top">
+                                                <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
+
+                                                <%--
+                                                ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
+                                                --%>
+                                            </td>
+                                            <td>
+                                                <label class="status"><format:metadata obj="${requisition?.status}"/></label>
+                                            </td>
+                                            <td>
+                                                ${requisition.requestNumber }
+                                            </td>
+                                            <td>
+                                                <format:date obj="${requisition.dateRequested}"/>
+                                            </td>
+                                            <%--
+                                            <td>
+                                                <format:metadata obj="${requisition?.type}"/>
+                                            </td>
+                                            <td>
+                                                <format:metadata obj="${requisition?.commodityClass?:warehouse.message(code:'default.none.label')}"/>
+                                            </td>
+                                            --%>
+                                            <td>
+                                                <g:link action="show" id="${requisition.id}">
+                                                    ${fieldValue(bean: requisition, field: "name")}
+                                                </g:link>
+                                            </td>
+                                            <td>
+                                                ${requisition?.origin?.name}
+
+                                            </td>
+                                            <td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
+                                            <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
+                                            <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
+
+                                            <%--
+                                            <td>${requisition.createdBy}</td>
+                                            <td>${requisition.updatedBy}</td>
+                                            <td><format:datetime obj="${requisition.dateCreated}" /></td>
+                                            <td><format:datetime obj="${requisition.lastUpdated}" /></td>
+                                            --%>
 
                                             <td class="top center">
-                                                <img src="${resource(dir:'images/icons/silk', file: 'zoom.png')}" class="dialog-trigger" data-id="#dialog-box-${requisition?.id}"/>
-
 
                                                 <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}" style="display:none;">
                                                     <%--
@@ -360,54 +423,6 @@
                                                 </div>
 
                                             </td>
-                                            <td class="left top">
-                                                <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
-
-                                                <%--
-                                                ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
-                                                --%>
-                                            </td>
-                                            <td>
-                                                <g:render template="/requisition/actions" model="[requisition:requisition]"/>
-                                            </td>
-                                            <td>
-                                                <label class="status"><format:metadata obj="${requisition?.status}"/></label>
-                                            </td>
-                                            <td>
-                                                ${requisition.requestNumber }
-                                            </td>
-                                            <td>
-                                                <format:date obj="${requisition.dateRequested}"/>
-                                            </td>
-                                            <%--
-                                            <td>
-                                                <format:metadata obj="${requisition?.type}"/>
-                                            </td>
-                                            <td>
-                                                <format:metadata obj="${requisition?.commodityClass?:warehouse.message(code:'default.none.label')}"/>
-                                            </td>
-                                            --%>
-                                            <td>
-                                                <g:link action="show" id="${requisition.id}">
-                                                    ${fieldValue(bean: requisition, field: "name")}
-                                                </g:link>
-                                            </td>
-                                            <td>
-                                                ${requisition?.origin?.name}
-
-                                            </td>
-                                            <td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
-                                            <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
-                                            <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
-
-                                            <%--
-                                            <td>${requisition.createdBy}</td>
-                                            <td>${requisition.updatedBy}</td>
-                                            <td><format:datetime obj="${requisition.dateCreated}" /></td>
-                                            <td><format:datetime obj="${requisition.lastUpdated}" /></td>
-                                            --%>
-
-
                                         </tr>
                                     </g:each>
                                     </tbody>

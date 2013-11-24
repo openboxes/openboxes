@@ -16,35 +16,42 @@ import org.pih.warehouse.product.Product;
 
 class Synonym implements Serializable {
 
-	def beforeInsert = {
-        Synonym.withNewSession {
-    		createdBy = AuthService.currentUser.get()
+    def beforeInsert = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            createdBy = currentUser
+            updatedBy = currentUser
         }
-	}
-	def beforeUpdate ={
-        Synonym.withNewSession {
-    		updatedBy = AuthService.currentUser.get()
+    }
+    def beforeUpdate = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            updatedBy = currentUser
         }
-	}
+    }
 	
 	String id
-	String synonym
+	String name
+    Locale locale
 	Date dateCreated;
 	Date lastUpdated;
 	User createdBy
 	User updatedBy
 	
-	static belongsTo = Product
+	static belongsTo = [product:Product]
 	
 	static mapping = {
-		id generator: 'uuid'		
-		products joinTable: [name:'product_synonym', column: 'product_id', key: 'synonym_id']
+		id generator: 'uuid'
+        // Using a join tale because we want multiple one-to-many associations, not many-to-many
+        // product-synonyms, shipment-synonyms, etc
+		//products joinTable: [name:'product_synonym', column: 'product_id', key: 'synonym_id']
 	}
 	
-	static hasMany = [products : Product]
+	//static hasMany = [products : Product]
 	
 	static constraints = {
-		synonym(nullable:false, maxSize: 255)
+		name(nullable:false, maxSize: 255)
+        locale(nullable:true)
 		updatedBy(nullable:true)
 		createdBy(nullable:true)
 	}

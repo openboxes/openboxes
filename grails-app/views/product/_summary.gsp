@@ -1,11 +1,22 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<div id="product-summary" productid="${productInstance?.id}">
+<div id="product-summary" productid="${productInstance?.id}" class="summary">
 	<table id="product-summary-table" border="0">
 		<tbody>
 			<tr>						
-				<td class="top" style="width: 1%;">
-					<g:render template="../product/actions" model="[productInstance:productInstance]" />
-				</td>
+				<td class="middle" style="width: 1%;">
+                    <g:if test="${productInstance?.images }">
+                        <div class="nailthumb-product">
+                            <g:set var="image" value="${productInstance?.images?.sort()?.first()}"/>
+                            <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+                        </div>
+                    </g:if>
+                    <g:else>
+                    <div class="nailthumb-product">
+                        <img src="${resource(dir: 'images', file: 'default-product.png')}" />
+                    </div>
+                    </g:else>
+                </td>
+
 
 				<g:if test="${productInstance?.coldChain }">
 					<td style="width: 1%;" class="top">				
@@ -30,7 +41,7 @@
 			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
 			                </g:link>				
 			            </div>
-		                <div>		
+                        <div>
 			                <span class="product-generic fade" style="text-transform:uppercase;">			
 			                	<g:if test="${productInstance?.productGroups }">
 		                    		${productInstance?.productGroups?.sort().first()}
@@ -42,17 +53,17 @@
 	                    </div>
 	                   
         			</div>
-        			 <div id="product-tags" style="float: left; margin-left: 50px;">
-	        				<g:each var="tag" in="${productInstance?.tags }">
-	        					<g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
-		        					<span class="tag">${tag.tag }</span>
-	        					</g:link>
-	        				</g:each>
-        			</div>
-        			<div class="clear"></div>
+                    <div id="product-tags" style="float: left; margin-left: 50px;">
+                        <g:each var="tag" in="${productInstance?.tags }">
+                            <g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
+                                <span class="tag">${tag.tag }</span>
+                            </g:link>
+                        </g:each>
+                    </div>
+                    <div class="clear"></div>
         		</td>
 				<td class="right">
-        			<div id="product-status" class="title">        			
+        			<div id="product-status" class="title">
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 							<g:if test="${totalQuantity <= 0}">
 								<g:if test="${latestInventoryDate}">
@@ -82,3 +93,35 @@
 		</tbody>
 	</table>
 </div>
+<div class="summary-actions">
+    <table>
+        <tr>
+            <td width="1%">
+                <g:render template="../product/actions" model="[productInstance:productInstance]" />
+            </td>
+            <td>
+                <div class="button-group">
+                    <g:link controller='inventory' action='browse' class="button icon arrowleft">
+                        ${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
+                    </g:link>
+                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button icon edit ${actionName=='edit'?'active':''}">
+                        ${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
+                    </g:link>
+                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon log ${actionName=='showStockCard'?'active':''}">
+                        ${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
+                    </g:link>
+                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button icon add ${actionName=='showRecordInventory'?'active':''}">
+                        ${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
+                    </g:link>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+</div>
+<script>
+    $(function() {
+        $('.nailthumb-product img').hide();
+        $('.nailthumb-product img').nailthumb({width : 40, height : 40});
+    });
+</script>

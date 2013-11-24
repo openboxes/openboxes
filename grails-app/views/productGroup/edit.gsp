@@ -25,21 +25,22 @@
 				<g:renderErrors bean="${productGroupInstance}" as="list" />
 			</div>
 		</g:hasErrors>
+
+        <div class="summary">
+            <h1>${productGroupInstance.category.name} &rsaquo; ${productGroupInstance.description}</h1>
+
+        </div>
+
+
 		<div class="buttonBar">            	
-           	<span class="linkButton">
-           		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-           	</span>
-           	<span class="linkButton">
-           		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-           	</span>
+            <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
 		</div>
-		<g:form method="post" action="update">
+            <g:form method="post" action="update">
 				<g:hiddenField name="id" value="${productGroupInstance?.id}" />
 				<g:hiddenField name="version" value="${productGroupInstance?.version}" />
-				<div class="dialog">
-					
-				
-				
+				<div class="box">
+                    <h2><warehouse:message code="productGroup.label" default="Product group"/></h2>
 					<table>
 						<tbody>
 							<tr class="prop">
@@ -55,16 +56,19 @@
 
 
 							<tr class="prop">
-								<td valign="top" class="name"><label for="category"><warehouse:message
+								<td valign="top" class="name"><label for="category.id"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
 								<td valign="top" class="value">
 									<%-- 
 									<g:selectCategoryMcDropdown id="category" name="category.id" 
 										value="${productGroupInstance?.category?.id}"/>									
-									--%>
 									<g:hiddenField name="oldCategory.id" value="${productGroupInstance?.category?.id }"/>
 									<g:categorySelect id="category" name="category.id" 
-										value="${productGroupInstance?.category?.id}"/>									
+										value="${productGroupInstance?.category?.id}"/>
+									--%>
+
+                                    <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
+                                                      value="${productGroupInstance?.category?.id}" />
 
 								</td>									
 							</tr>
@@ -73,7 +77,7 @@
                                   <label for="dateCreated"><warehouse:message code="productGroup.dateCreated.label" default="Date Created" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'dateCreated', 'errors')}">
-                                   ${productGroupInstance?.dateCreated} 
+                                   <div id="dateCreated">${productGroupInstance?.dateCreated}</div>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -81,43 +85,15 @@
                                   <label for="lastUpdated"><warehouse:message code="productGroup.lastUpdated.label" default="Last Updated" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'lastUpdated', 'errors')}">
-                                    ${productGroupInstance?.lastUpdated}
+                                    <div id="lastUpdated">${productGroupInstance?.lastUpdated}</div>
                                 </td>
                             </tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label for="products"><warehouse:message
-											code="productGroup.products.label" default="Products" /></label></td>
-								<td valign="top"
-									class="value ${hasErrors(bean: productGroupInstance, field: 'products', 'errors')}">
-									<g:selectProducts 
-										id="products"
-										name="product.id" 
-										category="${productGroupInstance?.category }"
-										value="${productGroupInstance?.products }"/>
-								</td>
-							</tr>									
-
-							<%-- 
-							<tr class="prop">
-								<td valign="top" class="name"><label for="products"><warehouse:message
-											code="productGroup.products.label" default="Products" /></label></td>
-								<td valign="top"
-									class="value ${hasErrors(bean: productGroupInstance, field: 'products', 'errors')}">
-									<g:select name="products"
-										from="${org.pih.warehouse.product.Product.list()}"
-										multiple="yes" optionKey="id" size="5"
-										value="${productGroupInstance?.products}" />
-								</td>
-							</tr>
-							--%>
-
-							<tr class="prop">
-								<td valign="top"></td>
-								<td valign="top">
+								<td valign="top" colspan="2">
 									<div class="buttons">
-										<g:actionSubmit class="save" action="update"
+										<g:actionSubmit class="button icon approve" action="update"
 											value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-										<g:actionSubmit class="delete" action="delete"
+										<g:actionSubmit class="button icon delete" action="delete"
 											value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}"
 											onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 									</div>
@@ -126,7 +102,21 @@
 						</tbody>
 					</table>
 				</div>
-		</g:form>
+            </g:form>
+            <div class="box">
+                <h2><warehouse:message code="productGroup.products.label" default="Products"/></h2>
+                <g:render template="products" model="[productGroup: productGroupInstance, products:productGroupInstance?.products]"/>
+            </div>
+
+                <%--
+                <g:selectProducts
+                        id="products"
+                        name="product.id"
+                        category="${productGroupInstance?.category }"
+                        value="${productGroupInstance?.products }"/>
+                --%>
+
+
 	</div>
 <script>
 	$(document).ready(function() {			

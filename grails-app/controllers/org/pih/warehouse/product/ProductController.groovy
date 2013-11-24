@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -47,6 +48,7 @@ class ProductController {
 	}
 
 	def redirect = {
+        log.info("Redirecting to product " + params.id)
 		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
 	}
 
@@ -110,14 +112,14 @@ class ProductController {
 			cmd.productInstanceList[i].category = Category.get(cat.id);
 		}
 
-		cmd.productInstanceList.eachWithIndex { prod, i ->
-			log.info "productInstanceList[" + i + "]: " + prod.category;
-			if (!prod.hasErrors() && prod.save()) {
+		cmd.productInstanceList.eachWithIndex { product, i ->
+			log.info "productInstanceList[" + i + "]: " + product.category;
+			if (!product.hasErrors() && product.save()) {
 				// saved with no errors
 			}
 			else {
 				// copy the errors from this product on to the overall command object errors
-				prod.errors.getAllErrors().each {
+                product.errors.getAllErrors().each {
 					cmd.errors.reject(it.getCode(), it.getDefaultMessage())
 				}
 			}
@@ -181,11 +183,15 @@ class ProductController {
 	def save = {
 		println "Save product: " + params
 
+
 		def productInstance = new Product();
 		productInstance.properties = params
 
         updateTags(productInstance, params)
+        //productInstance.validate()
 
+        //render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
+        //return;
         /*
 		if (!productInstance.productCode) { 
 			productInstance.productCode = productService.generateProductIdentifier();
@@ -234,16 +240,17 @@ class ProductController {
         }
 
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+            log.info("saved product " + productInstance.errors)
             def warehouseInstance = Location.get(session.warehouse.id);
             def inventoryInstance = warehouseInstance?.inventory;
 			//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
 			sendProductCreatedEmail(productInstance)
-			redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
+			//redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
 			//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
+            //return;
 		}
-		else {
-			render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
-		}
+
+        render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
 	}
 
 
@@ -388,7 +395,7 @@ class ProductController {
         } catch (Exception e) {
             log.error("Error occurred: " + e.message)
         }
-        redirect(action: "edit", id: productInstance?.id)
+        //redirect(action: "edit", id: productInstance?.id)
     }
 
 
@@ -960,50 +967,59 @@ class ProductController {
 		
     }
 
+
+    /**
+     * Add a product group to existing product
+     *
+     * @return
+     */
+    def addProductGroupToProduct = {
+        println "addProductGroupToProduct() " + params
+        def product = Product.get(params.id)
+        if (product) {
+            def productGroup = ProductGroup.findByDescription(params.productGroup)
+            if (!productGroup) {
+                productGroup = new ProductGroup(description: params.productGroup, category: product.category)
+            }
+            product.addToProductGroups(productGroup)
+            product.save(failOnError: true)
+        }
+        render(template:'productGroups', model:[product: product, productGroups:product.productGroups])
+    }
+
+    /**
+     * Delete product group from database
+     */
+    def deleteProductGroup = {
+        println "deleteSynonym() " + params
+
+        def product = Product.get(params.productId)
+        if (product) {
+            def productGroup = ProductGroup.get(params.id)
+            product.removeFromProductGroups(productGroup)
+            productGroup.delete()
+            product.save(flush:true)
+        }
+        else {
+            response.status = 404
+        }
+        render(template:'productGroups', model:[product: product, productGroups:product?.productGroups])
+    }
+
+
     /**
      * Add a synonym to existing product
      *
      * @return
      */
     def addSynonymToProduct = {
-        println "addSynonymToProduct() " + request.JSON
-        /*
+        println "addSynonymToProduct() " + params
         def product = Product.get(params.id)
-        def synonym = Synonym.findBySynonym(params.synonym)
-        if (!synonym) {
-            synonym = new Synonym(synonym: params.synonym)
+        if (product) {
+            product.addToSynonyms(new Synonym(name : params.synonym, locale: RCU.getLocale(request)))
+            product.save(failOnError: true)
         }
-
-        if (product && synonym) {
-            product.addToSynonyms(synonym)
-            product.save()
-            render("saved synonym to product")
-        }
-        else {
-            render("unable to add synonym to product")
-        }
-        */
-
-        def synonym = new Synonym(synonym : request.JSON.synonym).save( failOnError : true )
-        //def product = Product.get(request.JSON.productId)
-        //if (product) {
-        //    product.addToSynonyms(synonym)
-        //    product.save(failOnError: true)
-        //}
-
-        //render synonyms as JSON
-        redirect(action: "getSynonyms")
-    }
-
-    /**
-     * Get synonyms associated with the given product.
-     */
-    def getSynonyms = {
-        println "getSynonyms() " + params
-        //def product = Product.get(params.productId)
-        def synonyms = Synonym.list()
-
-        render synonyms as JSON
+        render(template:'synonyms', model:[product: product, synonyms:product.synonyms])
     }
 
     /**
@@ -1011,11 +1027,18 @@ class ProductController {
      */
     def deleteSynonym = {
         println "deleteSynonym() " + params
-        def synonym = Synonym.get(params.id)
-        if (synonym) {
+
+        def product = Product.get(params.productId)
+        if (product) {
+            def synonym = Synonym.get(params.id)
+            product.removeFromSynonyms(synonym)
             synonym.delete()
+            product.save(flush:true)
         }
-        redirect(action: "getSynonyms")
+        else {
+            response.status = 404
+        }
+        render(template:'synonyms', model:[product: product, synonyms:product?.synonyms])
     }
 }
 

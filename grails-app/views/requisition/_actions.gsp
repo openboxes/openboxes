@@ -1,9 +1,9 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus"%>
 
 <g:if test="${requisition?.id }">
-	<span id="shipment-action-menu" class="action-menu">
-		<button class="action-btn button big icon cog">
-			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+	<span id="requisition-action-menu" class="action-menu">
+		<button class="action-btn ">
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" />
 		</button>
 
 		<%--

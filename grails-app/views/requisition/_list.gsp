@@ -33,12 +33,12 @@
                               title="${warehouse.message(code: 'requisition.origin.label', default: 'Origin')}" />
 
             <g:sortableColumn property="requestedBy" params="${pageParams}"
-                              title="${warehouse.message(code: 'requisition.requestedBy.label', default: 'Requested by')}" />
+                              title="${warehouse.message(code: 'requisition.requested.label', default: 'Requested')}" />
             <th>
-                <warehouse:message code="default.createdBy.label"/>
+                <warehouse:message code="default.created.label"/>
             </th>
             <th>
-                <warehouse:message code="default.updatedBy.label"/>
+                <warehouse:message code="default.updated.label"/>
             </th>
             <%--
 

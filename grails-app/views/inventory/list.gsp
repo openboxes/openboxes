@@ -18,11 +18,8 @@
 
             <div class="yui-ga">
                 <div class="yui-u first">
-                    <div class="box">
-                        <h2>
-                            <warehouse:message code="default.filters.label" default="Filters"/>
-                        </h2>
-                        <div class="button-group" style="padding:15px;">
+                    <div class="button-bar">
+                        <div class="button-group">
                             <g:link controller="inventory" action="listTotalStock" class="button ${'listTotalStock'.equals(actionName)?'primary':''}">
                                 <warehouse:message code="inventory.listTotalStock.label"/>
                             </g:link>

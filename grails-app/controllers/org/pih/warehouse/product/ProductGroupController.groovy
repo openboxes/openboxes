@@ -138,11 +138,11 @@ class ProductGroupController {
 			productGroupInstance.properties = params
 			
 			// The user changed the category, so we want to redisplay the form with no products
-			if (params?.oldCategory?.id != productGroupInstance?.category?.id) { 
-				productGroupInstance.products = []
-				render(view: "edit", model: [productGroupInstance: productGroupInstance])
-				return
-			}
+			//if (params?.oldCategory?.id != productGroupInstance?.category?.id) {
+				//productGroupInstance.products = []
+			//	render(view: "edit", model: [productGroupInstance: productGroupInstance])
+			//	return
+			//}
 			
 			//productGroupInstance.products = productService.getProducts(params['product.id'])
 			/*
@@ -155,15 +155,18 @@ class ProductGroupController {
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 //redirect(action: "edit", id: productGroupInstance.id)
-				redirect(controller: "inventory", action: "browse")
+				//redirect(controller: "inventory", action: "browse")
+                redirect(controller:"productGroup", action:"list")
             }
             else {
+                println productGroupInstance.errors
                 render(view: "edit", model: [productGroupInstance: productGroupInstance])
             }
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
-            redirect(controller: "inventory", action: "browse")
+            //redirect(controller: "inventory", action: "browse")
+            redirect(controller:"productGroup", action:"list")
         }
     }
 
@@ -243,5 +246,50 @@ class ProductGroupController {
 		
 		render(view: "edit", model: [productGroupInstance: productGroupInstance])
 	}
+
+
+    /**
+     * Add a product group to existing product
+     *
+     * @return
+     */
+    def addProductToProductGroup = {
+        println "addProductToProductGroup() " + params
+        def productGroup = ProductGroup.get(params.id)
+        if (productGroup) {
+            def product = Product.get(params.product.id)
+            if (product) {
+                productGroup.addToProducts(product)
+                productGroup.save()
+            }
+            //def productGroup = ProductGroup.findByDescription(params.productGroup)
+            //if (!productGroup) {
+            //    productGroup = new ProductGroup(description: params.productGroup, category: product.category)
+            //}
+            //product.addToProductGroups(productGroup)
+            //product.save(failOnError: true)
+        }
+        render(template:'products', model:[productGroup: productGroup, products:productGroup.products])
+    }
+
+    /**
+     * Delete product group from database
+     */
+    def deleteProductFromProductGroup = {
+        println "deleteProductFromProductGroup() " + params
+        /*
+        def product = Product.get(params.productId)
+        if (product) {
+            def productGroup = ProductGroup.get(params.id)
+            product.removeFromProductGroups(productGroup)
+            productGroup.delete()
+            product.save(flush:true)
+        }
+        else {
+            response.status = 404
+        }
+        */
+        render(template:'products', model:[productGroup: productGroup, products:productGroup.products])
+    }
 
 }

@@ -47,35 +47,19 @@
 		</g:hasErrors>
 
 		<div class="buttonBar">
-			<g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+			<g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
 	        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
 		</div>
 		<g:form action="save" method="post">
-			<fieldset>
-				<div class="dialog">
+
+				<div class="box">
 				
-				
+				    <h2><warehouse:message code="productGroup.label"/></h2>
 					
 					<table>
 						<tbody>
 
-							<tr class="prop">
-								<td valign="middle" class="name"><label for="category"><warehouse:message
-											code="productGroup.category.label" default="Category" /></label></td>
-								<td valign="middle" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
-									<%-- Show category if coming from Inventory Browser --%>									
-									<g:if test="${productGroupInstance?.category }">
-							        	<format:category category="${productGroupInstance?.category }"/>
-										<g:hiddenField id="category" name="category.id" 
-											value="${productGroupInstance?.category?.id }" />
-									</g:if>
-									<g:else>
-										<g:categorySelect id="category" name="category.id" 
-											value="${productGroupInstance?.category?.id}"/>									
-									</g:else>
-									
-								</td>
-							</tr>
+
 							<tr class="prop">
 								<td valign="middle" class="name"><label for="description"><warehouse:message
 											code="productGroup.name.label" default="Generic product" /></label>
@@ -99,6 +83,27 @@
 									
 								</td>
 							</tr>
+                            <tr class="prop">
+                                <td valign="middle" class="name"><label for="category"><warehouse:message
+                                        code="productGroup.category.label" default="Category" /></label></td>
+                                <td valign="middle" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
+                                    <%-- Show category if coming from Inventory Browser --%>
+                                    <g:if test="${productGroupInstance?.category }">
+                                        <format:category category="${productGroupInstance?.category }"/>
+                                        <g:hiddenField id="category" name="category.id"
+                                                       value="${productGroupInstance?.category?.id }" />
+                                    </g:if>
+                                    <g:else>
+                                    <%--
+                                    <g:categorySelect id="category" name="category.id"
+                                        value="${productGroupInstance?.category?.id}"/>
+                                    --%>
+                                        <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
+                                                          value="${productGroupInstance?.category?.id}" />
+                                    </g:else>
+
+                                </td>
+                            </tr>
 							
 							<g:if test="${productGroupInstance?.products }">
 								<tr class="prop">
@@ -168,13 +173,12 @@
 	                        	--%>
 
 							<tr class="prop">
-								<td valign="top"></td>
-								<td valign="top">
+								<td valign="top center" colspan="2">
 									<div class="buttons">
-										<g:submitButton name="create" class="save"
+										<g:submitButton name="create" class="button"
 											value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
 
-										<g:link action="list">
+										<g:link action="list" class="button">
 											${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
 										</g:link>
 
@@ -185,7 +189,7 @@
 						</tbody>
 					</table>
 				</div>
-			</fieldset>
+
 		</g:form>
 	</div>
 	

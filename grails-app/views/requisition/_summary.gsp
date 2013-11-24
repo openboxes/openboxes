@@ -1,14 +1,14 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionItemType" %>
-<div id="requisition-summary" >
+<div id="requisition-summary" class="summary">
 	<g:if test="${requisition?.id}">
 		<table>
 			<tbody>			
 				<tr>
-                    <td class="top">
+                    <td class="top" width="1%">
                         <g:render template="../requisition/actions" model="[requisition:requisition]" />
                     </td>
-                    <td class="center">
-						<div>
+                    <td class="center" width="1%">
+						<div class="box">
 							<g:if test="${requisition?.requestNumber }">
 								<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
                                 <div class="barcode">${requisition.requestNumber}</div>
@@ -20,6 +20,15 @@
 						<div class="title" id="name">
 							${requisition?.name }
 						</div>
+                        <g:if test="${requisition.lastUpdated}">
+                            <div class="fade">
+                                <warehouse:message code="default.lastUpdated.label" default="Last updated"/>
+                                <g:prettyDateFormat date="${requisition.lastUpdated}"/>
+                            </div>
+                        </g:if>
+
+
+                        <%--
 						<div class="clear"></div>
 						<div class="fade">
 							<span id="origin">
@@ -71,7 +80,7 @@
                                 <warehouse:message code="picklist.picklistItems.label"/>:
                                 <b><g:link controller="picklist" action="show" id="${picklist?.id}">${picklist?.picklistItems?.size()?:0}</g:link></b>
                             </span>
-
+                            --%>
 
 							<%--
 							<span class="fade">&nbsp;|&nbsp;</span>
@@ -97,21 +106,10 @@
 							 --%>
 						</div>
 					</td>
-					<td class="middle">
-						<div class="center">
-                            <div class="">
-                                <div class="title ">
-                                    <format:metadata obj="${requisition?.status }"/>
-                                </div>
-                                <g:if test="${requisition.lastUpdated}">
-                                    <span class="fade">
-                                        <warehouse:message code="default.lastUpdated.label" default="Last updated"/>
-                                        <g:prettyDateFormat date="${requisition.lastUpdated}"/>
-                                    </span>
-                                </g:if>
-                            </div>
-							<div class="clear"></div>
-						</div>
+					<td>
+                        <div class="top title right">
+                            <format:metadata obj="${requisition?.status }"/>
+                        </div>
 
                         <%--
                         <g:if test="${requisition?.status == org.pih.warehouse.requisition.RequisitionStatus.VERIFYING}">
@@ -137,7 +135,7 @@
                         </g:if>
                         --%>
                     </td>
-					
+
 										
 				</tr>
 			</tbody>
@@ -154,7 +152,7 @@
         </table>
 	</g:if>
 </div>
-<div id="flow-header" class="box">
+<div id="flow-header" class="buttonBar">
     <%--
     <g:render template="/requisition/flowHeader" model="[requisition:requisition]"/>
     --%>
@@ -162,42 +160,42 @@
         <div>
             <div class="button-group">
                     <g:if test="${requisition?.id}">
-                        <g:link controller="requisition" action="show" id="${requisition?.id}" class="button big icon search ${actionName.contains('create')||actionName.equals('show')?'active':''}">
+                        <g:link controller="requisition" action="show" id="${requisition?.id}" class="button icon search ${actionName.contains('create')||actionName.equals('show')?'active':''}">
                             <warehouse:message code="requisition.wizard.show.label" default="View"/>
                         </g:link>
                     </g:if>
                     <g:else>
-                        <g:link controller="requisition" action="show" id="${requisition?.id}" class="button big icon add ${actionName.contains('create')||actionName.equals('show')?'active':''}">
+                        <g:link controller="requisition" action="show" id="${requisition?.id}" class="button icon add ${actionName.contains('create')||actionName.equals('show')?'active':''}">
                             <warehouse:message code="requisition.wizard.create.label" default="Create"/>
                         </g:link>
                     </g:else>
-                    <g:link controller="requisition" action="edit"  id="${requisition?.id}" class="button big icon edit ${actionName.equals('edit')||actionName.equals('editHeader')?'active':''}">
+                    <g:link controller="requisition" action="edit"  id="${requisition?.id}" class="button icon edit ${actionName.equals('edit')||actionName.equals('editHeader')?'active':''}">
                         <warehouse:message code="requisition.wizard.edit.label" default="Edit"/>
                     </g:link>
-                    <g:link controller="requisition" action="review" id="${requisition?.id}" class="button big icon log ${actionName.equals('review')||actionName.equals('change')?'active':''}">
+                    <g:link controller="requisition" action="review" id="${requisition?.id}" class="button icon log ${actionName.equals('review')||actionName.equals('change')?'active':''}">
                         <warehouse:message code="requisition.wizard.verify.label" default="Verify"/>
                     </g:link>
-                    <g:link controller="requisition" action="pick" id="${requisition?.id}" class="button big icon tag ${actionName.equals('pick')?'active':''}">
+                    <g:link controller="requisition" action="pick" id="${requisition?.id}" class="button icon tag ${actionName.equals('pick')?'active':''}">
                         <warehouse:message code="requisition.wizard.pick.label" default="Pick"/>
                     </g:link>
-                    <g:link controller="requisition" action="confirm" id="${requisition?.id}" class="button big icon approve ${actionName.equals('confirm')?'active':''}">
+                    <g:link controller="requisition" action="confirm" id="${requisition?.id}" class="button icon approve ${actionName.equals('confirm')?'active':''}">
                         <warehouse:message code="requisition.wizard.check.label" default="Check"/>
                     </g:link>
-                    <g:link controller="requisition" action="transfer" id="${requisition?.id}" class="button big icon arrowright ${actionName.equals('transfer')?'active':''}">
+                    <g:link controller="requisition" action="transfer" id="${requisition?.id}" class="button icon arrowright ${actionName.equals('transfer')?'active':''}">
                         <warehouse:message code="requisition.wizard.issue.label" default="Issue"/>
                     </g:link>
             </div>
 
             <div class="right button-group">
-                <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank" class="button big">
+                <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank" class="button">
                     <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
                     ${warehouse.message(code: 'picklist.button.print.label', default: 'Download pick list')}
                 </g:link>
-                <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank" class="button big">
+                <g:link controller="picklist" action="print" id="${requisition?.id}" target="_blank" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
                     ${warehouse.message(code: 'picklist.button.print.label', default: 'Print pick list')}
                 </g:link>
-                <g:link controller="deliveryNote" action="print" id="${requisition?.id}" target="_blank" class="button big">
+                <g:link controller="deliveryNote" action="print" id="${requisition?.id}" target="_blank" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
                     ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
                 </g:link>

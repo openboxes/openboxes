@@ -48,10 +48,9 @@
                             <g:form controller="requisition" action="saveDetails">
                                 <g:hiddenField name="redirectAction" value="review"/>
                                 <g:hiddenField name="id" value="${requisition?.id}"/>
-                                <div class="box">
-                                <table>
+                                <table style="width:auto;">
                                     <tr>
-                                        <td class="left bottom">
+                                        <td class="center middle">
                                             <label>
                                                 ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
                                             </label>
@@ -68,7 +67,7 @@
                                                 </g:else>
                                             </g:else>
                                         </td>
-                                        <td class="left bottom">
+                                        <td class="center middle">
                                             <label>
                                                 ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
                                             </label>
@@ -85,7 +84,7 @@
                                                 </g:else>
                                             </g:else>
                                         </td>
-                                        <td class="left middle">
+                                        <td class="center middle">
 
                                             <g:if test="${params.edit}">
                                                 <button class="button icon approve">
@@ -107,7 +106,6 @@
 
 
                                 </table>
-                                </div>
                             </g:form>
                             <hr/>
                             <br/>

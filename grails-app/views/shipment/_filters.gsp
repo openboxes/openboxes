@@ -1,8 +1,8 @@
 <div>
-    <h2><warehouse:message code="default.filters.label"/></h2>
 	<g:form method="GET" controller="shipment" action="list">
         <g:hiddenField name="type" value="${params.type}"/>
 		<div class="box">
+            <h2><warehouse:message code="default.filters.label"/></h2>
 			<table>
 				<tr>
 					<td>

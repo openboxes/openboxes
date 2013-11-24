@@ -5,7 +5,7 @@
         <h2>
             <g:isUserAdmin>
 
-                <span class="action-menu">
+                <div class="action-menu" style="position:absolute;top:5px;right:5px">
                     <button class="action-btn">
                         <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
                     </button>
@@ -26,7 +26,7 @@
                             </g:else>
                         </div>
                     </div>
-                </span>
+                </div>
             </g:isUserAdmin>
 
 

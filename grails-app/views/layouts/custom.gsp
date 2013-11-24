@@ -111,29 +111,6 @@
     </div>
     --%>
     </g:if>
-    <g:if test="${session.warehouse && session.user && session._showTime}">
-        <div class="box">
-            <div class="left">
-                <span class="title">
-                    <g:set var="currentUri">${request.requestURI}${request.queryString?"?"+request.queryString:""}</g:set>
-                    <g:link url="${currentUri}">${currentUri}</g:link>
-                </span>
-            </div>
-            <div class="right">
-                <span style="color: #666;">
-                    Data load took ${(request?.actionDuration?:0)/1000}s
-                </span>
-                /
-                <span style="color: #666;">
-                    Page load took ${(request?.viewDuration?:0)/1000}s
-                </span>
-                <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
-                </g:link>
-            </div>
-            <div class="clear"></div>
-        </div>
-    </g:if>
 
 
 <!-- Body includes the divs for the main body content and left navigation menu -->

@@ -178,34 +178,34 @@
                 --%>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
-                            code="requisition.requestedBy.label" /></label></td>
+                            code="requisition.requested.label" /></label></td>
                     <td class="value">
-                        ${requisition?.requestedBy?.name }
+                        <g:formatDate date="${requisition?.dateRequested }"/>
                         <div class="fade">
-                            <g:formatDate date="${requisition?.dateRequested }"/>
+                            ${requisition?.requestedBy?.name }
                         </div>
                     </td>
                 </tr>
                 <tr class="prop">
                     <td class="name">
                         <label><warehouse:message
-                                code="requisition.createdBy.label" /></label>
+                                code="requisition.created.label" /></label>
                     </td>
                     <td class="value">
-                        ${requisition?.createdBy?.name}
+                        <g:formatDate date="${requisition?.dateCreated }"/>
                         <div class="fade">
-                            <g:formatDate date="${requisition?.dateCreated }"/>
+                            ${requisition?.createdBy?.name}
                         </div>
                     </td>
                 </tr>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
-                            code="requisition.verifiedBy.label" /></label></td>
+                            code="requisition.verified.label" /></label></td>
                     <td class="value">
                         <g:if test="${requisition?.verifiedBy?.name }">
-                            ${requisition?.verifiedBy?.name }
+                            <g:formatDate date="${requisition?.dateVerified }"/>
                             <div class="fade">
-                                <g:formatDate date="${requisition?.dateVerified }"/>
+                                ${requisition?.verifiedBy?.name }
                             </div>
                         </g:if>
                         <g:else>
@@ -218,12 +218,12 @@
                 </tr>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
-                            code="picklist.picker.label" /></label></td>
+                            code="picklist.picked.label" /></label></td>
                     <td class="value">
                         <g:if test="${requisition?.picklist?.picker }">
-                            ${requisition?.picklist?.picker?.name }
+                            <g:formatDate date="${requisition?.picklist?.datePicked }"/>
                             <div class="fade">
-                                <g:formatDate date="${requisition?.picklist?.datePicked }"/>
+                                ${requisition?.picklist?.picker?.name }
                             </div>
                         </g:if>
                         <g:else>
@@ -235,13 +235,13 @@
                 </tr>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
-                            code="requisition.checkedBy.label" /></label></td>
+                            code="requisition.checked.label" /></label></td>
                     <td class="value">
 
                         <g:if test="${requisition?.checkedBy}">
-                            ${requisition?.checkedBy?.name }
+                            <g:formatDate date="${requisition?.dateChecked }"/>
                             <div class="fade">
-                                <g:formatDate date="${requisition?.dateChecked }"/>
+                                ${requisition?.checkedBy?.name }
                             </div>
                         </g:if>
                         <g:else>
@@ -266,12 +266,12 @@
                 <tr class="prop">
                     <td class="name">
                         <label><warehouse:message
-                                code="default.updatedBy.label" /></label>
+                                code="default.updated.label" /></label>
                     </td>
                     <td class="value">
-                        ${requisition?.updatedBy?.name }
+                        <g:formatDate date="${requisition?.lastUpdated }"/>
                         <div class="fade">
-                            <g:formatDate date="${requisition?.lastUpdated }"/>
+                            ${requisition?.updatedBy?.name }
                         </div>
                     </td>
                 </tr>

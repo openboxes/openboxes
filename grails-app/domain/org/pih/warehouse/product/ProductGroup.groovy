@@ -39,9 +39,9 @@ class ProductGroup implements Comparable, Serializable {
 	static constraints = {
 		name(nullable:true)
 		description(nullable:false, blank: false, maxSize: 255)
-		products validator: { products, productGroup -> 
-			return products.every {  productGroup.category == it.category }
-		}
+		//products validator: { products, productGroup ->
+		//	return products.every {  productGroup.category == it.category }
+		//}
 	}
 
 	String toString() { return "$description"; }

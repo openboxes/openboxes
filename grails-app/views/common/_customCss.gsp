@@ -5,8 +5,14 @@
 				margin: 0px; 
 				background-color: #${session.warehouse.bgColor}; 
 				color: #${session.warehouse.fgColor}; 
-			} 
-			#hd a { 
+			}
+            /*
+            h2 {
+                background-color: #${session.warehouse.bgColor};
+                color: #${session.warehouse.fgColor};
+            }
+            */
+			#hd a {
 				color: #${session.warehouse.fgColor}; 
 			}  		
 		</g:if>		

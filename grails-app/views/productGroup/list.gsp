@@ -15,14 +15,24 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             
-            
-			         	
-			<div class="buttonBar">            	
-           		<g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-           		<g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            <div class="summary">
+                <h1><warehouse:message code="productGroups.label"/></h1>
+
             </div>
-            
-            <div class="list">
+
+
+            <div class="buttonBar">
+                <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+                <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            </div>
+            <%--
+            <g:form controller="productGroup" action="list" >
+                <g:textField name="q" class="text" size="60"></g:textField>
+                <g:submitButton name="Search" class="button icon search"></g:submitButton>
+            </g:form>
+            --%>
+            <div class="list box">
+                <h2><warehouse:message code="productGroups.label"/></h2>
                 <table>
                     <thead>
                         <tr>

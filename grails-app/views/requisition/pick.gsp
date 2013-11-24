@@ -79,10 +79,9 @@
                                     <g:form controller="requisition" action="saveDetails">
                                         <g:hiddenField name="redirectAction" value="pick"/>
                                         <g:hiddenField name="id" value="${requisition?.id}"/>
-                                        <div class="box">
-                                        <table >
+                                        <table style="width:auto;">
                                             <tr>
-                                                <td class="left middle">
+                                                <td class="middle center">
                                                     <label>
                                                         ${warehouse.message(code:'requisition.pickedBy.label', default: 'Picked by')}
                                                     </label>
@@ -94,7 +93,7 @@
                                                         ${requisition?.picklist?.picker?.name}
                                                     </g:else>
                                                 </td>
-                                                <td class="left middle">
+                                                <td class="middle center">
                                                     <label>
                                                         ${warehouse.message(code:'requisition.datePicked.label', default: 'Date picked')}
                                                     </label>
@@ -110,7 +109,7 @@
                                                         </g:else>
                                                     </g:else>
                                                 </td>
-                                                <td>
+                                                <td class="middle center">
                                                     <g:if test="${params.edit}">
                                                         <button class="button icon approve">
                                                             ${warehouse.message(code:'default.button.save.label')}
@@ -130,8 +129,8 @@
                                             </tr>
 
                                         </table>
-                                        </div>
                                     </g:form>
+                                    <hr/>
                                 </g:if>
 
 

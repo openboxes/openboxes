@@ -2,7 +2,7 @@
 	<div class="widget-header">
 		<h2>
 
-            <span class="action-menu">
+            <div class="action-menu" style="position:absolute;top:5px;right:5px">
                 <button class="action-btn">
                     <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
                 </button>
@@ -25,7 +25,7 @@
 
                     </div>
                 </div>
-            </span>
+            </div>
 
 
             <warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/>

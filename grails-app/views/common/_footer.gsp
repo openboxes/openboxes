@@ -35,11 +35,29 @@
             <warehouse:message code="default.ipAddress.label" default="IP Address"/>: &nbsp;
             <b>${request.getRemoteAddr()}</b>
 		</span>
-		<%-- 
-		&nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="default.layout.label"/>: &nbsp; 
-		<g:link controller="dashboard" action="chooseLayout" params="['layout':'custom']">custom</g:link>&nbsp;
-		<g:link controller="dashboard" action="chooseLayout" params="['layout':'mega']">mobile</g:link>		
-		--%>		
+        <g:if test="${session.warehouse && session.user && session._showTime}">
+            &nbsp;&nbsp; | &nbsp;&nbsp;
+            <span>
+                Data load:
+                <b>${(request?.actionDuration?:0)/1000}s</b>
+            </span>
+            &nbsp;&nbsp; | &nbsp;&nbsp;
+            <span>
+                Page load:
+                <b>${(request?.viewDuration?:0)/1000}s</b>
+            </span>
+            <%--
+            <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
+                (disable)
+            </g:link>
+            --%>
+        </g:if>
+
+    <%--
+    &nbsp;&nbsp; | &nbsp;&nbsp;
+    <warehouse:message code="default.layout.label"/>: &nbsp;
+    <g:link controller="dashboard" action="chooseLayout" params="['layout':'custom']">custom</g:link>&nbsp;
+    <g:link controller="dashboard" action="chooseLayout" params="['layout':'mega']">mobile</g:link>
+    --%>
 	</div>
 </div>
