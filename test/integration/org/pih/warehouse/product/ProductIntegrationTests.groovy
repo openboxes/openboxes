@@ -1,5 +1,6 @@
 package org.pih.warehouse.product
 
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
@@ -114,50 +115,59 @@ class ProductIntegrationTests extends GroovyTestCase{
 
 
     @Test
-    void deleteSynonym_shouldNotCascadeOnDelete() {
+    void deleteSynonym_shouldCascadeOnDelete() {
         def category = new Category(name: "new category").save(flush: true)
-        def synonym = new Synonym(synonym: "new synonym").save(flush: true)
         def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
 
+        def synonym = new Synonym(name: "new synonym")
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
+        println "Synonyms: " + Synonym.list().size()
+
         assertEquals 1, product1.synonyms.size()
-        assertNotNull Synonym.findBySynonym("new synonym")
+        assertNotNull Synonym.findByName("new synonym")
+        println "Synonyms: " + Synonym.list().size()
 
         // Remove the synonym from product synonyms, which should not cause a cascade delete on synonym
         product1.removeFromSynonyms(synonym)
+        println "Synonyms: " + Synonym.list().size()
 
         assertEquals 0, product1.synonyms.size()
-        assertNotNull Synonym.findBySynonym("new synonym")
+        assertNull Synonym.findByName("new synonym")
 
 
     }
 
     @Test
-    void deleteProduct_shouldNotCascadeOnDelete() {
+    void deleteProduct_shouldCascadeOnDelete() {
         def category = new Category(name: "new category").save(flush: true)
-        def synonym = new Synonym(synonym: "new synonym").save(flush: true)
         def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
 
+        def synonym = new Synonym(name: "new synonym")
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
+
+
+        assertNotNull Synonym.findByName("new synonym")
 
         assertEquals 1, product1.synonyms.size()
 
         product1.delete()
 
-        assertNotNull Synonym.findBySynonym("new synonym")
+        assertNull Synonym.findByName("new synonym")
 
     }
 
-    @Test
+
+    // This test no longer makes sense because synonym is one-to-many association with product
+    @Ignore
     void deleteProduct_shouldNotCascadeOnDeleteWhenReferencedFromAnotherProduct() {
         def category = new Category(name: "new category").save(flush: true)
-        def synonym = new Synonym(synonym: "new synonym").save(flush: true)
         def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
         def product2 = new Product(name: "new product 2", category: category).save(flush: true, failOnError: true)
 
+        def synonym = new Synonym(name: "new synonym")
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
@@ -167,15 +177,14 @@ class ProductIntegrationTests extends GroovyTestCase{
         assertNotNull Product.findByName("new product 1")
         assertEquals 1, product1.synonyms.size()
         assertEquals 1, product2.synonyms.size()
-        assertNotNull Synonym.findBySynonym("new synonym")
+        assertNotNull Synonym.findByName("new synonym")
 
-        synonym.removeFromProducts(product1)
         product1.delete()
 
         assertNull Product.findByName("new product 1")
         assertEquals 0, product1?.synonyms?.size()
         assertEquals 1, product2.synonyms.size()
-        assertNotNull Synonym.findBySynonym("new synonym")
+        assertNotNull Synonym.findByName("new synonym")
 
     }
 
