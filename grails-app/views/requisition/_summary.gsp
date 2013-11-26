@@ -8,7 +8,7 @@
                         <g:render template="../requisition/actions" model="[requisition:requisition]" />
                     </td>
                     <td class="center" width="1%">
-						<div class="box">
+						<div class="box-barcode">
 							<g:if test="${requisition?.requestNumber }">
 								<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
                                 <div class="barcode">${requisition.requestNumber}</div>
@@ -159,31 +159,34 @@
     <g:if test="${requisition?.id}">
         <div>
             <div class="button-group">
-                    <g:if test="${requisition?.id}">
-                        <g:link controller="requisition" action="show" id="${requisition?.id}" class="button icon search ${actionName.contains('create')||actionName.equals('show')?'active':''}">
-                            <warehouse:message code="requisition.wizard.show.label" default="View"/>
-                        </g:link>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="requisition" action="show" id="${requisition?.id}" class="button icon add ${actionName.contains('create')||actionName.equals('show')?'active':''}">
-                            <warehouse:message code="requisition.wizard.create.label" default="Create"/>
-                        </g:link>
-                    </g:else>
-                    <g:link controller="requisition" action="edit"  id="${requisition?.id}" class="button icon edit ${actionName.equals('edit')||actionName.equals('editHeader')?'active':''}">
-                        <warehouse:message code="requisition.wizard.edit.label" default="Edit"/>
+                <g:link controller="requisition" action="list" class="button icon log">
+                    <warehouse:message code="requisition.list.label" default="List requisitions"/>
+                </g:link>
+                <g:if test="${requisition?.id}">
+                    <g:link controller="requisition" action="show" id="${requisition?.id}" class="button icon search ${actionName.contains('create')||actionName.equals('show')?'active':''}">
+                        <warehouse:message code="requisition.wizard.show.label" default="View"/>
                     </g:link>
-                    <g:link controller="requisition" action="review" id="${requisition?.id}" class="button icon log ${actionName.equals('review')||actionName.equals('change')?'active':''}">
-                        <warehouse:message code="requisition.wizard.verify.label" default="Verify"/>
+                </g:if>
+                <g:else>
+                    <g:link controller="requisition" action="show" id="${requisition?.id}" class="button icon add ${actionName.contains('create')||actionName.equals('show')?'active':''}">
+                        <warehouse:message code="requisition.wizard.create.label" default="Create"/>
                     </g:link>
-                    <g:link controller="requisition" action="pick" id="${requisition?.id}" class="button icon tag ${actionName.equals('pick')?'active':''}">
-                        <warehouse:message code="requisition.wizard.pick.label" default="Pick"/>
-                    </g:link>
-                    <g:link controller="requisition" action="confirm" id="${requisition?.id}" class="button icon approve ${actionName.equals('confirm')?'active':''}">
-                        <warehouse:message code="requisition.wizard.check.label" default="Check"/>
-                    </g:link>
-                    <g:link controller="requisition" action="transfer" id="${requisition?.id}" class="button icon arrowright ${actionName.equals('transfer')?'active':''}">
-                        <warehouse:message code="requisition.wizard.issue.label" default="Issue"/>
-                    </g:link>
+                </g:else>
+                <g:link controller="requisition" action="edit"  id="${requisition?.id}" class="button icon edit ${actionName.equals('edit')||actionName.equals('editHeader')?'active':''}">
+                    <warehouse:message code="requisition.wizard.edit.label" default="Edit"/>
+                </g:link>
+                <g:link controller="requisition" action="review" id="${requisition?.id}" class="button icon log ${actionName.equals('review')||actionName.equals('change')?'active':''}">
+                    <warehouse:message code="requisition.wizard.verify.label" default="Verify"/>
+                </g:link>
+                <g:link controller="requisition" action="pick" id="${requisition?.id}" class="button icon tag ${actionName.equals('pick')?'active':''}">
+                    <warehouse:message code="requisition.wizard.pick.label" default="Pick"/>
+                </g:link>
+                <g:link controller="requisition" action="confirm" id="${requisition?.id}" class="button icon approve ${actionName.equals('confirm')?'active':''}">
+                    <warehouse:message code="requisition.wizard.check.label" default="Check"/>
+                </g:link>
+                <g:link controller="requisition" action="transfer" id="${requisition?.id}" class="button icon arrowright ${actionName.equals('transfer')?'active':''}">
+                    <warehouse:message code="requisition.wizard.issue.label" default="Issue"/>
+                </g:link>
             </div>
 
             <div class="right button-group">

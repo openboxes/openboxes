@@ -43,7 +43,7 @@
                             --%>
                             <li>
                                 <span class="action-menu" >
-                                    <button class="action-hover-btn button icon user">
+                                    <button class="action-hover-btn button icon user big">
                                         <span id="username">${session?.user?.name}</span>
                                         <span id="userrole">[<g:userRole user="${session.user}"/>]</span>
 
@@ -131,7 +131,7 @@
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
                                                     <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
                                                 </a>
-                                                <span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none; padding: 10px;">
+                                                <span id="warehouseMenu" title="${warehouse.message(code:'dashboard.chooseLocation.label')}" style="display: none; padding: 10px;">
                                                     <%--
                                                     <g:isUserNotInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_MANAGER]">
                                                         <div class="error">
@@ -141,28 +141,28 @@
                                                     --%>
 
                                                     <%--<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_MANAGER]">--%>
-                                                        <div style="height: 300px; overflow: auto;">
+                                                        <div style="max-height: 400px; overflow: auto;">
                                                             <table>
                                                                 <g:set var="count" value="${0 }"/>
+
                                                                 <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                                                    <tr class="odd">
-                                                                        <td>
+                                                                    <tr class="prop">
+                                                                        <td class="name">
                                                                             <g:if test="${!entry?.key }">
-                                                                                <label>${warehouse.message(code: 'default.others.label', default: 'Others')}</label>
+                                                                                <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
                                                                             </g:if>
                                                                             <g:else>
-                                                                                <label>${entry.key }</label>
+                                                                                <h3>${entry.key }</h3>
                                                                             </g:else>
                                                                         </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
+                                                                        <td class="value">
                                                                             <div>
                                                                                 <g:each var="warehouse" in="${entry.value.sort() }">
                                                                                     <div class="left" style="margin: 1px;">
                                                                                         <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
                                                                                         <a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                                                                            ${warehouse.name}
+                                                                                            <format:metadata obj="${warehouse}"/>
+
                                                                                         </a>
                                                                                     </div>
                                                                                 </g:each>
@@ -201,7 +201,8 @@
                                         </li>
 
                                         <!--
-										 <li><g:link class="list" controller="user" action="preferences"><warehouse:message code="default.preferences.label"  default="Preferences"/></g:link></li>
+										 <li><g:link class="list" controller="user"
+                                                     action="preferences"><warehouse:message code="default.preferences.label"  default="Preferences"/></g:link></li>
 										 -->
                                         <!--
 										 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
@@ -211,7 +212,7 @@
                             </li>
                             <g:if test="${session?.warehouse}">
                                 <li>
-                                    <button class="warehouse-switch button icon pin">
+                                    <button class="warehouse-switch button icon pin big">
                                         ${session?.warehouse?.name }</button>
                                 </li>
 

@@ -10,7 +10,7 @@
 package org.pih.warehouse.requisition
 
 public enum RequisitionItemType {
-	ORIGINAL(0),
+    ORIGINAL(0),
     SUBSTITUTION(1),
 	QUANTITY_CHANGE(2),
 	PACKAGE_CHANGE(3),

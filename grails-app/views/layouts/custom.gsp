@@ -200,6 +200,12 @@
         $(".chzn-select").chosen();
         $(".chzn-select-deselect").chosen({allow_single_deselect:true});
 
+        //$(".chzn-select").live('load',function(){
+        //    $(this).chosen();
+        //});
+        //$(".chzn-select-deselect").live('load',function(){
+        //    $(this).chosen({allow_single_deselect:true});
+        //});
 
         <g:if test="${session.useDebugLocale}">
         // Initialize the localization dialog
@@ -367,7 +373,8 @@
         /*
          $(".action-btn").button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} });
          */
-        $(".action-btn").click(function(event) {
+
+        $(".action-btn").live('click', function(event) {
             //show the menu directly over the placeholder
             var actions = $(this).parent().children(".actions");
 
@@ -385,6 +392,13 @@
 
             // To prevent the action button from POST'ing to the server
             event.preventDefault();
+        });
+
+        $(".action-menu-item").click(function(event) {
+            var actions = $(this).parent().children(".actions");
+
+            // Need to toggle before setting the position
+            actions.toggle();
         });
 
         $(".action-hover-btn").click(function(event) {

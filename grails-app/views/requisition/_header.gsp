@@ -1,25 +1,22 @@
-    <div id="requisition-header" class="box dialog">
-        <div style="line-height: 20px;">
-            <h2>
+    <div id="requisition-header" class="box">
+        <h2>
 
-                <%--
-                <a class="toggle" href="javascript:void(0);">
-                    <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
-                </a>
-                <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
-                &nbsp;
-                --%>
-                <warehouse:message code="requisition.label" default="Requisition"/>
-                <div class="right">
-                    <g:if test="${requisition?.id }">
-                        <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button icon edit">
-                            ${warehouse.message(code:'requisition.button.edit.label', default: 'Edit header')}
-                        </g:link>
-                    </g:if>
-                </div>
-                <div class="clear-all"></div>
-            </h2>
-        </div>
+            <%--
+            <a class="toggle" href="javascript:void(0);">
+                <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+            </a>
+            <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
+            &nbsp;
+            --%>
+            <div style="position:absolute;top:5px;right:5px">
+                <g:if test="${requisition?.id }">
+                    <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button icon edit">
+                        ${warehouse.message(code:'requisition.button.edit.label', default: 'Edit header')}
+                    </g:link>
+                </g:if>
+            </div>
+            <warehouse:message code="requisition.label" default="Requisition"/>
+        </h2>
 
 
         <table id="requisition-header-details-table" class="header-summary-table">
@@ -49,9 +46,13 @@
                     <td class="value">
                         <g:set var="itemsByStatus" value="${requisition.requisitionItems.groupBy { it.status }}"/>
                         <g:each var="status" in="${itemsByStatus.keySet()}">
-                            <div>
-                                <format:metadata obj="${status}"/> <span class="circle">${itemsByStatus[status].size()}</span>
-                            </div>
+                            <span class="tag">
+                                <g:remoteLink controller="requisition" action="showRequisitionItems" id="${requisition.id}"
+                                              params="[status:status]" update="requisitionItems">
+                                    <format:metadata obj="${status}"/> (${itemsByStatus[status].size()})
+                                </g:remoteLink>
+
+                            </span>
                         </g:each>
                     </td>
                 </tr>

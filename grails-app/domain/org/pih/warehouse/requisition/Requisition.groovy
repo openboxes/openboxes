@@ -228,6 +228,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return requisitionItems?.findAll { !it.parentRequisitionItem }
     }
 
+    def getOriginalRequisitionItems() {
+        return requisitionItems?.findAll { it.requisitionItemType == RequisitionItemType.ORIGINAL }
+    }
+
     /**
      * @return  all requisition items that have been added as substitutions or supplements
      */

@@ -29,13 +29,6 @@
 			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  
 			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 				</g:if>
-                <div class="right">
-                    <span>Logged in as ${session.user.name}</span>
-                    <g:link class="list" controller="auth" action="logout" style="color:#666">
-                        <warehouse:message code="default.logout.label"/>
-                    </g:link>
-                </div>
-                <div class="clear"></div>
 
 
 				<g:form controller="dashboard" action="chooseLocation">
@@ -64,66 +57,73 @@
 
                         </div>
                         --%>
+                        <div class="box" style="padding:10px;">
+                            <div class="left middle">
+                                <h1><warehouse:message code="dashboard.loggedInAs.message" args="[session.user.name]"/></h1>
+                            </div>
+                            <div class="right">
+                                <g:link class="button icon remove big" controller="auth" action="logout">
+                                    <warehouse:message code="default.logout.label"/>
+                                </g:link>
+                            </div>
+                            <div class="clear"></div>
 
+                        </div>
 						<div id="chooseLocationSelect">
-							<table>
-								<tbody>
+                            <table>
+                                <tbody>
 									<g:set var="count" value="${0 }"/>
-									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/> 
+									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/>
 									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
-										<tr>
-											<td class="middle left" >
-												<h3>${entry.key?:warehouse.message(code:'default.none.label') }</h3>
-											</td>
-										</tr>
-										<tr class="">
-											<td>	
+                                        <tr class="prop">
+                                            <td class="name top right" >
+                                                <h3>${entry.key?:warehouse.message(code:'default.none.label') }</h3>
+                                            </td>
+                                            <td class="value">
                                                 <g:set var="locationGroup" value="${entry.key }"/>
                                                 <g:each var="warehouse" in="${entry.value.sort() }" status="status">
                                                     <div class="left" style="margin: 2px;">
-                                                    <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-                                                        ${warehouse.name}
-                                                    </a>
+                                                        <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
+                                                            <format:metadata obj="${warehouse}"/>
+                                                        </a>
                                                     </div>
                                                 </g:each>
 
-											</td>
-										</tr>										
+                                            </td>
+                                        </tr>
 									</g:each>
-									<tr class="">
-										<td class="middle left">
-											<h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-										</td>
-									</tr>
-									<tr class="">
-										<td>
+                                    <tr class="prop">
+                                        <td class="name top right">
+                                            <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
+                                        </td>
+                                        <td class="value">
                                             <g:each var="warehouse" in="${nullLocationGroup }" status="status">
                                                 <div class="left" style="margin: 1px;">
                                                     <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-                                                        ${warehouse.name}
+                                                        <format:metadata obj="${warehouse}"/>
                                                     </a>
                                                 </div>
                                             </g:each>
-										</td>
-									</tr>
+                                        </td>
+                                    </tr>
 									<%--
 									<tr class="prop">
 										<td class="">
 										</td>
 										<td class="middle">
-											<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/> 
+											<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
 											Remember my location and log me in automatically.
-											
+
 											${session.user.rememberLastLocation}
 											${session.user.warehouse }
 										</td>
-									</tr>	
+									</tr>
 									<tr>
 										<td>
 											<g:if test="${session?.user?.warehouse }">
-												<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
-											</g:if>												
-										
+												<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/>
+											</g:if>
+
 										</td>
 									</tr>
 									--%>
@@ -131,10 +131,10 @@
 										<div class="warehouse">
 											<warehouse:message code="dashboard.noWarehouse.message"/>
 										</div>
-										<div class="warehouse">		
+										<div class="warehouse">
 											<warehouse:message code="dashboard.requiredActivities.message" args="[grailsApplication.config.app.loginLocation.requiredActivities]"/>
 										</div>
-									</g:unless>							
+									</g:unless>
 								</tbody>
 							</table>
 						</div>
