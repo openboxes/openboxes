@@ -444,7 +444,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def startTime = System.currentTimeMillis()
         def canUndoChanges = isChanged() || isApproved() || isCanceled()
 
-        log.debug "canUndoChanges: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "canUndoChanges: " + (System.currentTimeMillis() - startTime) + " ms"
         return canUndoChanges
     }
 
@@ -452,7 +452,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def startTime = System.currentTimeMillis()
         def canChangeQuantity = !isChanged() && !isApproved() && !isCanceled()
 
-        log.debug "canChangeQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "canChangeQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
         return canChangeQuantity
     }
 
@@ -460,7 +460,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def startTime = System.currentTimeMillis()
         def canChangeQuantity = !isChanged() && !isApproved() && !isCanceled()
 
-        log.debug "canChangeQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "canChangeQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
         return canChangeQuantity
     }
 
@@ -468,7 +468,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def startTime = System.currentTimeMillis()
         def canCancelQuantity = !isChanged() && !isApproved() && !isCanceled()
 
-        log.debug "canCancelQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "canCancelQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
         return canCancelQuantity
     }
 
@@ -476,7 +476,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def startTime = System.currentTimeMillis()
         def canChooseSubstitute = !isChanged() && !isApproved() && !isCanceled()
 
-        log.debug "canChooseSubstitute: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "canChooseSubstitute: " + (System.currentTimeMillis() - startTime) + " ms"
         return canChooseSubstitute
     }
 
@@ -489,7 +489,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             println "Error: " + e.message
         }
 
-        log.debug "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return quantityPicked?:0
     }
@@ -499,21 +499,21 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 		def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
 
 
-        log.debug "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
         return quantityRemaining
 	}
 
     def calculateNumInventoryItem(Inventory inventory) {
         long startTime = System.currentTimeMillis()
         def numInventoryItem = InventoryItem.findAllByProduct(product).size()
-        log.debug "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
         return numInventoryItem
     }
 
     def retrievePicklistItems() {
         long startTime = System.currentTimeMillis()
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
-        log.debug "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
         return picklistItems
     }
 
