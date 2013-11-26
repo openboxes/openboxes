@@ -77,7 +77,7 @@ grails.project.dependency.resolution = {
         test(name:'spock', version:'0.6')
         */
 
-        //runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
+        runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
 
         runtime( ':excel-import:0.3' ) { excludes 'poi-contrib', 'poi-scratchpad' }
 
