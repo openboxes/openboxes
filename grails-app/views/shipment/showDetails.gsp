@@ -160,7 +160,6 @@
                                         <g:if test="${shipmentInstance?.carrier}">
                                             ${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
                                             ${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
-                                            ${shipmentInstance?.carrier.id}
                                         </g:if>
                                     </td>
                                 </tr>
