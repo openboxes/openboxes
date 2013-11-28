@@ -22,8 +22,23 @@
 		</style>
     </head>
     <body>        
-		<div class="body">		
-			<div id="chooseLocation">
+		<div class="body">
+
+            <div id="header">
+                <div class="right">
+
+                    <warehouse:message code="dashboard.loggedInAs.message" args="[session.user.name]"/>
+                    &nbsp;
+                    <g:link class="button icon unlock big" controller="auth" action="logout">
+                        <warehouse:message code="default.logout.label"/>
+                    </g:link>
+                </div>
+                <div class="clear"></div>
+
+            </div>
+
+
+            <div id="chooseLocation">
 
 				<g:if test="${flash.message}">
 			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  
@@ -57,18 +72,6 @@
 
                         </div>
                         --%>
-                        <div class="box" style="padding:10px;">
-                            <div class="left middle">
-                                <h1><warehouse:message code="dashboard.loggedInAs.message" args="[session.user.name]"/></h1>
-                            </div>
-                            <div class="right">
-                                <g:link class="button icon remove big" controller="auth" action="logout">
-                                    <warehouse:message code="default.logout.label"/>
-                                </g:link>
-                            </div>
-                            <div class="clear"></div>
-
-                        </div>
 						<div id="chooseLocationSelect">
                             <table>
                                 <tbody>

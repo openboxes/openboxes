@@ -77,12 +77,15 @@
 															
 									</td>
 								</tr>
-								<tr class="prop">
-									<td class="middle left" colspan="2">
-										<warehouse:message code="auth.newuser.text"/> &nbsp;<g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>
-									</td>
-								</tr>
-							</tbody>
+
+                                <tr class="">
+                                    <td class="middle left" colspan="2">
+                                        <warehouse:message code="auth.newuser.text"/>
+                                        <g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>
+                                    </td>
+                                </tr>
+
+                            </tbody>
 						</table>
 					</div>
 					
