@@ -11,6 +11,11 @@
         
     </head>
     <body>
+
+        <g:set var="pageParams"
+           value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order,relatedToMe:params.relatedToMe]"/>
+
+
         <div class="body">
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
@@ -20,10 +25,18 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td class="top" width="1%">
+                            <td class="top">
                                 <div class="title">
-                                    <warehouse:message code="requisition.list.label" /> <span class="fade">(${requisitions.totalCount})</span>
+                                    <warehouse:message code="requisition.list.label" /> (${requisitions.totalCount})
                                 </div>
+                            </td>
+                            <td class="right">
+                                <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
+                                    <warehouse:message code="requisition.button.export.label" default="Export requisitions"/>
+                                </g:link>
+                                <g:link controller="requisition" action="exportRequisitionItems" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
+                                    <warehouse:message code="requisition.button.export.label" default="Export requisition items"/>
+                                </g:link>
                             </td>
                         </tr>
                     </tbody>
@@ -162,8 +175,6 @@
                     </div>
                 </div>
                 <div class="yui-u">
-                    <g:set var="pageParams"
-                           value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order,relatedToMe:params.relatedToMe]"/>
                     <div class="box">
                         <%--<g:render template="list" model="[requisitions:requisitions,pageParams:pageParams]"/>--%>
                         <h2>

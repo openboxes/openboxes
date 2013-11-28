@@ -513,7 +513,6 @@ class DataService {
         def sw = new StringWriter()
 
         def csvWriter = new CSVWriter(sw, {
-            "ID" { it.id }
             "Requisition Number" { it.requisitionNumber }
             "Status" { it.status }
             "Type" { it.type }
@@ -522,31 +521,30 @@ class DataService {
             "Requesting ward" { it.origin }
             "Processing depot" { it.destination }
 
-            "Requested by" { it?.requestedBy?.name }
+            "Requested by" { it?.requestedBy?.name?:"" }
             "Date Requested" { it.dateRequested }
 
-            "Verified" { it?.verifiedBy?.name }
+            "Verified" { it?.verifiedBy?.name?:"" }
             "Date Verified" { it.dateVerified }
 
-            "Picked" { it?.pickedBy?.name }
+            "Picked" { it?.pickedBy?.name?:"" }
             "Date Picked" { it.datePicked }
 
-            "Checked" { it?.checkedBy?.name }
+            "Checked" { it?.checkedBy?.name?:"" }
             "Date Checked" { it.dateChecked }
 
-            "Issued" { it?.issuedBy?.name }
+            "Issued" { it?.issuedBy?.name?:"" }
             "Date Issued" { it.dateIssued }
 
-            "Created" { it?.createdBy?.name }
+            "Created" { it?.createdBy?.name?:"" }
             "Date Created" { it.dateCreated }
 
-            "Updated" { it?.updatedBy?.name }
+            "Updated" { it?.updatedBy?.name?:"" }
             "Date Updated" { it.lastUpdated }
         })
 
         requisitions.each { requisition ->
             def row =  [
-                    id: requisition?.id,
                     requisitionNumber: requisition.requestNumber,
                     type: requisition?.type,
                     commodityClass: requisition?.commodityClass,
@@ -556,28 +554,28 @@ class DataService {
                     destination: requisition.destination,
 
                     requestedBy: requisition.requestedBy,
-                    dateRequested: requisition.dateRequested,
+                    dateRequested: requisition.dateRequested?"${formatDate.format(requisition.dateRequested)}":"",
 
                     reviewedBy: requisition.reviewedBy,
-                    dateReviewed: requisition.dateReviewed,
+                    dateReviewed: requisition.dateReviewed?"${formatDate.format(requisition.dateReviewed)}":"",
 
                     verifiedBy: requisition.verifiedBy,
-                    dateVerified: requisition.dateVerified,
+                    dateVerified: requisition.dateVerified?"${formatDate.format(requisition.dateVerified)}":"",
 
                     checkedBy: requisition.checkedBy,
-                    dateChecked: requisition.dateChecked,
+                    dateChecked: requisition.dateChecked?"${formatDate.format(requisition.dateChecked)}":"",
 
                     deliveredBy: requisition.deliveredBy,
-                    dateDelivered: requisition.dateDelivered,
+                    dateDelivered: requisition.dateDelivered?"${formatDate.format(requisition.dateDelivered)}":"",
 
                     pickedBy: requisition?.picklist?.picker,
-                    datePicked: requisition?.picklist?.datePicked,
+                    datePicked: requisition?.picklist?.datePicked?"${formatDate.format(requisition?.picklist?.datePicked)}":"",
 
                     issuedBy: requisition.issuedBy,
-                    dateIssued: requisition.dateIssued,
+                    dateIssued: requisition.dateIssued?"${formatDate.format(requisition.dateIssued)}":"",
 
                     receivedBy: requisition.receivedBy,
-                    dateReceived: requisition.dateReceived,
+                    dateReceived: requisition.dateReceived?"${formatDate.format(requisition.dateReceived)}":"",
 
                     createdBy: requisition.createdBy,
                     dateCreated: requisition.dateCreated?"${formatDate.format(requisition.dateCreated)}":"",
@@ -589,6 +587,66 @@ class DataService {
         }
         return sw.toString()
     }
+
+    String exportRequisitionItems(requisitions) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+        def csvWriter = new CSVWriter(sw, {
+            "Requisition Number" { it.requisitionNumber }
+            "Status" { it.status }
+            "Type" { it.type }
+            "Class" { it.commodityClass }
+            "Name" { it.name }
+            "Requesting ward" { it.origin }
+            "Processing depot" { it.destination }
+            "Requested by" { it?.requestedBy?.name }
+            "Date Requested" { it.dateRequested }
+            "Product code" { it.productCode }
+            "Product name" {it.productName }
+            "Status" { it.itemStatus?:"" }
+            "Requested" { it.quantity?:"" }
+            "Approved" { it.quantityApproved?:"" }
+            "Picked" { it.quantityPicked?:"" }
+            "Canceled" { it.quantityCanceled?:"" }
+            "Reason Code" { it.reasonCode?: "" }
+            "Comments" { it.comments?: "" }
+
+        })
+
+        requisitions.each { requisition ->
+            requisition.requisitionItems.each { requisitionItem ->
+                def row =  [
+                        requisitionNumber: requisition.requestNumber,
+                        type: requisition?.type,
+                        commodityClass: requisition?.commodityClass,
+                        status: requisition.status,
+                        name: requisition.name,
+                        requestedBy: requisition.requestedBy?:"",
+                        dateRequested: requisition.dateRequested?"${formatDate.format(requisition.dateRequested)}":"",
+                        origin: requisition.origin,
+                        destination: requisition.destination,
+                        productCode: requisitionItem.product.productCode,
+                        productName: requisitionItem.product.name,
+                        itemStatus: requisitionItem.status,
+                        quantity: requisitionItem.quantity,
+                        quantityCanceled: requisitionItem.quantityCanceled,
+                        quantityApproved: requisitionItem.quantityApproved,
+                        quantityPicked: requisitionItem.calculateQuantityPicked(),
+                        reasonCode: requisitionItem.cancelReasonCode,
+                        comments: requisitionItem.cancelComments,
+
+
+
+
+                ]
+                csvWriter << row
+            }
+        }
+        return sw.toString()
+    }
+
+
 
     /**
      * Generic method to generate CSV string based on given csvrows map.

@@ -708,9 +708,8 @@ class RequisitionController {
     }
 
 
-    def export = {
-        def location = Location.get(session.warehouse.id)
-        def requisitions = Requisition.list()
+    def exportRequisitions = {
+        def requisitions = getRequisitions(params)
         if (requisitions) {
             def date = new Date();
             response.setHeader("Content-disposition",
@@ -724,6 +723,57 @@ class RequisitionController {
             render(text: 'No requisitions found', status: 404)
         }
 
+    }
+
+    def exportRequisitionItems = {
+        def requisitions = getRequisitions(params)
+        if (requisitions) {
+            def date = new Date();
+            response.setHeader("Content-disposition",
+                    "attachment; filename='Requisitions-${date?date.format("yyyyMMdd-hhmmss"):""}.csv'")
+            response.contentType = "text/csv"
+            def csv = dataService.exportRequisitionItems(requisitions)
+            println "export requisitions: " + csv
+            render csv
+        }
+        else {
+            render(text: 'No requisitions found', status: 404)
+        }
+
+    }
+
+    def export = {
+        def requisitions = getRequisitions(params)
+        if (requisitions) {
+            def date = new Date();
+            response.setHeader("Content-disposition",
+                    "attachment; filename='Requisitions-${date?date.format("yyyyMMdd-hhmmss"):""}.csv'")
+            response.contentType = "text/csv"
+            def csv = dataService.exportRequisitions(requisitions)
+            println "export requisitions: " + csv
+            render csv
+        }
+        else {
+            render(text: 'No requisitions found', status: 404)
+        }
+
+    }
+
+    def getRequisitions(params) {
+        def user = User.get(session?.user?.id)
+        def location = Location.get(session?.warehouse?.id)
+
+        // Requisition that encapsulates the basic parameters in the search form
+        def requisition = new Requisition(params)
+        requisition.destination = Location.get(session?.warehouse?.id)
+
+        // Disables pagination
+        params.max = -1
+
+        // Requisitions to export
+        def requisitions = requisitionService.getRequisitions(requisition, params)
+
+        return requisitions
     }
 
 
