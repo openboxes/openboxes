@@ -76,11 +76,11 @@ class InventoryItemController {
 		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
 		// (that is, find a workaround to GRAILS-5080)
 		//	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		commandInstance.pendingShipmentList = 
-			shipmentService.getPendingShipments(commandInstance.warehouseInstance);
+		//commandInstance.pendingShipmentList =
+		//	shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
         //log.info "After get pending shipments " + (System.currentTimeMillis() - currentTime) + " ms"
-
+        /*
         def shipmentItems =
 			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
 
@@ -92,9 +92,10 @@ class InventoryItemController {
 			}
 		}	
 		commandInstance.shipmentMap = shipmentMap;
+        */
 
         //log.info "After get pending shipment items " + (System.currentTimeMillis() - currentTime) + " ms"
-
+        /*
 		def orderItems =
 			orderService.getPendingOrderItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance);
 		def orderMap = orderItems.groupBy { it.order }
@@ -105,10 +106,11 @@ class InventoryItemController {
 			}
 		}
 		commandInstance.orderMap = orderMap;
-
+        */
         //log.info "After get pending orders " + (System.currentTimeMillis() - currentTime) + " ms"
 
 
+        /*
 		def requisitionItems =
 			requisitionService.getPendingRequisitionItems(commandInstance.warehouseInstance, commandInstance?.productInstance)
 		def requisitionMap = requisitionItems.groupBy { it.requisition }
@@ -121,6 +123,7 @@ class InventoryItemController {
 			}
 		}
 		commandInstance.requisitionMap = requisitionMap;
+		*/
 
         //log.info "After get pending requisitions " + (System.currentTimeMillis() - currentTime) + " ms"
 
@@ -150,10 +153,85 @@ class InventoryItemController {
 
         def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.productInstance)
 
+        //def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
+        //requisitionItems: requisitionItems, , issuedRequisitionItems:issuedRequisitionItems
+
+        [ commandInstance: commandInstance, quantityMap: quantityMap ]
+	}
+
+    def showStockHistory = { StockCardCommand cmd ->
+        long currentTime = System.currentTimeMillis()
+        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+        // add the current warehouse to the command object
+        cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+
+        // now populate the rest of the commmand object
+        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+        render(template: "showStockHistory", model: [commandInstance:commandInstance])
+    }
+
+    def showPendingRequisitions = { StockCardCommand cmd ->
+        long currentTime = System.currentTimeMillis()
+        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+        // add the current warehouse to the command object
+        cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+
+        // now populate the rest of the commmand object
+        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+
+        def requisitionItems =
+            requisitionService.getPendingRequisitionItems(commandInstance.warehouseInstance, commandInstance?.productInstance)
+        def requisitionMap = requisitionItems.groupBy { it.requisition }
+
+        println "requisitionmap: " + requisitionMap
+        if (requisitionMap) {
+            requisitionMap.keySet().each {
+                def quantity = requisitionMap[it].sum() { it.quantity }
+                requisitionMap.put(it, quantity)
+            }
+        }
+        commandInstance.requisitionMap = requisitionMap;
+
+        render(template: "showPendingRequestLog", model: [commandInstance:commandInstance, requisitionItems:requisitionItems])
+    }
+
+    def showPendingShipments = { StockCardCommand cmd ->
+        long currentTime = System.currentTimeMillis()
+        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+        // add the current warehouse to the command object
+        cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+
+        // now populate the rest of the commmand object
+        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+
+        def shipmentItems =
+            shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+
+        def shipmentMap = shipmentItems.groupBy { it.shipment }
+        if (shipmentMap) {
+            shipmentMap.keySet().each {
+                def quantity = shipmentMap[it].sum() { it.quantity }
+                shipmentMap.put(it, quantity)
+            }
+        }
+        commandInstance.shipmentMap = shipmentMap;
+
+        render(template: "showPendingShipmentLog", model: [commandInstance:commandInstance])
+    }
+
+    def showConsumption = { StockCardCommand cmd ->
+        long currentTime = System.currentTimeMillis()
+        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+        // add the current warehouse to the command object
+        cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+
+        // now populate the rest of the commmand object
+        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
 
-		[ commandInstance: commandInstance, requisitionItems: requisitionItems, quantityMap: quantityMap, issuedRequisitionItems:issuedRequisitionItems ]
-	}
+        render(template: "showConsumption", model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems])
+    }
+
 
     /*
     def exportStockHistory = {

@@ -58,7 +58,18 @@
 			$(".tabs").tabs({
 				cookie : {
 					expires : 1
-				}
+				},
+                ajaxOptions: {
+                    error: function(xhr, status, index, anchor) {
+                        $(anchor.hash).html();
+                    },
+                    beforeSend: function() {
+                        $('#loader').show();
+                    },
+                    complete: function() {
+                        $("#loader").hide();
+                    }
+                }
 			});
 		});
 

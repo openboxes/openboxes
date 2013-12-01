@@ -100,6 +100,10 @@
         </div>
         <div id="megamenu">
             <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
+            <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
+                Loading...
+            </div>
+
         </div>
         <div id="breadcrumb">
             <g:render template="/common/breadcrumb"/>
@@ -160,8 +164,6 @@
 <script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
 
 <script type="text/javascript">
-
-
 
     <g:if test="${session.useDebugLocale}">
     // Define the localization
