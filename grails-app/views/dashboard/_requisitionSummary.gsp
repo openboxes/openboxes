@@ -2,36 +2,35 @@
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode"%>
 
 
-<div class="widget-small">
-	<div class="widget-header">
-        <h2>
-            <%--
-            <span class="action-menu">
-                <button class="action-btn">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-                </button>
-                <div class="actions">
-                    <div class="action-menu-item">
-                        <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                            Show all requisitions
-                        </g:link>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="dashboard" action="index" class="${params.onlyShowMine.equals('true')?'selected':''}"
-                                params="['onlyShowMine':true]">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="View requests" style="vertical-align: middle" />
-                            Show my requisitions
-                        </g:link>
-                    </div>
+<div class="box">
+    <h2>
+        <warehouse:message code="requisitions.label"/>
+    </h2>
+
+
+        <%--
+        <span class="action-menu">
+            <button class="action-btn">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+            </button>
+            <div class="actions">
+                <div class="action-menu-item">
+                    <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        Show all requisitions
+                    </g:link>
                 </div>
-            </span>
-            --%>
-            <warehouse:message code="requisitions.label"/>
-        </h2>
+                <div class="action-menu-item">
+                    <g:link controller="dashboard" action="index" class="${params.onlyShowMine.equals('true')?'selected':''}"
+                            params="['onlyShowMine':true]">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="View requests" style="vertical-align: middle" />
+                        Show my requisitions
+                    </g:link>
+                </div>
+            </div>
+        </span>
+        --%>
 
-
-	</div>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
 			<g:if test="${!requisitionStatistics.ALL}">

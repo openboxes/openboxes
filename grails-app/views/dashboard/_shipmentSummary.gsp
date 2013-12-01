@@ -1,11 +1,8 @@
 <!--  Show recent shipments/receipts -->
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode"%>
 
-
-<div class="widget-small">
-	<div class="widget-header">
-		<h2><warehouse:message code="shipping.label"/></h2>
-	</div>
+<div class="box">
+    <h2><warehouse:message code="shipping.label"/></h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">
 			<g:if test="${!outgoingShipmentsByStatus}">

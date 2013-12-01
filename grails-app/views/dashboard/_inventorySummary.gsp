@@ -1,7 +1,5 @@
-<div class="widget-large">
-	<div class="widget-header">
-		<h2><warehouse:message code="inventory.label" args="[session.warehouse.name]"/></h2>
-	</div>
+<div class="box">
+    <h2><warehouse:message code="inventory.label" args="[session.warehouse.name]"/></h2>
     <div class="widget-content" style="padding:0; margin:0">
         <div id="inventorySummary">
             <%--

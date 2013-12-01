@@ -79,10 +79,8 @@
 									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/>
 									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
                                         <tr class="prop">
-                                            <td class="name top right" >
+                                            <td class="top left" >
                                                 <h3>${entry.key?:warehouse.message(code:'default.none.label') }</h3>
-                                            </td>
-                                            <td class="value">
                                                 <g:set var="locationGroup" value="${entry.key }"/>
                                                 <g:each var="warehouse" in="${entry.value.sort() }" status="status">
                                                     <div class="left" style="margin: 2px;">
@@ -96,10 +94,8 @@
                                         </tr>
 									</g:each>
                                     <tr class="prop">
-                                        <td class="name top right">
+                                        <td class="top left">
                                             <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-                                        </td>
-                                        <td class="value">
                                             <g:each var="warehouse" in="${nullLocationGroup }" status="status">
                                                 <div class="left" style="margin: 1px;">
                                                     <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">

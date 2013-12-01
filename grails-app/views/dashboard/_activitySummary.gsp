@@ -1,37 +1,35 @@
-<div class="widget-large">
-	<div class="widget-header">
-		<h2>
+<div class="box">
+    <h2>
+        <div class="action-menu" style="position:absolute;top:5px;right:5px">
+            <button class="action-btn">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+            </button>
+            <div class="actions">
+                <div class="action-menu-item">
+                    <g:link controller="dashboard" action="index" class="${!params.daysToInclude || params.daysToInclude.equals('3')?'selected':''}" params="[daysToInclude:3]">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <warehouse:message code="dashboard.lastThreeDays.label" default="Last 3 days"/></g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('7')?'selected':''}" params="[daysToInclude:7]">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <warehouse:message code="dashboard.lastWeek.label" default="Last week"/></g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('30')?'selected':''}" params="[daysToInclude:30]">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <warehouse:message code="dashboard.lastMonth.label" default="Last month"/>
+                    </g:link>
 
-            <div class="action-menu" style="position:absolute;top:5px;right:5px">
-                <button class="action-btn">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-                </button>
-                <div class="actions">
-                    <div class="action-menu-item">
-                        <g:link controller="dashboard" action="index" class="${!params.daysToInclude || params.daysToInclude.equals('3')?'selected':''}" params="[daysToInclude:3]">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                            <warehouse:message code="dashboard.lastThreeDays.label" default="Last 3 days"/></g:link>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('7')?'selected':''}" params="[daysToInclude:7]">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                            <warehouse:message code="dashboard.lastWeek.label" default="Last week"/></g:link>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="dashboard" action="index" class="${params.daysToInclude.equals('30')?'selected':''}" params="[daysToInclude:30]">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                            <warehouse:message code="dashboard.lastMonth.label" default="Last month"/>
-                        </g:link>
-
-                    </div>
                 </div>
             </div>
+        </div>
 
 
-            <warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/>
-        </h2>
-	</div>
-	<div class="widget-content" style="padding: 0; margin: 0">	    					    			
+        <warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/>
+    </h2>
+
+	<div class="widget-content" style="padding: 0; margin: 0">
 		<%-- 	
 		<div style="padding: 10px">
 			There are ${activityList.size() } recent activities.		

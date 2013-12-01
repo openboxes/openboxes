@@ -1,38 +1,37 @@
 
-<div class="widget-large">
-	<div class="widget-header">
+<div class="box">
 
-        <h2>
-            <g:isUserAdmin>
+    <h2>
+        <g:isUserAdmin>
 
-                <div class="action-menu" style="position:absolute;top:5px;right:5px">
-                    <button class="action-btn">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-                    </button>
-                    <div class="actions">
-                        <div class="action-menu-item">
+            <div class="action-menu" style="position:absolute;top:5px;right:5px">
+                <button class="action-btn">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+                </button>
+                <div class="actions">
+                    <div class="action-menu-item">
 
-                            <g:if test="${!params.editTags}">
-                                <g:link controller="dashboard" action="index" params="[editTags:true]">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle" />
-                                    <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
-                                </g:link>
-                            </g:if>
-                            <g:else>
-                                <g:link controller="dashboard" action="index">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'control_end.png')}" style="vertical-align: middle" />
-                                    <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
-                                </g:link>
-                            </g:else>
-                        </div>
+                        <g:if test="${!params.editTags}">
+                            <g:link controller="dashboard" action="index" params="[editTags:true]">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle" />
+                                <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
+                            </g:link>
+                        </g:if>
+                        <g:else>
+                            <g:link controller="dashboard" action="index">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'control_end.png')}" style="vertical-align: middle" />
+                                <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
+                            </g:link>
+                        </g:else>
                     </div>
                 </div>
-            </g:isUserAdmin>
+            </div>
+        </g:isUserAdmin>
 
 
-            <warehouse:message code="tags.label" default="Tags"/>
-        </h2>
-	</div>
+        <warehouse:message code="tags.label" default="Tags"/>
+    </h2>
+
 	<div class="widget-content">
         <div id="tag-summary">
             <g:if test="${tags}">
