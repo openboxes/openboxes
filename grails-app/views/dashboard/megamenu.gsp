@@ -292,13 +292,22 @@
             <div class="megaButton">
                 <g:link controller="requisition" action="export" class="list"><warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/></g:link>
             </div>
+            <div class="megaButton">
+                <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
+            </div>
+            <div class="megaButton">
+                <g:link controller="inventory" action="exportLatestInventoryDate" class="list"><warehouse:message code="product.exportLatestInventoryDate.label" default="Export latest inventory date"/></g:link>
+            </div>
+            <div class="megaButton">
+                <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
+            </div>
             <%--
             <div class="megaButton">
                 <g:link controller="requisitionItem" action="listPending" class=""><warehouse:message code="requisitionItem.listPending.label" default="List pending items"/></g:link>
             </div>
             --%>
             <div class="megaButton">
-                <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="Cancelled items"/></g:link>
+                <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/></g:link>
             </div>
 		</div>
 	</li>
@@ -366,12 +375,6 @@
                     </div>
                     <div class="megaButton">
                         <g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
                     </div>
                 <%--
                 <div class="megaButton">

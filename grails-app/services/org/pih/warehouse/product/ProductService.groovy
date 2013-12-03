@@ -796,6 +796,39 @@ class ProductService {
 		return sw.toString()
 	}
 
+
+
+    String exportLatestInventoryDate(products, latestInventoryDateMap, binLocationMap) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+        def csvWriter = new CSVWriter(sw, {
+            "Product Code" { it.productCode }
+            "Name" { it.name }
+            "Unit of Measure" { it.unitOfMeasure }
+            "Bin Location" { it.binLocation }
+            "Most Recent Stock Count" { it.latestInventoryDate }
+            "Date Created" { it.dateCreated }
+            "Date Updated" { it.lastUpdated }
+        })
+
+        products.each { product ->
+            def latestInventoryDate = latestInventoryDateMap[product.id]
+            def row =  [
+                    productCode: product.productCode?:"",
+                    name: product.name,
+                    unitOfMeasure: product.unitOfMeasure?:"",
+                    binLocation: binLocationMap[product]?:"",
+                    latestInventoryDate: latestInventoryDate?"${formatDate.format(latestInventoryDate)}":"",
+                    dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
+                    lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
+            ]
+            csvWriter << row
+        }
+        return sw.toString()
+
+
+    }
 	
 	/**
 	 * Find or create a category with the given name.
