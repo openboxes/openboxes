@@ -181,7 +181,7 @@
                     <g:if test="${shipmentInstance?.isReceiveAllowed()}">
                         <g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}"
                                 name="receiveShipmentLink">
-                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'box.png')}" alt="Receive Shipment"
+                            <img src="${createLinkTo(dir: 'images/icons', file: 'handtruck.png')}" alt="Receive Shipment"
                                  class="middle"/>&nbsp;
                             <warehouse:message code="shipping.receiveShipment.label"/>
                         </g:link>
@@ -210,6 +210,16 @@
                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_undo.png')}"
                              alt="Rollback Last Event" class="middle"/>&nbsp;
                         <warehouse:message code="shipping.rollbackLastEvent.label"/></g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="shipment" action="renderShippedEmail" id="${shipmentInstance?.id}">
+                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
+                        <warehouse:message code="shipping.shippedEmail.label" default="Show shipment sent email"/></g:link>
+                </div>
+                <div class="action-menu-item">
+                    <g:link controller="shipment" action="renderReceivedEmail" id="${shipmentInstance?.id}">
+                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
+                        <warehouse:message code="shipping.receivedEmail.label" default="Show shipment received email"/></g:link>
                 </div>
             </g:isUserInRole>
         </g:if>

@@ -1009,7 +1009,7 @@ class ShipmentService {
 			}
 			
 			
-			if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save()) {
+			if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save(flush:true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
@@ -1021,7 +1021,8 @@ class ShipmentService {
 				createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventCode.RECEIVED, location);
 												
 				// Save updated shipment instance
-				shipmentInstance.save();
+				shipmentInstance.save(flush:true);
+                shipmentInstance.receipt.save(flush:true)
 			
 				// only need to create a transaction if the destination is a warehouse
 				if (shipmentInstance.destination?.isWarehouse() && creditStockOnReceipt) {
@@ -1072,7 +1073,7 @@ class ShipmentService {
 
 					// Associate the incoming transaction with the shipment					
 					shipmentInstance.addToIncomingTransactions(creditTransaction) 
-					shipmentInstance.save();
+					shipmentInstance.save(flush:true);
 					
 				}
 			}

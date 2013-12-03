@@ -124,6 +124,10 @@ class ShipmentItem implements Comparable, Serializable {
 		return orderShipments()
 	}
 	*/
+
+    def receiptItems() {
+        return ReceiptItem.findAllByShipmentItem(this)
+    }
 	
 	
 	/**

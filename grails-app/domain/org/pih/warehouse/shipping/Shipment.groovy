@@ -73,7 +73,9 @@ class Shipment implements Comparable, Serializable {
 		"mostRecentEvent", 
 		"status",
 		"actualShippingDate",
-		"actualDeliveryDate" ]
+		"actualDeliveryDate",
+        "recipients"
+    ]
 	
 	static mappedBy = [outgoingTransactions: 'outgoingShipment',
 		incomingTransactions: 'incomingShipment']
@@ -333,7 +335,31 @@ class Shipment implements Comparable, Serializable {
 			
 		return container
 	}
-	
+
+    /**
+     * Get all recipients for this shipment
+     *
+     * @return
+     */
+    def getRecipients() {
+        def recipients = []
+        containers.each { container ->
+            if (container?.recipient?.email) {
+                recipients.add(container.recipient)
+            }
+        }
+        shipmentItems.each { shipmentItem ->
+            if (shipmentItem?.recipient?.email) {
+                recipients.add(shipmentItem.recipient)
+            }
+        }
+        if (recipient?.email) {
+            recipients.add(recipient)
+        }
+        return recipients?.unique()
+    }
+
+
 	/**
 	 * Clones the specified container
 	 */

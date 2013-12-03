@@ -32,6 +32,11 @@
 					<g:set var="includeNotifications" value="${shipmentItemsWithRecipient || (!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier) || (!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient)}"/>
 					
 					<div class="dialog box">
+                        <h2>
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"/>
+                            <label><warehouse:message code="shipping.label"/></label>
+                        </h2>
+
 						<table>
 							<tbody>
 								<tr class="prop">
@@ -41,7 +46,7 @@
 											<warehouse:message code="shipping.sendShipment.message" 
 												args="[shipmentInstance?.origin?.name,shipmentInstance?.destination?.name]"/>
 										</p>
-										<hr/>
+										<div class="box">
 										<table>
 											<tr>
 												<td>
@@ -88,35 +93,42 @@
 												</tr>
 											</g:else>
 										</table>
+                                        </div>
 									</td>								
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label>
-											<warehouse:message code="shipping.expectedShippingDate.label" />:
-										</label>
-									</td>
-									<td class="value">
-										<format:date obj="${shipmentInstance?.expectedShippingDate}"
-											format="dd/MMM/yyyy"/>
+                                        <label><warehouse:message code="default.dates.label" default="Dates"/></label>
+                                    </td>
+                                    <td class="value">
+
+
+                                        <table style="width:auto;">
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <warehouse:message code="shipping.expectedShippingDate.label" />:
+                                                    </label>
+                                                    <div>
+                                                    <format:date obj="${shipmentInstance?.expectedShippingDate}"
+                                                                 format="dd/MMM/yyyy"/>
+                                                    </div>
+                                                </td>
+                                                <td ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}>
+                                                    <label>
+                                                        <warehouse:message code="shipping.actualShippingDate.label" />:
+                                                    </label>
+                                                    <div>
+                                                    <g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
+                                                                        value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        </table>
 									</td>
 								</tr>
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label>
-											<warehouse:message code="shipping.actualShippingDate.label" />:
-										</label>
-									</td>
-									<td valign="middle"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
-										nowrap="nowrap">
-										<g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
-											value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>										
-									</td>
-								</tr>											
-																	
-								
-								
+
 								<%-- 								
 								<tr class="prop">
 									<td valign="top" class="name">

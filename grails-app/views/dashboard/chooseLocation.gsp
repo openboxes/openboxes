@@ -78,7 +78,7 @@
 									<g:set var="count" value="${0 }"/>
 									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/>
 									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                        <tr class="prop">
+                                        <tr>
                                             <td class="top left" >
                                                 <h3>${entry.key?:warehouse.message(code:'default.none.label') }</h3>
                                                 <g:set var="locationGroup" value="${entry.key }"/>
@@ -93,7 +93,7 @@
                                             </td>
                                         </tr>
 									</g:each>
-                                    <tr class="prop">
+                                    <tr>
                                         <td class="top left">
                                             <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
                                             <g:each var="warehouse" in="${nullLocationGroup }" status="status">

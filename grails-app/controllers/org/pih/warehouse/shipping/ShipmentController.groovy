@@ -367,6 +367,7 @@ class ShipmentController {
 			// associate the receipt with the shipment
 			shipmentInstance.receipt = receiptInstance
 			receiptInstance.shipment = shipmentInstance
+
 			
 			// check for errors
 			if(receiptInstance.hasErrors() || !receiptInstance.validate()) {					
@@ -381,7 +382,7 @@ class ShipmentController {
 			shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse, creditStockOnReceipt);
 
 
-			if (!shipmentInstance.hasErrors()) {
+			if (!shipmentInstance.hasErrors() ) {
                 def recipients = new HashSet()
                 triggerReceiveShipmentEmails(shipmentInstance, userInstance, recipients)
 
@@ -475,8 +476,20 @@ class ShipmentController {
         }
     }
 
+    def renderReceivedEmail = {
+        def shipmentInstance = Shipment.get(params.id)
+        def userInstance = User.get(session.user.id)
+        render(template:"/email/shipmentReceived", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
+    }
 
-	def showPackingList = { 
+    def renderShippedEmail = {
+        def shipmentInstance = Shipment.get(params.id)
+        def userInstance = User.get(session.user.id)
+        render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
+    }
+
+
+    def showPackingList = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"

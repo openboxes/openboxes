@@ -65,5 +65,10 @@ class ReceiptItem implements Comparable, Serializable {
    int compareTo(obj) {
 	   return shipmentItem <=> obj.shipmentItem
 	}
+
+    String toString() {
+        return "${id}:${product.name}:${inventoryItem.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
+    }
+
 	
 }
