@@ -149,6 +149,26 @@
             </tr>
             <tr class="prop">
                 <td class="label">
+                    <label><warehouse:message code="product.latestInventoryDate.label"/></label>
+                </td>
+                <td class="value">
+                    <span class="">
+                        <g:if test="${latestInventoryDate}">
+                            <g:prettyDateFormat date="${latestInventoryDate}"/>
+                            <div class="fade">
+                                ${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
+                                ${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }
+                            </div>
+
+                        </g:if>
+                        <g:else>
+                            <span class="fade"><warehouse:message code="default.never.label" /></span>
+                        </g:else>
+                    </span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
                     <label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
                 </td>
                 <td class="value">
@@ -191,31 +211,11 @@
             </tr>
             <tr class="prop">
                 <td class="label">
-                    <label><warehouse:message code="product.latestInventoryDate.label"/></label>
-                </td>
-                <td class="value">
-                    <span class="">
-                        <g:if test="${latestInventoryDate}">
-                            <g:prettyDateFormat date="${latestInventoryDate}"/>
-                            <div class="fade">
-                                ${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
-                                ${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }
-                            </div>
-
-                        </g:if>
-                        <g:else>
-                            <span class="fade"><warehouse:message code="default.never.label" /></span>
-                        </g:else>
-                    </span>
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="label">
                     <label><warehouse:message code="inventoryLevel.minQuantity.label"/></label>
                 </td>
                 <td class="value">
                     <g:if test="${inventoryLevelInstance?.minQuantity}">
-                        ${inventoryLevelInstance?.minQuantity?:'' }
+                        ${g.formatNumber(number: inventoryLevelInstance?.minQuantity, format: '###,###,###') }
                         <span class="">
                             <g:if test="${productInstance?.unitOfMeasure }">
                                 <format:metadata obj="${productInstance?.unitOfMeasure}"/>
@@ -237,7 +237,7 @@
                 <td class="value">
 
                     <g:if test="${inventoryLevelInstance?.reorderQuantity}">
-                        ${inventoryLevelInstance?.reorderQuantity?:'' }
+                        ${g.formatNumber(number: inventoryLevelInstance?.reorderQuantity, format: '###,###,###') }
                         <span class="">
                             <g:if test="${productInstance?.unitOfMeasure }">
                                 <format:metadata obj="${productInstance?.unitOfMeasure}"/>
@@ -260,7 +260,7 @@
 					</td>
 					<td class="value">
 						<g:if test="${inventoryLevelInstance?.maxQuantity}">
-							${inventoryLevelInstance?.maxQuantity?:'' }
+                            ${g.formatNumber(number: inventoryLevelInstance?.maxQuantity, format: '###,###,###') }
 							<span class="">
 								<g:if test="${productInstance?.unitOfMeasure }">
 									<format:metadata obj="${productInstance?.unitOfMeasure}"/>

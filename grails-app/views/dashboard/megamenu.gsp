@@ -290,9 +290,6 @@
 			</div>
             <hr/>
             <div class="megaButton">
-                <g:link controller="requisition" action="export" class="list"><warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/></g:link>
-            </div>
-            <div class="megaButton">
                 <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
             </div>
             <div class="megaButton">
@@ -306,6 +303,9 @@
                 <g:link controller="requisitionItem" action="listPending" class=""><warehouse:message code="requisitionItem.listPending.label" default="List pending items"/></g:link>
             </div>
             --%>
+            <div class="megaButton">
+                <g:link controller="requisition" action="export" class="list"><warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/></g:link>
+            </div>
             <div class="megaButton">
                 <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/></g:link>
             </div>

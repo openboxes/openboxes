@@ -41,26 +41,23 @@
 			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
 			                </g:link>				
 			            </div>
-                        <div>
-			                <span class="product-generic fade" style="text-transform:uppercase;">			
-			                	<g:if test="${productInstance?.productGroups }">
-		                    		${productInstance?.productGroups?.sort().first()}
-		                    	</g:if>
-		                    	<g:else>
-		                    		${productInstance?.name }
-		                    	</g:else>
-		                    </span>							
-	                    </div>
-	                   
+                        <div class="product-generic fade" style="text-transform:uppercase; line-height: 20px;">
+                            <g:if test="${productInstance?.productGroups }">
+                                ${productInstance?.productGroups?.sort().first()}
+                            </g:if>
+                            <g:else>
+                                ${productInstance?.name }
+                            </g:else>
+                        </div>
+                        <div id="product-tags">
+                            <g:each var="tag" in="${productInstance?.tags }">
+                                <g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
+                                    <span class="tag">${tag.tag }</span>
+                                </g:link>
+                            </g:each>
+                        </div>
+
         			</div>
-                    <div id="product-tags" style="float: left; margin-left: 50px;">
-                        <g:each var="tag" in="${productInstance?.tags }">
-                            <g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
-                                <span class="tag">${tag.tag }</span>
-                            </g:link>
-                        </g:each>
-                    </div>
-                    <div class="clear"></div>
         		</td>
 				<td class="right">
         			<div id="product-status" class="title">
