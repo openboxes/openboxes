@@ -59,10 +59,10 @@
 
 
                     <div class="box">
-                        <div class="right">
-                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">Download .csv</g:link>
-                        </div>
                         <h2>
+                            <div style="position:absolute;top:5px;right:5px">
+                                <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
+                            </div>
                             <warehouse:message code="${controllerName}.${actionName}.label"/> -
                             <warehouse:message code="default.showing.message" args="[quantityMap?.keySet()?.size()]"/>
                         </h2>
