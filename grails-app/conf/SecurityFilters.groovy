@@ -15,8 +15,8 @@ import org.pih.warehouse.core.User
 class SecurityFilters {
 	
   static ArrayList controllersWithAuthUserNotRequired = ['test']
-  static ArrayList actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
-  static ArrayList actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
+  static ArrayList actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
+  static ArrayList actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
 	def authService 
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
