@@ -797,42 +797,14 @@ class InventoryController {
 
     def exportLatestInventoryDate = {
         println params
-        //def productIds = params.list('product.id')
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getTotalStock(location);
-        def statusMap = inventoryService.getInventoryStatus(location)
-        def products = quantityMap.keySet()
 
-        def latestInventoryDates = TransactionEntry.executeQuery("""
-                select ii.product.id, max(t.transactionDate)
-                from TransactionEntry as te
-                left join te.inventoryItem as ii
-                left join te.transaction as t
-                where t.inventory = :inventory
-                and t.transactionType.transactionCode in (:transactionCodes)
-                group by ii.product
-                """,
-                [inventory: location.inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]])
-
-
-        // Convert to map
-        def latestInventoryDateMap = [:]
-        latestInventoryDates.each {
-            latestInventoryDateMap[it[0]] = it[1]
-        }
-
-        def binLocationMap = [:]
-        def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
-        inventoryLevels.each { inventoryLevel ->
-            binLocationMap[inventoryLevel.product] = inventoryLevel.binLocation
-        }
-
-        if (products) {
+        if (location) {
             def date = new Date();
             response.setHeader("Content-disposition",
                     "attachment; filename='MostRecentStockCount-${date.format("yyyyMMdd-hhmmss")}.csv'")
             response.contentType = "text/csv"
-            render productService.exportLatestInventoryDate(products, latestInventoryDateMap, binLocationMap)
+            render inventoryService.exportLatestInventoryDate(location)
         }
         else {
             //render(text: 'No products found', status: 404)
