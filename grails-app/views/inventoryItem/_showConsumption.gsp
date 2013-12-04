@@ -1,5 +1,6 @@
-<div id="consumption">
-    <table class="box" id="data">
+<div id="consumption" class="box">
+    <h2><warehouse:message code="stockCard.consumption.label" default="Consumption"/></h2>
+    <table id="data">
         <thead>
             <tr class="header odd">
                 <th><warehouse:message code="requisition.monthRequested.label" default="Month requested"/></th>
