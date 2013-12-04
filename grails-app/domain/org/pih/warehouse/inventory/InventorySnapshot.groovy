@@ -19,6 +19,7 @@ class InventorySnapshot implements java.io.Serializable {
 	String id
 	
     // Core data elements
+    Date date
     Location location
     Product product
 	InventoryItem inventoryItem
