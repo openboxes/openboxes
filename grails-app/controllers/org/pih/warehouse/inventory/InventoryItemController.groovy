@@ -159,6 +159,17 @@ class InventoryItemController {
         [ commandInstance: commandInstance, quantityMap: quantityMap ]
 	}
 
+    def showCurrentStockAllLocations = { StockCardCommand cmd ->
+        long currentTime = System.currentTimeMillis()
+        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+        // add the current warehouse to the command object
+        cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+        def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.productInstance)
+        render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap])
+    }
+
+
     def showStockHistory = { StockCardCommand cmd ->
         long currentTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"

@@ -1,5 +1,6 @@
-<div id="consumption">
-    <table class="box" id="data">
+<div id="consumption" class="box">
+    <h2><warehouse:message code="stockCard.consumption.label" default="Consumption"/></h2>
+    <table id="data">
         <thead>
             <tr class="header odd">
                 <th><warehouse:message code="requisition.monthRequested.label" default="Month requested"/></th>
@@ -17,11 +18,7 @@
             </tr>
         </thead>
         <tbody>
-
-
-
             <g:each var="entry" in="${issuedRequisitionItems.groupBy { it.requisition.monthRequested } }" status="i">
-
                 <g:set var="monthlyQuantityRequested" value="${entry?.value?.collect { it?.quantity?:0 }?.sum()?:0 }"/>
                 <g:set var="monthlyQuantityCanceled" value="${entry?.value?.collect { it?.quantityCanceled?:0 }?.sum()?:0 }"/>
                 <g:set var="monthlyQuantityIssued" value="${monthlyQuantityRequested - monthlyQuantityCanceled}"/>

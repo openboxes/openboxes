@@ -40,10 +40,10 @@
                     .selected-row { background-color: lightyellow; }
                     </style>
                     <tr class="${styleClass} prop">
-                        <td class="top" style="text-align: left; width: 10%" nowrap="nowrap">
+                        <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
                             <g:render template="actionsCurrentStock" model="[itemInstance:itemInstance,itemQuantity:itemQuantity]" />
                         </td>
-                        <td class="top">
+                        <td class="middle">
 
                             <span class="lotNumber">
                                 ${itemInstance?.lotNumber ?: '<span class="fade"><warehouse:message code="default.none.label"/></span>' }
@@ -51,7 +51,7 @@
                             <g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
                             </g:link>
                         </td>
-                        <td class="top">
+                        <td class="middle">
                             <g:if test="${itemInstance?.expirationDate}">
                                 <format:expirationDate obj="${itemInstance?.expirationDate}"/>
                             </g:if>
@@ -59,7 +59,7 @@
                                 <span class="fade"><warehouse:message code="default.never.label"/></span>
                             </g:else>
                         </td>
-                        <td class="top center">
+                        <td class="middle center">
                             <g:set var="styleClass" value=""/>
                             <g:if test="${itemQuantity<0}">
                                 <g:set var="styleClass" value="color: red;"/>
@@ -131,58 +131,6 @@
                 </g:hasErrors>
             </tr>
         </tfoot>
-    </table>
-</div>
-
-<div class="box">
-    <h2><warehouse:message code="inventory.currentStockEverywhere.label" default="Current stock everywhere"/></h2>
-    <table>
-        <thead>
-            <tr>
-                <th>${warehouse.message(code:'locationGroup.label')}</th>
-                <th>${warehouse.message(code:'location.label')}</th>
-                <th>${warehouse.message(code:'location.locationType.label')}</th>
-                <th>${warehouse.message(code:'default.quantity.label')}</th>
-            </tr>
-        </thead>
-        <g:if test="${quantityMap}">
-            <tbody>
-                <g:each in="${quantityMap}" var="entry" status="i">
-                    <tr class="prop ${i%2?'even':'odd'} ${entry?.key?.isWarehouse()?'':'canceled'}">
-                        <td>
-                            ${entry?.key?.locationGroup?.name}
-                        </td>
-                        <td>
-                            ${entry?.key}
-                        </td>
-                        <td>
-                            <format:metadata obj="${entry?.key?.locationType?.name}"/>
-                        </td>
-                        <td>
-                            ${entry.value} ${commandInstance?.productInstance?.unitOfMeasure}
-                        </td>
-                    </tr>
-                </g:each>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="4">
-                        <div class="fade">*Cannot guarantee quantities at locations that are not managed inventories (like Wards and Pharmacies).</div>
-
-                    </th>
-                </tr>
-            </tfoot>
-        </g:if>
-        <g:unless test="${quantityMap}">
-            <tr>
-                <td colspan="4">
-                    <div class="empty center fade">
-                        <warehouse:message code="inventory.quantityOnHand.unavailable.label" default="No quantity on hand at any locations."/>
-                    </div>
-                </td>
-
-            </tr>
-        </g:unless>
     </table>
 </div>
 
