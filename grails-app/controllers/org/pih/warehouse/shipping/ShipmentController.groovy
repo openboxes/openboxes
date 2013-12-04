@@ -441,31 +441,32 @@ class ShipmentController {
      * @param recipients
      */
     void triggerReceiveShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
-        if (!recipients) recipients = new HashSet<Person>()
+        if (!userInstance) userInstance = User.get(session.user.id)
+        if (!shipmentInstance.hasErrors()) {
+            if (!recipients) recipients = new HashSet<Person>()
 
-        // Add all admins to the email
-        def adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
-        adminList.each { adminUser ->
-            if (adminUser?.email) {
+            // add all admins to the email
+            def adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
+            adminList.each { adminUser ->
                 recipients.add(adminUser);
             }
-        }
 
-        // add the current user to the list of email recipients
-        if (userInstance) {
-            recipients.add(userInstance)
-        }
+            // add the current user to the list of email recipients
+            if (userInstance?.email) {
+                recipients.add(userInstance)
+            }
 
-        if (!shipmentInstance.hasErrors()) {
+            // add all shipment recipients
+            shipmentInstance?.recipients?.each { recipient ->
+                recipients.add(recipient)
+            }
 
-            if (!userInstance) userInstance = User.get(session.user.id)
             def shipmentName = "${shipmentInstance.name}"
             def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
             def shipmentDate = "${formatDate(date:shipmentInstance?.actualDeliveryDate, format: 'MMMMM dd yyyy')}"
             def subject = "${warehouse.message(code:'shipment.hasBeenReceived.message',args:[shipmentType, shipmentName, shipmentDate])}"
             def body = g.render(template:"/email/shipmentReceived", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
-            //def toList = recipients?.collect { it?.email }?.unique()
-            def toList = ["jmiranda@pih.org"]
+            def toList = recipients?.collect { it?.email }?.unique()
             log.info("Mailing shipment emails to ${toList} with body:\n" + body)
 
             try {

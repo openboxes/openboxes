@@ -51,18 +51,6 @@
                                 ${shipmentInstance?.destination?.name }
                             </td>
                         </tr>
-                        <tr class="prop">
-                            <td class="name middle"  style="width: 10%;">
-                                <label><warehouse:message code="shipping.recipients.label" default="Recipients" /></label>
-                            </td>
-                            <td class="value" style="width: 30%;">
-                                <ul>
-                                    <g:each var="recipient" in="${shipmentInstance?.recipients}">
-                                        <li>${recipient}</li>
-                                    </g:each>
-                                </ul>
-                            </td>
-                        </tr>
 
                         <tr class="prop">
                             <td valign="middle" class="name middle">
