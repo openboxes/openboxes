@@ -101,7 +101,7 @@ input:focus, select:focus, textarea:focus {
 
 .body {
     /*float: left;*/
-    margin: 0px 5px 0px 0px;
+    margin: 0px 0px 0px 0px;
 }
 
 /* NAVIGATION MENU */
@@ -1124,7 +1124,7 @@ button.action-btn, button.previous, button.next {
     border-bottom: 1px solid #aaa;
 }
 .summary-actions {
-    padding: 10px;
+    padding: 1px;
 
 }
 
