@@ -12,9 +12,29 @@
 						</td>
 					</tr>
 				</g:if>
+                <tr class="prop">
+                    <td class="name">
+                        <label>
+                            <warehouse:message code="package.uom.label"/>
+                        </label>
+                    </td>
+                    <td class="value middle">
+                        <div class="middle">
+                            1
+                            <g:select name="uom.id"
+                                      from="${org.pih.warehouse.core.UnitOfMeasure.list() }"
+                                      value="${packageInstance?.uom?.id }"
+                                      optionKey="id" optionValue="name"
+                                      noSelection="['null':'']"></g:select>
+                            =
+                            <g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
+                            ${productInstance?.unitOfMeasure?:warehouse.message(code: 'default.each.label') }
+                        </div>
+                    </td>
+                </tr>
 				<tr class="prop">
 					<td valign="top" class="name">
-					    <label for="name">Name on package</label>
+					    <label for="name">${warehouse.message(code:'default.name.label')}</label>
 					</td>
 					<td valign="top" class="value ">
 						<g:textField name="name" size="60" class="medium text" value="${packageInstance?.name }" />
@@ -28,39 +48,25 @@
 						</label>
 					</td>
 					<td class="value">
-						<g:textField name="gtin" value="${packageInstance?.gtin }" class="medium text"/>
+						<g:textField name="gtin" value="${packageInstance?.gtin }" size="60" class="medium text"/>
 					</td>
 				</tr>		
-				<%-- 
-				<tr class="prop">
-					<td class="name">
-						<label>
-							<warehouse:message code="package.quantity.label"/>
-						</label>
-					</td>
-					<td class="value">
-						<g:textField name="quantity" value="${packageInstance?.quantity }" size="5" class="medium text"/>
-					</td>
-				</tr>
-				--%>	
-				<tr class="prop">
-					<td class="name">
-						<label>
-							<warehouse:message code="package.uom.label"/>
-						</label>
-					</td>
-					<td class="value middle">
-						<div class="middle">
-							1 
-							<g:select name="uom.id" from="${org.pih.warehouse.core.UnitOfMeasure.list() }" 
-								value="${packageInstance?.uom?.id }"
-								optionValue="name" optionKey="id" noSelection="['null':'']"></g:select>
-							= 
-							<g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
-							${productInstance?.unitOfMeasure?:warehouse.message(code: 'default.each.label') }	
-						</div>
-					</td>
-				</tr>		
+
+
+                <tr class="prop">
+                    <td class="name">
+                        <label>
+                            <warehouse:message code="package.price.label"/>
+                        </label>
+                    </td>
+                    <td class="value">
+                        <div class="middle">
+                            <g:textField name="price" value="${packageInstance?.price }" size="10" class="medium text"/>
+                            ${warehouse.message(code:'default.currency.usd.label', default:'USD')}
+                        </div>
+                    </td>
+                </tr>
+
 				<%-- 										
 				<tr class="prop">
 					<td class="name">
@@ -88,6 +94,7 @@
 																								
 			</tbody>
 		</table>
+        <hr/>
 		<div class="buttons">
 			<button type="submit" class="button icon approve"> 
 				${warehouse.message(code: 'default.button.save.label', default: 'Save')}
