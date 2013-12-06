@@ -17,10 +17,14 @@
             font-size: 11px;
         }
         .header {
-            padding: 0px;
+            padding: 5px;
             margin: 0px;
             background-color: #${session.warehouse.bgColor};
             color: #${session.warehouse.fgColor};
+        }
+        .header a {
+            color: #${session.warehouse.fgColor};
+            text-decoration: none;
         }
 
         .box {
@@ -118,11 +122,13 @@
 
         .prop .name {
             text-align: left;
+            vertical-align: middle;
             width: 25%;
             /*white-space: nowrap;*/ /* it makes the sidebar tables look really bad */
         }
         .prop .value {
             text-align: left;
+            vertical-align: middle;
             width: 75%;
         }
 
@@ -195,10 +201,14 @@
             padding: 0;
             border: 0;
         }
-
-        div.left { float: left; width: 49%; }
-        div.right { float: right; width: 49%; }
+        .middle { vertical-align: middle; }
+        .top { vertical-align: top; }
+        .bottom { vertical-align: bottom; }
+        div.left { float: left; width: 48%; }
+        div.right { float: right; width: 48%; }
         div.clear { clear: both; }
+        .fade { color: #666; }
+        blockquote { margin: 5px 5px 5px 20px; }
 
     </style>
 </head>

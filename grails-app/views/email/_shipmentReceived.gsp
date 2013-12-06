@@ -19,52 +19,80 @@
     <table class="details stripe">
         <tbody>
         <tr class="prop">
-            <td><label>${warehouse.message(code: 'shipping.origin.label') }</label></td>
+            <td class="name"><label>${warehouse.message(code: 'shipping.origin.label') }</label></td>
             <td>${shipmentInstance?.origin?.name }</td>
         </tr>
         <tr class="prop">
-            <td>
+            <td class="name">
                 <label>${warehouse.message(code: 'shipping.destination.label') }</label>
             </td>
-            <td>
+            <td class="value">
                 ${shipmentInstance?.destination?.name }
             </td>
         </tr>
         <tr class="prop">
-            <td>
-                <label>${warehouse.message(code: 'shipping.shippingDate.label') }</label>
+            <td class="name">
+                <label>${warehouse.message(code: 'shipping.expectedShippingDate.label') }</label>
             </td>
-            <td>
-                <g:formatDate date="${shipmentInstance?.actualShippingDate }" format="dd MMM yyyy"/>
-            </td>
-        </tr>
-        <tr class="prop">
-            <td>
-                <label>${warehouse.message(code: 'shipping.expectedDeliveryDate.label') }</label>
-            </td>
-            <td>
-                <g:formatDate date="${shipmentInstance?.expectedDeliveryDate }" format="dd MMM yyyy"/>
+            <td class="value">
+                <g:if test="${shipmentInstance?.expectedShippingDate}">
+                    <g:formatDate date="${shipmentInstance?.expectedShippingDate }" format="d MMM yyyy"/>
+                </g:if>
+                <g:else>
+                    <span class="fade"><warehouse:message code="default.notAvailable.label"/></span>
+                </g:else>
             </td>
         </tr>
         <tr class="prop">
-            <td>
-                <label>${warehouse.message(code: 'shipping.actualDeliveryDate.label') }</label>
+            <td class="name">
+                <label>${warehouse.message(code: 'shipping.actualShippingDate.label') }</label>
             </td>
-            <td>
-                <g:formatDate date="${shipmentInstance?.actualDeliveryDate }" format="dd MMM yyyy"/>
+            <td class="value">
+                <g:if test="${shipmentInstance?.actualShippingDate}">
+                    <g:formatDate date="${shipmentInstance?.actualShippingDate }" format="d MMM yyyy"/>
+                </g:if>
+                <g:else>
+                    <span class="fade"><warehouse:message code="default.notAvailable.label"/></span>
+                </g:else>
             </td>
         </tr>
 
+        <tr class="prop">
+            <td class="name">
+                <label>${warehouse.message(code: 'shipping.expectedDeliveryDate.label') }</label>
+            </td>
+            <td class="value">
+                <g:if test="${shipmentInstance?.expectedDeliveryDate}">
+                    <g:formatDate date="${shipmentInstance?.expectedDeliveryDate }" format="d MMM yyyy"/>
+                </g:if>
+                <g:else>
+                    <span class="fade"><warehouse:message code="default.notAvailable.label"/></span>
+                </g:else>
+            </td>
+        </tr>
+        <tr class="prop">
+            <td class="name">
+                <label>${warehouse.message(code: 'shipping.actualDeliveryDate.label') }</label>
+            </td>
+            <td class="value">
+                <g:if test="${shipmentInstance?.actualDeliveryDate}">
+                    <g:formatDate date="${shipmentInstance?.actualDeliveryDate }" format="d MMM yyyy"/>
+                </g:if>
+                <g:else>
+                    <span class="fade"><warehouse:message code="default.notAvailable.label"/></span>
+                </g:else>
+            </td>
+        </tr>
 
         <g:if test="${shipmentInstance?.referenceNumbers }">
             <g:each var="referenceNumber" in="${shipmentInstance?.referenceNumbers}" status="i">
                 <tr class="prop">
-                    <td valign="top" class="name">
+                    <td valign="middle" class="name">
                         <label>
                             <format:metadata obj="${referenceNumber?.referenceNumberType}"/>
                         </label>
                     </td>
-                    <td valign="top" class="value">
+                    <td valign="middle" class="value">
                         ${referenceNumber?.identifier }
                     </td>
                 </tr>
@@ -72,10 +100,10 @@
         </g:if>
         <g:if test="${userInstance}">
             <tr class="prop">
-                <td>
+                <td class="name">
                     <label>${warehouse.message(code: 'shipping.preparedBy.label') }</label>
                 </td>
-                <td>
+                <td class="value">
                     ${userInstance?.name }
                     <a href="mailto:${userInstance?.email }">${userInstance?.email }</a>
                 </td>
@@ -83,12 +111,22 @@
         </g:if>
         <g:if test="${shipmentInstance?.carrier}">
             <tr class="prop">
-                <td>
+                <td class="name">
                     <label>${warehouse.message(code: 'shipping.carriedBy.label') }</label>
                 </td>
-                <td>
+                <td class="value">
                     ${shipmentInstance?.carrier?.name }
                     <a href="mailto:${shipmentInstance?.carrier?.email }">${shipmentInstance?.carrier?.email }</a>
+                </td>
+            </tr>
+        </g:if>
+        <g:if test="${shipmentInstance?.additionalInformation}">
+            <tr class="prop">
+                <td class="name">
+                    <label>${warehouse.message(code: 'shipping.additionalInformation.label') }</label>
+                </td>
+                <td class="value">
+                    ${shipmentInstance?.additionalInformation}
                 </td>
             </tr>
         </g:if>
@@ -105,20 +143,17 @@
             <th><warehouse:message code="default.time.label"/></th>
             <th><warehouse:message code="default.event.label"/></th>
             <th><warehouse:message code="location.label"/></th>
-            <th></th>
         </tr>
-
         </thead>
         <tbody>
-
         <g:set var="i" value="${0 }"/>
         <g:each in="${shipmentInstance.events}" var="event">
             <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
                 <td>
-                    <g:formatDate date="${event.eventDate}" format="MMMMM dd, yyyy"/>
+                    <g:formatDate date="${event.eventDate}" format="MMM d, yyyy"/>
                 </td>
                 <td>
-                    <g:formatDate date="${event.eventDate}" format="hh:mm a"/>
+                    <g:formatDate date="${event.eventDate}" format="hh:mma"/>
                 </td>
 
                 <td>
@@ -127,24 +162,14 @@
                 <td>
                     ${event?.eventLocation?.name}
                 </td>
-                <td style="text-align: right">
-                    <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.SHIPPED }">
-
-                    </g:if>
-                    <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.RECEIVED }">
-
-                    </g:if>
-
-
-                </td>
             </tr>
         </g:each>
         <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
             <td>
-                <g:formatDate date="${shipmentInstance?.dateCreated}" format="MMMMM dd, yyyy"/>
+                <g:formatDate date="${shipmentInstance?.dateCreated}" format="MMM d, yyyy"/>
             </td>
             <td>
-                <g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mm a"/>
+                <g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mma"/>
             </td>
             <td>
                 <warehouse:message code="default.created.label"/>
@@ -152,14 +177,28 @@
             <td>
                 ${shipmentInstance?.origin?.name}
             </td>
-            <td style="text-align: right">
-
-            </td>
         </tr>
-
         </tbody>
     </table>
 </div>
+
+<div class="box right">
+    <h2>${warehouse.message(code:'shipment.comments.label', default: 'Comments') }</h2>
+    <table class='stripe'>
+        <tbody>
+        <g:each var="comment" in="${shipmentInstance?.comments}">
+            <tr>
+                <td>
+                    ${comment?.sender?.name} · <g:formatDate date="${comment?.dateCreated}" format="MMM d hh:mma"/>
+
+                    <blockquote class="fade">${comment.comment}</blockquote>
+                </td>
+            </tr>
+        </g:each>
+        </tbody>
+    </table>
+</div>
+
 <div class="clear"></div>
 
 
@@ -248,7 +287,9 @@
                         </g:else>
                     </td>
                     <td class="left">
+                        <g:if test="${shimentItem?.receiptItems()}">
                         ${shipmentItem?.receiptItems()?.first()?.comment}
+                        </g:if>
                     </td>
                 </tr>
             </g:each>
