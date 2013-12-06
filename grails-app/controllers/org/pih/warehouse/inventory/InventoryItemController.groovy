@@ -360,6 +360,11 @@ class InventoryItemController {
 		
 	//	def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
 
+        println "commandInstance.recordInventoryRows: "
+        cmd?.recordInventoryRows.each {
+           println "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
+        }
+
 		render(view: "showRecordInventory", model: [ commandInstance : cmd ])
 	}
 

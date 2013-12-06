@@ -64,9 +64,9 @@
 						</tr>											
 					</thead>									
 					<tbody>												
-						<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
+						<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows?.findAll { it?.oldQuantity != 0 || it?.newQuantity != 0}}"/>
 						<g:if test="${inventoryItems }">											
-							<g:each var="recordInventoryRow" in="${inventoryItems?.sort { it.expirationDate }?.sort { it.lotNumber } }" status="status">
+							<g:each var="recordInventoryRow" in="${inventoryItems?.sort { it?.expirationDate }?.sort { it?.lotNumber } }" status="status">
 								<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
 								<tr class="${styleClass} ${status%2==0?'odd':'even'}">
 									<td>
@@ -153,14 +153,14 @@
 	var inventory = { InventoryItems: [] };	
 
 	// We need to do this in order to make sure the index for new items is correct
-	<g:each var="row" in="${commandInstance?.recordInventoryRows}" status="status">
+	<g:each var="row" in="${commandInstance?.recordInventoryRows?.findAll { it?.oldQuantity != 0 || it?.newQuantity != 0}}" status="status">
 		var existingInventoryItem = { 
-				Id: '${row.id}', 
+				Id: '${row?.id}',
 				Type: '', 
 				ProductId: '', 
 				UnitOfMeasure: '${commandInstance?.productInstance?.unitOfMeasure?:"EA"}',
-				LotNumber: '${row.lotNumber}', 
-				ExpirationDate: '${row.expirationDate?:warehouse.message(code: 'default.never.label')}', 
+				LotNumber: '${row?.lotNumber}',
+				ExpirationDate: '${row?.expirationDate?:warehouse.message(code: 'default.never.label')}',
 				Qty: 0 
 			};	
 		inventory.InventoryItems.push(existingInventoryItem);

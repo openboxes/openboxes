@@ -1666,7 +1666,7 @@ class InventoryService implements ApplicationContextAware {
 
 		try {
 			// Validation was done during bind, but let's do this just in case
-			if (cmd.validate()) {
+			//if (cmd.validate()) {
 				def inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
 				// Create a new transaction
 				def transaction = new Transaction(cmd.properties)
@@ -1736,7 +1736,7 @@ class InventoryService implements ApplicationContextAware {
 						}
 					}
 				}
-			}
+			//}
 		} catch (Exception e) {
 			log.error("Error saving an inventory record to the database ", e);
 			throw e;
