@@ -61,7 +61,7 @@
 							</td>
 							<td class="top">
 		 						<div>${activity.label }</div>
-                                 <span class='fade'>${format.date(obj:activity.lastUpdated,format:'MMMMM dd hh:mm a')}</span>
+                                 <span class='fade'>${format.date(obj:activity.lastUpdated,format:'MMM d hh:mma')}</span>
                              </td>
 		 				</tr>
 		 			</g:each>

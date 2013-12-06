@@ -1,8 +1,6 @@
-<div class="widget-large">
-	<div class="widget-header">
-		<h2><warehouse:message code="dashboard.indicators.label" default="KPIs"/></h2>
-	</div>	    			
-	<div class="widget-content" style="padding:0; margin:0">	    					    			
+<div class="box">
+    <h2><warehouse:message code="dashboard.indicators.label" default="KPIs"/></h2>
+	<div class="widget-content" style="padding:0; margin:0">
 		<div id="indicatorSummary">
 
     		<table>

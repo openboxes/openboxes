@@ -8,7 +8,6 @@
 			<warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/>
 		</title>
         <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
-        <link rel="stylesheet" href="${resource(dir:'css',file:'footable.extra.css')}" type="text/css" media="all" />
 
     </head>
 	<body>

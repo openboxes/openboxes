@@ -54,10 +54,10 @@
 								<g:each in="${shipmentInstance.events}" var="event">
 									<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
 										<td>																			
-											<g:formatDate date="${event.eventDate}" format="MMMMM dd, yyyy"/> 																			
+											<g:formatDate date="${event.eventDate}" format="MMM d, yyyy"/>
 										</td>
 										<td>
-											<g:formatDate date="${event.eventDate}" format="hh:mm a"/>
+											<g:formatDate date="${event.eventDate}" format="hh:mma"/>
 										</td>											
 										
 										<td>																
@@ -82,10 +82,10 @@
 								</g:each>
 								<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
 									<td>																			
-										<g:formatDate date="${shipmentInstance?.dateCreated}" format="MMMMM dd, yyyy"/>																		
+										<g:formatDate date="${shipmentInstance?.dateCreated}" format="MMM d, yyyy"/>
 									</td>
 									<td>
-										<g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mm a"/>
+										<g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mma"/>
 									</td>
 									<td>																
 										<warehouse:message code="default.created.label"/>
@@ -122,10 +122,10 @@
                                 <g:each var="transaction" in="${shipmentInstance?.incomingTransactions}">
                                     <tr class="${i++ % 2 ? 'even' : 'odd' }">
                                         <td>
-                                            <g:formatDate date="${transaction?.transactionDate}" format="MMMMM dd, yyyy"/>
+                                            <g:formatDate date="${transaction?.transactionDate}" format="MMM d, yyyy"/>
                                         </td>
                                         <td>
-                                            <g:formatDate date="${transaction?.transactionDate}" format="hh:mm a"/>
+                                            <g:formatDate date="${transaction?.transactionDate}" format="hh:mma"/>
                                             <%--<format:datetime obj="${transaction?.transactionDate }"/> --%>
                                         </td>
                                         <td>
@@ -143,10 +143,10 @@
                                 <g:each var="transaction" in="${shipmentInstance?.outgoingTransactions}">
                                     <tr class="${i++ % 2 ? 'even' : 'odd' }">
                                         <td>
-                                            <g:formatDate date="${transaction?.transactionDate}" format="MMMMM dd, yyyy"/>
+                                            <g:formatDate date="${transaction?.transactionDate}" format="MMM d, yyyy"/>
                                         </td>
                                         <td>
-                                            <g:formatDate date="${transaction?.transactionDate}" format="hh:mm a"/>
+                                            <g:formatDate date="${transaction?.transactionDate}" format="hh:mma"/>
                                             <%--<format:datetime obj="${transaction?.transactionDate }"/>--%>
                                         </td>
                                         <td>
@@ -608,7 +608,7 @@
                         <g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation') && shipmentInstance?.additionalInformation}">
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label><warehouse:message code="default.additionalInformation.label" /></label><br/>
+                                    <label><warehouse:message code="shipping.additionalInformation.label" default="Additional information" /></label><br/>
                                 </td>
                                 <td valign="top" class="value">
                                     <g:if test="${shipmentInstance.additionalInformation}">

@@ -59,7 +59,7 @@
                 <label><warehouse:message code="requisition.date.label"/>:</label>
             </td>
             <td class="right">
-                <g:formatDate date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
+                <g:formatDate date="${requisition?.dateRequested}" format="d MMM yyyy  hh:mma"/>
             </td>
         </tr>
         <tr>
@@ -67,7 +67,7 @@
                 <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
             </td>
             <td class="right">
-                <g:formatDate date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
+                <g:formatDate date="${new Date()}" format="d MMM yyyy hh:mma"/>
             </td>
         </tr>
 
@@ -172,7 +172,7 @@
                     <label><warehouse:message code="requisition.date.label"/>:</label>
                 </td>
                 <td class="right">
-                    <g:formatDate date="${requisition?.dateRequested}" format="MMMMM dd, yyyy  hh:mm a"/>
+                    <g:formatDate date="${requisition?.dateRequested}" format="MMM d, yyyy  hh:mma"/>
                 </td>
             </tr>
             <tr>
@@ -180,7 +180,7 @@
                     <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
                 </td>
                 <td class="right">
-                    <g:formatDate date="${new Date()}" format="MMMMM dd, yyyy hh:mm a"/>
+                    <g:formatDate date="${new Date()}" format="MMM d, yyyy hh:mma"/>
                 </td>
             </tr>
 
