@@ -2,6 +2,7 @@
 .settings
 *.iml
 *.iws
+*.sql
 *Db.properties
 *Db.script
 /plugins
