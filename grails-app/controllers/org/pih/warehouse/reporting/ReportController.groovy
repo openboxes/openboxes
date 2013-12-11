@@ -24,11 +24,19 @@ class ReportController {
 
     def showInventorySamplingReport = {
 
-        def howMany = (params.n?:10).toInteger()
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = inventoryService.getInventorySampling(location, howMany);
-
         def sw = new StringWriter()
+        def count = (params.n?:10).toInteger()
+        def location = Location.get(session.warehouse.id)
+        def inventoryItems = []
+
+        try {
+            inventoryItems = inventoryService.getInventorySampling(location, count);
+        } catch (RuntimeException e) {
+            log.error (e.message)
+            sw.append(e.message)
+        }
+
+
         if (inventoryItems) {
 
             println inventoryItems

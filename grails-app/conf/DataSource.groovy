@@ -51,7 +51,7 @@ environments {
 	test {
 		dataSource {			
 			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-        }
+        	}
 	}
 	loadtest {
 		dataSource {			
