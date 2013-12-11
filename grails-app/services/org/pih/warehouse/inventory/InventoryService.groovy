@@ -1226,6 +1226,9 @@ class InventoryService implements ApplicationContextAware {
 	 *
 	 * Note that the transaction entries should all be from the same inventory,
 	 * or the quantity results would be somewhat nonsensical
+     *
+     * Also note that this method is calculating backwards to get the current quantity on hand gor the given product
+     * and its inventory items.
 	 *
 	 * TODO: add a parameter here to optionally take in a product, which means that we are only
 	 * calculation for a single product, which means that we can stop after we hit a product inventory transaction?
@@ -1239,32 +1242,43 @@ class InventoryService implements ApplicationContextAware {
         def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
         def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
 
-        // first make sure the transaction entries are sorted, with most recent first
+
         if (entries) {
 
+            // first make sure the transaction entries are sorted, with most recent first
             entries = entries.sort().reverse()
 
             entries.each { transactionEntry ->
 
                 // There are cases where the transaction entry might be null, so we need to check for this edge case
                 if (transactionEntry) {
+
+
                     def inventoryItem = transactionEntry.inventoryItem
-                    //def product = inventoryItem.product
+                    def product = inventoryItem.product
                     def transaction = transactionEntry.transaction
+
+                    //boolean hasReachedInventoryTransaction = false
+                    //boolean hasReachedProductInventoryTransaction = false
 
                     // first see if this is an entry we can skip (because we've already reached a product inventory transaction
                     // for this product, or a inventory transaction for this inventory item)
-                    if (!(reachedProductInventoryTransaction[inventoryItem.product] && reachedProductInventoryTransaction[inventoryItem.product] != transaction) &&
-                            !(reachedInventoryTransaction[inventoryItem.product] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] && reachedInventoryTransaction[inventoryItem.product][inventoryItem] != transaction)) {
 
+                    //hasReachedInventoryTransaction = reachedInventoryTransaction[product][inventoryItem]
+
+                    if (!(reachedProductInventoryTransaction[product] && reachedProductInventoryTransaction[product] != transaction) &&
+                            !(reachedInventoryTransaction[product] && reachedInventoryTransaction[product][inventoryItem]
+                                    && reachedInventoryTransaction[product][inventoryItem] != transaction)) {
+
+                        println "PROCESS ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
                         // check to see if there's an entry in the map for this product and create if needed
-                        if (!quantityMap[inventoryItem.product]) {
-                            quantityMap[inventoryItem.product] = [:]
+                        if (!quantityMap[product]) {
+                            quantityMap[product] = [:]
                         }
 
                         // check to see if there's an entry for this inventory item in the map and create if needed
-                        if (!quantityMap[inventoryItem.product][inventoryItem]) {
-                            quantityMap[inventoryItem.product][inventoryItem] = 0
+                        if (!quantityMap[product][inventoryItem]) {
+                            quantityMap[product][inventoryItem] = 0
                         }
 
                         //println "Transaction entry " + transactionEntry.id
@@ -1273,26 +1287,33 @@ class InventoryService implements ApplicationContextAware {
                         def code = transactionEntry.transaction.transactionType.transactionCode
 
                         if (code == TransactionCode.CREDIT) {
-                            quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
+                            quantityMap[product][inventoryItem] += transactionEntry.quantity
                         }
-                        if (code == TransactionCode.DEBIT) {
-                            quantityMap[inventoryItem.product][inventoryItem] -= transactionEntry.quantity
+                        else if (code == TransactionCode.DEBIT) {
+                            quantityMap[product][inventoryItem] -= transactionEntry.quantity
                         }
-                        if (code == TransactionCode.INVENTORY) {
-                            quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
+                        else if (code == TransactionCode.INVENTORY) {
+                            quantityMap[product][inventoryItem] += transactionEntry.quantity
 
                             // mark that we are done with this inventory item (after this transaction)
-                            if (!reachedInventoryTransaction[inventoryItem.product]) {
-                                reachedInventoryTransaction[inventoryItem.product] = [:]
+                            if (!reachedInventoryTransaction[product]) {
+                                reachedInventoryTransaction[product] = [:]
                             }
-                            reachedInventoryTransaction[inventoryItem.product][inventoryItem] = transaction
+                            reachedInventoryTransaction[product][inventoryItem] = transaction
                         }
-                        if (code == TransactionCode.PRODUCT_INVENTORY) {
-                            quantityMap[inventoryItem.product][inventoryItem] += transactionEntry.quantity
+                        else if (code == TransactionCode.PRODUCT_INVENTORY) {
+                            quantityMap[product][inventoryItem] += transactionEntry.quantity
 
                             // mark that we are done with this product (after this transaction)
                             reachedProductInventoryTransaction[inventoryItem.product] = transaction
                         }
+                        else {
+                            throw new RuntimeException("Transaction code ${code} is not valid")
+                        }
+                    }
+                    else {
+                        println "IGNORE  ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
+
                     }
                 }
             }
@@ -1524,12 +1545,11 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(inventory, inventoryItem)
 		def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
 
-		// inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
-		//log.debug "inventoryItem -> " + inventoryItem.class
-
 		// FIXME was running into an issue where a proxy object was being used to represent the inventory item
 		// so the map.get() method was returning null.  So we needed to fully load the inventory item using
 		// the GORM get method.
+        // inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
+        //log.debug "inventoryItem -> " + inventoryItem.class
 		inventoryItem = InventoryItem.get(inventoryItem.id)
 		Integer quantity = quantityMap[inventoryItem]
 		return quantity ?: 0;
@@ -2025,12 +2045,11 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param inventory
 	 */
-	List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem inventoryItem) {
+	List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem item) {
 		return TransactionEntry.createCriteria().list() {
-			and {
-				eq("inventoryItem", inventoryItem)
-				transaction { eq("inventory", inventory) }
-			}
+            inventoryItem { eq("product", item?.product) }
+            //eq("inventoryItem", inventoryItem)
+            transaction { eq("inventory", inventory) }
 		}
 	}
 

@@ -105,36 +105,30 @@ class InventoryServiceTests extends GroovyTestCase {
     private void transactionEntryTestFixture() {
 
         basicTestFixture()
-        // create some transactions
-        transaction1 = new Transaction(transactionType: transactionType_inventory,
-                transactionDate: new Date() - 5, inventory: bostonInventory)
-        transaction2 = new Transaction(transactionType: transactionType_consumptionDebit,
-                transactionDate: new Date() - 4, inventory: bostonInventory)
-        transaction3 = new Transaction(transactionType: transactionType_productInventory,
-                transactionDate: new Date() - 3, inventory: bostonInventory)
-        transaction4 = new Transaction(transactionType: transactionType_transferIn,
-                transactionDate: new Date() - 2, inventory: bostonInventory, source: haitiLocation)
-        transaction5 = new Transaction(transactionType: transactionType_consumptionDebit,
-                transactionDate: new Date() - 1, inventory: bostonInventory, destination: haitiLocation)
 
-        // define some aspirin lot 1 transaction entries
+        transaction1 = new Transaction(transactionType: transactionType_inventory, transactionDate: new Date() - 5, inventory: bostonInventory)
         transaction1.addToTransactionEntries(new TransactionEntry(quantity: 10, inventoryItem: aspirinItem1))
-        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem1))
-        transaction3.addToTransactionEntries(new TransactionEntry(quantity: 100, inventoryItem: aspirinItem1))
-        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 24, inventoryItem: aspirinItem1))
-        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 30, inventoryItem: aspirinItem1))
-
-        // define some aspirin lot 2 transaction entries
         transaction1.addToTransactionEntries(new TransactionEntry(quantity: 25, inventoryItem: aspirinItem2))
-        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem2))
-        // even though there is no entry for this lot on this transaction, it is  product inventory transaction so should reset the quantity count
-        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 16, inventoryItem: aspirinItem2))
-        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 13, inventoryItem: aspirinItem2))
-
-        // define some tylenol lot 1 transaction entries
         transaction1.addToTransactionEntries(new TransactionEntry(quantity: 36, inventoryItem: tylenolItem))
+
+
+        transaction2 = new Transaction(transactionType: transactionType_consumptionDebit, transactionDate: new Date() - 4, inventory: bostonInventory)
+        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem1))
+        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem2))
         transaction2.addToTransactionEntries(new TransactionEntry(quantity: 21, inventoryItem: tylenolItem))
+
+        transaction3 = new Transaction(transactionType: transactionType_productInventory, transactionDate: new Date() - 3, inventory: bostonInventory)
+        transaction3.addToTransactionEntries(new TransactionEntry(quantity: 100, inventoryItem: aspirinItem1))
+
+
+        transaction4 = new Transaction(transactionType: transactionType_transferIn, transactionDate: new Date() - 2, inventory: bostonInventory, source: haitiLocation)
+        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 24, inventoryItem: aspirinItem1))
+        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 16, inventoryItem: aspirinItem2))
         transaction4.addToTransactionEntries(new TransactionEntry(quantity: 33, inventoryItem: tylenolItem))
+
+        transaction5 = new Transaction(transactionType: transactionType_consumptionDebit, transactionDate: new Date() - 1, inventory: bostonInventory, destination: haitiLocation)
+        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 30, inventoryItem: aspirinItem1))
+        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 13, inventoryItem: aspirinItem2))
         transaction5.addToTransactionEntries(new TransactionEntry(quantity: 23, inventoryItem: tylenolItem))
 
         def transactions = [transaction1, transaction2, transaction3, transaction4, transaction5]
@@ -153,6 +147,54 @@ class InventoryServiceTests extends GroovyTestCase {
         assert transaction4.id != null
         assert transaction5.id != null
     }
+
+    private void transactionEntryTestFixture2() {
+
+        basicTestFixture()
+
+        transaction1 = new Transaction(transactionType: transactionType_inventory, transactionDate: new Date(), inventory: bostonInventory)
+        transaction1.addToTransactionEntries(new TransactionEntry(quantity: 10, inventoryItem: aspirinItem1))
+        transaction1.addToTransactionEntries(new TransactionEntry(quantity: 25, inventoryItem: aspirinItem2))
+        transaction1.addToTransactionEntries(new TransactionEntry(quantity: 36, inventoryItem: tylenolItem))
+
+
+        transaction2 = new Transaction(transactionType: transactionType_consumptionDebit, transactionDate: new Date(), inventory: bostonInventory)
+        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem1))
+        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem2))
+        transaction2.addToTransactionEntries(new TransactionEntry(quantity: 21, inventoryItem: tylenolItem))
+
+        transaction3 = new Transaction(transactionType: transactionType_productInventory, transactionDate: new Date(), inventory: bostonInventory)
+        transaction3.addToTransactionEntries(new TransactionEntry(quantity: 100, inventoryItem: aspirinItem1))
+
+
+        transaction4 = new Transaction(transactionType: transactionType_transferIn, transactionDate: new Date(), inventory: bostonInventory, source: haitiLocation)
+        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 24, inventoryItem: aspirinItem1))
+        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 16, inventoryItem: aspirinItem2))
+        transaction4.addToTransactionEntries(new TransactionEntry(quantity: 33, inventoryItem: tylenolItem))
+
+        transaction5 = new Transaction(transactionType: transactionType_consumptionDebit, transactionDate: new Date(), inventory: bostonInventory, destination: haitiLocation)
+        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 30, inventoryItem: aspirinItem1))
+        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 13, inventoryItem: aspirinItem2))
+        transaction5.addToTransactionEntries(new TransactionEntry(quantity: 23, inventoryItem: tylenolItem))
+
+        def transactions = [transaction1, transaction2, transaction3, transaction4, transaction5]
+        transactions.each {
+            if(!it.save(flush: true)){
+                it.errors.allErrors.each {
+                    println it
+                }
+            }
+        }
+
+
+        assert transaction1.id != null
+        assert transaction2.id != null
+        assert transaction3.id != null
+        assert transaction4.id != null
+        assert transaction5.id != null
+    }
+
+
 
     private void localTransferTestFixture() {
         basicTestFixture()
@@ -293,24 +335,35 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_getQuantityByProductMap() {
 
         transactionEntryTestFixture()
-
-        //def inventoryService = new InventoryService()
-
         def map = inventoryService.getQuantityByProductMap(TransactionEntry.list())
 
         assert map[aspirinProduct] == 97
         assert map[tylenolProduct] == 25
     }
 
+
+    @Test
     //todo: getQuantity is broken now, need to know why
-    void xtest_getQuantityByInventoryItem(){
+    void getQuantity(){
         transactionEntryTestFixture()
-        //def inventoryService = new InventoryService()
+
         assert inventoryService.getQuantity(bostonInventory, aspirinItem1) == 94
         assert inventoryService.getQuantity(bostonInventory, aspirinItem2) == 3
         assert inventoryService.getQuantity(bostonInventory, tylenolItem) == 25
     }
 
+    @Test
+    void getQuantity_shouldHandleTransactionsForSameDay(){
+        transactionEntryTestFixture2()
+
+        assert inventoryService.getQuantity(bostonInventory, aspirinItem1) == 94
+        assert inventoryService.getQuantity(bostonInventory, aspirinItem2) == 3
+        assert inventoryService.getQuantity(bostonInventory, tylenolItem) == 25
+    }
+
+
+
+    @Test
     void test_getProductsQuantityForInventory(){
         transactionEntryTestFixture()
         //def inventoryService = new InventoryService()
@@ -319,6 +372,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert results.keySet().size() == 1
     }
 
+    @Test
 	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
 		transactionEntryTestFixture()
 		//def inventoryService = new InventoryService()
