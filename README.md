@@ -22,7 +22,7 @@ You must not remove this notice, or any other, from this software.
 * [Eclipse IDE for Java EE Developers](http://www.eclipse.org/downloads)
 * Java 1.6
 * [Grails 1.3.7](http://grails.org/download/archive/Grails)
-* MySQL 5+
+* MySQL 5.5+
 * Tomcat 6 or 7 (optional for dev envrionment)
  
 
@@ -57,9 +57,51 @@ mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identif
 ```
 
 ##### Create Openboxes configuration file 
-Add `$HOME/.grails/openboxes-config.properties` -- see http://pastebin.com/i4gDemnu for an example.
+Add `$HOME/.grails/openboxes-config.properties`
 
-##### Upgrade grails version and plugins for grails -- does some basic cleanup / dependency resolution.
+```
+# Database connection settings
+# You can use dataSource.url when you are using a non-dev/non-test database (test-app may not run properly).
+# If you want to run $ grails test-app you should comment out the dataSource.url below and create a new 
+# openboxes_test database.  Eventually, we will move to an in-memory H2 database for testing, but we're 
+# currently stuck with MySQL because I'm using some MySQL-specific stuff in the Liquibase changesets.  My bad.
+
+dataSource.url=jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+dataSource.username=openboxes
+dataSource.password=openboxes
+
+# OpenBoxes mail settings - disabled by default
+grails.mail.enabled=false
+
+# Application settings
+#inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
+#openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
+
+# Google Product Search
+#google.api.key=<Google API key>
+
+# Hipaaspace.com API (NDC Lookup)
+#hipaaspace.api.key=<hipaaspace API key>
+
+# RXNorm API
+#rxnorm.api.key=<RxNorm API key>
+
+# Google analytics
+#google.analytics.enabled = false
+#google.analytics.webPropertyID = <Google Analytics Key>
+```
+
+##### Compile or "upgrade" grails version and plugins for grails
+Either of these actions should start the dependency resolution process.  
+
+**IMPORTANT** You may need to run either of these commands multiple times in order to resolve all dependencies.
+
+```    
+grails compile
+```
+
+OR
+
 ```    
 grails upgrade
 ```
