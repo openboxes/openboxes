@@ -14,12 +14,11 @@ import org.apache.log4j.Level
 import org.apache.log4j.net.SMTPAppender
 import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 
-
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 grails.config.locations = [ 
-	//"classpath:${appName}-config.groovy",
-	//"classpath:${appName}-config.properties",
+	"classpath:${appName}-config.groovy",
+	"classpath:${appName}-config.properties",
 	"file:${userHome}/.grails/${appName}-config.groovy",
 	"file:${userHome}/.grails/${appName}-config.properties"
 ]
@@ -408,8 +407,7 @@ jqueryValidationUi {
 
 
 /**
- * Google analytics and feedback have been removed until I can
- * improve performance.
+ * Google analytics and feedback have been removed until I can improve performance.
  */
 //google.analytics.enabled = false
 //grails.feedback.enabled = false
