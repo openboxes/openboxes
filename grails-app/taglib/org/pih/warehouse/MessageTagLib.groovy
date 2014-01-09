@@ -20,16 +20,22 @@ class MessageTagLib {
     def grailsApplication
 	def messageSource
 
-    //@Cacheable("messageCache")
+
     def message = { attrs, body ->
         long startTime = System.currentTimeMillis()
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 
         // If we just want the default behavior, uncomment the next three lines and comment out the rest of the method
-        //Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
-        //attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
-        //out << defaultTagLib.message.call(attrs)
-        //return;
+        Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+        attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
+        out << defaultTagLib.message.call(attrs)
+        return;
+    }
+
+    //@Cacheable("messageCache")
+    def message_ = { attrs, body ->
+        long startTime = System.currentTimeMillis()
+        def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {

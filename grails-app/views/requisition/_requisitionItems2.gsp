@@ -101,9 +101,6 @@
                     <th class="center ">
                         <warehouse:message code="requisitionItem.quantityApproved.label" default="Approved" />
                     </th>
-                    <th class="center ">
-                        <warehouse:message code="requisitionItem.quantityPicked.label" default="Picked" />
-                    </th>
                     <th class="center">
                         <warehouse:message code="requisitionItem.quantityAvailable.label" default="Available" />
                     </th>
@@ -118,6 +115,7 @@
                     </tr>
                 </g:if>
                 <g:set var="count" value="${0 }"/>
+                <g:set var="previousRequisitionItem" value="${null}"/>
                 <g:each var="requisitionItem" in="${requisitionItems.sort()}" status="i">
                     <g:set var="isChildOfPrevious" value="${i!=0 && previousRequisitionItem == requisitionItem?.parentRequisitionItem}"/>
                     <g:if test="${!isChildOfPrevious}">
@@ -127,7 +125,7 @@
                     <g:set var="quantityOnHand" value="${quantityOnHandMap[requisitionItem?.product?.id]} "/>
                     <g:set var="substitution" value="${requisitionItem?.substitution}"/>
                     <g:set var="quantityOnHandForSubstitution" value="${quantityOnHandMap[substitution?.product?.id]} "/>
-                    <g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
+                    <%--<g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />--%>
                     <%-- Need to hack this in since the quantityOnHand value was a String --%>
                     <g:set var="isCanceled" value="${requisitionItem?.isCanceled()}"/>
                     <g:set var="isChanged" value="${requisitionItem?.isChanged()}"/>
@@ -188,30 +186,28 @@
                             </g:remoteLink>
                             --%>
 
-                            <div class="action-menu">
-                                <button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-                                </button>
-                                <div class="actions">
+                            <div>
+
+                                <div>
                                     <g:if test="${!requisitionItem.parentRequisitionItem}">
+                                        <%--
                                         <g:if test="${requisitionItem?.canApproveQuantity()}">
                                             <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="approveQuantity" id="${requisition?.id }"
+                                                <g:remoteLink controller="requisition" action="approveQuantity" id="${requisition?.id }" class="button"
                                                         params="['requisitionItem.id':requisitionItem?.id, actionType:'approveQuantity']" update="requisitionItems">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
-                                                    <warehouse:message code="requisitionItem.approveQuantity.label" default="Approve quantity"/>
-                                                </g:remoteLink>
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>                                                </g:remoteLink>
                                             </div>
                                         </g:if>
-                                        <g:if test="${requisitionItem.canChangeQuantity()}">
+                                        --%>
+                                        <g:if test="${requisitionItem.canChangeQuantity()||requisitionItem.canChooseSubstitute()||requisitionItem?.canApproveQuantity()}">
                                             <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }"
-                                                        params="['requisitionItem.id':requisitionItem?.id, actionType:'changeQuantity']" update="requisitionItems">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                                                    <warehouse:message code="requisitionItem.changeQuantity.label" default="Change quantity"/>
+                                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" class="button"
+                                                        params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>
                                                 </g:remoteLink>
                                             </div>
                                         </g:if>
+                                        <%--
                                         <g:if test="${requisitionItem.canChooseSubstitute()}">
                                             <div class="action-menu-item">
                                                 <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" update="requisitionItems"
@@ -230,13 +226,13 @@
                                                 </g:remoteLink>
                                             </div>
                                         </g:if>
+                                        --%>
                                         <g:if test="${requisitionItem.canUndoChanges()}">
                                             <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="undoChanges" id="${requisition?.id }"
+                                                <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
                                                               params="['requisitionItem.id':requisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
                                                         onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                                                    <warehouse:message code="requisitionItem.undoChange.label" default="Undo changes"/>
                                                 </g:remoteLink>
                                             </div>
                                         </g:if>
@@ -244,11 +240,11 @@
                                     <g:else>
 
                                         <div class="action-menu-item">
-                                            <g:remoteLink controller="requisition" action="undoChanges" id="${requisition?.id }"
+                                            <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
                                                           params="['requisitionItem.id':requisitionItem?.parentRequisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
                                                           onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                                                <warehouse:message code="requisitionItem.undoChange.label" default="Undo changes"/>
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>
+
                                             </g:remoteLink>
                                         </div>
 
@@ -303,11 +299,9 @@
                         <td class="center middle">
                             ${requisitionItem?.quantityApproved?:0}
                         </td>
+
                         <td class="center middle">
-                            ${requisitionItem?.totalQuantityPicked()?:0}
-                        </td>
-                        <td class="center middle">
-                            <div class="box-status">
+                            <div class="box-status ${isAvailable?'success':'error'}">
                                 ${quantityOnHandMap[requisitionItem?.product?.id]?:0}
                             </div>
                         </td>

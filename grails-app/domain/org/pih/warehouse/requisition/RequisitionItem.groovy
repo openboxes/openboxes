@@ -489,7 +489,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             println "Error: " + e.message
         }
 
-        //println "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
+        println "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return quantityPicked?:0
     }
@@ -513,7 +513,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def retrievePicklistItems() {
         long startTime = System.currentTimeMillis()
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
-        //println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
+        println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
         return picklistItems
     }
 
@@ -536,20 +536,22 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def calculatePercentageRemaining() {
         return totalQuantity()?(totalQuantityRemaining()/totalQuantity())*100:0
     }
-    /*
-    def getNextRequisitionItem() {
-        def currentIndex = requisition.requisitionItems.findIndexOf { it == this }
-        def nextItem = requisition?.requisitionItems[currentIndex+1]?:requisition?.requisitionItems[0]
+
+    def next() {
+        def requisitionItems = requisition.requisitionItems as List
+        def currentIndex = requisitionItems.findIndexOf { it == this }
+        def nextItem = requisitionItems[currentIndex+1]?:requisitionItems[0]
         return nextItem
     }
 
-    def getPreviousRequisitionItem() {
-        def lastIndex = requisition?.requisitionItems?.size()-1
-        def currentIndex = requisition.requisitionItems.findIndexOf { it == this }
-        def previousItem = requisition?.requisitionItems[currentIndex-1]?:requisition?.requisitionItems[lastIndex]
+    def previous() {
+        def requisitionItems = requisition.requisitionItems as List
+        def lastIndex = requisitionItems?.size()-1
+        def currentIndex = requisitionItems.findIndexOf { it == this }
+        def previousItem = requisitionItems[currentIndex-1]?:requisitionItems[lastIndex]
         return previousItem
     }
-    */
+
     RequisitionItem newInstance() {
         return new RequisitionItem()
     }

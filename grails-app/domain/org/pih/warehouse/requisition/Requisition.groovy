@@ -123,7 +123,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     static hasMany = [requisitionItems: RequisitionItem]
     static mapping = {
         id generator: 'uuid'
-        requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc'
+        requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
         //week formula('WEEK(date_requested)')    //provide the exact column name of the date field
         //month formula('MONTH(date_requested)')

@@ -46,13 +46,18 @@
                     <td class="value">
                         <g:set var="itemsByStatus" value="${requisition.requisitionItems.groupBy { it.status }}"/>
                         <g:each var="status" in="${itemsByStatus.keySet()}">
-                            <span class="tag">
+                            <%--
+                            <div class="">
                                 <g:remoteLink controller="requisition" action="showRequisitionItems" id="${requisition.id}"
                                               params="[status:status]" update="requisitionItems">
-                                    <format:metadata obj="${status}"/> (${itemsByStatus[status].size()})
-                                </g:remoteLink>
+                                    <format:metadata obj="${status}"/> (${itemsByStatus[status].size()})</g:remoteLink>
 
-                            </span>
+                            </div>
+                            --%>
+                            <div class="">
+                                <format:metadata obj="${status}"/> (${itemsByStatus[status].size()})
+                            </div>
+
                         </g:each>
                     </td>
                 </tr>

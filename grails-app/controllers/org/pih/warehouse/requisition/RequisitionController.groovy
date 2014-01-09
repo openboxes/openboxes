@@ -781,8 +781,10 @@ class RequisitionController {
         def requisition = Requisition.get(params.id)
         def location = Location.get(session.warehouse.id)
         def status = params.status ? RequisitionItemStatus.valueOf(RequisitionItemStatus, params.status) : null
-        println status
+        println "Status: " + status
+
         def requisitionItems = requisition?.requisitionItems
+
         switch (status) {
             case RequisitionItemStatus.APPROVED:
                 requisitionItems = requisitionItems.findAll { it.isApproved() }
@@ -872,7 +874,7 @@ class RequisitionController {
 
         try {
             // Different product
-            if (requisitionItem.product != substitution) {
+            if (substitution && requisitionItem.product != substitution) {
                 println "Choose substitute " + substitution + " " + quantity
                 requisitionItem.chooseSubstitute(substitution, null, quantity, params.reasonCode, params.comments)
             }
@@ -882,6 +884,11 @@ class RequisitionController {
                 requisitionItem.changeQuantity(quantity, params.reasonCode, params.comments)
 
             }
+            else {
+                println "Approve quantity " + quantity
+                requisitionItem.approveQuantity()
+            }
+
         } catch (ValidationException e) {
             requisitionItem.errors = e.errors
         }
@@ -893,21 +900,35 @@ class RequisitionController {
             return
         }
 
-        render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
+        // Update go to next item
+        params.actionType="show"
+        requisitionItem = requisitionItem.next()
+        products = getRelatedProducts(requisitionItem)
+        quantityOnHandMap = getQuantityOnHandMap(location, products)
+
+        render(template:'editRequisitionItem',  model: [requisitionItem:requisitionItem,quantityOnHandMap:quantityOnHandMap])
+
+        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
     }
 
 
     def approveQuantity = {
         log.info "approve quantity = " + params
+        def quantityOnHandMap = [:]
+        def location = Location.get(session.warehouse.id)
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         if (requisitionItem) {
+            def products = getRelatedProducts(requisitionItem)
+            quantityOnHandMap = getQuantityOnHandMap(location, products)
             requisitionItem.approveQuantity()
+            requisitionItem.save()
         }
         //forward(controller : "requisition", action: "showRequisitionItems", id: requisitionItem.requisition.id)
-        render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
+        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
+        render(template:'editRequisitionItem',  model: [requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
     }
 
-    def undoChanges = {
+    def undoChangesFromList = {
         log.info "cancel quantity = " + params
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         if (requisitionItem) {
@@ -915,6 +936,23 @@ class RequisitionController {
             requisitionItem.save();
         }
         render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
+    }
+
+
+    def undoChanges = {
+        log.info "cancel quantity = " + params
+        def quantityOnHandMap = [:]
+        def location = Location.get(session.warehouse.id)
+        def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
+        if (requisitionItem) {
+            def products = getRelatedProducts(requisitionItem)
+            quantityOnHandMap = getQuantityOnHandMap(location, products)
+            requisitionItem.undoChanges()
+            requisitionItem.save();
+        }
+        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
+
+        render(template:'editRequisitionItem',  model: [requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
     }
 
 
