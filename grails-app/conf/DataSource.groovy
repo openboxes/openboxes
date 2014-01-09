@@ -17,17 +17,6 @@ dataSource {
     loggingSql = false
 	format_sql = false
 	use_sql_comments = false
-    properties {
-        maxActive = 100
-        maxIdle = 25
-        minIdle = 5
-        initialSize = 5
-        minEvictableIdleTimeMillis = 60000
-        timeBetweenEvictionRunsMillis = 60000
-        maxWait = 10000
-        //validationQuery = "ping"
-    }
-
 }
 
 // Hibernate caching properties
