@@ -73,9 +73,10 @@ class DocumentService {
 	
 	public File writeImage(org.pih.warehouse.core.Document document) {
 		File file
-		try { 
+		try {
 			file = new File(document.filename)
-			FileOutputStream fos = new FileOutputStream(file);
+			println "Attempt to write to " + file?.absolutePath
+            FileOutputStream fos = new FileOutputStream(file);
 			fos << document?.fileContents
 			fos.close()
 		} catch (Exception e) { 
