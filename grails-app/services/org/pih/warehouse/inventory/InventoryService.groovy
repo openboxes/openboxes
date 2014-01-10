@@ -3357,8 +3357,8 @@ class InventoryService implements ApplicationContextAware {
             transaction.addToTransactionEntries(transactionEntry)
         }
         transaction.save(flush:true, failOnError: true);
-        println "Transaction ${transaction.transactionNumber} saved successfully! "
-        println "Added ${transaction.transactionEntries.size()} transaction entries"
+        println "Transaction ${transaction?.transactionNumber} saved successfully! "
+        println "Added ${transaction?.transactionEntries?.size()} transaction entries"
         return data
     }
 }

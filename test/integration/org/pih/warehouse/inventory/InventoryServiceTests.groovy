@@ -573,6 +573,7 @@ class InventoryServiceTests extends GroovyTestCase {
         def command = new ImportDataCommand()
         command.location = location
         command.importFile = file
+        command.date = new Date()
 
         def data = inventoryService.importInventoryData(command)
 
