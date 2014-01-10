@@ -32,6 +32,7 @@ class DataServiceTests extends GroovyTestCase {
     }
 
 
+
     @Test
     void findOrCreateCategory() {
         def category = dataService.findOrCreateCategory("New Category")

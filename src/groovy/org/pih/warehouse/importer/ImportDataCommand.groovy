@@ -16,16 +16,18 @@ class ImportDataCommand {
 	def importFile
 	def type
 	Location location
+    Date date
 	def columnMap
 	def data
 	//def errors
-	
+	def warnings = [:]
 	def products = []
 	def categories = []
 	def inventoryItems = []
 	def transaction 
 	
 	static constraints = {
+        date(nullable:true)
 		filename(nullable:true)
 		importFile(nullable:true)
 		type(nullable:false)

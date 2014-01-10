@@ -19,8 +19,91 @@
 				</div>
 			</g:if> 
 			<g:hasErrors bean="${commandInstance}">
-				<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
+				<div class="errors">
+                    <g:renderErrors bean="${commandInstance}" as="list" />
+                </div>
 			</g:hasErrors>
+
+
+            <g:if test="${commandInstance?.data}">
+
+                <g:form controller="batch" action="importData" method="POST">
+                    <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
+                    <input name="type" type="hidden" value="${params.type }"/>
+
+                    <div class="box">
+                        <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
+                        <table>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message code="default.type.label"/></label>
+                                </td>
+                                <td class="value">
+                                    ${commandInstance?.type}
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message code="import.filename.label" default="Filename"/></label>
+                                </td>
+                                <td class="value">
+                                    ${commandInstance?.filename}
+                                </td>
+
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message code="default.date.label"/></label>
+                                </td>
+                                <td class="value">
+                                    <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="30"/>
+                                </td>
+
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message code="location.label"/></label>
+                                </td>
+                                <td class="value">
+                                    ${commandInstance?.location}
+                                </td>
+
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message code="default.rows.label" default="Rows"/></label>
+                                </td>
+                                <td class="value">
+                                    ${commandInstance?.data?.size()} rows
+                                </td>
+
+                            </tr>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="center">
+
+                                        <div class="center">
+
+                                            <button type="submit" name="validate" class="button icon approve">
+                                                ${warehouse.message(code: 'default.button.validate.label', default: 'Validate')}</button>
+
+                                            <button type="submit" name="import" value="true" class="button icon add">
+                                                ${warehouse.message(code: 'default.button.finish.label')}</button>
+
+
+                                            <a href="${createLink(controller: "batch", action: "importData", params: params)}" class="button icon trash">
+                                                <warehouse:message code="default.button.cancel.label"/>
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </g:form>
+            </g:if>
 
             <div class="box">
                 <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/></h2>
@@ -30,12 +113,6 @@
                     </div>
                 </g:if>
                 <g:if test="${commandInstance?.data}">
-                    <div class="notice">
-                        <warehouse:message code="inventory.thereAreRowsIn.message"
-                            args="[commandInstance.data.size(), commandInstance.filename,
-                                commandInstance?.products?.size(), commandInstance?.inventoryItems?.size(),
-                                commandInstance?.categories?.size()]" />
-                    </div>
                     <table class="footable">
                         <thead>
                             <tr>
@@ -47,18 +124,19 @@
 
                                     </th>
                                 </g:each>
+                                <th>Warnings</th>
                             </tr>
                         </thead>
                         <tbody>
                             <g:each var="row" in="${commandInstance?.data}" status="status">
                                 <tr class="${status%2?'even':'odd' }">
                                     <td></td>
-                                    <td>${status+1 }</td>
+                                    <td class="center">${status+2 }</td>
                                     <g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
                                         <td>${row[column.value] }</td>
                                     </g:each>
                                     <g:each var="prompt" in="${row?.prompts }">
-                                        <td>
+                                        <td class="center">
                                             <select name="${prompt.key }">
                                                 <g:each var="value" in="${prompt.value }">
                                                     <option value="${value.id }">${value.name }</option>
@@ -66,29 +144,14 @@
                                             </select>
                                         </td>
                                     </g:each>
+                                    <td>
+                                        <div class="error">${commandInstance?.warnings[status]}</div>
+                                    </td>
                                 </tr>
                             </g:each>
                         </tbody>
+
                     </table>
-                    <g:if test="${!commandInstance.errors.hasErrors()}">
-                        <div class="buttonBar">
-                            <g:form controller="batch" action="importData" method="POST">
-                                <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
-                                <input name="type" type="hidden" value="${params.type }"/>
-
-                                <div class="center">
-
-                                    <button type="submit" name="importNow" value="true" class="button icon approve">
-                                        ${warehouse.message(code: 'default.button.import.label')}</button>
-
-                                    <a href="${createLink(controller: "batch", action: "importData", params: params)}" class="button icon trash">
-                                        <warehouse:message code="default.button.cancel.label"/>
-                                    </a>
-                                </div>
-                            </g:form>
-                        </div>
-                    </g:if>
-
                 </g:if>
             </div>
 		</div>

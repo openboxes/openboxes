@@ -20,11 +20,8 @@ import java.text.SimpleDateFormat;
 
 class ImporterUtil {
 
-	
-
 	static DateFormat EXCEL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
-	
 	static getProductService() { 
 		return ApplicationHolder.getApplication().getMainContext().getBean("productService")
 	}

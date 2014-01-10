@@ -95,14 +95,18 @@ class BatchController {
 				try { 
 					// Need to choose the right importer 
 					log.info command.type
-					if (command.type == "inventory")
+					if (command.type == "inventory") {
 						dataImporter = new InventoryExcelImporter(command?.filename);
-					else if (command.type == "product")
-						dataImporter = new ProductExcelImporter(command?.filename)
-                    else if (command.type == "inventoryLevel")
+                    }
+					else if (command.type == "product") {
+                        dataImporter = new ProductExcelImporter(command?.filename)
+                    }
+					else if (command.type == "inventoryLevel") {
                         dataImporter = new InventoryLevelExcelImporter(command?.filename)
-					else
+                    }
+					else {
 						throw new RuntimeException("Unable to import data using ${command.type} importer")
+                    }
 				}
 				catch (OfficeXmlFileException e) {
                     log.error ("Error with import file " + e.message, e)
@@ -120,7 +124,7 @@ class BatchController {
                     //return;
 
 					// Validate data using importer (might change data)
-					//dataImporter.validateData(command);
+					dataImporter.validateData(command);
 					
 					//command.data = dataImporter.data
 					command.columnMap = dataImporter.columnMap
@@ -139,7 +143,7 @@ class BatchController {
 
 				
 				// If there are no errors and the user requests to import the data, we should execute the import
-				if (!command.hasErrors() && params.importNow) {
+				if (!command.hasErrors() && params.import) {
 					println "Data is about to be imported ..."
 					dataImporter.importData(command)
 

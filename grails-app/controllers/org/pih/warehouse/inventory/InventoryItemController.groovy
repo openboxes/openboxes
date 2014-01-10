@@ -156,7 +156,12 @@ class InventoryItemController {
         //def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
         //requisitionItems: requisitionItems, , issuedRequisitionItems:issuedRequisitionItems
 
-        [ commandInstance: commandInstance, quantityMap: quantityMap ]
+        def consumptionColumns = [['string', 'Month'], ['number', 'On-hand'], ['number', 'Available']]
+        def consumptionData = [['Jan', 1000, 400], ['Feb', 1170, 460], ['Mar', 660, 1120], ['Apr', 1030, 540],
+                ['May', 660, 1120], ['Jun', 1030, 540],['Jul', 660, 1120], ['Aug', 1030, 540],['Sep', 660, 1120], ['Oct', 1030, 540],
+                ['Nov', 660, 1120], ['Dec', 1030, 540]]
+
+        [ commandInstance: commandInstance, quantityMap: quantityMap, consumptionColumns: consumptionColumns, consumptionData: consumptionData ]
 	}
 
     def showCurrentStockAllLocations = { StockCardCommand cmd ->
@@ -240,7 +245,14 @@ class InventoryItemController {
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
 
-        render(template: "showConsumption", model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems])
+
+        def consumptionColumns = [['string', 'Year'], ['number', 'Issues'], ['number', 'Consumption']]
+        def consumptionData = [['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]
+
+
+        render(template: "showConsumption",
+                model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems,
+                        consumptionColumns: consumptionColumns, consumptionData: consumptionData])
     }
 
 

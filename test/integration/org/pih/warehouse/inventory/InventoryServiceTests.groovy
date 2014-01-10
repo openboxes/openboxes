@@ -9,14 +9,14 @@
  * */
 package org.pih.warehouse.inventory
 
-
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Tag;
-import org.pih.warehouse.core.User;
-
+import org.pih.warehouse.core.User
+import org.springframework.core.io.ClassPathResource;
 import testutils.DbHelper
 
 import org.junit.Test
@@ -561,6 +561,33 @@ class InventoryServiceTests extends GroovyTestCase {
 		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
+
+    @Test
+    void importInventory_shouldSaveRecordInventoryTransaction() {
+
+        def location = Location.list()[0]
+        def resource = new ClassPathResource("resources/inventory2.xls")
+        def file = resource.getFile()
+        assert file.exists()
+
+        def command = new ImportDataCommand()
+        command.location = location
+        command.importFile = file
+
+        def data = inventoryService.importInventoryData(command)
+
+        def productCodes = data.collect { it.productCode }.unique()
+        productCodes.each {
+            def product = Product.findByProductCode(it)
+            if (product) {
+                def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
+                println "Product ${product.productCode} ${product.name}: ${quantityOnHand}"
+            }
+        }
+
+    }
+
+
 
 	/*
 	@Test

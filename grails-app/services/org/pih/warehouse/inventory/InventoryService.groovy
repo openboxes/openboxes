@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
@@ -20,6 +21,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
@@ -865,7 +867,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-
     def getQuantityOnHandZero(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)
@@ -881,7 +882,6 @@ class InventoryService implements ApplicationContextAware {
         return stockOut
 
     }
-
 
     def getOutOfStock(Location location) {
         long startTime = System.currentTimeMillis()
@@ -1270,7 +1270,7 @@ class InventoryService implements ApplicationContextAware {
                             !(reachedInventoryTransaction[product] && reachedInventoryTransaction[product][inventoryItem]
                                     && reachedInventoryTransaction[product][inventoryItem] != transaction)) {
 
-                        println "PROCESS ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
+                        //println "PROCESS ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
                         // check to see if there's an entry in the map for this product and create if needed
                         if (!quantityMap[product]) {
                             quantityMap[product] = [:]
@@ -1312,7 +1312,7 @@ class InventoryService implements ApplicationContextAware {
                         }
                     }
                     else {
-                        println "IGNORE  ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
+                        //println "IGNORE  ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
 
                     }
                 }
@@ -1957,8 +1957,6 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.product = product
 			inventoryItem.save()
 		}
-
-
 		return inventoryItem
 
 	}
@@ -3238,10 +3236,130 @@ class InventoryService implements ApplicationContextAware {
             csvWriter << row
         }
         return sw.toString()
-
-
     }
 
+    /**
+     *
+     * @param command
+     */
+    def validateInventoryData(ImportDataCommand command) {
 
+        def dateFormatter = new SimpleDateFormat("yy-mm")
+        def calendar = Calendar.getInstance()
+        command.data.eachWithIndex { row, index ->
+            def rowIndex = index + 2
+            def product = Product.findByProductCode(row.productCode)
+            if (!product) {
+                command.errors.reject("error.product.notExists", "Row ${rowIndex}: Product '${row.productCode}' does not exist");
+            }
+            else {
+                def minLength = Math.min(product.name.length(),row.product.length())
+                def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
+                if (row.product && levenshteinDistance > 0) {
+                    command.warnings[index] = "Product '${row.productCode}' referenced in import [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
+                }
+
+
+                def manufacturerCode = row.manufacturerCode
+                if (manufacturerCode instanceof Double) {
+                    command.errors.reject("error.manufacturerCode.invalid", "Row ${rowIndex}: Manufacturer code '${manufacturerCode}' must be a string")
+                    manufacturerCode = manufacturerCode.toInteger().toString()
+                }
+                if (row.manufacturer != product.manufacturer) {
+                    command.warnings[index] = "Manufacturer [${row.manufacturer}] is not the same as in the database [${product.manufacturer}]"
+                }
+
+                if (row.manufacturerCode != product.manufacturerCode) {
+                    command.warnings[index] = "Manufacturer code [${row.manufacturerCode}] is not the same as in the database [${product.manufacturerCode}]"
+                }
+                def lotNumber = row.lotNumber
+                if (lotNumber instanceof Double) {
+                    command.errors.reject("error.lotNumber.invalid", "Row ${rowIndex}: Lot number '${lotNumber}' must be a string")
+                    lotNumber = lotNumber.toInteger().toString()
+                }
+                def inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
+                if (!inventoryItem) {
+                    command.warnings[index] = "Inventory item for lot number '${lotNumber}' not found"
+                }
+
+                def expirationDate = dateFormatter.parse(row.expirationDate)
+                calendar.setTime(expirationDate)
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                expirationDate = calendar.getTime()
+                if (expirationDate <= new Date()) {
+                    command.warnings[index] = "Expiration date is '${expirationDate}' is not valid"
+                }
+
+            }
+
+            if ((row.quantity as int) < 0) {
+                command.errors.reject("error.quantity.negative", "Row ${rowIndex}: Product '${row.productCode}' cannot have negative quantity");
+            }
+
+
+        }
+    }
+
+    /**
+     *
+     * @param command
+     * @return
+     */
+    def importInventoryData(ImportDataCommand command) {
+        def dateFormatter = new SimpleDateFormat("yy-mm")
+        def importer = new InventoryExcelImporter(command.importFile.absolutePath)
+        def data = importer.data
+        assert data != null
+        println "Data to be imported: " + data
+
+        def transaction = new Transaction()
+        transaction.transactionDate = command.date
+        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        transaction.transactionNumber = generateTransactionNumber()
+        transaction.comment = "Imported from ${command.importFile.absolutePath} on ${new Date()}"
+        transaction.inventory = command.location.inventory
+
+        def calendar = Calendar.getInstance()
+        command.data.eachWithIndex { row, index ->
+            println "${index}: ${row}"
+            def transactionEntry = new TransactionEntry()
+            transactionEntry.quantity = row.quantity.toInteger()
+            transactionEntry.comments = row.comments
+
+            // Find an existing product, should fail if not found
+            def product = Product.findByProductCode(row.productCode)
+            assert product
+
+            // Check the Levenshtein distance between the given name and stored product name (make sure they're close)
+            println "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
+            //assert product.name == row.product
+
+            // Handler for the lot number
+            def lotNumber = row.lotNumber
+            println lotNumber.class.name
+            if (lotNumber instanceof Double) {
+                lotNumber = lotNumber.toInteger().toString()
+            }
+            println "Lot Number: " + lotNumber
+
+            // Expiration date should be the last day of the month
+            def expirationDate = dateFormatter.parse(row.expirationDate)
+            calendar.setTime(expirationDate)
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            expirationDate = calendar.getTime()
+            println "Expiration date: " + expirationDate
+
+            // Find or create an inventory item
+            def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
+            println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
+            transactionEntry.inventoryItem = inventoryItem
+
+            transaction.addToTransactionEntries(transactionEntry)
+        }
+        transaction.save(flush:true, failOnError: true);
+        println "Transaction ${transaction.transactionNumber} saved successfully! "
+        println "Added ${transaction.transactionEntries.size()} transaction entries"
+        return data
+    }
 }
 

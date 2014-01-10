@@ -22,9 +22,12 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.Consumption
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import java.text.SimpleDateFormat;
 // import java.util.Calendar;
@@ -559,6 +562,7 @@ class InventoryController {
 
     }
 
+    @Cacheable("dashboardCache")
     def listLowStock = {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getLowStock(location);
@@ -1655,6 +1659,38 @@ class InventoryController {
 			session.inventorySearchTerms.remove(params.searchTerm);
 		redirect(action: browse);
 	}
+
+
+    def upload = {
+        def inventoryList = [:]
+        if (request.method == "POST") {
+            File localFile = null;
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
+            CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file");
+            if (!uploadFile?.empty) {
+                try {
+                    localFile = new File("uploads/" + uploadFile.originalFilename);
+                    localFile.mkdirs()
+                    uploadFile.transferTo(localFile);
+                    //flash.message = "File uploaded successfully"
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            //Workbook workbook = WorkbookFactory.create(file.inputStream)
+            //Iterate through bookList and create/persists your domain instances
+            //def bookList = excelImportService.columns(workbook, CONFIG_BOOK_COLUMN_MAP)
+            def excelImporter = new InventoryExcelImporter(localFile.absolutePath)
+            inventoryList = excelImporter.data
+            println inventoryList
+        }
+
+
+        [inventoryList:inventoryList]
+
+    }
 
 }
 
