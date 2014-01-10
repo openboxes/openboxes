@@ -3251,18 +3251,19 @@ class InventoryService implements ApplicationContextAware {
             def product = Product.findByProductCode(row.productCode)
             if (!product) {
                 command.errors.reject("error.product.notExists", "Row ${rowIndex}: Product '${row.productCode}' does not exist");
+                command.warnings[index] = "Product '${row.productCode}' does not exist"
             }
             else {
                 def minLength = Math.min(product.name.length(),row.product.length())
                 def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
                 if (row.product && levenshteinDistance > 0) {
-                    command.warnings[index] = "Product '${row.productCode}' referenced in import [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
+                    command.warnings[index] = "Product name [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
                 }
-
 
                 def manufacturerCode = row.manufacturerCode
                 if (manufacturerCode instanceof Double) {
-                    command.errors.reject("error.manufacturerCode.invalid", "Row ${rowIndex}: Manufacturer code '${manufacturerCode}' must be a string")
+                    //command.errors.reject("error.manufacturerCode.invalid", "Row ${rowIndex}: Manufacturer code '${manufacturerCode}' must be a string")
+                    command.warnings[index] = "Manufacturer code '${manufacturerCode}' must be a string"
                     manufacturerCode = manufacturerCode.toInteger().toString()
                 }
                 if (row.manufacturer != product.manufacturer) {
@@ -3274,7 +3275,8 @@ class InventoryService implements ApplicationContextAware {
                 }
                 def lotNumber = row.lotNumber
                 if (lotNumber instanceof Double) {
-                    command.errors.reject("error.lotNumber.invalid", "Row ${rowIndex}: Lot number '${lotNumber}' must be a string")
+                    //command.errors.reject("error.lotNumber.invalid", "Row ${rowIndex}: Lot number '${lotNumber}' must be a string")
+                    command.warnings[index] = "Lot number '${lotNumber}' must be a string"
                     lotNumber = lotNumber.toInteger().toString()
                 }
                 def inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
@@ -3282,12 +3284,14 @@ class InventoryService implements ApplicationContextAware {
                     command.warnings[index] = "Inventory item for lot number '${lotNumber}' not found"
                 }
 
-                def expirationDate = dateFormatter.parse(row.expirationDate)
-                calendar.setTime(expirationDate)
-                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-                expirationDate = calendar.getTime()
-                if (expirationDate <= new Date()) {
-                    command.warnings[index] = "Expiration date is '${expirationDate}' is not valid"
+                if (row.expirationDate) {
+                    def expirationDate = dateFormatter.parse(row.expirationDate)
+                    calendar.setTime(expirationDate)
+                    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                    expirationDate = calendar.getTime()
+                    if (expirationDate <= new Date()) {
+                        command.warnings[index] = "Expiration date is '${expirationDate}' is not valid"
+                    }
                 }
 
             }

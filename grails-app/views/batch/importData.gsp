@@ -145,7 +145,9 @@
                                         </td>
                                     </g:each>
                                     <td>
-                                        <div class="error">${commandInstance?.warnings[status]}</div>
+                                        <g:if test='${commandInstance?.warnings[status]}'>
+                                            <div class="error">${commandInstance?.warnings[status]}</div>
+                                        </g:if>
                                     </td>
                                 </tr>
                             </g:each>
