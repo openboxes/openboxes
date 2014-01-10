@@ -3325,7 +3325,7 @@ class InventoryService implements ApplicationContextAware {
         transaction.transactionDate = command.date
         transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         transaction.transactionNumber = generateTransactionNumber()
-        transaction.comment = "Imported from ${command.importFile.absolutePath} on ${new Date()}"
+        transaction.comment = "Imported from ${command.importFile.name} on ${new Date()}"
         transaction.inventory = command.location.inventory
 
         def calendar = Calendar.getInstance()
@@ -3345,19 +3345,20 @@ class InventoryService implements ApplicationContextAware {
 
             // Handler for the lot number
             def lotNumber = row.lotNumber
-            println lotNumber.class.name
             if (lotNumber instanceof Double) {
                 lotNumber = lotNumber.toInteger().toString()
             }
             println "Lot Number: " + lotNumber
 
             // Expiration date should be the last day of the month
-            def expirationDate = dateFormatter.parse(row.expirationDate)
-            calendar.setTime(expirationDate)
-            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            expirationDate = calendar.getTime()
-            println "Expiration date: " + expirationDate
-
+            def expirationDate = null
+            if (row.expirationDate) {
+                expirationDate = dateFormatter.parse(row.expirationDate)
+                calendar.setTime(expirationDate)
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                expirationDate = calendar.getTime()
+                println "Expiration date: " + expirationDate
+            }
             // Find or create an inventory item
             def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated

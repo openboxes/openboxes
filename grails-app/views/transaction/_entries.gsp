@@ -43,6 +43,7 @@
                             </g:else>
                             --%>
                             <g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+                                ${transactionEntry?.inventoryItem?.product?.productCode}
                                 <format:product product="${transactionEntry?.inventoryItem?.product}"/>
                             </g:link>
                         </td>
