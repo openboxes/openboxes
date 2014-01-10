@@ -310,7 +310,7 @@ class ProductService {
                 if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
                 if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
                 if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
-                if (params.productCode) ilike("productCode", params.productCode + "%")
+                if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
                 if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
                 if (params.createdById) eq("createdBy.id", params.createdById)
                 if (params.updatedById) eq("updatedBy.id", params.updatedById)

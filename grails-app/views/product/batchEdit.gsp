@@ -32,7 +32,8 @@
                         <div class="filter">
                             <label><warehouse:message code="category.label"/></label>
                             <div>
-                                <g:selectCategory name="categoryId" class="chzn-select" value="${categoryInstance?.id}" style="width: 100%;"/>
+                                <g:selectCategory name="categoryId" class="chzn-select-deselect" value="${categoryInstance?.id}"
+                                                  data-placeholder=" " style="width: 100%;" noSelection="['null':'']"/>
                             </div>
                             <div>
                                 <g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}"/>
@@ -333,8 +334,8 @@
                         <g:hiddenField name="createdById" value="${params.createdById}"/>
                         <g:hiddenField name="updatedById" value="${params.updatedById}"/>
 
-                        <div class="dialog" style="overflow: auto;">
-                            <table style="width: 1000px;">
+                        <div class="dialog">
+                            <table>
                                 <thead>
                                 <tr class="odd">
                                     <th valign="top">
@@ -462,7 +463,7 @@
                                     </g:if>
                                     <g:else>
                                         <tr>
-                                            <td colspan="9" class="center">
+                                            <td colspan="11" class="center empty">
                                                 <warehouse:message code="default.noResults.message" default="No results"/>
                                             </td>
                                         </tr>
