@@ -58,7 +58,7 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.requisitionNumber.label" /></label></td>
                                 <td class="value">
-                                    ${requisition.requestNumber}
+                                    <g:textField name="requestNumber" value="${requisition.requestNumber}" class="text" size="100"/>
                                 </td>
                             </tr>
                             <tr class="prop">
