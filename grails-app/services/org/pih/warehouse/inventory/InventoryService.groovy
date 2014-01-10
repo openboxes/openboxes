@@ -3248,40 +3248,39 @@ class InventoryService implements ApplicationContextAware {
         def calendar = Calendar.getInstance()
         command.data.eachWithIndex { row, index ->
             def rowIndex = index + 2
+
+            if (!command.warnings[index]) {
+                command.warnings[index] = []
+            }
+
             def product = Product.findByProductCode(row.productCode)
             if (!product) {
                 command.errors.reject("error.product.notExists", "Row ${rowIndex}: Product '${row.productCode}' does not exist");
-                command.warnings[index] = "Product '${row.productCode}' does not exist"
+                command.warnings[index] << "Product '${row.productCode}' does not exist"
             }
             else {
-                def minLength = Math.min(product.name.length(),row.product.length())
-                def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
-                if (row.product && levenshteinDistance > 0) {
-                    command.warnings[index] = "Product name [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
-                }
-
                 def manufacturerCode = row.manufacturerCode
                 if (manufacturerCode instanceof Double) {
                     //command.errors.reject("error.manufacturerCode.invalid", "Row ${rowIndex}: Manufacturer code '${manufacturerCode}' must be a string")
-                    command.warnings[index] = "Manufacturer code '${manufacturerCode}' must be a string"
+                    command.warnings[index] << "Manufacturer code '${manufacturerCode}' must be a string"
                     manufacturerCode = manufacturerCode.toInteger().toString()
                 }
-                if (row.manufacturer != product.manufacturer) {
-                    command.warnings[index] = "Manufacturer [${row.manufacturer}] is not the same as in the database [${product.manufacturer}]"
+                if (row.manufacturer && product.manufacturer && row.manufacturer != product.manufacturer) {
+                    command.warnings[index] << "Manufacturer [${row.manufacturer}] is not the same as in the database [${product.manufacturer}]"
                 }
 
-                if (row.manufacturerCode != product.manufacturerCode) {
-                    command.warnings[index] = "Manufacturer code [${row.manufacturerCode}] is not the same as in the database [${product.manufacturerCode}]"
+                if (row.manufacturerCode && product.manufacturerCode && row.manufacturerCode != product.manufacturerCode) {
+                    command.warnings[index] << "Manufacturer code [${row.manufacturerCode}] is not the same as in the database [${product.manufacturerCode}]"
                 }
                 def lotNumber = row.lotNumber
                 if (lotNumber instanceof Double) {
                     //command.errors.reject("error.lotNumber.invalid", "Row ${rowIndex}: Lot number '${lotNumber}' must be a string")
-                    command.warnings[index] = "Lot number '${lotNumber}' must be a string"
+                    command.warnings[index] << "Lot number '${lotNumber}' must be a string"
                     lotNumber = lotNumber.toInteger().toString()
                 }
                 def inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
                 if (!inventoryItem) {
-                    command.warnings[index] = "Inventory item for lot number '${lotNumber}' not found"
+                    command.warnings[index] << "Inventory item for lot number '${lotNumber}' not found"
                 }
 
                 if (row.expirationDate) {
@@ -3290,8 +3289,14 @@ class InventoryService implements ApplicationContextAware {
                     calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
                     expirationDate = calendar.getTime()
                     if (expirationDate <= new Date()) {
-                        command.warnings[index] = "Expiration date is '${expirationDate}' is not valid"
+                        command.warnings[index] << "Expiration date is '${expirationDate}' is not valid"
                     }
+                }
+
+                //def minLength = Math.min(product.name.length(),row.product.length())
+                def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
+                if (row.product && levenshteinDistance > 0) {
+                    command.warnings[index] << "Product name [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
                 }
 
             }

@@ -145,8 +145,12 @@
                                         </td>
                                     </g:each>
                                     <td>
-                                        <g:if test='${commandInstance?.warnings[status]}'>
-                                            <div class="error">${commandInstance?.warnings[status]}</div>
+                                        <g:if test='${!commandInstance?.warnings[status].isEmpty()}'>
+                                            <div class="error">
+                                                <g:each var="warning" in="${commandInstance?.warnings[status]}">
+                                                    <li>&bull;${warning}</li>
+                                                </g:each>
+                                            </div>
                                         </g:if>
                                     </td>
                                 </tr>
