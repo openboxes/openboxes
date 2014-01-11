@@ -78,6 +78,9 @@
 				    					<th class="center bottom">
 				    						<warehouse:message code="report.number.label"/>
 				    					</th>
+                                        <th class="bottom">
+                                            <warehouse:message code="product.productCode.label"/>
+                                        </th>
 				    					<th class="bottom">
 				    						<warehouse:message code="product.description.label"/>
 				    					</th>
@@ -106,8 +109,11 @@
 											<td class="center">
 												${i+1 }							
 											</td>
-											<td>	   
-												<format:product product="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}"/> 	
+                                            <td>
+                                                ${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}
+                                            </td>
+											<td>
+												<format:product product="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}"/>
 											</td>
 											<td>
 												${checklistEntry?.shipmentItem?.inventoryItem?.lotNumber?:checklistEntry?.shipmentItem?.lotNumber  }
