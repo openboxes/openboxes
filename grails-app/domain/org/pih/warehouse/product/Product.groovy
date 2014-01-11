@@ -196,8 +196,8 @@ class Product implements Comparable, Serializable {
     User createdBy
     User updatedBy
 
-
-    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation", "inventoryLevels"];
+    // "inventoryLevels"
+    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation"];
 
     static hasMany = [
             categories: Category,
@@ -207,6 +207,7 @@ class Product implements Comparable, Serializable {
             productGroups: ProductGroup,
             packages: ProductPackage,
             synonyms: Synonym,
+            inventoryLevels: InventoryLevel,
             inventoryItems: InventoryItem
     ]
 
@@ -286,6 +287,7 @@ class Product implements Comparable, Serializable {
         return this?.productGroups ? this?.productGroups?.sort()?.first() : null
     }
 
+    /*
     def getInventoryLevels() {
         if (id) {
             Product.withTransaction {
@@ -293,6 +295,7 @@ class Product implements Comparable, Serializable {
             }
         }
     }
+    */
 
     InventoryLevel getInventoryLevel(locationId) {
         if (id) {

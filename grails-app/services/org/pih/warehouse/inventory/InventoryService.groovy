@@ -961,10 +961,11 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 		}
-		
+
 		def products = Product.createCriteria().list() {
 			if (terms) {
 				createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
+                createAlias("inventoryLevels", "inventoryLevels", CriteriaSpecification.LEFT_JOIN)
 			}
 			if(categories) {
 				inList("category", categories)
@@ -975,79 +976,26 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 			if (terms) {
-				or {
-					and {
-						terms.each {term ->
-							ilike('inventoryItems.lotNumber', "%" + term + "%")
-						}
-					}
-					or {
-						and {
-							terms.each {term ->
-								ilike("name", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each {term ->
-								ilike("description", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("brandName", "%" +term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("manufacturer", "%" +term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("manufacturerCode", "%" +term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("manufacturerName", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("vendor", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("vendorCode", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("vendorName", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("upc", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("ndc", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("unitOfMeasure", "%" + term + "%")
-							}
-						}
-						and {
-							terms.each { term ->
-								ilike("productCode", "%" + term + "%")
-							}
-						}
-					}
+				and {
+                    terms.each { term ->
+                        or {
+                            ilike('inventoryItems.lotNumber', "%" + term + "%")
+                            ilike('inventoryLevels.binLocation', "%" + term + "%")
+                            ilike("name", "%" + term + "%")
+                            ilike("description", "%" + term + "%")
+                            ilike("brandName", "%" +term + "%")
+                            ilike("manufacturer", "%" +term + "%")
+                            ilike("manufacturerCode", "%" +term + "%")
+                            ilike("manufacturerName", "%" + term + "%")
+                            ilike("vendor", "%" + term + "%")
+                            ilike("vendorCode", "%" + term + "%")
+                            ilike("vendorName", "%" + term + "%")
+                            ilike("upc", "%" + term + "%")
+                            ilike("ndc", "%" + term + "%")
+                            ilike("unitOfMeasure", "%" + term + "%")
+                            ilike("productCode", "%" + term + "%")
+                        }
+                    }
 				}
 			}
 
@@ -1055,8 +1003,6 @@ class InventoryService implements ApplicationContextAware {
         log.info " * Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
-		
-		
 		//products = products.collect { it }.unique { it.id }
         log.info " * Get unique IDs: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
@@ -1066,9 +1012,10 @@ class InventoryService implements ApplicationContextAware {
         log.info "Offset " + offset
 		products = Product.createCriteria().list(max: maxResult, offset: offset) {
 			inList("id", (products.collect { it.id })?: [""])
-			order("category", "asc")
+			//order("category", "asc")
 			order("name", "asc")
 		}
+
         log.info " * Re-query for products by ID: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 	
