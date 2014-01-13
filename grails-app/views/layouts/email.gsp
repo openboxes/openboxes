@@ -19,11 +19,11 @@
         .header {
             padding: 5px;
             margin: 0px;
-            background-color: #${session.warehouse.bgColor};
-            color: #${session.warehouse.fgColor};
+            background-color: #${session?.warehouse?.bgColor?:'white'};
+            color: #${session?.warehouse?.fgColor?:'black'};
         }
         .header a {
-            color: #${session.warehouse.fgColor};
+            color: #${session?.warehouse?.fgColor?:'white'};
             text-decoration: none;
         }
 
@@ -49,13 +49,14 @@
 
         tr {
             border: 0;
+            height: 2em;
         }
         td, th {
             font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
             line-height: 12px;
             padding: 6px 6px;
             text-align: left;
-            vertical-align: top;
+            vertical-align: middle;
         }
         th {
             /*background: #fff url(../images/skin/shadow.jpg);*/
@@ -121,7 +122,7 @@
         }
 
         .prop .name {
-            text-align: left;
+            text-align: right;
             vertical-align: middle;
             width: 25%;
             /*white-space: nowrap;*/ /* it makes the sidebar tables look really bad */
