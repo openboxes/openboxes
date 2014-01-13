@@ -14,6 +14,7 @@ import org.apache.commons.mail.EmailException
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product
 
 class AuthController {
 
@@ -198,5 +199,17 @@ class AuthController {
 		redirect(action:"login")
 
 	}
+
+
+    def renderAccountCreatedEmail = {
+        def userInstance = User.get(params.id)
+        render(template:"/email/userAccountCreated", model:[userInstance:userInstance])
+    }
+
+    def renderAccountConfirmedEmail = {
+        def userInstance = User.get(params.id)
+        render(template:"/email/userAccountConfirmed", model:[userInstance:userInstance])
+    }
+
 
 }

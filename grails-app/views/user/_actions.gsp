@@ -53,7 +53,19 @@
 					<warehouse:message code="user.sendTestEmail.label"/>									
 				</g:link>
 			</div>
-		</g:isUserInRole>
+            <div class="action-menu-item">
+                <g:link controller="auth" action="renderAccountCreatedEmail" id="${userInstance?.id}">
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
+                    <warehouse:message code="user.accountCreated.label" default="Account created email"/></g:link>
+            </div>
+            <div class="action-menu-item">
+                <g:link controller="auth" action="renderAccountConfirmedEmail" id="${userInstance?.id}">
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
+                    <warehouse:message code="user.accountConfirmed.label" default="Account confirmed email"/></g:link>
+            </div>
+
+
+        </g:isUserInRole>
 		<div class="action-menu-item">
 			<g:link action="toggleActivation" id="${userInstance?.id}">
 				<g:if test="${userInstance?.active}">

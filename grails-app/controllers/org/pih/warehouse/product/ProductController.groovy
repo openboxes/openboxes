@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel;
@@ -1040,6 +1041,15 @@ class ProductController {
         }
         render(template:'synonyms', model:[product: product, synonyms:product?.synonyms])
     }
+
+
+    def renderCreatedEmail = {
+        def productInstance = Product.get(params.id)
+        def userInstance = User.get(session.user.id)
+        render(template:"/email/productCreated", model:[productInstance:productInstance, userInstance:userInstance])
+    }
+
+
 }
 
 

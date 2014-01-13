@@ -162,7 +162,12 @@
                         <warehouse:message code="product.delete.label" default="Delete product"/>
 		  			</g:link>
 				</div>
-			</g:if>		
+                <div class="action-menu-item">
+                    <g:link controller="product" action="renderCreatedEmail" id="${productInstance?.id}">
+                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
+                        <warehouse:message code="product.productCreated.label" default="Product created email"/></g:link>
+                </div>
+            </g:if>
 		</g:isUserAdmin>
 		
 	</div>
