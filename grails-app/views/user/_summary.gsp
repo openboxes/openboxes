@@ -1,4 +1,4 @@
-				<div class="${(userInstance?.active) ? 'active':'inactive'}">
+				<div class="${(userInstance?.active) ? 'active':'inactive'} summary">
 					<table style="width:auto;">
 						<tr>
 	            			<td class="top">

@@ -72,22 +72,21 @@
             <thead>
                 <tr>
                     <th>
-
+                        <warehouse:message code="requisitionItem.status.label" default="Status" />
                     </th>
                     <th class='center'>
                         <warehouse:message code="default.actions.label"/>
                     </th>
+                    <%--
                     <th>
                         <warehouse:message code="requisitionItem.type.label" default="Type" />
                     </th>
+                    --%>
                     <th>
                         <warehouse:message code="product.productCode.label" />
                     </th>
                     <th>
                         <warehouse:message code="requisitionItem.product.label" />
-                    </th>
-                    <th>
-                        <warehouse:message code="requisitionItem.status.label" default="Status" />
                     </th>
                     <th>
                         <warehouse:message code="product.unitOfMeasure.label" />
@@ -137,31 +136,35 @@
 
                     <tr class="${requisitionItem.isChanged()?'modified':''} ${requisitionItem?.isSubstituted()?'substituted':''} ${requisitionItem.isCanceled()?'canceled':''} ${rowClass}">
                         <td class="middle center">
-                            <g:set var="statusClass" value=""/>
-                            <g:if test="${requisitionItem?.isCanceled()}">
-                                <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
-                                <g:set var="statusClass" value="error"/>
-                            </g:if>
-                            <g:elseif test="${requisitionItem?.isSubstituted()}">
-                                <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
-                                <g:set var="statusClass" value="error"/>
-                            </g:elseif>
-                            <g:elseif test="${requisitionItem?.isApproved()}">
-                                <img src="${resource(dir:'images/icons/silk', file: 'accept.png')}"/>
-                                <g:set var="statusClass" value="success"/>
-                            </g:elseif>
-                            <g:elseif test="${requisitionItem?.isChanged()}">
-                                <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
-                                <g:set var="statusClass" value="notice"/>
-                            </g:elseif>
-                            <g:elseif test="${requisitionItem?.isPending()}">
-                                <img src="${resource(dir:'images/icons/silk', file: 'hourglass.png')}"/>
-                                <g:set var="statusClass" value="notice"/>
-                            </g:elseif>
-                            <g:else>
-                                <img src="${resource(dir:'images/icons/silk', file: 'information.png')}"/>
-                                <g:set var="statusClass" value="success"/>
-                            </g:else>
+
+                            <div title='<format:metadata obj="${requisitionItem?.status}"/> <format:metadata obj="${requisitionItem?.cancelReasonCode}"/> ${requisitionItem?.cancelComments}'>
+                                <g:set var="statusClass" value=""/>
+                                <g:if test="${requisitionItem?.isCanceled()}">
+                                    <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
+                                    <g:set var="statusClass" value="error"/>
+                                </g:if>
+                                <g:elseif test="${requisitionItem?.isSubstituted()}">
+                                    <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
+                                    <g:set var="statusClass" value="error"/>
+                                </g:elseif>
+                                <g:elseif test="${requisitionItem?.isApproved()}">
+                                    <img src="${resource(dir:'images/icons/silk', file: 'accept.png')}"/>
+                                    <g:set var="statusClass" value="success"/>
+                                </g:elseif>
+                                <g:elseif test="${requisitionItem?.isChanged()}">
+                                    <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
+                                    <g:set var="statusClass" value="notice"/>
+                                </g:elseif>
+                                <g:elseif test="${requisitionItem?.isPending()}">
+                                    <img src="${resource(dir:'images/icons/silk', file: 'hourglass.png')}"/>
+                                    <g:set var="statusClass" value="notice"/>
+                                </g:elseif>
+                                <g:else>
+                                    <img src="${resource(dir:'images/icons/silk', file: 'information.png')}"/>
+                                    <g:set var="statusClass" value="success"/>
+                                </g:else>
+
+                            </div>
                         </td>
 
                         <td class="middle">
@@ -265,28 +268,28 @@
                             </div>
 
                         </td>
+                        <%--
                         <td class="middle">
                             <format:metadata obj="${requisitionItem?.requisitionItemType}"/>
                         </td>
+                        --%>
                         <td class="middle">
                             <g:if test="${requisitionItem.parentRequisitionItem}">
                                 <div class="canceled">${requisitionItem?.parentRequisitionItem?.product?.productCode}</div>
-                                <img src="${resource(dir:'images/icons', file: 'indent.gif')}"/>
                             </g:if>
-                            ${requisitionItem?.product?.productCode}
+                            <div class="${requisitionItem?.status}">
+                                ${requisitionItem?.product?.productCode}
+                            </div>
                         </td>
                         <td class="middle">
                             <g:if test="${requisitionItem.parentRequisitionItem}">
                                 <div class="canceled">${requisitionItem?.parentRequisitionItem?.product?.name}</div>
-                                <img src="${resource(dir:'images/icons', file: 'indent.gif')}"/>
                             </g:if>
-                            ${requisitionItem?.product?.name}
-                        </td>
-                        <td class="center middle">
-                            <div class="box-status" title='<format:metadata obj="${requisitionItem?.cancelReasonCode}"/>'>
-                                <format:metadata obj="${requisitionItem?.status}"/>
+                            <div class="${requisitionItem?.status}">
+                                ${requisitionItem?.product?.name}
                             </div>
                         </td>
+
                         <td class="center middle">
                             ${requisitionItem?.product?.unitOfMeasure}
                         </td>
