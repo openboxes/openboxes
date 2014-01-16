@@ -117,6 +117,7 @@
                         var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
                         var progress = data.hitCount / data.totalCount
                         $('#totalStockValue').html(value);
+
                         if (progress < 0.1) {
                             $("#totalStockSummary").html("* Pricing data is available for less than 10% of all products");
                         }
@@ -136,6 +137,7 @@
                             $("#totalStockSummary").html("* Pricing data is available for more than 90% of all products");
                         }
                         var progressSummary = data.hitCount + " out of " + data.totalCount;
+                        $('#progressSummary').html(progressSummary);
                         var progressPercentage = progress*100;
                         $( "#progressbar" ).progressbar({ value: progressPercentage });
                         $( "#progressPercentage").html("<span title='" + progressSummary + "'>" + formatPercentage(progressPercentage) + "</span>");

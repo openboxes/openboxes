@@ -136,7 +136,7 @@
                 <div class="buttonsBar" style="min-width: 200px;">
                     <div class="megaButton">
                         <g:link controller="requisition" action="list" class="list">
-                            <warehouse:message code="requisitions.label" default="Requisitions" />
+                            <warehouse:message code="default.all.label" default="All" />
                             (${requisitionStatistics["ALL"]})
                         </g:link>
                     </div>
