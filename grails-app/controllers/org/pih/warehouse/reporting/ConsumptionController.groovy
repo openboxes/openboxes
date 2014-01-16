@@ -287,9 +287,9 @@ class ConsumptionController {
                 //println csvRow
                 //csvWriter << csvRow
             }
-            //println "CSV: " + sw.toString()
 
             def csv = dataService.generateCsv(csvrows)
+            println "CSV: " + csv
             println "Location breakdown " + (command.includeLocationBreakdown?'yes':'no')
             println "Selected locations " + command.selectedLocations
 
@@ -297,8 +297,11 @@ class ConsumptionController {
 
             response.setHeader("Content-disposition", "attachment; filename='Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
             render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+            return
         }
         else {
+            println "Render as HTML " + params
+
             [command:command]
         }
     }
@@ -395,7 +398,7 @@ class ShowConsumptionRowCommand {
     }
 
     Integer getTransferBalance() {
-        transferOutQuantity - transferInQuantity
+        transferOutQuantity
     }
 
     Float getMonthlyQuantity() {
@@ -411,7 +414,12 @@ class ShowConsumptionRowCommand {
     }
 
     Float getNumberOfMonthsRemaining() {
-        return onHandQuantity / getMonthlyQuantity()
+        if (getMonthlyQuantity()>0) {
+            return onHandQuantity / getMonthlyQuantity()
+        }
+        else {
+            return 0.0
+        }
     }
 
 

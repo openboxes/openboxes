@@ -994,10 +994,13 @@ button.action-btn, button.previous, button.next {
 .border-left {
     border-left: 3px solid lightgrey;
 }
+.border-top {
+    border-top: 3px solid lightgrey;
+}
 
-
+.credit { color: green; }
 .debit {
-    /*color: blue;*/
+    color: red;
 }
 
 .debit:before {

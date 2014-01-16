@@ -186,44 +186,10 @@
                         Returned ${command.rows?.keySet()?.size()} results
                     </h2>
 
-                    <div style="max-width:100%; overflow-x: scroll; min-height: 450px; max-height: 450px; overflow-y: scroll; white-space: nowrap; ">
+                    <div>
                         <table>
                             <thead>
-                                <tr>
-                                    <td colspan="" class="border-right"></td>
-                                    <td colspan="" class="border-right"></td>
-                                    <%--
-                                    <td colspan="" class="border-right"></td>
-                                    <td colspan="" class="border-right"></td>
-                                    <td colspan="" class="border-right"></td>
-                                    --%>
-                                    <td colspan="6" class="center border-right">
-                                        <b>${warehouse.message(code:'consumption.debit.breakdown.label', default: 'Debit breakdown')}  </b>
-                                        <div class="fade">(count)</div>
-                                    </td>
 
-                                    <td colspan="2" class="center border-right">
-                                        <b>${warehouse.message(code:'consumption.credit.breakdown.label', default: 'Credit breakdown')} </b>
-                                        <div class="fade">(count)</div>
-                                    </td>
-
-                                    <td colspan="1" class="border-right"></td>
-
-                                    <td colspan="3" class="center border-right">
-                                        <label>${warehouse.message(code:'consumption.breakdown.label', default: 'Consumption breakdown')} </label>
-                                    </td>
-
-                                    <td colspan="2" class="center border-right">
-                                        <label>${warehouse.message(code:'consumption.remaining.label', default: 'Remaining')} </label>
-                                    </td>
-                                    <%--
-                                    <g:if test="${command.selectedProperties}">
-                                        <td colspan="${command.selectedProperties.size()}">
-                                            <label>Custom columns</label>
-                                        </td>
-                                    </g:if>
-                                    --%>
-                                </tr>
                                 <tr>
                                     <th class="center border-right"><warehouse:message code="product.productCode.label"/></th>
                                     <th class="border-right"><warehouse:message code="product.name.label"/></th>
@@ -232,13 +198,18 @@
                                     <th class="border-right"><warehouse:message code="category.label"/></th>
                                     <th class="center border-right"><warehouse:message code="product.unitOfMeasure.label"/></th>
                                     <th class="center border-right"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
-                                    --%>
                                     <th class="center" colspan="2"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
                                     <th class="centert" colspan="2"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
                                     <th class="center border-right" colspan="2"><warehouse:message code="consumption.issued.label" default="Issued"/></th>
+                                    --%>
 
+                                    <th class="border-right center"><warehouse:message code="consumption.issued.label" default="Issued"/></th>
+                                    <th class="border-right center"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
+                                    <th class="border-right center"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
+                                    <th class="border-right center"><warehouse:message code="consumption.returns.label" default="Returns"/></th>
+                                    <%--
                                     <th class="center border-right" colspan="2"><warehouse:message code="consumption.returns.label" default="Returns"/></th>
-
+                                    --%>
                                     <th class="center border-right"><warehouse:message code="consumption.balance.label" default="Balance"/></th>
 
                                     <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
@@ -266,7 +237,11 @@
                                     <g:set var="onHandQuantity" value="${row.onHandQuantity}"/>
                                     <g:set var="numberOfMonthsLeft" value="${onHandQuantity / monthlyQuantity}"/>
 
-                                    <tr class="prop ${i%2?'odd':'even'} ${(numberOfMonthsLeft<3&&numberOfMonthsLeft>0)?'error':''} ${(numberOfMonthsLeft<0)?'notice':''}" >
+                                    <tr class="prop ${i%2?'odd':'even'}">
+                                        <%--
+                                            ${(numberOfMonthsLeft<3&&numberOfMonthsLeft>0)?'error':} ${(numberOfMonthsLeft<0)?'notice':''}"
+                                        --%>
+
                                         <td class="center border-right">
                                             ${product?.productCode}
                                         </td>
@@ -288,6 +263,7 @@
                                         </td>
                                         --%>
 
+                                        <%--
                                         <td class="center">
                                             ${row.expiredQuantity}
                                         </td>
@@ -307,14 +283,21 @@
                                         <td class="center border-right">
                                             <span class="fade">(${row.transferOutTransactions?.size()})</span>
                                         </td>
+                                        --%>
 
-
-                                        <td class="center">
-                                            ${row.transferInQuantity}
+                                        <td class="middle center border-right">
+                                            <div class="debit">${row.transferOutQuantity}</div>
+                                        </td>
+                                        <td class="middle center border-right">
+                                            <div class="debit">${row.expiredQuantity}</div>
+                                        </td>
+                                        <td class="middle center border-right">
+                                            <div class="debit">${row.damagedQuantity}</div>
                                         </td>
                                         <td class="center border-right">
-                                            <span class="fade">(${row.transferInTransactions?.size()})</span>
+                                            N/A
                                         </td>
+
 
                                         <td class="center border-right">
                                             ${row.transferBalance}
