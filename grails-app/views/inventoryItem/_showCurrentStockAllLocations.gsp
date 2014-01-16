@@ -3,8 +3,8 @@
     <table>
         <thead>
         <tr class="odd">
-            <th>${warehouse.message(code:'locationGroup.label')}</th>
             <th>${warehouse.message(code:'location.label')}</th>
+            <th>${warehouse.message(code:'locationGroup.label')}</th>
             <th>${warehouse.message(code:'location.locationType.label')}</th>
             <th>${warehouse.message(code:'default.quantity.label')}</th>
         </tr>
@@ -13,18 +13,21 @@
             <tbody>
             <g:set var="quantityMap" value="${quantityMap?.sort {it.value}}"/>
             <g:each in="${quantityMap}" var="entry" status="i">
-                <tr class="prop ${i%2?'even':'odd'} ${entry?.key?.isWarehouse()?'':'canceled'}">
-                    <td>
-                        ${entry?.key?.locationGroup?.name}
-                    </td>
+                <tr class="prop ${i%2?'even':'odd'} ">
                     <td>
                         ${entry?.key}
+
+
+                    </td>
+                    <td>
+                        ${entry?.key?.locationGroup?.name}
                     </td>
                     <td>
                         <format:metadata obj="${entry?.key?.locationType?.name}"/>
                     </td>
                     <td>
-                        ${entry.value} ${commandInstance?.productInstance?.unitOfMeasure}
+                        <g:formatNumber number="${entry.value?:0}" format="###,###.#" maxFractionDigits="1"/>
+                         ${commandInstance?.productInstance?.unitOfMeasure} <g:if test="${!entry?.key?.isWarehouse()}">(*)</g:if>
                     </td>
                 </tr>
             </g:each>
@@ -32,7 +35,8 @@
             <tfoot>
             <tr>
                 <th colspan="4">
-                    <div class="fade">*Cannot guarantee quantities at locations that are not managed inventories (like Wards and Pharmacies).</div>
+
+                    <span class="fade">(*) Cannot guarantee quantities at locations that are not managed inventories (e.g. Wards and Pharmacies).</span>
 
                 </th>
             </tr>
