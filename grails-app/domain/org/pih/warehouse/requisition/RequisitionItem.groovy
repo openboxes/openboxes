@@ -530,7 +530,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def calculatePercentageCompleted() {
-        return totalQuantity()?((totalQuantityPicked()+totalQuantityCanceled()+totalQuantityApproved())/totalQuantity())*100:0
+        return totalQuantity()?((totalQuantityCanceled()+totalQuantityApproved())/totalQuantity())*100:0
     }
 
     def calculatePercentageRemaining() {
