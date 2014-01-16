@@ -991,14 +991,37 @@ class ProductController {
     /**
      * Delete product group from database
      */
-    def deleteProductGroup = {
-        println "deleteSynonym() " + params
+    def removeFromProductGroups = {
+        println "removeFromProductGroup() " + params
 
         def product = Product.get(params.productId)
         if (product) {
             def productGroup = ProductGroup.get(params.id)
             product.removeFromProductGroups(productGroup)
-            productGroup.delete()
+            product.save(flush:true)
+        }
+        else {
+            response.status = 404
+        }
+        render(template:'productGroups', model:[product: product, productGroups:product?.productGroups])
+    }
+
+
+    /**
+     * Delete product group from database
+     */
+    def deleteProductGroup = {
+        println "deleteProductGroup() " + params
+
+        def product = Product.get(params.productId)
+        if (product) {
+            def productGroup = ProductGroup.get(params.id)
+            def productIds = productGroup?.products?.collect { it.id }
+            productIds.each { productId ->
+                def productGroupProduct = Product.get(productId)
+                productGroup.removeFromProducts(productGroupProduct)
+            }
+            productGroup.delete(flush: true)
             product.save(flush:true)
         }
         else {
