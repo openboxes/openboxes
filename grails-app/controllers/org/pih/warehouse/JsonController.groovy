@@ -365,6 +365,26 @@ class JsonController {
 		render results as JSON;
 	}
 
+    def autoSuggestProductGroups = {
+        println "autoSuggest: " + params
+        def searchTerms = params.term.split(" ")
+        //def searchTerm = "%" + params.term + "%";
+        def c = ProductGroup.createCriteria()
+        def results = c.list {
+            projections {
+                property "description"
+            }
+            and {
+                searchTerms.each { searchTerm ->
+                    ilike("description", "%" + searchTerm + "%" )
+                }
+            }
+        }
+        results = results.unique().collect { [ value: it, label: it ] }
+        render results as JSON;
+    }
+
+
 	def findProductNames = {
 		def searchTerm = "%" + params.term + "%";
 		def c = Product.createCriteria()
