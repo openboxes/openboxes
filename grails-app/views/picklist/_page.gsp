@@ -8,10 +8,10 @@
             <th><warehouse:message code="report.number.label"/></th>
             <th class="center">${warehouse.message(code: 'product.productCode.label')}</th>
             <th>${warehouse.message(code: 'product.label')}</th>
-            <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
             <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
             <th class="center">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
             <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
+            <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
             <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
             <th class="center">${warehouse.message(code:'requisition.checkedBy.label')}</th>
         </tr>
@@ -60,11 +60,13 @@
                         <g:if test="${j==0}">
                             ${requisitionItem?.product?.name}
                         </g:if>
-                    </td>
-                    <td class="center middle">
-                        <g:if test="${j==0}">
-                            ${requisitionItem?.quantity ?: 0}
-                            ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+
+                        <g:if test="${requisitionItem.cancelReasonCode}">
+                            <div class="fade">
+                                <format:metadata obj="${requisitionItem.status}"/> due to
+                                <format:metadata obj="${requisitionItem.cancelReasonCode}" />
+                                ${requisitionItem.cancelComments}
+                            </div>
                         </g:if>
                     </td>
                     <td class="center middle">
@@ -81,6 +83,12 @@
                     <td class="middle center">
                         <g:if test="${picklistItems}">
                             <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                        </g:if>
+                    </td>
+                    <td class="center middle">
+                        <g:if test="${j==0}">
+                            ${requisitionItem?.quantity ?: 0}
+                            ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                         </g:if>
                     </td>
                     <td class="middle center">

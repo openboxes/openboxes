@@ -11,27 +11,25 @@
             type="text/javascript"></script>
     <link rel="stylesheet" href="${createLinkTo(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.css')}"
           type="text/css" media="all"/>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+
 </head>
 
 <body>
 <div id="print-header" style="line-height: 40px;">
     <%--<img id="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>--%>
     <span class="title"><warehouse:message code="picklist.print.label"/></span>
-    <span style="float: right;">
-        <button type="button" id="print-button" onclick="window.print();">
-            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>
+    <div class="right button-group" style="margin:10px;">
+        <a href="javascript:window.print()" type="button" id="print-button" onclick="window.print();"  class="button">
             ${warehouse.message(code: "default.button.print.label", default: 'Print')}
-        </button>
-        &nbsp;
-        <g:link controller="picklist" action="renderPdf" id="${requisition?.id}">
-            <img src="${resource(dir: 'images/icons', file: 'pdf.png')}"/>
+        </a>
+        <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" class="button">
             ${warehouse.message(code: "default.button.download.label", default: 'Download')}
         </g:link>
-        <a href="javascript:window.close();">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+        <a href="javascript:window.close();" class="button">
             ${warehouse.message(code: "default.button.close.label", default: 'Close')}
         </a>
-    </span>
+    </div>
     <hr/>
 </div>
 
@@ -50,10 +48,10 @@
         </td>
         <td>
             <div class="header">
-                <h1><warehouse:message code="picklist.label"/></h1>
+                <h3><warehouse:message code="picklist.label"/></h3>
             </div>
             <div class="header">
-                <h3>${requisition.requestNumber} | ${requisition?.name }</h3>
+                <h1>${requisition.requestNumber} | ${requisition?.name }</h1>
             </div>
             <%--
             <div class="header">
@@ -79,7 +77,7 @@
 <div>
     <table border="0" class="signature-table">
         <tr class="header">
-            <td>
+            <td class="name right">
                 <label><warehouse:message code="requisition.depot.label"/>:</label>
             </td>
             <td>
@@ -87,7 +85,7 @@
             </td>
         </tr>
         <tr class="header">
-            <td>
+            <td class="name right">
                 <label><warehouse:message code="requisition.ward.label"/>:</label>
             </td>
             <td>
@@ -96,7 +94,7 @@
         </tr>
 
         <tr class="header">
-            <td>
+            <td class="name right">
                 <label><warehouse:message code="requisition.date.label"/>:</label>
             </td>
             <td>
@@ -105,7 +103,7 @@
             </td>
         </tr>
         <tr class="header">
-            <td>
+            <td class="name right">
                 <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
             </td>
             <td>
@@ -215,6 +213,7 @@
 <div class="clear"></div>
 
 <g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
+<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()||it.isSubstituted() }}'/>
 <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
 <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
 <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
@@ -250,6 +249,13 @@
             ${warehouse.message(code:'default.everythingElse.label', default:'Everything else')}
         </h2>
         <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, location:location, pageBreakAfter: 'avoid']"/>
+    </g:if>
+    <g:if test="${requisitionItemsCanceled}">
+        <h2>
+            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" title="Canceled"/>&nbsp;
+            ${warehouse.message(code:'default.canceled.label', default:'Canceled')}
+        </h2>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid']"/>
     </g:if>
 </div>
 

@@ -108,6 +108,7 @@
 <div class="clear"></div>
 
 <g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
+<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()||it.isSubstituted() }}'/>
 <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
 <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
 <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
@@ -142,6 +143,13 @@
             ${warehouse.message(code:'product.other.label', default:'Other')}
         </h2>
         <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, pageBreakAfter: 'avoid']"/>
+    </g:if>
+    <g:if test="${requisitionItemsCanceled}">
+        <h2>
+            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" title="Canceled"/>&nbsp;
+        ${warehouse.message(code:'default.canceled.label', default:'Canceled')}
+        </h2>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid']"/>
     </g:if>
 
 </div>

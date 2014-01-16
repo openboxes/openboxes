@@ -261,6 +261,7 @@
 </div>
 
 <g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
+<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()||it.isSubstituted() }}'/>
 <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
 <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
 <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
@@ -291,11 +292,18 @@
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <g:set var="pageTitle">
+            <%--<img src="${resource(dir: 'images/icons/silk', file: 'package.png', absolute: true)}" title="Other items"/>--%>
+            ${warehouse.message(code:'default.otherItems.label', default:'Other items')}
+        </g:set>
+        <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, location: location, picklist:picklist, pageBreakAfter: 'avoid']"/>
+    </g:if>
+    <g:if test="${requisitionItemsCanceled}">
+        <g:set var="pageTitle">
         <%--<img src="${resource(dir: 'images/icons/silk', file: 'package.png', absolute: true)}" title="Other items"/>--%>
-        ${warehouse.message(code:'default.otherItems.label', default:'Other items')}
-    </g:set>
-    <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, location: location, picklist:picklist, pageBreakAfter: 'avoid']"/>
-</g:if>
+            ${warehouse.message(code:'default.canceled.label', default:'Canceled items')}
+        </g:set>
+        <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, location: location, picklist:picklist, pageBreakAfter: 'avoid']"/>
+    </g:if>
 </div>
 </body>
 </html>
