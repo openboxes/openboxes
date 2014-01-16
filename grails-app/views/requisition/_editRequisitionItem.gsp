@@ -1,25 +1,25 @@
+
+<div class="button-container">
+    <div class="button-group">
+
+<g:remoteLink controller="requisition" action="showRequisitionItems" id="${requisitionItem?.requisition?.id }" update="requisitionItems" class="button icon log">
+    <warehouse:message code="default.button.list.label" default="Back to verify"/>
+</g:remoteLink>
+<g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
+              params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon reload">
+    <warehouse:message code="default.button.refresh.label" default="Refresh"/>
+</g:remoteLink>
+
+</div>
 <div class="box" id="changeQuantity">
-<g:set var="quantityOnHand" value="${quantityOnHandMap[requisitionItem?.product?.id]?:0}"/>
-<g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
 
 <h2>
-    <span class="box-status ${isAvailable?'success':'error'}">
-        ${isAvailable?"Available":"Unavailable"}
-    </span>
-                ${requisitionItem?.product?.productCode}
-                ${requisitionItem?.product}
-                (${requisitionItem.orderIndex+1} / ${requisitionItem.requisition.requisitionItemCount})
+    ${requisitionItem?.product?.productCode}
+    ${requisitionItem?.product}
+    (${requisitionItem.orderIndex+1} / ${requisitionItem.requisition.requisitionItemCount})
 
-                <div class="button-group right" style="margin: 5px;">
-                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                  params="['requisitionItem.id':requisitionItem?.previous()?.id, actionType:'show']" update="requisitionItems" class="button icon arrowleft">
-                        <warehouse:message code="default.button.previous.label" default="Previous"/>
-                    </g:remoteLink>
-                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                  params="['requisitionItem.id':requisitionItem?.next()?.id, actionType:'show']" update="requisitionItems" class="button icon arrowright">
-                        <warehouse:message code="default.button.next.label" default="Next"/>
-                    </g:remoteLink>
-                </div>
+
+
 </h2>
 
     <table>
@@ -67,7 +67,9 @@
                 <label><warehouse:message code="requisitionItem.status.label"/></label>
             </td>
             <td class="middle">
-                <format:metadata obj="${requisitionItem?.status}"/>
+                <span class="tag">
+                    <format:metadata obj="${requisitionItem?.status}"/>
+                </span>
             </td>
         </tr>
         <tr class="prop">
@@ -77,8 +79,13 @@
             <td class="middle">
                 ${requisitionItem?.product?.productCode}
                 ${requisitionItem?.product}
+                (${requisitionItem?.product?.unitOfMeasure})
+
+
+
             </td>
         </tr>
+        <%--
         <tr class="prop">
             <td class="middle name right">
                 <label><warehouse:message code="product.package.label" default="Package size(s)"/></label>
@@ -92,16 +99,7 @@
                 </g:each>
             </td>
         </tr>
-        <tr class="prop">
-            <td class="middle right name">
-                <label><warehouse:message code="product.unitOfMeasure.label"/></label>
-            </td>
-            <td class="middle">
-                ${requisitionItem?.product?.unitOfMeasure}
-            </td>
-        </tr>
-    </table>
-    <table>
+        --%>
         <tr class="prop">
             <td class="middle right name">
                 <label><warehouse:message code="requisitionItem.quantityRequested.label"/></label>
@@ -128,43 +126,77 @@
         </tr>
         <tr class="prop">
             <td class="top right name">
-                <label><warehouse:message code="requisitionItem.quantityOnHand.label" default="On-hand"/></label>
+                <label><warehouse:message code="requisitionItem.substitutions.label" default="Substitutions"/></label>
             </td>
             <td class="middle">
-                <g:if test='${requisitionItem.product.productGroups}'>
-                    <table style="width:auto;" class="box">
-                        <tr>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="product.productPackages.label" default="Package sizes"/></th>
-                            <th><warehouse:message code="inventoryItem.quantityOnHand.label"/></th>
-                        </tr>
-                        <g:set var='count' value='${0 }'/>
-                        <g:each var="productGroup" in="${requisitionItem.product.productGroups}">
-                            <g:each var="product" in="${productGroup.products}">
-                                <tr class="${count++%2?'even':'odd'}">
-                                    <td>${product?.productCode} ${product?.name}</td>
-                                    <td>
-                                        <ul>
+                <table style="width:auto;" class="box">
+                    <tr>
+                        <th><warehouse:message code="product.productCode.label"/></th>
+                        <th><warehouse:message code="product.label"/></th>
+                        <th><warehouse:message code="product.productPackages.label" default="Package sizes"/></th>
+                        <th><warehouse:message code="inventoryItem.quantityOnHand.label"/></th>
+                        <th><warehouse:message code="inventoryItem.status.label" default="Status"/></th>
+                    </tr>
+                    <g:set var='count' value='${0 }'/>
+                    <g:each var="product" in="${quantityOnHandMap.keySet()}">
+                        <g:set var="quantityOnHand" value="${quantityOnHandMap[product]?:0}"/>
+                        <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
+
+
+                        <g:set var="rowStyle" value=""/>
+                        <g:if test="${product == requisitionItem.product}">
+                            <g:set var="rowStyle" value="canceled"/>
+                        </g:if>
+                            <tr class="${count++%2?'even':'odd'} ${rowStyle}">
+                                <td>
+                                    ${product?.productCode}
+                                </td>
+                                <td>
+                                    <g:link controller="inventoryItem" action="showStockCard" id="${product?.id }" target="_blank" >
+                                       ${product?.name}
+                                    </g:link>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <g:if test='${product.packages}'>
                                             <g:each var="productPackage" in="${product.packages}">
                                                 <li>${productPackage.name} ${productPackage.uom.code}/${productPackage.quantity}</li>
                                             </g:each>
-                                        </ul>
-                                    </td>
-                                    <td>${quantityOnHandMap[product?.id]?:0} EA/1</td>
+                                        </g:if>
+                                        <g:else>
+                                            <li>EA/1</li>
+                                        </g:else>
+                                    </ul>
+                                </td>
+                                <td>
+                                    ${quantityOnHandMap[product]?:0} EA/1
+                                </td>
+                                <td>
+                                    <span class="box-status ${isAvailable?'success':'error'}">
+                                        ${isAvailable?"Available":"Unavailable"}
+                                    </span>
+                                </td>
 
-                                </tr>
-                            </g:each>
-                        </g:each>
-                    </table>
-                </g:if>
-                <g:else>
-                    ${quantityOnHand} EA/1
+                            </tr>
 
-                </g:else>
+                    </g:each>
+                </table>
             </td>
         </tr>
         <tr class="prop">
             <td>
+                <div class="button-group">
+
+                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
+                                  params="['requisitionItem.id':requisitionItem?.previous()?.id, actionType:'show']" update="requisitionItems" class="button icon arrowleft">
+                        <warehouse:message code="default.button.previous.label" default="Previous"/>
+                    </g:remoteLink>
+                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
+                                  params="['requisitionItem.id':requisitionItem?.next()?.id, actionType:'show']" update="requisitionItems" class="button icon arrowright">
+                        <warehouse:message code="default.button.next.label" default="Next"/>
+                    </g:remoteLink>
+                </div>
+
 
             </td>
             <td class="middle left">
@@ -181,28 +213,38 @@
                     <div class="button-container">
 
 
-                        <div class="button-group">
+
                             <g:if test="${requisitionItem.canUndoChanges()}">
-                                <g:remoteLink controller="requisition" action="undoChanges" id="${requisitionItem?.requisition?.id }"
-                                              params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon trash">
-                                    <warehouse:message code="default.button.undo.label" default="Undo"/>
-                                </g:remoteLink>
+                                <div class="button-group">
+                                    <g:remoteLink controller="requisition" action="undoChanges" id="${requisitionItem?.requisition?.id }"
+                                                  params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon trash">
+                                        <warehouse:message code="default.button.undo.label" default="Undo"/>
+                                    </g:remoteLink>
+                                </div>
                             </g:if>
                             <g:else>
-                                <button class="button icon approve ${requisitionItem.canApproveQuantity()?'':'disabled'}">
-                                    ${warehouse.message(code:'default.button.approve.label', default: 'Approve') }
-                                </button>
-                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                              params="['requisitionItem.id':requisitionItem?.id, actionType:'change']" update="requisitionItems" class="button icon edit ${requisitionItem.canChangeQuantity()?'':'disabled'}">
-                                    <warehouse:message code="default.button.change.label" default="Change"/>
-                                </g:remoteLink>
-                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                              params="['requisitionItem.id':requisitionItem?.id, actionType:'cancel']" update="requisitionItems" class="button icon trash ${requisitionItem.canCancelQuantity()?'':'disabled'}">
-                                    <warehouse:message code="default.button.cancel.label" default="Cancel"/>
-                                </g:remoteLink>
+                                <div class="button-group">
+                                    <button class="button icon approve ${requisitionItem.canApproveQuantity()?'':'disabled'}">
+                                        ${warehouse.message(code:'verify.button.approve.label', default: 'Approve item') }
+                                    </button>
+                                </div>
+                                <div class="button-group">
+                                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
+                                                  params="['requisitionItem.id':requisitionItem?.id, actionType:'change']" update="requisitionItems" class="button icon add ${requisitionItem.canChangeQuantity()?'':'disabled'}">
+                                        <warehouse:message code="verify.button.change.label" default="Change quantity"/>
+                                    </g:remoteLink>
+                                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
+                                                  params="['requisitionItem.id':requisitionItem?.id, actionType:'change']" update="requisitionItems" class="button icon edit ${requisitionItem.canChangeQuantity()?'':'disabled'}">
+                                        <warehouse:message code="verify.button.substitute.label" default="Substitute product"/>
+                                    </g:remoteLink>
+                                    <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
+                                                  params="['requisitionItem.id':requisitionItem?.id, actionType:'cancel']" update="requisitionItems" class="button icon trash ${requisitionItem.canCancelQuantity()?'':'disabled'}">
+                                        <warehouse:message code="verify.button.cancel.label" default="Cancel item"/>
+                                    </g:remoteLink>
+                                </div>
                             </g:else>
-                        </div>
 
+                        <%--
                         <div class="button-group">
                             <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
                                           params="['requisitionItem.id':requisitionItem?.previous()?.id, actionType:'show']" update="requisitionItems" class="button icon arrowleft">
@@ -213,16 +255,10 @@
                                 <warehouse:message code="default.button.next.label" default="Next"/>
                             </g:remoteLink>
                         </div>
-                        <div class="button-group">
-                            <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                          params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon reload">
-                                <warehouse:message code="default.button.refresh.label" default="Refresh"/>
-                            </g:remoteLink>
-                            <g:remoteLink controller="requisition" action="showRequisitionItems" id="${requisitionItem?.requisition?.id }" update="requisitionItems" class="button icon log">
-                                <warehouse:message code="default.button.list.label" default="List"/>
-                            </g:remoteLink>
-                        </div>
+                        --%>
                     </div>
+
+
 
                 </g:formRemote>
 
@@ -232,6 +268,8 @@
 
     </table>
 </div>
+
+
 
 
 <g:hasErrors bean="${requisitionItem}">

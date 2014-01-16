@@ -828,7 +828,9 @@ class RequisitionController {
         def products = []
         products << requisitionItem.product
         requisitionItem.product.productGroups.each { productGroup ->
+            //println "PRODUCT GROUP " + productGroup
             productGroup.products.each { product ->
+                //println "PRODUCT " + product
                 products.add(product)
             }
         }
@@ -836,13 +838,18 @@ class RequisitionController {
         return products
     }
 
+
     def getQuantityOnHandMap(location, products) {
-        def quantityOnHandMap = inventoryService.getQuantityByProductMap(location.inventory, products)
-        products.each {
-            quantityOnHandMap[it.id] = quantityOnHandMap[it]?:0
+        def quantityOnHandMap = [:]
+        if (products) {
+            products.eachWithIndex { product, index ->
+                quantityOnHandMap[product] = inventoryService.getQuantityOnHand(location, product)
+                //println "PRODUCT " + product.productCode + " " + index + " " + quantityOnHandMap[product]
+            }
         }
         return quantityOnHandMap
     }
+
 
 
     def showRequisitionItems = {
@@ -854,8 +861,10 @@ class RequisitionController {
         def location = Location.get(session.warehouse.id)
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         def products = getRelatedProducts(requisitionItem)
-        def quantityOnHandMap = getQuantityOnHandMap(location, products)
 
+        //println "PRODUCTS " + products*.productCode
+        def quantityOnHandMap = getQuantityOnHandMap(location, products)
+        //println "editRequisitionItem: " + quantityOnHandMap
         render(template: "editRequisitionItem", model: [requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
     }
 
