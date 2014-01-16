@@ -21,6 +21,7 @@ class MessageTagLib {
 	def messageSource
 
 
+    /*
     def message = { attrs, body ->
         long startTime = System.currentTimeMillis()
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
@@ -31,9 +32,10 @@ class MessageTagLib {
         out << defaultTagLib.message.call(attrs)
         return;
     }
+    */
 
     //@Cacheable("messageCache")
-    def message_ = { attrs, body ->
+    def message = { attrs, body ->
         long startTime = System.currentTimeMillis()
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 
