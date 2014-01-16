@@ -7,7 +7,8 @@
                 <th>${warehouse.message(code: 'product.label')}</th>
                 <th style="min-width: 150px;">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
+                <th class="center">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
+                <th class="center">${warehouse.message(code: 'requisitionItem.quantityDelivered.label', default: "Delivered")}</th>
                 <th>${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
             </tr>
         </thead>
@@ -64,18 +65,17 @@
                             <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
                         </td>
                         <td class="center middle">
-                            <g:if test="${requisitionItem?.parentRequisitionItem}">
-                                <div class="canceled">
-                                    ${requisitionItem?.parentRequisitionItem?.quantity}
-                                    ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
-                                </div>
-                            </g:if>
+                            ${requisitionItem.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                        </td>
+                        <td class="center middle">
                             ${picklistItems[j]?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                         </td>
                         <td class="center middle">
-                            <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
-                                <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}</p>
-                                <p class="fade">${requisitionItem?.parentRequisitionItem?.cancelComments}</p>
+                            <g:if test="${requisitionItem.cancelReasonCode}">
+                                <div class="fade">
+                                    <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</p>
+                                    <p class="fade">${requisitionItem?.cancelComments}</p>
+                                </div>
                             </g:if>
                         </td>
                         <% j++ %>

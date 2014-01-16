@@ -57,11 +57,14 @@
                             <g:if test="${j==0}">
                                 ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
                             </g:if>
+
                             <g:if test="${requisitionItem.cancelReasonCode}">
                                 <div class="fade">
-                                    <format:metadata obj="${requisitionItem.status}"/> due to
-                                    <format:metadata obj="${requisitionItem.cancelReasonCode}" />
-                                    ${requisitionItem.cancelComments}
+                                    <p>
+                                        <format:metadata obj="${requisitionItem.status}"/> due to
+                                        ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}
+                                    </p>
+                                    <p class="fade">${requisitionItem?.cancelComments}</p>
                                 </div>
                             </g:if>
                         </td>
