@@ -19,6 +19,14 @@
                 <tbody>
                     <tr class="prop">
                         <td class="name">
+                            <label>${warehouse.message(code: 'shipping.shipmentNumber.label') }</label>
+                        </td>
+                        <td class="value">
+                            ${shipmentInstance?.shipmentNumber }
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td class="name">
                             <label>${warehouse.message(code: 'shipping.origin.label') }</label>
                         </td>
                         <td class="value">
@@ -102,10 +110,10 @@
                     </g:if>
                     <g:if test="${userInstance}">
                         <tr class="prop">
-                            <td>
+                            <td class="name">
                                 <label>${warehouse.message(code: 'shipping.preparedBy.label') }</label>
                             </td>
-                            <td>
+                            <td class="value">
                                 ${userInstance?.name }
                                 <a href="mailto:${userInstance?.email }">${userInstance?.email }</a>
                             </td>
@@ -113,10 +121,10 @@
                     </g:if>
                     <g:if test="${shipmentInstance?.carrier}">
                         <tr class="prop">
-                            <td>
+                            <td class="name">
                                 <label>${warehouse.message(code: 'shipping.carriedBy.label') }</label>
                             </td>
-                            <td>
+                            <td class="value">
                                 ${shipmentInstance?.carrier?.name }
                                 <a href="mailto:${shipmentInstance?.carrier?.email }">${shipmentInstance?.carrier?.email }</a>
                             </td>
@@ -197,6 +205,13 @@
                             </td>
                         </tr>
                     </g:each>
+                    <g:unless test="${shipmentInstance?.comments}">
+                        <tr>
+                            <td class="center empty">
+                                ${warehouse.message(code:'comments.none.label', default: "No comments")}
+                            </td>
+                        </tr>
+                    </g:unless>
                 </tbody>
             </table>
         </div>

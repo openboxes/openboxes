@@ -19,6 +19,14 @@
     <table class="details stripe">
         <tbody>
         <tr class="prop">
+            <td class="name">
+                <label>${warehouse.message(code: 'shipping.shipmentNumber.label') }</label>
+            </td>
+            <td class="value">
+                ${shipmentInstance?.shipmentNumber }
+            </td>
+        </tr>
+        <tr class="prop">
             <td class="name"><label>${warehouse.message(code: 'shipping.origin.label') }</label></td>
             <td>${shipmentInstance?.origin?.name }</td>
         </tr>
@@ -287,8 +295,8 @@
                         </g:else>
                     </td>
                     <td class="left">
-                        <g:if test="${shimentItem?.receiptItems()}">
-                        ${shipmentItem?.receiptItems()?.first()?.comment}
+                        <g:if test="${shipmentItem?.receiptItems()}">
+                            ${shipmentItem?.receiptItems()?.first()?.comment}
                         </g:if>
                     </td>
                 </tr>
