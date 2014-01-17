@@ -11,35 +11,37 @@
         </thead>
         <g:if test="${quantityMap}">
             <tbody>
-            <g:set var="quantityMap" value="${quantityMap?.sort {it.value}}"/>
-            <g:each in="${quantityMap}" var="entry" status="i">
-                <tr class="prop ${i%2?'even':'odd'} ">
-                    <td>
-                        ${entry?.key}
-
-
-                    </td>
-                    <td>
-                        ${entry?.key?.locationGroup?.name}
-                    </td>
-                    <td>
-                        <format:metadata obj="${entry?.key?.locationType?.name}"/>
-                    </td>
-                    <td>
-                        <g:formatNumber number="${entry.value?:0}" format="###,###.#" maxFractionDigits="1"/>
-                         ${commandInstance?.productInstance?.unitOfMeasure} <g:if test="${!entry?.key?.isWarehouse()}">(*)</g:if>
-                    </td>
-                </tr>
-            </g:each>
+                <g:set var="totalQuantity" value="${0 }"/>
+                <g:set var="quantityMap" value="${quantityMap?.sort {it.value}}"/>
+                <g:each in="${quantityMap}" var="entry" status="i">
+                    <g:set var="totalQuantity" value="${totalQuantity + (entry?.value?:0) }"/>
+                    <tr class="prop ${i%2?'even':'odd'} ">
+                        <td>
+                            ${entry?.key}
+                        </td>
+                        <td>
+                            ${entry?.key?.locationGroup?.name}
+                        </td>
+                        <td>
+                            <format:metadata obj="${entry?.key?.locationType?.name}"/>
+                        </td>
+                        <td>
+                            <g:formatNumber number="${entry.value?:0}" format="###,###.#" maxFractionDigits="1"/>
+                             ${commandInstance?.productInstance?.unitOfMeasure}
+                        </td>
+                    </tr>
+                </g:each>
             </tbody>
             <tfoot>
-            <tr>
-                <th colspan="4">
-
-                    <span class="fade">(*) Cannot guarantee quantities at locations that are not managed inventories (e.g. Wards and Pharmacies).</span>
-
-                </th>
-            </tr>
+                <tr>
+                    <th><warehouse:message code="default.total.label"/></th>
+                    <th></th>
+                    <th></th>
+                    <th>
+                        <g:formatNumber number="${totalQuantity?:0}" format="###,###.#" maxFractionDigits="1"/>
+                        ${commandInstance?.productInstance?.unitOfMeasure}
+                    </th>
+                </tr>
             </tfoot>
         </g:if>
         <g:unless test="${quantityMap}">
