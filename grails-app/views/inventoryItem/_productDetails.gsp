@@ -284,10 +284,10 @@
                     <td class="value middle">
                         <g:if test="${productInstance?.pricePerUnit > 0 && totalQuantity > 0 }">
                             $${g.formatNumber(number: (totalQuantity*productInstance?.pricePerUnit), format: '###,###,###.00') }
-                            <span class="fade">USD</span>
+                            USD
                         </g:if>
                         <g:else>
-                            <span class="fade">$0.00 USD</span>
+                            $0.00 USD
                         </g:else>
                     </td>
                 </tr>
