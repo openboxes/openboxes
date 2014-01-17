@@ -244,7 +244,7 @@ class ProductController {
             log.info("saved product " + productInstance.errors)
             def warehouseInstance = Location.get(session.warehouse.id);
             def inventoryInstance = warehouseInstance?.inventory;
-			//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
+			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
 			sendProductCreatedEmail(productInstance)
 			//redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
 			//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
@@ -526,26 +526,23 @@ class ProductController {
 
 
 	/**
-	 *
 	 * @param userInstance
 	 * @return
 	 */	
-	def sendProductCreatedEmail(Product product) {
+	def sendProductCreatedEmail(Product productInstance) {
 		def adminList = []
 		try {
 			adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN).collect { it.email }
 			if (adminList) {
-				def subject = "${warehouse.message(code:'email.productCreated.message',args:[product?.name,product?.createdBy?.name])}";
-				def body = "${g.render(template:'/email/productCreated',model:[product:product])}"
+				def subject = "${warehouse.message(code:'email.productCreated.message',args:[productInstance?.name,productInstance?.createdBy?.name])}";
+				def body = "${g.render(template:'/email/productCreated',model:[productInstance:productInstance])}"
 				mailService.sendHtmlMail(subject, body.toString(), adminList);
 				flash.message = "${warehouse.message(code:'email.sent.message',args:[adminList])}"
 			}
-			else {
-			}
 		}
 		catch (Exception e) {
-			log.error("Error sending 'Product Created' email")
-			//flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
+			log.error("Error sending 'Product Created' email", e)
+			flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
 		}
 	}
 
