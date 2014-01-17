@@ -62,7 +62,7 @@ class InventoryItemController {
     //@CacheFlush("megamenuCache")
 	def showStockCard = { StockCardCommand cmd ->
         //log.info "=".multiply(20)
-        long currentTime = System.currentTimeMillis()
+        long startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
 		// add the current warehouse to the command object
 		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
@@ -151,43 +151,51 @@ class InventoryItemController {
         */
         //log.info "After setting session productsViewed " + (System.currentTimeMillis() - currentTime) + " ms"
 
-        def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.productInstance)
+        def quantityMap = inventoryService.getQuantityOnHand(commandInstance.warehouseInstance, commandInstance?.productInstance)
 
         //def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
         //requisitionItems: requisitionItems, , issuedRequisitionItems:issuedRequisitionItems
 
+        // FIXME Ignore this for now -- just testing out some graphing plugins
         def consumptionColumns = [['string', 'Month'], ['number', 'On-hand'], ['number', 'Available']]
         def consumptionData = [['Jan', 1000, 400], ['Feb', 1170, 460], ['Mar', 660, 1120], ['Apr', 1030, 540],
                 ['May', 660, 1120], ['Jun', 1030, 540],['Jul', 660, 1120], ['Aug', 1030, 540],['Sep', 660, 1120], ['Oct', 1030, 540],
                 ['Nov', 660, 1120], ['Dec', 1030, 540]]
 
+
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
         [ commandInstance: commandInstance, quantityMap: quantityMap, consumptionColumns: consumptionColumns, consumptionData: consumptionData ]
 	}
 
     def showCurrentStockAllLocations = { StockCardCommand cmd ->
-        long currentTime = System.currentTimeMillis()
+        def startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
         cmd.warehouseInstance = Location.get(session?.warehouse?.id)
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.productInstance)
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+
         render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap])
     }
 
 
     def showStockHistory = { StockCardCommand cmd ->
-        long currentTime = System.currentTimeMillis()
+        def startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
         cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+
         render(template: "showStockHistory", model: [commandInstance:commandInstance])
     }
 
     def showPendingRequisitions = { StockCardCommand cmd ->
-        long currentTime = System.currentTimeMillis()
+        def startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
         cmd.warehouseInstance = Location.get(session?.warehouse?.id)
@@ -208,11 +216,14 @@ class InventoryItemController {
         }
         commandInstance.requisitionMap = requisitionMap;
 
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+
+
         render(template: "showPendingRequestLog", model: [commandInstance:commandInstance, requisitionItems:requisitionItems])
     }
 
     def showPendingShipments = { StockCardCommand cmd ->
-        long currentTime = System.currentTimeMillis()
+        long startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
         cmd.warehouseInstance = Location.get(session?.warehouse?.id)
@@ -231,6 +242,8 @@ class InventoryItemController {
             }
         }
         commandInstance.shipmentMap = shipmentMap;
+
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
         render(template: "showPendingShipmentLog", model: [commandInstance:commandInstance])
     }
