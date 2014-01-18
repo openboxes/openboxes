@@ -1,6 +1,5 @@
 <div id="dlgAddItem" title="${warehouse.message(code:'shipping.addItem.label')}" style="padding: 10px; display: none;" >
-	
-	
+
 	<div id="itemSearchForm" >
 		<h4><warehouse:message code="shipping.itemSearch.label"/></h4>
 		<div style="text-align: left;">
@@ -8,9 +7,10 @@
 				<tbody>
 					<tr>
 						<td style="text-align: left">
-							<g:autoSuggestSearchable id="searchable" name="searchable"
-								jsonUrl="${request.contextPath }/json/findInventoryItems" width="575" styleClass="text"/>
-							&nbsp;
+							<g:autoSuggestSearchable id="searchable" name="searchable" minLength="3"
+								jsonUrl="${request.contextPath }/json/findInventoryItems" width="590" styleClass="middle text"
+                            />
+                            <div class="fade">Type at least 3 characters to see results</div>
 						</td>
 					</tr>
 				</tbody>
@@ -47,7 +47,8 @@
 		$("#dlgAddItem").dialog({ 
 			autoOpen: true, 
 			modal: true, 
-			width: 600,			
+			width: 700,
+            height: 400,
 			open: function() { }
 		});				
 		

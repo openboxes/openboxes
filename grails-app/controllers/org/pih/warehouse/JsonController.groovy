@@ -530,33 +530,45 @@ class JsonController {
 		if (params.term) {
 			// Improved the performance of the auto-suggest by moving 
 			def tempItems = inventoryService.findInventoryItems(params.term)
-			
-			// Get a map of quantities for all items in inventory
-			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(location?.inventory)
-			
+
+            println tempItems
+
 			if (tempItems) {
 
-				tempItems.each { 
-					def quantity = quantitiesByInventoryItem[it]
-					quantity = (quantity) ?: 0
-					
-					def localizedName = localizationService.getLocalizedString(it.product.name)
-					localizedName = (it.product.productCode?:"----") + " " + localizedName
-					if (quantity > 0) { 
-						inventoryItems << [
-							id: it.id,
-							value: it.lotNumber,
-							label:  localizedName + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
-							valueText: it.lotNumber,
-							lotNumber: it.lotNumber,
-							product: it.product.id,
-							productId: it.product.id,
-							productName: localizedName,
-							quantity: quantity,
-							expirationDate: it.expirationDate
-						]
-					}	
-				}
+                if (tempItems.size() > 100) {
+                    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Too many items for term {0}. Please search by product code.', args: [params.term])}"
+                    inventoryItems << [id: 'null', value: message]
+                }
+                else {
+                    def quantitiesByInventoryItem = [:]
+                    tempItems.each { inventoryItem ->
+                        def quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
+                        quantitiesByInventoryItem[inventoryItem] = quantity?:0
+                        //quantitiesByInventoryItem[inventoryItem] = 1
+                    }
+
+                    tempItems.each {
+                        def quantity = quantitiesByInventoryItem[it]
+                        quantity = (quantity) ?: 0
+
+                        def localizedName = localizationService.getLocalizedString(it.product.name)
+                        localizedName = (it.product.productCode?:" - ") + " " + localizedName
+                        if (quantity > 0) {
+                            inventoryItems << [
+                                id: it.id,
+                                value: it.lotNumber,
+                                label:  localizedName + " - Item: " + it.lotNumber + " - Qty: " + quantity,
+                                valueText: it.lotNumber,
+                                lotNumber: it.lotNumber,
+                                product: it.product.id,
+                                productId: it.product.id,
+                                productName: localizedName,
+                                quantity: quantity,
+                                expirationDate: it.expirationDate
+                            ]
+                        }
+                    }
+                }
 			}
 		}
 		if (inventoryItems.size() == 0) { 

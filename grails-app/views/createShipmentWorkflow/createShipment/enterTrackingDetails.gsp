@@ -31,6 +31,7 @@
 				<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 				
 				<div class="dialog box">
+                    <h2><warehouse:message code="shipping.enterTrackingDetails.label"/></h2>
 					<table>
 	                    <tbody>		
 
@@ -40,7 +41,7 @@
 										code="shipping.traveler.label" /></label></td>
 									<td valign="top">
 										<g:autoSuggest id="carrier" name="carrier" jsonUrl="${request.contextPath }/json/findPersonByName" 
-											width="300"
+											width="300" styleClass="middle text"
 											valueId="${shipmentInstance?.carrier?.id}" 
 											valueName="${shipmentInstance?.carrier?.name}"/>		
 											
@@ -58,7 +59,8 @@
 									<td valign="top" class="value">
 									
 										<g:selectShipper id="shipperInput" 
-											name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
+											name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }"
+                                            noSelection="['null':'']"/>
 										
 										<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
@@ -72,7 +74,7 @@
 										code="shipping.recipient.label" /></label></td>
 									<td valign="top" class="value">
 										<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-											width="300"
+											width="300" styleClass="middle text"
 											valueId="${shipmentInstance?.recipient?.id}" 
 											valueName="${shipmentInstance?.recipient?.name}"/>		
 											
@@ -133,10 +135,10 @@
                		</table>
 				</div>
 				<div class="buttons">
-					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
+					<button name="_eventId_back" class="button">&lsaquo; <warehouse:message code="default.button.back.label"/></button>
+					<button name="_eventId_next" class="button"><warehouse:message code="default.button.next.label"/> &rsaquo;</button>
+					<button name="_eventId_save" class="button"><warehouse:message code="default.button.saveAndExit.label"/></button>
+					<button name="_eventId_cancel" class="button"><warehouse:message code="default.button.cancel.label"/></button>
 				</div>
 				
 			</g:form>

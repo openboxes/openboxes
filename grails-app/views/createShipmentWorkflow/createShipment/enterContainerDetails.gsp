@@ -121,14 +121,10 @@
 					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey; padding: 0px;">
 									<div class="box" >
 										<g:set var="count" value="${0 }"/>	
-										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
+										<h2 class="center"><warehouse:message code="containers.label"/></h2>
+                                        <table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">
 											<thead>
-												<tr>
-													<td colspan="5" class="center">
-														<div class="title"><warehouse:message code="containers.label"/></div>
-													</td>										
-												</tr>
-											
+
 												<tr class="">													
 													<th class="left middle">
 														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
@@ -271,8 +267,22 @@
 				 			--%>			 			
 				 			<td valign="top" style="padding: 0px;">		
 								<div class="box">
+                                    <h2>
+                                        <span class="middle">
+                                            <g:if test="${selectedContainer}">
+                                                <g:if test="${selectedContainer.parentContainer }">
+                                                    ${selectedContainer?.parentContainer?.name } &rsaquo;
+                                                </g:if>
+                                                ${selectedContainer?.name }
+                                            </g:if>
+                                            <g:else>
+                                                <warehouse:message code="shipping.unpackedItems.label" />
+                                            </g:else>
+                                        </span>
+
+
+                                    </h2>
 									<table style="border: 0px solid lightgrey">
-										
 										<tr>
 											<td class="left" style="width:1%;">
 												<div class="action-menu" >
@@ -287,28 +297,11 @@
 												</div>	
 											</td>
 											<td class="middle left">
-												
-												<span class="middle title">
-													<warehouse:message code="containers.label"/>
-													&rsaquo;
-												</span>
-												<span class="middle title">
-													<g:if test="${selectedContainer}">								
-														<g:if test="${selectedContainer.parentContainer }">
-															${selectedContainer?.parentContainer?.name } &rsaquo;
-														</g:if>				
-									 					${selectedContainer?.name }		 					
-													</g:if>
-													<g:else>
-														<warehouse:message code="shipping.unpackedItems.label" />			 						
-													</g:else>
-												</span>
-												
-												<g:if test="${selectedContainer}">	
+												<g:if test="${selectedContainer}">
 													<div class="">										
 														<g:render template="/container/summary" model="[container:selectedContainer]"/>
 										 			</div>	
-												</g:if>								
+												</g:if>
 											</td>
 										</tr>
 									</table>									
@@ -318,7 +311,7 @@
 											<tr>
 												<th class="middle"><warehouse:message code="default.actions.label"/></th>
 												<th class="left middle"><warehouse:message code="default.qty.label"/></th>
-                                                <th class="middle"><warehouse:message code="product.productCode.label"/></th>
+                                                <th class="middle center"><warehouse:message code="product.productCode.label"/></th>
 												<th class="middle"><warehouse:message code="product.label"/></th>
 												<th class="middle"><warehouse:message code="default.lotSerialNo.label"/></th>
 												<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
@@ -351,13 +344,11 @@
 															<span class="draggable draghandle" shipmentItem="${shipmentItem?.id }">
 																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
 																&nbsp;
-                                                                <span class="box">
-																${shipmentItem?.quantity} 
+																${shipmentItem?.quantity}
 																${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-                                                                </span>
 															</span>
 														</td>
-                                                        <td>
+                                                        <td class="center middle">
                                                             ${shipmentItem?.product?.productCode}
                                                         </td>
 														<td class="middle">
@@ -403,10 +394,10 @@
 			</div>
 			<div class="buttons">
 				<g:form action="createShipment" method="post" >
-					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
+					<button name="_eventId_back" class="button">&lsaquo; <warehouse:message code="default.button.back.label"/></button>
+					<button name="_eventId_next" class="button"><warehouse:message code="default.button.next.label"/> &rsaquo;</button>
+					<button name="_eventId_save" class="button"><warehouse:message code="default.button.saveAndExit.label"/></button>
+					<button name="_eventId_cancel" class="button"><warehouse:message code="default.button.cancel.label"/></button>
 	            </g:form>
 			</div>
         </div>        
