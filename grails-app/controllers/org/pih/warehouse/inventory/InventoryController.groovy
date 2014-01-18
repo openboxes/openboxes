@@ -626,7 +626,7 @@ class InventoryController {
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getOutOfStock(location);
+        def quantityMap = inventoryService.getOutOfStock(location, params.abcClass);
         def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Out of stock - supported - " + location.name + ".csv"
