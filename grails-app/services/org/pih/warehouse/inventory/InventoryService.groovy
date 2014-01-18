@@ -790,6 +790,27 @@ class InventoryService implements ApplicationContextAware {
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
         }
 
+        def outOfStockClassA = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "A"
+        }
+
+        def outOfStockClassB = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "B"
+        }
+
+        def outOfStockClassC = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "C"
+        }
+
+        def outOfStockClassNone = quantityMap.findAll { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == null
+        }
+
+
 
         //println lowStock.keySet().size()
         log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -807,6 +828,15 @@ class InventoryService implements ApplicationContextAware {
                 reconditionedStockCost: getTotalCost(reconditionedStock),
             outOfStock:outOfStock.keySet().size(),
                 outOfStockCost: getTotalCost(outOfStock),
+            outOfStockClassA:outOfStockClassA.keySet().size(),
+                outOfStockCostClassA: getTotalCost(outOfStockClassA),
+            outOfStockClassB:outOfStockClassB.keySet().size(),
+                outOfStockCostClassB: getTotalCost(outOfStockClassB),
+            outOfStockClassC:outOfStockClassC.keySet().size(),
+                outOfStockCostClassC: getTotalCost(outOfStockClassC),
+            outOfStockClassNone:outOfStockClassNone.keySet().size(),
+                outOfStockCostClassNone: getTotalCost(outOfStockClassNone),
+
             onHandQuantityZero:onHandQuantityZero.keySet().size(),
                 onHandQuantityZeroCost: getTotalCost(onHandQuantityZero),
             inStock:inStock.keySet().size(),
@@ -872,9 +902,9 @@ class InventoryService implements ApplicationContextAware {
         def quantityMap = getQuantityByProductMap(location.inventory)
         //def stockOut = quantityMap.findAll { it.value <= 0 }
 
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        //def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
         def stockOut = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
+            //def inventoryLevel = inventoryLevelMap[product]?.first()
             quantity <= 0
         }
 
@@ -883,7 +913,7 @@ class InventoryService implements ApplicationContextAware {
 
     }
 
-    def getOutOfStock(Location location) {
+    def getOutOfStock(Location location, String abcClass) {
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)
         //def stockOut = quantityMap.findAll { it.value <= 0 }
@@ -891,7 +921,10 @@ class InventoryService implements ApplicationContextAware {
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
         def stockOut = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
+            if (abcClass)
+                inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && (abcClass == inventoryLevel.abcClass)
+            else
+                inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
         }
 
         log.debug "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -1189,7 +1222,6 @@ class InventoryService implements ApplicationContextAware {
         def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
         def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
 
-
         if (entries) {
 
             // first make sure the transaction entries are sorted, with most recent first
@@ -1199,7 +1231,6 @@ class InventoryService implements ApplicationContextAware {
 
                 // There are cases where the transaction entry might be null, so we need to check for this edge case
                 if (transactionEntry) {
-
 
                     def inventoryItem = transactionEntry.inventoryItem
                     def product = inventoryItem.product
@@ -1526,6 +1557,8 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Get a map of quantity values for all available inventory items in the given inventory.
 	 *
+     * FIXME Use sparingly - this is very expensive because it calculates the QoH over an entire inventory.
+     *
 	 * @param inventory
 	 * @return
 	 */
@@ -1543,8 +1576,6 @@ class InventoryService implements ApplicationContextAware {
 	 */
     //@Cacheable("stockCardCommandCache")
 	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
-		log.debug "Params " + params
-
 		// Get basic details required for the whole page
 		cmd.productInstance = Product.get(params?.product?.id ?: params.id);  // check product.id and id
 		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
@@ -3107,10 +3138,11 @@ class InventoryService implements ApplicationContextAware {
 
 
     def getQuantityOnHand(product) {
+        log.info ("Get getQuantityOnHand() for product ${product.name} at all locations")
         def quantityMap = [:]
         def locations = Location.list()
         locations.each { location ->
-            if (location.inventory) {
+            if (location.inventory && location.isWarehouse()) {
                 def quantity = getQuantityOnHand(location, product)
                 if (quantity) {
                     quantityMap[location] = quantity

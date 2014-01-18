@@ -21,6 +21,68 @@
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
+
+                        </td>
+                        <td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <g:link controller="inventory" action="listOutOfStock" params="['abcClass':'A']">
+                                <warehouse:message code="inventory.classA.label" default="Class A"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="outOfStockCountClassA"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="center" style="width: 1%">
+
+                        </td>
+                        <td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <g:link controller="inventory" action="listOutOfStock" params="['abcClass':'B']">
+                                <warehouse:message code="inventory.classB.label" default="Class B"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="outOfStockCountClassB"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="center" style="width: 1%">
+
+                        </td>
+                        <td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <g:link controller="inventory" action="listOutOfStock" params="['abcClass':'C']">
+                                <warehouse:message code="inventory.classC.label" default="Class C"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="outOfStockCountClassC"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                <%--
+                    <tr>
+                        <td class="center" style="width: 1%">
+
+                        </td>
+                        <td>
+                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
+                            <g:link controller="inventory" action="listOutOfStock">
+                                <warehouse:message code="inventory.classNone.label" default="No class"/>
+                            </g:link>
+                        </td>
+                        <td class="right">
+                            <div id="outOfStockCountClassNone"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                        </td>
+                    </tr>
+                --%>
+                    <tr>
+                        <td class="center" style="width: 1%">
                             <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
                         </td>
                         <td>
