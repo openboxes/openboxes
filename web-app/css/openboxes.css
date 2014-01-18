@@ -1588,8 +1588,9 @@ h2 {
 	padding: 0 0 0 10px;
 }
 */
+
 /*
-.chzn-select, .chzn-select-deselect { width: 100%; }
+.chzn-select, .chzn-select-deselect { width: 95%; }
 */
 .chzn-container {
     width: 100% !important;
@@ -2241,7 +2242,7 @@ div.clear {
     margin-left: 1.5em;
 }
 
-.ui-autocomplete { position: absolute; cursor: default;z-index:30 !important;}
+.ui-autocomplete { position: absolute; cursor: default;z-index:9999 !important;}
 
 /*requisition item search auto complete*/
 .ui-autocomplete span.product-group{
