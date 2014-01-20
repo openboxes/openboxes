@@ -14,7 +14,9 @@
                             <div># of products with pricing information</div>
                         </td>
                         <td>
-                            <div id="progressSummary" class="right"></div>
+                            <div id="progressSummary" class="right">
+                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -25,7 +27,9 @@
                             <div>Percentage of products with pricing information</div>
                         </td>
                         <td>
-                            <div id="progressPercentage" class="right"></div>
+                            <div id="progressPercentage" class="right">
+                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -36,7 +40,9 @@
                             <warehouse:message code="inventory.totalStockValue.label" default="Total value of inventory"/>
                         </td>
                         <td class="right">
-                            <div id="totalStockValue"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="totalStockValue">
+                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                            </div>
                         </td>
                     </tr>
                 <%--

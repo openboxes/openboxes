@@ -56,9 +56,9 @@
                         $('#inStockCount').html(data.inStock?data.inStock:0);
                         $('#onHandQuantityZeroCount').html(data.onHandQuantityZero?data.onHandQuantityZero:0);
                         $('#outOfStockCount').html(data.outOfStock?data.outOfStock:0);
-                        $('#outOfStockCountClassA').html(data.outOfStockClassA?data.outOfStockClassA:0);
-                        $('#outOfStockCountClassB').html(data.outOfStockClassB?data.outOfStockClassB:0);
-                        $('#outOfStockCountClassC').html(data.outOfStockClassC?data.outOfStockClassC:0);
+                        //$('#outOfStockCountClassA').html(data.outOfStockClassA?data.outOfStockClassA:0);
+                        //$('#outOfStockCountClassB').html(data.outOfStockClassB?data.outOfStockClassB:0);
+                        //$('#outOfStockCountClassC').html(data.outOfStockClassC?data.outOfStockClassC:0);
                         //$('#outOfStockCountClassNone').html(data.outOfStockClassNone?data.outOfStockClassNone:0);
                         $('#reorderStockCount').html(data.reorderStock?data.reorderStock:0);
 
@@ -74,9 +74,9 @@
                         $('#totalStockCount').html("ERROR: " + error);
                         $('#inStockCount').html("ERROR: " + error);
                         $('#outOfStockCount').html("ERROR: " + error);
-                        $('#outOfStockCountClassA').html("ERROR: " + error);
-                        $('#outOfStockCountClassB').html("ERROR: " + error);
-                        $('#outOfStockCountClassC').html("ERROR: " + error);
+                        //$('#outOfStockCountClassA').html("ERROR: " + error);
+                        //$('#outOfStockCountClassB').html("ERROR: " + error);
+                        //$('#outOfStockCountClassC').html("ERROR: " + error);
                         //$('#outOfStockCountClassNone').html("ERROR: " + error);
                         $('#reorderStockCount').html("ERROR: " + error);
 

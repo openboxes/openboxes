@@ -19,6 +19,7 @@
 
                         </td>
                     </tr>
+                <%--
                     <tr>
                         <td class="center" style="width: 1%">
 
@@ -64,6 +65,7 @@
 
                         </td>
                     </tr>
+                --%>
                 <%--
                     <tr>
                         <td class="center" style="width: 1%">
