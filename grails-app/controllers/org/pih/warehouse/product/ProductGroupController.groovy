@@ -21,7 +21,20 @@ class ProductGroupController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [productGroupInstanceList: ProductGroup.list(params), productGroupInstanceTotal: ProductGroup.count()]
+
+        def productGroupTotal
+        def productGroups = []
+
+        if (params.q) {
+            productGroups = ProductGroup.findAllByDescriptionLike("%" + params.q + "%", params)
+            productGroupTotal = ProductGroup.countByDescriptionLike("%" + params.q + "%")
+        }
+        else {
+            productGroups = ProductGroup.list(params)
+            productGroupTotal = ProductGroup.count()
+        }
+
+        [productGroupInstanceList: productGroups, productGroupInstanceTotal: productGroupTotal]
     }
 
     def create = {
@@ -280,18 +293,17 @@ class ProductGroupController {
      */
     def deleteProductFromProductGroup = {
         println "deleteProductFromProductGroup() " + params
-        /*
-        def product = Product.get(params.productId)
-        if (product) {
-            def productGroup = ProductGroup.get(params.id)
+        def productGroup = ProductGroup.get(params.id)
+        def product = Product.get(params?.product?.id)
+        if (product && productGroup) {
             product.removeFromProductGroups(productGroup)
-            productGroup.delete()
+            productGroup.removeFromProducts(product)
             product.save(flush:true)
         }
         else {
             response.status = 404
         }
-        */
+
         render(template:'products', model:[productGroup: productGroup, products:productGroup.products])
     }
 

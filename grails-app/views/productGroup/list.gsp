@@ -31,8 +31,13 @@
                 <g:submitButton name="Search" class="button icon search"></g:submitButton>
             </g:form>
             --%>
+            <g:form controller="productGroup" action="list">
+                <g:textField name="q" value="${params.q}" class="medium text" size="60"/>
+                <g:submitButton name="submit" value="Search" class="button icon search"/>
+            </g:form>
             <div class="list box">
-                <h2><warehouse:message code="productGroups.label"/></h2>
+                <h2><warehouse:message code="productGroups.label"/> (${productGroupInstanceTotal})</h2>
+
                 <table>
                     <thead>
                         <tr>
@@ -70,7 +75,7 @@
                 </table>
             </div>
             <div class="paginateButtons">
-                <g:paginate total="${productGroupInstanceTotal}" />
+                <g:paginate total="${productGroupInstanceTotal}" params="${params}" />
             </div>
         
         </div>
