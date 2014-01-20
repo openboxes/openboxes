@@ -27,8 +27,11 @@
                                     <thead>
                                         <tr class="odd">
                                             <th></th>
+                                            <%--
                                             <th><warehouse:message code="requisition.progressBar.label" /></th>
                                             <th></th>
+                                            --%>
+
                                             <th><warehouse:message code="product.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.quantity.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.totalQuantity.label" default="Quantity requested" /></th>

@@ -17,6 +17,7 @@
             <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"
         </g:elseif>
     </td>
+    <%--
     <td>
         <g:set var="value" value="${formatNumber(number:requisitionItem.calculatePercentageCompleted(),maxFractionDigits: 0) }" />
         <div id="progressbar-${requisitionItem?.id }" class="progressbar" style="width: 100px;"></div>
@@ -29,6 +30,7 @@
     <td>
         ${value }%
     </td>
+    --%>
     <td class="product">
         <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id }">
             ${requisitionItem?.product?.productCode}
