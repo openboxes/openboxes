@@ -29,7 +29,7 @@ html * {
 .available { background: #E6EFC2; color: #264409; border-color: #C6D880; }*/
 .unavailable { background: #FBE3E4; color: #8a1f11; border-color: #FBC2C4;}
 .available { background: #a8d1ff; color: #264409; border-color: black; } /* border-color: #C6D880; */
-
+.yui-gf .yui-u { margin-left:0px; width:75%; }
 
 body {
     background: #fff;
