@@ -67,18 +67,18 @@
                         console.log(xhr);
                         console.log(status);
                         console.log(error);
-                        $('#lowStockCount').html("ERROR: " + error);
-                        $('#overStockCount').html("ERROR: " + error);
-                        $('#reconditionedStockCount').html("ERROR: " + error);
-                        $('#onHandQuantityZeroCount').html("ERROR: " + error);
-                        $('#totalStockCount').html("ERROR: " + error);
-                        $('#inStockCount').html("ERROR: " + error);
-                        $('#outOfStockCount').html("ERROR: " + error);
+                        $('#lowStockCount').html("ERROR " + error);
+                        $('#overStockCount').html("ERROR " + error);
+                        $('#reconditionedStockCount').html("ERROR " + error);
+                        $('#onHandQuantityZeroCount').html("ERROR " + error);
+                        $('#totalStockCount').html("ERROR " + error);
+                        $('#inStockCount').html("ERROR " + error);
+                        $('#outOfStockCount').html("ERROR " + error);
                         //$('#outOfStockCountClassA').html("ERROR: " + error);
                         //$('#outOfStockCountClassB').html("ERROR: " + error);
                         //$('#outOfStockCountClassC').html("ERROR: " + error);
                         //$('#outOfStockCountClassNone').html("ERROR: " + error);
-                        $('#reorderStockCount').html("ERROR: " + error);
+                        $('#reorderStockCount').html("ERROR " + error);
 
                     }
                 });
@@ -104,17 +104,17 @@
                         console.log(status);
                         console.log(error);
                         // Expiration
-                        $('#expiredStockCount').html("ERROR: " + error);
-                        $('#expiringIn30DaysStockCount').html("ERROR: " + error);
-                        $('#expiringIn60DaysStockCount').html("ERROR: " + error);
-                        $('#expiringIn90DaysStockCount').html("ERROR: " + error);
-                        $('#expiringIn180DaysStockCount').html("ERROR: " + error);
-                        $('#expiringIn365DaysStockCount').html("ERROR: " + error);
+                        $('#expiredStockCount').html("ERROR " + error);
+                        $('#expiringIn30DaysStockCount').html("ERROR " + error);
+                        $('#expiringIn60DaysStockCount').html("ERROR " + error);
+                        $('#expiringIn90DaysStockCount').html("ERROR " + error);
+                        $('#expiringIn180DaysStockCount').html("ERROR " + error);
+                        $('#expiringIn365DaysStockCount').html("ERROR " + error);
                     }
                 });
 
                 $( "#progressbar" ).progressbar({ value: 0 });
-                $( "#progressPercentage").html('Loading...')
+                //$( "#progressPercentage").html('')
                 $.ajax({
                     dataType: "json",
                     timeout: 60000,
@@ -155,7 +155,7 @@
                         //console.log(xhr);
                         //console.log(status);
                         //console.log(error);
-                        $('#totalStockValue').html('<span class="error" title="' + error + '">N/A</span>');
+                        $('#totalStockValue').html('ERROR');
                         $("#totalStockSummary").html('Unable to calculate total value due to error: ' + error + " " + status + " " + xhr);
                     }
                 });
