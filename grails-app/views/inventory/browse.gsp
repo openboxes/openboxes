@@ -65,7 +65,7 @@
                                             <td>
                                                 <g:selectCategory id="subcategoryId"
                                                                   name="subcategoryId"
-                                                                  class="chzn-select"
+                                                                  class="chzn-select-deselect"
                                                                   noSelection="['null':'']"
                                                                   style="width:100%;"
                                                                   value="${commandInstance?.subcategoryInstance?.id}"/>
@@ -449,16 +449,21 @@
 
 						</div>
                         <div class="paginateButtons">
+
+                            <g:set var="pageParams"
+                                   value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+
+
                             <g:paginate total="${numProducts}"
                                         action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
                             <div class="right">
                                 <warehouse:message code="inventory.browseResultsPerPage.label"/>:
-                                <g:if test="${params.max != '10'}"><g:link action="browse" params="[max:10, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId]">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
-                                <g:if test="${params.max != '25'}"><g:link action="browse" params="[max:25, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId]">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
-                                <g:if test="${params.max != '50'}"><g:link action="browse" params="[max:50, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId]">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
-                                <g:if test="${params.max != '100'}"><g:link action="browse" params="[max:100, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId]">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
-                                <g:if test="${params.max != '-1'}"><g:link action="browse" params="[max:-1, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId]">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                                <g:if test="${params.max != '10'}"><g:link action="browse" params="${[max:10, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+                                <g:if test="${params.max != '25'}"><g:link action="browse" params="${[max:25, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
+                                <g:if test="${params.max != '50'}"><g:link action="browse" params="${[max:50, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
+                                <g:if test="${params.max != '100'}"><g:link action="browse" params="${[max:100, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
+                                <g:if test="${params.max != '-1'}"><g:link action="browse" params="${[max:-1, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
                             </div>
                         </div>
 					</div>

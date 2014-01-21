@@ -529,6 +529,17 @@ class InventoryServiceTests extends GroovyTestCase {
         assertEquals 1, results.size()
     }
 
+    @Test
+    void getProductsByTag_shouldNotFailDueToSQLGrammarException() {
+        productTagTestFixture()
+        def tags = Tag.list()
+
+        assertEquals 2, tags.size()
+        def results = inventoryService.getProductsByTags(["thistag"] as List, -1, 0)
+        assertEquals 1, results.size()
+    }
+
+
     void test_getProductsByTermsAndCategoriesAndLotNumberWithProductSearchTerm() {
         basicTestFixture()
         def terms = ["Asp", "rin"]

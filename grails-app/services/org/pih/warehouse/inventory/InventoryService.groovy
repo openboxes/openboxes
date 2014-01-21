@@ -230,6 +230,7 @@ class InventoryService implements ApplicationContextAware {
 		log.info "searchTerms = " + searchTerms
 		log.debug("get products: " + commandInstance?.warehouseInstance)
 		log.info "command.tag  = " + commandInstance.tag
+
 		def products = []
 
         // User wants to view all products that match the given tag
@@ -1073,10 +1074,10 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	def getProductsByTags(List<String> inputTags, int max, int offset) {
-        log.debug "Get products by tags: " + inputTags
+        log.info "Get products by tags=${inputTags} max=${max} offset=${offset}"
 		def products = Product.withCriteria {
 			tags { 'in'('tag', inputTags) }
-			maxResults(max)
+			if (max > 0) maxResults(max)
 			firstResult(offset)
 			//maxResults(params.max)
 			//firstResult(params.offset)
