@@ -35,7 +35,8 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="shipping.addToShipment.label"/></label></td>                            
 									<td valign="top" class="value">
-										<select name="shipmentContainer">
+
+										<select id="shipmentContainer" name="shipmentContainer">
 											<option value="null"></option>
 											<g:each var="shipmentInstance" in="${commandInstance?.pendingShipmentList }">
 												<g:set var="expectedShippingDate" value="${prettyDateFormat(date: shipmentInstance?.expectedShippingDate)}"/> 
@@ -59,7 +60,7 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="default.quantity.label"/> </label></td>                            
 									<td valign="top" class="value">
-										 <g:textField id="quantity" name="quantity" size="5" value="" /> &nbsp;
+										 <g:textField id="quantity" name="quantity" size="15" value="" class="medium text" /> &nbsp;
 											<span class="fade"><warehouse:message code="product.remaining.label"/>: ${itemQuantity }</span> 									 
 									</td>
 								</tr>  	        
@@ -68,18 +69,18 @@
 									<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label"/></label></td>                            
 									<td valign="top" class="value">
 										<g:autoSuggestEditable id="recipient-${itemInstance?.id}" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-											width="200" valueId="" valueName=""/>							
+											width="200" valueId="" valueName="" class="medium text"/>
 									</td>
 								</tr>
 							</tbody>
 							<tfoot>
 								<tr>
 									<td colspan="2" class="middle center">
-										<button type="submit" name="addItem" class="middle">
-											<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/> <warehouse:message code="shipping.addToShipment.label"/>
+										<button type="submit" name="addItem" class="button icon add">
+											<warehouse:message code="shipping.addToShipment.label"/>
 										</button>
 										&nbsp;
-										<a href="javascript:void();" id="btnAddClose-${itemInstance?.id }">
+										<a href="javascript:void(-1);" id="btnAddClose-${itemInstance?.id }">
 											<warehouse:message code="default.button.cancel.label"/>
 										</a>
 										

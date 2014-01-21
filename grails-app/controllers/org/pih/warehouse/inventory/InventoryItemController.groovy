@@ -76,8 +76,8 @@ class InventoryItemController {
 		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
 		// (that is, find a workaround to GRAILS-5080)
 		//	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		//commandInstance.pendingShipmentList =
-		//	shipmentService.getPendingShipments(commandInstance.warehouseInstance);
+		commandInstance.pendingShipmentList =
+			shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
         //log.info "After get pending shipments " + (System.currentTimeMillis() - currentTime) + " ms"
         /*
