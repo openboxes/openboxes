@@ -92,19 +92,16 @@
                 --%>
                 <tr class="prop">
                     <td>
-                        <label>${warehouse.message(code: 'default.lastUpdatedAfter.label', default: 'Last updated after')}</label>
-                        <div>
+                        <label>${warehouse.message(code: 'default.updatedBetween.label', default: 'Last updated between')}</label>
+
+                        <div class="center middle">
                             <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
-                                                value="${lastUpdatedFrom}" format="MM/dd/yyyy"/>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td>
-                        <label>${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
-                        <div>
+                                                value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="20"/>
+
+                            and
+
                             <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
-                                                value="${lastUpdatedTo}" format="MM/dd/yyyy"/>
+                                                value="${lastUpdatedTo}" format="MM/dd/yyyy" size="20"/>
                         </div>
 
                     </td>
@@ -125,7 +122,7 @@
                 --%>
                 <tr class="prop">
                     <td>
-						<div class="right">
+						<div class="center">
 							<button type="submit" class="button icon search" name="search" value="true">
 								<warehouse:message code="default.search.label"/>
 							</button>

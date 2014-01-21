@@ -1,4 +1,5 @@
-<div class="list">
+<div class="list box">
+    <h2>${warehouse.message(code:'shipments.label')}</h2>
 	<table>
 		<thead>
 			<tr>
@@ -47,24 +48,24 @@
 							</div>
 						</div>
 					</td>
-					<td class="center"><img
+					<td class="center middle"><img
 						src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
 						style="vertical-align: middle; width: 24px; height: 24px;" />
 					</td>
-					<td class="left shipment-name">
+					<td class="middle left shipment-name">
                         <g:link action="showDetails" id="${shipmentInstance.id}">
                             ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 							${fieldValue(bean: shipmentInstance, field: "name")}
 						</g:link></td>
-					<td align="center">
+					<td class="middle">
                         ${fieldValue(bean: shipmentInstance, field: "origin.name")}
 					</td>
-                    <td>
+                    <td class="middle">
                         ${fieldValue(bean: shipmentInstance, field: "destination.name")}
 					</td>
 
-					<td><g:set var="today" value="${new Date() }" /> <format:metadata
+					<td class="middle"><g:set var="today" value="${new Date() }" /> <format:metadata
 							obj="${shipmentInstance?.status.code}" /> <g:if
 							test="${shipmentInstance?.status.date}">
 						<g:if test="${shipmentInstance?.status?.date?.equals(today) }">
@@ -90,7 +91,7 @@
 									date="${shipmentInstance?.expectedShippingDate}" />
 							</g:else>
 						</g:else></td>
-					<td align="center"><format:date
+					<td class="middle center"><format:date
 							obj="${shipmentInstance?.lastUpdated}" /></td>
 				</tr>
 			</g:each>

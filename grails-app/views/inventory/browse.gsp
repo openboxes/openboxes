@@ -180,7 +180,7 @@
 				           						<th>
 				           						
 				           						</th>
-				           						<th class="middle">
+				           						<th class="center middle">
                                                    <g:render template="./actions" model="[]"/>
 				           						</th>
 												<th class="center middle" style="width: 1%">
@@ -240,7 +240,7 @@
 
 
                                                            <tr class="${counter%2==0?'even':'odd' } product prop">
-                                                               <td>
+                                                               <td class="center middle">
                                                                    <g:if test="${inventoryItem?.product?.images }">
                                                                        <div class="nailthumb-container">
                                                                            <g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
@@ -253,7 +253,7 @@
                                                                        </div>
                                                                    </g:else>
                                                                </td>
-                                                               <td>
+                                                               <td class="center middle">
                                                                    <div class="action-menu hover">
                                                                        <button class="action-btn">
                                                                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
@@ -261,7 +261,7 @@
                                                                        </button>
                                                                        <div class="actions left">
                                                                            <div class="action-menu-info">
-                                                                               <table style="width: 525px">
+                                                                               <table style="width: 600px">
                                                                                    <tr>
                                                                                        <td style="width: 100px;" class="center middle">
                                                                                            <g:if test="${inventoryItem?.product?.images }">
@@ -282,7 +282,7 @@
                                                                                                <tr>
                                                                                                    <td>
                                                                                                        <div class="title">
-                                                                                                           <span class="fade">#${inventoryItem?.product?.productCode}</span>
+                                                                                                           ${inventoryItem?.product?.productCode}
                                                                                                            ${inventoryItem?.product?.name}
                                                                                                        </div>
 
@@ -333,7 +333,7 @@
                                                                        </div>
                                                                    </div>
                                                                </td>
-                                                               <td class="top center">
+                                                               <td class="middle center">
                                                                    <g:checkBox id="${inventoryItem?.product?.id }" name="product.id"
                                                                                class="checkbox" style="top:0em;" checked="${false }"
                                                                                value="${inventoryItem?.product?.id }" />
@@ -345,10 +345,10 @@
 
                                                            </td>
                                                                --%>
-                                                               <td class="checkable top">
+                                                               <td class="checkable center middle">
                                                                    <span class="fade">${inventoryItem?.product?.productCode }</span>
                                                                </td>
-                                                               <td class="checkable top">
+                                                               <td class="checkable left middle">
                                                                    <g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
                                                                        <div title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">
                                                                            <g:if test="${inventoryItem?.product?.name?.trim()}">
@@ -357,21 +357,21 @@
                                                                            <g:else>
                                                                                <warehouse:message code="product.untitled.label"/>
                                                                            </g:else>
+                                                                           <span class="fade">(${inventoryItem?.product?.category})</span>
                                                                        </div>
-                                                                       <div class="fade">${inventoryItem?.product?.category}</div>
 
                                                                    </g:link>
                                                                </td>
-                                                               <td class="checkable top left">
+                                                               <td class="checkable middle left">
                                                                    <span class="fade">${inventoryItem?.product?.manufacturer }</span>
                                                                </td>
-                                                               <td class="checkable top left">
+                                                               <td class="checkable middle left">
                                                                    <span class="fade">${inventoryItem?.product?.brandName}</span>
                                                                </td>
-                                                               <td class="checkable top left">
+                                                               <td class="checkable middle left">
                                                                    <span class="fade">${inventoryItem?.product?.manufacturerCode }</span>
                                                                </td>
-                                                               <td class="checkable top center" style="width: 7%; border-left: 1px solid lightgrey;">
+                                                               <td class="checkable middle center" style="width: 7%; border-left: 1px solid lightgrey;">
 
                                                                    <g:if test="${!showQuantity }">
 
@@ -384,7 +384,7 @@
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
                                                                    </g:else>
                                                                </td>
-                                                               <td class="checkable top center" style="width: 7%; border-right: 1px solid lightgrey;">
+                                                               <td class="checkable middle center" style="width: 7%; border-right: 1px solid lightgrey;">
                                                                    <g:if test="${!showQuantity }">
 
                                                                    </g:if>
@@ -396,7 +396,7 @@
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
                                                                    </g:else>
                                                                </td>
-                                                               <td class="checkable top center" style="width: 7%;">
+                                                               <td class="checkable middle center" style="width: 7%;">
 
                                                                    <g:if test="${!showQuantity }">
                                                                        <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
