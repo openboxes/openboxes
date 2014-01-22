@@ -41,7 +41,7 @@
 								format="MM/dd/yyyy"
 								showTrigger="false" />						
 						    --%>
-                            <g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="day"/>
+                            <g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="day" noSelection="['':'']"/>
 						</td>
 					</tr>
                     <tr class="prop">
@@ -123,16 +123,14 @@
                                                 <warehouse:message code="inventory.addInventoryItem.label"/>
                                             </button>
 
-                                            <div class="button-group">
-                                                <button name="save" type="submit" class="button icon approve primary" id="saveInventoryItem">
-                                                    <warehouse:message code="default.button.save.label"/>&nbsp;
-                                                </button>
+                                            <button name="save" type="submit" class="button icon approve primary" id="saveInventoryItem">
+                                                <warehouse:message code="default.button.save.label"/>&nbsp;
+                                            </button>
 
-                                                <g:link controller="inventoryItem" action="showStockCard"
-                                                        params="['product.id':commandInstance.productInstance?.id]" class="button icon remove danger">
-                                                    <warehouse:message code="default.button.discard.label" default="Discard"/>
-                                                </g:link>
-                                            </div>
+                                            <g:link controller="inventoryItem" action="showStockCard"
+                                                    params="['product.id':commandInstance.productInstance?.id]" class="button icon remove danger">
+                                                <warehouse:message code="default.button.discard.label" default="Discard"/>
+                                            </g:link>
                                         </div>
 
                                     </td>

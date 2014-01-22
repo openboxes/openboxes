@@ -97,7 +97,7 @@
                 <g:render template="../product/actions" model="[productInstance:productInstance]" />
             </td>
             <td>
-                <div class="button-group">
+                <div class="button-container">
                     <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon log ${actionName=='showStockCard'?'active':''}">
                         ${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
                     </g:link>
