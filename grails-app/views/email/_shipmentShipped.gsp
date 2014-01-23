@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <div class="box left">
+        <div class="box">
             <h2>${warehouse.message(code:'default.details.label', default:'Details') }</h2>
             <table class="details">
                 <tbody>
@@ -144,7 +144,7 @@
             </table>
         </div>
 
-        <div class="box right">
+        <div class="box">
             <h2>${warehouse.message(code:'shipping.events.label') }</h2>
             <table class='stripe'>
                 <thead>
@@ -192,7 +192,7 @@
             </table>
         </div>
 
-        <div class="box right">
+        <div class="box">
             <h2>${warehouse.message(code:'shipment.comments.label', default: 'Comments') }</h2>
             <table class='stripe'>
                 <tbody>
@@ -216,7 +216,6 @@
             </table>
         </div>
 
-        <div class="clear"></div>
         <div class="box">
             <h2>${warehouse.message(code:'shipping.contents.label') }</h2>
             <table class='stripe'>

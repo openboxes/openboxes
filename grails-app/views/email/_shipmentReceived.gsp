@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div class="box left">
+<div class="box">
     <h2>${warehouse.message(code:'default.details.label', default:'Details') }</h2>
     <table class="details stripe">
         <tbody>
@@ -142,7 +142,7 @@
     </table>
 </div>
 
-<div class="box right">
+<div class="box">
     <h2>${warehouse.message(code:'shipping.events.label') }</h2>
     <table class='stripe'>
         <thead>
@@ -190,25 +190,29 @@
     </table>
 </div>
 
-<div class="box right">
+<div class="box">
     <h2>${warehouse.message(code:'shipment.comments.label', default: 'Comments') }</h2>
     <table class='stripe'>
         <tbody>
-        <g:each var="comment" in="${shipmentInstance?.comments}">
-            <tr>
-                <td>
-                    ${comment?.sender?.name} · <g:formatDate date="${comment?.dateCreated}" format="MMM d hh:mma"/>
-
-                    <blockquote class="fade">${comment.comment}</blockquote>
-                </td>
-            </tr>
-        </g:each>
+            <g:each var="comment" in="${shipmentInstance?.comments}">
+                <tr>
+                    <td>
+                        ${comment?.sender?.name} · <g:formatDate date="${comment?.dateCreated}" format="MMM d hh:mma"/>
+                        <blockquote class="fade">${comment.comment}</blockquote>
+                    </td>
+                </tr>
+            </g:each>
+            <g:unless test="${shipmentInstance?.comments}">
+                <tr>
+                    <td class="center empty">
+                        ${warehouse.message(code:'comments.none.label', default: "No comments")}
+                    </td>
+                </tr>
+            </g:unless>
         </tbody>
+
     </table>
 </div>
-
-<div class="clear"></div>
-
 
 <div class="box">
     <h2>${warehouse.message(code:'shipping.contents.label') }</h2>
@@ -304,8 +308,5 @@
         </g:if>
     </table>
 </div>
-
-
-
 
 </g:applyLayout>
