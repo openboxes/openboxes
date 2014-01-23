@@ -22,8 +22,17 @@
 
 					
 	    		<table class="zebra">
-	    			
-	    			<tbody>
+                    <thead>
+                        <tr class="prop odd">
+                            <td colspan="3" class="center">
+                                <g:set var="startDate" value="${g.formatDate(date:new Date()-7, format:'MMMMM dd')}"/>
+                                <g:set var="endDate" value="${g.formatDate(date:new Date()+7, format:'MMMMM dd')}"/>
+                                <div class="fade">${warehouse.message(code: 'dashboard.outgoing.label', args: [session.warehouse.name, startDate, endDate]) }</div>
+
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
 						<tr>
 							<td class="center" style="width: 1%">
 								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>

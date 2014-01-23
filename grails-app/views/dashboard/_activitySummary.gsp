@@ -59,10 +59,12 @@
 								--%>
 								<img src="${createLinkTo(dir:'images/icons/silk',file: activity.type + '.png')}" class="middle"/> 
 							</td>
-							<td class="top">
+							<td class="middle">
 		 						<div>${activity.label }</div>
-                                 <span class='fade'>${format.date(obj:activity.lastUpdated,format:'MMM d hh:mma')}</span>
                              </td>
+                            <td class="nowrap middle">
+                                <div class='fade'>${format.date(obj:activity.lastUpdated,format:'MMM d hh:mma')}</div>
+                            </td>
 		 				</tr>
 		 			</g:each>
 		 			
