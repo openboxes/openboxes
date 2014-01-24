@@ -205,8 +205,9 @@
                                         <g:if test="${requisitionItem.canChangeQuantity()||requisitionItem.canChooseSubstitute()||requisitionItem?.canApproveQuantity()}">
                                             <div class="action-menu-item">
                                                 <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" class="button"
+                                                              onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
                                                         params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
                                                 </g:remoteLink>
                                             </div>
                                         </g:if>
@@ -234,6 +235,7 @@
                                             <div class="action-menu-item">
                                                 <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
                                                               params="['requisitionItem.id':requisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
+                                                          onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
                                                         onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
                                                 </g:remoteLink>
@@ -245,6 +247,7 @@
                                         <div class="action-menu-item">
                                             <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
                                                           params="['requisitionItem.id':requisitionItem?.parentRequisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
+                                                          onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
                                                           onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>
 
@@ -275,7 +278,9 @@
                         --%>
                         <td class="middle">
                             <g:if test="${requisitionItem.parentRequisitionItem}">
-                                <div class="canceled">${requisitionItem?.parentRequisitionItem?.product?.productCode}</div>
+                                <div class="canceled">
+                                    ${requisitionItem?.parentRequisitionItem?.product?.productCode}
+                                </div>
                             </g:if>
                             <div class="${requisitionItem?.status}">
                                 ${requisitionItem?.product?.productCode}
@@ -283,7 +288,9 @@
                         </td>
                         <td class="middle">
                             <g:if test="${requisitionItem.parentRequisitionItem}">
-                                <div class="canceled">${requisitionItem?.parentRequisitionItem?.product?.name}</div>
+                                <div class="canceled">
+                                    ${requisitionItem?.parentRequisitionItem?.product?.name}
+                                </div>
                             </g:if>
                             <div class="${requisitionItem?.status}">
                                 ${requisitionItem?.product?.name}
