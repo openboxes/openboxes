@@ -1,3 +1,4 @@
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <div class="page-content">
     <table id="requisition-items" class="fs-repeat-header">
         <thead>
@@ -46,29 +47,42 @@
                     </td>
                     <td class="middle center">
                         <g:if test="${j==0}">
-                            <span class="product-code">
+                            <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
+                                <div class="canceled">${requisitionItem?.parentRequisitionItem?.product?.productCode}</div>
+                            </g:if>
+                            <div class="${requisitionItem?.status}">
                                 ${requisitionItem?.product?.productCode}
-                            </span>
-                        <%--
-                        <g:if test="${requisitionItem?.parentRequisitionItem}">
-                            ${requisitionItem?.parentRequisitionItem?.product?.productCode}
-                        </g:if>
-                        --%>
+                            </div>
                         </g:if>
                     </td>
                     <td class="middle">
                         <g:if test="${j==0}">
-                            ${requisitionItem?.product?.name}
-                        </g:if>
-                        <g:if test="${requisitionItem.cancelReasonCode}">
-                            <div>
-                                <p>
-                                    <format:metadata obj="${requisitionItem.status}"/> due to
-                                    ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}
-                                </p>
-                                <p class="fade">${requisitionItem?.cancelComments}</p>
+                            <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
+                                <div class="canceled">
+                                    ${StringEscapeUtils.escapeXml(requisitionItem?.parentRequisitionItem?.product?.name)}
+                                </div>
+                            </g:if>
+                            <div class="${requisitionItem?.status}">
+                                ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
                             </div>
                         </g:if>
+                        <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
+                            <div class="fade">
+                                <i>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}</i>
+                                <g:if test="${requisitionItem?.parentRequisitionItem?.cancelComments}">
+                                    (${requisitionItem?.parentRequisitionItem?.cancelComments})
+                                </g:if>
+                            </div>
+                        </g:if>
+                        <g:if test="${requisitionItem?.cancelReasonCode}">
+                            <div class="fade">
+                                <i>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</i>
+                                <g:if test="${requisitionItem?.cancelComments}">
+                                    (${requisitionItem?.cancelComments})
+                                </g:if>
+                            </div>
+                        </g:if>
+
                     </td>
                     <td class="center middle">
                         <g:set var="binLocation" value="${requisitionItem?.product?.getInventoryLevel(location?.id)?.binLocation}"/>
@@ -88,8 +102,15 @@
                     </td>
                     <td class="center middle">
                         <g:if test="${j==0}">
-                            ${requisitionItem?.quantity ?: 0}
-                            ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            <g:if test="${requisitionItem.parentRequisitionItem?.isChanged()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
+                                    ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                </div>
+                            </g:if>
+                            <div class="${requisitionItem?.status}">
+                                ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </div>
                         </g:if>
                     </td>
                     <td class="middle center">

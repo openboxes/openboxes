@@ -11,6 +11,7 @@
             type="text/javascript"></script>
     <link rel="stylesheet" href="${createLinkTo(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.css')}"
           type="text/css" media="all"/>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 
     <style>
     .cf-header {
@@ -23,56 +24,21 @@
 <body>
 <div id="print-header" style="line-height: 40px">
     <span class="title"><warehouse:message code="deliveryNote.print.label" default="Print delivery note"/></span>
-    <span style="float: right;">
-        <button type="button" id="print-button" onclick="window.print()">
-            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>
-            ${warehouse.message(code: "default.print.label")}
-        </button>
-        &nbsp;
-        <a href="javascript:window.close();">Close</a>
-    </span>
+    <div style="float: right;">
+
+        <div class="button-group">
+            <a href="" id="print-button" onclick="window.print()" class="button">
+                ${warehouse.message(code: "default.button.print.label", default:"Print")}
+            </a>
+
+            <a href="javascript:window.close();" class="button">
+                ${warehouse.message(code: "default.button.close.label")}
+            </a>
+        </div>
+    </div>
     <hr/>
 </div>
 
-<div class="clear"></div>
-
-<div class="right">
-    <table style="width:auto;" border="0">
-        <tr>
-            <td>
-                <label><warehouse:message code="requisition.depot.label"/>:</label>
-            </td>
-            <td class="right">
-                ${requisition.destination?.name}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label><warehouse:message code="requisition.ward.label"/>:</label>
-            </td>
-            <td class="right">
-                ${requisition.origin?.name}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label><warehouse:message code="requisition.date.label"/>:</label>
-            </td>
-            <td class="right">
-                <g:formatDate date="${requisition?.dateRequested}" format="d MMM yyyy  hh:mma"/>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
-            </td>
-            <td class="right">
-                <g:formatDate date="${new Date()}" format="d MMM yyyy hh:mma"/>
-            </td>
-        </tr>
-
-    </table>
-</div>
 <table border="0">
     <tr>
         <td width="1%">
@@ -87,28 +53,80 @@
                 <h1><warehouse:message code="requisition.deliveryNote.label"/></h1>
             </div>
             <div class="header">
-                <h3>${requisition?.requestNumber} | ${requisition?.name }</h3>
+                ${requisition?.requestNumber} - ${requisition?.name }
+
             </div>
-            <%--
-            <div class="header">
-                <h3>${requisition?.destination?.name}</h3>
-            </div>
-            --%>
+
             <div class="header">
                 <g:if test="${requisition.requestNumber}">
                     <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
                 </g:if>
             </div>
         </td>
+        <td>
+            <table>
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.requisitionNumber.label"/>:</label>
+                    </td>
+                    <td>
+                        ${requisition?.requestNumber}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.requisitionType.label"/>:</label>
+                    </td>
+                    <td>
+                        <format:metadata obj="${requisition.type}"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.destination.label"/>:</label>
+                    </td>
+                    <td>
+                        ${requisition.destination?.name}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.origin.label"/>:</label>
+                    </td>
+                    <td>
+                        ${requisition.origin?.name}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.date.label"/>:</label>
+                    </td>
+                    <td>
+                        <g:formatDate date="${requisition?.dateRequested}" format="d MMMMM yyyy  hh:mma"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
+                    </td>
+                    <td>
+                        <g:formatDate date="${new Date()}" format="d MMMMM yyyy hh:mma"/>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
 
     </tr>
 </table>
 
-
+<hr/>
+<br/>
 <div class="clear"></div>
 
 <g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
-<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()||it.isSubstituted() }}'/>
+<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()}}'/>
 <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
 <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
 <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
@@ -139,10 +157,10 @@
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" title="Other"/>
-            ${warehouse.message(code:'product.other.label', default:'Other')}
+            <img src="${resource(dir: 'images/icons/silk', file: 'pill.png')}" title="Medicines & Consumables"/>
+            ${warehouse.message(code:'product.everythingElse.label', default:'Medicines & Consumables')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, pageBreakAfter: 'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, pageBreakAfter: (requisitionItemsCanceled)?'always':'avoid']"/>
     </g:if>
     <g:if test="${requisitionItemsCanceled}">
         <h2>

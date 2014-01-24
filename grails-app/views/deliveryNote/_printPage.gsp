@@ -9,7 +9,6 @@
                 <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityDelivered.label', default: "Delivered")}</th>
-                <th>${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
             </tr>
         </thead>
         <tbody>
@@ -40,7 +39,7 @@
                         </td>
                         <td class="center middle">
                             <g:if test="${j==0}">
-                                <g:if test="${requisitionItem?.parentRequisitionItem}">
+                                <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
                                         ${requisitionItem?.parentRequisitionItem?.product?.productCode}
                                     </div>
@@ -50,34 +49,64 @@
                         </td>
                         <td class="middle">
                             <g:if test="${j==0}">
-                                <g:if test="${requisitionItem?.parentRequisitionItem}">
+                                <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
                                         ${requisitionItem?.parentRequisitionItem?.product?.name}
                                     </div>
                                 </g:if>
                                 ${requisitionItem?.product?.name}
                             </g:if>
-                        </td>
-                        <td class="middle center">
-                            ${picklistItems[j]?.inventoryItem?.lotNumber}
-                        </td>
-                        <td class="middle center">
-                            <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
-                        </td>
-                        <td class="center middle">
-                            ${requisitionItem.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
-                        </td>
-                        <td class="center middle">
-                            ${picklistItems[j]?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
-                        </td>
-                        <td class="center middle">
-                            <g:if test="${requisitionItem.cancelReasonCode}">
+
+                            <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
                                 <div class="fade">
-                                    <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</p>
-                                    <p class="fade">${requisitionItem?.cancelComments}</p>
+                                    <i>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}</i>
+                                    <g:if test="${requisitionItem?.parentRequisitionItem?.cancelComments}">
+                                        (${requisitionItem?.parentRequisitionItem?.cancelComments})
+                                    </g:if>
                                 </div>
                             </g:if>
+                            <g:if test="${requisitionItem?.cancelReasonCode}">
+                                <div class="fade">
+                                    <i>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</i>
+                                    <g:if test="${requisitionItem?.cancelComments}">
+                                        (${requisitionItem?.cancelComments})
+                                    </g:if>
+                                </div>
+                            </g:if>
+
+
+
                         </td>
+                        <td class="middle center">
+                            <g:if test="${picklistItems}">
+                                ${picklistItems[j]?.inventoryItem?.lotNumber}
+                            </g:if>
+                        </td>
+                        <td class="middle center">
+                            <g:if test="${picklistItems}">
+                                <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                            </g:if>
+                        </td>
+                        <td class="center middle">
+                            <g:if test="${requisitionItem.parentRequisitionItem?.isChanged()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
+                                    ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                </div>
+                            </g:if>
+                            <div class="${requisitionItem?.status}">
+                                ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </div>
+
+
+
+                        </td>
+                        <td class="center middle">
+                            <g:if test="${picklistItems}">
+                                ${picklistItems[j]?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </g:if>
+                        </td>
+
                         <% j++ %>
                     </tr>
                 </g:while>

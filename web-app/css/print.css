@@ -9,7 +9,8 @@ h4 { font-size: 23px; }
 h5 { font-size: 17px; }
 h6 { font-size: 14px; }
 */
-h3 { font-size: 17px; }
+h1 { font-size: 17px;font-weight: bold; }
+h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 
 .header{
     margin: 10px;
@@ -104,3 +105,6 @@ table {border-collapse: collapse; page-break-inside: auto;}
 thead {display: table-header-group;}
 tr {page-break-inside: avoid; page-break-after: auto;}
 td {vertical-align: top;}
+
+.lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
+.binLocation { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
