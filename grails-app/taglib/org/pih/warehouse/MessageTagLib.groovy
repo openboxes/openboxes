@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse
 
+import grails.plugin.springcache.annotations.Cacheable
+
 //import grails.plugin.springcache.annotations.Cacheable
 import java.text.MessageFormat;
 
@@ -42,7 +44,7 @@ class MessageTagLib {
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {
 
-            def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
+            def localization = null; //Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
                 println "Querying database for translation " + attrs.code + " " + session?.user?.locale
                 //println "Arguments: " + attrs?.args + ":" + attrs?.args?.class
