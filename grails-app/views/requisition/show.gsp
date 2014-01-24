@@ -26,12 +26,12 @@
                                 <table>
                                     <thead>
                                         <tr class="odd">
-                                            <th></th>
+                                            <th><warehouse:message code="requisition.status.label"/></th>
                                             <%--
                                             <th><warehouse:message code="requisition.progressBar.label" /></th>
                                             <th></th>
                                             --%>
-
+                                            <th class="left"><warehouse:message code="requisition.requisitionItemType.label" default="Type"/></th>
                                             <th><warehouse:message code="product.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.quantity.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.totalQuantity.label" default="Quantity requested" /></th>
@@ -39,7 +39,6 @@
                                             <th class="center"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
                                             <th class="center"><warehouse:message code="requisition.quantityRemaining.label" /></th>
                                             <th class="center"><warehouse:message code="product.uom.label" /></th>
-                                            <th class="center"><warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" /></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -63,16 +62,14 @@
                             </div>
                         </div>
                         <div class="clear"></div>
-                        <div class="buttons">
-                            <div class="center">
-                                <g:link controller="requisition" action="list" class="button icon arrowleft">
-                                    <warehouse:message code="default.button.back.label"/>
-                                </g:link>
+                        <div class="button-container center">
+                            <g:link controller="requisition" action="list" class="button icon arrowleft">
+                                <warehouse:message code="default.button.back.label"/>
+                            </g:link>
 
-                                <g:link controller="requisition" action="edit" id="${requisition.id }" class="button icon arrowright">
-                                    <warehouse:message code="default.button.next.label"/>
-                                </g:link>
-                            </div>
+                            <g:link controller="requisition" action="edit" id="${requisition.id }" class="button icon arrowright">
+                                <warehouse:message code="default.button.next.label"/>
+                            </g:link>
                         </div>
                     </div>
                 </div>

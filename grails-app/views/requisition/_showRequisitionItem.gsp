@@ -1,6 +1,6 @@
 <g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
 <tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled()||requisitionItem?.isChanged())?'canceled':''}">
-    <td>
+    <td class="middle center">
         <g:if test="${requisitionItem?.isCanceled()}">
             <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"
         </g:if>
@@ -31,7 +31,10 @@
         ${value }%
     </td>
     --%>
-    <td class="product">
+    <td>
+        <format:metadata obj="${requisitionItem?.requisitionItemType}"/>
+    </td>
+    <td class="middle">
         <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id }">
             ${requisitionItem?.product?.productCode}
             <format:metadata obj="${requisitionItem?.product?.name}" />
@@ -44,27 +47,23 @@
         </g:link>
 
     </td>
-    <td class="quantity center">
+    <td class="middle center">
         <g:showQuantity requisitionItem="${requisitionItem}"/>
     </td>
-    <td class="quantity center">
+    <td class="middle center">
         ${requisitionItem?.totalQuantity()}
     </td>
-    <td class="quantityPicked center">
+    <td class="middle center">
         ${requisitionItem?.calculateQuantityPicked()?:0}
     </td>
-    <td class="quantityCanceled center">
+    <td class="middle center">
         ${requisitionItem?.quantityCanceled?:0}
     </td>
-    <td class="quantityRemaining center">
+    <td class="middle center">
         ${requisitionItem?.calculateQuantityRemaining()?:0}
     </td>
-    <td>
+    <td class="middle center">
         ${requisitionItem?.product?.unitOfMeasure?:"EA" }
     </td>
-    <td class="center">
-        ${requisitionItem?.orderIndex}
-    </td>
-
 </tr>
 

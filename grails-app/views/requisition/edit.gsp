@@ -62,9 +62,6 @@
                                     <th class="list-header middle">
                                         ${warehouse.message(code: 'requisitionItem.status.label')}
                                     </th>
-                                    <th class="list-header middle center">
-                                        ${warehouse.message(code: 'requisitionItem.orderIndex.label', default: 'Sort order')}
-                                    </th>
                                     <%--
                                     <th class="list-header">
                                         ${warehouse.message(code: 'requisitionItem.comment.label')}
@@ -108,9 +105,6 @@
                                     <td class="middle list-header">
                                         <div data-bind="text: status"></div>
                                     </td>
-                                    <td class="middle center">
-                                        <div data-bind="text: orderIndex()"></div>
-                                    </td>
                                     <td class="center middle">
                                         <a href='#' class="button"
                                             data-bind='click: $root.requisition.removeItem' tabindex="-1">
@@ -139,17 +133,15 @@
                         </table>
                     </div>
                 </g:if>
-				<div class="buttons">
-					<div class="center">
-						<g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button icon arrowleft">
-							<warehouse:message code="default.button.back.label"/>
-						</g:link>
-						<input type="hidden" data-bind="value: requisition.id" />
-						<button id="save-requisition" class="button icon arrowright">
-							${warehouse.message(code: 'default.button.next.label')}</button>
-					</div>
+				<div class="button-container center">
+                    <input type="hidden" data-bind="value: requisition.id" />
 
-				</div>					
+                    <g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button icon arrowleft">
+                        <warehouse:message code="default.button.back.label"/>
+                    </g:link>
+                    <button id="save-requisition" class="button icon arrowright">
+                        ${warehouse.message(code: 'default.button.next.label')}</button>
+				</div>
 			</g:form>
 		</div>
 	</div>
