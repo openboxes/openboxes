@@ -12,6 +12,7 @@
                 <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
                 <th class="center">${warehouse.message(code:'requisition.checkedBy.label')}</th>
+                <th class="center">${warehouse.message(code:'requisitionItem.cancelReasonCode.label')}</th>
             </tr>
         </thead>
         <tbody>
@@ -65,26 +66,6 @@
                                     ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
                                 </div>
                             </g:if>
-
-                            <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
-                                <div class="fade">
-                                    <i>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}</i>
-                                    <g:if test="${requisitionItem?.parentRequisitionItem?.cancelComments}">
-                                        (${requisitionItem?.parentRequisitionItem?.cancelComments})
-                                    </g:if>
-                                </div>
-                            </g:if>
-                            <g:if test="${requisitionItem?.cancelReasonCode}">
-                                <div class="fade">
-                                    <i>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</i>
-                                    <g:if test="${requisitionItem?.cancelComments}">
-                                        (${requisitionItem?.cancelComments})
-                                    </g:if>
-                                </div>
-                            </g:if>
-
-
-
                         </td>
                         <td class="center middle">
                             <g:set var="binLocation" value="${requisitionItem?.product?.getInventoryLevel(session.warehouse.id)?.binLocation}"/>
@@ -126,7 +107,40 @@
                             </g:if>
                         </td>
                         <td class="center middle">
+                            <!-- Checked by -->
                         </td>
+                        <td class="middle">
+                            <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
+                                <g:if test="${requisitionItem.parentRequisitionItem?.isSubstituted()}">
+                                    Substituted due to
+                                </g:if>
+                                <g:elseif test="${requisitionItem.parentRequisitionItem?.isChanged()}">
+                                    Modified due to
+                                </g:elseif>
+                                <i>
+                                    ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}
+                                </i>
+                                <g:if test="${requisitionItem?.parentRequisitionItem?.cancelComments}">
+                                    <blockquote>
+                                        ${requisitionItem?.parentRequisitionItem?.cancelComments}
+                                    </blockquote>
+                                </g:if>
+                            </g:if>
+                            <g:if test="${requisitionItem?.cancelReasonCode}">
+                                <g:if test="${requisitionItem?.isCanceled()}">
+                                    Canceled due to
+                                </g:if>
+                                <i>
+                                    ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}
+                                </i>
+                                <g:if test="${requisitionItem?.cancelComments}">
+                                    <blockquote>
+                                        ${requisitionItem?.cancelComments}
+                                    </blockquote>
+                                </g:if>
+                            </g:if>
+                        </td>
+
                         <% j++ %>
                     </tr>
                 </g:while>

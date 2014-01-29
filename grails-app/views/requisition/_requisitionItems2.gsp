@@ -248,40 +248,7 @@
                             </g:elseif>
                         </td>
                         <td class="middle left">
-
                             <format:metadata obj="${requisitionItem?.status}"/>
-                            <%--
-                            <div title=''>
-                                <g:set var="statusClass" value=""/>
-                                <g:if test="${requisitionItem?.isCanceled()}">
-                                    <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
-                                    <g:set var="statusClass" value="error"/>
-                                </g:if>
-                                <g:elseif test="${requisitionItem?.isSubstituted()}">
-                                    <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
-                                    <g:set var="statusClass" value="error"/>
-                                </g:elseif>
-                                <g:elseif test="${requisitionItem?.isApproved()}">
-                                    <img src="${resource(dir:'images/icons/silk', file: 'accept.png')}"/>
-                                    <g:set var="statusClass" value="success"/>
-                                </g:elseif>
-                                <g:elseif test="${requisitionItem?.isChanged()}">
-                                    <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
-                                    <g:set var="statusClass" value="notice"/>
-                                </g:elseif>
-                                <g:elseif test="${requisitionItem?.isPending()}">
-                                    <img src="${resource(dir:'images/icons/silk', file: 'hourglass.png')}"/>
-                                    <g:set var="statusClass" value="notice"/>
-                                </g:elseif>
-                                <g:else>
-                                    <img src="${resource(dir:'images/icons/silk', file: 'information.png')}"/>
-                                    <g:set var="statusClass" value="success"/>
-                                </g:else>
-
-                                <format:metadata obj="${requisitionItem?.status}"/>
-
-                            </div>
-                            --%>
                         </td>
                         <td class="middle">
                             <g:if test="${requisitionItem?.isCanceled()}">
