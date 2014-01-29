@@ -27,7 +27,7 @@
                     </div>
                     <div class="yui-u">
                         <g:render template="requisitionItems2" model="[requisition: requisition,
-                                requisitionItems:requisition.requisitionItems,
+                                requisitionItems:requisition.originalRequisitionItems,
                                 quantityOnHandMap:quantityOnHandMap,
                                 selectedRequisitionItem:selectedRequisitionItem]" />
 			        </div>

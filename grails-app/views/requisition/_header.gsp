@@ -8,7 +8,7 @@
             <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
             &nbsp;
             --%>
-            <div style="position:absolute;top:5px;right:5px">
+            <div class="box-button">
                 <g:if test="${requisition?.id }">
                     <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button icon edit">
                         ${warehouse.message(code:'requisition.button.edit.label', default: 'Edit header')}

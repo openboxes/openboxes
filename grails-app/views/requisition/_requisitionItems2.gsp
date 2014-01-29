@@ -71,11 +71,18 @@
         <table id="requisitionItemsTable">
             <thead>
                 <tr>
-                    <th>
-                        <warehouse:message code="requisitionItem.status.label" default="Status" />
-                    </th>
                     <th class='center'>
                         <warehouse:message code="default.actions.label"/>
+                    </th>
+
+                    <th>
+
+                    </th>
+                    <th>
+
+                    </th>
+                    <th>
+                        <warehouse:message code="requisitionItem.status.label" default="Status" />
                     </th>
                     <%--
                     <th>
@@ -83,26 +90,21 @@
                     </th>
                     --%>
                     <th>
-                        <warehouse:message code="product.productCode.label" />
-                    </th>
-                    <th>
                         <warehouse:message code="requisitionItem.product.label" />
                     </th>
-                    <th>
-                        <warehouse:message code="product.unitOfMeasure.label" />
-                    </th>
-                    <th class="center ">
+                    <th class="center middle">
                         <warehouse:message code="requisitionItem.quantityRequested.label" default="Requested"/>
                     </th>
-                    <th class="center ">
-                        <warehouse:message code="requisitionItem.quantityCanceled.label" default="Canceled"/>
-                    </th>
-                    <th class="center ">
+                    <th class="center middle">
                         <warehouse:message code="requisitionItem.quantityApproved.label" default="Approved" />
                     </th>
-                    <th class="center">
+                    <th class="center middle">
                         <warehouse:message code="requisitionItem.quantityAvailable.label" default="Available" />
                     </th>
+                    <th>
+                        <warehouse:message code="requisitionItem.cancelReasonCode.label" default="Reason code"/>
+                    </th>
+
                 </tr>
             </thead>
             <tbody>
@@ -135,9 +137,121 @@
                     <g:set var="rowClass" value="${count%2?'odd':'even'}"/>
 
                     <tr class="${requisitionItem.isChanged()?'modified':''} ${requisitionItem?.isSubstituted()?'substituted':''} ${requisitionItem.isCanceled()?'canceled':''} ${rowClass}">
-                        <td class="middle center">
+                        <td class="middle">
+                            <%--
+                            <g:remoteLink controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.id }" class="button icon approve">
+                                <warehouse:message code="requisitionItem.approve.label" default="Approve"/>
+                            </g:remoteLink>
+                            <g:link controller="requisition" action="editRequisitionItem" id="${requisitionItem?.id}" class="button icon edit">
+                                <warehouse:message code="requisitionItem.edit.label" default="Edit"/>
+                            </g:link>
 
-                            <div title='<format:metadata obj="${requisitionItem?.status}"/> <format:metadata obj="${requisitionItem?.cancelReasonCode}"/> ${requisitionItem?.cancelComments}'>
+                            <g:remoteLink controller="requisition" action="approveQuantity" id="${requisitionItem?.id }" params="['requisition.id':requisitionItem.requisition.id]">
+                                <warehouse:message code="default.button.approve.label" default="Approve"/>
+                            </g:remoteLink>
+                            <g:remoteLink controller="requisition" action="editRequisitionItem" update="requisitionItems" id="${requisitionItem.id}">
+                                <warehouse:message code="default.button.edit.label" default="Edit"/>
+                            </g:remoteLink>
+
+                            <g:remoteLink controller="requisition" action="undoChanges" id="${requisitionItem?.id }" params="['requisition.id':requisitionItem.requisition.id]"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
+                                <warehouse:message code="default.button.undo.label" default="Undo"/>
+                            </g:remoteLink>
+                            --%>
+
+                            <div>
+
+                                <g:if test="${!requisitionItem.parentRequisitionItem}">
+                                <%--
+                                <g:if test="${requisitionItem?.canApproveQuantity()}">
+                                    <div class="action-menu-item">
+                                        <g:remoteLink controller="requisition" action="approveQuantity" id="${requisition?.id }" class="button"
+                                                params="['requisitionItem.id':requisitionItem?.id, actionType:'approveQuantity']" update="requisitionItems">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>                                                </g:remoteLink>
+                                    </div>
+                                </g:if>
+                                --%>
+                                    <g:if test="${requisitionItem.canChangeQuantity()||requisitionItem.canChooseSubstitute()||requisitionItem?.canApproveQuantity()}">
+                                        <div class="action-menu-item">
+                                            <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" class="button"
+                                                          onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
+                                                          params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+                                            </g:remoteLink>
+                                        </div>
+                                    </g:if>
+                                <%--
+                                <g:if test="${requisitionItem.canChooseSubstitute()}">
+                                    <div class="action-menu-item">
+                                        <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" update="requisitionItems"
+                                                params="['requisitionItem.id':requisitionItem?.id, actionType:'chooseSubstitute']" >
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch.png')}"/>&nbsp;
+                                            <warehouse:message code="requisitionItem.substitute.label" default="Choose substitute"/>
+                                        </g:remoteLink>
+                                    </div>
+                                </g:if>
+                                <g:if test="${requisitionItem.canChangeQuantity()}">
+                                    <div class="action-menu-item">
+                                        <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }"
+                                                params="['requisitionItem.id':requisitionItem?.id, actionType:'cancelQuantity']" update="requisitionItems">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>&nbsp;
+                                            <warehouse:message code="requisitionItem.cancel.label" default="Cancel requisition item"/>
+                                        </g:remoteLink>
+                                    </div>
+                                </g:if>
+                                --%>
+                                    <g:if test="${requisitionItem.canUndoChanges()}">
+                                        <div class="action-menu-item">
+                                            <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
+                                                          params="['requisitionItem.id':requisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
+                                                          onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
+                                                          onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+                                            </g:remoteLink>
+                                        </div>
+                                    </g:if>
+                                </g:if>
+                                <g:else>
+
+                                    <div class="action-menu-item">
+                                        <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
+                                                      params="['requisitionItem.id':requisitionItem?.parentRequisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
+                                                      onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
+                                                      onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+                                        </g:remoteLink>
+                                    </div>
+                                </g:else>
+                            </div>
+                        </td>
+                        <td class="middle center">
+                            ${i+1}
+                        </td>
+                        <td class="middle center">
+                            <g:if test="${requisitionItem?.isSubstituted()}">
+                                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
+                            </g:if>
+                            <g:elseif test="${requisitionItem?.isSubstitution()}">
+                                <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
+                            </g:elseif>
+                            <g:elseif test="${requisitionItem?.isChanged()}">
+                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}"/>
+                            </g:elseif>
+                            <g:elseif test="${requisitionItem?.isPending()}">
+                                <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
+                            </g:elseif>
+                            <g:elseif test="${requisitionItem?.isCanceled()}">
+                                <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
+                            </g:elseif>
+                            <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
+                                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
+                            </g:elseif>
+                        </td>
+                        <td class="middle left">
+
+                            <format:metadata obj="${requisitionItem?.status}"/>
+                            <%--
+                            <div title=''>
                                 <g:set var="statusClass" value=""/>
                                 <g:if test="${requisitionItem?.isCanceled()}">
                                     <img src="${resource(dir:'images/icons/silk', file: 'decline.png')}"/>
@@ -164,156 +278,109 @@
                                     <g:set var="statusClass" value="success"/>
                                 </g:else>
 
+                                <format:metadata obj="${requisitionItem?.status}"/>
+
                             </div>
-                        </td>
-
-                        <td class="middle">
-                            <%--
-                            <g:remoteLink controller="requisitionItem" action="approveQuantity" id="${requisitionItem?.id }" class="button icon approve">
-                                <warehouse:message code="requisitionItem.approve.label" default="Approve"/>
-                            </g:remoteLink>
-                            <g:link controller="requisition" action="editRequisitionItem" id="${requisitionItem?.id}" class="button icon edit">
-                                <warehouse:message code="requisitionItem.edit.label" default="Edit"/>
-                            </g:link>
-
-                            <g:remoteLink controller="requisition" action="approveQuantity" id="${requisitionItem?.id }" params="['requisition.id':requisitionItem.requisition.id]">
-                                <warehouse:message code="default.button.approve.label" default="Approve"/>
-                            </g:remoteLink>
-                            <g:remoteLink controller="requisition" action="editRequisitionItem" update="requisitionItems" id="${requisitionItem.id}">
-                                <warehouse:message code="default.button.edit.label" default="Edit"/>
-                            </g:remoteLink>
-
-                            <g:remoteLink controller="requisition" action="undoChanges" id="${requisitionItem?.id }" params="['requisition.id':requisitionItem.requisition.id]"
-                                    onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
-                                <warehouse:message code="default.button.undo.label" default="Undo"/>
-                            </g:remoteLink>
                             --%>
-
-                            <div>
-
+                        </td>
+                        <td class="middle">
+                            <g:if test="${requisitionItem?.isCanceled()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.product?.productCode}
+                                    ${requisitionItem?.product?.name} (${requisitionItem?.product?.unitOfMeasure})
+                                </div>
+                            </g:if>
+                            <g:elseif test="${requisitionItem?.isSubstituted()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.product?.productCode}
+                                    ${requisitionItem?.product?.name} (${requisitionItem?.product?.unitOfMeasure})
+                                </div>
                                 <div>
-                                    <g:if test="${!requisitionItem.parentRequisitionItem}">
-                                        <%--
-                                        <g:if test="${requisitionItem?.canApproveQuantity()}">
-                                            <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="approveQuantity" id="${requisition?.id }" class="button"
-                                                        params="['requisitionItem.id':requisitionItem?.id, actionType:'approveQuantity']" update="requisitionItems">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>                                                </g:remoteLink>
-                                            </div>
-                                        </g:if>
-                                        --%>
-                                        <g:if test="${requisitionItem.canChangeQuantity()||requisitionItem.canChooseSubstitute()||requisitionItem?.canApproveQuantity()}">
-                                            <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" class="button"
-                                                              onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
-                                                        params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-                                                </g:remoteLink>
-                                            </div>
-                                        </g:if>
-                                        <%--
-                                        <g:if test="${requisitionItem.canChooseSubstitute()}">
-                                            <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }" update="requisitionItems"
-                                                        params="['requisitionItem.id':requisitionItem?.id, actionType:'chooseSubstitute']" >
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch.png')}"/>&nbsp;
-                                                    <warehouse:message code="requisitionItem.substitute.label" default="Choose substitute"/>
-                                                </g:remoteLink>
-                                            </div>
-                                        </g:if>
-                                        <g:if test="${requisitionItem.canChangeQuantity()}">
-                                            <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisition?.id }"
-                                                        params="['requisitionItem.id':requisitionItem?.id, actionType:'cancelQuantity']" update="requisitionItems">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>&nbsp;
-                                                    <warehouse:message code="requisitionItem.cancel.label" default="Cancel requisition item"/>
-                                                </g:remoteLink>
-                                            </div>
-                                        </g:if>
-                                        --%>
-                                        <g:if test="${requisitionItem.canUndoChanges()}">
-                                            <div class="action-menu-item">
-                                                <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
-                                                              params="['requisitionItem.id':requisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
-                                                          onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
-                                                        onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                                                </g:remoteLink>
-                                            </div>
-                                        </g:if>
-                                    </g:if>
-                                    <g:else>
-
-                                        <div class="action-menu-item">
-                                            <g:remoteLink controller="requisition" action="undoChangesFromList" id="${requisition?.id }" class="button"
-                                                          params="['requisitionItem.id':requisitionItem?.parentRequisitionItem?.id,actionType:'undoChanges']" update="requisitionItems"
-                                                          onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
-                                                          onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>
-
-                                            </g:remoteLink>
-                                        </div>
-
-                                        <%--
-                                        <div class="action-menu-item">
-                                            <g:remoteLink controller="requisition" action="deleteItem" id="${requisitionItem?.id }" params="[redirectAction:'review']" update="requisitionItems"
-                                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                                                <warehouse:message code="requisitionItem.delete.label" default="Delete requisition item"/>
-                                            </g:remoteLink>
-                                        </div>
-                                        --%>
-                                    </g:else>
-
-
-
+                                    ${requisitionItem?.substitutionItem?.product?.productCode}
+                                    ${requisitionItem?.substitutionItem?.product?.name} (${requisitionItem?.substitutionItem?.product?.unitOfMeasure})
                                 </div>
-                            </div>
-
-                        </td>
-                        <%--
-                        <td class="middle">
-                            <format:metadata obj="${requisitionItem?.requisitionItemType}"/>
-                        </td>
-                        --%>
-                        <td class="middle">
-                            <g:if test="${requisitionItem.parentRequisitionItem}">
-                                <div class="canceled">
-                                    ${requisitionItem?.parentRequisitionItem?.product?.productCode}
-                                </div>
-                            </g:if>
-                            <div class="${requisitionItem?.status}">
+                            </g:elseif>
+                            <g:else>
                                 ${requisitionItem?.product?.productCode}
-                            </div>
+                                ${requisitionItem?.product} (${requisitionItem?.product?.unitOfMeasure})
+                            </g:else>
                         </td>
-                        <td class="middle">
-                            <g:if test="${requisitionItem.parentRequisitionItem}">
+                        <td class="center middle">
+                            <g:if test="${requisitionItem?.isSubstituted()}">
                                 <div class="canceled">
-                                    ${requisitionItem?.parentRequisitionItem?.product?.name}
+                                    ${requisitionItem?.quantity?:0}
+                                </div>
+                                <div>
+                                    ${requisitionItem?.substitutionItem?.quantity?:0}
                                 </div>
                             </g:if>
-                            <div class="${requisitionItem?.status}">
-                                ${requisitionItem?.product?.name}
-                            </div>
+                            <g:elseif test="${requisitionItem?.isChanged()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.quantity?:0}
+                                </div>
+                                <div>
+                                    ${requisitionItem?.modificationItem?.quantity?:0}
+                                </div>
+                            </g:elseif>
+                            <g:elseif test="${requisitionItem?.isCanceled()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.quantity?:0}
+                                </div>
+                            </g:elseif>
+                            <g:else>
+                                ${requisitionItem?.quantity?:0}
+                            </g:else>
                         </td>
 
                         <td class="center middle">
-                            ${requisitionItem?.product?.unitOfMeasure}
+                            <g:if test="${requisitionItem?.isSubstituted()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.quantityApproved?:0}
+                                </div>
+                                <div>
+                                    ${requisitionItem?.substitutionItem?.quantityApproved?:0}
+                                </div>
+                            </g:if>
+                            <g:elseif test="${requisitionItem?.isChanged()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.quantityApproved?:0}
+                                </div>
+                                <div>
+                                    ${requisitionItem?.modificationItem?.quantityApproved?:0}
+                                </div>
+                            </g:elseif>
+                            <g:elseif test="${requisitionItem?.isCanceled()}">
+                                <div class="canceled">
+                                    ${requisitionItem?.quantityApproved?:0}
+                                </div>
+                            </g:elseif>
+                            <g:else>
+                                <div class="approved">
+                                    ${requisitionItem?.quantityApproved?:0}
+                                </div>
+                            </g:else>
                         </td>
                         <td class="center middle">
-                            ${requisitionItem?.quantity?:0}
-                        </td>
-                        <td class="center middle">
-                            ${requisitionItem?.quantityCanceled?:0}
-                        </td>
-                        <td class="center middle">
-                            ${requisitionItem?.quantityApproved?:0}
-                        </td>
-
-                        <td class="center middle">
-                            <div class="box-status ${isAvailable?'success':'error'}">
-                                ${quantityOnHandMap[requisitionItem?.product?.id]?:0}
+                            <div class="box-status ${isAvailable||isAvailableForSubstitution?'success':'error'}">
+                                <g:if test="${requisitionItem?.isSubstituted()}">
+                                    ${quantityOnHandMap[requisitionItem?.substitutionItem?.product?.id]?:0}
+                                </g:if>
+                                <g:elseif test="${requisitionItem?.isChanged()}">
+                                    ${quantityOnHandMap[requisitionItem?.modificationItem?.product?.id]?:0}
+                                </g:elseif>
+                                <g:elseif test="${requisitionItem?.isCanceled()}">
+                                    ${quantityOnHandMap[requisitionItem?.product?.id]?:0}
+                                </g:elseif>
+                                <g:else>
+                                    ${quantityOnHandMap[requisitionItem?.product?.id]?:0}
+                                </g:else>
                             </div>
+                        </td>
+                        <td>
+                            <g:if test="${requisitionItem?.cancelReasonCode}">
+                                <warehouse:message code="enum.ReasonCode.${requisitionItem?.cancelReasonCode}"/>
+                                <p>${requisitionItem?.cancelComments}</p>
+                            </g:if>
                         </td>
 
                     </tr>
@@ -328,9 +395,8 @@
         </table>
 
     </div>
-<div class="clear"></div>
-<div class="buttons">
-    <div class="button-group">
+
+    <div class="button-container center">
         <g:link controller="requisition" action="edit" id="${requisition.id }" class="button icon arrowleft">
             <warehouse:message code="default.button.back.label"/>
         </g:link>
@@ -339,15 +405,8 @@
             <warehouse:message code="default.button.next.label"/>
         </g:link>
     </div>
-</div>
 
 </div>
 <script>
-$(document).ready(function() {
-    //$("tr.canceled").hide();
-    $("tr.substituted").hide();
-    $("tr.modified").hide();
-});
-
 
 </script>

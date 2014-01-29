@@ -84,12 +84,13 @@ public enum ReasonCode {
 
 
     static listRequisitionQuantityChangeReasonCodes() {
-		[       STOCKOUT,
+		[
+                PACKAGE_SIZE,
+                STOCKOUT,
                 LOW_STOCK,
                 DAMAGED,
                 EXPIRED,
                 INSUFFICIENT_CONSUMPTION,
-                PACKAGE_SIZE,
                 CANCELED_BY_REQUESTER,
                 NON_FORMULARY_NO_SUBSTITUTION,
                 NOT_STOCKED,

@@ -26,19 +26,19 @@
                                 <table>
                                     <thead>
                                         <tr class="odd">
+                                            <th></th>
+                                            <th></th>
                                             <th><warehouse:message code="requisition.status.label"/></th>
                                             <%--
                                             <th><warehouse:message code="requisition.progressBar.label" /></th>
                                             <th></th>
                                             --%>
-                                            <th class="left"><warehouse:message code="requisition.requisitionItemType.label" default="Type"/></th>
                                             <th><warehouse:message code="product.label" /></th>
-                                            <th class="center"><warehouse:message code="requisition.quantity.label" /></th>
-                                            <th class="center"><warehouse:message code="requisition.totalQuantity.label" default="Quantity requested" /></th>
-                                            <th class="center"><warehouse:message code="picklist.quantity.label" /></th>
-                                            <th class="center"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
-                                            <th class="center"><warehouse:message code="requisition.quantityRemaining.label" /></th>
                                             <th class="center"><warehouse:message code="product.uom.label" /></th>
+                                            <th class="center"><warehouse:message code="requisitionItem.quantityRequested.label" default="Requested" /></th>
+                                            <th class="center"><warehouse:message code="requisitionItem.quantityApproved.label" /></th>
+                                            <th class="center"><warehouse:message code="requisitionItem.quantityPicked.label" default="Picked"/></th>
+                                            <th class="center"><warehouse:message code="requisitionItem.quantityRemaining.label" /></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -48,7 +48,7 @@
                                                         code="requisition.noRequisitionItems.message" /></td>
                                             </tr>
                                         </g:if>
-                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
+                                        <g:each var="requisitionItem" in="${requisition?.originalRequisitionItems.sort()}" status="i">
                                             <g:render template="showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
                                             <%--
                                             <g:each var="childRequisitionItem" in="${requisitionItem?.requisitionItems}" status="j">
