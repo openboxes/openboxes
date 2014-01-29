@@ -192,7 +192,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     def getRequisitionItemCount() {
-        return requisitionItems?.collect { !it.requisitionItemType == RequisitionItemType.ORIGINAL }?.size()
+        return getOriginalRequisitionItems()?.size()
     }
 
 

@@ -164,28 +164,41 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * Undo any changes made to this requisition item.
      */
     def undoChanges() {
-        quantityApproved = 0
-        quantityCanceled = 0
-        cancelComments = null
-        cancelReasonCode = null
-
-        if (substitutionItem) {
-            requisition.removeFromRequisitionItems(substitutionItem)
-            substitutionItem.delete()
+        // This is to protect from undo-ing changes to the child -- we should only undo changes from the parent
+        if (parentRequisitionItem) {
+            parentRequisitionItem.undoChanges()
         }
+        else {
+            quantityApproved = 0
+            quantityCanceled = 0
+            cancelComments = null
+            cancelReasonCode = null
 
-        if (modificationItem) {
-            requisition.removeFromRequisitionItems(modificationItem)
-            modificationItem.delete()
-        }
+            if (substitutionItem) {
+                removeFromRequisitionItems(substitutionItem)
+                requisition.removeFromRequisitionItems(substitutionItem)
+                substitutionItem.delete()
+            }
 
-        substitutionItem = null
-        modificationItem = null
-        // Need to remove from both associations
-        if (requisitionItems) {
-            requisitionItems.each {
-                requisition.removeFromRequisitionItems(it)
-                removeFromRequisitionItems(it)
+            if (modificationItem) {
+                removeFromRequisitionItems(modificationItem)
+                requisition.removeFromRequisitionItems(modificationItem)
+                modificationItem.delete()
+            }
+
+            substitutionItem = null
+            modificationItem = null
+
+            // Need to remove from both associations
+            if (requisitionItems) {
+                // Avoid concurrent modification exception
+                def requisitionItemIds = requisitionItems.collect { it.id }
+                requisitionItemIds.each {
+                    def requisitionItem = RequisitionItem.get(it)
+                    requisition.removeFromRequisitionItems(requisitionItem)
+                    removeFromRequisitionItems(requisitionItem)
+                    requisitionItem.delete()
+                }
             }
         }
     }
@@ -417,7 +430,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return  true if this child requisition item's parent is canceled and the child product and product package is different from its parent
      */
     def isSubstitution() {
-        return parentRequisitionItem?.isChanged() && (parentRequisitionItem?.product != product) && (parentRequisitionItem?.productPackage != productPackage)
+        return parentRequisitionItem?.isChanged() && (parentRequisitionItem?.product != product)
     }
 
     def isPartiallyFulfilled() {
