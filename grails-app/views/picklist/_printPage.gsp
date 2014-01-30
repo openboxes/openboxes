@@ -112,10 +112,10 @@
                         <td class="middle">
                             <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
                                 <g:if test="${requisitionItem.parentRequisitionItem?.isSubstituted()}">
-                                    Substituted due to
+                                    ${warehouse.message(code:'requisitionItem.substituted.label')}
                                 </g:if>
                                 <g:elseif test="${requisitionItem.parentRequisitionItem?.isChanged()}">
-                                    Modified due to
+                                    ${warehouse.message(code:'requisitionItem.modified.label')}
                                 </g:elseif>
                                 <i>
                                     ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}
@@ -128,7 +128,7 @@
                             </g:if>
                             <g:if test="${requisitionItem?.cancelReasonCode}">
                                 <g:if test="${requisitionItem?.isCanceled()}">
-                                    Canceled due to
+                                    ${warehouse.message(code:'requisitionItem.canceled.label')}
                                 </g:if>
                                 <i>
                                     ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}
