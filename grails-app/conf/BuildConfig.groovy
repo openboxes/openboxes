@@ -89,7 +89,8 @@ grails.project.dependency.resolution = {
 
         test (name:'geb', version:'0.6.3')
 
-        compile ":rendering:0.4.3"
+        //compile ":rendering:0.4.3"
+        compile ":rendering:0.4.4"
         //compile ":standalone:1.0"
         //compile ":burning-image:0.5.1"
         //compile ":settings:1.4"
