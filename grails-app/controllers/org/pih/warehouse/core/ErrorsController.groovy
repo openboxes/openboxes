@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.converters.JSON
 import org.apache.catalina.util.Base64
 import org.apache.commons.io.FileUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import util.ClickstreamUtil;
 
 class ErrorsController {
@@ -46,7 +47,7 @@ class ErrorsController {
 
         def emailMessage = [
             from: session?.user?.email,
-            to: ["emr-requests@pih.org"],
+            to: ["jcm62@columbia.edu"],
             cc: [],
             bcc: [],
             subject: jsonObject[0]["summary"],
@@ -63,23 +64,22 @@ class ErrorsController {
 
 
 	def processError = { 		
-		def toList = []
+		def toList = ["justin@openboxes.com"]  //"support@openboxes.com"
 		def ccList = []
-		
-		//toList.add("justin.miranda@gmail.com")
-		toList.add("emr-requests@pih.org")
-		ccList.add("jmiranda@pih.org")
-		
+
 		def reportedBy = User.findByUsername(params.reportedBy)
 		if (params.ccMe && reportedBy) { 
-			ccList << reportedBy?.email
+			ccList.add(reportedBy?.email)
 		}		
 		
 		def dom = params.remove("dom")
-        //params.clickstream = ClickstreamUtil.getClickstreamAsString(session.clickstream)
-		def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
-		def body = "${g.render(template:'/email/errorReport', params:params)}"
-
+        def sessionId = session?.id
+        def stacktrace = params.remove("stacktrace")
+        def clickstream = params.remove("clickstream")
+        def serverUrl = ConfigurationHolder.config.grails.serverURL
+        def clickstreamUrl = "${serverUrl}/stream/view/${sessionId}"
+ 		def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
+		def body = "${g.render(template:'/email/errorReport', model:[stacktrace:stacktrace, clickstream:clickstream, clickstreamUrl:clickstreamUrl], params:params)}"
 
         //def clickstreamAsCsv = ClickstreamUtil.getClickstreamAsCsv(session.clickstream)
 		mailService.sendHtmlMailWithAttachment(reportedBy, toList, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html");

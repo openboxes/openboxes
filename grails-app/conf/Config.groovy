@@ -36,33 +36,12 @@ grails {
 		// By default we enable email.  You can enable/disable email using environment settings below or in your 
 		// ${user.home}/openboxes-config.properties file 
 		enabled = true			
-		from = "openboxes@pih.org"
+		from = "info@openboxes.com"
 		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
 		host = "localhost"
 		port = "25"
 	}
 }
-
-/*
-grails {
-    mail {
-        enabled = true
-        from = "openboxes@pih.org"
-        prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
-        host = "smtp.gmail.com"
-        port = 587
-        username = "justin.miranda@gmail.com"
-        password = "kaphu5ra"
-        props = ["mail.debug": "true",
-                "mail.smtp.protocol": "smtps",
-                "mail.smtp.auth": "true",
-                "mail.smtp.starttls.enable": "true",
-                "mail.smtp.host": "smtp.gmail.com",
-                "mail.smtp.user": "justin.miranda@gmail.com",
-                "mail.smtp.password": "kaphu5ra"]
-    }
-}
-*/
 
 /* Indicates which activities are required for a location to allow logins */
 openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
@@ -119,10 +98,10 @@ grails.validateable.packages = [
 /* Default settings for emails sent through the SMTP appender  */
 mail.error.server = 'localhost'
 mail.error.port = 25
-mail.error.from = 'openboxes@pih.org'
-mail.error.to = 'jmiranda@pih.org'
+mail.error.from = 'info@openboxes.com'
+mail.error.to = 'justin@openboxes.com'
 mail.error.subject = '[OpenBoxes]['+GrailsUtil.environment+']'
-mail.error.debug = false
+mail.error.debug = true
 
 // set per-environment serverURL stem for creating absolute links
 environments {
@@ -201,12 +180,13 @@ log4j = {
 				"Thread: [%t]%n" +
                 "Username: %X{username}%n" +
                 "Location: %X{location}%n" +
-				//"Locale: %X{locale}%n" +
-				"IP address: %X{ipAddress}  http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
+				"Locale: %X{locale}%n" +
+				"IP address: %X{ipAddress} http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
+                "Request URL: %X{requestUrl}%n" +
 				"Query string: %X{queryString}%n" +
+                "Clickstream: %X{clickStreamUrl}%n%n" +
                 "Stacktrace: %n%m%n"
-                //"Clickstream: %X{clickStream}%n"
 
 			// The 'alternate' appender is the best, but only works on localhost w/o authentication
 			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {

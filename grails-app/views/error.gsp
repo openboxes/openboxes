@@ -1,3 +1,4 @@
+<%@ page import="grails.util.GrailsUtil" %>
 <html>
   <head>
 	  <title>General Error</title>
@@ -45,8 +46,8 @@
 
     <h2>Error Details</h2>
   	<div class="message">
-		<strong>Error ${request?.'javax.servlet.error.status_code'}:</strong> 
-		${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
+		<strong>Error ${request?.'javax.servlet.error.status_code'}:</strong>
+    		${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
 		<strong>Servlet:</strong> ${request?.'javax.servlet.error.servlet_name'}<br/>
 		<strong>URI:</strong> ${request?.'javax.servlet.error.request_uri'}<br/>
 		<g:if test="${exception}">
@@ -69,7 +70,7 @@
 	    </div>
 	</g:if>
 	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
-	<div id="error-dialog" class="dialog" title="Error Report">
+	<div id="error-dialog" class="dialog" title="Bug Report">
 		<g:form controller="errors" action="processError">
 			<g:hiddenField id="dom" name="dom" value=""/>
 			<g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
@@ -81,12 +82,7 @@
 			<g:hiddenField name="exception.date" value="${new Date() }"/>
 			<g:set var="absoluteTargetUri" value="${g.createLinkTo(url: targetUri, absolute: true) }"/>
 			<g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
-			
-			
-			<g:set var="summary" value="${exception.className?.replace('Controller','').replace('Service', '')} | ${exception?.message?.encodeAsHTML()} (${exception?.cause?.class?.name})"/>
-			
-			
-			
+			<g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
 			<table>
 				<%-- 
 				<tr class="prop">
@@ -109,54 +105,44 @@
 					</td>
 				</tr>
 				--%>
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message code="error.reportedTo.label"/></label>
+                    </td>
+                    <td class="value">
+                        OpenBoxes Support
+                        (<a href="mailto:support@openboxes.com" target="_blank">support@openboxes.com</a>)
+                    </td>
+                </tr>
 				<tr class="prop">
 					<td class="name">
-						<label><warehouse:message code="default.reportedBy.label"/></label>
+						<label><warehouse:message code="error.reportedBy.label"/></label>
 					</td>
 					<td class="value">
 						${session?.user?.name }
-						<span class="fade">${session?.user?.email }</span>
-					</td>
-				</tr>
-                <tr class="prop">
-
-                    <td class="name">
-                        <!-- no label -->
-                    </td>
-                    <td class="value">
+                        (<a href="mailto:${session?.user?.email }" target="_blank">${session?.user?.email }</a>)
                         <div>
                             <g:checkBox name="ccMe" value="${true }" />&nbsp;
                             <warehouse:message code="default.reportCcMe.label" />
                         </div>
-                    </td>
-                </tr>
-
-				<%-- 
-				<tr class="prop">
-					<td class="name"> 
-						<label><warehouse:message code="error.class.label"/></label>
-					</td>
-					<td>
-						${exception?.className}:${exception.lineNumber }				
 					</td>
 				</tr>
-				--%>		
 				<tr class="prop">
 					<td class="name">
 						<label><warehouse:message code="error.summary.label"/></label>
 					</td>
 					<td class="value">
-						<%-- 
-						<g:if test="${request?.'javax.servlet.error.message'}">						 
+                        <%--
+						<g:if test="${request?.'javax.servlet.error.message'}">
 							${request?.'javax.servlet.error.message'?.encodeAsHTML()}
 						</g:if>
 						<g:else>
 							${exception?.message?.encodeAsHTML()}
 						</g:else>
 						--%>
-						<g:textField name="summary" class="text" size="60" 
-							value="${summary }"
-							placeholder="${warehouse.message(code:'error.summary.message') }"/>
+						<g:textField name="summary" class="text" size="100"
+							value="${summary }" placeholder="${warehouse.message(code:'error.summary.message') }"/>
+                        <br/>
 					</td>
 				</tr>
 				
@@ -195,13 +181,11 @@
 				<tr class="prop">
 					<td class="name"></td>			
 					<td class="value">
-						<button>							
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'email_go.png')}" style="vertical-align: middle" />
+						<button class="button icon mail">
 							<warehouse:message code="default.button.submit.label"/>
 						</button>	
 						&nbsp;
-						<button class="close-dialog">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'decline.png')}" style="vertical-align: middle" />
+						<button class="close-dialog button icon remove">
 							<warehouse:message code="default.button.close.label"/>
 						</button>
 					</td>

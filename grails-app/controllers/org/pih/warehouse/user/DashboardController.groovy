@@ -12,6 +12,7 @@ package org.pih.warehouse.user
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -83,7 +84,16 @@ class DashboardController {
 		redirect(controller: "inventory", action: "browse", params:params)
 			
 	}
-
+    def throwException = {
+        println "Configuration: " + ConfigurationHolder.config.grails
+        println "Configuration: " + ConfigurationHolder.config.grails.mail
+        try {
+            throw new RuntimeException("error of some kind")
+        } catch (RuntimeException e) {
+            log.error("Caught runtime exception: ${e.message}", e)
+            throw new RuntimeException("another exception wrapped in this exception", e)
+        }
+    }
 
     //@Cacheable("dashboardControllerCache")
 	def index = {
