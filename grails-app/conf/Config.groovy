@@ -180,12 +180,12 @@ log4j = {
 				"Thread: [%t]%n" +
                 "Username: %X{username}%n" +
                 "Location: %X{location}%n" +
-                "Server: ${CH.config.server}"
-				"Locale: %X{locale}%n" +
+                "Locale: %X{locale}%n" +
 				"IP address: %X{ipAddress} http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
                 "Request URL: %X{requestUrl}%n" +
 				"Query string: %X{queryString}%n" +
+                "Server: ${grails.serverUrl}%n" +
                 "Clickstream: %X{clickStreamUrl}%n%n" +
                 "Stacktrace: %n%m%n"
 
