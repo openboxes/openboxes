@@ -98,8 +98,8 @@ grails.validateable.packages = [
 /* Default settings for emails sent through the SMTP appender  */
 mail.error.server = 'localhost'
 mail.error.port = 25
-mail.error.from = 'info@openboxes.com'
-mail.error.to = 'justin@openboxes.com'
+mail.error.from = 'justin@openboxes.com'
+mail.error.to = 'errors@openboxes.com'
 mail.error.subject = '[OpenBoxes]['+GrailsUtil.environment+']'
 mail.error.debug = true
 
@@ -180,6 +180,7 @@ log4j = {
 				"Thread: [%t]%n" +
                 "Username: %X{username}%n" +
                 "Location: %X{location}%n" +
+                "Server: ${CH.config.server}"
 				"Locale: %X{locale}%n" +
 				"IP address: %X{ipAddress} http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
@@ -219,7 +220,7 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " Error Occurred",
+					subject: mail.error.subject + " An application error occurred",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
@@ -297,6 +298,7 @@ log4j = {
             //'org.jumpmind'
 
    debug 	'org.apache.cxf',
+            'grails.plugin.rendering',
 
            //'com.gargoylesoftware.htmlunit',
             'org.apache.http.wire'        // shows traffic between htmlunit and server

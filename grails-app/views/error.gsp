@@ -84,27 +84,6 @@
 			<g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
 			<g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
 			<table>
-				<%-- 
-				<tr class="prop">
-					<td class="name">
-						<label>To</label>
-					</td>
-					<td class="value">
-						jmiranda@pih.org
-					</td>
-				</tr>
-				<tr class="prop">
-					<td class="name">
-						<label>Cc</label>
-					</td>
-					<td class="value">
-						<g:textField size="100" name="cc" value="${session?.user?.email }"/>
-						<span class="fade">
-							<warehouse:message code="default.separateMultipleAddresses.message"/>
-						</span>
-					</td>
-				</tr>
-				--%>
                 <tr class="prop">
                     <td class="name">
                         <label><warehouse:message code="error.reportedTo.label"/></label>

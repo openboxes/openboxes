@@ -31,9 +31,8 @@ class MailService {
 	def prefix = "${config.grails.mail.prefix}" //[OpenBoxes
 	def from = "${config.grails.mail.from}" // openboxes@pih.org
 	def host= "${config.grails.mail.host}" // localhost
-	def port = Integer.parseInt ("${config.grails.mail.port}") // 23; 	
-	
-	
+	def port = Integer.parseInt ("${config.grails.mail.port}") // 25;
+
 	def addBccAddresses(email) { 		
 		def bccAddresses = "${grailsApplication.config.grails.mail.bcc}"
 		println "Add BCC addresses to email: " + bccAddresses
@@ -73,7 +72,6 @@ class MailService {
 		def isMailEnabled = Boolean.valueOf(grailsApplication.config?.grails?.mail?.enabled?.trim())			
 		log.info (isMailEnabled ? "Mail is enabled" : "Mail is disabled") 
 		return isMailEnabled
-		
 	}
 	
 	/**
