@@ -1038,7 +1038,7 @@ class ProductController {
         def product = Product.get(params.id)
         if (product) {
             product.addToSynonyms(new Synonym(name : params.synonym, locale: RCU.getLocale(request)))
-            product.save(failOnError: true)
+            product.save(flush:true, failOnError: true)
         }
         render(template:'synonyms', model:[product: product, synonyms:product.synonyms])
     }

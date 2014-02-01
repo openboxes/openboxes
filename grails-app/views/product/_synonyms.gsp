@@ -18,6 +18,7 @@
                     </td>
                     <td class="middle">
                         <g:remoteLink controller="product" action="deleteSynonym" update="synonyms" class="button icon trash"
+                                    onError="alert('An error occurred while trying to delete this synonym.  Please refresh the page and try again.');"
                                       id="${synonym.id}" params="[productId:product.id]">Delete</g:remoteLink>
                     </td>
                 </tr>
@@ -35,6 +36,8 @@
                 <td colspan="3">
                     <g:formRemote id="addSynonymToProduct" name="addSynonymToProduct"
                                   update="synonyms" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()"
+                                  onError="alert('An error occurred while trying to add a synonym.  Please refresh the page and try again.');"
+
                                   url="[controller: 'product', action:'addSynonymToProduct']">
                         <input name="id" type="hidden" value="${product?.id}" />
                         <input id="synonym" type="text" name="synonym" value="" size="80" class="medium text"/>
