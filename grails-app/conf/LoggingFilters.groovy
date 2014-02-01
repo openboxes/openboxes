@@ -20,7 +20,7 @@ class LoggingFilters {
                     def sessionId = session?.id
                     def userId = session?.user?.username
                     def serverUrl = CH.config.grails.serverURL
-                    def clickStreamUrl = "${serverUrl}/stream/view${sessionId}"
+                    def clickStreamUrl = "${serverUrl}/stream/view/${sessionId}"
                     //RequestContextHolder.getRequestAttributes()?.getSessionId()
                     //String clickstreamAsString = ClickstreamUtil.getClickstreamAsString(session.clickstream)
                     //log.info "SessionID " + sessionId

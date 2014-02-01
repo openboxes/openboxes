@@ -64,7 +64,7 @@ class ErrorsController {
 
 
 	def processError = { 		
-		def toList = ["justin@openboxes.com"]  //"support@openboxes.com"
+		def toList = ["errors@openboxes.com"]  //"support@openboxes.com"
 		def ccList = []
 
 		def reportedBy = User.findByUsername(params.reportedBy)
