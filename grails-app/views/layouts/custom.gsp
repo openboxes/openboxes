@@ -162,7 +162,7 @@
 <script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
-
+<script type="text/javascript" src="https://openboxes.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_US-f1g0r6-1988229788/6211/12/1.4.5/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=945c35f0"></script>
 <script type="text/javascript">
 
     <g:if test="${session.useDebugLocale}">
