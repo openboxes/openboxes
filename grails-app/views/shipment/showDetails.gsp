@@ -177,22 +177,15 @@
 								<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 									<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}" >
                                         <td width="1%">
-                                            <g:if test="${session.user.photo}">
-                                            <g:link action="viewPhoto" id="${userInstance?.id }">
-                                                <img src="${createLink(controller:'user', action:'viewThumb', id:userInstance.id)}"
-                                                     style="vertical-align: middle" />
-                                            </g:link>
+                                            <g:if test="${comment?.sender?.photo}">
+                                                <g:link action="viewPhoto" id="${comment?.sender?.id }">
+                                                    <img src="${createLink(controller:'user', action:'viewThumb', id:comment?.sender?.id)}"
+                                                         style="vertical-align: middle" />
+                                                </g:link>
                                             </g:if>
                                             <g:else>
-                                                <g:if test="${session?.user?.active}">
-                                                    <img class="photo" src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg') }"
-                                                         style="vertical-align: bottom;" />
-
-                                                </g:if>
-                                                <g:else>
-                                                    <img class="photo" src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg') }"
-                                                         style="vertical-align: bottom;" />
-                                                </g:else>
+                                                <img class="photo" src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg') }"
+                                                     style="vertical-align: bottom;" />
                                             </g:else>
 
                                         </td>
