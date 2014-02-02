@@ -32,6 +32,7 @@ class LoggingFilters {
                     MDC.put('requestUri', request?.requestURI?.toString()?:"No request URI")
                     MDC.put('requestUrl', request?.requestURL?.toString()?:"No request URL")
                     MDC.put('queryString', request?.queryString?:"No query string")
+                    MDC.put('serverUrl', CH?.config?.grails?.serverURL?:"No server URL")
                     MDC.put('clickStreamUrl', sessionId?clickStreamUrl:"No clickstream")
                 } catch (Exception e) {
                     log.warn("Error occurred while adding attributes to Mapped Diagnostic Context: ${e.message}", e)
@@ -49,7 +50,8 @@ class LoggingFilters {
                     MDC.remove('locale')
                     MDC.remove('ipAddress')
                     MDC.remove('requestUri')
-                    MDC.remove('requestUrl')
+                    MDC.remove('requestUri')
+                    MDC.remove('serverUrl')
                     MDC.remove('queryString')
                     MDC.remove('clickStreamUrl')
                 } catch (Exception e) {

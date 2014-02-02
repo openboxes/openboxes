@@ -185,7 +185,7 @@ log4j = {
 				"Request URI: %X{requestUri}%n" +
                 "Request URL: %X{requestUrl}%n" +
 				"Query string: %X{queryString}%n" +
-                "Server: ${grails.serverUrl}%n" +
+                "Server: %X{serverUrl}%n" +
                 "Clickstream: %X{clickStreamUrl}%n%n" +
                 "Stacktrace: %n%m%n"
 
