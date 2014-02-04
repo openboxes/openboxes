@@ -120,9 +120,6 @@ class BatchController {
 			  	    // Get data from importer (should be done as a separate step 'processData' or within 'validateData')
 					command.data = dataImporter.data
 
-                    //render command.data as JSON;
-                    //return;
-
 					// Validate data using importer (might change data)
 					dataImporter.validateData(command);
 					

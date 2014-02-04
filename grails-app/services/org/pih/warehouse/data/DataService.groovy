@@ -132,7 +132,7 @@ class DataService {
      */
     def importInventoryLevel(location, row) {
         println "Import inventory levels " + location + " row " + row
-        def product = findOrCreateProduct(row)
+        def product = findProduct(row)
 
         // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
         updateProduct(product, row)
@@ -243,7 +243,7 @@ class DataService {
         }
         inventoryLevel.status = InventoryStatus.SUPPORTED
         inventoryLevel.product = product
-        inventoryLevel.binLocation = binLocation
+        //inventoryLevel.binLocation = binLocation
         inventoryLevel.minQuantity = minQuantity
         inventoryLevel.reorderQuantity = reorderQuantity
         inventoryLevel.maxQuantity = maxQuantity
@@ -314,6 +314,14 @@ class DataService {
     }
 
 
+    def findProduct(row) {
+        def product = Product.findByProductCode(row.productCode)
+        if (!product) {
+            throw new RuntimeException("Product ${row.productCode} was not found")
+        }
+        return product
+    }
+
     /**
      * Find or create a category with the given categoryName.
      *
@@ -345,32 +353,30 @@ class DataService {
      */
     def updateProduct(product, row) {
         // Change category
-        def category = productService.findOrCreateCategory(row.category)
-        if (product.category != category && category) {
-            product.category = category
-        }
-
+//        def category = productService.findOrCreateCategory(row.category)
+//        if (product.category != category && category) {
+//            product.category = category
+//        }
         // Change product name
-        if (row.productName != product.name && product.name != null) {
-            product.name = row.productName
-        }
-
+//        if (row.productName != product.name && product.name != null) {
+//            product.name = row.productName
+//        }
         // Change all other attributes if they exist
-        if (row.manufacturer) {
-            product.manufacturer = row.manufacturer
-        }
-        if (row.manufacturerCode) {
-            product.manufacturerCode = row.manufacturerCode
-        }
-        if (row.vendor){
-            product.vendor = row.vendor
-        }
-        if (row.vendorCode){
-            product.vendorCode = row.vendorCode
-        }
-        if (row.unitOfMeasure) {
-            product.unitOfMeasure = row.unitOfMeasure
-        }
+//        if (row.manufacturer) {
+//            product.manufacturer = row.manufacturer
+//        }
+//        if (row.manufacturerCode) {
+//            product.manufacturerCode = row.manufacturerCode
+//        }
+//        if (row.vendor){
+//            product.vendor = row.vendor
+//        }
+//        if (row.vendorCode){
+//            product.vendorCode = row.vendorCode
+//        }
+//        if (row.unitOfMeasure) {
+//            product.unitOfMeasure = row.unitOfMeasure
+//        }
         if (row.pricePerUnit) {
             product.pricePerUnit = getFloat(row.pricePerUnit)
         }
