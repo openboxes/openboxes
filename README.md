@@ -77,6 +77,10 @@ grails.mail.enabled=false
 #inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
 #openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
+# If you wish to not set up any test data, you can indicate this per the below 
+# (eg. if you are running from a copy of a production db)
+# openboxes.fixtures.enabled=false
+
 # Google Product Search
 #google.api.key=<Google API key>
 
@@ -90,6 +94,10 @@ grails.mail.enabled=false
 #google.analytics.enabled = false
 #google.analytics.webPropertyID = <Google Analytics Key>
 ```
+
+NOTE: If you are running in development mode with a copy of an existing production database, you will need to
+instruct the application to not setup test fixtures automatically by uncommenting the above property:
+openboxes.fixtures.enabled=false
 
 ##### Compile or "upgrade" grails version and plugins for grails
 Either of these actions should start the dependency resolution process.  
