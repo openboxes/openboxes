@@ -40,10 +40,10 @@ gvm install grails 1.3.7
 ```
 
 ##### Clone repository 
-* If you are a not core contributor, fork [openboxes git repository](https://github.com/PIH/openboxes)
+* If you are a not core contributor, fork [openboxes git repository](https://github.com/openboxes/openboxes)
 * If you are a core contributor:
 ```
-        git clone git@github.com:PIH/openboxes.git      
+git clone git@github.com:openboxes/openboxes.git      
 ```
 Otherwise, replace git url with the one of your forked repository
 
