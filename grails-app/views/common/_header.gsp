@@ -28,6 +28,64 @@
                         </li>
 
 
+                        <li>
+                            <span class="action-menu">
+                                <button class="action-hover-btn button icon comment big">
+                                    Get help
+                                </button>
+                                <ul class="actions" style="text-align:left;">
+
+                                    <li class="action-menu-item">
+                                        <g:link url="http://openboxes.atlassian.net/wiki/questions" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}"/>
+                                            <warehouse:message code="docs.faq.label" default="FAQ"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://www.dropbox.com/sh/okkhdne14rju65d/JD9TpTUOt6" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'book_red.png')}"/>
+                                            <warehouse:message code="docs.userGuide.label" default="User Guide"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://groups.google.com/forum/#!forum/openboxes" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'folder.png')}"/>
+                                            <warehouse:message code="docs.forum.label" default="Forum"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'outline.png')}"/>
+                                            <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
+                                        </g:link>
+                                    </li>
+                                    <li>
+                                        <hr/>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://openboxes.atlassian.net/secure/CreateIssue!default.jspa" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}"/>
+                                            <warehouse:message code="docs.reportBug.label" default="Report a Bug"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="mailto:support@openboxes.com" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'email.png')}"/>
+                                            <warehouse:message code="docs.contactSupport.label" default="Contact Support"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="mailto:feedback@openboxes.com" data-uv-trigger="contact" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'lightbulb.png')}"/>
+                                            <warehouse:message code="docs.provideFeedback.label" default="Provide Feedback"/>
+                                        </g:link>
+                                    </li>
+
+                                </ul>
+                            </span>
+
+                        </li>
+
 					    <g:if test="${session.user}">
                             <%--
                             <li>
@@ -66,7 +124,7 @@
                                         <li class="action-menu-item">
                                             <g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}"/>
-                                                <warehouse:message code="editProfile.label" default="Edit profile"/>
+                                                <warehouse:message code="profile.label" default="Profile"/>
                                             </g:link>
                                         </li>
                                         <li class="action-menu-item">
