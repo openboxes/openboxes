@@ -193,6 +193,7 @@
                                 <tr>
                                     <th class="center border-right"><warehouse:message code="product.productCode.label"/></th>
                                     <th class="border-right"><warehouse:message code="product.name.label"/></th>
+                                    <th class="border-right"><warehouse:message code="product.genericProduct.label"/></th>
 
                                     <%--
                                     <th class="border-right"><warehouse:message code="category.label"/></th>
@@ -249,6 +250,11 @@
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
                                                 ${product?.name}
                                             </g:link>
+                                        </td>
+                                        <td class="border-right">
+
+                                            ${product?.genericProduct?.description?:""}
+
                                         </td>
 
                                         <%--

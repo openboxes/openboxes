@@ -249,6 +249,7 @@ class ConsumptionController {
                 def csvrow =  [
                         'Product code': row.product.productCode?:'',
                         'Product': row.product.name,
+                        'Generic product': row.product?.genericProduct?.description?:"",
                         'Category': row.product?.category?.name,
                         'UoM': row.product.unitOfMeasure?:'',
                         'Bin Location': row?.product?.getBinLocation(session.warehouse.id)?:'',
