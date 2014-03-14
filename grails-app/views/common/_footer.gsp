@@ -1,9 +1,9 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
-		&copy; 2013 <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="application.version.label"/>: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp; 
-		<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;					
+		&copy; 2014 <a href="openboxes.com">OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
+		<warehouse:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+		<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
     </div>
@@ -60,4 +60,11 @@
     <g:link controller="dashboard" action="chooseLayout" params="['layout':'mega']">mobile</g:link>
     --%>
 	</div>
+
+    <%--
+    <div class="center">
+        <a href="https://twitter.com/justinmiranda" class="twitter-follow-button" data-show-count="false">Follow @justinmiranda</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    </div>
+    --%>
 </div>
