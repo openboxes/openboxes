@@ -10,6 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.test.*
+import org.pih.warehouse.core.User
 
 // import org.pih.warehouse.core.Document;
 // import org.pih.warehouse.inventory.InventoryItem
@@ -19,6 +20,7 @@ class ProductGroupTests extends GrailsUnitTestCase {
 		super.setUp()
 
         Product.metaClass.static.withNewSession = {Closure c -> c.call() }
+        User.metaClass.static.withNewSession = {Closure c -> c.call() }
 
     }
 

@@ -31,6 +31,7 @@ class SynonymTests extends GrailsUnitTestCase {
         mockDomain(Product, [product1,product2])
         mockDomain(Category, [category])
 
+        User.metaClass.static.withNewSession = {Closure c -> c.call() }
         Synonym.metaClass.static.withNewSession = {Closure c -> c.call() }
         Product.metaClass.static.withNewSession = {Closure c -> c.call() }
         //mockDomain(LocationType, [depot, supplier, ward])
