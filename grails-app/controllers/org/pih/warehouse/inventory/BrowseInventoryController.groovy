@@ -10,7 +10,9 @@
 
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.product.Category;
 
 // import java.text.SimpleDateFormat;
@@ -37,16 +39,15 @@ class BrowseInventoryController {
 			throw new Exception("Location is required")
 		}				
 		//def inventorySnapshots = InventorySnapshot.findAllByLocation(location)
-		def inventorySnapshots = InventorySnapshot.withCriteria {
+		def inventorySnapshots = InventorySnapshot.createCriteria().list(max:params.max?:10, offset:params.offset?:0) {
 			and {
-								
 				eq("location", location)
 				if (category) { 
 					product { 
 						eq("category", category)
 					}
 				}
-				if (q) { 
+				if (q) {
 					product {
 						ilike("name", "%" + q + "%")
 					}
@@ -54,11 +55,11 @@ class BrowseInventoryController {
 			}
 		}
 
-		
-		def locations = Location.list();
+		def locationType = LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID)
+		def locations = Location.findAllWhere(locationType: locationType);
 		def categories = Category.list();
 		
-		[inventorySnapshots: inventorySnapshots, locations: locations, categories: categories, selectedLocation: location]
+		[inventorySnapshots: inventorySnapshots, locations: locations, categories: categories, location: location, category: category]
 		
 	}
 	

@@ -39,6 +39,7 @@ class InventorySnapshot implements java.io.Serializable {
 	
     // Constraints
     static constraints = {
+        date(nullable:true)
 		product(nullable:false)
 		location(nullable:false)
 		inventoryItem(nullable:true)
