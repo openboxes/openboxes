@@ -23,20 +23,38 @@
 
             <div class="tabs tabs-ui">
                 <ul>
+                    <li><a href="#prepare-data-tab"><warehouse:message code="product.import.step0.label" default="Step 0"/>.
+                        <warehouse:message code="product.import.prepare.label" default="Prepare data file"/></a></li>
                     <li><a href="#upload-data-tab"><warehouse:message code="product.import.step1.label" default="Step 1"/>.
-                        <warehouse:message code="product.import.label" default="Upload CSV file"/></a></li>
+                        <warehouse:message code="product.import.upload.label" default="Upload date file"/></a></li>
                     <li><a href="#verify-data-tab">
                         <warehouse:message code="product.import.step2.label" default="Step 2"/>.
-                        <warehouse:message code="product.verify.label" default="Verify products"/></a></li>
+                        <warehouse:message code="product.import.verify.label" default="Verify products"/></a></li>
                     <li><a href="#import-data-tab">
                         <warehouse:message code="product.import.step2.label" default="Step 3"/>.
-                        <warehouse:message code="product.import.label" default="Import products"/></a></li>
+                        <warehouse:message code="product.import.save.label" default="Import products"/></a></li>
 
                     <div class="button-group right">
                         <a class="prev button icon arrowleft" href="#">Previous</a>
                         <a class="next button icon arrowright">Next</a>
                     </div>
                 </ul>
+                <div id="prepare-data-tab" style="padding: 10px;" class="ui-tabs-hide">
+                    <div class="empty center">
+                        <g:link controller="batch" action="downloadCsvTemplate" params="[template:'products.csv']" class="next button icon arrowdown">
+                            <warehouse:message code="import.product.template.label" default="Download CSV template"/>
+                        </g:link>
+                        -- OR --
+                        <g:link controller="product" action="exportAsCsv" class="next button icon arrowdown">
+                            <warehouse:message code="import.product.exportAll.label" default="Download CSV of all products"/>
+                        </g:link>
+                        -- OR --
+                        <a class="next button icon arrowright">
+                            <warehouse:message code="import.product.haveMyOwn.label" default="I have my own CSV data file"/>
+                        </a>
+                    </div>
+
+                </div>
                 <div id="upload-data-tab" style="padding: 10px;" class="ui-tabs-hide">
                     <div id="upload-form" class="dialog">
                         <g:uploadForm controller="product" action="uploadCsv" fragment="verify-data-tab">
@@ -161,6 +179,11 @@
                             </table>
                         </div>
                     </g:if>
+                    <g:else>
+                        <div class="empty center">
+                            <warehouse:message code="import.product.uploadDataFile.message" default="You must upload a data file before proceeding to this step."/>
+                        </div>
+                    </g:else>
                 </div>
                 <div id="import-data-tab" class="ui-tabs-hide">
                     <g:if test="${command?.products && !productsHaveBeenImported}">
@@ -252,9 +275,16 @@
                             </div>
                         </g:form>
                     </g:if>
+                    <g:else>
+                        <div class="empty center">
+                            <warehouse:message code="import.product.uploadDataFile.message" default="You must upload a data file before proceeding to this step."/>
+                        </div>
+                    </g:else>
 
                 </div>
             </div>
+
+
 
         </div>
 			
