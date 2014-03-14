@@ -179,6 +179,24 @@ class InventoryItemController {
         render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap])
     }
 
+    def showAlternativeProducts = { StockCardCommand cmd ->
+        def startTime = System.currentTimeMillis()
+        def product = Product.get(params.id)
+        def location = Location.get(session?.warehouse?.id)
+
+        def products = product.alternativeProducts() as List
+        println "Products " + products
+        def quantityMap = [:]
+        if (!products.isEmpty()) {
+            quantityMap = inventoryService.getQuantityByProductMap(location, products)
+        }
+        def totalQuantity = quantityMap.values().sum()?:0
+
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        render(template: "showProductGroups", model: [product:product, totalQuantity: totalQuantity, quantityMap: quantityMap])
+    }
+
 
     def showStockHistory = { StockCardCommand cmd ->
         def startTime = System.currentTimeMillis()

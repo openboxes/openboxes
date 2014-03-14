@@ -309,6 +309,7 @@
                     ${productInstance?.productCode }
                 </td>
             </tr>
+
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="category.label"/></label>
@@ -334,20 +335,25 @@
 
                 </td>
             </tr>
-            <g:if test="${productInstance?.productGroups }">
-                <tr class="prop">
-                    <td class="label left">
-                        <label><warehouse:message code="productGroup.label"/></label>
-                    </td>
-                    <td class="value">
+            <tr class="prop">
+                <td class="label left">
+                    <label><warehouse:message code="productGroups.label"/></label>
+                </td>
+                <td class="value">
+                    <g:if test="${productInstance?.productGroups }">
                         <g:each var="productGroup" in="${productInstance?.productGroups }">
-                            <g:link controller="productGroup" action="edit" id="${productGroup.id }">
+                            <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
                                 ${productGroup?.description }
                             </g:link>
                         </g:each>
-                    </td>
-                </tr>
-            </g:if>
+                    </g:if>
+                    <g:else>
+                        <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
+                            <warehouse:message code="default.button.edit.label"/>
+                        </g:link>
+                    </g:else>
+                </td>
+            </tr>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.units.label"/></label>

@@ -4,6 +4,7 @@
 	<div id="transactionLogTabs" class="tabs">												
 		<ul>
 			<li><a href="#tabs-1" id="current-stock-tab"><warehouse:message code="inventory.currentStockCurrentLocation.label" default="Current Location"/></a></li>
+            <li><a href="/openboxes/inventoryItem/showAlternativeProducts/${commandInstance?.productInstance?.id}"><warehouse:message code="product.alternativeProducts.label" default="Alternative products"/></a></li>
             <li><a href="/openboxes/inventoryItem/showCurrentStockAllLocations/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.currentStockAllLocations.label" default="All Locations"/></a></li>
             <li><a href="/openboxes/inventoryItem/showStockHistory/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
             <li><a href="/openboxes/inventoryItem/showPendingRequisitions/${commandInstance?.productInstance?.id}"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>

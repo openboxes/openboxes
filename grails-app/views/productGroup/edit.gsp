@@ -59,15 +59,7 @@
 								<td valign="top" class="name"><label for="category.id"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
 								<td valign="top" class="value">
-									<%-- 
-									<g:selectCategoryMcDropdown id="category" name="category.id" 
-										value="${productGroupInstance?.category?.id}"/>									
-									<g:hiddenField name="oldCategory.id" value="${productGroupInstance?.category?.id }"/>
-									<g:categorySelect id="category" name="category.id" 
-										value="${productGroupInstance?.category?.id}"/>
-									--%>
-
-                                    <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
+                                    <g:selectCategory name="category.id" class="chzn-select-deselect" noSelection="['null':'']"
                                                       value="${productGroupInstance?.category?.id}" />
 
 								</td>									

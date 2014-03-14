@@ -17,7 +17,9 @@
                     ${product.productCode }
                 </td>
                 <td class="middle">
-                    ${product.name }
+                    <g:link controller="inventoryItem" action="showStockCard" id="${product.id}">
+                        ${product.name }
+                    </g:link>
                 </td>
                 <td class="middle">
                     ${product.unitOfMeasure }
