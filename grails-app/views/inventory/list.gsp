@@ -71,6 +71,7 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.status.label"/></th>
                                 <th><warehouse:message code="product.productCode.label"/></th>
                                 <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="product.genericProduct.label"/></th>
                                 <th><warehouse:message code="category.label"/></th>
                                 <th><warehouse:message code="product.manufacturer.label"/></th>
                                 <th><warehouse:message code="product.vendor.label"/></th>
@@ -108,6 +109,9 @@
                                         <g:link controller="inventoryItem" action="showStockCard" id="${entry.key.id}">
                                             ${entry.key}
                                         </g:link>
+                                    </td>
+                                    <td>
+                                        ${entry.key?.genericProduct?.description?:""}
                                     </td>
                                     <td>
                                         ${entry.key?.category?.name}
