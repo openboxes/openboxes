@@ -99,7 +99,9 @@ class BootStrap {
         log.info("Finished running liquibase changelog(s)!")
 
 		def enableFixtures = Boolean.parseBoolean(grailsApplication.config.openboxes.fixtures.enabled?:"true");
+        log.info("Insert test fixtures?  " + enableFixtures)
 		if (enableFixtures) {
+            log.info("Inserting test fixtures ...")
             insertTestFixture()
         }
 
