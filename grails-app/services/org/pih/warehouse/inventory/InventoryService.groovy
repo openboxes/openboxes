@@ -3136,9 +3136,12 @@ class InventoryService implements ApplicationContextAware {
                 'Product code': product.productCode?:'',
                 'Product': product.name,
                 'UOM': product.unitOfMeasure,
+                'Generic product': product?.genericProduct?.description?:"",
                 'Category': product?.category?.name,
-                'Manufacturer': product?.manufacturer,
-                'Vendor': product?.vendor
+                'Manufacturer': product?.manufacturer?:"",
+                'Manufacturer code': product?.manufacturerCode?:"",
+                'Vendor': product?.vendor?:"",
+                'Vendor code': product?.vendorCode?:""
                 //'Bin Location': inventoryLevel?.binLocation?:"",
                 //'Min': inventoryLevel?.minQuantity?:"",
                 //'Reorder': inventoryLevel?.reorderQuantity?:"",

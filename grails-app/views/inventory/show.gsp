@@ -35,6 +35,7 @@
             <div class="yui-u first">
 
                 <div class="box" style="height:100%;">
+                    <h2 class="middle"></h2>
                     <g:form controller="inventory" action="search">
                         <div class="filters">
                             <div class="prop">
@@ -128,9 +129,11 @@
                             <tr>
                                 <th><warehouse:message code="product.productCode.label"/></th>
                                 <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="product.genericProduct.label"/></th>
+                                <th><warehouse:message code="category.label"/></th>
                                 <th><warehouse:message code="product.uom.label"/></th>
                                 <th><warehouse:message code="product.manufacturer.label"/></th>
-                                <th><warehouse:message code="product.vendor.label"/></th>
+                                <th class="border-right"><warehouse:message code="product.vendor.label"/></th>
                                 <g:each var="date" in="${command?.dates}">
                                     <th class="center"><g:formatDate date="${date}" format="MMM dd"/></th>
                                 </g:each>
@@ -143,7 +146,17 @@
                                     ${product?.productCode}
                                 </td>
                                 <td>
-                                    <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">${product?.name}</g:link>
+                                    <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
+                                        ${product?.name}
+                                    </g:link>
+                                </td>
+                                <td>
+                                    <g:link controller="productGroup" action="edit" id="${product?.genericProduct?.id}">
+                                        ${product?.genericProduct?.description?:""}
+                                    </g:link>
+                                </td>
+                                <td>
+                                    ${product?.category?.name}
                                 </td>
                                 <td>
                                     ${product?.unitOfMeasure}
@@ -152,7 +165,7 @@
                                     ${product?.manufacturer}
                                     <div class="fade">${product?.manufacturerCode}</div>
                                 </td>
-                                <td>
+                                <td class="border-right">
                                     ${product?.vendor}
                                     <div class="fade">${product?.vendorCode}</div>
                                 </td>
