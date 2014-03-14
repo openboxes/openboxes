@@ -49,13 +49,13 @@
                                     </li>
                                     <li class="action-menu-item">
                                         <g:link url="https://groups.google.com/forum/#!forum/openboxes" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'folder.png')}"/>
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'comment.png')}"/>
                                             <warehouse:message code="docs.forum.label" default="Forum"/>
                                         </g:link>
                                     </li>
                                     <li class="action-menu-item">
                                         <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'outline.png')}"/>
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}"/>
                                             <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
                                         </g:link>
                                     </li>
