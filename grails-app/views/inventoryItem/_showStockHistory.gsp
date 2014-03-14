@@ -106,7 +106,7 @@
                                     <g:if test="${previousTransaction?.id != transaction?.id}">
                                         <td  class="middle">
                                             <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
-                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'decline.png' )}"/>
+                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}"/>
                                             </g:if>
                                             <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
                                                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" />
@@ -115,7 +115,7 @@
                                                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
                                             </g:elseif>
                                             <g:elseif test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY}">
-                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
+                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'calculator.png' )}" />
                                             </g:elseif>
                                         </td>
                                         <td nowrap="nowrap" class="middle">
