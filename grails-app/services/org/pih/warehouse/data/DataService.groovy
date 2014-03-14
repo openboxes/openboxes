@@ -146,16 +146,15 @@ class DataService {
         Product.withNewSession {
 
             def product = findProduct(row)
-
-            //def tags = findTags(row.tags)
+            //def tags = findOrCreateTags(row.tags)
 
             // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
             updateProduct(product, row)
 
             // Add tags that don't currently exist
-            addTagsToProduct(product, row.tags)
-            //product.save(flush:true)
-
+            //if(row.tags) {
+            //    addTagsToProduct(product, row.tags)
+            //}
 
             // Create inventory level for current location, include bin location
             if (location.inventory) {
@@ -169,7 +168,11 @@ class DataService {
 
             // Save product
             product.merge()
-            //if (index % 100 == 0) cleanUpGorm()
+
+            // Clean up session after 50 products
+            if (index % 50 == 0) {
+                cleanUpGorm()
+            }
 
         }
 
@@ -478,21 +481,14 @@ class DataService {
 
     def addTagToProduct(product, tagName) {
         // Check if the product already has the given tag
-        def tag = product.tags.find { it.tag == tagName }
-        if (!tag) {
-            // Otherwise try to find an existing tag that matches the tag
-            Tag.withNewSession {
-                tag = Tag.findByTag(tagName)
-                // Or create a brand new one
-                if (!tag) {
-                    tag = new Tag(tag: tagName)
-                    tag.save()
-                }
+        def alreadyHasTag = product.tags.find { it.tag == tagName }
+        if (!alreadyHasTag) {
+            //tag = Tag.findByTag(tagName)
+            def foundTag = Tag.executeQuery( "select distinct t from Tag t where t.tag = :tagName", [tagName:tagName, max:1] );
+            if (foundTag) {
+                product.addToTags(foundTag[0])
+                product.merge()
             }
-            // Then add the tag and save the product
-            product.addToTags(tag)
-            product.merge()
-
         }
     }
 
