@@ -20,12 +20,43 @@ class ProductTests extends GrailsUnitTestCase {
 
     protected void setUp() {
         super.setUp()
+        Product product1 = new Product(id: "prod1", name: "product1")
+        Product product2 = new Product(id: "prod2", name: "product2")
+        Product product3 = new Product(id: "prod3", name: "product3")
+        Product product4 = new Product(id: "prod4", name: "product4")
 
+
+        InventoryItem item1 = new InventoryItem(id: "item1", product:product1)
+        InventoryItem item2 = new InventoryItem(id: "item2", product:product2)
+        InventoryItem item3 = new InventoryItem(id: "item3", product:product3)
+        InventoryItem item4 = new InventoryItem(id: "item4", product:product4)
+
+        product1.inventoryItems = [item1, item2, item3, item4]
+
+        ProductGroup productGroup1 = new ProductGroup(description: "productGroup1")
+
+        ProductGroup productGroup2 = new ProductGroup(description: "productGroup2")
+
+        mockDomain(Product, [product1,product2,product3,product4])
+        mockDomain(InventoryItem, [item1, item2, item3, item4])
+        mockDomain(ProductGroup, [productGroup1, productGroup2])
         mockDomain(Synonym)
-        mockDomain(Product)
         mockDomain(Category)
 
+        productGroup1.addToProducts(product1)
+        productGroup1.addToProducts(product2)
+        productGroup1.addToProducts(product4)
 
+        productGroup2.addToProducts(product1)
+        productGroup2.addToProducts(product3)
+        productGroup2.addToProducts(product4)
+
+        product1.addToProductGroups(productGroup1)
+        product1.addToProductGroups(productGroup2)
+        product2.addToProductGroups(productGroup1)
+        product3.addToProductGroups(productGroup2)
+        product4.addToProductGroups(productGroup1)
+        product4.addToProductGroups(productGroup2)
     }
 
     protected void tearDown() {
@@ -34,17 +65,8 @@ class ProductTests extends GrailsUnitTestCase {
 
     @Test
     void toJson() {
-        Product product = new Product(id: "prod1", name: "product1")
-        InventoryItem item1 = new InventoryItem(id: "item1", product:product)
-        InventoryItem item2 = new InventoryItem(id: "item2", product:product)
-        InventoryItem item3 = new InventoryItem(id: "item3", product:product)
-        InventoryItem item4 = new InventoryItem(id: "item4", product:product)
-        product.inventoryItems = [item1, item2, item3, item4]
-        mockDomain(Product, [product])
-        mockDomain(InventoryItem, [item1, item2, item3, item4])
-
+        def product = Product.findById("prod1")
         def map = product.toJson()
-
         assert map.id == product.id
         assert map.name == product.name
 //        assert map.inventoryItems.any { it.inventoryItemId == item1.id }
@@ -60,7 +82,29 @@ class ProductTests extends GrailsUnitTestCase {
         product.addToSynonyms(new Synonym(synonym: "synonym"))
         product.save(flush: true)
         assertEquals 1, product.synonyms.size()
+    }
+
+
+    @Test
+    void alternativeProducts_shouldReturnAlternativeProducts() {
+        def product1 = Product.findByName("product1")
+        def product2 = Product.findByName("product2")
+        def product3 = Product.findByName("product3")
+        def product4 = Product.findByName("product4")
+
+        def productGroup1 = ProductGroup.findByDescription("productGroup1")
+        assert productGroup1.products.size() == 3
+
+        def productGroup2 = ProductGroup.findByDescription("productGroup2")
+        assert productGroup2.products.size() == 3
+
+        assert product1.alternativeProducts().size() == 3
+        assert !product1.alternativeProducts().contains(product1)
+        assert product1.alternativeProducts().contains(product2)
+        assert product1.alternativeProducts().contains(product3)
+        assert product1.alternativeProducts().contains(product4)
 
     }
+
 
 }

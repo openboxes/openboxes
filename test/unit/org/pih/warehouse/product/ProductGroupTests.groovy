@@ -17,7 +17,10 @@ import grails.test.*
 class ProductGroupTests extends GrailsUnitTestCase {
 	protected void setUp() {
 		super.setUp()
-	}
+
+        Product.metaClass.static.withNewSession = {Closure c -> c.call() }
+
+    }
 
 	protected void tearDown() {
 		super.tearDown()
