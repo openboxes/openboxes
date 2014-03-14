@@ -465,8 +465,35 @@ class DataService {
      * @param tags
      * @return
      */
-    def addTagsToProduct(product, tags) {
-        productService.addTagsToProduct(product, tags.split(","))
+    def addTagsToProduct(product, tagNames) {
+        def tags = tagNames?.split(",")
+        if (tags) {
+            tags.each { tagName ->
+                if (tagName) {
+                    addTagToProduct(product, tagName)
+                }
+            }
+        }
+    }
+
+    def addTagToProduct(product, tagName) {
+        // Check if the product already has the given tag
+        def tag = product.tags.find { it.tag == tagName }
+        if (!tag) {
+            // Otherwise try to find an existing tag that matches the tag
+            Tag.withNewSession {
+                tag = Tag.findByTag(tagName)
+                // Or create a brand new one
+                if (!tag) {
+                    tag = new Tag(tag: tagName)
+                    tag.save()
+                }
+            }
+            // Then add the tag and save the product
+            product.addToTags(tag)
+            product.merge()
+
+        }
     }
 
     /**
