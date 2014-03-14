@@ -45,8 +45,19 @@ import static org.pih.warehouse.core.UnitOfMeasureType.AREA
 class DataService {
 
     def productService
+    def sessionFactory
 
-	static transactional = true
+    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+
+
+    private void cleanUpGorm()  {
+        def session = sessionFactory.currentSession
+        session.flush()
+        session.clear()
+        propertyInstanceMap.get().clear()
+    }
+
+    static transactional = true
 
 
     /**
@@ -75,19 +86,19 @@ class DataService {
     }
 
     def validateInventoryLevel(row) {
-        row.each { k, v ->
-            def expectedType = InventoryLevelExcelImporter.propertyMap.get(k).expectedType
+        row.each { key, value ->
+            def expectedType = InventoryLevelExcelImporter.propertyMap.get(key).expectedType
             switch (expectedType) {
                 case  ExcelImportUtils.PROPERTY_TYPE_STRING:
-                    assert !v || v instanceof String
+                    assert !value || value instanceof String, "Value [${value}] must be a String"
                     break;
 
                 case ExcelImportUtils.PROPERTY_TYPE_DATE:
-                    assert !v || v instanceof Date
+                    assert !value || value instanceof Date, "Value [${value}] must be a Date"
                     break;
 
                 case ExcelImportUtils.PROPERTY_TYPE_INT:
-                    assert !v || v instanceof Number
+                    assert !value || value instanceof Number, "Value [${value}] must be a Number"
                     break;
 
                 default:
@@ -114,9 +125,9 @@ class DataService {
         println "Import inventory levels " + location + " filename " + filename
         InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(filename);
         def inventoryLevelList = importer.getData();
-        inventoryLevelList.each { row ->
+        inventoryLevelList.eachWithIndex { row, index ->
             if (validateInventoryLevel(row)) {
-                importInventoryLevel(location, row)
+                importInventoryLevel(location, row, index)
             }
         }
         return inventoryLevelList
@@ -130,27 +141,38 @@ class DataService {
      * @param fileName
      * @return
      */
-    def importInventoryLevel(location, row) {
-        println "Import inventory levels " + location + " row " + row
-        def product = findProduct(row)
+    def importInventoryLevel(location, row, index) {
+        println "Import inventory levels " + location + " row " + row + " index " + index
+        Product.withNewSession {
 
-        // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
-        updateProduct(product, row)
+            def product = findProduct(row)
 
-        // Add tags that don't currently exist
-        addTagsToProduct(product, row.tags)
+            //def tags = findTags(row.tags)
 
-        // Create inventory level for current location, include bin location
-        if (location.inventory) {
-            addInventoryLevelToProduct(product, location.inventory, row.binLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity)
+            // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
+            updateProduct(product, row)
+
+            // Add tags that don't currently exist
+            addTagsToProduct(product, row.tags)
+            //product.save(flush:true)
+
+
+            // Create inventory level for current location, include bin location
+            if (location.inventory) {
+                addInventoryLevelToProduct(product, location.inventory, row.binLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity)
+            }
+
+            // Create product package if UOM and quantity are provided
+            if (row.packageUom && row.packageSize) {
+                addProductPackageToProduct(product, row.packageUom, row.packageSize, row.pricePerPackage)
+            }
+
+            // Save product
+            product.merge()
+            //if (index % 100 == 0) cleanUpGorm()
+
         }
 
-        // Create product package if UOM and quantity are provided
-        if (row.packageUom && row.packageSize) {
-            addProductPackageToProduct(product, row.packageUom, row.packageSize, row.pricePerPackage)
-        }
-        // Save product
-        product.save(failOnError:true)
     }
 
     /**
@@ -178,11 +200,11 @@ class DataService {
      * @return
      */
     def addProductPackageToProduct(product, uomCode, quantity, price) {
-        println "Add product package to product: " + uomCode + " " + quantity + " " + price
+        println "Create or modify product package: " + uomCode + " " + quantity + " " + price
         if (uomCode) {
-            def productPackage = findOrCreateProductPackage(product, uomCode, quantity, price)
+            def productPackage = findOrCreateProductPackage(product, uomCode, quantity as Integer, price as Float)
             product.addToPackages(productPackage)
-            product.save(flush: true, failOnError: true)
+            //product = product.merge()
         }
     }
 
@@ -200,8 +222,10 @@ class DataService {
             unitOfMeasure.code = uomCode
             unitOfMeasure.name = uomCode
             unitOfMeasure.description = uomCode
-            unitOfMeasure.save(failOnError: true, flush: true)
+            unitOfMeasure.save()
         }
+        unitOfMeasure = unitOfMeasure.merge()
+        log.info "findOrCreateUnitOfMeasure: ${unitOfMeasure}"
         return unitOfMeasure
 
     }
@@ -220,8 +244,11 @@ class DataService {
             unitOfMeasureClass.description = "Quantity"
             unitOfMeasureClass.active = true
             unitOfMeasureClass.type = UnitOfMeasureType.QUANTITY
-            unitOfMeasureClass.save(failOnError: true, flush: true)
+            unitOfMeasureClass.save()
         }
+        log.info "findOrCreateUnitOfMeasureClass: ${unitOfMeasureClass}"
+        unitOfMeasureClass = unitOfMeasureClass.merge()
+
         return unitOfMeasureClass
     }
 
@@ -240,6 +267,9 @@ class DataService {
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel();
+            inventoryLevel.lastUpdated = new Date()
+            inventoryLevel.dateCreated = new Date()
+            inventory.addToConfiguredProducts(inventoryLevel)
         }
         inventoryLevel.status = InventoryStatus.SUPPORTED
         inventoryLevel.product = product
@@ -247,9 +277,10 @@ class DataService {
         inventoryLevel.minQuantity = minQuantity
         inventoryLevel.reorderQuantity = reorderQuantity
         inventoryLevel.maxQuantity = maxQuantity
-        //inventoryLevel.save(failOnError: true, flush: true)
-        inventory.addToConfiguredProducts(inventoryLevel)
-        inventory.save(flush: true, failOnError: true)
+
+        inventoryLevel = inventoryLevel.merge()
+
+        log.info "findOrCreateInventoryLevel: ${inventoryLevel}"
         return inventoryLevel
     }
 
@@ -263,6 +294,7 @@ class DataService {
      * @return
      */
     def findOrCreateProductPackage(product, uomCode, quantity, price) {
+        println "findOrCreateProductPackage: ${product} ${uomCode} ${quantity} ${price}"
         def unitOfMeasure = findOrCreateUnitOfMeasure(uomCode)
         def criteria = ProductPackage.createCriteria()
         def productPackage = criteria.get {
@@ -273,6 +305,8 @@ class DataService {
 
         if (!productPackage) {
             productPackage = new ProductPackage()
+            productPackage.lastUpdated = new Date()
+            productPackage.dateCreated = new Date()
         }
         productPackage.name = unitOfMeasure.code + "/" + quantity
         productPackage.description = unitOfMeasure.code + "/" + quantity
@@ -281,7 +315,11 @@ class DataService {
         productPackage.uom = unitOfMeasure
         productPackage.price = price?:0.0
         productPackage.quantity = quantity?:1
-        productPackage.save(failOnError: true, flush: true)
+        productPackage = productPackage.merge()
+
+        log.info "findOrCreateProductPackage: ${productPackage}"
+
+
         return productPackage
     }
 
@@ -308,11 +346,17 @@ class DataService {
             product.vendor = row.vendor
             product.vendorCode = row.vendorCode
             product.unitOfMeasure = row.unitOfMeasure
-            product.save(flush: true, failOnError: true)
+            product.save()
         }
+        product = product.merge()
+        log.info "findOrCreateProduct: ${product}"
         return product
     }
 
+
+    def findTags(tagNames) {
+        return Tag.findAll("from Tag as t where t.tag in (:tagNames)",[tagNames: tagNames])
+    }
 
     def findProduct(row) {
         def product = Product.findByProductCode(row.productCode)
@@ -336,8 +380,10 @@ class DataService {
         if (!category) {
             println("Could not find category " + categoryName)
             category = new Category(name: categoryName, rootCategory: Category.getRootCategory())
-            category.save(failOnError: true, flush: true)
+            category.save()
         }
+        log.info "findOrCreateCategory: ${category}"
+        category = category.merge()
         return category
     }
 
@@ -353,27 +399,27 @@ class DataService {
      */
     def updateProduct(product, row) {
         // Change category
-//        def category = productService.findOrCreateCategory(row.category)
-//        if (product.category != category && category) {
-//            product.category = category
-//        }
-        // Change product name
-//        if (row.productName != product.name && product.name != null) {
-//            product.name = row.productName
-//        }
+        //        def category = productService.findOrCreateCategory(row.category)
+        //        if (product.category != category && category) {
+        //            product.category = category
+        //        }
+                // Change product name
+        //        if (row.productName != product.name && product.name != null) {
+        //            product.name = row.productName
+        //        }
         // Change all other attributes if they exist
-//        if (row.manufacturer) {
-//            product.manufacturer = row.manufacturer
-//        }
-//        if (row.manufacturerCode) {
-//            product.manufacturerCode = row.manufacturerCode
-//        }
-//        if (row.vendor){
-//            product.vendor = row.vendor
-//        }
-//        if (row.vendorCode){
-//            product.vendorCode = row.vendorCode
-//        }
+        if (row.manufacturer) {
+            product.manufacturer = row.manufacturer
+        }
+        if (row.manufacturerCode) {
+            product.manufacturerCode = row.manufacturerCode
+        }
+        if (row.vendor){
+            product.vendor = row.vendor
+        }
+        if (row.vendorCode){
+            product.vendorCode = row.vendorCode
+        }
 //        if (row.unitOfMeasure) {
 //            product.unitOfMeasure = row.unitOfMeasure
 //        }

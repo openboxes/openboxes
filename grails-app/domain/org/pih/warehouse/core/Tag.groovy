@@ -16,12 +16,23 @@ import org.pih.warehouse.product.Product;
 
 class Tag implements Serializable {
 
-	def beforeInsert = {
-		createdBy = AuthService.currentUser.get()
-	}
-	def beforeUpdate ={
-		updatedBy = AuthService.currentUser.get()
-	}
+    def beforeInsert = {
+        User.withNewSession {
+            def currentUser = AuthService.currentUser.get()
+            if (currentUser) {
+                createdBy = currentUser
+                updatedBy = currentUser
+            }
+        }
+    }
+    def beforeUpdate = {
+        User.withNewSession {
+            def currentUser = AuthService.currentUser.get()
+            if (currentUser) {
+                updatedBy = currentUser
+            }
+        }
+    }
 	
 	String id
 	String tag

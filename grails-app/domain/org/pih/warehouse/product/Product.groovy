@@ -40,16 +40,20 @@ class Product implements Comparable, Serializable {
 
 
     def beforeInsert = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            createdBy = currentUser
-            updatedBy = currentUser
+        User.withNewSession {
+            def currentUser = AuthService.currentUser.get()
+            if (currentUser) {
+                createdBy = currentUser
+                updatedBy = currentUser
+            }
         }
     }
     def beforeUpdate = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            updatedBy = currentUser
+        User.withNewSession {
+            def currentUser = AuthService.currentUser.get()
+            if (currentUser) {
+                updatedBy = currentUser
+            }
         }
     }
 
@@ -284,8 +288,26 @@ class Product implements Comparable, Serializable {
 
 
     ProductGroup getGenericProduct() {
-        return this?.productGroups ? this?.productGroups?.sort()?.first() : null
+        return productGroups ? productGroups?.sort()?.first() : null
     }
+
+
+
+    Set<Product> alternativeProducts() {
+        def products = []
+        productGroups.each { productGroup ->
+            productGroup.products.each { product ->
+                if (product != this) {
+                    products.add(product)
+
+                }            }
+        }
+        products = products.unique()
+        return products
+    }
+
+
+
 
     /*
     def getInventoryLevels() {

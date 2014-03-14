@@ -30,7 +30,7 @@ class Category implements Comparable, Serializable {
 	static mapping = {
 		id generator: 'uuid'
 		sort name:"desc"
-		categories sort:"name"
+		categories sort:"name", cascade: "all-delete-orphan"
 		cache true
 	}
 	

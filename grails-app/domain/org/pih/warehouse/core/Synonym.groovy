@@ -17,16 +17,20 @@ import org.pih.warehouse.product.Product;
 class Synonym implements Serializable {
 
     def beforeInsert = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            createdBy = currentUser
-            updatedBy = currentUser
+        User.withNewSession {
+            def currentUser = AuthService.currentUser.get()
+            if (currentUser) {
+                createdBy = currentUser
+                updatedBy = currentUser
+            }
         }
     }
     def beforeUpdate = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            updatedBy = currentUser
+        User.withNewSession {
+            def currentUser = AuthService.currentUser.get()
+            if (currentUser) {
+                updatedBy = currentUser
+            }
         }
     }
 	

@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Tag
@@ -715,10 +716,10 @@ class ProductService {
 						}
 					}
 					product.addToProductGroups(productGroup)
-                    product.save(flush: true)
+                    //product.save()
 				}
                 addTagsToProduct(product, tags)
-                product.save(flush: true)
+                product.save()
             }
 		}
 
@@ -894,13 +895,12 @@ class ProductService {
      * @return
      */
     def addTagToProduct(product, tagName) {
-
         // Check if the product already has the given tag
         def tag = product.tags.find { it.tag == tagName }
         if (!tag) {
             // Otherwise try to find an existing tag that matches the tag
+            //Tag.withNewSession {
             tag = Tag.findByTag(tagName)
-
             // Or create a brand new one
             if (!tag) {
                 tag = new Tag(tag: tagName)
@@ -909,7 +909,12 @@ class ProductService {
 
             // Then add the tag and save the product
             product.addToTags(tag)
-            product.save();
+            //product?.tags?.count()
+            //product?.category?.categories?.count()
+            product.merge()
+            //product.save();
+            //}
+
         }
     }
 

@@ -49,14 +49,14 @@
                                 <td class="value">
                                     ${commandInstance?.filename}
                                 </td>
-
                             </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message code="default.date.label"/></label>
                                 </td>
                                 <td class="value">
-                                    <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="30"/>
+                                    <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
                                 </td>
 
                             </tr>
@@ -83,16 +83,17 @@
                                     <td colspan="2" class="center">
 
                                         <div class="center">
-
+                                            <%--
                                             <button type="submit" name="validate" class="button icon approve">
-                                                ${warehouse.message(code: 'default.button.validate.label', default: 'Validate')}</button>
+                                                ${warehouse.message(code: 'default.button.validate.label', default: 'Re-validate')}</button>
+                                            --%>
 
-                                            <button type="submit" name="import" value="true" class="button icon add">
-                                                ${warehouse.message(code: 'default.button.finish.label')}</button>
-
-
+                                            <g:if test="${!commandInstance?.hasErrors()}">
+                                                <button type="submit" name="import" value="true" class="button icon approve">
+                                                    ${warehouse.message(code: 'default.button.finish.label')}</button>
+                                            </g:if>
                                             <a href="${createLink(controller: "batch", action: "importData", params: params)}" class="button icon trash">
-                                                <warehouse:message code="default.button.cancel.label"/>
+                                                <warehouse:message code="default.button.cancel.label" default="Cancel"/>
                                             </a>
 
                                         </div>
@@ -113,10 +114,11 @@
                     </div>
                 </g:if>
                 <g:if test="${commandInstance?.data}">
+
                     <table class="footable">
                         <thead>
                             <tr>
-                                <th data-class="expand highlight"></th>
+                                <th data-class="expand"></th>
 
                                 <th>Row</th>
                                 <g:each var="column" in="${commandInstance?.columnMap?.columnMap }" status="i">
@@ -145,12 +147,10 @@
                                         </td>
                                     </g:each>
                                     <td>
-                                        <g:if test='${!commandInstance?.warnings[status]?.isEmpty()}'>
-                                            <div class="error">
-                                                <g:each var="warning" in="${commandInstance?.warnings[status]}">
-                                                    <li>&bull;${warning}</li>
-                                                </g:each>
-                                            </div>
+                                        <g:if test='${!commandInstance?.warnings[status]}'>
+                                            <g:each var="warning" in="${commandInstance?.warnings[status]}">
+                                                <li>&bull;${warning}</li>
+                                            </g:each>
                                         </g:if>
                                     </td>
                                 </tr>

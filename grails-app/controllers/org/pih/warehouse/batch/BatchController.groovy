@@ -24,6 +24,7 @@ import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequ
 class BatchController {
 
     def dataService
+    def documentService
 	def inventoryService
 	def importService
 
@@ -51,7 +52,38 @@ class BatchController {
     }
 
 
-	def importData = { ImportDataCommand command ->
+    def downloadTemplate = {
+        println "Download XLS template " + params
+        def filename = params.template
+        try {
+            def file = documentService.findFile("templates/" + filename)
+            response.contentType = "application/vnd.ms-excel"
+            response.setHeader 'Content-disposition', "attachment; filename=\"${filename}\""
+            response.outputStream << file.bytes
+            response.outputStream.flush()
+        }
+        catch (FileNotFoundException e) {
+            response.status = 404
+        }
+    }
+
+    def downloadCsvTemplate = {
+        println "Download csv template " + params
+        def filename = params.template
+        try {
+            def file = documentService.findFile("templates/" + filename)
+            response.contentType = "text/csv"
+            response.setHeader 'Content-disposition', "attachment; filename=\"${filename}\""
+            response.outputStream << file.bytes
+            response.outputStream.flush()
+        }
+        catch (FileNotFoundException e) {
+            response.status = 404
+        }
+    }
+
+
+    def importData = { ImportDataCommand command ->
 		
 		log.info params 
 		log.info command.location
@@ -105,7 +137,8 @@ class BatchController {
                         dataImporter = new InventoryLevelExcelImporter(command?.filename)
                     }
 					else {
-						throw new RuntimeException("Unable to import data using ${command.type} importer")
+						//throw new RuntimeException("Unable to import data using ${command.type} importer")
+                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
                     }
 				}
 				catch (OfficeXmlFileException e) {
@@ -138,6 +171,9 @@ class BatchController {
 					command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}")
 				}
 
+                if (command.type == 'inventory' && !command.date) {
+                    command.errors.reject("date", "${warehouse.message(code: 'import.inventoryImportMustHaveDate.message', default:"Inventory import must specify the date of the stock count")}")
+                }
 				
 				// If there are no errors and the user requests to import the data, we should execute the import
 				if (!command.hasErrors() && params.import) {

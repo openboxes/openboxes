@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
+import org.joda.time.LocalDate
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -27,9 +28,12 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.reporting.Consumption
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
-import org.springframework.validation.Errors;
+import org.springframework.validation.Errors
+
+import java.text.ParseException;
 import java.util.Random
 
 
@@ -37,8 +41,13 @@ import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
 
+    def sessionFactory
+    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+    def startTime = System.currentTimeMillis()
+    def lastBatchStarted = startTime
+
+
     def dataService
-	def sessionFactory
 	def productService
 	def identifierService
 	//def authService
@@ -1380,6 +1389,16 @@ class InventoryService implements ApplicationContextAware {
 		
 		return quantityMap
 	}
+
+    /**
+     * Get a map of quantities (indexed by product) for the given location
+     * @param location
+     * @param products
+     * @return
+     */
+    Map<Product, Integer> getQuantityByProductMap(Location location, List<Product> products) {
+        return getQuantityByProductMap(location.inventory, products)
+    }
 
 	/**
 	 * Get a map of quantities (indexed by product) for a particular inventory.
@@ -2761,7 +2780,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param importParams
 	 * @param errors
 	 */
-	private void validateInventoryData(Map params, Errors errors) {
+	def validateInventoryData(Map params, Errors errors) {
 		def lotNumber = (params.lotNumber) ? String.valueOf(params.lotNumber) : null;
 		if (params?.lotNumber instanceof Double) {
 			errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be not formatted as a Double value");
@@ -3224,7 +3243,7 @@ class InventoryService implements ApplicationContextAware {
      */
     def validateInventoryData(ImportDataCommand command) {
 
-        def dateFormatter = new SimpleDateFormat("yy-mm")
+        def dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
         def calendar = Calendar.getInstance()
         command.data.eachWithIndex { row, index ->
             def rowIndex = index + 2
@@ -3260,18 +3279,37 @@ class InventoryService implements ApplicationContextAware {
                 }
                 def inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
                 if (!inventoryItem) {
-                    command.warnings[index] << "Inventory item for lot number '${lotNumber}' not found"
+                    command.warnings[index] << "Inventory item for lot number '${lotNumber}' does not exist and will be created"
                 }
 
-                if (row.expirationDate) {
-                    def expirationDate = dateFormatter.parse(row.expirationDate)
-                    calendar.setTime(expirationDate)
-                    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-                    expirationDate = calendar.getTime()
-                    if (expirationDate <= new Date()) {
-                        command.warnings[index] << "Expiration date is '${expirationDate}' is not valid"
+                def expirationDate = null
+                try {
+                    if (row.expirationDate) {
+                        if (row.expirationDate instanceof String) {
+                            expirationDate = dateFormatter.parse(row.expirationDate)
+                            calendar.setTime(expirationDate)
+                            expirationDate = calendar.getTime()
+                        }
+                        else if (row.expirationDate instanceof Date) {
+                            expirationDate = row.expirationDate
+                        }
+                        else if (row.expirationDate instanceof LocalDate) {
+                            expirationDate = row.expirationDate.toDate()
+                        }
+                        else {
+                            expirationDate = row.expirationDate
+                            command.warnings[index] << "Expiration date '${row.expirationDate}' has unknown format ${row?.expirationDate?.class}"
+                        }
+
+                        if (expirationDate <= new Date()) {
+                            command.warnings[index] << "Expiration date '${row.expirationDate}' is not valid"
+                        }
+
                     }
+                } catch (ParseException e) {
+                    command.errors.reject("error.expirationDate.invalid", "Row ${rowIndex}: Product '${row.productCode}' must have a valid date (or no date)")
                 }
+
 
                 //def minLength = Math.min(product.name.length(),row.product.length())
                 def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
@@ -3282,7 +3320,7 @@ class InventoryService implements ApplicationContextAware {
             }
 
             if ((row.quantity as int) < 0) {
-                command.errors.reject("error.quantity.negative", "Row ${rowIndex}: Product '${row.productCode}' cannot have negative quantity");
+                command.errors.reject("error.quantity.negative", "Row ${rowIndex}: Product '${row.productCode}' must have positive quantity");
             }
 
 
@@ -3332,13 +3370,26 @@ class InventoryService implements ApplicationContextAware {
 
             // Expiration date should be the last day of the month
             def expirationDate = null
-            if (row.expirationDate) {
+            if (row.expirationDate instanceof String) {
                 expirationDate = dateFormatter.parse(row.expirationDate)
                 calendar.setTime(expirationDate)
-                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
                 expirationDate = calendar.getTime()
-                println "Expiration date: " + expirationDate
             }
+            else if (row.expirationDate instanceof Date) {
+                expirationDate = row.expirationDate
+            }
+            else if (row.expirationDate instanceof LocalDate) {
+                expirationDate = row.expirationDate.toDate()
+            }
+            else {
+                expirationDate = row.expirationDate
+            }
+
+
+
+
+
+
             // Find or create an inventory item
             def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
@@ -3351,5 +3402,114 @@ class InventoryService implements ApplicationContextAware {
         println "Added ${transaction?.transactionEntries?.size()} transaction entries"
         return data
     }
+
+
+
+
+    def createOrUpdateInventorySnapshot(date) {
+        try {
+            def locations = Location.findAll("from Location as l where l.inventory is not null")
+            locations.each { location ->
+
+                def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
+                println "Date ${date}, location ${location}: " + inventorySnapshots
+                if (inventorySnapshots == 0) {
+                    log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
+                    //Location.withTransaction {
+                    if (!location.isAttached()) {
+                        location.attach()
+                    }
+                    // Only process locations with inventory
+                    if (location?.inventory) {
+                        def productQuantityMap = getQuantityByProductMap(location.inventory)
+                        productQuantityMap.keySet().eachWithIndex { product, index ->
+                            def onHandQuantity = productQuantityMap[product]
+                            updateInventorySnapshot(date, product, location, onHandQuantity)
+                            if (index % 100 == 0) {
+                                cleanUpGorm()
+                            }
+                        }
+                    }
+                }
+            }
+            //log.info "Saved inventory snapshot for ${products.size()} products over ${locations.size()} locations"
+        } catch (Exception e) {
+            log.error("Unable to complete inventory snapshot process", e)
+        }
+    }
+
+
+    def updateInventorySnapshot(date, product, location, onHandQuantity) {
+        //log.info "Updating inventory snapshot for product " + product.name + " @ " + location.name
+        try {
+            //def inventorySnapshot = InventorySnapshot.findByLocationAndProduct(location, product)
+
+            def inventorySnapshot = InventorySnapshot.findWhere(date: date, location: location, product:product)
+            if (!inventorySnapshot) {
+                inventorySnapshot = new InventorySnapshot(date: date, location: location, product: product)
+            }
+            def pendingQuantity = calculatePendingQuantity(product, location)
+            inventorySnapshot.quantityOnHand = onHandQuantity?:0
+            inventorySnapshot.quantityInbound = pendingQuantity[0]?:0
+            inventorySnapshot.quantityOutbound = pendingQuantity[1]?:0
+            //inventorySnapshot.lastUpdated = new Date()
+            inventorySnapshot.save(failOnError: true)
+        } catch (Exception e) {
+            log.error("Error saving inventory snapshot for product " + product.name + " and location " + location.name, e)
+            throw e;
+        }
+    }
+
+    def calculatePendingQuantity(product, location) {
+        def inboundQuantity = 0;
+        def outboundQuantity = 0;
+        try {
+            def shipmentItems = ShipmentItem.withCriteria {
+                shipment {
+                    eq("destination", location)
+                }
+                or {
+                    inventoryItem {
+                        eq("product", product)
+                    }
+                    eq("product", product)
+                }
+            }
+            inboundQuantity = shipmentItems.sum { it.quantity }
+            shipmentItems = ShipmentItem.withCriteria {
+                shipment {
+                    eq("origin", location)
+                }
+                or {
+                    inventoryItem {
+                        eq("product", product)
+                    }
+                    eq("product", product)
+                }
+            }
+            outboundQuantity = shipmentItems.sum { it.quantity }
+
+        } catch (Exception e) {
+            println ("Error " + e.message)
+        }
+
+        [inboundQuantity, outboundQuantity]
+    }
+
+    def cleanUpGorm() {
+        printStatus()
+        sessionFactory.currentSession.flush()
+        sessionFactory.currentSession.clear()
+        propertyInstanceMap.get().clear()
+    }
+
+    def printStatus() {
+        def batchEnded = System.currentTimeMillis()
+        def seconds = (batchEnded-lastBatchStarted)/1000
+        def total = (batchEnded-startTime)/1000
+        println "Last batch: ${seconds}s, total: ${total}s"
+        lastBatchStarted = batchEnded
+    }
+
 }
 

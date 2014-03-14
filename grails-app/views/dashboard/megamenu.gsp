@@ -360,22 +360,24 @@
                     <div class="megaButton">
                         <g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
                     </div>
+                    <%--
                     <div class="megaButton">
                         <g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
                     </div>
                     <div class="megaButton">
                         <g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
                     </div>
+                    --%>
                     <div class="megaButton">
                         <g:link controller="product" action="batchEdit" class="create"><warehouse:message code="product.batchEdit.label"/></g:link>
-                    </div>
-                    <hr/>
-                    <div class="megaButton">
-                        <g:link controller="batch" action="importData" params="[type:'']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'data.label', default: 'data')]"/></g:link>
                     </div>
                     <div class="megaButton">
                         <g:link controller="product" action="importAsCsv" class="import"><warehouse:message code="product.importAsCsv.label"/></g:link>
                     </div>
+                    <div class="megaButton">
+                        <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
+                    </div>
+
                 <%--
                 <div class="megaButton">
                     <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'product.label')]"/></g:link>
@@ -475,6 +477,14 @@
 					<div class="megaButton">
 						<g:link controller="inventory" action="editTransaction" class="create"><warehouse:message code="transaction.add.label"/></g:link> 				
 					</div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label', default: 'Inventory')]"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/></g:link>
+                    </div>
+
                 </div>
 			</div>
 		</li>

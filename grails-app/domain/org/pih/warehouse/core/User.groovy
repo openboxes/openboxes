@@ -31,7 +31,8 @@ class User extends Person {
     static hasMany = [roles: Role, locationRoles: LocationRole]
     static mapping = {
         table "`user`"
-        roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id']
+        roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id'], cascade: "save-update"
+        locationRoles cascade: "all-delete-orphan"
         id generator: 'uuid'
     }
     static transients = ["passwordConfirm"]
