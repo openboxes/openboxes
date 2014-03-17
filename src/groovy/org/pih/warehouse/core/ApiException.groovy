@@ -12,6 +12,10 @@ package org.pih.warehouse.core
 class ApiException extends RuntimeException {
 	String reason
 	String message
-	
+
+    public ApiException(String message) {
+        this.message = message
+    }
+
 	
 }
