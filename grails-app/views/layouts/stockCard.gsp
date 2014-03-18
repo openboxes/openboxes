@@ -8,6 +8,9 @@
     <script src="${createLinkTo(dir:'js/jquery.cycle', file:'jquery.cycle.lite.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 	<title><g:pageProperty name="page.title"/></title>
+<%--
+    <gvisualization:apiImport/>
+--%>
 </head>
 <body>
 	<div class="body">	
@@ -35,20 +38,19 @@
 			totalQuantity: commandInstance?.totalQuantity]"/>
 
 		<div class="dialog">		
-		
-		
-		<div class="yui-gf"> 
-	    	<div class="yui-u first"> 		
-				<g:render template="productDetails" 
-					model="[productInstance:commandInstance?.productInstance, 
-						inventoryInstance:commandInstance?.inventoryInstance, 
-						inventoryLevelInstance: commandInstance?.inventoryLevelInstance, 
-						totalQuantity: commandInstance?.totalQuantity]"/>
-			</div>
-			<div class="yui-u">
-				<g:pageProperty name="page.content"/>	
-			</div>
-		</div>
+            <div class="yui-gf">
+                <div class="yui-u first">
+                    <g:render template="productDetails"
+                        model="[productInstance:commandInstance?.productInstance,
+                            inventoryInstance:commandInstance?.inventoryInstance,
+                            inventoryLevelInstance: commandInstance?.inventoryLevelInstance,
+                            totalQuantity: commandInstance?.totalQuantity]"/>
+                </div>
+                <div class="yui-u">
+                    <g:pageProperty name="page.content"/>
+                </div>
+            </div>
+        </div>
 	</div>
 	<script>
 		$(document).ready(function() {
