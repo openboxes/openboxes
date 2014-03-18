@@ -3428,7 +3428,7 @@ class InventoryService implements ApplicationContextAware {
                         productQuantityMap.keySet().eachWithIndex { product, index ->
                             def onHandQuantity = productQuantityMap[product]
                             updateInventorySnapshot(date, product, location, onHandQuantity)
-                            if (index % 100 == 0) {
+                            if (index % 50 == 0) {
                                 cleanUpGorm()
                             }
                         }
