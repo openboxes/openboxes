@@ -3,9 +3,11 @@
 	<table>
 		<thead>
 			<tr>
+                <%--
 				<th style="width: 1%">
 					${warehouse.message(code: 'default.actions.label')}
 				</th>
+				--%>
 				<th style="width: 1%">
 				</th>
 				<th style="width: 33%">
@@ -19,7 +21,7 @@
                     <label class="block"><warehouse:message
 								code="default.destination.label" /></label>
 			    </th>
-				<%-- 
+				<%--
                     	<th>
                     		<label class="block">${warehouse.message(code: 'shipping.expectedShippingDate.label')}</label>
                     	</th>
@@ -36,6 +38,7 @@
 		<tbody>
 			<g:each var="shipmentInstance" in="${shipments}" status="i">
 				<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                    <%--
 					<td>
 						<div class="action-menu">
 							<button class="action-btn">
@@ -48,6 +51,7 @@
 							</div>
 						</div>
 					</td>
+					--%>
 					<td class="center middle"><img
 						src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
@@ -74,12 +78,12 @@
 							<g:else>
 								<g:prettyDateFormat date="${shipmentInstance?.status?.date}" />
 							</g:else>
-							<%-- 
+							<%--
 						<format:date obj="${shipmentInstance?.status.date}"/>
 						--%>
 						</g:if> <g:else>
-						- Expected to ship 
-						<%-- 
+						- Expected to ship
+						<%--
 						<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 						--%>
 							<g:if

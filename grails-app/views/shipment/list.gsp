@@ -37,6 +37,7 @@
                             <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
                                 <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
                                     <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode]]"/>
+
                                 </div>
                             </g:each>
                         </div>
