@@ -478,7 +478,9 @@ class UserController {
 			users << userInstance;
 			
 			def recipients = users.collect { it.email }
-			def subject = "${warehouse.message(code:'email.userAccountChanged.message',args:[userInstance?.email])}";
+            def activatedOrDeactivated = "${userInstance.active ? warehouse.message(code:'user.activated.label') : warehouse.message(code:'user.disabled.label')}"
+            def subject = "${warehouse.message(code: 'email.userAccountActivated.message', args: [userInstance.username,activatedOrDeactivated])}"
+			//def subject = "${warehouse.message(code:'email.userAccountChanged.message',args:[userInstance?.email,activatedOrDeactivated])}";
 			def body = "${g.render(template:'/email/userAccountActivated',model:[userInstance:userInstance])}"
 			mailService.sendHtmlMail(subject, body.toString(), recipients);
 			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}"
@@ -529,9 +531,9 @@ class UserController {
 		}
 	}
 		
-	static scale = { 
-		BufferedImage thumbnail = Scalr.resize(image, 150);
-	}
+	//static scale = {
+	//	BufferedImage thumbnail = Scalr.resize(image, 150);
+	//}
 	
 	static resize = { bytes, out, maxW, maxH ->
 		AWTImage ai = new ImageIcon(bytes).image
