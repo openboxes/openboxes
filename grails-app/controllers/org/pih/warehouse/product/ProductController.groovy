@@ -433,7 +433,9 @@ class ProductController {
 			try {
 				// first we need to delete any inventory items associated with this product
 				def items = InventoryItem.findAllByProduct(productInstance)
-				items.each { it.delete(flush:true) }
+				items.each {
+                    it.delete(flush:true)
+                }
 
 				// now delete the actual product
 				productInstance.delete(flush: true)
