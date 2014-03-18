@@ -19,6 +19,7 @@ import org.pih.warehouse.product.Product
 class AuthController {
 
 	def mailService;
+    def grailsApplication
 	
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"];
     
@@ -57,7 +58,8 @@ class AuthController {
      */
 	def handleLogin = {
 		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
-		
+
+        // FIXME Handle setting timezone based on configuration
 		TimeZone userTimezone = TimeZone.getTimeZone("America/New_York")
 		String browserTimezone = request.getParameter("browserTimezone")
 		if (browserTimezone != null) {
@@ -151,9 +153,31 @@ class AuthController {
 			
 			// Create account 
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {				
-				session.user = userInstance;				
-				
-				try {
+				session.user = userInstance;
+
+
+                // Attempt to add default roles to user instance
+                try {
+                    def defaultRoles = grailsApplication.config.openboxes.signup.defaultRoles
+                    if (!defaultRoles.isEmpty()) {
+                        println "Default roles: " + defaultRoles
+                        def roleTypes = defaultRoles.split(",")
+                        roleTypes.each { roleType ->
+                            def role = Role.findByRoleType(roleType)
+                            userInstance.addToRoles(role)
+                        }
+
+                        if (userInstance.roles) {
+                            userInstance.active = Boolean.TRUE
+                        }
+                        userInstance.save()
+                    }
+                } catch (Exception e) {
+                    log.error("Unable to assign default roles: " + e.message, e)
+                }
+
+                // Send email to administrators
+                try {
 					def recipients = [ ];
 					def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
 					if (roleAdmin) {
@@ -180,7 +204,7 @@ class AuthController {
 						mailService.sendHtmlMail(subject, body.toString(), userInstance.email);
 					}
 				} catch (EmailException e) { 
-					log.error("Unable to send emails: " + e.message)
+					log.error("Unable to send emails: " + e.message, e)
 				}
 				
 			}			
