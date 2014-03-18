@@ -240,38 +240,15 @@ class RequisitionController {
 	
     def normalize = {
         def requisition = Requisition.get(params.id)
-        requisition?.requisitionItems?.each { requisitionItem ->
-            if (requisitionItem.requisitionItems) {
-                if (requisitionItem.requisitionItems.size() > 1) {
-                    throw new Exception("Cannot have more than one change per requisition item")
-                }
-                else {
-                    requisitionItem.requisitionItems.each { childItem ->
-                        println "Requisition item of type " + childItem.requisitionItemType + " is being normalized."
-
-                        if (childItem.requisitionItemType == RequisitionItemType.SUBSTITUTION) {
-                            requisitionItem.substitutionItem = childItem
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.PACKAGE_CHANGE) {
-                            requisitionItem.modificationItem = childItem
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.QUANTITY_CHANGE) {
-                            requisitionItem.modificationItem = childItem
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.ORIGINAL) {
-                            throw new Exception("Original requisition item cannot be modified")
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.ADDITION) {
-                            throw new Exception("Addition operation not supported")
-                        }
-                        else {
-                            throw new Exception("Operation not supported")
-                        }
-                    }
-                }
-            }
-        }
+        requisitionService.normalizeRequisition(requisition)
         redirect(action: "review", id: requisition.id)
+    }
+
+    def normalizeAll = {
+        def requisitions = Requisition.list()
+        requisitions.each { requisition ->
+            requisitionService.normalizeRequisition(requisition)
+        }
 
     }
 
@@ -593,7 +570,7 @@ class RequisitionController {
 
     def show = {
         def requisition = Requisition.get(params.id)
-		
+        //def requisition = Requisition.findById(params.id, [fetch: [requisitionItems: 'join']])
         if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -838,15 +815,12 @@ class RequisitionController {
 
     def editRequisitionItem = {
         log.info "edit requisition item: " + params
-
         def location = Location.get(session.warehouse.id)
         def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         def products = getRelatedProducts(requisitionItem)
-
-        //println "PRODUCTS " + products*.productCode
         def quantityOnHandMap = getQuantityOnHandMap(location, products)
-        //println "editRequisitionItem: " + quantityOnHandMap
+
         render(template: "editRequisitionItem", model: [requisition:requisition,requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
     }
 
@@ -860,7 +834,7 @@ class RequisitionController {
         def nextItem = originalItems[currentIndex+1]?:originalItems[0]
 
         //render(template: "editRequisitionItem", model: [requisition:requisition,requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
-        redirect(action: "editRequisitionItem", id: params.id, params: ['requisitionItem.id':nextItem.id,'actionType':'show'])
+        redirect(action: "editRequisitionItem", id: params.id, params: ['requisitionItem.id':nextItem?.id,'actionType':'show'])
     }
 
     def previousRequisitionItem = {
@@ -872,7 +846,7 @@ class RequisitionController {
         def currentIndex = originalItems.findIndexOf { it == requisitionItem }
         def previousItem = originalItems[currentIndex-1]?:originalItems[lastIndex]
 
-        redirect(action: "editRequisitionItem", id: params.id, params: ['requisitionItem.id':previousItem.id,'actionType':'show'])
+        redirect(action: "editRequisitionItem", id: params.id, params: ['requisitionItem.id':previousItem?.id,'actionType':'show'])
 
 
     }

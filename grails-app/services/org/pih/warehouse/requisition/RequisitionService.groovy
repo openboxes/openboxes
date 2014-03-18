@@ -777,7 +777,41 @@ class RequisitionService {
 
     }
 
+    def normalizeRequisition(Requisition requisition) {
 
+        println "Normalizing requisition " + requisition.requestNumber
+        requisition?.requisitionItems?.each { requisitionItem ->
+            if (requisitionItem.requisitionItems) {
+                if (requisitionItem.requisitionItems.size() > 1) {
+                    throw new Exception("Cannot have more than one change per requisition item")
+                }
+                else {
+                    requisitionItem.requisitionItems.each { childItem ->
+                        println "Requisition item of type " + childItem.requisitionItemType + " is being normalized."
+
+                        if (childItem.requisitionItemType == RequisitionItemType.SUBSTITUTION) {
+                            requisitionItem.substitutionItem = childItem
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.PACKAGE_CHANGE) {
+                            requisitionItem.modificationItem = childItem
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.QUANTITY_CHANGE) {
+                            requisitionItem.modificationItem = childItem
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.ORIGINAL) {
+                            throw new Exception("Original requisition item cannot be modified for requisition ${requisition.requestNumber}")
+                        }
+                        else if (childItem.requisitionItemType == RequisitionItemType.ADDITION) {
+                            throw new Exception("Addition operation not supported for requisition ${requisition.requestNumber}")
+                        }
+                        else {
+                            throw new Exception("Operation not supported for requisition ${requisition.requestNumber}")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 
 }
