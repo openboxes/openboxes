@@ -19,6 +19,7 @@ class PicklistController {
 	def scaffold = true
 	
 	def picklistService
+    def pdfRenderingService
 
 	def save = {
 		def jsonRequest = request.JSON
@@ -45,14 +46,44 @@ class PicklistController {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
+        //def filename = "Picklist - ${requisition.requestNumber}"
         //[requisition:requisition, picklist: picklist, location:location]
 
-        println location
-        renderPdf(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location], filename: "Picklist - ${requisition.requestNumber}")
+        //def defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+        //def locale = session?.user?.locale ?: session.locale ?: defaultLocale;
+
+        //println "location ${location}"
+        //println "request.locale ${request?.locale}"
+        //println "session.user.locale ${session?.user?.locale}"
+        //println "session.locale ${session?.locale}"
+        //println "defaultLocale ${defaultLocale}"
+
+        //println "Generating picklist PDF using locale ${locale}"
+        //[template: '/simple', model: [var: 1]] + args
+
+        //response.contentType = 'application/pdf'
+        //response.setHeader 'Content-disposition', "attachment; filename=\"${filename}\""
+
+//        pdfRenderingService.render([
+//                locale:Locale.FRENCH,
+//                template: "/picklist/print",
+//                model: [requisition:requisition, picklist: picklist, location:location]], response)
+
+        //println "Content: " + content
+        renderPdf(
+                template: "/picklist/print",
+                //locale:locale,
+                model: [requisition:requisition, picklist: picklist, location:location],
+                filename: "Picklist - ${requisition.requestNumber}"
+        )
+
 
     }
 
     def renderHtml = {
+
+        def defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+        def locale = session?.user?.locale ?: session.locale ?: defaultLocale;
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
