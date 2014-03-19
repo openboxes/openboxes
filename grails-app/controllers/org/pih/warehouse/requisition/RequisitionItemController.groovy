@@ -492,6 +492,7 @@ class RequisitionItemController {
                 "Requested by" {it.requestedBy}
                 "Product code" {it.productCode}
                 "Product name" {it.productName}
+                "Product group" {it.productGroup}
                 "Reason code" { it.cancelReasonCode }
                 "Quantity canceled" { it.quantityCanceled }
                 "Quantity requested" { it.quantityRequested }
@@ -505,6 +506,7 @@ class RequisitionItemController {
                         requestedBy: requisitionItem.requisition.requestedBy.name,
                         productCode: requisitionItem.product.productCode,
                         productName: StringEscapeUtils.escapeCsv(requisitionItem.product.name),
+                        productGroup: StringEscapeUtils.escapeCsv(requisitionItem.product?.genericProduct?.description)?:"",
                         cancelReasonCode: requisitionItem.cancelReasonCode?:"",
                         quantityCanceled: requisitionItem.quantityCanceled?:"",
                         quantityRequested: requisitionItem.quantity?:"",

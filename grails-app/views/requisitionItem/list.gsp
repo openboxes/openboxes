@@ -56,7 +56,7 @@
                 </div>
                 <div class="yui-u">
 
-
+                    <div class="button-bar">
                         <div class="button-group">
                             <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="['requisitionItem']"/></g:link>
                             <%--
@@ -65,6 +65,7 @@
                             <g:link class="button icon arrowdown" action="export" params="${params}"><warehouse:message code="default.export.label" args="['requisitionItem']"/></g:link>
 
                         </div>
+                    </div>
                     <div class="list">
 
                         <div class="box">
@@ -87,6 +88,7 @@
                                         <th><warehouse:message code="requisitionItem.requisition.label" default="Requisition" /></th>
                                         <th><warehouse:message code="requisitionItem.dateRequested.label" default="Date requested" /></th>
                                         <th><warehouse:message code="requisitionItem.product.label" default="Product" /></th>
+                                        <th><warehouse:message code="product.genericProduct.label" default="Product group" /></th>
                                         <th><warehouse:message code="requisitionItem.cancelReasonCode.label" default="Cancel reason code" /></th>
                                         <th><warehouse:message code="requisitionItem.cancelComments.label" default="Cancel comments" /></th>
                                         <th><warehouse:message code="requisitionItem.quantityApproved.label" default="Quantity approved" /></th>
@@ -119,6 +121,10 @@
                                                 ${fieldValue(bean: requisitionItemInstance.product, field: "productCode")}
                                                 ${fieldValue(bean: requisitionItemInstance, field: "product")}
                                             </g:link>
+                                        </td>
+                                        <td>
+                                            ${requisitionItemInstance?.product?.genericProduct?.description?:""}
+
                                         </td>
 
                                         <td>${fieldValue(bean: requisitionItemInstance, field: "cancelReasonCode")}</td>
