@@ -24,7 +24,7 @@
 	    		<table class="zebra">
                     <thead>
                         <tr class="prop odd">
-                            <td colspan="3" class="center">
+                            <td colspan="3" class="left">
                                 <g:set var="startDate" value="${g.formatDate(date:new Date()-7, format:'MMMMM dd')}"/>
                                 <g:set var="endDate" value="${g.formatDate(date:new Date()+7, format:'MMMMM dd')}"/>
                                 <div class="fade">${warehouse.message(code: 'dashboard.outgoing.label', args: [session.warehouse.name, startDate, endDate]) }</div>
