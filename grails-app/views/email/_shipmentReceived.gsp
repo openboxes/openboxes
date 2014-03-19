@@ -282,10 +282,10 @@
                         ${shipmentItem?.inventoryItem?.product?.getBinLocation(session.warehouse.id)}
                     </td>
                     <td class="center">
-                        <g:formatNumber number="${shipmentItem.totalQuantityShipped()}" format="###,##0" />
+                        <g:formatNumber number="${shipmentItem.quantity}" format="###,##0" />
                     </td>
                     <td class="center">
-                        <g:formatNumber number="${shipmentItem.totalQuantityReceived()}" format="###,##0" />
+                        <g:formatNumber number="${shipmentItem.quantityReceived()}" format="###,##0" />
                     </td>
                     <td class="center">
                         ${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}

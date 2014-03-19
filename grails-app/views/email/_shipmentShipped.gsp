@@ -273,7 +273,7 @@
                                     <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
                                 </td>
                                 <td class="center">
-                                    <g:formatNumber number="${shipmentItem.totalQuantityShipped()}" format="###,##0" />
+                                    <g:formatNumber number="${shipmentItem.quantity}" format="###,##0" />
                                 </td>
                                 <td class="center">
                                     <g:if test="${shipmentItem?.inventoryItem?.product?.coldChain}">

@@ -128,9 +128,13 @@ class ShipmentItem implements Comparable, Serializable {
     def receiptItems() {
         return ReceiptItem.findAllByShipmentItem(this)
     }
-	
-	
-	/**
+
+    def quantityReceived() {
+        def receiptItems = receiptItems()
+        return (receiptItems) ? receiptItems.sum { it.quantityReceived } : 0
+    }
+
+    /**
 	 * Sorts shipping items by associated product name, then lot number, then quantity,
 	 * and finally by id. 
 	 * 
