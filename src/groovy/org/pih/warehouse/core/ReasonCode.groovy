@@ -50,7 +50,8 @@ public enum ReasonCode {
     SUPPLY_MAX_QUANTITY(17),
     NOT_ON_STOCK_LIST(18),
     INSUFFICIENT_QUANTITY_RECONDITIONED(19),
-    OTHER(19)
+    SUBSTITUTION_WITHIN_PRODUCT_GROUP(20),
+    OTHER(100)
 
 
     final Integer sortOrder
@@ -65,6 +66,7 @@ public enum ReasonCode {
                 EXPIRED,
                 DAMAGED,
                 SUBSTITUTION,
+                SUBSTITUTION_WITHIN_PRODUCT_GROUP,
                 PACKAGE_SIZE,
                 CLINICAL_OVERRIDE,
                 INSUFFICIENT_CONSUMPTION,
@@ -107,6 +109,7 @@ public enum ReasonCode {
     static listRequisitionSubstitutionReasonCodes() {
         [
                 SUBSTITUTION,
+                SUBSTITUTION_WITHIN_PRODUCT_GROUP,
                 REPLACED_BY_FORMULARY_ITEM,
                 STOCKOUT,
                 LOW_STOCK,
