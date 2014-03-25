@@ -39,11 +39,11 @@ class CategoryTagLib {
 		out << "</select>";
 	}
 	
-	def selectCategory = { attrs ->
-		out << "<select multiple=\"true\" name='" + attrs.name + "' class='"+ attrs.cssClass +"'>";
-		displayCategoryOptions(attrs['rootNode'], attrs.value, 0);
-		out << "</select>";
-	}
+	//def selectCategory = { attrs ->
+	//	out << "<select multiple=\"true\" name='" + attrs.name + "' class='"+ attrs.cssClass +"'>";
+	//	displayCategoryOptions(attrs['rootNode'], attrs.value, 0);
+	//	out << "</select>";
+	//}
 	
 	
 	
