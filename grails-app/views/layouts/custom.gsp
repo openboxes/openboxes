@@ -388,10 +388,9 @@
             // Set the position for the actions menu
             actions.position({
                 my: "left top",
-                at: "left bottom",
+                at: "right top",
                 of: $(this).closest(".action-btn"),
-                //offset: "0 0"
-                collision: "flip"
+                collision: "flip fit"
             });
 
             // To prevent the action button from POST'ing to the server
