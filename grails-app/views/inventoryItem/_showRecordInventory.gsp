@@ -41,7 +41,7 @@
 								format="MM/dd/yyyy"
 								showTrigger="false" />						
 						    --%>
-                            <g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="day" noSelection="['':'']"/>
+                            <g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 						</td>
 					</tr>
                     <tr class="prop">

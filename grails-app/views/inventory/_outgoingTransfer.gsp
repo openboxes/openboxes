@@ -1,5 +1,7 @@
-<div class="left">
-	<g:form action="saveDebitTransaction">
+<div class="box">
+    <h2><warehouse:message code="inventory.outgoingTransfer.label"/></h2>
+
+    <g:form action="saveDebitTransaction">
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>							
@@ -19,10 +21,13 @@
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
+                    <%--
 					<span>
 						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
 								value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>								
+					</span>
+				    --%>
+                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	
 			<tr class="prop">
@@ -42,7 +47,7 @@
 				</td>
 				<td class="value">
 					<span>
-						<g:selectTransactionDestination name="transactionInstance.destination.id"
+						<g:selectTransactionDestination name="transactionInstance.destination.id" class="chzn-select-deselect"
 							value="${command?.transactionInstance?.destination?.id}" noSelection="['null': '']"/>
 
 					</span>
@@ -54,7 +59,7 @@
 				</td>
 				<td class="value">
 					<span class="value">
-						<g:textArea cols="80" rows="5" name="transactionInstance.comment" 
+						<g:textArea cols="100%" rows="5" name="transactionInstance.comment"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -133,7 +138,7 @@
 																value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="10" autocomplete="off"  class="text" />
 														</g:if>
 														<g:else>
-															<g:textField name="transactionEntries[${status }].quantity" class="text"
+															<g:textField name="transactionEntries[${status }].quantity" class="text medium"
 																value="" size="10" autocomplete="off" />
 														</g:else>
 														<g:set var="status" value="${status+1 }"/>										
@@ -159,11 +164,11 @@
 				<tr class="prop">
 					<td colspan="7">
 						<div class="center">
-							<button type="submit" name="save" class="button">
+							<button type="submit" name="save" class="button icon approve">
 								<warehouse:message code="default.button.save.label"/>
 							</button>
 							&nbsp;
-							<g:link controller="inventory" action="browse">${warehouse.message(code: 'default.button.back.label')}</g:link>
+							<g:link controller="inventory" action="browse">${warehouse.message(code: 'default.button.cancel.label')}</g:link>
 						</div>
 					</td>
 				</tr>

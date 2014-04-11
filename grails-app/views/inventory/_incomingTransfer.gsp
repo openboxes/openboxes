@@ -1,18 +1,26 @@
-<div class="left">
+<div class="box">
+    <h2><warehouse:message code="inventory.incomingTransfer.label"/></h2>
+
 	<g:form action="saveCreditTransaction">
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
+
+
 		<table>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
+
+                    <%--
 					<span class="transactionDate">
 						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
 							value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>								
+					</span>
+				    --%>
+                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	
 			<tr class="prop">
@@ -21,7 +29,8 @@
 				</td>
 				<td class="value">			
 
-					<g:selectTransactionSource name="transactionInstance.source.id" 
+					<g:selectTransactionSource name="transactionInstance.source.id"
+                        class="chzn-select-deselect"
 						optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
 							
 				</td>
@@ -32,7 +41,7 @@
 				</td>
 				<td class="value">
 					<span class="comment">
-						<g:textArea cols="80" rows="1" name="transactionInstance.comment" 
+						<g:textArea cols="100%" rows="10" name="transactionInstance.comment"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -130,7 +139,7 @@
 												</span>	
 											</td>
 											<td>
-												<g:textField name="transactionEntries[${i }].quantity" size="1" autocomplete="off" value="${transactionEntry?.quantity }"/>
+												<g:textField name="transactionEntries[${i }].quantity" size="5" class="text medium" autocomplete="off" value="${transactionEntry?.quantity }"/>
 											</td>
 											<td>
 												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
@@ -206,7 +215,7 @@
 												</span>	
 											</td>
 											<td>
-												<g:textField name="transactionEntries[${i }].quantity" size="1" autocomplete="off" value="${command?.transactionEntries[i]?.quantity }"/>
+												<g:textField name="transactionEntries[${i }].quantity" size="5" class="text medium" autocomplete="off" value="${command?.transactionEntries[i]?.quantity }"/>
 											</td>
 											<td>
 												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
@@ -223,12 +232,12 @@
 			<tr class="prop">
 				<td colspan="7">
 					<div class="center">
-						<button type="submit" name="save">								
+						<button type="submit" name="save" class="button icon approve">
 							<warehouse:message code="default.button.save.label"/>
 						</button>
 						&nbsp;
 						<g:link controller="inventory" action="browse">
-							${warehouse.message(code: 'default.button.back.label')}
+							${warehouse.message(code: 'default.button.cancel.label')}
 						</g:link>
 					</div>
 				</td>
