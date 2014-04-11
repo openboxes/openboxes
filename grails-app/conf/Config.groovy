@@ -24,6 +24,14 @@ grails.config.locations = [
 ]
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
 
+//grails.plugins.reloadConfig.files = []
+//grails.plugins.reloadConfig.includeConfigLocations = true
+//grails.plugins.reloadConfig.interval = 5000
+//grails.plugins.reloadConfig.enabled = true
+//grails.plugins.reloadConfig.notifyPlugins = []
+//grails.plugins.reloadConfig.automerge = true
+//grails.plugins.reloadConfig.notifyWithConfig = true
+
 grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 
 // if(System.properties["${appName}.config.location"]) {
@@ -394,6 +402,13 @@ jqueryValidationUi {
 //google.analytics.enabled = false
 //grails.feedback.enabled = false
 
+// UserVoice widget
+openboxes.uservoice.widget.enabled = true
+openboxes.uservoice.widget.position = "bottom-left"
+
+// JIRA Issue Collector
+openboxes.jira.issue.collector.enabled = true
+openboxes.jira.issue.collector.url = "https://openboxes.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_USgc5zl3-1988229788/6318/12/1.4.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=fb813fdb"
 
 /**
  * Global Properties

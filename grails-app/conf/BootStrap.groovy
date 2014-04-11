@@ -105,12 +105,6 @@ class BootStrap {
             insertTestFixture()
         }
 
-        assignProductIdentifiers()
-        assignShipmentIdentifiers()
-        assignOrderIdentifiers()
-        assignRequisitionIdentifiers()
-        assignTransactionIdentifiers()
-
         //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
         //TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
         //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
@@ -245,80 +239,6 @@ class BootStrap {
         }
     }
 
-    void assignShipmentIdentifiers() {
-        def shipments = Shipment.findAll("from Shipment as s where shipmentNumber is null or shipmentNumber = ''")
-        shipments.each { shipment ->
-            println "Assigning identifier to shipment " + shipment.id + " " + shipment.name
-            try {
-                shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
-                if (!shipment.merge(flush:true,validate:false)) {
-                    println shipment.errors
-                }
-            } catch (Exception e) {
-                println "Unable to assign shipment identifier: " + e.message
-            }
-        }
-    }
-
-    void assignRequisitionIdentifiers() {
-        def requisitions = Requisition.findAll("from Requisition as r where requestNumber is null or requestNumber = ''")
-        requisitions.each { requisition ->
-            try {
-                println "Assigning identifier to requisition " + requisition.id + " " + requisition.name
-                requisition.requestNumber = identifierService.generateRequisitionIdentifier()
-                if (!requisition.merge(flush:true,validate:false)) {
-                    println requisition.errors
-                }
-            } catch (Exception e) {
-                println("Unable to assign requisition identifier: " + e.message)
-            }
-        }
-    }
-
-    void assignOrderIdentifiers() {
-        def orders = Order.findAll("from Order as o where orderNumber is null or orderNumber = ''")
-        orders.each { order ->
-            try {
-                println "Assigning identifier to order " + order.id + " " + order.description
-                order.orderNumber = identifierService.generateOrderIdentifier()
-                if (!order.merge(flush:true,validate:false)) {
-                    println order.errors
-                }
-            } catch(Exception e) {
-                println("Unable to assign order identifier: " + e.message)
-            }
-        }
-    }
-    void assignTransactionIdentifiers() {
-        def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
-        transactions.each { transaction ->
-            try {
-                println "Assigning identifier to transaction " + transaction.id + " " + transaction.dateCreated + " " + transaction.lastUpdated
-                transaction.transactionNumber = identifierService.generateTransactionIdentifier()
-                if (!transaction.merge(flush:true, validate:false)) {
-                    println transaction.errors
-                }
-                println "Assigned identifier to transaction " + transaction.id + " " + transaction.dateCreated + " " + transaction.lastUpdated
-            } catch(Exception e) {
-                println("Unable to assign transaction identifier: " + e.message)
-            }
-        }
-    }
-
-    void assignProductIdentifiers() {
-        def products = Product.findAll("from Product as p where productCode is null or productCode = ''")
-        products.each { product ->
-            try {
-                println "Assigning identifier to product " + product.id + " " + product.name
-                product.productCode = identifierService.generateProductIdentifier()
-                if (!product.merge(flush:true,validate:false)) {
-                    println product.errors
-                }
-            } catch(Exception e) {
-                println("Unable to assign product identifier: " + e.message)
-            }
-        }
-    }
 
 
     private def addInventoryItem(product, expirationDate, quantity) {

@@ -20,6 +20,7 @@ import org.pih.warehouse.shipping.Shipment;
 class IdentifierService {
 
     boolean transactional = true
+    def grailsApplication
 
    
 	/**
@@ -42,16 +43,16 @@ class IdentifierService {
 		for (int i = 0; i < format.length(); i++) {
 			switch(format[i]) {
 				case 'N':
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS)
+					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.numeric?:Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS)
 					break;
 				case 'D':
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS)
+					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.numeric?:Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS)
 					break;
 				case 'L':
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS)
+					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.alphabetic?:Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS)
 					break;
 				case 'A':
-					identifier += RandomStringUtils.random(1, Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS)
+					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.alphanumeric?:Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS)
 					break;
 				default:
 					identifier += format[i]
@@ -69,7 +70,7 @@ class IdentifierService {
 	 * @param length
 	 */
 	def generateIdentifier(int length) {
-		return RandomStringUtils.random(length, Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS)
+		return RandomStringUtils.random(length, grailsApplication.config.openboxes.identifier.alphanumeric?:Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS)
 	}
 
 	
@@ -77,36 +78,38 @@ class IdentifierService {
 	 * @return
 	 */
 	def generateOrderIdentifier() {
-		return generateIdentifier(Constants.DEFAULT_PRODUCT_NUMBER_FORMAT)
+		return generateIdentifier(grailsApplication.config.openboxes.identifier.order.format?:Constants.DEFAULT_ORDER_NUMBER_FORMAT)
 	}
 
 	/**
 	 * @return
 	 */
-	def generateProductIdentifier() { 
-		return generateIdentifier(Constants.DEFAULT_PRODUCT_NUMBER_FORMAT)
+	def generateProductIdentifier() {
+		return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format?:Constants.DEFAULT_PRODUCT_NUMBER_FORMAT)
 	}
 	
 	/**
 	 * @return
 	 */
 	def generateRequisitionIdentifier() {
-		return generateIdentifier(Constants.DEFAULT_REQUISITION_NUMBER_FORMAT)
+		return generateIdentifier(grailsApplication.config.openboxes.identifier.requisition.format?:Constants.DEFAULT_REQUISITION_NUMBER_FORMAT)
 	}
 
 	/**
 	 * @return
 	 */
 	def generateShipmentIdentifier() {
-		return generateIdentifier(Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT)
+		return generateIdentifier(grailsApplication.config.openboxes.identifier.shipment.format?:Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT)
 	}
 
 	/**
 	 * @return
 	 */
 	def generateTransactionIdentifier() {
-		return generateIdentifier(Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT)
+		return generateIdentifier(grailsApplication.config.openboxes.identifier.transaction.format?:Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT)
 	}
+
+
 
 
     void assignTransactionIdentifiers() {
@@ -116,7 +119,7 @@ class IdentifierService {
                 println "Assigning identifier to transaction " + transaction.id + " " + transaction.dateCreated + " " + transaction.lastUpdated
                 Transaction.withTransaction {
                     transaction.transactionNumber = generateTransactionIdentifier()
-                    if (!transaction.save(flush: true, validate: false)) {
+                    if (!transaction.merge(flush: true, validate: false)) {
                         println transaction.errors
                     }
                 }
@@ -137,7 +140,7 @@ class IdentifierService {
             try {
                 println "Assigning identifier to product " + product.id + " " + product.name
                 product.productCode = generateProductIdentifier()
-                if (!product.save(flush: true, validate: false)) {
+                if (!product.merge(flush: true, validate: false)) {
                     println product.errors
                 }
             } catch (Exception e) {
@@ -152,7 +155,7 @@ class IdentifierService {
             println "Assigning identifier to shipment " + shipment.id + " " + shipment.name
             try {
                 shipment.shipmentNumber = generateShipmentIdentifier()
-                if (!shipment.save(flush: true, validate: false)) {
+                if (!shipment.merge(flush: true, validate: false)) {
                     println shipment.errors
                 }
             } catch (Exception e) {
@@ -167,7 +170,7 @@ class IdentifierService {
             try {
                 println "Assigning identifier to requisition " + requisition.id + " " + requisition.name
                 requisition.requestNumber = generateRequisitionIdentifier()
-                if (!requisition.save(flush: true, validate: false)) {
+                if (!requisition.merge(flush: true, validate: false)) {
                     println requisition.errors
                 }
             } catch (Exception e) {
@@ -182,7 +185,7 @@ class IdentifierService {
             try {
                 println "Assigning identifier to order " + order.id + " " + order.name
                 order.orderNumber = generateOrderIdentifier()
-                if (!order.save(flush: true, validate: false)) {
+                if (!order.merge(flush: true, validate: false)) {
                     println order.errors
                 }
             } catch (Exception e) {
@@ -190,6 +193,7 @@ class IdentifierService {
             }
         }
     }
+
 
 
 

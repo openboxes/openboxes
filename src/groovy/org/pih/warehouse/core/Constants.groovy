@@ -67,7 +67,7 @@ class Constants {
 	
 	// Characters that should be included with each of the random number types 	
 	static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
-	static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVXYZ"
+	static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
 	static final String RANDOM_IDENTIFIER_NUMERIC_CHARACTERS = "0123456789"
 	
 	// Default random number formats
