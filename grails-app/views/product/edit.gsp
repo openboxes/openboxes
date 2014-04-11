@@ -150,94 +150,6 @@
                                                              placeholder="e.g. 0573-0165"/>
                                             </td>
                                         </tr>
-
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.properties.label" default="Properties"/></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td>
-
-                                                            <g:checkBox name="active" value="${productInstance?.active}" />
-                                                            <label for="active"><warehouse:message
-                                                            code="product.active.label" /></label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="essential" value="${productInstance?.essential}" />
-                                                            <label for="essential"><warehouse:message
-                                                                    code="product.essential.label" /></label>
-
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.handlingRequirements.label" default="Handling requirements"></warehouse:message></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')} ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')} ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
-                                                            <label for="coldChain"><warehouse:message
-                                                                code="product.coldChain.label" /></label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
-                                                            <label for="controlledSubstance"><warehouse:message
-                                                                code="product.controlledSubstance.label" /></label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
-                                                            <label for="hazardousMaterial"><warehouse:message
-                                                                code="product.hazardousMaterial.label" /></label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="reconditioned" value="${productInstance?.reconditioned}" />
-                                                            <label for="reconditioned"><warehouse:message
-                                                                    code="product.reconditioned.label" default="Reconditioned"/></label>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.inventoryControl.label" default="Inventory control"></warehouse:message></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="serialized" value="${productInstance?.serialized}" />
-                                                            <label for="serialized"><warehouse:message
-                                                                code="product.serialized.label" /></label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
-                                                            <label for="lotControl"><warehouse:message
-                                                                code="product.lotControl.label" /></label>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                        </tr>
                                     <tr class="prop">
                                         <td class="name">
                                             <label><warehouse:message code="product.tags.label" default="Tags"></warehouse:message></label>
@@ -256,12 +168,97 @@
                                             </script>
                                         </td>
                                     </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td></td><td></td>
+
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label><warehouse:message code="product.status.label" default="Status"/></label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
+                                                <table>
+                                                    <tr>
+                                                        <td width="25%">
+
+                                                            <g:checkBox name="active" value="${productInstance?.active}" />
+                                                            <label for="active"><warehouse:message
+                                                            code="product.active.label" /></label>
+                                                        </td>
+                                                        <td width="25%">
+                                                            <g:checkBox name="essential" value="${productInstance?.essential}" />
+                                                            <label for="essential"><warehouse:message
+                                                                    code="product.essential.label" /></label>
+
+                                                        </td>
+                                                        <td width="25%">
+                                                        </td>
+                                                        <td width="25%">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
                                         </tr>
-                                    </tfoot>
+
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label><warehouse:message code="product.handlingRequirements.label" default="Handling requirements"></warehouse:message></label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')} ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')} ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
+                                                <table>
+                                                    <tr>
+                                                        <td width="25%">
+                                                            <g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
+                                                            <label for="coldChain"><warehouse:message
+                                                                code="product.coldChain.label" /></label>
+                                                        </td>
+
+                                                        <td width="25%">
+                                                            <g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
+                                                            <label for="controlledSubstance"><warehouse:message
+                                                                code="product.controlledSubstance.label" /></label>
+                                                        </td>
+
+                                                        <td width="25%">
+                                                            <g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
+                                                            <label for="hazardousMaterial"><warehouse:message
+                                                                code="product.hazardousMaterial.label" /></label>
+                                                        </td>
+
+                                                        <td width="25%">
+                                                            <g:checkBox name="reconditioned" value="${productInstance?.reconditioned}" />
+                                                            <label for="reconditioned"><warehouse:message
+                                                                    code="product.reconditioned.label" default="Reconditioned"/></label>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label><warehouse:message code="product.inventoryControl.label" default="Inventory control"></warehouse:message></label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
+                                                <table>
+                                                    <tr>
+                                                        <td width="25%">
+                                                            <g:checkBox name="serialized" value="${productInstance?.serialized}" />
+                                                            <label for="serialized"><warehouse:message
+                                                                code="product.serialized.label" /></label>
+                                                        </td>
+
+                                                        <td width="25%">
+                                                            <g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
+                                                            <label for="lotControl"><warehouse:message
+                                                                code="product.lotControl.label" /></label>
+                                                        </td>
+                                                        <td width="25%">
+                                                        </td>
+                                                        <td width="25%">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
 
                                 </table>
                             </div>
@@ -418,31 +415,24 @@
                                         --%>
 
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="2">
-                                                <div class="center">
-                                                    <button type="submit" class="button icon approve">
-                                                        ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
-                                                    </button>
-                                                    &nbsp;
-                                                    <g:if test="${productInstance?.id }">
-                                                        <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
-                                                            ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                                                        </g:link>
-                                                    </g:if>
-                                                    <g:else>
-                                                        <g:link controller="inventory" action="browse" class="button icon remove">
-                                                            ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                                                        </g:link>
-                                                    </g:else>
-                                                </div>
 
-                                            </td>
-                                        </tr>
-
-                                    </tfoot>
                                 </table>
+                            </div>
+                            <div class="center">
+                                <button type="submit" class="button icon approve">
+                                    ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+                                </button>
+                                &nbsp;
+                                <g:if test="${productInstance?.id }">
+                                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }'>
+                                        ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+                                    </g:link>
+                                </g:if>
+                                <g:else>
+                                    <g:link controller="inventory" action="browse">
+                                        ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+                                    </g:link>
+                                </g:else>
                             </div>
 
 

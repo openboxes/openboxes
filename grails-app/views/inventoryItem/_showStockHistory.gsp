@@ -38,6 +38,9 @@
                         </th>
 
                         <th class="border-right center" width="7%">
+                            ${warehouse.message(code: 'transaction.count.label', default: 'Count')}
+                        </th>
+                        <th class="border-right center" width="7%">
                             ${warehouse.message(code: 'transaction.credit.label', default: 'Credit')}
                         </th>
                         <th class="border-right center" width="7%">
@@ -129,7 +132,7 @@
                                         </td>
                                         <td class="middle">
                                             <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
-                                                ${transaction?.transactionNumber } &rsaquo;
+
                                                 <format:metadata obj="${transaction?.transactionType}"/>
                                                 <g:if test="${transaction?.source }">
                                                     ${warehouse.message(code:'default.from.label')}
@@ -139,6 +142,9 @@
                                                     ${warehouse.message(code:'default.to.label')}
                                                     ${transaction?.destination?.name }
                                                 </g:elseif>
+                                                <g:if test="${transaction?.transactionNumber}">
+                                                    &rsaquo; ${transaction?.transactionNumber }
+                                                </g:if>
                                             </g:link>
                                         </td>
 
@@ -200,7 +206,15 @@
                                         <span class="lotNumber">${transactionEntry?.inventoryItem?.lotNumber}</span>
                                     </td>
                                     <td class="border-right center middle">
-                                        <g:if test="${transaction?.transactionType?.transactionCode!= org.pih.warehouse.inventory.TransactionCode.DEBIT}">
+                                        <g:if test="${transaction?.transactionType?.transactionCode in [org.pih.warehouse.inventory.TransactionCode.INVENTORY, org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY] }">
+                                            <span class="balance">
+                                                <g:formatNumber number="${transactionEntry.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
+                                            </span>
+                                        </g:if>
+                                    </td>
+
+                                    <td class="border-right center middle">
+                                        <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
                                             <span class="credit">
                                                 <g:formatNumber number="${transactionEntry.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
                                             </span>
@@ -307,6 +321,9 @@
                     <tr class="odd">
                         <th colspan="6" class="left border-right">
                             <warehouse:message code="stockCard.totals.label" default="Totals"/>
+                        </th>
+                        <th class="center border-right">
+
                         </th>
                         <th class="center border-right">
 
