@@ -107,7 +107,7 @@
                     <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button icon add ${actionName=='showRecordInventory'?'active':''}">
                         ${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
                     </g:link>
-                    <g:link controller='inventory' action='browse' class="button icon arrowleft">
+                    <g:link controller='inventory' action='browse' class="button icon arrowup">
                         ${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
                     </g:link>
                 </div>
