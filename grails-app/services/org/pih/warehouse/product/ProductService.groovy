@@ -484,12 +484,15 @@ class ProductService {
 		def lines = data.split("\n")
 		def delimiters = [",", "\t", ";"]
 		for (def delimiter : delimiters) {
-			def columns = lines[0].split(delimiter)
-			if (columns.size() == Constants.EXPORT_PRODUCT_COLUMNS.size()) {
+			def headerColumns = lines[0].split(delimiter)
+            println "*** Actual:   " + headerColumns + " [" + headerColumns.size() + "]"
+			if (headerColumns.size() == Constants.EXPORT_PRODUCT_COLUMNS.size()) {
 				return delimiter
 			}
 		}			
-		throw new RuntimeException("File must contain the following columns:" + Constants.EXPORT_PRODUCT_COLUMNS)
+		throw new RuntimeException("""Invalid file format: File must contain the following columns:" + Constants.EXPORT_PRODUCT_COLUMNS + ";
+            columns must be separated by a comma (,) or tab (\\t);
+            lines must be separated by a linefeed (\\n); If you're using Mac Excel, save the file as Windows Comma Separated (.csv) and upload again.""")
 	}
 	
 	/**

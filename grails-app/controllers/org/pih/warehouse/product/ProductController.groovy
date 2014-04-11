@@ -884,8 +884,8 @@ class ProductController {
 				println "Content type: " + uploadFile.contentType
 				println "Validate: " + contentTypes.contains(uploadFile.contentType)
 				
-				try {				
-					localFile = new File("uploads/" + uploadFile?.originalFilename);
+				try {
+                    localFile = new File("uploads/" + uploadFile?.originalFilename);
 					localFile.mkdirs()
 					uploadFile?.transferTo(localFile);
 					session.localFile = localFile
@@ -906,22 +906,31 @@ class ProductController {
 					
 					command.products = productService.importProducts(csv, false)
 					
-					flash.message = "Uploaded file ${uploadFile?.originalFilename}"
+					flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
 
                     //dataService.getFileProperties(uploadFile)
                     //def localFile = dataService.saveFile(uploadFile)
 					//render localFile.getText()
 					//response.outputStream << localFile.newInputStream()
 				} catch (RuntimeException e) {
-					flash.message = e.message
-				
-				} catch (Exception e) { 
-					flash.message = e.message
-				
+                    log.error("Runtime exception occurred while uploading product import CSV " + e.message, e)
+					//flash.message = e.message
+                    command.errors.reject("Runtime exception: " + e.message)
+
+				}
+                catch (FileNotFoundException e) {
+                    log.error("File not found exception occurred while uploading product import CSV " + e.message, e)
+                    command.errors.reject("File '${localFile.absolutePath}' could not be uploaded.  This is most likely due to a file permission error.  Make sure that the 'uploads' directory exists and has the proper read/write permissions.");
+
+                }
+                catch (Exception e) {
+                    log.error("Exception occurred while uploading product import CSV " + e.message, e)
+                    command.errors.reject("Unknown error: " + e.message)
+
 				}				
 			}			
 			else {
-				flash.message = "${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}"
+                command.errors.reject("${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}")
 			}			
 		}
 		
