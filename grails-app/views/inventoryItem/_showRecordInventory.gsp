@@ -115,14 +115,19 @@
                                 </tbody>
                                 <tfoot>
                                 <tr>
-
-                                    <td class="left" colspan="5">
-
+                                    <td colspan="5">
                                         <div class="button-container">
                                             <button id="addRow" class="button icon add" >
                                                 <warehouse:message code="inventory.addInventoryItem.label"/>
                                             </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
 
+                                    <td class="left" colspan="5">
+
+                                        <div class="button-container">
                                             <button name="save" type="submit" class="button icon approve primary" id="saveInventoryItem">
                                                 <warehouse:message code="default.button.save.label"/>&nbsp;
                                             </button>
