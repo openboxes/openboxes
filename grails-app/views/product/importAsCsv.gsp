@@ -26,7 +26,7 @@
                     <li><a href="#prepare-data-tab"><warehouse:message code="product.import.step0.label" default="Step 0"/>.
                         <warehouse:message code="product.import.prepare.label" default="Prepare data file"/></a></li>
                     <li><a href="#upload-data-tab"><warehouse:message code="product.import.step1.label" default="Step 1"/>.
-                        <warehouse:message code="product.import.upload.label" default="Upload date file"/></a></li>
+                        <warehouse:message code="product.import.upload.label" default="Upload data file"/></a></li>
                     <li><a href="#verify-data-tab">
                         <warehouse:message code="product.import.step2.label" default="Step 2"/>.
                         <warehouse:message code="product.import.verify.label" default="Verify products"/></a></li>
