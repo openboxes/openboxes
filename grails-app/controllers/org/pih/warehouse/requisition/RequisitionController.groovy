@@ -533,7 +533,7 @@ class RequisitionController {
 			render(view: "transfer", model:[requisition:requisition,picklist:picklist])
 			return
 		}
-		flash.message = "Successfully saved outbound transaction with ID " + transaction.transactionNumber		
+		flash.message = "Successfully saved outbound transaction with ID " + transaction.id
 		redirect(action: "show", id: params.id)
 	}
 	

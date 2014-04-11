@@ -185,8 +185,7 @@
                         <g:if test="${latestInventoryDate}">
                             <g:prettyDateFormat date="${latestInventoryDate}"/>
                             <div class="fade">
-                                ${g.formatDate(date: latestInventoryDate, format: 'dd-MMM-yyyy') }<br/>
-                                ${g.formatDate(date: latestInventoryDate, format: 'hh:mm:ss a') }
+                                ${g.formatDate(date: latestInventoryDate, format: 'MMM dd hh:mm a') }<br/>
                             </div>
 
                         </g:if>

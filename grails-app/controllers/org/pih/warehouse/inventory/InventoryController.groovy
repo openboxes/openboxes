@@ -1310,7 +1310,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
+					flash.message = "Successfully saved transaction " + transaction?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
@@ -1386,7 +1386,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction?.hasErrors() && transaction?.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
+					flash.message = "Successfully saved transaction " + transaction?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
@@ -1487,7 +1487,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
 					transactionInstance.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transactionInstance?.transactionNumber
+					flash.message = "Successfully saved transaction " + transactionInstance?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transactionInstance?.id)
 				}
@@ -1568,7 +1568,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) { 
 					transaction.save(failOnError: true)				
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
+					flash.message = "Successfully saved transaction " + transaction?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)					
 				} 
