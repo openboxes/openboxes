@@ -94,7 +94,7 @@
                                                 <g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />
                                                 --%>
                                                 <g:autoSuggestString id="name" name="name" size="80" class="text"
-                                                    jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name}"
+                                                    jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name?.encodeAsHTML()}"
                                                     placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
                                             </td>
                                         </tr>
