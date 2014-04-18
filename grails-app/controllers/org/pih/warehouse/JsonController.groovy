@@ -12,6 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -25,6 +26,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import java.text.SimpleDateFormat
 
 class JsonController {
+
 	def inventoryService
 	def productService
 	def localizationService	
@@ -325,6 +327,23 @@ class JsonController {
 		def results = inventoryService.getExpiredStock(null, location)
 		render ((results)?results.size():"0")
 	}
+
+
+    def getQuantityOnHandMap = {
+        def startTime = System.currentTimeMillis()
+        //def location = Location.get(session?.warehouse?.id)
+        //def results = inventoryService.getQuantityByProductMap(location.inventory)
+        def results = inventoryService.getQuantityByProductMap(session?.warehouse?.id)
+
+        def elapsedTime = System.currentTimeMillis() - startTime
+        render ([count:results.size(),elapsedTime:elapsedTime,results:results] as JSON)
+    }
+
+
+    Map<Product,Integer> getQuantityOnHand(Inventory inventory) {
+        return inventoryService.getQuantityByProductMap(inventory)
+    }
+
 
     def findProductCodes = {
         def searchTerm = params.term + "%";

@@ -918,7 +918,7 @@ class InventoryService implements ApplicationContextAware {
             quantity <= 0
         }
 
-        log.debug "Get quantity on hand zero: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get quantity on hand zero: " + (System.currentTimeMillis() - startTime) + " ms"
         return stockOut
 
     }
@@ -937,7 +937,7 @@ class InventoryService implements ApplicationContextAware {
                 inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
         }
 
-        log.debug "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
         return stockOut
     }
 
@@ -945,7 +945,9 @@ class InventoryService implements ApplicationContextAware {
     def getLowStock(Location location) {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
+        println ("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        println ("getInventoryLevelMap: " + (System.currentTimeMillis() - startTime) + " ms")
         println inventoryLevelMap.keySet().size()
 		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
         def lowStock = quantityMap.findAll { product,quantity ->
@@ -953,8 +955,7 @@ class InventoryService implements ApplicationContextAware {
             def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
         }
-        println lowStock.keySet().size()
-        log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return lowStock
 	}
 
@@ -967,7 +968,7 @@ class InventoryService implements ApplicationContextAware {
             def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
-        log.debug "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
 		return reorderStock
 	}
 
@@ -981,7 +982,7 @@ class InventoryService implements ApplicationContextAware {
             def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
         }
-        log.debug "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return overStock
     }
 
@@ -1335,7 +1336,7 @@ class InventoryService implements ApplicationContextAware {
 			quantityMapByProductAndInventoryItem[product].values().each { quantityMap[product] += it }
 		}
 
-        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getQuantityByProductMap(transactionEntries): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1380,15 +1381,27 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryInstance
 	 * @return
 	 */
+    @Cacheable("quantityOnHandCache")
+    Map<Product, Integer> getQuantityByProductMap(String locationId) {
+        def location = Location.get(locationId)
+        return getQuantityByProductMap(location.inventory)
+    }
+
+
 	Map<Product, Integer> getQuantityByProductMap(Inventory inventory) {
-		def startTime = System.currentTimeMillis()
+        def startTime = System.currentTimeMillis()
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
 
-        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "getQuantityByProductMap(inventory): " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return quantityMap
 	}
+
+
+    List<Product> getProductsByInventory(Inventory inventory) {
+        InventoryLevel.executeQuery("select il.product from InventoryLevel as il where il.inventory = :inventory", [inventory:inventory])
+    }
 
     /**
      * Get a map of quantities (indexed by product) for the given location
@@ -1731,7 +1744,7 @@ class InventoryService implements ApplicationContextAware {
 					}
 				}
 
-				// 4. Make sure that the inventory item has been saved before we process the transactions
+                // 4. Make sure that the inventory item has been saved before we process the transactions
 				if (!cmd.hasErrors()) {
 					// Check if there are any changes recorded ... no reason to
 					if (!transaction.transactionEntries) {
@@ -2003,6 +2016,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List getTransactionEntriesByInventory(Inventory inventory) {
+        def startTime = System.currentTimeMillis()
 		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = criteria.list {
 			transaction {
@@ -2011,6 +2025,9 @@ class InventoryService implements ApplicationContextAware {
 				order("dateCreated", "asc")
 			}
 		}
+        println "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
+
+
 		return transactionEntries;
 	}
 
@@ -3161,7 +3178,7 @@ class InventoryService implements ApplicationContextAware {
 
 
     def getQuantityOnHand(product) {
-        log.info ("Get getQuantityOnHand() for product ${product.name} at all locations")
+        log.info ("Get getQuantityOnHand() for product ${product?.name} at all locations")
         def quantityMap = [:]
         def locations = Location.list()
         locations.each { location ->
@@ -3513,6 +3530,91 @@ class InventoryService implements ApplicationContextAware {
         println "Last batch: ${seconds}s, total: ${total}s"
         lastBatchStarted = batchEnded
     }
+
+
+
+
+    def getQuantityMap(Location location) {
+        def quantityMap = [:]
+        def products = Product.list()
+        products.each { product ->
+            calculateQuantityOnHand(product, location)
+        }
+        return quantityMap
+
+    }
+
+    def calculateQuantityOnHand(Product product, Location location) {
+        def quantityOnHand = 0
+        def stockCountDate = null
+        def mostRecentStockCount = getMostRecentQuantityOnHand(product, location)
+        if (mostRecentStockCount) {
+            stockCountDate = mostRecentStockCount[0][0]
+            quantityOnHand = mostRecentStockCount[0][1]
+        }
+
+        println "stockCountDate: " + stockCountDate
+        println "quantityOnHand: " + quantityOnHand
+
+        def quantityDebit = getQuantityChangeSince(product, location, TransactionCode.DEBIT, stockCountDate)[0]?:0
+        def quantityCredit = getQuantityChangeSince(product, location, TransactionCode.CREDIT, stockCountDate)[0]?:0
+
+        println "quantityDebit: " + quantityDebit
+        println "quantityCredit: " + quantityCredit
+
+
+        return quantityOnHand - quantityDebit + quantityCredit
+    }
+
+
+    def getMostRecentQuantityOnHand(Product product, Location location) {
+        def results = Transaction.executeQuery( """
+                                    SELECT max(te.transaction.transactionDate), sum(te.quantity)
+                                    FROM TransactionEntry te
+                                    JOIN te.transaction
+                                    JOIN te.inventoryItem
+                                    WHERE te.inventoryItem.product = :product
+                                    AND te.transaction.inventory = :inventory
+                                    AND te.transaction.transactionType.transactionCode = :transactionCode
+                                    group by te.transaction.transactionDate
+                                    order by te.transaction.transactionDate desc
+                                    """, [max: 1, product:product, inventory:location.inventory, transactionCode:TransactionCode.PRODUCT_INVENTORY] );
+
+        //return results ? results[0] : null
+        return results
+    }
+
+    def getQuantityChangeSince(Product product, Location location, TransactionCode transactionCode, Date transactionDate) {
+        def results
+        if (transactionDate) {
+            results = Transaction.executeQuery( """
+                                        SELECT sum(te.quantity)
+                                        FROM TransactionEntry te
+                                        JOIN te.transaction
+                                        JOIN te.inventoryItem
+                                        WHERE te.inventoryItem.product = :product
+                                        AND te.transaction.inventory = :inventory
+                                        AND te.transaction.transactionType.transactionCode = :transactionCode
+                                        AND te.transaction.transactionDate >= :transactionDate
+                                        """, [product:product, inventory:location.inventory, transactionCode:transactionCode, transactionDate: transactionDate] );
+        }
+        else {
+            results = Transaction.executeQuery( """
+                                        SELECT sum(te.quantity)
+                                        FROM TransactionEntry te
+                                        JOIN te.transaction
+                                        JOIN te.inventoryItem
+                                        WHERE te.inventoryItem.product = :product
+                                        AND te.transaction.inventory = :inventory
+                                        AND te.transaction.transactionType.transactionCode = :transactionCode
+                                        """, [product:product, inventory:location.inventory, transactionCode:transactionCode] );
+
+        }
+        return results
+    }
+
+
+
 
 }
 

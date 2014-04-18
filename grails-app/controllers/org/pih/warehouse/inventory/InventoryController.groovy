@@ -47,6 +47,168 @@ class InventoryController {
 		redirect(action: "browse");
 	}
 
+    /*
+    def calculateQuantityOnHand = {
+        def product = Product.get(params.id)
+        def location = Location.get(session?.warehouse?.id)
+        def quantityMap = inventoryService.calculateQuantityOnHand(product, location)
+        render ([quantityMap: quantityMap] as JSON)
+    }
+    */
+
+
+    def analyze = {
+
+    }
+
+    def calculateQuantityOnHandByProduct = {
+        def items = []
+
+        def startTime = System.currentTimeMillis()
+
+
+        def location = Location.get(session.warehouse.id)
+        //def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
+        quantityMap.each { product, value ->
+            //def inventoryLevel
+            def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
+            def status = product.getStatus(session.warehouse.id, value) // statusMap[product]
+            items << [
+                    id:product.id,
+                    name: product.name,
+                    status: status,
+                    productCode: product.productCode,
+                    genericProduct:product?.genericProduct?.description,
+                    //inventoryLevel: inventoryLevel,
+                    minQuantity: inventoryLevel?.minQuantity?:0,
+                    maxQuantity: inventoryLevel?.maxQuantity?:0,
+                    reorderQuantity: inventoryLevel?.reorderQuantity?:0,
+                    unitOfMeasure: product.unitOfMeasure,
+                    unitPrice: product.pricePerUnit?:0,
+                    onHandQuantity:value?:0.0,
+                    totalValue: (product.pricePerUnit?:0) * (value?:0)
+            ]
+        }
+
+
+        def elapsedTime = (System.currentTimeMillis() - startTime) / 1000
+
+        def inStockCount = items.findAll { it.status == "IN_STOCK" }.size()
+        def reorderStockCount = items.findAll { it.status == "REORDER" }.size()
+        def lowStockCount = items.findAll { it.status == "LOW_STOCK" }.size()
+        def outOfStockCount = items.findAll { it.status == "STOCK_OUT" }.size()
+        def overStockCount = items.findAll { it.status == "OVERSTOCK" }.size()
+
+        def totalValue = items.sum { it.totalValue }
+        def data = [totalValue:totalValue,items:items,elapsedTime:elapsedTime,allStockCount:items.size(),inStockCount:inStockCount,reorderStockCount:reorderStockCount,lowStockCount:lowStockCount,outOfStockCount:outOfStockCount,overStockCount:overStockCount]
+
+
+        //render "${params.callback}(${result as JSON})"
+        render text: "${params.callback}(${data as JSON})", contentType: "application/javascript", encoding: "UTF-8"
+
+
+    }
+
+
+    def calculateQuantityOnHandByProductGroup = {
+        def items = []
+        def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
+        quantityMap.each { product, value ->
+            def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
+            items << [
+                id:product.id,
+                name: product.name,
+                status: product.getStatus(session.warehouse.id, value),
+                productCode: product.productCode,
+                genericProduct:product?.genericProduct?.description?:product.name,
+                inventoryLevel: inventoryLevel,
+                unitOfMeasure: product.unitOfMeasure,
+                minQuantity: inventoryLevel?.minQuantity?:0,
+                maxQuantity: inventoryLevel?.maxQuantity?:0,
+                reorderQuantity: inventoryLevel?.reorderQuantity?:0,
+                unitPrice: product.pricePerUnit?:0.0,
+                onHandQuantity:value?:0.0,
+                totalValue: (product.pricePerUnit?:0) * (value?:0)
+            ]
+        }
+        //def things = [
+        //        [id:1, name:"fred", total:10, date: "2012-01-01"],
+        //        [id:2, name:"fred", total:10, date: "2012-01-03"],
+        //        [id:3, name:"jane", total:10, date: "2012-01-04"],
+        //        [id:4, name:"fred", total:10, date: "2012-02-11"],
+        //        [id:5, name:"jane", total:10, date: "2012-01-01"],
+        //        [id:6, name:"ted", total:10, date: "2012-03-21"],
+        //        [id:7, name:"ted", total:10, date: "2012-02-09"]
+        //];
+        //def otherThings = things.inject([:].withDefault { [:].withDefault { 0 } } ) {
+        //    map, v -> map[v.name][Date.parse('yyyy-MM-dd', v.date).format('MMMM')] += v.total; map
+        //}
+
+
+
+
+        def quantityItemMap = items.inject([:].withDefault { [value:0,numProducts:0,numInventoryLevels:0,onHandQuantity:0,minQuantity:0,maxQuantity:0,reorderQuantity:0,products:[]] } ) { map, item ->
+            //map[item.genericProduct].products << item;
+            map[item.genericProduct].numProducts++;
+            if (item.inventoryLevel) map[item.genericProduct].numInventoryLevels++;
+            map[item.genericProduct].onHandQuantity += item.onHandQuantity;
+            map[item.genericProduct].minQuantity += item.minQuantity;
+            map[item.genericProduct].reorderQuantity += item.reorderQuantity;
+            map[item.genericProduct].maxQuantity += item.maxQuantity;
+            map[item.genericProduct].value += item.value;
+            map
+        }
+
+
+        def statusSummary = items.inject([:].withDefault { [count:0] } ) { map, item ->
+            map[item.status].count++
+            map
+        }
+
+
+        def multipleInventoryLevels = quantityItemMap.findAll { k,v -> v.numInventoryLevels > 1 }
+        def outOfStock = quantityItemMap.findAll { k,v -> v.onHandQuantity <= 0 && v.minQuantity > 0 }
+        def lowStock = quantityItemMap.findAll { k,v -> v.onHandQuantity > 0 && v.onHandQuantity <= v.minQuantity && v.minQuantity > 0}
+        def reorderStock = quantityItemMap.findAll { k,v -> v.onHandQuantity > v.minQuantity && v.onHandQuantity <= v.reorderQuantity && v.reorderQuantity > 0}
+        def idealStock = quantityItemMap.findAll { k,v -> v.onHandQuantity > v.reorderQuantity && v.onHandQuantity <= v.maxQuantity && v.maxQuantity > 0}
+        def overStock = quantityItemMap.findAll { k,v -> v.onHandQuantity > v.maximumQuantity && v.maximumQuantity > 0 }
+
+        //render([quantityMap:quantityMap] as JSON)
+        render ([
+                statusSummary:statusSummary,
+                count:statusSummary.values()*.count.sum(),
+                summary:[
+                    count: outOfStock.size()+lowStock.size()+reorderStock.size()+idealStock.size()+overStock.size(),
+                    multipleInventoryLevels:multipleInventoryLevels.size(),
+                    outOfStockCount:outOfStock.size(),
+                    lowStockCount:lowStock.size(),
+                    reorderStock:reorderStock.size(),
+                    idealStock:idealStock.size(),
+                    overStock:overStock.size()
+                ],
+                outOfStock:outOfStock,
+                lowStock:lowStock,
+                reorderStock:outOfStock,
+                idealStock:idealStock,
+                overStock:overStock]as JSON)
+    }
+
+
+    def mostRecentQuantityOnHand = {
+        def product = Product.get(params.id)
+        def location = Location.get(session?.warehouse?.id)
+        def object = inventoryService.getMostRecentQuantityOnHand(product, location)
+        render ([mostRecentQuantityOnHand:object] as JSON)
+    }
+
+    def quantityMap = {
+        def location = Location.get(session?.warehouse?.id)
+        def quantityMap = inventoryService.getQuantityMap(location)
+        render ([quantityMap:quantityMap] as JSON)
+    }
+
+
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
@@ -564,9 +726,13 @@ class InventoryController {
 
     @Cacheable("dashboardCache")
     def listLowStock = {
+
+        def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getLowStock(location);
+        println ("Took " + (System.currentTimeMillis() - startTime) + " ms")
         def statusMap = inventoryService.getInventoryStatus(location)
+        println ("Took " + (System.currentTimeMillis() - startTime) + " ms")
         if (params.format == "csv") {
             def filename = "Low stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
@@ -1310,7 +1476,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.id
+					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
@@ -1386,7 +1552,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction?.hasErrors() && transaction?.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.id
+					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
@@ -1487,7 +1653,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
 					transactionInstance.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transactionInstance?.id
+					flash.message = "Successfully saved transaction " + transactionInstance?.transactionNumber
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transactionInstance?.id)
 				}
@@ -1568,7 +1734,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) { 
 					transaction.save(failOnError: true)				
-					flash.message = "Successfully saved transaction " + transaction?.id
+					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)					
 				} 

@@ -31,6 +31,17 @@ beans = {
         timeToIdle = 43200        // 12 hours = 60 * 60 * 12
     }
 
+    quantityOnHandCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "quantityOnHandCache"
+        // these are just examples of properties you could set
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 86400       // 1 day = 60 * 60 * 24
+        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
+    }
+
     megamenuCache(EhCacheFactoryBean) { bean ->
         cacheManager = ref("springcacheCacheManager")
         cacheName = "megamenuCache"
