@@ -53,7 +53,6 @@
                                 <th>Inventory Level ID</th>
                                 <th>Status</th>
                                 <th>Name</th>
-                                <th>Number of products</th>
                                 <th>Product codes</th>
                                 <th>Type</th>
                                 <th>Min</th>
@@ -175,16 +174,16 @@
                     { "mData": "inventoryLevelId", "bSearchable": false, "bVisible": false },
                     { "mData": "status" }, // 0
                     { "mData": "name" }, // 1
-                    { "mData": "numProducts" }, // 2
-                    { "mData": "productCodes" }, // 3
-                    { "mData": "inventoryStatus" }, // 4
-                    { "mData": "minQuantity" }, // 5
-                    { "mData": "reorderQuantity" }, // 6
-                    { "mData": "maxQuantity" }, // 7
-                    { "mData": "onHandQuantity" }, //8
-                    { "mData": "totalValue" }, // 9
-                    { "mData": "hasProductGroup" },  // 10
-                    { "mData": "hasInventoryLevel" } // 11
+                    //{ "mData": "numProducts" }, // 2
+                    { "mData": "productCodes" }, // 2
+                    { "mData": "inventoryStatus" }, // 3
+                    { "mData": "minQuantity" }, // 4
+                    { "mData": "reorderQuantity" }, // 5
+                    { "mData": "maxQuantity" }, // 6
+                    { "mData": "onHandQuantity" }, //7
+                    { "mData": "totalValue" }, // 8
+                    { "mData": "hasProductGroup" },  // 9
+                    { "mData": "hasInventoryLevel" } // 10
 
                 ],
                 "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -219,9 +218,9 @@
                         $('td:eq(1)', nRow).html('<a href="/openboxes/productGroup/edit/' + aData["id"] + '" target="_blank">' + aData["name"] + '</a>');
                     }
                     if (aData["inventoryLevelId"]) {
-                        $('td:eq(5)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData["inventoryLevelId"] + '" target="_blank">' + aData["minQuantity"] + '</a>');
-                        $('td:eq(6)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData["inventoryLevelId"] + '" target="_blank">' + aData["reorderQuantity"] + '</a>');
-                        $('td:eq(7)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData["inventoryLevelId"] + '" target="_blank">' + aData["maxQuantity"] + '</a>');
+                        $('td:eq(4)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData["inventoryLevelId"] + '" target="_blank">' + aData["minQuantity"] + '</a>');
+                        $('td:eq(5)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData["inventoryLevelId"] + '" target="_blank">' + aData["reorderQuantity"] + '</a>');
+                        $('td:eq(6)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData["inventoryLevelId"] + '" target="_blank">' + aData["maxQuantity"] + '</a>');
                     }
                     return nRow;
                 }

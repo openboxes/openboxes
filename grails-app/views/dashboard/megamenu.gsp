@@ -250,6 +250,9 @@
 		</a>
 		<div class="buttonsBar" style="min-width: 200px;">
             <div class="megaButton">
+                <g:link controller="report" action="showInventoryReport"><warehouse:message code="report.showInventoryReport.label" default="Show inventory report"/></g:link>
+            </div>
+            <div class="megaButton">
                 <g:link controller="inventory" action="show">
                     <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH report"/>
                 </g:link>

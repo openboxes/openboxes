@@ -1155,6 +1155,7 @@ class JsonController {
                 aaData += data.productGroupDetails[it].values()
             }
         }
+        aaData.unique()
 
         render (["aaData":aaData] as JSON)
     }
