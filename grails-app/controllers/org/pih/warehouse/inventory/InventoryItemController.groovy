@@ -277,13 +277,12 @@ class InventoryItemController {
         def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
 
 
-        def consumptionColumns = [['string', 'Year'], ['number', 'Issues'], ['number', 'Consumption']]
-        def consumptionData = [['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]
-
+        //def consumptionColumns = [['string', 'Year'], ['number', 'Issues'], ['number', 'Consumption']]
+        //def consumptionData = [['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]
+        //consumptionColumns: consumptionColumns, consumptionData: consumptionData
 
         render(template: "showConsumption",
-                model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems,
-                        consumptionColumns: consumptionColumns, consumptionData: consumptionData])
+                model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems])
     }
 
 
