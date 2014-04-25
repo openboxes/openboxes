@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.reporting
 
+import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.report.ChecklistReportCommand
@@ -24,6 +25,58 @@ class ReportController {
 
     def showInventoryReport = {
 
+    }
+
+    def getCsv(list) {
+        println list
+
+        def csv = "";
+
+        csv+= "Status,"
+        csv+= "Product group,"
+        csv+= "Product codes,"
+        csv+= "Min,"
+        csv+= "Reorder,"
+        csv+= "Max,"
+        csv+= "QoH,"
+        csv+= "Value"
+        csv+= "\n"
+
+                //StringEscapeUtils.escapeCsv(product?.name?:"")
+        // "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"
+        list.each { row ->
+            csv += row.status + ","
+            csv += StringEscapeUtils.escapeCsv(row.name) + ","
+            csv += StringEscapeUtils.escapeCsv(row.productCodes.join(",")) + ","
+            csv += row.minQuantity + ","
+            csv += row.reorderQuantity + ","
+            csv += row.maxQuantity + ","
+            csv += row.onHandQuantity + ","
+            csv += row.totalValue + ","
+            csv += "\n"
+        }
+
+        return csv;
+    }
+
+
+    def exportInventoryReport = {
+        println "Export inventory report " + params
+        def map = []
+        def location = Location.get(session.warehouse.id)
+        if (params.list("status")) {
+            def data = reportService.calculateQuantityOnHandByProductGroup(location.id)
+            params.list("status").each {
+                println it
+                map += data.productGroupDetails[it].values()
+            }
+            map.unique()
+        }
+
+        def filename = "Stock report - " + location.name + ".csv"
+        response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+        render(contentType: "text/csv", text:getCsv(map))
+        return;
     }
 
 

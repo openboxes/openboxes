@@ -35,6 +35,7 @@ class JsonController {
 	def productService
 	def localizationService	
 	def shipmentService
+    def reportService
 	def messageSource
     def consoleService
 
@@ -1149,7 +1150,7 @@ class JsonController {
         log.info "getQuantityOnHandByProductGroup " + params
         def aaData = [] //data.productGroupDetails.ALL.values()
         if (params.list("status")) {
-            def data = calculateQuantityOnHandByProductGroup(params.location.id)
+            def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
             params.list("status").each {
                 println it
                 aaData += data.productGroupDetails[it].values()
@@ -1160,243 +1161,16 @@ class JsonController {
         render (["aaData":aaData] as JSON)
     }
 
-
-    //@Cacheable("quantityOnHandCache")
-    def calculateQuantityOnHandByProductGroup(locationId) {
-        def items = []
-        def startTime = System.currentTimeMillis()
-        def location = Location.get(locationId)
-        //def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
-        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
-
-        quantityMap.each { product, map ->
-
-            def status = map.status
-            def onHandQuantity = map.onHandQuantity
-            def inventoryLevel = map.inventoryLevel
-
-            //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-            def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
-            items << [
-                    id:product.id,
-                    name: product.name,
-                    //status: product.getStatus(session.warehouse.id, value),
-                    status: status,
-                    productCode: product.productCode,
-                    genericProductId:product?.genericProduct?.id,
-                    genericProduct:product?.genericProduct?.description?:product.name,
-                    hasProductGroup: (product?.genericProduct?.id!=null),
-                    unitOfMeasure: product.unitOfMeasure,
-                    imageUrl: imageUrl,
-                    inventoryLevel: inventoryLevel,
-                    minQuantity: inventoryLevel?.minQuantity?:0,
-                    maxQuantity: inventoryLevel?.maxQuantity?:0,
-                    reorderQuantity: inventoryLevel?.reorderQuantity?:0,
-                    unitPrice: product.pricePerUnit?:0.0,
-                    //onHandQuantity:value?:0.0,
-                    onHandQuantity:onHandQuantity,
-                    totalValue: (product.pricePerUnit?:0) * (onHandQuantity?:0)
-            ]
-        }
-        //def things = [
-        //        [id:1, name:"fred", total:10, date: "2012-01-01"],
-        //        [id:2, name:"fred", total:10, date: "2012-01-03"],
-        //        [id:3, name:"jane", total:10, date: "2012-01-04"],
-        //        [id:4, name:"fred", total:10, date: "2012-02-11"],
-        //        [id:5, name:"jane", total:10, date: "2012-01-01"],
-        //        [id:6, name:"ted", total:10, date: "2012-03-21"],
-        //        [id:7, name:"ted", total:10, date: "2012-02-09"]
-        //];
-        //def otherThings = things.inject([:].withDefault { [:].withDefault { 0 } } ) {
-        //    map, v -> map[v.name][Date.parse('yyyy-MM-dd', v.date).format('MMMM')] += v.total; map
-        //}
-
-        // Group all items by status
-        def statusSummary = items.inject([:].withDefault { [count:0,items:[]] } ) { map, item ->
-            map[item.status].count++
-            //map[item.status].items << item
-            map
-        }
+    def getSummaryByProductGroup = {
+        log.info "getSummaryByProductGroup " + params
+        def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
 
 
-
-        // Group entries by product group
-
-        // Removed products:[]
-        def productGroupMap = items.inject([:].withDefault { [id:null,name:null,status:null,productCodes:[],totalValue:0,numProducts:0,numInventoryLevels:0,
-                onHandQuantity:0,minQuantity:0,maxQuantity:0,reorderQuantity:0,inventoryStatus:null,hasInventoryLevel:false,hasProductGroup:false,inventoryLevelId:null] } ) { map, item ->
-            //map[item.genericProduct].products << item;
-            map[item.genericProduct].id = item.genericProductId
-            map[item.genericProduct].name = item.genericProduct
-            map[item.genericProduct].hasProductGroup = item.hasProductGroup
-            map[item.genericProduct].numProducts++;
-            map[item.genericProduct].onHandQuantity += item.onHandQuantity;
-            //map[item.genericProduct].products << item
-            map[item.genericProduct].productCodes << item.productCode
-            map[item.genericProduct].totalValue += item.totalValue;
-
-            if (item.inventoryLevel) {
-                map[item.genericProduct].numInventoryLevels++
-                map[item.genericProduct].hasInventoryLevel = true
-
-                // Make sure we're using the latest version of the inventory level (the one where values are not set to 0)
-                def currentInventoryLevel = map[item.genericProduct].inventotryLevel
-                if (!currentInventoryLevel) {
-                    // || item?.inventoryLevel?.lastUpdated?.after(currentInventoryLevel.lastUpdated)
-                    map[item.genericProduct].inventoryLevelId = item?.inventoryLevel?.id
-                    map[item.genericProduct].inventoryLevel = item.inventoryLevel
-                    map[item.genericProduct].inventoryStatus = item?.inventoryLevel?.status?.name()
-                    map[item.genericProduct].minQuantity = item.minQuantity;
-                    map[item.genericProduct].reorderQuantity = item.reorderQuantity;
-                    map[item.genericProduct].maxQuantity = item.maxQuantity;
-                    //map[item.genericProduct].status =
-                }
-            }
-
-            map
-        }
-
-        // Set status for all rows
-        productGroupMap.each { k, v ->
-            v.status = getStatusMessage(v?.inventoryLevel, v?.onHandQuantity)
-            v.totalValue = g.formatNumber(number:v.totalValue, type:"currency", currencyCode: "USD")
-        }
-
-
-        //def noInventoryLevels = productGroupMap.findAll { k,v -> !v.inventoryLevel }
-        def hasInventoryLevel = productGroupMap.findAll { k,v -> v.hasInventoryLevel }
-        def hasNoInventoryLevel = productGroupMap.findAll { k,v -> !v.hasInventoryLevel }
-        def zeroInventoryLevels = productGroupMap.findAll { k,v -> v.numInventoryLevels == 0 }
-        def multipleInventoryLevels = productGroupMap.findAll { k,v -> v.numInventoryLevels > 1 }
-        def singleInventoryLevel = productGroupMap.findAll { k,v -> v.numInventoryLevels == 1 }
-
-        def hasInventoryLevelCount = hasInventoryLevel.size()
-        def hasNoInventoryLevelCount = hasNoInventoryLevel.size()
-
-        def zeroInventoryLevelsCount = zeroInventoryLevels.size()
-        def multipleInventoryLevelsCount = multipleInventoryLevels.size()
-        def singleInventoryLevelCount = singleInventoryLevel.size()
-        def inventoryLevelsCount = zeroInventoryLevelsCount + multipleInventoryLevelsCount + singleInventoryLevelCount
-
-        // Process all product groups
-        def notStocked = productGroupMap.findAll { k,v -> v.onHandQuantity <= 0 && !v.hasInventoryLevel }
-        def outOfStock = productGroupMap.findAll { k,v -> v.onHandQuantity <= 0 && v.hasInventoryLevel }
-        def lowStock = productGroupMap.findAll { k,v -> v.onHandQuantity > 0 && v.onHandQuantity <= v.minQuantity && v.minQuantity > 0 } //&& v.minQuantity > 0
-        def reorderStock = productGroupMap.findAll { k,v -> v.onHandQuantity > v.minQuantity && v.onHandQuantity <= v.reorderQuantity && v.reorderQuantity > 0 }//v.reorderQuantity > 0
-        def inStock = productGroupMap.findAll { k,v -> v.onHandQuantity > 0 && v.reorderQuantity == 0 && v.maxQuantity == 0 && v.minQuantity == 0 }
-        def idealStock = productGroupMap.findAll { k,v -> v.onHandQuantity > v.reorderQuantity && v.onHandQuantity <= v.maxQuantity }//&& v.maxQuantity > 0
-        def overStock = productGroupMap.findAll { k,v -> v.onHandQuantity > v.maxQuantity && v.maxQuantity > 0 } //v.maxQuantity > 0
-
-        println "Not stocked: " + notStocked.size()
-        println "Out of stock: " + outOfStock.size()
-
-
-        // Get product group sizes
-        def notStockedCount = notStocked.size()
-        def outOfStockCount = outOfStock.size()
-        def lowStockCount = lowStock.size()
-        def reorderStockCount = reorderStock.size()
-        def inStockCount = inStock.size()
-        def idealStockCount = idealStock.size()
-        def overStockCount = overStock.size()
-
-        def all = productGroupMap
-        def accounted = notStocked + outOfStock + lowStock + reorderStock + idealStock + overStock + inStock
-        def invalid = all - accounted
-        def invalidCount = invalid.size()
-
-        def totalCountActual = outOfStockCount + lowStockCount + reorderStockCount + idealStockCount + inStockCount + overStockCount + notStockedCount + invalidCount;
-        def totalCountFromSummary = statusSummary.values()*.count.sum()
-
-
-
-
-        def elapsedTime = (System.currentTimeMillis() - startTime)/1000
-
-        //render([quantityMap:quantityMap] as JSON)
-        return [
-                responseTime: elapsedTime + "s",
-                productSummary:[
-                    statusSummary:statusSummary,
-                    totalCount:totalCountFromSummary
-                ],
-                inventoryLevelSummary:[
-                    totalCount:inventoryLevelsCount,
-                    hasInventoryLevel: hasInventoryLevelCount,
-                    hasNoInventoryLevel: hasNoInventoryLevelCount,
-                    zeroInventoryLevels: zeroInventoryLevelsCount,
-                    singleInventoryLevel: singleInventoryLevelCount,
-                    multipleInventoryLevels:multipleInventoryLevelsCount
-                ],
-                productGroupSummary:[
-                        totalCountProductsExpected: productGroupMap.values().sum{ it.numProducts },
-                        totalCountProductGroupsExpected: productGroupMap.keySet().size(),
-                        totalCountProductGroupsActual: totalCountActual,
-                        "NOT_STOCKED": [numProductGroups: notStockedCount, percentage: notStockedCount/totalCountActual, numProducts: notStocked.values().sum { it.numProducts }],
-                        "STOCK_OUT": [numProductGroups: outOfStockCount, percentage: outOfStockCount/totalCountActual, numProducts: outOfStock.values().sum { it.numProducts }],
-                        "LOW_STOCK": [numProductGroups: lowStockCount, percentage: lowStockCount/totalCountActual, numProducts: lowStock.values().sum { it.numProducts }],
-                        "REORDER": [numProductGroups: reorderStockCount, percentage: reorderStockCount/totalCountActual, numProducts: reorderStock.values().sum { it.numProducts }],
-                        "IN_STOCK": [numProductGroups: inStockCount, percentage: inStockCount/totalCountActual, numProducts: inStock.values().sum { it.numProducts }],
-                        "IDEAL_STOCK": [numProductGroups: idealStockCount, percentage: idealStockCount/totalCountActual, numProducts: idealStock.values().sum { it.numProducts }],
-                        "OVERSTOCK": [numProductGroups: overStockCount, percentage: overStockCount/totalCountActual, numProducts: overStock.values().sum { it.numProducts }],
-                        "INVALID": [numProductGroups: invalidCount, percentage: invalidCount/totalCountActual, numProducts: invalid.values().sum { it.numProducts }]
-                ],
-                productGroupDetails: [
-                    "ALL":productGroupMap,
-                    "NOT_STOCKED":notStocked,
-                    "STOCK_OUT":outOfStock,
-                    "LOW_STOCK":lowStock,
-                    "REORDER":outOfStock,
-                    "IN_STOCK":inStock,
-                    "IDEAL_STOCK":idealStock,
-                    "OVERSTOCK":overStock,
-                    "INVALID":invalid
-                ]
-        ]
+        render (data.productGroupSummary as JSON)
     }
 
-    def getStatusMessage(InventoryLevel inventoryLevel, Integer currentQuantity) {
 
-        def statusMessage = "UNSUPPORTED"
-        if (inventoryLevel) {
-            if (inventoryLevel.status == InventoryStatus.SUPPORTED  || !inventoryLevel.status) {
-                if (currentQuantity <= 0) {
-                    statusMessage = "STOCK_OUT"
-                }
-                else if (inventoryLevel.minQuantity && currentQuantity <= inventoryLevel.minQuantity && inventoryLevel.minQuantity > 0) {
-                    statusMessage = "LOW_STOCK"
-                }
-                else if (inventoryLevel.reorderQuantity && currentQuantity <= inventoryLevel.reorderQuantity && inventoryLevel.reorderQuantity > 0) {
-                    statusMessage = "REORDER"
-                }
-                else if (inventoryLevel.maxQuantity && currentQuantity > inventoryLevel.maxQuantity && inventoryLevel.maxQuantity > 0) {
-                    statusMessage = "OVERSTOCK"
-                }
-                else if (inventoryLevel.maxQuantity && currentQuantity > inventoryLevel.reorderQuantity && currentQuantity <= inventoryLevel.maxQuantity && inventoryLevel.maxQuantity > 0 ) {
-                    statusMessage = "IN_STOCK"
-                }
-            }
-            else if (inventoryLevel.status == InventoryStatus.NOT_SUPPORTED) {
-                statusMessage = "NOT_SUPPORTED"
-            }
-            else if (inventoryLevel.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
-                statusMessage = "SUPPORTED_NON_INVENTORY"
-            }
-            else {
-                statusMessage = "UNAVAILABLE"
-            }
-        }
-        else {
-            if (currentQuantity <= 0) {
-                statusMessage = "NOT_STOCKED"
-            }
-            else if (currentQuantity > 0 ) {
-                statusMessage = "IN_STOCK"
-            }
-        }
 
-        return statusMessage
-    }
 
 
     def mostRecentQuantityOnHand = {
