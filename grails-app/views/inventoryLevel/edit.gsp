@@ -19,6 +19,11 @@
 	                <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+
+
+            <g:render template="../inventoryLevel/form" model="[productInstance:inventoryLevelInstance.product,inventoryLevelInstance:inventoryLevelInstance]"/>
+
+            <%--
             <g:form method="post" controller="inventoryLevel" action="save">
             	<fieldset>
 	                <g:hiddenField name="id" value="${inventoryLevelInstance?.id}" />
@@ -103,6 +108,7 @@
 	                </div>
                 </fieldset>
             </g:form>
+            --%>
         </div>
     </body>
 </html>

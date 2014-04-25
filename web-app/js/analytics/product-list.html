@@ -1,0 +1,150 @@
+<div ng-controller='ProductListController' ng-init="init()">
+
+    <div class="alert alert-info" ng-show="loading">Loading...</div>
+
+    <!--
+    <div ng-repeat="group in groups">
+        <h2>
+            {{ group.label }}
+        </h2>
+        <table class="table table-striped">
+            <tr ng-repeat="result in group.results">
+                <td>
+                    <span class="label" ng-class="{'label-success': result.status == 'IN_STOCK', 'label-info': result.status == 'OVERSTOCK', label-danger': result.status == 'STOCK_OUT', 'label-warning': result.status == 'REORDER' || result.status == 'LOW_STOCK' }">
+                        {{result.status}}
+                    </span>
+                </td>
+                <td>
+                    {{result.productCode}}
+                </td>
+                <td>
+                    {{result.name}}
+                </td>
+                <td>
+                    {{result.genericProduct | uppercase}}
+                </td>
+                <td>
+                    {{result.unitOfMeasure | uppercase}}
+                </td>
+                <td>
+                    {{result.minQuantity}}
+                </td>
+                <td>
+                    {{result.reorderQuantity}}
+                </td>
+                <td>
+                    {{result.maxQuantity}}
+                </td>
+                <td>
+                    {{result.onHandQuantity}}
+                </td>
+                <td>
+                    {{result.unitPrice | currency:"$" }}
+                </td>
+                <td>
+                    {{result.totalValue | currency:"$" }}
+                </td>
+            </tr>
+        </table>
+    </div>
+    -->
+
+
+    <div ng-init="filtered = (results | filter: searchTerm)">
+        <h1 translate="product.list.label">Product list</h1>
+        <h2>Showing {{currentPage+1}} out of {{numberOfPages()}} pages</h2>
+        <ul class="pagination">
+            <!--ng-disabled="currentPage == 0" -->
+            <li><button ng-click="setCurrentPage(currentPage-1)">&laquo; Previous</button></li>
+            <li><button ng-click="setCurrentPage(currentPage+1)">Next &raquo;</button></li>
+        </ul>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Results &raquo; Returned {{(results | filter: searchTerm).length}} items in {{elapsedTime}} ms
+                </h3>
+            </div>
+            <div ng-switch="(results | filter:searchTerm).length">
+                <div ng-switch-when="0" class="panel-body">
+                    No results were found  <button ng-click='init()' class="button icon search">Show all</button>
+                </div>
+                <div ng-switch-default>
+                    <div id="exportable" class="table-responsive" >
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th><a href="" ng-click="sortBy='status'; reverse=!reverse;">Status</a></th>
+                                <th>Product code</th>
+                                <th><a href="" ng-click="sortBy='name'; reverse=!reverse;">Name</a></th>
+                                <th><a href="" ng-click="sortBy='genericProduct'; reverse=!reverse;">Generic product</a></th>
+                                <th><a href="" ng-click="sortBy='unitOfMeasure'; reverse=!reverse;">UOM</a></th>
+                                <th width="7%"><a href="" ng-click="sortBy='minQuantity'; reverse=!reverse;">Min</a></th>
+                                <th width="7%"><a href="" ng-click="sortBy='reorderQuantity'; reverse=!reverse;">Reorder</a></th>
+                                <th width="7%"><a href="" ng-click="sortBy='maxQuantity'; reverse=!reverse;">Max</a></th>
+                                <th width="7%"><a href="" ng-click="sortBy='onHandQuantity'; reverse=!reverse;">QoH</a></th>
+                                <th width="7%"><a href="" ng-click="sortBy='pricePerUnit'; reverse=!reverse;">Unit price</a></th>
+                                <th width="10%"><a href="" ng-click="sortBy='totalValue'; reverse=!reverse;">Total value</a></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr ng-repeat="result in results | filter:searchTerm | orderBy:sortBy:reverse | startFrom:currentPage*pageSize | limitTo: pageSize">
+                                <td>
+                                    <span class="label" ng-class="{'label-success': result.status == 'IN_STOCK', 'label-info': result.status == 'OVERSTOCK', 'label-danger': result.status == 'STOCK_OUT', 'label-warning': result.status == 'REORDER' || result.status == 'LOW_STOCK' }">
+                                        {{result.status}}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{result.productCode}}
+                                </td>
+                                <td>
+                                    <a href="#/products/{{result.id}}" class="thumb"><img ng-src="{{result.imageUrl}}"></a>
+                                    <a href="#/products/{{result.id}}">
+                                        {{result.name}}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{result.genericProduct | uppercase}}
+                                </td>
+                                <td>
+                                    {{result.unitOfMeasure | uppercase}}
+                                </td>
+                                <td>
+                                    {{result.minQuantity}}
+                                </td>
+                                <td>
+                                    {{result.reorderQuantity}}
+                                </td>
+                                <td>
+                                    {{result.maxQuantity}}
+                                </td>
+                                <td>
+                                    {{result.onHandQuantity}}
+                                </td>
+                                <td>
+                                    {{result.unitPrice | currency:"$" }}
+                                </td>
+                                <td>
+                                    {{result.totalValue | currency:"$" }}
+                                </td>
+
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="11">
+                                    <ul class="pagination">
+                                        <li ng-repeat="i in getNumberAsArray(numberOfPages()) track by $index"><button ng-click="setCurrentPage($index)">{{$index + 1}}</button></li>
+                                    </ul>
+
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

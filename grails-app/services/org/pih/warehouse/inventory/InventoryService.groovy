@@ -869,12 +869,38 @@ class InventoryService implements ApplicationContextAware {
         def inventoryStatusMap = [:]
         quantityMap.each { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryStatusMap[product] = getInventoryStatus(inventoryLevel, quantity)
+            inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
 
         }
         return inventoryStatusMap
     }
 
+    /**
+     * Get inventory status, inventory level and quantity on hand for all products.
+     *
+     * @param location
+     * @return
+     */
+    def getInventoryStatusAndLevel(Location location) {
+        def quantityMap = getQuantityByProductMap(location.inventory)
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryStatusMap = [:]
+        quantityMap.each { product, quantity ->
+            def inventoryLevel = inventoryLevelMap[product]?.first()
+            def status = inventoryLevel?.statusMessage(quantity)?:"NONE"
+            inventoryStatusMap[product] = [inventoryLevel:inventoryLevel,status:status,onHandQuantity:quantity]
+        }
+        return inventoryStatusMap
+    }
+
+    /**
+     * Get inventory status for a single inventory level
+     *
+     * @param inventoryLevel
+     * @param quantity
+     * @return
+     */
+    /*
     def getInventoryStatus(inventoryLevel, quantity) {
         def status = ""
         if (inventoryLevel?.status >= InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
@@ -887,7 +913,7 @@ class InventoryService implements ApplicationContextAware {
             else if (inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity ) {
                 status = "REORDER"
             }
-            else if (inventoryLevel?.maxQuantity && quantity > inventoryLevel?.maxQuantity) {
+            else if (inventoryLevel?.maxQuantity && quantity > inventoryLevel?.maxQuantity && inventoryLevel?.maxQuantity > 0) {
                 status = "OVERSTOCK"
             }
             else {
@@ -904,7 +930,7 @@ class InventoryService implements ApplicationContextAware {
             status = "UNAVAILABLE"
         }
         return status
-    }
+    }*/
 
 
     def getQuantityOnHandZero(Location location) {
@@ -1381,7 +1407,6 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryInstance
 	 * @return
 	 */
-    @Cacheable("quantityOnHandCache")
     Map<Product, Integer> getQuantityByProductMap(String locationId) {
         def location = Location.get(locationId)
         return getQuantityByProductMap(location.inventory)

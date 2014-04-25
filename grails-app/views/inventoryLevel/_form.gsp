@@ -13,10 +13,12 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'product', 'errors')}">
                     <g:if test="${inventoryLevelInstance?.product}">
+                        ${inventoryLevelInstance?.product?.productCode}
                         <g:hiddenField name="product.id" value="${inventoryLevelInstance?.product?.id}"/>
                         <format:product product="${inventoryLevelInstance?.product}"/>
                     </g:if>
                     <g:elseif test="${productInstance}">
+                        ${productInstance?.productCode}
                         <g:hiddenField name="product.id" value="${productInstance?.id}"/>
                         <format:product product="${productInstance}"/>
                     </g:elseif>

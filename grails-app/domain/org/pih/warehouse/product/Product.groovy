@@ -334,36 +334,7 @@ class Product implements Comparable, Serializable {
         println "Current quantity = " + currentQuantity
         println "Status: " + inventoryLevel?.status
         println "Latest inventory " + latestInventoryDate
-
-        if (inventoryLevel?.status == InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
-            if (currentQuantity <= 0) {
-                status = "STOCK_OUT"
-            }
-            else if (inventoryLevel?.minQuantity && currentQuantity <= inventoryLevel?.minQuantity) {
-                status = "LOW_STOCK"
-            }
-            else if (inventoryLevel?.reorderQuantity && currentQuantity <= inventoryLevel?.reorderQuantity ) {
-                status = "REORDER"
-            }
-            else if (inventoryLevel?.maxQuantity && currentQuantity > inventoryLevel?.maxQuantity) {
-                status = "OVERSTOCK"
-            }
-            else {
-                status = "IN_STOCK"
-            }
-        }
-        else if (inventoryLevel?.status == InventoryStatus.NOT_SUPPORTED) {
-            status = "NOT_SUPPORTED"
-        }
-        else if (inventoryLevel?.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
-            status = "SUPPORTED_NON_INVENTORY"
-        }
-        else {
-            status = "SUPPORTED"
-        }
-
-        return status;
-
+        return inventoryLevel?.statusMessage(currentQuantity)
     }
 
 

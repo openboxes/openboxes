@@ -18,51 +18,65 @@
 
             <div class="yui-ga">
                 <div class="yui-u first">
-                    <div class="button-bar">
-                        <div class="button-group">
-                            <g:link controller="inventory" action="listTotalStock" class="button ${'listTotalStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listTotalStock.label"/>
-                            </g:link>
-
-                            <g:link controller="inventory" action="listInStock" class="button ${'listInStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listInStock.label"/>
-                            </g:link>
-
-                            <g:link controller="inventory" action="listQuantityOnHandZero" class="button ${'listQuantityOnHandZero'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listQuantityOnHandZero.label"/>
-                            </g:link>
-
-                            <g:link controller="inventory" action="listOutOfStock" class="button ${'listOutOfStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listOutOfStock.label"/>
-                            </g:link>
-
-
-                            <g:link controller="inventory" action="listLowStock" class="button ${'listLowStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listLowStock.label"/>
-                            </g:link>
-
-                            <g:link controller="inventory" action="listReorderStock" class="button ${'listReorderStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listReorderStock.label"/>
-                            </g:link>
-
-                            <g:link controller="inventory" action="listOverStock" class="button ${'listOverStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listOverStock.label"/>
-                            </g:link>
-
-                            <g:link controller="inventory" action="listReconditionedStock" class="button ${'listReconditionedStock'.equals(actionName)?'primary':''}">
-                                <warehouse:message code="inventory.listReconditionedStock.label"/>
-                            </g:link>
-                        </div>
+                    <div class="button-container button-bar">
+                        <div class="left">
+                            <div class="action-menu">
+                                <button class="action-btn button icon log">
+                                    <warehouse:message code="inventory.${actionName}.label"/>
+                                </button>
+                                <div class="actions">
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listTotalStock" class="${'listTotalStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listTotalStock.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listInStock" class="${'listInStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listInStock.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listQuantityOnHandZero" class="${'listQuantityOnHandZero'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listQuantityOnHandZero.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listOutOfStock" class="${'listOutOfStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listOutOfStock.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listLowStock" class="${'listLowStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listLowStock.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listReorderStock" class="${'listReorderStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listReorderStock.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listOverStock" class="${'listOverStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listOverStock.label"/>
+                                        </g:link>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <g:link controller="inventory" action="listReconditionedStock" class="${'listReconditionedStock'.equals(actionName)?'active':''}">
+                                            <warehouse:message code="inventory.listReconditionedStock.label"/>
+                                        </g:link>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
 
+                        <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
+                    </div>
                     <g:set var="totalStockValue" value="${0.00}"/>
 
 
                     <div class="box">
                         <h2>
-                            <div style="position:absolute;top:5px;right:5px">
-                                <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
-                            </div>
+
                             <warehouse:message code="${controllerName}.${actionName}.label"/> -
                             <warehouse:message code="default.showing.message" args="[quantityMap?.keySet()?.size()]"/>
                         </h2>
@@ -89,10 +103,6 @@
                                 <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
                                 <tr class="${i%2?'odd':'even'}">
                                     <td>
-                                        <%--
-                                        <g:render template="../product/status" model="[product:entry?.key,totalQuantity:entry?.value]"/>
-                                        --%>
-
                                         <g:if test="${statusMap}">
                                             <g:set var="status" value="${statusMap[entry?.key]}"/>
                                         </g:if>
@@ -165,9 +175,8 @@
                                         </g:else>
                                     </td>
                                 </tr>
-
-
                             </g:each>
+
                             <g:unless test="${quantityMap}">
                                 <tr>
                                     <td colspan="12" class="center">
@@ -181,7 +190,7 @@
                             </g:unless>
                             <tfoot>
                                 <tr>
-                                    <th colspan="15">
+                                    <th colspan="16">
                                         <div class="title right middle">
                                             <warehouse:message code="inventory.totalValue.label" default="Total value"/>
                                             <g:formatNumber number="${totalStockValue}" type="currency" currencyCode="USD"/>
@@ -192,8 +201,6 @@
                                 </tr>
                             </tfoot>
                         </table>
-
-
                     </div>
                 </div>
             </div>

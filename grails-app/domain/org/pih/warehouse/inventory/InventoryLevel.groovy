@@ -52,4 +52,39 @@ class InventoryLevel {
 		binLocation(nullable:true)
         abcClass(nullable: true)
 	}
+
+    def statusMessage(Integer currentQuantity) {
+        def statusMessage = ""
+        if (status == InventoryStatus.SUPPORTED  || !status) {
+            if (currentQuantity <= 0) {
+                statusMessage = "STOCK_OUT"
+            }
+            else if (minQuantity && currentQuantity <= minQuantity && minQuantity > 0) {
+                statusMessage = "LOW_STOCK"
+            }
+            else if (reorderQuantity && currentQuantity <= reorderQuantity && reorderQuantity > 0) {
+                statusMessage = "REORDER"
+            }
+            else if (maxQuantity && currentQuantity > maxQuantity && maxQuantity > 0) {
+                statusMessage = "OVERSTOCK"
+            }
+            else {
+                statusMessage = "IN_STOCK"
+            }
+        }
+        else if (status == InventoryStatus.NOT_SUPPORTED) {
+            statusMessage = "NOT_SUPPORTED"
+        }
+        else if (status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
+            statusMessage = "SUPPORTED_NON_INVENTORY"
+        }
+        else {
+            statusMessage = "UNAVAILABLE"
+        }
+        return statusMessage
+    }
+
+
+
+
 }

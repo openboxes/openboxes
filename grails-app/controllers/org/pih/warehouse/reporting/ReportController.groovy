@@ -22,6 +22,11 @@ class ReportController {
 	def productService
 	def reportService
 
+    def showInventoryReport = {
+
+    }
+
+
     def showInventorySamplingReport = {
 
         def sw = new StringWriter()
