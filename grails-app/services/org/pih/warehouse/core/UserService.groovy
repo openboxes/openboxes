@@ -54,18 +54,41 @@ class UserService {
     }
 
 
-    def findPersons(String terms, Map params) {
+    def findPersons(String query, Map params) {
 		def criteria = Person.createCriteria()
 		def results = criteria.list (params) {
 			or { 
-				like("firstName", terms)
-				like("lastName", terms)
-				like("email", terms)
+				like("firstName", query)
+				like("lastName", query)
+				like("email", query)
 			}
 			order("lastName", "desc")
 		}
-		
+        return results
 	}
+
+
+    def findUsers(String query, Map params) {
+        println "findUsers: " + query + " : " + params
+        def criteria = User.createCriteria()
+        def results = criteria.list (params) {
+            if (query) {
+                or {
+                    like("firstName", query)
+                    like("lastName", query)
+                    like("email", query)
+                    like("username", query)
+                }
+            }
+            if (params.status) {
+                eq("active", Boolean.valueOf(params.status))
+            }
+
+            order("lastName", "desc")
+        }
+
+        return results;
+    }
 	
 	
 	void convertPersonToUser(String personId) { 

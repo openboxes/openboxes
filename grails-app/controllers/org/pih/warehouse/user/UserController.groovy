@@ -42,21 +42,20 @@ class UserController {
      * Show list of users
      */
 	def list = {
+
+        println params
 		def userInstanceList = []
 		def userInstanceTotal = 0;
 		
 		params.max = Math.min(params.max ? params.int('max') : 15, 100)
 		
-		if (params.q) {
-			def term = "%" + params.q + "%"
-			userInstanceList = User.findAllByUsernameLikeOrEmailLike(term, term, params)
-			userInstanceTotal = User.countByUsernameLikeOrEmailLike(term, term, params);
-		}
-		else {
-			userInstanceList = User.list(params)
-			userInstanceTotal = User.count()
-		}
-		
+        def query = params.q ? "%" + params.q + "%" : ""
+
+        userInstanceList = userService.findUsers(query, params)
+        userInstanceTotal = userInstanceList.totalCount
+        //userInstanceList = User.findAllByUsernameLikeOrEmailLike(term, term, params)
+        //userInstanceTotal = User.countByUsernameLikeOrEmailLike(term, term, params);
+
 		[userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
 	}
 	

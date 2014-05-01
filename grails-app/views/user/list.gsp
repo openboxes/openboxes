@@ -21,16 +21,30 @@
             <div class="yui-gf">
                 <div class="yui-u first">
                     <div class="dialog box">
+                        <h2><warehouse:message code="default.filters.label"/></h2>
                         <g:form action="list" method="get">
                             <ul class="filter-list">
                                 <li class="filter-list-item">
-                                    <label><warehouse:message code="user.search.label"/></label>
-                                </li>
-                                <li class="filter-list-item">
+                                    <p>
+                                        <label><warehouse:message code="user.search.label"/></label>
+                                    </p>
                                     <g:textField name="q" size="40" value="${params.q }" class="text"/>
                                 </li>
                                 <li class="filter-list-item">
-                                    <button type="submit" class="button">${warehouse.message(code: 'default.button.find.label')}</button>
+                                    <p>
+                                        <label>${warehouse.message(code:'default.status.label', default: "Status")}</label>
+                                    </p>
+                                    <g:select name="status" from="['':'All users', 'true':'Active users only', 'false':'Inactive users only']"
+                                            value="${params.status}"
+                                              class="chzn-select-deselect"
+                                              optionKey="key" optionValue="value"/>
+
+                                </li>
+                                <li>
+                                    <hr/>
+                                </li>
+                                <li class="filter-list-item right">
+                                    <button type="submit" class="button icon search">${warehouse.message(code: 'default.button.find.label')}</button>
                                 </li>
                             </ul>
                         </g:form>
@@ -41,6 +55,7 @@
                 <div class="yui-u">
 
                     <div class="list box dialog">
+                        <h2><warehouse:message code="users.label"/> (${userInstanceTotal} results)</h2>
                         <table>
                             <thead>
                                 <tr>
@@ -51,6 +66,7 @@
                                     <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}" />
                                 <!--      <g:sortableColumn property="email" title="${warehouse.message(code: 'user.role.label', default: 'Roles')}" />  -->
                                     <g:sortableColumn property="role" title="${warehouse.message(code: 'user.roles.label')}" />
+                                    <g:sortableColumn property="lastLoginDate" title="${warehouse.message(code: 'user.lastLoginDate.label')}" />
                                 </tr>
                             </thead>
                             <tbody>
@@ -66,13 +82,25 @@
                                     <td>${fieldValue(bean: userInstance, field: "email")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "roles")}</td>
+                                    <td>
+                                        <g:formatDate date="${userInstance.lastLoginDate}"/>
+                                    </td>
                                 </tr>
                             </g:each>
+                            <g:unless test="${userInstanceList}">
+                                <tr>
+                                    <td colspan="7">
+                                        <p class="empty center">
+                                            <warehouse:message code="users.empty.label" default="No users returned"/>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </g:unless>
                             </tbody>
                         </table>
                     </div>
                     <div class="paginateButtons">
-                        <g:paginate total="${userInstanceTotal}" />
+                        <g:paginate total="${userInstanceTotal}" params="${params}"/>
                     </div>
                 </div>
             </div>
