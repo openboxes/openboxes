@@ -31,7 +31,7 @@
                         <li>
                             <span class="action-menu">
                                 <button class="action-hover-btn button icon comment big">
-                                    Get help
+                                    <warehouse:message code="default.help.label" default="Help"/>
                                 </button>
                                 <ul class="actions" style="text-align:left;">
 
