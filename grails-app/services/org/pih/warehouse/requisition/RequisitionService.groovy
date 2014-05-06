@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.LocalTransfer
 import org.pih.warehouse.inventory.Transaction
@@ -577,19 +578,30 @@ class RequisitionService {
     }
 
 
-    public List<RequisitionItem> getIssuedRequisitionItems(Location location, Product product) {
+    public List<RequisitionItem> getIssuedRequisitionItems(Location location, Product product, Date startDate, Date endDate, List<ReasonCode> cancelReasonCodes) {
+        println "Reason codes: " + cancelReasonCodes
+
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
-                or {
-                    eq("destination", location)
-                    eq("origin", location)
-                }
                 and {
+                    eq("destination", location)
                     eq("isTemplate", false)
                     eq("status", RequisitionStatus.ISSUED)
+                    if (startDate) {
+                        ge("dateRequested", startDate)
+                    }
+                    if (endDate) {
+                        le("dateRequested", endDate)
+                    }
                 }
             }
             eq("product", product)
+            if (cancelReasonCodes) {
+                or {
+                    isNull("cancelReasonCode")
+                    'in'("cancelReasonCode", cancelReasonCodes)
+                }
+            }
         }
         //println requisitionItems
         return requisitionItems

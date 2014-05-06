@@ -38,8 +38,8 @@ class StockCardCommand {
 	Map shipmentMap = [:]
 	
 	// Transaction log section
-	Date startDate = new Date() - 60;		// defaults to today - 60d
-	Date endDate = new Date();				// defaults to today
+	Date startDate
+	Date endDate
 	TransactionType transactionType
 	Map transactionLogMap;
 	

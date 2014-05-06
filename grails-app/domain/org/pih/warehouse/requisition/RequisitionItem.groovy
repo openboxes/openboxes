@@ -502,7 +502,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             println "Error: " + e.message
         }
 
-        println "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
+        //println "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return quantityPicked?:0
     }

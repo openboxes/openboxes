@@ -15,6 +15,7 @@ import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -267,19 +268,22 @@ class InventoryItemController {
     }
 
     def showConsumption = { StockCardCommand cmd ->
+
+        log.info "Show consumption " + params
         long currentTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+
         // add the current warehouse to the command object
         cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 
+        def reasonCodes = params.list("reasonCode");//.collect { reasonCode ->
+            //ReasonCode.findReasonCodeByName(reasonCode)
+            //reasonCode as ReasonCode
+        //}
+
+
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-        def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
-
-
-        //def consumptionColumns = [['string', 'Year'], ['number', 'Issues'], ['number', 'Consumption']]
-        //def consumptionData = [['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]
-        //consumptionColumns: consumptionColumns, consumptionData: consumptionData
+        def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance, cmd.startDate, cmd.endDate, reasonCodes)
 
         render(template: "showConsumption",
                 model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems])
@@ -555,9 +559,37 @@ class InventoryItemController {
 		
 		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 	}
-	
-	
-	/**
+
+
+//    def donateStock = {
+//        log.info "Params " + params;
+//        def inventoryItem = InventoryItem.get(params.id)
+//        def location = Location.get(session.warehouse.id)
+//        //	def inventoryInstance = Inventory.get(params?.inventory?.id)
+//        if (inventoryItem) {
+//            def results = inventoryService.donateStock(inventoryItem, params.donationQuantity as int, location, params);
+//
+//            println "Success: " + results.success
+//            if (!inventoryItem.hasErrors() && results.success) {
+//                //flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+//                flash.message = "Your donation offer has been posted to stockswap.org."
+//            }
+//            else {
+//                // There were errors, so we want to display the itemInstance.errors to the user
+//                //flash.itemInstance = itemInstance;
+//
+//                flash.message = "We are unable to donate to stockswap due to an unexpected error."
+//                results.data.errors.errors.each { error ->
+//                    inventoryItem.errors.reject(error.message)
+//                }
+//                flash.itemInstance = inventoryItem
+//            }
+//        }
+//        redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id])
+//    }
+
+
+    /**
 	 * Handles form submission from Show Stock Card > Adjust Stock dialog.	
 	 */
 	def adjustStock = {

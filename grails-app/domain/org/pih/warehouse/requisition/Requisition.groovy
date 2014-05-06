@@ -127,7 +127,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
         //week formula('WEEK(date_requested)')    //provide the exact column name of the date field
         //month formula('MONTH(date_requested)')
-        monthRequested formula: "date_format(date_requested, '%M-%Y')"
+        monthRequested formula: "date_format(date_requested, '%M %Y')"
         //yearRequested formula: "date_format(date_requested, '%Y')"
         //comments cascade: "all-delete-orphan"
         //documents cascade: "all-delete-orphan"

@@ -4,12 +4,12 @@
 	<div id="transactionLogTabs" class="tabs">												
 		<ul>
 			<li><a href="#tabs-1" id="current-stock-tab"><warehouse:message code="inventory.currentStockCurrentLocation.label" default="Current Location"/></a></li>
-            <li><a href="/openboxes/inventoryItem/showAlternativeProducts/${commandInstance?.productInstance?.id}"><warehouse:message code="product.alternativeProducts.label" default="Alternative products"/></a></li>
-            <li><a href="/openboxes/inventoryItem/showCurrentStockAllLocations/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.currentStockAllLocations.label" default="All Locations"/></a></li>
-            <li><a href="/openboxes/inventoryItem/showStockHistory/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
-            <li><a href="/openboxes/inventoryItem/showPendingRequisitions/${commandInstance?.productInstance?.id}"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>
-            <li><a href="/openboxes/inventoryItem/showPendingShipments/${commandInstance?.productInstance?.id}"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
-            <li><a href="/openboxes/inventoryItem/showConsumption/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.consumption.label" default="Consumption"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showAlternativeProducts/${commandInstance?.productInstance?.id}"><warehouse:message code="product.alternativeProducts.label" default="Alternative products"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showCurrentStockAllLocations/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.currentStockAllLocations.label" default="All Locations"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showStockHistory/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showPendingRequisitions/${commandInstance?.productInstance?.id}"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showPendingShipments/${commandInstance?.productInstance?.id}"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showConsumption/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.consumption.label" default="Consumption"/></a></li>
 
             <%--
 			<li><a href="#tabs-2"><warehouse:message code="inventory.stockHistory.label"/></a></li>
