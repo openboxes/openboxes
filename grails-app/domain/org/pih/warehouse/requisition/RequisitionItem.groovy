@@ -501,7 +501,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         } catch (Exception e) {
 
         }
-        log.debug "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
+        //log.debug "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return quantityPicked?:0
     }
@@ -511,14 +511,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 		def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
 
 
-        log.debug "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
+        //log.debug "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
         return quantityRemaining
 	}
 
     def calculateNumInventoryItem(Inventory inventory) {
         long startTime = System.currentTimeMillis()
         def numInventoryItem = InventoryItem.findAllByProduct(product).size()
-        log.debug "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
+        //log.debug "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
         return numInventoryItem
     }
 
