@@ -11,25 +11,34 @@ class CalculateQuantityJob {
     def inventoryService
 
     static triggers = {
-
-        //simple startDelay: 10000, repeatInterval: 86400000l
-        //simple startDelay: 30000, repeatInterval: 86400000l
-		//simple name:'simpleTrigger', startDelay:10000, repeatInterval: 30000, repeatCount: 10
+        //simple startDelay: 30000, repeatInterval: 1000l * 60 * 10 * 1 //* 60 * 24;  // every 24 hours
 		//cron name:'cronTrigger', startDelay:10000, cronExpression: '0/6 * 15 * * ?'
-		//custom name:'customTrigger', triggerClass:MyTriggerClass, myParam:myValue, myAnotherParam:myAnotherValue
 	}
 
 
 	
 	
-	def execute() {
-        def date = new Date()
-        log.info "Executing CalculateQuantityJob on ${date}"
-		def startTime = System.currentTimeMillis()
-        log.info "Starting inventory snapshot process " + new Date()
-        inventoryService.createOrUpdateInventorySnapshot(date)
-		println "Finished inventory snapshot process " + new Date()
-	}
+	def execute(context) {
+
+        def startTime = System.currentTimeMillis()
+        //def date = context.mergedJobDataMap.get('date')?:new Date()
+
+
+        println "not started yet"
+        def transactionDates = inventoryService.getTransactionDates()
+        transactionDates.each { date ->
+
+            log.info "Executing CalculateQuantityJob for date ${date}"
+            log.info "Starting inventory snapshot process " + new Date()
+
+            inventoryService.createOrUpdateInventorySnapshot(date)
+
+            println "Finished inventory snapshot process " + new Date()
+            println "Finished calculate quantity job ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+            println "=".multiply(60)
+        }
+
+    }
 
 
 }

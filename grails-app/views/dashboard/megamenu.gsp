@@ -249,9 +249,11 @@
 			<warehouse:message code="report.label" />
 		</a>
 		<div class="buttonsBar" style="min-width: 200px;">
+            <%--
             <div class="megaButton">
-                <g:link controller="report" action="showInventoryReport"><warehouse:message code="report.showInventoryReport.label" default="Show inventory report"/></g:link>
+                <g:link controller="report" action="list"><warehouse:message code="report.list.label" default="List reports"/></g:link>
             </div>
+            --%>
             <div class="megaButton">
                 <g:link controller="inventory" action="show">
                     <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH report"/>
@@ -396,7 +398,24 @@
     </li>
 </g:authorize>
 <g:isUserAdmin>
-		<li><a href="javascript:void(0)"> <warehouse:message code="admin.label" /></a>
+        <li><a href="javascript:void(0)"> <warehouse:message code="analytics.label" default="Analytics"/></a>
+			<div style="min-width: 200px;">
+				<div class="buttonsBar">
+                    <div class="megaButton">
+                        <g:link controller="inventoryBrowser" action="index" class="list">
+                            <warehouse:message code="inventory.browse.label" default="Inventory browser" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="inventorySnapshot" action="list" class="list">
+                            <warehouse:message code="inventory.snapshot.label" default="Inventory snapshots" />
+                        </g:link>
+                    </div>
+                </div>
+            </div>
+        </li>
+
+		<li><a href="javascript:void(0)"> <warehouse:message code="configuration.label" default="Configuration" /></a>
 			<div style="min-width: 200px;">
 				<div class="buttonsBar">
                     <div class="megaButton">
