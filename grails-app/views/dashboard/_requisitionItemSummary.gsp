@@ -32,6 +32,7 @@
 	<div class="widget-content" style="padding:0px;; margin:0">
         <table id="dataTable">
             <thead>
+                <th>Rank</th>
                 <th>Product</th>
                 <th>Count</th>
                 <th>Quantity</th>
@@ -95,6 +96,7 @@
             "aoColumns": [
 
                 //{ "mData": "id", "bVisible":false }, // 0
+                { "mData": "rank", "sWidth": "5%" }, // 0
                 { "mData": "name" }, // 0
                 { "mData": "count", "sWidth": "5%"  }, // 1
                 { "mData": "quantity", "sWidth": "5%"  } // 2
@@ -102,13 +104,13 @@
 
             ],
             "bUseRendered": false,
-            "aaSorting": [[ 2, "desc" ], [1, "desc"]],
+            "aaSorting": [[ 2, "desc" ], [3, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 console.log(nRow);
                 console.log(aData);
                 console.log(iDisplayIndex);
 
-                $('td:eq(0)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
+                $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
                         aData["name"] + '</a>');
                 return nRow;
             }
