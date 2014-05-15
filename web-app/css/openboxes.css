@@ -137,9 +137,6 @@ input:focus, select:focus, textarea:focus {
 .linkButton a.create {
     background: url(../images/icons/silk/add.png) center left no-repeat;
 }
-.linkButton a.new {
-    background: url(../images/skin/new.png) center left no-repeat;
-}
 
 .linkButton a.ALL {
     background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
@@ -553,15 +550,6 @@ th.desc a {
 }
 .linkButton a.shipperService {
     background: url(../images/icons/silk/map.png) center left no-repeat;
-}
-.linkButton a.ups {
-    background: url(../images/icons/ups.jpg) center left no-repeat;
-}
-.linkButton a.usps {
-    background: url(../images/icons/usps.jpg) center left no-repeat;
-}
-.linkButton a.fedex {
-    background: url(../images/icons/fedex.jpg) center left no-repeat;
 }
 .linkButton a.browse {
     background: url(../images/icons/browse.png) center left no-repeat;
@@ -1106,12 +1094,9 @@ button.action-btn, button.previous, button.next {
     -webkit-border-radius: 999px;
     -moz-border-radius: 999px;
     border-radius: 999px;
-    behavior: url(PIE.htc);
-
     width: 12px;
     height: 12px;
     padding: 4px;
-
     background: lightyellow;
     border: 1px solid #666;
     color: #666;
@@ -1945,8 +1930,8 @@ fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; }
 .progressbar { width: 250px; height: 20px; }
 #progressbar {  padding: 10px; margin: 10px; }
-#progressbar .step { padding-left: 0; border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
-#progressbar .caption​ { width: 50px; margin: 0 auto; }​
+#progressbar .step { border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
+#progressbar .caption { width: 50px; margin: 0 auto; }​
 .step.selected { font-weight: bold; text-decoration: underline; background-color: #f7f7f7 /*#F8F7EF*/; }
 span.right { float: left; }
 span.left { width: 10%;  float: left; text-align: center; }
