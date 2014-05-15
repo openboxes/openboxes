@@ -23,9 +23,6 @@ class ReportController {
 	def productService
 	def reportService
 
-    def showInventoryReport = {
-
-    }
 
     def getCsv(list) {
         println list
