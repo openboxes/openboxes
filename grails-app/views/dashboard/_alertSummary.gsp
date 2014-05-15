@@ -144,3 +144,49 @@
 	</div>
 </div>
 
+<script>
+    $(window).load(function(){
+
+        $.ajax({
+            dataType: "json",
+            timeout: 60000,
+            url: "${request.contextPath}/json/getDashboardAlerts?location.id=${session.warehouse.id}",
+            //data: data,
+            success: function (data) {
+                console.log(data);
+                // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
+                $('#lowStockCount').html(data.lowStock?data.lowStock:0);
+                $('#overStockCount').html(data.overStock?data.overStock:0);
+                $('#reconditionedStockCount').html(data.reconditionedStock?data.reconditionedStock:0);
+                $('#totalStockCount').html(data.totalStock?data.totalStock:0);
+                $('#inStockCount').html(data.inStock?data.inStock:0);
+                $('#onHandQuantityZeroCount').html(data.onHandQuantityZero?data.onHandQuantityZero:0);
+                $('#outOfStockCount').html(data.outOfStock?data.outOfStock:0);
+                //$('#outOfStockCountClassA').html(data.outOfStockClassA?data.outOfStockClassA:0);
+                //$('#outOfStockCountClassB').html(data.outOfStockClassB?data.outOfStockClassB:0);
+                //$('#outOfStockCountClassC').html(data.outOfStockClassC?data.outOfStockClassC:0);
+                //$('#outOfStockCountClassNone').html(data.outOfStockClassNone?data.outOfStockClassNone:0);
+                $('#reorderStockCount').html(data.reorderStock?data.reorderStock:0);
+
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                $('#lowStockCount').html("ERROR " + error);
+                $('#overStockCount').html("ERROR " + error);
+                $('#reconditionedStockCount').html("ERROR " + error);
+                $('#onHandQuantityZeroCount').html("ERROR " + error);
+                $('#totalStockCount').html("ERROR " + error);
+                $('#inStockCount').html("ERROR " + error);
+                $('#outOfStockCount').html("ERROR " + error);
+                //$('#outOfStockCountClassA').html("ERROR: " + error);
+                //$('#outOfStockCountClassB').html("ERROR: " + error);
+                //$('#outOfStockCountClassC').html("ERROR: " + error);
+                //$('#outOfStockCountClassNone').html("ERROR: " + error);
+                $('#reorderStockCount').html("ERROR " + error);
+
+            }
+        });
+    });
+</script>

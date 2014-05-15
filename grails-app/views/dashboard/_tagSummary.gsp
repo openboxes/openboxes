@@ -37,14 +37,16 @@
             <g:if test="${tags}">
                 <div id="tagcloud">
                     <g:each in="${tags }" var="tag">
-                        <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
-                            ${tag.tag } (${tag?.products?.size() })</g:link>
-                        <g:if test="${params.editTags}">
-                            <g:isUserAdmin>
-                                <g:link controller="dashboard" action="hideTag" id="${tag.id}" params="[editTags:true]">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
-                            </g:isUserAdmin>
-                            <br/>
+                        <g:if test="${tag?.products?.size() > 1}">
+                            <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
+                                ${tag.tag?:"Empty tag name" } (${tag?.products?.size() })</g:link>
+                            <g:if test="${params.editTags}">
+                                <g:isUserAdmin>
+                                    <g:link controller="dashboard" action="hideTag" id="${tag.id}" params="[editTags:true]">
+                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
+                                </g:isUserAdmin>
+                                <br/>
+                            </g:if>
                         </g:if>
 
                     </g:each>
@@ -93,3 +95,22 @@
 		<div class="clear"></div>
 	</div>
 </div>
+<script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
+
+<script>
+
+    $(window).load(function(){
+        $("#tagcloud a").tagcloud({
+            size: {
+                start:1.2,
+                end: 1.5,
+                unit: 'em'
+            },
+            color: {
+                start: "#aaa", // "#CDE"
+                end: "#F52"//"#FS2"
+            }
+        });
+    });
+
+</script>

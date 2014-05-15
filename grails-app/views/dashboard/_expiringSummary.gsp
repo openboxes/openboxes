@@ -82,3 +82,36 @@
 		</div>
 	</div>
 </div>
+<script>
+    $(window).load(function(){
+        $.ajax({
+            dataType: "json",
+            timeout: 60000,
+            url: "${request.contextPath}/json/getDashboardExpiryAlerts?location.id=${session.warehouse.id}",
+            //data: data,
+            success: function (data) {
+                console.log(data);
+                // Expiration
+                $('#expiredStockCount').html(data.expired?data.expired:0);
+                $('#expiringIn30DaysStockCount').html(data.within30Days?data.within30Days:0);
+                $('#expiringIn60DaysStockCount').html(data.within60Days?data.within60Days:0);
+                $('#expiringIn90DaysStockCount').html(data.within90Days?data.within90Days:0);
+                $('#expiringIn180DaysStockCount').html(data.within180Days?data.within180Days:0);
+                $('#expiringIn365DaysStockCount').html(data.within365Days?data.within365Days:0);
+
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                // Expiration
+                $('#expiredStockCount').html("ERROR " + error);
+                $('#expiringIn30DaysStockCount').html("ERROR " + error);
+                $('#expiringIn60DaysStockCount').html("ERROR " + error);
+                $('#expiringIn90DaysStockCount').html("ERROR " + error);
+                $('#expiringIn180DaysStockCount').html("ERROR " + error);
+                $('#expiringIn365DaysStockCount').html("ERROR " + error);
+            }
+        });
+    });
+</script>
