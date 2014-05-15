@@ -280,9 +280,9 @@ log4j = {
 			'org.docx4j',
 			'org.apache.http.headers',
 			'org.apache.ddlutils',
-			'org.apache.http.wire',
+			//'org.apache.http.wire',
 			'net.sf.ehcache.hibernate',
-            'org.hibernate.SQL',
+            //'org.hibernate.SQL',
             //'org.hibernate.type',
             'org.hibernate.cache'
             'org.apache.ddlutils'
@@ -307,11 +307,16 @@ log4j = {
 
    debug 	'org.apache.cxf',
             'grails.plugin.rendering',
+           //'org.hibernate.transaction',
+           //'org.hibernate.jdbc',
+           //'org.hibernate.SQL'
 
            //'com.gargoylesoftware.htmlunit',
             'org.apache.http.wire'        // shows traffic between htmlunit and server
 
    trace    'org.hibernate.type.descriptor.sql.BasicBinder'
+           //'org.hibernate.type'
+
 
 }
 
@@ -409,6 +414,9 @@ openboxes.uservoice.widget.position = "bottom-left"
 // JIRA Issue Collector
 openboxes.jira.issue.collector.enabled = true
 openboxes.jira.issue.collector.url = "https://openboxes.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_USgc5zl3-1988229788/6318/12/1.4.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=fb813fdb"
+
+// Barcode scanner
+openboxes.scannerDetection.enabled = true
 
 /**
  * Global Properties

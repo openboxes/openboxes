@@ -1184,6 +1184,26 @@ class JsonController {
         render ([quantityMap:quantityMap] as JSON)
     }
 
+
+    def scanBarcode = {
+        def url
+        def barcode = params.barcode
+
+        def product = Product.findByProductCode(barcode);
+        if (product) {
+            url = g.createLink(controller: "inventoryItem", action: "showStockCard", id: product.id)
+        }
+        else {
+            def requisition = Requisition.findByRequestNumber(barcode);
+            if (requisition) {
+                url = g.createLink(controller: "requisition", action: "show", id: requisition.id)
+            }
+        }
+        render ([url:url,barcode:barcode] as JSON)
+    }
+
+
+
     def getMostRequestedItems = {
 
         def data = [:]
@@ -1221,7 +1241,8 @@ class JsonController {
                 }
             }
 
-            data.results = results.collect { [ id: it[0], name: it[1], count: it[2], quantity: it[3]]  }
+            def count = 1;
+            data.results = results.collect { [ id: it[0], name: it[1], count: it[2], quantity: it[3], rank: count++]  }
 
 
 
