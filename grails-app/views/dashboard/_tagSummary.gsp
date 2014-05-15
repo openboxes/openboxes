@@ -34,28 +34,55 @@
 
 	<div class="widget-content">
         <div id="tag-summary">
-            <g:if test="${tags}">
-                <div id="tagcloud">
-                    <g:each in="${tags }" var="tag">
-                        <g:if test="${tag?.products?.size() > 1}">
-                            <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
-                                ${tag.tag?:"Empty tag name" } (${tag?.products?.size() })</g:link>
-                            <g:if test="${params.editTags}">
-                                <g:isUserAdmin>
-                                    <g:link controller="dashboard" action="hideTag" id="${tag.id}" params="[editTags:true]">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
-                                </g:isUserAdmin>
-                                <br/>
-                            </g:if>
-                        </g:if>
-
-                    </g:each>
-                </div>
+            <g:if test="${params.editTags}">
+                <g:isUserAdmin>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><warehouse:message code="tag.name.label" default="Tag"/></th>
+                                <th><warehouse:message code="tag.count.label" default="Count"/></th>
+                                <th><warehouse:message code="tag.active.label" default="Active"/></th>
+                                <th><warehouse:message code="default.actions.label"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <g:each in="${tags }" var="tag" status="i">
+                                <tr class="${i%2?'odd':'even'}">
+                                    <td>
+                                        ${tag.tag?:"Empty tag"}
+                                    </td>
+                                    <td>
+                                        ${tag?.products?.size()?:0}
+                                    </td>
+                                    <td>
+                                        ${tag.isActive}
+                                    </td>
+                                    <td>
+                                        <g:link controller="dashboard" action="hideTag" id="${tag.id}" params="[editTags:true]">
+                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
+                                    </td>
+                                </tr>
+                            </g:each>
+                        </tbody>
+                    </table>
+                </g:isUserAdmin>
             </g:if>
             <g:else>
-                <div style="margin:10px;" class="center">
-                    <span class="fade"><warehouse:message code="tag.noTags.label"/></span>
-                </div>
+                <g:if test="${tags}">
+                    <div id="tagcloud">
+                        <g:each in="${tags }" var="tag">
+                            <g:if test="${tag?.products?.size() > 1}">
+                                <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
+                                    ${tag.tag?:"Empty tag" } (${tag?.products?.size() })</g:link>
+                            </g:if>
+                        </g:each>
+                    </div>
+                </g:if>
+                <g:else>
+                    <div style="margin:10px;" class="center">
+                        <span class="fade"><warehouse:message code="tag.noTags.label"/></span>
+                    </div>
+                </g:else>
             </g:else>
         </div>
 
