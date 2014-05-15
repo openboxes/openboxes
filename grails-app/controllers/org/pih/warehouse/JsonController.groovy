@@ -12,11 +12,13 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import groovy.time.TimeCategory
 import java_cup.runtime.virtual_parse_stack
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -1169,10 +1171,6 @@ class JsonController {
         render (data.productGroupSummary as JSON)
     }
 
-
-
-
-
     def mostRecentQuantityOnHand = {
         def product = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
@@ -1185,5 +1183,55 @@ class JsonController {
         def quantityMap = inventoryService.getQuantityMap(location)
         render ([quantityMap:quantityMap] as JSON)
     }
+
+    def getMostRequestedItems = {
+
+        def data = [:]
+        println "getRequisitionItems: " + params
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        try {
+            def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+            def date = new Date()
+            if (params.date) {
+                date = dateFormat.parse(params.date)
+                date.clearTime()
+            }
+            data.location = location.id
+            data.startDate = date-30
+            data.endDate = date
+
+            def criteria = RequisitionItem.createCriteria()
+            def results = criteria.list {
+                requisition {
+                    eq("destination", location)
+                    between("dateRequested", date-30, date)
+                }
+                projections {
+                    product {
+                        groupProperty('id')
+                        groupProperty('name')
+                    }
+                    countDistinct('id', "occurrences")
+                    sum("quantity", "quantity")
+                }
+                order('occurrences','desc')
+                order('quantity','desc')
+                if (params.max) {
+                    maxResults(params.max as int)
+                }
+            }
+
+            data.results = results.collect { [ id: it[0], name: it[1], count: it[2], quantity: it[3]]  }
+
+
+
+        } catch (Exception e) {
+            log.error("Error occurred while getting requisition items " + e.message, e)
+            data = e.message
+        }
+
+        render ([aaData: data.results?:[]] as JSON)
+    }
+
 
 }
