@@ -32,7 +32,7 @@
 			</g:link>
 		</div>		
 	</div>
-</span>
+</div>
 
 <script>
 	$(document).ready(function() {

@@ -79,15 +79,15 @@
 		   		
 					<div class="box">
                         <h2>
-                            <warehouse:message code="default.results.label" default="Results"/> | ${inventoryItems.size()} expired inventory items
+                            <warehouse:message code="inventoryItems.expiring.label" default="Expiring inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
                         </h2>
                         <div class="">
                             <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
                                 <table>
                                     <thead>
-                                        <tr class="odd">
-                                            <th class="center" style="width: 50px; text-align: center;">
-                                                <input type="checkbox" id="toggleCheckbox"/>
+                                        <tr class="odd" style="height:50px;">
+                                            <th class="center middle">
+                                                <input type="checkbox" id="toggleCheckbox" class="middle"/>
                                             </th>
                                             <th><warehouse:message code="product.productCode.label"/></th>
                                             <th><warehouse:message code="product.label"/></th>
