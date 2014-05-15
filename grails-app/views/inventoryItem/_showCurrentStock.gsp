@@ -4,6 +4,11 @@
     </div>
 </g:hasErrors>
 
+<g:hasErrors bean="${flash.itemInstance}">
+    <div class="errors dialog">
+        <g:renderErrors bean="${flash.itemInstance}" as="list" />
+    </div>
+</g:hasErrors>
 
 <div class="box">
     <h2>Current stock ${session.warehouse.name}</h2>
@@ -53,7 +58,9 @@
                         </td>
                         <td class="middle">
                             <g:if test="${itemInstance?.expirationDate}">
-                                <format:expirationDate obj="${itemInstance?.expirationDate}"/>
+                                <prettytime:display date="${itemInstance?.expirationDate}"/>
+                                <span class="fade">(<format:date obj="${itemInstance?.expirationDate}"  format="MMM dd, yyyy"/>)</span>
+
                             </g:if>
                             <g:else>
                                 <span class="fade"><warehouse:message code="default.never.label"/></span>
