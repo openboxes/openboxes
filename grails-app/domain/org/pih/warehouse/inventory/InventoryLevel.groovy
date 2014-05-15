@@ -18,6 +18,7 @@ class InventoryLevel {
 	String id
 	InventoryStatus status = InventoryStatus.SUPPORTED;
 	//Boolean supported = Boolean.TRUE;
+    Boolean preferred = Boolean.FALSE
 	Product product;	
 	Integer minQuantity;			// Should warn user when quantity is below this value
 	Integer reorderQuantity;		// Should reorder product when quantity falls below this value
@@ -51,6 +52,7 @@ class InventoryLevel {
 		maxQuantity(nullable:true, range: 0..2147483646)
 		binLocation(nullable:true)
         abcClass(nullable: true)
+        preferred(nullable: true)
 	}
 
     def statusMessage(Integer currentQuantity) {

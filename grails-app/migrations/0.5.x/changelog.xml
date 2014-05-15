@@ -56,6 +56,7 @@
     <include file="0.5.x/modify-column-product-package-price.xml"/>
     <include file="0.5.x/add-column-synonym-locale.xml"/>
     <include file="0.5.x/add-column-inventory-snapshot-date.xml"/>
+    <include file="0.5.x/add-column-inventory-level-preferred.xml"/>
 
     <!--
     <include file="0.5.x/create-table-reason-code.xml"/>
