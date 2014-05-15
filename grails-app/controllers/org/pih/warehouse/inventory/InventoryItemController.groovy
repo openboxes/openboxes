@@ -290,6 +290,14 @@ class InventoryItemController {
     }
 
 
+    def showInventorySnapshot = {
+        def location = Location.get(session.warehouse.id)
+        def product = Product.get(params.id)
+        def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
+        render(template: "showInventorySnapshot", model: [inventorySnapshots:inventorySnapshots, product:product])
+
+    }
+
     /*
     def exportStockHistory = {
         def location = Location.get(session.warehouse.id)

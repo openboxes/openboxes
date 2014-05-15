@@ -1202,6 +1202,67 @@ class JsonController {
         render ([url:url,barcode:barcode] as JSON)
     }
 
+    def getQuantityOnHandByMonth = {
+        println params;
+        def dates = []
+        def numMonths = (params.numMonths as int)?:12
+        def location = Location.get(params.location.id)
+        def product = Product.get(params.product.id)
+
+        use(groovy.time.TimeCategory) {
+            def today = new Date()
+            numMonths.times { i ->
+                println today - (i+1).months
+                dates << (today - (i+1).months)
+            }
+        }
+
+        // initialize data
+        def data = dates.reverse().inject([:].withDefault { [label: null, days: 0, totalQuantity: 0, maxQuantity: 0, month: 0, year: 0] }) { map, date ->
+            def dateKey = date.format("MMM-yyyy")
+            map[dateKey].label = dateKey
+            map[dateKey].month = date.month
+            map[dateKey].year = date.year
+            map[dateKey].totalQuantity = 0
+            map[dateKey].maxQuantity = 0
+            map[dateKey].days = 0
+            map
+        }
+
+
+        def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
+        println "inventorySnapshots: " + inventorySnapshots
+        def items = inventorySnapshots.collect { [date:it.date, quantityOnHand:it.quantityOnHand] }
+        items.each { item ->
+            def dateKey = item.date.format("MMM-yyyy")
+            data[dateKey].label = dateKey
+            data[dateKey].month = item.date.month
+            data[dateKey].year = item.date.year
+            data[dateKey].totalQuantity += item.quantityOnHand
+            if (item.quantityOnHand > data[dateKey].maxQuantity) {
+                data[dateKey].maxQuantity = item.quantityOnHand
+            }
+            data[dateKey].days++
+            data
+        }
+
+
+        //(value.totalQuantity/value.days?:1)
+        def newData = []
+        data.each { key, value ->
+            if (value.days) {
+                //newData << [key, (value.totalQuantity/value.days) ]
+                newData << [key, (value.maxQuantity) ]
+            }
+            else {
+                newData << [key, 0]
+            }
+        }
+
+        render ([label: "QoH ${product?.name}", location: "${location.name}", data:newData] as JSON);
+    }
+
+
     def getInventorySnapshotsByDate = {
         println "getInventorySnapshotsByDate: " + params
         def data = []

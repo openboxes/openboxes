@@ -2,8 +2,10 @@
 	<div id="placeholder"
 		style="width: 400px; height: 300px; text-align: center;"></div>
 </div>
+<%--
 <script language="javascript" src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.min.js')}" type="text/javascript" ></script>
 <script language="javascript" type="text/javascript" src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.pie.min.js')}"></script>
+--%>
 <script type="text/javascript">
 $(function () {
     var data = [];

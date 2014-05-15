@@ -10,6 +10,7 @@
             <li><a href="${request.contextPath}/inventoryItem/showPendingRequisitions/${commandInstance?.productInstance?.id}"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showPendingShipments/${commandInstance?.productInstance?.id}"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showConsumption/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.consumption.label" default="Consumption"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showInventorySnapshot/${commandInstance?.productInstance?.id}"><warehouse:message code="inventory.snapshot.label" default="Snapshot"/></a></li>
 
             <%--
 			<li><a href="#tabs-2"><warehouse:message code="inventory.stockHistory.label"/></a></li>
