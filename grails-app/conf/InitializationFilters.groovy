@@ -19,7 +19,7 @@ class InitializationFilters {
 			before = {
 				try {
 					// Make sure all session variables are initialized
-					if (!session.warehouse) { 
+					if (!session.loginLocations) {
 						Location currentLocation = Location.get(session?.warehouse?.id)
                         session._showTime = true
 						session.loginLocations = locationService.getLoginLocations(currentLocation) 			

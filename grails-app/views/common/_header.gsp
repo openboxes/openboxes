@@ -201,25 +201,19 @@
                                                         <div style="max-height: 400px; overflow: auto;">
                                                             <table>
                                                                 <g:set var="count" value="${0 }"/>
-
+                                                                <g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/>
                                                                 <g:each var="entry" in="${session.loginLocationsMap}" status="i">
                                                                     <tr class="prop">
                                                                         <td class="name">
-                                                                            <g:if test="${!entry?.key }">
-                                                                                <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-                                                                            </g:if>
-                                                                            <g:else>
-                                                                                <h3>${entry.key }</h3>
-                                                                            </g:else>
+                                                                            <h3>${entry.key }</h3>
                                                                         </td>
                                                                         <td class="value">
                                                                             <div>
                                                                                 <g:each var="warehouse" in="${entry.value.sort() }">
+                                                                                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
                                                                                     <div class="left" style="margin: 1px;">
-                                                                                        <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                                                                        <a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+                                                                                        <a class="button big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
                                                                                             <format:metadata obj="${warehouse}"/>
-
                                                                                         </a>
                                                                                     </div>
                                                                                 </g:each>
@@ -227,6 +221,23 @@
                                                                         </td>
                                                                     </tr>
                                                                 </g:each>
+                                                                <tr class="prop">
+                                                                    <td class="name">
+                                                                        <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
+                                                                    </td>
+                                                                    <td class="value">
+                                                                        <div>
+                                                                            <g:each var="warehouse" in="${nullLocationGroup }" status="status">
+                                                                                <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+                                                                                <div class="left" style="margin: 1px;">
+                                                                                    <a href='${createLink(action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}' class="button big">
+                                                                                        <format:metadata obj="${warehouse}"/>
+                                                                                    </a>
+                                                                                </div>
+                                                                            </g:each>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                                             </table>
                                                         <%--
                                                         <div class="prop">
