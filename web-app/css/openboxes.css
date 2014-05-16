@@ -2999,3 +2999,15 @@ ul.filter-list {
     margin-right: 90px;
 }
 
+/* =============================================================================
+    Data Table CSS
+   ========================================================================== */
+
+table.dataTable tbody tr.odd { background-color: #f7f7f7;; }
+table.dataTable tbody tr.even { background-color: #fff; }
+
+table.dataTable tbody tr.odd td.sorting_1 { background-color: #f7f7f7;; }
+table.dataTable tbody tr.even td.sorting_1 { background-color: #fff; }
+
+table.dataTable tbody tr.odd td.sorting_2 { background-color: #f7f7f7;; }
+table.dataTable tbody tr.even td.sorting_2 { background-color: #fff; }
