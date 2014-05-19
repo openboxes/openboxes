@@ -14,8 +14,8 @@
 	    		<table>
 					<tr>
 						<td width="30%">
-                            <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="requisitionItemSummary"/>
+                            <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="receiptSummary"/>
                             <g:render template="shipmentSummary"/>
                             <g:render template="indicatorSummary"/>
