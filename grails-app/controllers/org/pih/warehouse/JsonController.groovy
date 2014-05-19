@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
@@ -27,6 +28,7 @@ import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 import java.text.SimpleDateFormat
@@ -1186,20 +1188,39 @@ class JsonController {
 
 
     def scanBarcode = {
+        println "Scan barcode: " + params
+
         def url
+        def type
         def barcode = params.barcode
 
         def product = Product.findByProductCode(barcode);
         if (product) {
-            url = g.createLink(controller: "inventoryItem", action: "showStockCard", id: product.id)
+            url = g.createLink(controller: "inventoryItem", action: "showStockCard", id: product.id, absolute: true)
+            type = "stock card"
         }
         else {
             def requisition = Requisition.findByRequestNumber(barcode);
             if (requisition) {
-                url = g.createLink(controller: "requisition", action: "show", id: requisition.id)
+                url = g.createLink(controller: "requisition", action: "show", id: requisition.id, absolute: true)
+                type = "requisition"
+            }
+            else {
+                def shipment = Shipment.findByShipmentNumber(barcode);
+                if (shipment) {
+                    url = g.createLink(controller: "shipment", action: "showDetails", id: shipment.id, absolute: true)
+                    type = "shipment"
+                }
+                else {
+                    def purchaseOrder = Order.findByOrderNumber(barcode);
+                    if (purchaseOrder) {
+                        url = g.createLink(controller: "purchaseOrder", action: "show", id: purchaseOrder.id, absolute: true)
+                        type = "purchase order"
+                    }
+                }
             }
         }
-        render ([url:url,barcode:barcode] as JSON)
+        render ([url:url,type:type,barcode:barcode] as JSON)
     }
 
     def getQuantityOnHandByMonth = {
