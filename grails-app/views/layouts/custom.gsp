@@ -325,8 +325,8 @@
 
         // Instantiate megamenu
         $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
-        $(".chzn-select").chosen();
-        $(".chzn-select-deselect").chosen({allow_single_deselect:true});
+        $(".chzn-select").chosen({ width: '100%' });
+        $(".chzn-select-deselect").chosen({ allow_single_deselect:true, width: '100%' });
 
         //$(".chzn-select").live('load',function(){
         //    $(this).chosen();
