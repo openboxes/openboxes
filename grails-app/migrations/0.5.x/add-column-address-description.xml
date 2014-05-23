@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1400872521050-1">
+    	<preConditions onFail="MARK_RAN">
+    		<not>
+    			<columnExists tableName="address" columnName="description"/>
+			</not>
+    	</preConditions>
+        <addColumn tableName="address">
+            <column name="description" type="VARCHAR(4000)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1400872521050-2">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="address2" tableName="address"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1400872521050-3">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="city" tableName="address"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1400872521050-4">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="state_or_province" tableName="address"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1400872521050-5">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="country" tableName="address"/>
+    </changeSet>
+</databaseChangeLog>

@@ -48,43 +48,31 @@
                         <div class="dialog box">
                             <h2>Filters</h2>
                             <g:form action="list" method="get">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <label><warehouse:message code="location.name.label"/></label>
-                                        </td>
-                                        <td>
-                                            <g:textField name="q" size="30" value="${params.q }" class="text" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label><warehouse:message code="location.locationType.label"/></label>
-                                        </td>
-                                        <td>
+                                <div>
+                                    <div class="filter-list-item">
+                                            <label class="clear"><warehouse:message code="location.name.label"/></label>
+                                            <g:textField name="q" value="${params.q }" class="text" />
+                                    </div>
+                                    <div class="filter-list-item">
+                                            <label class="clear"><warehouse:message code="location.locationType.label"/></label>
                                             <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
                                                       optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
                                                       value="${params?.locationType?.id}" noSelection="['null':'']" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label><warehouse:message code="location.locationGroup.label"/></label>
-                                        </td>
-                                        <td>
+                                    </div>
+                                    <div class="filter-list-item">
+
+                                            <label class="clear"><warehouse:message code="location.locationGroup.label"/></label>
                                             <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
                                                       optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
                                                       value="${params?.locationGroup?.id}" noSelection="['null':'']" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2" class="right">
+                                    </div>
+                                    <hr/>
+                                    <div class="filter-list-item center">
                                             <button type="submit" class="button icon search">
                                                 ${warehouse.message(code: 'default.button.find.label')}
                                             </button>
-                                        </td>
-                                    </tr>
-                                </table>
+                                    </div>
+                                </div>
                             </g:form>
                         </div>
 
@@ -114,18 +102,17 @@
                                 <tbody>
                                     <g:each in="${locationInstanceList}" status="i" var="locationInstance">
                                         <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
-                                            <td>
+                                            <td class="middle">
                                                 <g:render template="actions" model="[locationInstance:locationInstance]"/>
                                             </td>
-                                            <td>
+                                            <td class="middle">
                                                 <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
                                             </td>
-                                            <td class="left"><format:metadata obj="${locationInstance?.locationType}"/></td>
-                                            <td class="left">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
-                                            <td class="center">
+                                            <td class="left middle"><format:metadata obj="${locationInstance?.locationType}"/></td>
+                                            <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
+                                            <td class="center middle border-right">
                                                 <div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
-                                                    ${locationInstance?.name }<br/>
-                                                    [FG: ${locationInstance?.fgColor }, BG: ${locationInstance?.bgColor }]
+                                                    ${locationInstance?.name }
                                                 </div>
                                             </td>
                                             <td class="left middle">
