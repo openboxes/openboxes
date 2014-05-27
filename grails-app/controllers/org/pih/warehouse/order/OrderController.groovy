@@ -19,6 +19,8 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 class OrderController {
 	def orderService
+    def reportService
+
     static allowedMethods = [save: "POST", update: "POST"]
 
     def index = {
@@ -410,6 +412,56 @@ class OrderController {
 		redirect(action: "fulfill", id: orderInstance?.id)
 		
 	}
+
+    def print = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            return [orderInstance: orderInstance]
+        }
+    }
+
+
+    def renderPdf = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+
+            def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
+
+            // JSESSIONID is required because otherwise the login page is rendered
+            def url = baseUri + params.url + ";jsessionid=" + session.getId()
+            url += "?print=true"
+            url += "&location.id=" + params.location.id
+            url += "&category.id=" + params.category.id
+            url += "&startDate=" + params.startDate
+            url += "&endDate=" + params.endDate
+            url += "&showTransferBreakdown=" + params.showTransferBreakdown
+            url += "&hideInactiveProducts=" + params.hideInactiveProducts
+            url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
+            url += "&includeChildren=" + params.includeChildren
+            url += "&includeEntities=true"
+
+            // Let the browser know what content type to expect
+            //response.setHeader("Content-disposition", "attachment;") // removed filename=
+            response.setContentType("application/pdf")
+
+            // Render pdf to the response output stream
+            log.info "BaseUri is $baseUri"
+            log.info("Session ID: " + session.id)
+            log.info "Fetching url $url"
+            reportService.generatePdf(url, response.getOutputStream())
+
+
+        }
+
+    }
 
 	
 	

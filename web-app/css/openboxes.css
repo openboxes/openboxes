@@ -61,8 +61,11 @@ a:hover {
     text-decoration: underline;
 }
 
-a.button:link,a.button:visited,a.button:hover {
-
+a.button:link,a.button:visited {
+    color:#333;
+}
+a.button:hover {
+    color: white;
 }
 
 
@@ -86,6 +89,7 @@ input, select, textarea, button {
     margin: 2px 0;
     padding: 2px 4px;
 }
+
 select {
     padding: 2px 2px 2px 0;
 }
@@ -3012,3 +3016,10 @@ table.dataTable tbody tr.even td.sorting_1 { background-color: #fff; }
 table.dataTable tbody tr.odd td.sorting_2 { background-color: #f7f7f7;; }
 table.dataTable tbody tr.even td.sorting_2 { background-color: #fff; }
 #dataTable_processing { height: 60px; }
+
+input {
+    -webkit-box-sizing : border-box;
+    -moz-box-sizing : border-box;
+    box-sizing : border-box;
+}
+

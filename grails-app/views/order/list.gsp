@@ -2,22 +2,24 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'orders.label', default: 'Orders').toLowerCase()}" />
-        <title><warehouse:message code="default.view.label" args="[entityName]" /></title>
+        <g:set var="entityName" value="${warehouse.message(code: 'orders.label', default: 'Purchase orders').toLowerCase()}" />
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
     </head>    
     <body>
-        <div class="list">
-            <g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
-            </g:if>
+        <g:if test="${flash.message}">
+            <div class="message">${flash.message}</div>
+        </g:if>
+        <div class="box">
+
+            <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
          	<table>
             	<thead>
 					<tr>   
 						<th>${warehouse.message(code: 'default.actions.label')}</th>
-						<th>${warehouse.message(code: 'default.description.label')}</th>
-						<th>${warehouse.message(code: 'default.origin.label')}</th>					
-						<th>${warehouse.message(code: 'order.orderedOn.label')}</th>
-						<th>${warehouse.message(code: 'default.status.label')}</th>
+                        <th>${warehouse.message(code: 'default.status.label')}</th>
+                        <th>${warehouse.message(code: 'default.description.label')}</th>
+						<th>${warehouse.message(code: 'default.origin.label')}</th>
+						<th>${warehouse.message(code: 'order.orderedBetween.label', default: 'Ordered between')}</th>
 						<th>${warehouse.message(code: 'default.lastUpdated.label')}</th>
 					</tr>
 				</thead>		            
@@ -25,14 +27,23 @@
             		<tr class="prop odd">            
 			            <g:form action="list" method="post">
 			            	<td></td>
-			            	<td></td>
-				           	<td class="filter-list-item">
-					           	<g:select name="origin" 
+                            <td class="filter-list-item middle">
+                                <g:select name="status"
+                                          from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
+                                          optionValue="${{format.metadata(obj:it)}}" value="${status}"
+                                          noSelection="['':warehouse.message(code:'default.all.label')]" />
+                            </td>
+			            	<td>
+                                <g:textField class="text" name="description" value="${params.description}"/>
+
+			            	</td>
+				           	<td class="filter-list-item middle">
+					           	<g:select name="origin" class="chzn-select-deselect"
 					           							from="${suppliers}"
 					           							optionKey="id" optionValue="name" value="${origin}" 
-					           							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
+					           							noSelection="['':warehouse.message(code:'default.all.label')]" />
 							</td>
-				           	<td class="filter-list-item" nowrap="nowrap">
+				           	<td class="filter-list-item middle" nowrap="nowrap">
 					           	<g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
 																	value="${statusStartDate}" format="MM/dd/yyyy"/>
 
@@ -42,15 +53,8 @@
 																	
 								<a href="javascript:void(0);" class="clear-dates"><warehouse:message code="default.clear.label"/></a>
 							</td>
-				           	<td class="filter-list-item">
-					           	<g:select name="status" 
-		           					   from="${org.pih.warehouse.order.OrderStatus.list()}"
-		           					   optionValue="${{format.metadata(obj:it)}}" value="${status}" 
-		           					   noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;	
-							</td>
-				           	<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
-								<button name="filter">
-									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
+				           	<td class="filter-list-item" style="height: 100%; vertical-align: middle">
+								<button name="filter" class="button icon edit">
 									<warehouse:message code="default.button.filter.label"/>
 								</button>
 							</td>
@@ -62,33 +66,35 @@
 		            <g:unless test="${orders}">
 		            	<tr class="prop">
 		            		<td colspan="6">
-			           			<warehouse:message code="shipping.noShipmentsMatchingConditions.message"/>
+                                <div class="empty fade center">
+    			           			<warehouse:message code="orders.none.message"/>
+                                </div>
 				           	</td>
 						</tr>     
 		           	</g:unless>
             
 					<g:each var="orderInstance" in="${orders}" status="i">
 						<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">            
-							<td>
+							<td class="middle">
 								<div class="action-menu">
 									<g:render template="/order/actions" model="[orderInstance:orderInstance,hideDelete:true]"/>
 								</div>	
-							</td>									
-							<td>
+							</td>
+                            <td class="middle">
+                                <format:metadata obj="${orderInstance?.status}"/>
+                            </td>
+							<td class="middle">
 								<g:link action="show" id="${orderInstance.id}">
 									${fieldValue(bean: orderInstance, field: "description")}
 								</g:link>				
 							</td>
-							<td align="center">
+							<td class="middle">
 								${fieldValue(bean: orderInstance, field: "origin.name")}
 							</td>
-							<td align="center">
+							<td class="middle">
 								<format:date obj="${orderInstance?.dateOrdered}"/>
 							</td>
-							<td>												
-								<format:metadata obj="${orderInstance?.status}"/>								
-							</td>
-							<td align="center">
+							<td class="middle">
 								<format:date obj="${orderInstance?.lastUpdated}"/>
 							</td>
                         </tr>

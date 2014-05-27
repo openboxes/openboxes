@@ -21,6 +21,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
@@ -1416,6 +1417,12 @@ class JsonController {
         def data = inventoryService.getFastMovers(location, date, params.max as int)
 
         render ([aaData: data?.results?:[]] as JSON)
+    }
+
+
+    def getOrderItem = {
+        def orderItem = OrderItem.get(params.id)
+        render ([id:orderItem.id, product:orderItem.product, order:orderItem.order, quantity:orderItem.quantity, unitPrice:orderItem.unitPrice] as JSON)
     }
 
 

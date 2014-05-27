@@ -27,8 +27,7 @@
 		<g:form action="receiveOrder" autocomplete="off">
 			<div class="dialog">
 				<fieldset>
-					<g:render template="../order/summary" model="[orderInstance:order]"/>
-					<g:render template="progressBar" model="['state':'processOrderItems']"/>		
+					<g:render template="../order/summary" model="[orderInstance:order, currentState:'processOrderItems']"/>
 					<table>
 						<tr>
 							<td style="padding: 0px;">

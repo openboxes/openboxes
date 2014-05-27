@@ -188,6 +188,7 @@
                 ${warehouse.message(code: 'email.errorReportDisabled.message')}
             </div>
         </g:else>
+
 	</div>
 	
 	<script>

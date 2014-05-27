@@ -29,8 +29,7 @@
 			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>			
 			<div class="dialog">
 				<fieldset>
-					<g:render template="../order/summary" model="[orderInstance:order]"/>
-					<g:render template="progressBar" model="['state':'enterShipmentDetails']"/>	
+					<g:render template="../order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
 					<table>
 						<tbody>
 						
@@ -87,8 +86,8 @@
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
-							<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton> 
-							<g:link action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
+							<g:submitButton class="button" name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
+							<g:link class="button" action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 						</span>
 					</div>
 					
