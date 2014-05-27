@@ -17,6 +17,7 @@ public enum CommodityClass {
     COLD_CHAIN(3),
 	CONTROLLED_SUBSTANCE(4),
 	HAZARDOUS_MATERIAL(5),
+    DURABLE(6),
 
 	int sortOrder
 
@@ -34,6 +35,7 @@ public enum CommodityClass {
 		[
 			CONSUMABLES,
             MEDICATION,
+            DURABLE,
             MIXED,
             COLD_CHAIN,
 			CONTROLLED_SUBSTANCE,
