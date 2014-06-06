@@ -4,38 +4,37 @@
     <meta name="layout" content="analytics" />
 </head>
 
+<div id="error" class="error">
+
+</div>
+
 <div id="body">
     <h2>${session.warehouse.name}</h2>
 
+    <table id="dataTable" class="box">
+        <thead>
+        <tr>
+            <th>Product Group ID</th>
+            <th>Inventory Level ID</th>
+            <th>Status</th>
+            <th>Name</th>
+            <th>Product codes</th>
+            <th>Has Product Group</th>
+            <th>Has Inventory Level</th>
+            <th>Min</th>
+            <th>Reorder</th>
+            <th>Max</th>
+            <th>QoH</th>
+            <th>Total Value</th>
+        </tr>
+        </thead>
+        <tbody>
 
-<table id="dataTable" class="box">
-    <thead>
-    <tr>
-        <th>Product Group ID</th>
-        <th>Inventory Level ID</th>
-        <th>Status</th>
-        <th>Name</th>
-        <th>Product codes</th>
-        <th>Min</th>
-        <th>Reorder</th>
-        <th>Max</th>
-        <th>QoH</th>
-        <th>Total Value</th>
-        <%--
-        <th>Has Product Group</th>
-        <th>Has Inventory Level</th>
-        --%>
-    </tr>
-    </thead>
-    <tbody>
+        </tbody>
+        <tfoot>
 
-    </tbody>
-    <tfoot>
-
-    </tfoot>
-</table>
-
-
+        </tfoot>
+    </table>
 
 </div>
 
@@ -68,8 +67,8 @@
             },
             "iDisplayLength" : -1,
             "aLengthMenu": [
-                [25, 50, 100, 500, 1000, -1],
-                [25, 50, 100, 500, 1000, "All"]
+                [5, 10, 25, 50, 100, 500, 1000, -1],
+                [5, 10, 25, 50, 100, 500, 1000, "All"]
             ],
             "aoColumns": [
                 { "mData": "id", "bSearchable": false, "bVisible": false },
@@ -77,13 +76,13 @@
                 { "mData": "status" }, // 0
                 { "mData": "name", "sWidth": "33%" }, // 1
                 { "mData": "productCodes" }, // 2
+                { "mData": "hasProductGroup" },  // 8
+                { "mData": "hasInventoryLevel" }, // 9
                 { "mData": "minQuantity" }, // 3
                 { "mData": "reorderQuantity" }, // 4
                 { "mData": "maxQuantity" }, // 5
                 { "mData": "onHandQuantity" }, //6
-                { "mData": "totalValue" }, // 7
-                //{ "mData": "hasProductGroup" },  // 8
-                //{ "mData": "hasInventoryLevel" } // 9
+                { "mData": "totalValue" } // 7
                 //{ "mData": "numProducts" }, // 2
                 //{ "mData": "inventoryStatus" }, // 3
 
@@ -167,7 +166,7 @@
                 console.log(xhr);
                 console.log(status);
                 console.log(error);
-                alert("An error occurred: " + error + ".  Please contact your system administrator.")
+                $("#error").html("An error occurred: " + error + ".  Please contact your system administrator.");
 
             }
         });
