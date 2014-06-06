@@ -21,23 +21,44 @@ class CalculateQuantityJob {
 	def execute(context) {
 
         def startTime = System.currentTimeMillis()
-        //def date = context.mergedJobDataMap.get('date')?:new Date()
+        def date = context.mergedJobDataMap.get('date')
+        def product = Product.get(context.mergedJobDataMap.get('productId'))
+        def location = Location.get(context.mergedJobDataMap.get('locationId'))
+
+        println "Execute calculate quantity job " + context.mergedJobDataMap
+        println "Product: " + product
+        println "Location: " + location
+        println "Date: " + date
 
 
-        println "not started yet"
-        def transactionDates = inventoryService.getTransactionDates()
-        transactionDates.each { date ->
 
-            log.info "Executing CalculateQuantityJob for date ${date}"
-            log.info "Starting inventory snapshot process " + new Date()
-
-            inventoryService.createOrUpdateInventorySnapshot(date)
-
-            println "Finished inventory snapshot process " + new Date()
-            println "Finished calculate quantity job ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
-            println "=".multiply(60)
+        if (product && date && location) {
+            println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
+            inventoryService.createOrUpdateInventorySnapshot(date, location, product)
         }
+        else if (product && location) {
+            println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
+            inventoryService.createOrUpdateInventorySnapshot(location, product)
 
+        }
+        else if (date && location) {
+            println "Triggered calculate quantity job for all products at ${location} on ${date}"
+            inventoryService.createOrUpdateInventorySnapshot(date, location)
+        }
+        else if (date) {
+            println "Triggered calculate quantity job for all locations, products on ${date}"
+            inventoryService.createOrUpdateInventorySnapshot(date)
+        }
+        else {
+            println "Triggered calculate quantity job for all dates, locations, products"
+            def transactionDates = inventoryService.getTransactionDates()
+            transactionDates.each { transactionDate ->
+                log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
+                inventoryService.createOrUpdateInventorySnapshot(transactionDate)
+                println "Finished calculate quantity job ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+                println "=".multiply(60)
+            }
+        }
     }
 
 

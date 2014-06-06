@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
@@ -32,6 +33,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
+import util.InventoryUtil
 
 import java.text.ParseException;
 import java.util.Random
@@ -1397,6 +1399,13 @@ class InventoryService implements ApplicationContextAware {
         //log.info "quantityMap: " + quantityMap
 		return quantityMap
 	}
+
+    def getQuantityByProductGroup(Location location) {
+        def quantityMap = getQuantityByProductMap(location.inventory)
+
+        return quantityMap
+    }
+
 
 	/**
 	 * Get a map of quantities (indexed by product) for a particular inventory.
@@ -3452,11 +3461,64 @@ class InventoryService implements ApplicationContextAware {
         def results = Transaction.executeQuery("select transactionDate from Transaction")
 
         results.each { date ->
-        //    //def date = new Date().updated([year: it[0], month: it[1], day: it[2]])
+            //def date = new Date().updated([year: it[0], month: it[1], day: it[2]])
             date.clearTime()
             transactionDates << date
         }
         return transactionDates.unique().sort().reverse()
+    }
+
+
+
+    def getTransactionDates(location, product) {
+        def transactionDates = []
+        def startDate = new Date() - 365 * 5
+        def endDate = new Date()
+        (endDate..startDate).each {
+            it.clearTime()
+            transactionDates.add(it)
+        }
+
+        /*
+        Calendar.with {
+            (2010..2014).each { year ->
+                (JANUARY..DECEMBER).each { month ->
+                    def calendar = instance
+                    calendar[YEAR] = year
+                    calendar[MONTH] = month
+                    calendar[DAY_OF_MONTH] = 1
+                    def date = calendar.getTime()
+                    date.clearTime()
+                    transactionDates.add(date)
+                }
+            }
+        }
+        */
+
+        println "transactionDates: " + transactionDates
+        /*
+        def criteria = TransactionEntry.createCriteria()
+        def results = criteria.list {
+            projections {
+                transaction {
+                    distinct ("transactionDate")
+                }
+            }
+
+            transaction {
+                eq("inventory", location.inventory)
+            }
+            inventoryItem {
+                eq("product", product)
+            }
+        }
+        results.each { date ->
+            date.clearTime()
+            transactionDates << date
+        }
+        */
+
+        return transactionDates
     }
 
     def getDepotLocations() {
@@ -3510,6 +3572,41 @@ class InventoryService implements ApplicationContextAware {
                         }
                     }
                 //}
+            }
+            log.info "Saved inventory snapshot for products over locations"
+        } catch (Exception e) {
+            log.error("Unable to complete inventory snapshot process", e)
+        }
+    }
+
+    def createOrUpdateInventorySnapshot(Location location, Product product) {
+        try {
+            def dates = getTransactionDates(location, product)
+            dates.each { date ->
+                //def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
+                //println "Date ${date}, location ${location}: " + inventorySnapshots
+                //if (inventorySnapshots == 0) {
+                def quantity = getQuantity(product, location, date)
+                log.info "Create or update inventory snapshot for product ${product} at location ${location.name} on date ${date} = ${quantity} ${product.unitOfMeasure}"
+                updateInventorySnapshot(date, product, location, quantity)
+                //}
+            }
+            log.info "Saved inventory snapshot for products over locations"
+        } catch (Exception e) {
+            log.error("Unable to complete inventory snapshot process", e)
+        }
+    }
+
+
+
+    def createOrUpdateInventorySnapshot(date, location, product) {
+        try {
+            def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
+            println "Date ${date}, location ${location}: " + inventorySnapshots
+            if (inventorySnapshots == 0) {
+                log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
+                def quantity = getQuantity(product, location, date)
+                updateInventorySnapshot(date, product, location, quantity)
             }
             log.info "Saved inventory snapshot for products over locations"
         } catch (Exception e) {
@@ -3673,7 +3770,119 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+    def getProductGroupByStatusMap(location) {
 
+        def productGroupMap = [:]
+        def quantityMap = getQuantityByProductGroup(location)
+
+        def entries = []
+        quantityMap.each { key, value ->
+            entries << [product:key, genericProduct: key.genericProduct, currentQuantity: (value>0)?value:0]    // make sure currentQuantity >= 0
+        }
+        entries.sort { it.product.name }
+
+        def inventoryStatusMap = getInventoryStatusAndLevel(location)
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
+        println inventoryLevelMap
+        productGroupMap = entries.inject([:].withDefault { [status:null,name:null,product:null,genericProduct:null,type:null,minQuantity:0,reorderQuantity:0,maxQuantity:0,currentQuantity:0,inventoryLevel:null,productCount:0,products:[]] } ) { map, entry ->
+            def product = entry?.product
+            def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
+            def nameKey = entry?.genericProduct?.description?:entry?.product?.name
+            map[nameKey].name = nameKey
+            map[nameKey].product = entry?.product?.id
+            map[nameKey].genericProduct = entry?.genericProduct?.id
+
+            map[nameKey].type = entry?.genericProduct?"GenericProduct":"Product"
+            map[nameKey].currentQuantity += entry.currentQuantity?:0
+            map[nameKey].productCount++
+
+            if (inventoryLevel?.preferred) {
+                map[nameKey].minQuantity = inventoryLevel?.minQuantity?:0
+                map[nameKey].reorderQuantity = inventoryLevel?.reorderQuantity?:0
+                map[nameKey].maxQuantity = inventoryLevel?.maxQuantity?:0
+                map[nameKey].inventoryLevel = "Preferred"
+                //map[nameKey].status = inventoryLevel.statusMessage(entry?.quantityOnHand)
+            }
+            else {
+                map[nameKey].minQuantity += inventoryLevel?.minQuantity?:0
+                map[nameKey].reorderQuantity += inventoryLevel?.reorderQuantity?:0
+                map[nameKey].maxQuantity += inventoryLevel?.maxQuantity?:0
+                map[nameKey].inventoryLevel = (map[nameKey].productCount>1)?"Multiple":"Single"
+                //map[nameKey].status = inventoryLevel.statusMessage(entry?.quantityOnHand)
+            }
+
+            map[nameKey].products << [
+                    product:entry.product?.name,
+                    productCode: entry?.product?.productCode,
+                    genericProduct: entry?.genericProduct?.description,
+                    status: inventoryLevel?.statusMessage(entry.currentQuantity?:0),
+                    minQuantity:inventoryLevel?.minQuantity?:0,
+                    reorderQuantity:inventoryLevel?.reorderQuantity?:0,
+                    maxQuantity:inventoryLevel?.maxQuantity?:0,
+                    currentQuantity:entry.currentQuantity?:0,
+                    preferred:inventoryLevel?.preferred?:false
+            ]
+            map
+        }
+
+        productGroupMap.each { k, v ->
+            productGroupMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
+
+            //InventoryUtil.getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
+
+        }
+
+
+        return productGroupMap.values().groupBy { it.status }
+
+    }
+
+    def String getStatusMessage(inventoryStatus, minQuantity, reorderQuantity, maxQuantity, currentQuantity) {
+        def statusMessage = ""
+        if (inventoryStatus == InventoryStatus.SUPPORTED  || !inventoryStatus) {
+            if (currentQuantity <= 0) {
+                if (maxQuantity == 0 && minQuantity == 0 && reorderQuantity == 0) {
+                    statusMessage = "STOCK_OUT_OBSOLETE"
+                }
+                else {
+                    statusMessage = "STOCK_OUT"
+                }
+            }
+            else {
+                if (minQuantity && minQuantity > 0 && currentQuantity <= minQuantity ) {
+                    statusMessage = "LOW_STOCK"
+                }
+                else if (reorderQuantity && reorderQuantity > 0 && currentQuantity <= reorderQuantity ) {
+                    statusMessage = "REORDER"
+                }
+                else if (maxQuantity && maxQuantity > 0 && currentQuantity > maxQuantity ) {
+                    statusMessage = "OVERSTOCK"
+                }
+                else if (currentQuantity > 0) {
+                    if (maxQuantity == 0 && minQuantity == 0 && reorderQuantity == 0) {
+                        statusMessage = "IN_STOCK_OBSOLETE"
+                    }
+                    else {
+                        statusMessage = "IN_STOCK"
+                    }
+                }
+                else {
+                    statusMessage = "OBSOLETE"
+                }
+            }
+        }
+        else if (inventoryStatus == InventoryStatus.NOT_SUPPORTED) {
+            statusMessage = "NOT_SUPPORTED"
+        }
+        else if (inventoryStatus == InventoryStatus.SUPPORTED_NON_INVENTORY) {
+            statusMessage = "SUPPORTED_NON_INVENTORY"
+        }
+        else {
+            statusMessage = "UNAVAILABLE"
+        }
+        println "getStatusMessage(${inventoryStatus}, ${minQuantity}, ${reorderQuantity}, ${maxQuantity}, ${currentQuantity}) = ${statusMessage}"
+        return statusMessage
+    }
 
 }
 
