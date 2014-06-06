@@ -401,11 +401,12 @@ jqueryValidationUi {
 }
 
 
-/**
- * Google analytics and feedback have been removed until I can improve performance.
- */
+// Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
-//grails.feedback.enabled = false
+//google.analytics.webPropertyID = "UA-xxxxxx-x"
+
+// Feedback mechanism that allows screenshots
+//openboxes.feedback.enabled = false
 
 // UserVoice widget
 openboxes.uservoice.widget.enabled = true
@@ -418,16 +419,11 @@ openboxes.jira.issue.collector.url = "https://openboxes.atlassian.net/s/d41d8cd9
 // Barcode scanner
 openboxes.scannerDetection.enabled = true
 
-/**
- * Global Properties
- */
-// default and supported locales
+// Localization configuration - default and supported locales
 locale.defaultLocale = 'en'
 locale.supportedLocales = ['en','fr','es']
 
-/**
- * Grails doc configuration
- */
+// Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""
 grails.doc.authors = "Justin Miranda"
@@ -452,6 +448,7 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYears, class: org.joda.time.Years
 }
 
+// App-info configuration
 grails.plugins.dynamicController.mixins = [
     'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
             'com.burtbeckwith.appinfo_test.AdminManageController',
