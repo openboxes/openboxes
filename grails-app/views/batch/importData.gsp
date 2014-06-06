@@ -8,6 +8,7 @@
 			<warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/>
 		</title>
         <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.css" type="text/css" media="all" />
 
     </head>
 	<body>
@@ -23,7 +24,6 @@
                     <g:renderErrors bean="${commandInstance}" as="list" />
                 </div>
 			</g:hasErrors>
-
 
             <g:if test="${commandInstance?.data}">
 
@@ -71,12 +71,11 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label><warehouse:message code="default.rows.label" default="Rows"/></label>
+                                    <label><warehouse:message code="default.data.label" default="Data"/></label>
                                 </td>
                                 <td class="value">
-                                    ${commandInstance?.data?.size()} rows
+                                    <button id="toggle-data-btn" class="button icon search">Preview data (${commandInstance?.data?.size()} rows)</button>
                                 </td>
-
                             </tr>
                             <tfoot>
                                 <tr>
@@ -87,15 +86,14 @@
                                             <button type="submit" name="validate" class="button icon approve">
                                                 ${warehouse.message(code: 'default.button.validate.label', default: 'Re-validate')}</button>
                                             --%>
+                                            <a href="${createLink(controller: "batch", action: "importData", params: params)}" class="button icon arrowleft">
+                                                <warehouse:message code="default.button.back.label" default="Back"/>
+                                            </a>
 
                                             <g:if test="${!commandInstance?.hasErrors()}">
                                                 <button type="submit" name="import" value="true" class="button icon approve">
                                                     ${warehouse.message(code: 'default.button.finish.label')}</button>
                                             </g:if>
-                                            <a href="${createLink(controller: "batch", action: "importData", params: params)}" class="button icon trash">
-                                                <warehouse:message code="default.button.cancel.label" default="Cancel"/>
-                                            </a>
-
                                         </div>
 
                                     </td>
@@ -106,21 +104,31 @@
                 </g:form>
             </g:if>
 
-            <div class="box">
-                <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/></h2>
-                <g:if test="${!commandInstance?.data}">
+
+            <g:if test="${!commandInstance?.data}">
+                <div class="box">
+                    <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/></h2>
                     <div class="dialog">
                         <g:render template="uploadFileForm"/>
                     </div>
-                </g:if>
-                <g:if test="${commandInstance?.data}">
+                </div>
+            </g:if>
 
-                    <table class="footable">
+            <g:if test="${commandInstance?.data}">
+                <div id="data-dialog" class="dialog" style="display: none" title="${warehouse.message(code:'importer.previewData.label', default: 'Preview data')}">
+                    <%--
+                    <div>
+                        <g:each var="column" in="${commandInstance?.columnMap?.columnMap }" status="i">
+                            <a class="toggle-visibility" data-column="${i}">${column.value}</a>
+                        </g:each>
+                    </div>
+                    --%>
+                    <table id="dataTable" class="footable">
                         <thead>
                             <tr>
                                 <th data-class="expand"></th>
 
-                                <th>Row</th>
+                                <th>1</th>
                                 <g:each var="column" in="${commandInstance?.columnMap?.columnMap }" status="i">
                                     <th data-hide='${i>3?"phone,tablet":""}' ><warehouse:message code="import.${column.value}.label"/>
 
@@ -158,15 +166,65 @@
                         </tbody>
 
                     </table>
-                </g:if>
-            </div>
+                </div>
+            </g:if>
+
 		</div>
         <script src="${createLinkTo(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
         <script type="text/javascript">
-            $(function() {
-                $('table tbody tr td code').addClass('footable-toggle');
-                $('table').footable();
+            $(document).ready(function(){
+
+                $("#data-dialog").dialog({autoOpen:false, width: 1200, height: 750});
+
+                var table = $('#dataTable').dataTable({
+                    "scrollY": "200px",
+                    "paging": true
+                    /*
+                    "aoColumnDefs": [
+                        { "aTargets":[0],"bVisible":false },
+                        { "aTargets":[2],"bVisible":false },
+                        { "aTargets":[6],"bVisible":false },
+                        { "aTargets":[9],"bVisible":false },
+                        { "aTargets":[10],"bVisible":false },
+                        { "aTargets":[13],"bVisible":false },
+                        { "aTargets":[14],"bVisible":false },
+                        { "aTargets":[15],"bVisible":false },
+                        { "aTargets":[16],"bVisible":false },
+                        { "aTargets":[21],"bVisible":false }
+                    ]
+                    */
+                });
+                //$("#dataTable").hide();
+                $('#toggle-data-btn').click(function(event){
+                    event.preventDefault();
+                    //$("#dataTable").toggle()
+                    $("#data-dialog").dialog("open");
+                });
+
+                $('a.toggle-visibility').on( 'click', function (e) {
+                    console.log(e);
+                    e.preventDefault();
+
+                    console.log(table);
+                    // Get the column API object
+                    var columnIndex = $(this).attr('data-column');
+                    console.log(columnIndex);
+                    var column = table.column( columnIndex );
+                    console.log(column);
+                    // Toggle the visibility
+                    column.visible( ! column.visible() );
+                } );
+
             });
+
+            $(function() {
+                //$('table tbody tr td code').addClass('footable-toggle');
+                //$('.footable').footable();
+            });
+
+
+
         </script>
 
 	</body>

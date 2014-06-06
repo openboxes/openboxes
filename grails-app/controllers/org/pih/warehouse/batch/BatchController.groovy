@@ -102,7 +102,9 @@ class BatchController {
 						//flash.message = "File uploaded successfully"
 
 					} catch (Exception e) {
-						throw new RuntimeException(e);
+						//throw new RuntimeException(e);
+                        flash.message = "Unable to upload file due to exception: " + e.message
+                        return;
 					}
 				}
 				else {

@@ -43,7 +43,8 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
                 'Q':'minQuantity',
                 'R':'reorderQuantity',
                 'S':'maxQuantity',
-                'T':'currentQuantity'
+                'T':'currentQuantity',
+                'U':'preferredForReorder'
 		]
 	]
 
@@ -68,7 +69,9 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
             minQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             reorderQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             maxQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            currentQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null])
+            currentQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
+            preferredForReorder:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
+
 	]
 
 

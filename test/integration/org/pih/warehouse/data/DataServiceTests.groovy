@@ -83,7 +83,7 @@ class DataServiceTests extends GroovyTestCase {
         }
 
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
-        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, "AB-12-12", 0, 10, 100)
+        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, "AB-12-12", 0, 10, 100, true)
 
         assertNotNull inventoryLevel
         //assertEquals "AB-12-12", inventoryLevel.binLocation
@@ -93,8 +93,7 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals "Boston Headquarters", inventoryLevel.inventory.warehouse.name
         assertEquals "AB12", inventoryLevel.product.productCode
         assertEquals "New product", inventoryLevel.product.name
-
-
+        assertTrue inventoryLevel.preferred
     }
 
 
@@ -158,11 +157,29 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals 5000, product.getInventoryLevel(location.id).minQuantity
         assertEquals 10000, product.getInventoryLevel(location.id).reorderQuantity
         assertEquals 20000, product.getInventoryLevel(location.id).maxQuantity
+        assertTrue product.getInventoryLevel(location.id).preferred
 
-        def productPackage = product.getProductPackage("CS")
-        assertNotNull productPackage
-        assertEquals 1000, productPackage.quantity
-        assertEquals 85.91, productPackage.price, 0.0001
+        assertNotNull product.getProductPackage("CS")
+        assertEquals 1000, product.getProductPackage("CS").quantity
+        assertEquals 85.91, product.getProductPackage("CS").price, 0.0001
+
+
+        // Testing the new preferred for reorder flag
+        product = Product.findByProductCode("NT75")
+        assertNotNull product
+        assertEquals "Applicator stick", product.name
+        assertTrue product.getInventoryLevel(location.id).preferred
+
+        product = Product.findByProductCode("VV07")
+        assertNotNull product
+        assertEquals "Applicator, Cotton tipped, Nonsterile", product.name
+        assertFalse product.getInventoryLevel(location.id).preferred
+
+        product = Product.findByProductCode("SD08")
+        assertNotNull product
+        assertEquals "Bag, Biohazard, Autoclave, 14in x 19in", product.name
+        assertFalse product.getInventoryLevel(location.id).preferred
+
 
         /*
         product = Product.findByProductCode("QM56")
