@@ -106,9 +106,9 @@
             "bUseRendered": false,
             "aaSorting": [[ 2, "desc" ], [3, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                console.log(nRow);
-                console.log(aData);
-                console.log(iDisplayIndex);
+                //console.log(nRow);
+                //console.log(aData);
+                //console.log(iDisplayIndex);
 
                 $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
                         aData["name"] + '</a>');

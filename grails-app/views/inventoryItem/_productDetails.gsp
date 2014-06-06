@@ -208,6 +208,14 @@
                     </g:else>
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="inventoryLevel.preferred.label"/></label>
+                </td>
+                <td class="value">
+                    ${inventoryLevelInstance?.preferred?:'false' }
+                </td>
+            </tr>
 
             <tr class="prop">
                 <td class="label">

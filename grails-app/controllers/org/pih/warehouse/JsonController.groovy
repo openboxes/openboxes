@@ -14,6 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import java_cup.runtime.virtual_parse_stack
+import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -30,6 +31,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import util.InventoryUtil
 
 import java.text.SimpleDateFormat
 
@@ -231,6 +233,52 @@ class JsonController {
         //println "${createLink(controller:'inventoryItem', action: 'showStockCard', id: product.id)}"
 		render (quantityOnHand?:"0")
 	}
+
+    def listByProductGroup = {
+        def startTime = System.currentTimeMillis()
+        def location = Location.get(session?.warehouse?.id)
+        def productGroupByStatusMap = inventoryService.getProductGroupByStatusMap(location)
+        def data = (params.status == "ALL") ? productGroupByStatusMap.values().flatten() : productGroupByStatusMap[params.status]
+
+        def sw = new StringWriter()
+        if (data) {
+            def columns = data[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
+            sw.append(columns.join(",")).append("\n")
+            data.each { row ->
+                def values = row.values().collect { value ->
+                    if (value?.toString()?.isNumber()) {
+                        value
+                    }
+                    else if (value instanceof Collection) {
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                    else {
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                }
+                sw.append(values.join(","))
+                sw.append("\n")
+            }
+        }
+        response.setHeader("Content-disposition", "attachment; filename='InventoryStatus-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
+        render(contentType: "text/csv", text:sw.toString())
+        return;
+    }
+
+
+    //@Cacheable("dashboardCache")
+    def getProductGroupAlerts = {
+        def startTime = System.currentTimeMillis()
+        def location = Location.get(session?.warehouse?.id)
+        def productGroupByStatusMap = inventoryService.getProductGroupByStatusMap(location)
+
+
+        render ([elapsedTime: (System.currentTimeMillis()-startTime),
+                totalCount:productGroupByStatusMap.values().size(),
+                productGroupByStatusMap: productGroupByStatusMap] as JSON)
+
+    }
+
 
     @Cacheable("dashboardCache")
     def getDashboardAlerts = {
@@ -986,6 +1034,7 @@ class JsonController {
 	def globalSearch = {
 		def items = []
 		def terms = params.term?.split(" ")
+        def quantityMap = [:]
 		terms?.each{ term ->
 			
 			// Get all products that match terms
@@ -1010,8 +1059,10 @@ class JsonController {
 
             // Get all products that match terms
             def inventory = Location.get(session.warehouse.id).inventory
-            def productResults = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
-            items.addAll(productResults)
+            def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
+
+            quantityMap = inventoryService.getQuantityByProductMap(inventory, products);
+            items.addAll(products)
 
 			// Get all shipments that match terms
 			/*
@@ -1026,12 +1077,13 @@ class JsonController {
 		
 		items.unique{ it.id }
 		def json = items.collect{
+            def quantity = quantityMap[it]?:0
 			def type = it.class.simpleName.toLowerCase()
 			[   id: it.id,
                 type: it.class,
                 url: request.contextPath + "/" + type  + "/redirect/" + it.id,
 				value: it.name,
-                label: it.productCode + " " + it.name + " [" + (it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}") + "]" ]
+                label: it.productCode + " " + it.name + " [" + (it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}") + "] " + quantity + " " + it.unitOfMeasure ]
 		}
 		render json as JSON
 	}
@@ -1226,22 +1278,47 @@ class JsonController {
     def getQuantityOnHandByMonth = {
         println params;
         def dates = []
+        def format = "MMM-yy"
         def numMonths = (params.numMonths as int)?:12
         def location = Location.get(params.location.id)
         def product = Product.get(params.product.id)
 
-        use(groovy.time.TimeCategory) {
-            def today = new Date()
-            numMonths.times { i ->
-                println today - (i+1).months
-                dates << (today - (i+1).months)
+        def today = new Date()
+        today.clearTime()
+
+
+        if (numMonths >= 7) {
+            use(groovy.time.TimeCategory) {
+                numMonths.times { i ->
+                    dates << (today - (i+1).months)
+                }
             }
+            format = "MMM-yy"
         }
+        else if (numMonths >= 2) {
+            use(groovy.time.TimeCategory) {
+                (numMonths*4).times { i ->
+                    dates << (today - (i+1).weeks)
+                }
+            }
+            format = "'Week' W"
+        }
+        else {
+            use(groovy.time.TimeCategory) {
+                (numMonths*21).times { i ->
+                    dates << (today - (i+1).days)
+                }
+            }
+            format = "dd-MMM"
+        }
+        println "dates: " + dates
+
 
         // initialize data
-        def data = dates.reverse().inject([:].withDefault { [label: null, days: 0, totalQuantity: 0, maxQuantity: 0, month: 0, year: 0] }) { map, date ->
-            def dateKey = date.format("MMM-yyyy")
+        def data = dates.sort().inject([:].withDefault { [label: null, days: 0, totalQuantity: 0, maxQuantity: 0, month: 0, year: 0, day: 0] }) { map, date ->
+            def dateKey = date.format(format)
             map[dateKey].label = dateKey
+            map[dateKey].day = date.day
             map[dateKey].month = date.month
             map[dateKey].year = date.year
             map[dateKey].totalQuantity = 0
@@ -1250,35 +1327,46 @@ class JsonController {
             map
         }
 
-
-        def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
-        println "inventorySnapshots: " + inventorySnapshots
-        def items = inventorySnapshots.collect { [date:it.date, quantityOnHand:it.quantityOnHand] }
-        items.each { item ->
-            def dateKey = item.date.format("MMM-yyyy")
-            data[dateKey].label = dateKey
-            data[dateKey].month = item.date.month
-            data[dateKey].year = item.date.year
-            data[dateKey].totalQuantity += item.quantityOnHand
-            if (item.quantityOnHand > data[dateKey].maxQuantity) {
-                data[dateKey].maxQuantity = item.quantityOnHand
-            }
-            data[dateKey].days++
-            data
-        }
-
-
-        //(value.totalQuantity/value.days?:1)
         def newData = []
-        data.each { key, value ->
-            if (value.days) {
-                //newData << [key, (value.totalQuantity/value.days) ]
-                newData << [key, (value.maxQuantity) ]
+        //def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
+        def inventorySnapshots = InventorySnapshot.createCriteria().list() {
+            eq("product", product)
+            eq("location", location)
+            between("date", dates[0], dates[dates.size()-1])
+        }
+
+
+        println "dates: " + dates
+        println "inventorySnapshots: " + inventorySnapshots*.date
+        if (inventorySnapshots) {
+            def items = inventorySnapshots.collect { [date:it.date, quantityOnHand:it.quantityOnHand] }
+            items.each { item ->
+                def dateKey = item.date.format(format)
+                data[dateKey].label = dateKey
+                data[dateKey].month = item.date.month
+                data[dateKey].day = item.date.day
+                data[dateKey].year = item.date.year
+                data[dateKey].totalQuantity += item.quantityOnHand
+                if (item.quantityOnHand > data[dateKey].maxQuantity) {
+                    data[dateKey].maxQuantity = item.quantityOnHand
+                }
+                data[dateKey].days++
+                data
             }
-            else {
-                newData << [key, 0]
+
+
+            data.each { key, value ->
+                if (value.days) {
+                    //newData << [key, (value.totalQuantity/value.days) ]
+                    newData << [key, (value.maxQuantity) ]
+                }
+                else {
+                    newData << [key, 0]
+                }
             }
         }
+        println "newData: " + newData
+
 
         render ([label: "QoH ${product?.name}", location: "${location.name}", data:newData] as JSON);
     }

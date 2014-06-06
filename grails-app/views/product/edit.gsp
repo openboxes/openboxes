@@ -14,6 +14,12 @@
 		</g:else>
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
 		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
+        <style>
+        #category_id_chosen {
+            width: 100% !important;
+        }
+        </style>
+
     </head>
     <body>
         <div class="body">
@@ -752,14 +758,14 @@
                                     <table>
                                         <thead>
                                             <tr class="odd">
-                                                <th><warehouse:message code="inventory.label"/></th>
-                                                <th><warehouse:message code="product.label"/></th>
                                                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
+                                                <th><warehouse:message code="inventory.label"/></th>
                                                 <th><warehouse:message code="inventoryLevel.binLocation.label"/></th>
-                                                <th><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
-                                                <th><warehouse:message code="inventoryLevel.minQuantity.label"/></th>
-                                                <th><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
-                                                <th><warehouse:message code="inventoryLevel.maxQuantity.label"/></th>
+                                                <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
+                                                <th class="center"><warehouse:message code="inventoryLevel.minQuantity.label"/></th>
+                                                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
+                                                <th class="center"><warehouse:message code="inventoryLevel.maxQuantity.label"/></th>
+                                                <th class="center"><warehouse:message code="inventoryLevel.preferred.label"/></th>
                                                 <th><warehouse:message code="default.actions.label"/></th>
                                             </tr>
                                         </thead>
@@ -769,16 +775,6 @@
 
                                                 <tr class="prop ${i%2?'even':'odd'}">
                                                     <td>
-                                                        ${inventoryLevelInstance?.inventory?.warehouse?.name }
-                                                        <%--<g:hiddenField name="inventoryLevels[${i}].inventory.id" value="${inventoryLevelInstance?.id}"/>--%>
-                                                    </td>
-                                                    <td>
-                                                        <format:product product="${productInstance}" />
-                                                        <%--
-                                                        <g:hiddenField name="inventoryLevels[${i}].product.id" value="${inventoryLevelInstance?.product?.id}"/>
-                                                        --%>
-                                                    </td>
-                                                    <td>
                                                         <%--
                                                         <g:select name="inventoryLevels[${i}].status"
                                                            from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
@@ -786,6 +782,10 @@
                                                            noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;
                                                         --%>
                                                         ${inventoryLevelInstance?.status}
+                                                    </td>
+                                                    <td>
+                                                        ${inventoryLevelInstance?.inventory?.warehouse?.name }
+                                                        <%--<g:hiddenField name="inventoryLevels[${i}].inventory.id" value="${inventoryLevelInstance?.id}"/>--%>
                                                     </td>
                                                     <td>
                                                         <%--
@@ -797,21 +797,23 @@
                                                     <td class="center">
                                                         ${inventoryLevelInstance?.abcClass?:warehouse.message(code:'default.none.label')}
                                                     </td>
-
-                                                    <td>
+                                                    <td class="center">
                                                         <%--<g:textField name="inventoryLevels[${i}].minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="10" class="text"/>--%>
                                                         ${inventoryLevelInstance?.minQuantity?:0 }
                                                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
-                                                    <td>
+                                                    <td class="center">
                                                         <%--<g:textField name="inventoryLevels[${i}].reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="10" class="text"/>--%>
                                                         ${inventoryLevelInstance?.reorderQuantity?:0 }
                                                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                                                     </td>
-                                                    <td>
+                                                    <td class="center">
                                                         <%--<g:textField name="inventoryLevels[${i}].maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="10" class="text"/>--%>
                                                         ${inventoryLevelInstance?.maxQuantity?:0 }
                                                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                                                    </td>
+                                                    <td class="center">
+                                                        ${inventoryLevelInstance?.preferred }
                                                     </td>
 
                                                     <td>
@@ -836,7 +838,7 @@
                                             </g:each>
                                             <g:unless test="${productInstance?.inventoryLevels}">
                                                 <tr>
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="10" class="center">
                                                         <div class="empty center">
                                                             <warehouse:message code="product.hasNoInventoryLevels.label" default="There are no stock levels"/>
                                                         </div>
@@ -846,7 +848,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr class="prop">
-                                                <td colspan="9" class="center">
+                                                <td colspan="10" class="center">
 
                                                     <a href="javascript:void(0);" class="open-dialog create button icon add" dialog-id="inventory-level-dialog">
                                                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create new stock level')}</a>

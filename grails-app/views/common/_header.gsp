@@ -133,46 +133,46 @@
                                                 <warehouse:message code="dashboard.label" default="Dashboard"/>
                                             </g:link>
                                         </li>
-                                        <g:isUserAdmin>
-                                            <g:if test="${session._showTime}">
-                                                <li class="action-menu-item">
-                                                    <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
-                                                        <img src="${resource(dir: 'images/icons/silk', file: 'clock.png')}"/>
-                                                        <warehouse:message code="dashboard.disableShowTime.label" default="Disable response time"/>
-                                                    </g:link>
-                                                </li>
-                                            </g:if>
-                                            <g:else>
-                                                <li class="action-menu-item">
-                                                    <g:link controller="dashboard" action="index" params="[showTime:'on']" style="color: #666;">
-                                                        <img src="${resource(dir: 'images/icons/silk', file: 'clock.png')}"/>
-                                                        <warehouse:message code="dashboard.enableShowTime.label" default="Enable response time"/>
-                                                    </g:link>
-                                                </li>
-                                            </g:else>
-                                            <g:if test="${session.useDebugLocale }">
-                                                <li class="action-menu-item">
-                                                    <g:link controller="user" action="disableDebugMode" style="color: #666;">
-                                                        <img src="${resource(dir: 'images/icons/silk', file: 'flag_france.png')}"/>
-                                                        ${warehouse.message(code:'localization.disable.label', default: 'Disable localization mode')}
-                                                    </g:link>
-                                                </li>
-                                            </g:if>
-                                            <g:else>
-                                                <li class="action-menu-item">
-                                                    <g:link controller="user" action="enableDebugMode" style="color: #666;">
-                                                        <img src="${resource(dir: 'images/icons/silk', file: 'flag_france.png')}"/>
-                                                        ${warehouse.message(code:'localization.enable.label', default: 'Enable localization mode')}
-                                                    </g:link>
-                                                </li>
-                                            </g:else>
+
+                                        <g:if test="${session._showTime}">
+
                                             <li class="action-menu-item">
-                                                <g:link controller="dashboard" action="flushCache" style="color: #666">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
-                                                    ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
+                                                <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'clock_delete.png')}"/>
+                                                    <warehouse:message code="dashboard.disableShowTime.label" default="Disable show time"/>
                                                 </g:link>
                                             </li>
-                                        </g:isUserAdmin>
+                                        </g:if>
+                                        <g:else>
+                                            <li class="action-menu-item">
+                                                <g:link controller="dashboard" action="index" params="[showTime:'on']" style="color: #666;">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'clock_add.png')}"/>
+                                                    <warehouse:message code="dashboard.enableShowTime.label" default="Enable show time"/>
+                                                </g:link>
+                                            </li>
+                                        </g:else>
+                                        <g:if test="${session.useDebugLocale }">
+                                            <li class="action-menu-item">
+                                                <g:link controller="user" action="disableDebugMode" style="color: #666;">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'bug_delete.png')}"/>
+                                                    ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}
+                                                </g:link>
+                                            </li>
+                                        </g:if>
+                                        <g:else>
+                                            <li class="action-menu-item">
+                                                <g:link controller="user" action="enableDebugMode" style="color: #666;">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'bug_add.png')}"/>
+                                                    ${warehouse.message(code:'debug.enable.label', default: 'Enable debug mode')}
+                                                </g:link>
+                                            </li>
+                                        </g:else>
+                                        <li class="action-menu-item">
+                                            <g:link controller="dashboard" action="flushCache" style="color: #666">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
+                                                ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
+                                            </g:link>
+                                        </li>
 
                                         <g:if test="${session?.warehouse}">
                                             <%--

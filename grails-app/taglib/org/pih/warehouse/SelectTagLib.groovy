@@ -32,9 +32,12 @@ class SelectTagLib {
 	def shipmentService
 
     def selectCategory = { attrs, body ->
-        attrs.from = Category.list().sort { it.name }
+        attrs.from = Category.list().sort() // { it.name }
         attrs.optionKey = "id"
-        attrs.optionValue = { format.metadata(obj: it) }
+        attrs.optionValue = {
+            it.getHierarchyAsString(" > ")
+            //format.metadata(obj: it)
+        }
         out << g.select(attrs)
     }
 

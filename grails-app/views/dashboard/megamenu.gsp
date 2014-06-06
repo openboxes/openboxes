@@ -6,6 +6,26 @@
             <warehouse:message code="dashboard.label" />&nbsp;
         </g:link>
     </li>
+
+    <g:isUserAdmin>
+        <li><a href="javascript:void(0)"> <warehouse:message code="analytics.label" default="Analytics"/></a>
+            <div style="min-width: 200px;">
+                <div class="buttonsBar">
+                    <div class="megaButton">
+                        <g:link controller="inventoryBrowser" action="index" class="list">
+                            <warehouse:message code="inventory.browse.label" default="Inventory browser" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="inventorySnapshot" action="list" class="list">
+                            <warehouse:message code="inventory.snapshot.label" default="Inventory snapshots" />
+                        </g:link>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </g:isUserAdmin>
+
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 		<li>
 			<g:link controller="inventory" action="browse">
@@ -398,22 +418,6 @@
     </li>
 </g:authorize>
 <g:isUserAdmin>
-        <li><a href="javascript:void(0)"> <warehouse:message code="analytics.label" default="Analytics"/></a>
-			<div style="min-width: 200px;">
-				<div class="buttonsBar">
-                    <div class="megaButton">
-                        <g:link controller="inventoryBrowser" action="index" class="list">
-                            <warehouse:message code="inventory.browse.label" default="Inventory browser" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="inventorySnapshot" action="list" class="list">
-                            <warehouse:message code="inventory.snapshot.label" default="Inventory snapshots" />
-                        </g:link>
-                    </div>
-                </div>
-            </div>
-        </li>
 
 		<li><a href="javascript:void(0)"> <warehouse:message code="configuration.label" default="Configuration" /></a>
 			<div style="min-width: 200px;">

@@ -22,8 +22,8 @@
 						</td>
                         <td width="30%">
                             <g:render template="valueSummary"/>
-                            <g:render template="alertSummary"/>
-                            <g:render template="inventorySummary"/>
+                            <g:render template="productSummary"/>
+                            <g:render template="genericProductSummary"/>
                             <g:render template="expiringSummary"/>
                         </td>
 						<td width="40%">

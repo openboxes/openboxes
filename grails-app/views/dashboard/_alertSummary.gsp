@@ -154,14 +154,25 @@
             //data: data,
             success: function (data) {
                 console.log(data);
+                var outOfStockCount = data.outOfStock?data.outOfStock:0;
+                var lowStockCount = data.lowStock?data.lowStock:0;
+                var overStockCount = data.outOfStock?data.outOfStock:0;
+                var reconditionedStockCount = data.outOfStock?data.outOfStock:0;
+                var totalStockCount = data.outOfStock?data.outOfStock:0;
+                var totalStockCount = data.outOfStock?data.outOfStock:0;
+
+
+                $("#outOfStockCount").html("<a href='${request.contextPath}/inventory/listOutOfStock>" + count + "</a>");
+
+
                 // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
-                $('#lowStockCount').html(data.lowStock?data.lowStock:0);
+                $('#lowStockCount').html();
                 $('#overStockCount').html(data.overStock?data.overStock:0);
                 $('#reconditionedStockCount').html(data.reconditionedStock?data.reconditionedStock:0);
                 $('#totalStockCount').html(data.totalStock?data.totalStock:0);
                 $('#inStockCount').html(data.inStock?data.inStock:0);
                 $('#onHandQuantityZeroCount').html(data.onHandQuantityZero?data.onHandQuantityZero:0);
-                $('#outOfStockCount').html(data.outOfStock?data.outOfStock:0);
+                $('#outOfStockCount').html();
                 //$('#outOfStockCountClassA').html(data.outOfStockClassA?data.outOfStockClassA:0);
                 //$('#outOfStockCountClassB').html(data.outOfStockClassB?data.outOfStockClassB:0);
                 //$('#outOfStockCountClassC').html(data.outOfStockClassC?data.outOfStockClassC:0);

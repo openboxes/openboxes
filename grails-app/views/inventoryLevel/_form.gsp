@@ -44,6 +44,7 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'product', 'errors')}">
                     <g:select name="status"
+                              class="chzn-select-deselect"
                               id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-status"
                               from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
                               optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance?.status}"
@@ -55,7 +56,7 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'binLocation', 'errors')}">
-                    <g:textArea name="binLocation" value="${inventoryLevelInstance?.binLocation }" rows="4" class="large text"/>
+                    <g:textArea name="binLocation" value="${inventoryLevelInstance?.binLocation }" rows="3" cols="80" class="large text"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -96,6 +97,14 @@
                     ${inventoryLevelInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                 </td>
             </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="preferred"><warehouse:message code="inventoryLevel.preferred.label" default="Preferred for reorder" /></label>
+                </td>
+                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'preferred', 'errors')}">
+                    <g:checkBox name="preferred" value="${inventoryLevelInstance?.preferred }"/>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
@@ -107,8 +116,12 @@
         </g:if>
         <g:else>
             <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+            <%--
             <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+            --%>
         </g:else>
+
+
     </div>
 
 

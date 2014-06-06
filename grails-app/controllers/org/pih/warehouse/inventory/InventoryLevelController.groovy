@@ -206,18 +206,18 @@ class InventoryLevelController {
         def inventoryLevels = []
         def product = Product.get(params.id)
         def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-        def filename = "Stock Levels - ${dateFormatted}"
+        def filename = "Inventory Levels - ${dateFormatted}"
 
         if (product) {
-            filename = "Stock Levels - ${product?.name} - ${dateFormatted}"
+            filename = "Inventory Levels - ${product?.name} - ${dateFormatted}"
             inventoryLevels = product.inventoryLevels
         }
         else if (location) {
-            filename = "Stock Levels - ${location?.name} - ${dateFormatted}"
+            filename = "Inventory Levels - ${location?.name} - ${dateFormatted}"
             inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
         }
         else if (location) {
-            filename = "Stock Levels - ${dateFormatted}"
+            filename = "Inventory Levels - ${dateFormatted}"
             inventoryLevels = InventoryLevel.findAll()
         }
 
@@ -231,6 +231,7 @@ class InventoryLevelController {
                 "Inventory" {it.inventory}
                 "Status" {it.status}
                 "Bin Location" {it.binLocation}
+                "Preferred" {it.preferred}
                 "ABC Class" {it.abcClass}
                 "Max Quantity" {it.maxQuantity}
                 "Min Quantity" {it.maxQuantity}
@@ -244,6 +245,7 @@ class InventoryLevelController {
                         inventory: inventoryLevel.inventory.warehouse.name,
                         status: inventoryLevel.status,
                         binLocation: inventoryLevel.binLocation?:"",
+                        preferred: inventoryLevel.preferred?:"",
                         abcClass: inventoryLevel.abcClass?:"",
                         maxQuantity: inventoryLevel.maxQuantity?:"",
                         reorderQuantity: inventoryLevel.maxQuantity?:"",

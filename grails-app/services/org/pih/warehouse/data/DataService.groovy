@@ -87,19 +87,22 @@ class DataService {
 
     def validateInventoryLevel(row) {
         row.each { key, value ->
+
+            //println key + " = " + value + " " + row
             def expectedType = InventoryLevelExcelImporter.propertyMap.get(key).expectedType
             switch (expectedType) {
-                case  ExcelImportUtils.PROPERTY_TYPE_STRING:
-                    assert !value || value instanceof String, "Value [${value}] must be a String"
+                //case  ExcelImportUtils.PROPERTY_TYPE_STRING:
+                //    assert !value || value instanceof String || value instanceof Boolean, "Value [${value}] for column [${key}] must be a String or Boolean but was ${value?.class?.name} (" + row + ").";
+                //    break;
+
+                case ExcelImportUtils.PROPERTY_TYPE_INT:
+                    assert !value || value instanceof Number || value instanceof Boolean, "Value [${value}] for column [${key}] must be a Number or Boolean but was ${value?.class?.name} (" + row + ").";
                     break;
 
                 case ExcelImportUtils.PROPERTY_TYPE_DATE:
-                    assert !value || value instanceof Date, "Value [${value}] must be a Date"
+                    assert !value || value instanceof Date, "Value [${value}] for column [${key}] must be a Date but was ${value?.class?.name} (" + row + ").";
                     break;
 
-                case ExcelImportUtils.PROPERTY_TYPE_INT:
-                    assert !value || value instanceof Number, "Value [${value}] must be a Number"
-                    break;
 
                 default:
                     break;
@@ -158,7 +161,7 @@ class DataService {
 
             // Create inventory level for current location, include bin location
             if (location.inventory) {
-                addInventoryLevelToProduct(product, location.inventory, row.binLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity)
+                addInventoryLevelToProduct(product, location.inventory, row.binLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity, row.preferredForReorder)
             }
 
             // Create product package if UOM and quantity are provided
@@ -189,8 +192,8 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def addInventoryLevelToProduct(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity) {
-        findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity)
+    def addInventoryLevelToProduct(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder) {
+        findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder)
     }
 
     /**
@@ -266,7 +269,10 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity) {
+    def findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder) {
+
+        println "Product ${product.productCode} " + preferredForReorder
+
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel();
@@ -280,6 +286,7 @@ class DataService {
         inventoryLevel.minQuantity = minQuantity
         inventoryLevel.reorderQuantity = reorderQuantity
         inventoryLevel.maxQuantity = maxQuantity
+        inventoryLevel.preferred = Boolean.valueOf(preferredForReorder)
 
         inventoryLevel = inventoryLevel.merge()
 
