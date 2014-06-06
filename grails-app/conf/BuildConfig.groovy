@@ -65,6 +65,8 @@ grails.project.dependency.resolution = {
 	
 	}
 	plugins {
+        compile ":rendering:0.4.4"
+
         runtime( ':constraints:0.6.0' )
         runtime( ':jquery-validation:1.9' ) { // 1.7.3
             excludes 'constraints'
@@ -78,26 +80,21 @@ grails.project.dependency.resolution = {
         */
 
         runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
-
         runtime( ':excel-import:0.3' ) { excludes 'poi-contrib', 'poi-scratchpad' }
-
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
         runtime (":external-config-reload:1.4.0") {
             exclude "spock-grails-support"
         }
-		runtime ':quartz2:0.2.2'
-		//runtime ':quartz:1.0-RC4'
-		//compile ':quartz:1.0-RC4'
+        runtime ':quartz2:0.2.2'
 
         test (name:'geb', version:'0.6.3')
 
-        //compile ":rendering:0.4.3"
-        compile ":rendering:0.4.4"
+
+        // Dependencies that we want to use but cannot due to errors
         //compile ":standalone:1.0"
         //compile ":burning-image:0.5.1"
         //compile ":settings:1.4"
         //compile ":symmetricds:2.4.0"
-
         //compile ":grails-melody:1.46"
 
 	}
