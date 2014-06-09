@@ -191,12 +191,14 @@
                             <thead>
 
                                 <tr>
-                                    <th class="center border-right"><warehouse:message code="product.productCode.label"/></th>
-                                    <th class="border-right"><warehouse:message code="product.name.label"/></th>
-                                    <th class="border-right"><warehouse:message code="product.genericProduct.label"/></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th class="border-right"><warehouse:message code="product.label"/></th>
 
                                     <%--
                                     <th class="border-right"><warehouse:message code="category.label"/></th>
+                                    <th class="border-right"><warehouse:message code="product.genericProduct.label"/></th>
+
                                     <th class="center border-right"><warehouse:message code="product.unitOfMeasure.label"/></th>
                                     <th class="center border-right"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
                                     <th class="center" colspan="2"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
@@ -242,18 +244,49 @@
                                         <%--
                                             ${(numberOfMonthsLeft<3&&numberOfMonthsLeft>0)?'error':} ${(numberOfMonthsLeft<0)?'notice':''}"
                                         --%>
-
-                                        <td class="center border-right">
-                                            ${product?.productCode}
-                                        </td>
+                                        <td>${i+1}</td>
+                                        <td><a href="javascript:void(-1);" data-id="${product.id}" class="product-details-toggle-btn button">Details</a></td>
                                         <td class="border-right">
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
-                                                ${product?.name}
+                                                ${product?.productCode} ${product?.name}
                                             </g:link>
-                                        </td>
-                                        <td class="border-right">
+                                            <div id="product-details-box-${product?.id}" class="box product-details-box" style="display:none">
+                                                <table >
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="category.label"/></label>
+                                                        </td>
+                                                        <td>
+                                                            ${product?.category?.name?:""}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="product.genericProduct.label"/></label>
+                                                        </td>
+                                                        <td>
+                                                            ${product?.genericProduct?.description?:""}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="product.unitOfMeasure.label"/></label>
+                                                        </td>
+                                                        <td>
+                                                            ${product?.unitOfMeasure?:""}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
+                                                        </td>
+                                                        <td>
+                                                            ${product?.getInventoryLevel(session.warehouse.id)?.binLocation}
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
 
-                                            ${product?.genericProduct?.description?:""}
 
                                         </td>
 
@@ -291,13 +324,13 @@
                                         </td>
                                         --%>
 
-                                        <td class="middle center border-right">
+                                        <td class="center border-right">
                                             <div class="debit">${row.transferOutQuantity}</div>
                                         </td>
-                                        <td class="middle center border-right">
+                                        <td class="center border-right">
                                             <div class="debit">${row.expiredQuantity}</div>
                                         </td>
-                                        <td class="middle center border-right">
+                                        <td class="center border-right">
                                             <div class="debit">${row.damagedQuantity}</div>
                                         </td>
                                         <td class="center border-right">
@@ -334,7 +367,7 @@
                                 </g:each>
                                 <g:unless test="${command?.rows}">
                                     <tr class="prop">
-                                        <td colspan="20" class="empty center" style="display: inline-block; vertical-align: middle; line-height: normal;">
+                                        <td colspan="20" class="empty center" >
                                             <warehouse:message code="default.data.empty.label" default="No data to be displayed"/>
                                         </td>
                                     </tr>
@@ -369,6 +402,11 @@
 
             $("#parameters-toggle").click(function() {
                 $("#parameters-box").toggle();
+            });
+            $(".product-details-toggle-btn").click(function(event) {
+                var productId = $(this).attr("data-id");
+                console.log(productId);
+                $("#product-details-box-" + productId).toggle();
             });
         });
     </script>

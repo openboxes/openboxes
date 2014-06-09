@@ -1,93 +1,111 @@
+<style>
+.chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+    height: 26px;
+    line-height: 26px;
+}
+
+</style>
 <div class="filters">
 	<g:form method="POST" controller="consumption" action="show">
 
     <div class="box">
-        <h2><warehouse:message code="dates.label" default="Date Range"/></h2>
+        <h2><warehouse:message code="consumption.filters.label" default="Report parameters"/></h2>
         <table>
-            <tr class="prop">
-                <td colspan="2" class="middle">
-                    <div class="left">
-                        <warehouse:message code="consumption.afterDate.label" default="After"/>
-                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy"/>
-                    </div>
-                    <div class="left">
-                        <warehouse:message code="consumption.beforeDate.label" default="Before"/>
-                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy"/>
-                    </div>
+            <tr>
+                <td colspan="2">
+                    <h3>
+                        <warehouse:message code="consumption.dateRange.label" default="Date range"/>
+                    </h3>
+
+
+                </td>
+
+            </tr>
+            <tr>
+                <td class="middle">
+                    <label><warehouse:message code="consumption.afterDate.label" default="Consumed on or after"/></label>
+                </td>
+                <td>
+                    <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy" size="18"/>
                 </td>
             </tr>
-        </table>
-    </div>
-
-    <div class="box">
-        <h2><warehouse:message code="products.label" default="Products"/></h2>
-
-        <table>
-            <tr class="prop">
-                <td colspan="2">
+            <tr>
+                <td class="middle">
                     <label>
-                        <warehouse:message code="consumption.includeProductsWithCategory.label" default="Include products with category"/>
+                        <warehouse:message code="consumption.beforeDate.label" default="Consumed on or before"/>
                     </label>
-                    <g:selectCategory name="selectedCategories" value="${command?.selectedCategories?.id}" multiple="true" class="chzn-select-deselect"
-                                      style="padding: 5px;" data-placeholder=" "/>
+                </td>
+                <td>
+                    <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" size="18"/>
                 </td>
             </tr>
-            <tr class="prop">
+            <tr>
                 <td colspan="2">
-                    <label>
-                        <warehouse:message code="consumption.includeProductsWithTag.label" default="Include products with tag" />
-                    </label>
+                    <h3>
+                        <warehouse:message code="consumption.products.label" default="Product(s)"/>
+                    </h3>
+
+
+                </td>
+
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <g:selectCategory name="selectedCategories" multiple="true" value="${command?.selectedCategories?.id}" class="chzn-select"
+                    data-placeholder='${warehouse.message(code:"consumption.includeProductsWithCategory.label", default:"Include products within the following categories")}'/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
                     <g:selectTags name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"
-                        data-placeholder=" "/>
+                        data-placeholder='${warehouse.message(code:"consumption.includeProductsWithTag.label", default:"Include products within the following tags")}'/>
                 </td>
             </tr>
-        </table>
-    </div>
 
-    <div class="box">
-
-        <h2><warehouse:message code="locations.label" default="Locations"/></h2>
-        <table>
-            <tr class="prop">
+            <tr>
                 <td colspan="2">
-                    <label>
+                    <h3>
                         <warehouse:message code="consumption.fromLocations.label" default="Source(s)"/>
-                    </label>
+                    </h3>
                     <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"
-                                      data-placeholder=" "/>
+                                      data-placeholder="${warehouse.message(code:'consumption.fromLocations.label', default:'Source(s)')}"/>
                 </td>
             </tr>
 
 
-            <tr class="prop">
-                <td colspan="2" class="bottom">
-                    <label>
+            <tr>
+                <td colspan="2">
+                    <h3>
                         <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
-                    </label>
-                    <div class="right">
-                        <a id="selectAllLocations">Select all</a>&nbsp;|&nbsp;
-                        <a id="selectNoLocations">Select none</a>
-                    </div>
+                    </h3>
+                    <g:unless test="${!command.toLocations}">
+                        <div class="right">
+                            <a id="selectAllLocations">Select all</a>&nbsp;|&nbsp;
+                            <a id="selectNoLocations">Select none</a>
+                        </div>
+                    </g:unless>
 
                 </td>
             </tr>
             <tr class="">
                 <td colspan="2">
-                    <div>
+                    <div style="max-height: 300px; overflow: auto; border: 1px lightgrey solid">
                         <g:set var="count" value="${0}"/>
+                        <g:unless test="${command.toLocations}">
+                            <div class="empty fade center">
+                                <warehouse:message code="consumption.chooseFromLocation.message" default="You must choose at least one source"/>
+                            </div>
+                        </g:unless>
                         <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
                             <div class="">
 
                                 <g:each var="locationTypeEntry" in="${entry.value.groupBy{it.locationType}}">
+                                    <label>
+                                        ${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')}
+                                    &rsaquo;
+                                        <format:metadata obj="${locationTypeEntry}"/>
+                                    </label>
                                     <table >
-                                        <thead>
-                                            <tr>
-                                                <th colspan="2">
-                                                    ${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')}
-                                                    &rsaquo;
-                                                    <format:metadata obj="${locationTypeEntry}"/></th>
-                                            </tr>
-                                        </thead>
                                         <tbody>
                                             <g:each var="toLocation" in="${locationTypeEntry.value}">
                                                 <tr>
@@ -127,94 +145,88 @@
                 </td>
             </tr>
 
-        </table>
-    </div>
-        <div class="box">
-            <h2><warehouse:message code="renderOptions.label" default="Render options"/></h2>
-            <table>
-                <tr class="prop">
-                    <td>
-                        <label>
-                            <warehouse:message code="consumption.format.label" default="Format"/>
-                        </label>
-                    </td>
-                    <td>
-                        <span class="middle">
-                            <g:radio name="format" value="html" checked="${params.format=='html'||!params.format}"/> HTML
-                        </span>
-                        <span class="middle">
-                            <g:radio name="format" value="csv" checked="${false}" /> CSV
-                        </span>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    <label>
+                        <warehouse:message code="consumption.format.label" default="Format"/>
+                    </label>
+                </td>
+                <td>
+                    <span class="middle">
+                        <g:radio name="format" value="html" checked="${params.format=='html'||!params.format}"/> HTML
+                    </span>
+                    <span class="middle">
+                        <g:radio name="format" value="csv" checked="${false}" /> CSV
+                    </span>
+                </td>
+            </tr>
 
-                <tr class="prop">
-                    <td colspan="2">
-                        <label>
-                            <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
-                        </label>
-                        <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
+            <tr>
+                <td colspan="2">
+                    <label>
+                        <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
+                    </label>
+                    <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
 
-                    </td>
-                </tr>
+                </td>
+            </tr>
 
-                <tr class="prop">
-                    <td colspan="2">
-                        <label><warehouse:message code="consumption.additionalColumns.label" default="Choose additional columns"/></label>
-                        <select name="selectedProperties" multiple="true" class="chzn-select-deselect" style="height: 100px;">
-                            <g:each var="property" in="${command.productDomain.properties}">
-                                <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
-                                    <option value="${property.name}" ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}>
-                                        ${property.naturalName} (${property.typePropertyName})
-                                    </option>
-                                </g:if>
-                            </g:each>
-                        </select>
-                        <%--
-                    <div style="overflow: auto; max-height: 200px;" class="list">
-                        <table>
+            <tr>
+                <td colspan="2">
+                    <label><warehouse:message code="consumption.additionalColumns.label" default="Choose additional columns"/></label>
+                    <select name="selectedProperties" multiple="true" class="chzn-select-deselect" style="height: 100px;">
                         <g:each var="property" in="${command.productDomain.properties}">
                             <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
-                                <tr>
-                                    <td class="middle left">
-                                    <g:checkBox name="selectedProperties" value="${property.name}"
-                                        checked="${command.selectedProperties?.toList()?.contains(property.name)}"
-                                        class="property"/>
-                                    </td>
-                                    <td class="middle left">
-                                        ${property.naturalName}
-                                        <span class="fade">${property.typePropertyName}</span>
-                                    </td>
-                                </div>
+                                <option value="${property.name}" ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}>
+                                    ${property.naturalName} (${property.typePropertyName})
+                                </option>
                             </g:if>
                         </g:each>
-                        </table>
-                    </div>
-                        --%>
-                    </td>
-                </tr>
+                    </select>
+                    <%--
+                <div style="overflow: auto; max-height: 200px;" class="list">
+                    <table>
+                    <g:each var="property" in="${command.productDomain.properties}">
+                        <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
+                            <tr>
+                                <td class="middle left">
+                                <g:checkBox name="selectedProperties" value="${property.name}"
+                                    checked="${command.selectedProperties?.toList()?.contains(property.name)}"
+                                    class="property"/>
+                                </td>
+                                <td class="middle left">
+                                    ${property.naturalName}
+                                    <span class="fade">${property.typePropertyName}</span>
+                                </td>
+                            </div>
+                        </g:if>
+                    </g:each>
+                    </table>
+                </div>
+                    --%>
+                </td>
+            </tr>
 
-                <tr class="prop">
-                    <td class="center" colspan="2">
-                        <div>
-                            <button class="button icon search">
-                                <warehouse:message code="default.runReport.label" default="Run report"/>
-                            </button>
-                            <g:link controller="consumption" action="show" class="button icon trash">${warehouse.message(code:'consumption.parameters.reset.label', default: 'Reset parameters')}</g:link>
-                            <%--
-                            <a href="#" id="parameters-toggle" class="button icon settings">
-                                <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>
-                                --%>
-                        </div>
-
+            <tr>
+                <td class="center" colspan="2">
+                    <div>
+                        <button class="button icon search">
+                            <warehouse:message code="default.runReport.label" default="Run report"/>
+                        </button>
+                        <g:link controller="consumption" action="show" class="button icon trash">${warehouse.message(code:'consumption.parameters.reset.label', default: 'Reset parameters')}</g:link>
                         <%--
-                        <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
-                        --%>
-                    </td>
-                </tr>
-            </table>
+                        <a href="#" id="parameters-toggle" class="button icon settings">
+                            <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>
+                            --%>
+                    </div>
 
-        </div>
+                    <%--
+                    <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
+                    --%>
+                </td>
+            </tr>
+        </table>
+    </div>
 	</g:form>
 </div>
 <script>
