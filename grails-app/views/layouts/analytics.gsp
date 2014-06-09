@@ -5,6 +5,9 @@
     <meta name="layout" content="analytics" />
     <title><warehouse:message code="openboxes.analytics.title" default="OpenBoxes Analytics"/> | <g:layoutTitle/></title>
 
+
+
+    <!-- CSS Stylesheets -->
     <!--<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">-->
 
     <!-- Removing this fixed issues with the dataTable.css -->
@@ -29,6 +32,8 @@
     --%>
     <link rel="stylesheet" href="${createLinkTo(dir:'js/bootstrap-datepicker-1.3.0/css', file:'datepicker.css')}">
 
+
+    <!-- Javascript -->
     <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" charset="utf8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js"></script>
     <!--<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>-->

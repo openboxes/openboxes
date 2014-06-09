@@ -9,11 +9,13 @@
 </div>
 
 <div id="body">
-    <h2>${session.warehouse.name}</h2>
-    <div>
+    <h2>${session.warehouse.name}
+    <small>
         <span id="processingTime"></span> |
         <span id="totalValue"></span>
-    </div>
+    </small>
+    </h2>
+    <hr/>
     <table id="dataTable" class="box">
         <thead>
         <tr>
@@ -44,6 +46,8 @@
 
 <r:script disposition="defer">
 
+
+
     $( document ).ready(function() {
 
         //$("#dataTable").dataTable();
@@ -72,19 +76,27 @@
                 console.log("END fnServerParams");
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
-                $.getJSON( sSource, aoData, function (json) {
-                    /* Do whatever additional processing you want on the callback, then tell DataTables */
-                    fnCallback(json);
-                    console.log(json);
-                    $("#processingTime").html(json.processingTime);
-                    $("#totalValue").html("Total value of selected items $" + json.totalValueFormatted);
-                } );
+                $.ajax( {
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": function(json) {
+                        console.log(json);
+                        $("#processingTime").html(json.processingTime);
+                        $("#totalValue").html("Total value of selected items $" + json.totalValueFormatted);
+                        fnCallback(json);
+                    },
+                    "timeout": 30000,   // optional if you want to handle timeouts (which you should)
+                    "error": handleAjaxError // this sets up jQuery to give me errors
+                });
+
             },
 
             "oLanguage": {
                 "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner-large.gif' /><br/>Loading..."
             },
-            "iDisplayLength" : -1,
+            "iDisplayLength" : 10,
             "aLengthMenu": [
                 [5, 10, 25, 50, 100, 500, 1000, -1],
                 [5, 10, 25, 50, 100, 500, 1000, "All"]
@@ -93,7 +105,7 @@
                 { "mData": "id", "bSearchable": false, "bVisible": false },
                 { "mData": "inventoryLevelId", "bSearchable": false, "bVisible": false },
                 { "mData": "status" }, // 0
-                { "mData": "name", "sWidth": "33%" }, // 1
+                { "mData": "name", "sWidth": "50%" }, // 1
                 { "mData": "productCodes" }, // 2
                 { "mData": "hasProductGroup" },  // 8
                 { "mData": "hasInventoryLevel" }, // 9
@@ -110,12 +122,14 @@
             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
                 console.log(aData);
                 switch(aData["status"]){
+                    case 'IN_STOCK_OBSOLETE':
                     case 'IN_STOCK':
                         $(nRow).css('color', 'green')
                         break;
                     case 'NOT_STOCKED':
                         $(nRow).css('color', 'grey')
                         break;
+                    case 'STOCK_OUT_OBSOLETE':
                     case 'STOCK_OUT':
                         $(nRow).css('color', 'red')
                         break;
@@ -123,7 +137,7 @@
                         $(nRow).css('color', 'orange')
                         break;
                     case 'REORDER':
-                        $(nRow).css('color', '#eed7b0;')
+                        $(nRow).css('color', 'yellow;')
                         break;
                     case 'IDEAL_STOCK':
                         $(nRow).css('color', 'green')
@@ -145,12 +159,28 @@
                 }
                 return nRow;
             }
+
         });
 
-        dataTable.removeClass( 'display' )
-		.addClass('table table-striped table-bordered');
+        // Add some CSS styles to the table
+        dataTable.removeClass( 'display' ).addClass('table table-striped table-bordered');
 
+        function handleAjaxError( xhr, textStatus, error ) {
+            if ( textStatus === 'timeout' ) {
+                alert( 'The server took too long to send the data.' );
+            }
+            else {
+                alert( 'An error occurred on the server. Please submit a bug report using the link under the Help menu.' );
+            }
+            dataTable.fnProcessingIndicator( false );
+        }
 
+        // Toggle checkboxes
+        $("#status-0").click(function() {
+            $('input:checkbox').not(this).prop('checked', this.checked);
+        });
+
+        // Refresh datatable with data from the server
         $('#refresh-btn').click( function (event) {
             event.preventDefault();
             dataTable.fnClearTable();
@@ -164,12 +194,14 @@
             xhr.abort();
         } );
 
+        // AJAX Call to retrieve the count/percentage for each inventory status in the sidebar
         var xhr = $.ajax({
             dataType: "json",
-            timeout: 60000,
+            timeout: 30000,
             url: "${request.contextPath}/json/getSummaryByProductGroup?location.id=${session.warehouse.id}",
             //data: data,
             success: function (data) {
+
                 console.log("Loading data ...");
                 console.log(data);
                 $.each(data, function( key, value ) {
@@ -178,7 +210,6 @@
                     $("#badge-status-" + key).html(value.numProductGroups);
                     $("#badge-percentage-" + key).html(Math.round(value.percentage * 100) + "%");
                 });
-
                 //$("#reportContent").html(data);
                 // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
                 //$('#lowStockCount').html(data.lowStock?data.lowStock:0);
@@ -188,13 +219,19 @@
                 console.log(xhr);
                 console.log(status);
                 console.log(error);
-                $("#error").html("An error occurred: " + error + ".  Please contact your system administrator.");
                 $("#status-spinner").hide();
             }
         });
 
     });
 
+
+    jQuery.fn.dataTableExt.oApi.fnProcessingIndicator = function ( oSettings, onoff ) {
+        if ( typeof( onoff ) == 'undefined' ) {
+            onoff = true;
+        }
+        this.oApi._fnProcessingDisplay( oSettings, onoff );
+    };
 </r:script>
 
 </html>

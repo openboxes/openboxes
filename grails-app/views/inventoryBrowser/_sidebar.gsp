@@ -5,7 +5,7 @@
         <span id="status-spinner" class="spinner"><i class="icon-spin icon-refresh"></i></span>
     </div>
     <div class="form-group">
-        <g:each in="${['OVERSTOCK','IN_STOCK','IDEAL_STOCK','REORDER','LOW_STOCK','STOCK_OUT','NOT_STOCKED','INVALID']}" var="status" status="i">
+        <g:each in="${['ALL','OVERSTOCK','IN_STOCK','IDEAL_STOCK','REORDER','LOW_STOCK','STOCK_OUT','NOT_STOCKED','INVALID']}" var="status" status="i">
             <div class="checkbox">
                 <label for="status-${i}" title="${status}">
                     <span class=""><warehouse:message code="enum.InventoryLevelStatus.${status}"/></span>
@@ -16,9 +16,12 @@
             </div>
         </g:each>
     </div>
-    <hr/>
+
+
+
     <button id="refresh-btn" class="btn btn-primary">Refresh</button>
     <button id="cancel-btn" class="btn btn-default">Cancel</button>
+    <%--
     <button id="export-btn" class="btn btn-default" target="_blank">Export</button>
-
+    --%>
 </form>

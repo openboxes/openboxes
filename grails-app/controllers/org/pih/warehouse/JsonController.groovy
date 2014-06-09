@@ -1039,7 +1039,7 @@ class JsonController {
         def location = Location.get(session.warehouse.id)
 		terms?.each{ term ->
             // Get all products that match terms
-            def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
+            def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, location.inventory, 25, 0)
             quantityMap = getQuantityByProductMapCached(location, products);
             items.addAll(products)
 		}
@@ -1191,18 +1191,19 @@ class JsonController {
     def getQuantityOnHandByProductGroup = {
         def startTime = System.currentTimeMillis()
         log.info "getQuantityOnHandByProductGroup " + params
-        def aaData = [] //data.productGroupDetails.ALL.values()
+        def aaData = new HashSet() //data.productGroupDetails.ALL.values()
         if (params["status[]"]) {
             def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
             params["status[]"].split(",").each {
-                println "status = " + it
+                println "Add entries from data.productGroupDetails[${it}]"
                 def entry = data.productGroupDetails[it]
                 if (entry) {
                     aaData += entry.values()
                 }
             }
         }
-        aaData.unique()
+
+        //aaData.unique()
 
         def totalValue = 0
         totalValue = aaData.sum { it.totalValue?:0 }
@@ -1212,9 +1213,10 @@ class JsonController {
         numberFormat.minimumFractionDigits = 2
         def totalValueFormatted = numberFormat.format(totalValue?:0)
         //def totalValue = aaData.collect { it.totalValue }.sum()
-        //println "totalValue = " + totalValue
+        println "totalValue = " + totalValueFormatted
 
-        render (["aaData":aaData,"processingTime":"Took " + (System.currentTimeMillis()-startTime) + " ms to process",
+        render (["aaData":aaData,
+                "processingTime":"Took " + (System.currentTimeMillis()-startTime) + " ms to process",
                 totalValue:totalValue,totalValueFormatted:totalValueFormatted] as JSON)
     }
 
