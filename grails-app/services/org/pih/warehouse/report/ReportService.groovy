@@ -27,6 +27,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.w3c.dom.Document
 import org.xml.sax.InputSource
+import util.InventoryUtil
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -355,12 +356,13 @@ class ReportService implements ApplicationContextAware {
             def onHandQuantity = map.onHandQuantity
             def inventoryLevel = map.inventoryLevel
 
+            println product.name + " = " + status
+
             //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
             def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
             items << [
                     id:product.id,
                     name: product.name,
-                    //status: product.getStatus(session.warehouse.id, value),
                     status: status,
                     productCode: product.productCode,
                     genericProductId:product?.genericProduct?.id,
@@ -378,18 +380,6 @@ class ReportService implements ApplicationContextAware {
                     totalValue: (product.pricePerUnit?:0) * (onHandQuantity?:0)
             ]
         }
-        //def things = [
-        //        [id:1, name:"fred", total:10, date: "2012-01-01"],
-        //        [id:2, name:"fred", total:10, date: "2012-01-03"],
-        //        [id:3, name:"jane", total:10, date: "2012-01-04"],
-        //        [id:4, name:"fred", total:10, date: "2012-02-11"],
-        //        [id:5, name:"jane", total:10, date: "2012-01-01"],
-        //        [id:6, name:"ted", total:10, date: "2012-03-21"],
-        //        [id:7, name:"ted", total:10, date: "2012-02-09"]
-        //];
-        //def otherThings = things.inject([:].withDefault { [:].withDefault { 0 } } ) {
-        //    map, v -> map[v.name][Date.parse('yyyy-MM-dd', v.date).format('MMMM')] += v.total; map
-        //}
 
         // Group all items by status
         def statusSummary = items.inject([:].withDefault { [count:0,items:[]] } ) { map, item ->
@@ -403,7 +393,7 @@ class ReportService implements ApplicationContextAware {
         // Group entries by product group
 
         // Removed products:[]
-        def productGroupMap = items.inject([:].withDefault { [id:null,name:null,status:null,productCodes:[],totalValue:0,numProducts:0,numInventoryLevels:0,
+        def productGroupMap = items.inject([:].withDefault { [id:null,name:null,status:null,productCodes:[],unitPrice:0,totalValue:0,numProducts:0,numInventoryLevels:0,
                 onHandQuantity:0,minQuantity:0,maxQuantity:0,reorderQuantity:0,inventoryStatus:null,hasInventoryLevel:false,hasProductGroup:false,inventoryLevelId:null] } ) { map, item ->
             //map[item.genericProduct].products << item;
             map[item.genericProduct].id = item.genericProductId
@@ -414,6 +404,7 @@ class ReportService implements ApplicationContextAware {
             //map[item.genericProduct].products << item
             map[item.genericProduct].productCodes << item.productCode
             map[item.genericProduct].totalValue += item.totalValue;
+            map[item.genericProduct].unitPrice += item.unitPrice;
 
             if (item.inventoryLevel) {
                 map[item.genericProduct].numInventoryLevels++
@@ -438,13 +429,16 @@ class ReportService implements ApplicationContextAware {
 
 
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
-        numberFormat.maximumFractionDigits = 2
+        //numberFormat.maximumFractionDigits = 2
         numberFormat.currency = Currency.getInstance("USD")
+        numberFormat.maximumFractionDigits = 2
+        numberFormat.minimumFractionDigits = 2
 
         // Set status for all rows
         productGroupMap.each { k, v ->
-            v.status = getStatusMessage(v?.inventoryLevel, v?.onHandQuantity)
-            v.totalValue = numberFormat.format(v.totalValue)
+            v.status = InventoryUtil.getStatusMessage(v?.inventoryLevel?.status, v?.inventoryLevel?.minQuantity?:0,v?.inventoryLevel?.reorderQuantity?:0,v?.inventoryLevel?.maxQuantity?:0,v?.onHandQuantity?:0)
+            v.unitPriceFormatted = numberFormat.format(v.unitPrice)
+            v.totalValueFormatted = numberFormat.format(v.totalValue)
         }
 
 
@@ -531,7 +525,7 @@ class ReportService implements ApplicationContextAware {
                         "NOT_STOCKED":notStocked,
                         "STOCK_OUT":outOfStock,
                         "LOW_STOCK":lowStock,
-                        "REORDER":outOfStock,
+                        "REORDER":reorderStock,
                         "IN_STOCK":inStock,
                         "IDEAL_STOCK":idealStock,
                         "OVERSTOCK":overStock,
@@ -540,6 +534,7 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
+    /*
     def getStatusMessage(InventoryLevel inventoryLevel, Integer currentQuantity) {
 
         def statusMessage = "UNKNOWN"
@@ -585,6 +580,6 @@ class ReportService implements ApplicationContextAware {
 
         return statusMessage
     }
-
+    */
 
 }

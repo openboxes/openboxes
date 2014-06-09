@@ -33,6 +33,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import util.InventoryUtil
 
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 class JsonController {
@@ -266,7 +267,7 @@ class JsonController {
     }
 
 
-    //@Cacheable("dashboardCache")
+    @Cacheable("dashboardCache")
     def getProductGroupAlerts = {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session?.warehouse?.id)
@@ -1033,60 +1034,42 @@ class JsonController {
   
 	def globalSearch = {
 		def items = []
-		def terms = params.term?.split(" ")
         def quantityMap = [:]
+		def terms = params.term?.split(" ")
+        def location = Location.get(session.warehouse.id)
 		terms?.each{ term ->
-			
-			// Get all products that match terms
-			/*
-			def personResults = Person.withCriteria {
-				or {
-					ilike("firstName", term + "%")
-					ilike("lastName", term + "%")
-					ilike("email", term + "%")
-				}
-			}
-			items.addAll(personResults)
-			*/
-			
-			// Get all inventory items that match terms
-			//def inventoryItemResults = InventoryItem.withCriteria { 
-			//	or { 
-			//		ilike("lotNumber", term + "%")
-			//	}
-			//}
-			//items.addAll(inventoryItemResults)
-
             // Get all products that match terms
-            def inventory = Location.get(session.warehouse.id).inventory
             def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, inventory, 25, 0)
-
-            quantityMap = inventoryService.getQuantityByProductMap(inventory, products);
+            quantityMap = getQuantityByProductMapCached(location, products);
             items.addAll(products)
-
-			// Get all shipments that match terms
-			/*
-			def shipmentResults = Shipment.withCriteria {
-				or {
-					ilike("name", term + "%")
-				}
-			}
-			items.addAll(shipmentResults)
-			*/
 		}
 		
 		items.unique{ it.id }
 		def json = items.collect{
             def quantity = quantityMap[it]?:0
+            def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
+
 			def type = it.class.simpleName.toLowerCase()
 			[   id: it.id,
                 type: it.class,
                 url: request.contextPath + "/" + type  + "/redirect/" + it.id,
 				value: it.name,
-                label: it.productCode + " " + it.name + " [" + (it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}") + "] " + quantity + " " + it.unitOfMeasure ]
+                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + it.unitOfMeasure ]
 		}
 		render json as JSON
 	}
+
+    /**
+     * Caches the quantity on hand values indexed by product.
+     *
+     * @param location
+     * @param products
+     * @return
+     */
+    //@Cacheable("dashboardCache")
+    Map<Product, Integer> getQuantityByProductMapCached(Location location, List<Product> products) {
+        return inventoryService.getQuantityByProductMap(location.inventory, products)
+    }
 
 
     /*
@@ -1202,19 +1185,37 @@ class JsonController {
 
     }
 
+    /**
+     * Analytics > Inventory Browser > Data Table
+     */
     def getQuantityOnHandByProductGroup = {
+        def startTime = System.currentTimeMillis()
         log.info "getQuantityOnHandByProductGroup " + params
         def aaData = [] //data.productGroupDetails.ALL.values()
-        if (params.list("status")) {
+        if (params["status[]"]) {
             def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
-            params.list("status").each {
-                println it
-                aaData += data.productGroupDetails[it].values()
+            params["status[]"].split(",").each {
+                println "status = " + it
+                def entry = data.productGroupDetails[it]
+                if (entry) {
+                    aaData += entry.values()
+                }
             }
         }
         aaData.unique()
 
-        render (["aaData":aaData] as JSON)
+        def totalValue = 0
+        totalValue = aaData.sum { it.totalValue?:0 }
+        NumberFormat numberFormat = NumberFormat.getNumberInstance()
+        numberFormat.currency = Currency.getInstance("USD")
+        numberFormat.maximumFractionDigits = 2
+        numberFormat.minimumFractionDigits = 2
+        def totalValueFormatted = numberFormat.format(totalValue?:0)
+        //def totalValue = aaData.collect { it.totalValue }.sum()
+        //println "totalValue = " + totalValue
+
+        render (["aaData":aaData,"processingTime":"Took " + (System.currentTimeMillis()-startTime) + " ms to process",
+                totalValue:totalValue,totalValueFormatted:totalValueFormatted] as JSON)
     }
 
     def getSummaryByProductGroup = {
@@ -1275,6 +1276,9 @@ class JsonController {
         render ([url:url,type:type,barcode:barcode] as JSON)
     }
 
+    /**
+     * Stock Card > Snapshot graph
+     */
     def getQuantityOnHandByMonth = {
         println params;
         def dates = []
@@ -1368,10 +1372,12 @@ class JsonController {
         println "newData: " + newData
 
 
-        render ([label: "QoH ${product?.name}", location: "${location.name}", data:newData] as JSON);
+        render ([label: "${product?.name}", location: "${location.name}", data:newData] as JSON);
     }
 
-
+    /**
+     * Analytics > Inventory Snapshot data table
+     */
     def getInventorySnapshotsByDate = {
         println "getInventorySnapshotsByDate: " + params
         def data = []
@@ -1420,7 +1426,9 @@ class JsonController {
         render (["aaData":data, "iTotalRecords": data.size()?:0, "iTotalDisplayRecords": data.size()?:0, "sEcho": 1] as JSON)
     }
 
-
+    /**
+     * Dashboard > Most requested items
+     */
     def getMostRequestedItems = {
 
         def data = [:]

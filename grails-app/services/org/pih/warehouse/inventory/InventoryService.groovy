@@ -15,6 +15,7 @@ import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
+import org.hibernate.annotations.Cache
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.auth.AuthService
