@@ -24,7 +24,7 @@
 
 					<tr>
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/clock_red.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:30]">
@@ -38,7 +38,7 @@
 					</tr>
 					<tr>
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/clock.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:90]">
@@ -52,7 +52,7 @@
 					</tr>
 					<tr>
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk', file: 'calendar_select_day.png')}" class="middle"/>
+							<img src="${createLinkTo(dir:'images/icons/silk', file: 'error.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:180]">
@@ -66,7 +66,7 @@
 					</tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'calendar_view_month.png')}" class="middle"/>
+                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'accept.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[threshold:365]">

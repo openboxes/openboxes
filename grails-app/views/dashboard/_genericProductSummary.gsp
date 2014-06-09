@@ -4,8 +4,69 @@
 		<div id="alertSummary">
     		<table class="zebra">
     			<tbody>
+                <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
+                    </td>
+
+                    <td>
+                        <g:link controller="json" action="listByProductGroup" params="[status:'STOCK_OUT']">
+                            <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
+                        </g:link>
+                    </td>
+                    <td class="right">
+                        <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                    </td>
+                    <td>
+                        <g:link controller="json" action="listByProductGroup" params="[status:'STOCK_OUT_OBSOLETE']">
+                            <warehouse:message code="inventory.listOutOfStockObsolete.label" default="Stocked out, but obsolete"/>
+                        </g:link>
+                    </td>
+                    <td class="right">
+                        <div id="STOCK_OUT_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                    </td>
+
+                    <td>
+                        <g:link controller="json" action="listByProductGroup" params="[status:'LOW_STOCK']">
+                            <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
+                        </g:link>
+                    </td>
+                    <td class="right">
+                        <div id="LOW_STOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                    </td>
+
+                    <td>
+                        <g:link controller="json" action="listByProductGroup" params="[status:'REORDER']">
+                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
+                        </g:link>
+                    </td>
+                    <td class="right">
+                        <div id="REORDER" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                    </td>
+                </tr>
+
 
                 <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                    </td>
 
                     <td>
                         <g:link controller="json" action="listByProductGroup" params="[status:'OVERSTOCK']">
@@ -17,6 +78,9 @@
                     </td>
                 </tr>
                 <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                    </td>
 
                     <td>
                         <g:link controller="json" action="listByProductGroup" params="[status:'IN_STOCK']">
@@ -29,6 +93,9 @@
                     </td>
                 </tr>
                 <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                    </td>
                     <td>
                         <g:link controller="json" action="listByProductGroup" params="[status:'IN_STOCK_OBSOLETE']">
                             <warehouse:message code="inventory.listInStockObsolete.label" default="In stock, but obsolete"/>
@@ -40,57 +107,15 @@
                     </td>
                 </tr>
 
-                <tr>
-
-                    <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'REORDER']">
-                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="REORDER" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                    </td>
-                </tr>
-                <tr>
-
-                    <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'LOW_STOCK']">
-                            <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="LOW_STOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'STOCK_OUT']">
-                            <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'STOCK_OUT_OBSOLETE']">
-                            <warehouse:message code="inventory.listOutOfStockObsolete.label" default="Stocked out, but obsolete"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="STOCK_OUT_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
 
 
 
 				</tbody>
                 <tfoot>
                     <tr>
-
+                        <th class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle" title='${warehouse.message(code:"default.total.label",default:"Total")}'/>
+                        </th>
                         <th>
                             <g:link controller="json" action="listByProductGroup" params="[status:'ALL']">
                                 <warehouse:message code="default.total.label" />

@@ -5,16 +5,9 @@
 
     		<table class="zebra">
     			<tbody>
-                <tr class="prop">
-                    <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
-                    </td>
-                    <td colspan="2">
-                        <label><warehouse:message code="inventory.alerts.label" default="Alerts"/></label>
-                    </td>
-                </tr>
                 <tr>
                     <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listOutOfStock" target="_blank">
@@ -27,16 +20,9 @@
                     </td>
                 </tr>
 
-                <tr class="prop">
-                    <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
-                    </td>
-                    <td colspan="2">
-                        <label><warehouse:message code="inventory.warnings.label" default="Warnings"/></label>
-                    </td>
-                </tr>
                 <tr>
                     <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listLowStock" target="_blank">
@@ -49,7 +35,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listReorderStock" target="_blank">
@@ -60,19 +46,9 @@
                         <div id="reorderStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
-
-                <tr class="prop">
-                    <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/information.png')}" class="middle"/>
-                    </td>
-
-                    <td colspan="2">
-                        <label><warehouse:message code="inventory.information.label" default="Information"/></label>
-                    </td>
-                </tr>
-
                 <tr>
                     <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
 
                     </td>
                     <td>
@@ -86,7 +62,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-
+                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listTotalStock" target="_blank">
@@ -101,7 +77,7 @@
 
                 <tr>
                     <td class="center" style="width: 1%">
-
+                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listInStock" target="_blank">
@@ -115,6 +91,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/information.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listQuantityOnHandZero" target="_blank">
@@ -129,7 +106,7 @@
 
                     <tr>
                         <td class="center" style="width: 1%">
-
+                            <img src="${createLinkTo(dir:'images/icons/silk/information.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listReconditionedStock" target="_blank">
