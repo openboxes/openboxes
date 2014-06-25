@@ -1462,6 +1462,17 @@ class InventoryService implements ApplicationContextAware {
         log.debug "products: " + products.size()
 		def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
+        println "quantityMap: " + quantityMap.keySet()
+
+        // FIXME Hacky way to make sure all products that have been passed in have an entry in the quantity map
+        // FIXME Requires a proper implementation for hashCode/equals methods which was disabled due to a different bug
+        products.each {
+            def product = Product.get(it.id)
+            log.debug "contains key for product ${product.productCode} ${product.name}: " + quantityMap.containsKey(product)
+            if (!quantityMap.containsKey(product)) {
+                quantityMap[product] = 0
+            }
+        }
 
         log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 

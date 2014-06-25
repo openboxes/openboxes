@@ -300,7 +300,8 @@ class Product implements Comparable, Serializable {
                 if (product != this) {
                     products.add(product)
 
-                }            }
+                }
+            }
         }
         products = products.unique()
         return products
@@ -386,7 +387,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
-    String toString() { return "$name"; }
+    String toString() { return "${productCode}:${name}"; }
 
     /**
      * Sort by name
