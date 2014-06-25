@@ -57,7 +57,7 @@
             "bScrollCollapse": true,
             "bJQueryUI": false,
             "bAutoWidth": true,
-            "sPaginationType": "full_numbers",
+            "sPaginationType": "two_button",
             "sAjaxSource": "${request.contextPath}/json/getMostRequestedItems",
             "fnServerParams": function ( data ) {
                 //console.log("server data " + data);
