@@ -27,6 +27,7 @@ import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.reporting.Consumption
 import org.pih.warehouse.shipping.Shipment
@@ -1657,6 +1658,10 @@ class InventoryService implements ApplicationContextAware {
 	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
 		// Get basic details required for the whole page
 		cmd.productInstance = Product.get(params?.product?.id ?: params.id);  // check product.id and id
+        if (!cmd.productInstance) {
+            throw new ProductException("Product with identifier '${params?.product?.id?:params.id}' could not be found")
+        }
+
 		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
 		cmd.inventoryLevelInstance = getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
 
@@ -3789,14 +3794,14 @@ class InventoryService implements ApplicationContextAware {
 
         def entries = []
         quantityMap.each { key, value ->
-            entries << [product:key, genericProduct: key.genericProduct, currentQuantity: (value>0)?value:0]    // make sure currentQuantity >= 0
+            entries << [product: key, genericProduct: key.genericProduct, currentQuantity: (value>0)?value:0]    // make sure currentQuantity >= 0
         }
         entries.sort { it.product.name }
 
-        def inventoryStatusMap = getInventoryStatusAndLevel(location)
+        //def inventoryStatusMap = getInventoryStatusAndLevel(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
         println inventoryLevelMap
-        productGroupMap = entries.inject([:].withDefault { [status:null,name:null,product:null,genericProduct:null,type:null,minQuantity:0,reorderQuantity:0,maxQuantity:0,currentQuantity:0,inventoryLevel:null,productCount:0,products:[]] } ) { map, entry ->
+        productGroupMap = entries.inject([:].withDefault { [status:null,name:null,product:null,genericProduct:null,type:null,minQuantity:0,reorderQuantity:0,maxQuantity:0,currentQuantity:0,inventoryLevel:null,productCount:0,products:[],hasPreferred:false,inventoryLevelLastUpdated:null] } ) { map, entry ->
             def product = entry?.product
             def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
             def nameKey = entry?.genericProduct?.description?:entry?.product?.name
@@ -3808,21 +3813,35 @@ class InventoryService implements ApplicationContextAware {
             map[nameKey].currentQuantity += entry.currentQuantity?:0
             map[nameKey].productCount++
 
-            if (inventoryLevel?.preferred) {
+            // If this inventory level is preferred and there's no other preferred
+            if (inventoryLevel?.preferred && !map[nameKey].hasPreferred) {
                 map[nameKey].minQuantity = inventoryLevel?.minQuantity?:0
                 map[nameKey].reorderQuantity = inventoryLevel?.reorderQuantity?:0
                 map[nameKey].maxQuantity = inventoryLevel?.maxQuantity?:0
-                map[nameKey].inventoryLevel = "Preferred"
-                //map[nameKey].status = inventoryLevel.statusMessage(entry?.quantityOnHand)
+                map[nameKey].inventoryLevel = "Preferred item"
+                map[nameKey].inventoryLevelLastUpdated = inventoryLevel?.lastUpdated
+                map[nameKey].hasPreferred = true
             }
             else {
-                map[nameKey].minQuantity += inventoryLevel?.minQuantity?:0
-                map[nameKey].reorderQuantity += inventoryLevel?.reorderQuantity?:0
-                map[nameKey].maxQuantity += inventoryLevel?.maxQuantity?:0
-                map[nameKey].inventoryLevel = (map[nameKey].productCount>1)?"Multiple":"Single"
-                //map[nameKey].status = inventoryLevel.statusMessage(entry?.quantityOnHand)
+                // If there are more than one (preferred) inventory levels then we should use the latest
+                if (inventoryLevel?.preferred && map[nameKey].hasPreferred) {
+                    map[nameKey].inventoryLevel = "More than one preferred item"
+                }
+                else {
+                    map[nameKey].inventoryLevel = "No preferred items"
+                    def lastUpdated1 = inventoryLevel?.lastUpdated
+                    def lastUpdated2 = map[nameKey]?.inventoryLevelLastUpdated
+                    // jgreenspan says:
+                    // I think that if a flag is not set then it should default to the most recently updated inventory level.
+                    // If this is difficult to do then the report can show an error when there is no flag. Then this will force us to select a flag.
+                    if (!lastUpdated2 || (lastUpdated1 && lastUpdated2 && lastUpdated1.after(lastUpdated2))) {
+                        map[nameKey].minQuantity = inventoryLevel?.minQuantity?:0
+                        map[nameKey].reorderQuantity = inventoryLevel?.reorderQuantity?:0
+                        map[nameKey].maxQuantity = inventoryLevel?.maxQuantity?:0
+                        map[nameKey].inventoryLevelLastUpdated = lastUpdated1
+                    }
+                }
             }
-
             map[nameKey].products << [
                     product:entry.product?.name,
                     productCode: entry?.product?.productCode,
@@ -3839,16 +3858,26 @@ class InventoryService implements ApplicationContextAware {
 
         productGroupMap.each { k, v ->
             productGroupMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
-
             //InventoryUtil.getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
-
         }
-
-
         return productGroupMap.values().groupBy { it.status }
 
     }
 
+    /**
+     * The logic for this method is located in several locations because the logic is specific to
+     * a single product / inventoryLevel, whereas this method is for the entire product group.
+     *
+     * FIXME Move to InteventoryUtil when complete
+     * FIXME Add unit tests for this logic
+     *
+     * @param inventoryStatus
+     * @param minQuantity
+     * @param reorderQuantity
+     * @param maxQuantity
+     * @param currentQuantity
+     * @return
+     */
     def String getStatusMessage(inventoryStatus, minQuantity, reorderQuantity, maxQuantity, currentQuantity) {
         def statusMessage = ""
         if (inventoryStatus == InventoryStatus.SUPPORTED  || !inventoryStatus) {

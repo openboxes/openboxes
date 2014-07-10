@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -59,113 +60,31 @@ class InventoryItemController {
 	/**
 	 * Displays the stock card for a product
 	 */
-    //@Cacheable("showStockCardCache")
-    //@CacheFlush("megamenuCache")
 	def showStockCard = { StockCardCommand cmd ->
-        //log.info "=".multiply(20)
-        long startTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
-		// add the current warehouse to the command object
-		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
-		
-		// now populate the rest of the commmand object
-		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-        //log.info "After get stock card command " + (System.currentTimeMillis() - currentTime) + " ms"
+        try {
+            long startTime = System.currentTimeMillis()
 
-		// populate the pending shipments
-		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
-		// (that is, find a workaround to GRAILS-5080)
-		//	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		commandInstance.pendingShipmentList =
-			shipmentService.getPendingShipments(commandInstance.warehouseInstance);
+            // add the current warehouse to the command object
+            cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+            // now populate the rest of the commmand object
+            def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-        //log.info "After get pending shipments " + (System.currentTimeMillis() - currentTime) + " ms"
-        /*
-        def shipmentItems =
-			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+            // populate the pending shipments
+            // TODO: move this into the service layer after we find a way to add shipping service to inventory service
+            // (that is, find a workaround to GRAILS-5080)
+            //	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+            commandInstance.pendingShipmentList =
+                shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
-		def shipmentMap = shipmentItems.groupBy { it.shipment }
-		if (shipmentMap) { 
-			shipmentMap.keySet().each { 
-				def quantity = shipmentMap[it].sum() { it.quantity } 
-				shipmentMap.put(it, quantity)
-			}
-		}	
-		commandInstance.shipmentMap = shipmentMap;
-        */
+            def quantityMap = inventoryService.getQuantityOnHand(commandInstance.warehouseInstance, commandInstance?.productInstance)
 
-        //log.info "After get pending shipment items " + (System.currentTimeMillis() - currentTime) + " ms"
-        /*
-		def orderItems =
-			orderService.getPendingOrderItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance);
-		def orderMap = orderItems.groupBy { it.order }
-		if (orderMap) {
-			orderMap.keySet().each {
-				def quantity = orderMap[it].sum() { it.quantity }
-				orderMap.put(it, quantity)
-			}
-		}
-		commandInstance.orderMap = orderMap;
-        */
-        //log.info "After get pending orders " + (System.currentTimeMillis() - currentTime) + " ms"
-
-
-        /*
-		def requisitionItems =
-			requisitionService.getPendingRequisitionItems(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		def requisitionMap = requisitionItems.groupBy { it.requisition }
-
-        println "requisitionmap: " + requisitionMap
-		if (requisitionMap) {
-			requisitionMap.keySet().each {
-				def quantity = requisitionMap[it].sum() { it.quantity }
-				requisitionMap.put(it, quantity)
-			}
-		}
-		commandInstance.requisitionMap = requisitionMap;
-		*/
-
-        //log.info "After get pending requisitions " + (System.currentTimeMillis() - currentTime) + " ms"
-
-		
-		//println commandInstance?.transactionLogMap
-	    /*
-		// FIXME Hacky implementation of recently viewed products 
-		try { 
-			if (!session.productsViewed) { 
-				session.productsViewed = [:]
-			}
-			if (!session.productsViewed?.values()?.contains(commandInstance?.productInstance)) {
-				if (session?.productsViewed?.values()?.size() < 10) {
-					session.productsViewed.put(new Date(), commandInstance?.productInstance)
-				}	
-				else { 
-					def earliestDate = session.productsViewed.keySet().min()
-					session.productsViewed.remove(earliestDate)
-					session.productsViewed.put(new Date(), commandInstance?.productInstance)
-				}
-			}
-		} catch (Exception e) { 
-			log.error("Error while saving recently viewed product", e)
-		}
-        */
-        //log.info "After setting session productsViewed " + (System.currentTimeMillis() - currentTime) + " ms"
-
-        def quantityMap = inventoryService.getQuantityOnHand(commandInstance.warehouseInstance, commandInstance?.productInstance)
-
-        //def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouseInstance, commandInstance?.productInstance)
-        //requisitionItems: requisitionItems, , issuedRequisitionItems:issuedRequisitionItems
-
-        // FIXME Ignore this for now -- just testing out some graphing plugins
-        def consumptionColumns = [['string', 'Month'], ['number', 'On-hand'], ['number', 'Available']]
-        def consumptionData = [['Jan', 1000, 400], ['Feb', 1170, 460], ['Mar', 660, 1120], ['Apr', 1030, 540],
-                ['May', 660, 1120], ['Jun', 1030, 540],['Jul', 660, 1120], ['Aug', 1030, 540],['Sep', 660, 1120], ['Oct', 1030, 540],
-                ['Nov', 660, 1120], ['Dec', 1030, 540]]
-
-
-        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
-        [ commandInstance: commandInstance, quantityMap: quantityMap, consumptionColumns: consumptionColumns, consumptionData: consumptionData ]
+            log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+            [ commandInstance: commandInstance, quantityMap: quantityMap ]
+        } catch (ProductException e) {
+            flash.message = e.message
+            redirect(controller: "dashboard", action: "index")
+        }
 	}
 
     def showCurrentStockAllLocations = { StockCardCommand cmd ->
