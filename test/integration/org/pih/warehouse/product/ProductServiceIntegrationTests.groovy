@@ -1,5 +1,7 @@
 package org.pih.warehouse.product
 
+import org.junit.Ignore
+
 // import org.apache.commons.lang.StringUtils
 import org.junit.Test;
 import org.pih.warehouse.core.Constants
@@ -109,23 +111,24 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 	*/
     @Test
-	void importProducts_shouldFailWhenProductNameIsMissing() {
-		def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
+	void validateProducts_shouldFailWhenProductNameIsMissing() {
+		def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","tag1,tag2","0.01","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row)  			
 
 		def message = shouldFail(RuntimeException) {
-			productService.importProducts(csv)
+			productService.validateProducts(csv)
 		}
 		assertTrue message.contains("Product name cannot be empty")
 	}
 
-    @Test
+    @Ignore
 	void importProducts_shouldNotUpdateProductsWhenSaveToDatabaseIsFalse() {
 		def product = DbHelper.createProductIfNotExists("Sudafed");
 		assertNotNull product.id
-		def row1 = ["${product.id}","","Sudafed 2","OTC Medicines","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1) 
-		productService.importProducts(csv, false)		
+		def row1 = ["${product.id}","","Sudafed 2","OTC Medicines","Description","Unit of Measure","tag1,tag2","0.01","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
+		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        def products = productService.validateProducts(csv)
+        productService.importProducts(products)
 		def product2 = Product.get(product.id)
 		println ("Get product " + product2.name + " " + product2.id + " " + product2.productCode + " " + product.isAttached())		
 		assertEquals "Sudafed", product2.name
@@ -133,13 +136,19 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 
     @Test
-	void importProducts_shouldCreateNewProductWithNewCategory() {
+	void validateProducts_shouldCreateNewProductWithNewCategory() {
 		def category = Category.findByName("category 123")
 		assertNull category
-		def row1 = ["1235","","product 1235","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1) 
-		
-		productService.importProducts(csv, true)	
+		def row1 = ["1235","","product 1235","category 123","Description","Unit of Measure","tag1,tag2","0.01","Manufacturer","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
+		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        def products = productService.validateProducts(csv)
+
+        // FIXME Hack to keep from running into the following error
+        // not-null property references a null or transient value: org.pih.warehouse.product.Product.dateCreated; nested exception is org.hibernate.PropertyValueException: not-null property references a null or transient value: org.pih.warehouse.product.Product.dateCreated
+        products[0].dateCreated = new Date()
+        products[0].lastUpdated = new Date()
+
+        productService.importProducts(products)
 		def product = Product.findByName("product 1235")
 		assertNotNull product
 		category = Category.findByName("category 123")
@@ -150,9 +159,16 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     void importProducts_shouldCreateNewProductWithExistingCategory() {
 		def category = Category.findByName("Medicines")
 		assertNotNull category
-		def row1 = ["1235","","product 1235","Medicines","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
+		def row1 = ["1235","","product 1235","Medicines","Description","Unit of Measure","tag1,tag2","0.01","Manufacturer","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
-		productService.importProducts(csv, true)			
+        def products = productService.validateProducts(csv)
+
+        // FIXME Hack to keep from running into the following error
+        // not-null property references a null or transient value: org.pih.warehouse.product.Product.dateCreated; nested exception is org.hibernate.PropertyValueException: not-null property references a null or transient value: org.pih.warehouse.product.Product.dateCreated
+        products[0].dateCreated = new Date()
+        products[0].lastUpdated = new Date()
+
+        productService.importProducts(products)
 		def product = Product.findByName("product 1235")
 		assertNotNull product
 		assertEquals category, product.category		
@@ -162,9 +178,11 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void importProducts_shouldUpdateNameOnExistingProduct() {
 		def productBefore = DbHelper.createProductIfNotExists("Sudafed");
 		assertNotNull productBefore.id
-		def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]		
+		def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","Description","Unit of Measure","tag1,tag2","0.01","Manufacturer","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
-		productService.importProducts(csv, true)
+
+        def products = productService.validateProducts(csv)
+        productService.importProducts(products)
 		
 		def productAfter = Product.get(productBefore.id)
 		println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
@@ -175,9 +193,11 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void importProducts_shouldUpdateAllFieldsOnExistingProduct() {
 		def productBefore = DbHelper.createProductIfNotExists("Sudafed");
 		assertNotNull productBefore.id
-		def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+		def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","tag1,tag2","0.01","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
-		productService.importProducts(csv, true)
+
+        def products = productService.validateProducts(csv)
+		productService.importProducts(products)
 		def productAfter = Product.get(productBefore.id)
 		println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
 		assertEquals productBefore.id, productAfter.id
@@ -207,10 +227,12 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         assertNotNull productBefore.id
         assertEquals 0, productBefore?.tags?.size()?:0
 
-        def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+        def row1 = ["${productBefore.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","tag1,tag2","0.01","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
         def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def tags = ["tag1", "tag2"] as List
-        productService.importProducts(csv, tags, true)
+
+        def products = productService.validateProducts(csv)
+        productService.importProducts(products, tags)
 
         def productAfter = Product.get(productBefore.id)
         println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
@@ -230,10 +252,12 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         assertNotNull product.id
         assertEquals 0, product?.tags?.size()?:0
 
-        def row1 = ["${product.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+        def row1 = ["${product.id}","AB12","Sudafed 2.0","Medicines","It's sudafed, dummy.","EA","tag1,tag2","0.01","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
         def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def tags = ["tag3", "tag4", "tag1", "tag2"] as List
-        productService.importProducts(csv, tags, true)
+
+        def products = productService.validateProducts(csv)
+        productService.importProducts(products, tags)
 
         def result = Product.get(product.id)
         println ("Get product " + result.name + " " + result.id + " " + result.productCode)
@@ -247,14 +271,14 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     @Test
 	void getDelimiter_shouldDetectCommaDelimiter() {
 		// def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
-		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed description","EA","Acme","Brand X","ACME-249248","Vendor Y","Y-1284","Sudafed","true","UPC-1202323","NDC-122929-39292","",""]
+		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed description","EA","tag1,tag2","0.01","Acme","Brand X","ACME-249248","Vendor Y","Y-1284","Sudafed","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 		def delimiter = productService.getDelimiter(csv)
 		assertEquals ",", delimiter
 	}
     @Test
 	void getDelimiter_shouldDetectTabDelimiter() {
-		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed descrition","each","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+		def row1 = ["","AB12","Sudafed 2","Medicines","Sudafed descrition","each","tag1,tag2","0.01","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, "\t") + csvize(row1, "\t")		
 		def delimiter = productService.getDelimiter(csv)
 		assertEquals "\t", delimiter
@@ -262,7 +286,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Test
 	void getDelimiter_shouldDetectSemiColonDelimiter() {
-		def row1 = ["","00001","Sudafed 2","Medicines","Sudafed description","each","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
+		def row1 = ["","00001","Sudafed 2","Medicines","Sudafed description","each","tag1,tag2","0.01","Acme","Brand X","ACME-249248","Manufacturer Name","Vendor","Vendor Code","Vendor Name","true","UPC-1202323","NDC-122929-39292","",""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, ";") + csvize(row1, ";")
 		def delimiter = productService.getDelimiter(csv)
 		assertEquals ";", delimiter
@@ -384,18 +408,20 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals "Category", columns[3]
 		assertEquals "Description", columns[4]		
 		assertEquals "Unit of Measure", columns[5]
-		assertEquals "Manufacturer", columns[6]
-		assertEquals "Brand", columns[7]		
-		assertEquals "Manufacturer Code", columns[8]
-		assertEquals "Manufacturer Name", columns[9]
-		assertEquals "Vendor", columns[10]
-		assertEquals "Vendor Code", columns[11]
-		assertEquals "Vendor Name", columns[12]
-		assertEquals "Cold Chain", columns[13]
-		assertEquals "UPC", columns[14]
-		assertEquals "NDC", columns[15]
-		assertEquals "Date Created", columns[16]
-		assertEquals "Date Updated", columns[17]
+        assertEquals "Tags", columns[6]
+        assertEquals "Unit price", columns[7]
+		assertEquals "Manufacturer", columns[8]
+		assertEquals "Brand", columns[9]
+		assertEquals "Manufacturer Code", columns[10]
+		assertEquals "Manufacturer Name", columns[11]
+		assertEquals "Vendor", columns[12]
+		assertEquals "Vendor Code", columns[13]
+		assertEquals "Vendor Name", columns[14]
+		assertEquals "Cold Chain", columns[15]
+		assertEquals "UPC", columns[16]
+		assertEquals "NDC", columns[17]
+		assertEquals "Date Created", columns[18]
+		assertEquals "Date Updated", columns[19]
 	}
 
     @Test

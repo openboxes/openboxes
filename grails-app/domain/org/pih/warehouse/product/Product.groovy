@@ -204,15 +204,15 @@ class Product implements Comparable, Serializable {
     static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation"];
 
     static hasMany = [
-            categories: Category,
-            attributes: ProductAttribute,
-            tags: Tag,
-            documents: Document,
-            productGroups: ProductGroup,
-            packages: ProductPackage,
-            synonyms: Synonym,
-            inventoryLevels: InventoryLevel,
-            inventoryItems: InventoryItem
+        categories: Category,
+        attributes: ProductAttribute,
+        tags: Tag,
+        documents: Document,
+        productGroups: ProductGroup,
+        packages: ProductPackage,
+        synonyms: Synonym,
+        inventoryLevels: InventoryLevel,
+        inventoryItems: InventoryItem
     ]
 
     static mapping = {
@@ -381,6 +381,10 @@ class Product implements Comparable, Serializable {
         } else {
             return null
         }
+    }
+
+    Boolean hasTag(tag) {
+        return tagsToString()?.contains(tag)
     }
 
     /**

@@ -490,8 +490,8 @@ class ProductService {
 				return delimiter
 			}
 		}			
-		throw new RuntimeException("""Invalid file format: File must contain the following columns:" + Constants.EXPORT_PRODUCT_COLUMNS + ";
-            columns must be separated by a comma (,) or tab (\\t);
+		throw new RuntimeException("""Invalid file format: File must contain the following columns: ${Constants.EXPORT_PRODUCT_COLUMNS};
+            Columns must be separated by a comma (,) or tab (\\t);
             lines must be separated by a linefeed (\\n); If you're using Mac Excel, save the file as Windows Comma Separated (.csv) and upload again.""")
 	}
 	
@@ -546,11 +546,12 @@ class ProductService {
 		
 		// Iterate over each line and either update an existing product or create a new product
 		csv.toCsvReader(['skipLines':1, 'separatorChar':delimiter]).eachLine { tokens ->
-			//def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
-			def product = Product.findById(tokens[0])
-			if (product) { 
-				println "EXISTING PRODUCT " + product?.id + " " + product.description
+			def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
+            println "GET EXISTING PRODUCT " + tokens[0] + " OR " + tokens[1]
+			//def product = Product.findById(tokens[0])
+			if (product) {
 				product = Product.get(product.id)
+                println "FOUND EXISTING PRODUCT " + product?.id + " " + product?.name
 				products << product
 			}
 		}
@@ -567,30 +568,9 @@ class ProductService {
 	 * 
 	 * @param csv
 	 */
-	public List<Product> importProducts(String csv) {
-		return importProducts(csv, getDelimiter(csv), null, false)
+	public List validateProducts(String csv) {
+		return validateProducts(csv, getDelimiter(csv))
 	}
-
-	/**
-	 * 
-	 * @param csv
-	 * @param saveToDatabase
-	 * @return
-	 */
-	public List<Product> importProducts(String csv, boolean saveToDatabase) {
-		return importProducts(csv, getDelimiter(csv), null, saveToDatabase)
-	}
-
-	/**
-	 *
-	 * @param csv
-	 * @param saveToDatabase
-	 * @return
-	 */
-	public List<Product> importProducts(String csv, List tags, boolean saveToDatabase) {
-		return importProducts(csv, getDelimiter(csv), tags, saveToDatabase)
-	}
-
 	
 	/**
 	 * 
@@ -599,10 +579,10 @@ class ProductService {
 	 * @param saveToDatabase
 	 * @return
 	 */
-	public List<Product> importProducts(String csv, String delimiter, List tags, boolean saveToDatabase) {
+	public List validateProducts(String csv, String delimiter) {
 		println "CSV: " + csv
 		
-		def products = new ArrayList<Product>()
+		def products = []
 		if (!csv) {
 			throw new RuntimeException("CSV cannot be empty")
 		}
@@ -611,7 +591,7 @@ class ProductService {
 		def lines = csv.split("\n")
 		def columns = lines[0].split(delimiter)
 		if (columns.size() != Constants.EXPORT_PRODUCT_COLUMNS.size()) {
-			throw new RuntimeException("Invalid format")
+			throw new RuntimeException("Invalid data format")
 		}
 		
 		def rowCount = 1;
@@ -627,16 +607,23 @@ class ProductService {
 			def categoryName = tokens[3]
 			def description = tokens[4]
 			def unitOfMeasure = tokens[5]
-			def manufacturer = tokens[6]
-			def brandName = tokens[7]
-			def manufacturerCode = tokens[8]
-			def manufacturerName = tokens[9]
-			def vendor = tokens[10]
-			def vendorCode = tokens[11]
-			def vendorName = tokens[12]
-			def coldChain = Boolean.valueOf(tokens[13])
-			def upc = tokens[14]
-			def ndc = tokens[15]
+            def productTags = tokens[6]?.split(",")
+            def unitPrice
+            try {
+                unitPrice = tokens[7]?Float.valueOf(tokens[7]):null
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[7]}')", e)
+            }
+			def manufacturer = tokens[8]
+			def brandName = tokens[9]
+			def manufacturerCode = tokens[10]
+			def manufacturerName = tokens[11]
+			def vendor = tokens[12]
+			def vendorCode = tokens[13]
+			def vendorName = tokens[14]
+			def coldChain = Boolean.valueOf(tokens[15])
+			def upc = tokens[16]
+			def ndc = tokens[17]
 			//def dateCreated = tokens[11]?Date.parse("dd/MMM/yyyy hh:mm:ss", tokens[11]):null
 			//def dateUpdated = tokens[12]?Date.parse("dd/MMM/yyyy hh:mm:ss", tokens[12]):null
 
@@ -645,90 +632,66 @@ class ProductService {
 			}
 
 			def category = findOrCreateCategory(categoryName)
-			def product = Product.findById(productId)			
-			// Update existing product
-			if (product) {
-				println ("Found existing product " + product.name + " " + product.id + " " + product.productCode + " " + product.isAttached())
-				// Need to get a readonly copy so that we don't update the object before 
-				// the user has verified and explicitly agreed to import the changes.
-				product = Product.read(product.id)
-				println ("Readonly product " + product.name + " " + product.id + " " + product.productCode + " " + product.isAttached())
-				//if (dateUpdated && dateUpdated.before(product?.lastUpdated)) {
-				//throw new RuntimeException("Product has been modified on server")
-				//	product.errors.reject("Product has been modified on server")
-				//}
+			def product = Product.findByIdOrProductCode(productId, productCode)
 
-				//if (product?.category != category) {
-					//throw new RuntimeException("Product category cannot be modified")
-				//	product.errors.reject("Product category cannot be modified")
-				//}
-
-				product.name = productName
-				product.description = description
-				product.category = category
-				product.productCode = productCode
-				product.unitOfMeasure = unitOfMeasure
-				product.manufacturer = manufacturer
-				product.manufacturerCode = manufacturerCode
-				product.manufacturerName = manufacturerName
-				product.brandName = brandName
-				product.vendor = vendor
-				product.vendorCode = vendorCode
-				product.vendorName = vendorName
-				
-				product.upc = upc
-				product.ndc = ndc
-				product.coldChain = coldChain
-				
-				if (!saveToDatabase) product.discard()
-				
-				println ("Updated readonly product " + product.name + " " + product.id + " " + product.productCode + " " + product.isAttached())
-				products << product
-				
-			}
-			// Create a new product
-			else {
-				product = new Product(name: productName, category: category, description: description,
-					productCode: productCode, upc: upc, ndc: ndc, coldChain: coldChain,
-					unitOfMeasure: unitOfMeasure, manufacturer: manufacturer, manufacturerCode: manufacturerCode, brandName: brandName,
-					manufacturerName: manufacturerName, vendor: vendor, vendorCode: vendorCode, vendorName: vendorName)
-				
-				println "Create new product for " + productName + " " + product.isAttached()
-				
-				products << product
-			}
-			
-		}
-				
-		if (saveToDatabase) { 
-			println "Products to be saved to the database: " + products
-			products.each { product ->		
-				
-				println "Product: " + product.name + " " + product.id + " " + product.productCode
-				println "Product tags: " + product.tags
-				println "Product productGroup: " + product.productGroups
-                product.save(flush: true)
-
-				if(!product.productGroups) {
-					ProductGroup productGroup = ProductGroup.findByDescription(product.name)
-					if (!productGroup) {  
-						println "Creating new product group " + product.name
-						productGroup = new ProductGroup(name: product.name, description: product.name, category: product.category)
-						if (!productGroup.save(flush: true)) {
-							throw new ValidationException("Could not create generic product '" + product.name + "'", productGroup.errors)
-						}
-					}
-					product.addToProductGroups(productGroup)
-                    //product.save()
-				}
-                addTagsToProduct(product, tags)
-                product.save()
-            }
-		}
+            // If the identifier is incorrect/missing we should display the ID of the product found using the product code instead of the missing/incorrect product identifier
+            products << [id: product?.id?:productId, name: productName, category: category, description: description,
+                    productCode: productCode, upc: upc, ndc: ndc, coldChain: coldChain, pricePerUnit: unitPrice,tags:productTags,
+                    unitOfMeasure: unitOfMeasure, manufacturer: manufacturer, manufacturerCode: manufacturerCode, brandName: brandName,
+                    manufacturerName: manufacturerName, vendor: vendor, vendorCode: vendorCode, vendorName: vendorName, product: product]
 
 			
+		}
+
 		return products;
 	}
+
+
+    def importProducts(products) {
+        return importProducts(products, null)
+    }
+
+    def importProducts(products, tags) {
+        log.info ("Importing products " + products + " tags: " + tags)
+
+
+        products.each { productProperties ->
+
+            log.info "Import product " + productProperties.productCode + " " + productProperties.name
+            // Update existing
+            def product = Product.findByIdOrProductCode(productProperties.id, productProperties.productCode)
+            if (product) {
+                product.properties = productProperties
+            }
+            // ... or create a new product
+            else {
+                product = new Product(productProperties)
+            }
+            log.info "Product properties " + productProperties
+            log.info "Old tags " + product.tags
+            log.info "New tags: " + tags + ", " + productProperties.tags
+            addTagsToProduct(product, tags)
+            addTagsToProduct(product, productProperties.tags)
+
+            // Create a new generic product
+//            log.info "Old productGroups: " + product.productGroups
+//            if(!product.productGroups) {
+//                ProductGroup productGroup = ProductGroup.findByDescription(productProperties.name)
+//                if (!productGroup) {
+//                    log.info "Creating new product group " + productProperties.name
+//                    productGroup = new ProductGroup(name: productProperties.name, description: productProperties.name, category: productProperties.category)
+//                    if (!productGroup.save()) {
+//                        throw new ValidationException("Could not create generic product '" + product.name + "'", productGroup.errors)
+//                    }
+//                }
+//                product.addToProductGroups(productGroup)
+//            }
+
+            if (!product.save(flush:true)) {
+                throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
+            }
+        }
+    }
 
 
 	/**
@@ -758,6 +721,8 @@ class ProductService {
 			"Category" { it.category }
 			"Description" { it.description }
 			"Unit of Measure" { it.unitOfMeasure }
+            "Tags" { it.tags }
+            "Unit price" { it.unitPrice }
 			"Manufacturer" { it.manufacturer }
 			"Brand" { it.brandName }
 			"Manufacturer Code" { it.manufacturerCode }
@@ -780,6 +745,8 @@ class ProductService {
 				category: product?.category?.name,
 				description: product?.description?:'',
 				unitOfMeasure: product.unitOfMeasure?:'',
+                tags: product.tagsToString()?:'',
+                unitPrice: product.pricePerUnit?:'',
 				manufacturer: product.manufacturer?:'',
 				brandName: product.brandName?:'',
 				manufacturerCode: product.manufacturerCode?:'',
@@ -898,26 +865,22 @@ class ProductService {
      * @return
      */
     def addTagToProduct(product, tagName) {
+
         // Check if the product already has the given tag
         def tag = product.tags.find { it.tag == tagName }
+
         if (!tag) {
             // Otherwise try to find an existing tag that matches the tag
             //Tag.withNewSession {
             tag = Tag.findByTag(tagName)
+
             // Or create a brand new one
             if (!tag) {
                 tag = new Tag(tag: tagName)
-                tag.save()
+                tag.save(flush:true)
             }
-
-            // Then add the tag and save the product
             product.addToTags(tag)
-            //product?.tags?.count()
-            //product?.category?.categories?.count()
-            product.merge()
-            //product.save();
-            //}
-
+            product.merge(flush:true)
         }
     }
 

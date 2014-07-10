@@ -8,8 +8,9 @@
 			<warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/>
 		</title>
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+        <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
 		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
-		
+        <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
 	</head>
 	<body>
 		<div class="body">	
@@ -23,8 +24,6 @@
 
             <div class="tabs tabs-ui">
                 <ul>
-                    <li><a href="#prepare-data-tab"><warehouse:message code="product.import.step0.label" default="Step 0"/>.
-                        <warehouse:message code="product.import.prepare.label" default="Prepare data file"/></a></li>
                     <li><a href="#upload-data-tab"><warehouse:message code="product.import.step1.label" default="Step 1"/>.
                         <warehouse:message code="product.import.upload.label" default="Upload data file"/></a></li>
                     <li><a href="#verify-data-tab">
@@ -33,28 +32,11 @@
                     <li><a href="#import-data-tab">
                         <warehouse:message code="product.import.step2.label" default="Step 3"/>.
                         <warehouse:message code="product.import.save.label" default="Import products"/></a></li>
-
-                    <div class="button-group right">
+                    <div class="button-group">
                         <a class="prev button icon arrowleft" href="#">Previous</a>
                         <a class="next button icon arrowright">Next</a>
                     </div>
                 </ul>
-                <div id="prepare-data-tab" style="padding: 10px;" class="ui-tabs-hide">
-                    <div class="empty center">
-                        <g:link controller="batch" action="downloadCsvTemplate" params="[template:'products.csv']" class="next button icon arrowdown">
-                            <warehouse:message code="import.product.template.label" default="Download CSV template"/>
-                        </g:link>
-                        -- OR --
-                        <g:link controller="product" action="exportAsCsv" class="next button icon arrowdown">
-                            <warehouse:message code="import.product.exportAll.label" default="Download CSV of all products"/>
-                        </g:link>
-                        -- OR --
-                        <a class="next button icon arrowright">
-                            <warehouse:message code="import.product.haveMyOwn.label" default="I have my own CSV data file"/>
-                        </a>
-                    </div>
-
-                </div>
                 <div id="upload-data-tab" style="padding: 10px;" class="ui-tabs-hide">
                     <div id="upload-form" class="dialog">
                         <g:uploadForm controller="product" action="uploadCsv" fragment="verify-data-tab">
@@ -62,10 +44,27 @@
                             <input name="type" type="hidden" value="product"/>
                             <table>
                                 <tbody>
-
                                     <tr class="prop">
                                         <td class="name">
-                                            <label><warehouse:message code="import.file.label" default="File"/></label>
+                                            <label><warehouse:message code="import.file.label" default="Choose a starter data file"/></label>
+                                        </td>
+                                        <td class="value">
+                                            <div class="">
+                                                <g:link controller="batch" action="downloadCsvTemplate" params="[template:'products.csv']" class="button icon arrowdown">
+                                                    <warehouse:message code="import.product.template.label" default="Download CSV template"/>
+                                                </g:link>
+                                                <b>
+                                                -- OR --
+                                                </b>
+                                                <g:link controller="product" action="exportAsCsv" class="button icon arrowdown">
+                                                    <warehouse:message code="import.product.exportAll.label" default="Download CSV of all products"/>
+                                                </g:link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message code="import.file.label" default="Choose the data file you'd like to import"/></label>
                                         </td>
                                         <td class="value">
                                             <input name="importFile" type="file" />
@@ -100,7 +99,8 @@
                                     <tr class="">
                                         <td class="value" colspan="2">
                                             <div id="preview">
-                                                <table>
+
+                                                <table class="dataTable">
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
@@ -110,22 +110,22 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <g:each var="product" in="${command?.products }" status="status">
-                                                            <g:set var="existingProduct" value="${existingProductsMap[product.id] }"/>
-                                                            <g:set var="maxLength" value="${product?.description?.length() }"/>
+                                                        <g:each var="productProperties" in="${command?.products }" status="status">
+                                                            <g:set var="existingProduct" value="${productProperties.product }"/>
+                                                            <g:set var="maxLength" value="${productProperties?.description?.length() }"/>
                                                             <tr class="${status%2?'even':'odd' }">
                                                                 <td>
                                                                     ${status+1 }
                                                                 </td>
                                                                 <td>
 
-                                                                    <g:if test="${product?.id }">
-                                                                        <g:link controller="inventoryItem" action="showStockCard" id="${product.id }">
-                                                                            <g:if test="${product?.id?.length() == 32 }">
-                                                                                <span title="${product?.id }">${product?.id?.substring(20, 32) }</span>
+                                                                    <g:if test="${productProperties?.id }">
+                                                                        <g:link controller="inventoryItem" action="showStockCard" id="${productProperties.id }">
+                                                                            <g:if test="${productProperties?.id?.length() == 32 }">
+                                                                                <span title="${productProperties?.id }">${productProperties?.id?.substring(20, 32) }</span>
                                                                             </g:if>
                                                                             <g:else>
-                                                                                ${product?.id }
+                                                                                ${productProperties?.id }
                                                                             </g:else>
                                                                         </g:link>
                                                                     </g:if>
@@ -133,42 +133,52 @@
                                                                         <span class="modified">${warehouse.message(code: 'default.new.label') }</span>
                                                                     </g:else>
                                                                 </td>
-                                                                <td class="${product?.productCode!=existingProduct?.productCode?'modified':'' }">
-                                                                    <span title="${existingProduct?.productCode }">${product?.productCode }</span>
+                                                                <td class="${productProperties?.productCode!=existingProduct?.productCode?'modified':'' }">
+                                                                    <span title="${existingProduct?.productCode }">${productProperties?.productCode }</span>
                                                                 </td>
-                                                                <td class="${product?.name!=existingProduct?.name?'modified':'' }">
-                                                                    <span title="${existingProduct?.name }">${product?.name }</span>
+                                                                <td class="${productProperties?.name!=existingProduct?.name?'modified':'' }">
+                                                                    <span title="${existingProduct?.name }">${productProperties?.name }</span>
                                                                 </td>
-                                                                <td class="${(existingProduct && product?.category!=existingProduct?.category||!product?.category?.id)?'modified':'' }">
-                                                                    <span title="${existingProduct?.category }">${product?.category }</span>
+                                                                <td class="${productProperties?.category!=existingProduct?.category?'modified':'' }">
+                                                                    <span title="${existingProduct?.category }">${productProperties?.category }</span>
                                                                 </td>
-                                                                <td class="${product?.description!=existingProduct?.description?'modified':'' }">
+                                                                <td class="${productProperties?.description!=existingProduct?.description?'modified':'' }">
                                                                     <g:if test="${maxLength > 15 }">
-                                                                        <span title="${product?.description }">${product?.description?.substring(0,15)}...</span>
+                                                                        <span title="${productProperties?.description }">${productProperties?.description?.substring(0,15)}...</span>
                                                                     </g:if>
                                                                     <g:else>
-                                                                        ${product?.description }
+                                                                        ${productProperties?.description }
                                                                     </g:else>
                                                                 </td>
-                                                                <td class="${product?.unitOfMeasure!=existingProduct?.unitOfMeasure?'modified':'' }">${product?.unitOfMeasure }</td>
-                                                                <td class="${product?.manufacturer!=existingProduct?.manufacturer?'modified':'' }">${product?.manufacturer }</td>
-                                                                <td class="${product?.brandName!=existingProduct?.brandName?'modified':'' }">${product?.brandName }</td>
-                                                                <td class="${product?.manufacturerCode!=existingProduct?.manufacturerCode?'modified':'' }">${product?.manufacturerCode }</td>
-                                                                <td class="${product?.manufacturerName!=existingProduct?.manufacturerName?'modified':'' }">${product?.manufacturerName }</td>
-                                                                <td class="${product?.vendor!=existingProduct?.vendor?'modified':'' }">${product?.vendor }</td>
-                                                                <td class="${product?.vendorCode!=existingProduct?.vendorCode?'modified':'' }">${product?.vendorCode }</td>
-                                                                <td class="${product?.vendorName!=existingProduct?.vendorName?'modified':'' }">${product?.vendorName }</td>
-                                                                <td class="${product?.coldChain!=existingProduct?.coldChain?'modified':'' }">${product?.coldChain }</td>
-                                                                <td class="${product?.upc!=existingProduct?.upc?'modified':'' }">${product?.upc }</td>
-                                                                <td class="${product?.ndc!=existingProduct?.ndc?'modified':'' }">${product?.ndc }</td>
-                                                                <td class="fade">${product?.dateCreated }</td>
-                                                                <td class="fade">${product?.lastUpdated }</td>
+                                                                <td class="${productProperties?.unitOfMeasure!=existingProduct?.unitOfMeasure?'modified':'' }">${productProperties?.unitOfMeasure }</td>
+                                                                <td>
+                                                                    <ul>
+                                                                        <g:each var="tag" in="${productProperties?.tags }">
+                                                                            <li class="${!existingProduct?.hasTag(tag)?'modified':'' }">${tag}</li>
+                                                                        </g:each>
+                                                                    </ul>
+                                                                </td>
+                                                                <td class="${productProperties?.pricePerUnit!=existingProduct?.pricePerUnit?'modified':'' }">${productProperties?.pricePerUnit }</td>
+                                                                <td class="${productProperties?.manufacturer!=existingProduct?.manufacturer?'modified':'' }">${productProperties?.manufacturer }</td>
+                                                                <td class="${productProperties?.brandName!=existingProduct?.brandName?'modified':'' }">${productProperties?.brandName }</td>
+                                                                <td class="${productProperties?.manufacturerCode!=existingProduct?.manufacturerCode?'modified':'' }">${productProperties?.manufacturerCode }</td>
+                                                                <td class="${productProperties?.manufacturerName!=existingProduct?.manufacturerName?'modified':'' }">${productProperties?.manufacturerName }</td>
+                                                                <td class="${productProperties?.vendor!=existingProduct?.vendor?'modified':'' }">${productProperties?.vendor }</td>
+                                                                <td class="${productProperties?.vendorCode!=existingProduct?.vendorCode?'modified':'' }">${productProperties?.vendorCode }</td>
+                                                                <td class="${productProperties?.vendorName!=existingProduct?.vendorName?'modified':'' }">${productProperties?.vendorName }</td>
+                                                                <td class="${productProperties?.coldChain!=existingProduct?.coldChain?'modified':'' }">${productProperties?.coldChain }</td>
+                                                                <td class="${productProperties?.upc!=existingProduct?.upc?'modified':'' }">${productProperties?.upc }</td>
+                                                                <td class="${productProperties?.ndc!=existingProduct?.ndc?'modified':'' }">${productProperties?.ndc }</td>
+                                                                <td class="fade">${productProperties?.product?.dateCreated }</td>
+                                                                <td class="fade">${productProperties?.product?.lastUpdated }</td>
                                                             </tr>
+                                                            <%--
                                                             <g:if test="${product.hasErrors() }">
                                                                 <tr>
                                                                     <td colspan="20"><div class="errors"><g:renderErrors bean="${product}" as="list" /></div></td>
                                                                 </tr>
                                                             </g:if>
+                                                            --%>
                                                         </g:each>
                                                     </tbody>
                                                 </table>
@@ -226,13 +236,13 @@
                                         </td>
                                         <td class="value">
                                             <g:set var="totalProducts" value="${command?.products?.size()?:0 }"/>
-                                            <g:set var="existingProducts" value="${existingProductsMap?.keySet()?.size()?:0}"/>
+                                            <g:set var="existingProducts" value="${command?.products?.findAll { it.product }?.size()?:0}"/>
                                             <g:set var="newProducts" value="${totalProducts - existingProducts }"/>
 
                                             <ul>
                                                 <li>${existingProducts } ${warehouse.message(code:'import.existingProducts.label', default: 'updates to existing products') }</li>
                                                 <li>${newProducts } ${warehouse.message(code:'import.newProducts.label', default: 'new products to be created') }</li>
-                                            <li>${totalProducts } ${warehouse.message(code:'import.importedProducts.label', default: 'imported products') }</li>
+                                                <li>${totalProducts } ${warehouse.message(code:'import.importedProducts.label', default: 'imported products') }</li>
                                             </ul>
 
 
@@ -241,7 +251,7 @@
 
                                     <tr class="prop">
                                         <td valign="top" class="name">
-                                            <label for="tags"><warehouse:message code="product.tags.label" /></label>
+                                            <label for="tags1"><warehouse:message code="product.tags.label" /></label>
                                         </td>
                                         <td valign="top" class="value">
                                             <g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${tag }"/>
@@ -315,6 +325,41 @@
                 $(".tabs ul li a").attr("disabled", "disabled");
 
 			});
+
+            $(window).load(function(){
+
+                var dataTable = $('.dataTable').dataTable( {
+                    "bProcessing": true,
+                    "sServerMethod": "GET",
+                    "iDisplayLength": 10,
+                    "bSearch": false,
+                    "bScrollCollapse": true,
+                    "bJQueryUI": false,
+                    "bAutoWidth": true,
+                    "sPaginationType": "full_numbers",
+                    "aLengthMenu": [
+                        [5, 10, 25, 100, 1000, -1],
+                        [5, 10, 25, 100, 1000, "All"]
+                    ]
+                    /*
+                    "aoColumns": [
+
+                        //{ "mData": "id", "bVisible":false }, // 0
+                        { "mData": "rank", "sWidth": "1%" }, // 1
+                        { "mData": "productCode", "sWidth": "1%" }, // 2
+                        { "mData": "name" }, // 3
+                        { "mData": "count", "sWidth": "5%"  }, // 4
+                        { "mData": "quantity", "sWidth": "5%"  } // 5
+                        //
+                    ],*/
+
+
+                });
+
+
+            });
+
+
 		</script>
 
 		

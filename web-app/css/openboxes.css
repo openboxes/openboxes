@@ -2442,8 +2442,8 @@ blockquote {
     border-left: 3px solid #ccc;
 }
 
-/*.modified { color: red; }
-.approved { color: green; }*/
+.modified { color: red; }
+.approved { color: green; }
 
 .tooltip {
     position: absolute;

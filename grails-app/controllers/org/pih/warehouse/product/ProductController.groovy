@@ -9,7 +9,11 @@
  **/ 
 package org.pih.warehouse.product
 
+import com.google.zxing.BarcodeFormat
+import com.mysql.jdbc.MysqlDataTruncation
 import grails.converters.JSON
+import java.sql.SQLException
+import org.apache.commons.io.FilenameUtils
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -20,16 +24,11 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
-
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.Image as AWTImage
 import javax.imageio.ImageIO as IIO
 import javax.swing.ImageIcon;
-
-
-
-import com.google.zxing.BarcodeFormat
 
 class ProductController {
 
@@ -885,26 +884,29 @@ class ProductController {
 				println "Validate: " + contentTypes.contains(uploadFile.contentType)
 				
 				try {
+
+                    // Upload file
                     localFile = new File("uploads/" + uploadFile?.originalFilename);
 					localFile.mkdirs()
 					uploadFile?.transferTo(localFile);
 					session.localFile = localFile
-					//render uploadFile.contentType
+
+                    // Get CSV content
 					def csv = localFile.getText()
 					columns = productService.getColumns(csv)
 					println "CSV " + csv
-					def existingProducts = productService.getExistingProducts(csv)					
-					existingProducts.each { product ->						
-						existingProductsMap[product.id] = product.discard()
-					}
-					
-					tag = command?.importFile?.originalFilename
-					def lastPeriodPos = tag.lastIndexOf('.');
-					println lastPeriodPos
-					if (lastPeriodPos > 0) tag = tag.substring(0, lastPeriodPos)
-					println tag
-					
-					command.products = productService.importProducts(csv, false)
+
+                    // Get all existing products
+					//def existingProducts = productService.getExistingProducts(csv)
+					//existingProducts.each { product ->
+					//	existingProductsMap[product.id] = product
+                    //    println "existing product " + product.id + " " + product.name
+					//}
+
+                    // Create default tag based on base filename
+                    tag = FilenameUtils.getBaseName(command?.importFile?.originalFilename)
+
+					command.products = productService.validateProducts(csv)
 					
 					flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
 
@@ -934,7 +936,7 @@ class ProductController {
 			}			
 		}
 		
-		render(view: 'importAsCsv', model: [command:command, columns:columns, existingProductsMap:existingProductsMap, tag: tag])
+		render(view: 'importAsCsv', model: [command:command, columns:columns, tag: tag])
 	}
 
     /**
@@ -947,32 +949,37 @@ class ProductController {
 		// Step 2: Import data from file
 		def tags = []
 		def columns = []
-		def existingProductsMap = [:]
+
 		if (params.importNow && session.localFile) {
 			println "import now"
 			def csv = session.localFile.getText()
-
-            // Get any existing products
-			def existingProducts = productService.getExistingProducts(csv)
-            existingProducts.each { product ->
-                existingProductsMap[product.id] = product.discard()
-            }
 
             // Get columns
 			columns = productService.getColumns(csv)
 
 			//println existingProductsMap
 			tags = params?.tagsToBeAdded?.split(",") as List
-			println "\n\nTAGS " + tags + " " + tags.class
+			//println "\n\nTAGS " + tags + " " + tags.class
 
             // Import products
-            command.products = productService.importProducts(csv, tags, true)
-			//session.localFile = null
-			flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
-			
-			redirect(controller:"inventory", action:"browse",params:[tag:tags[0]])
+            command.products = productService.validateProducts(csv, tags)
+
+//            try {
+                productService.importProducts(command.products, tags)
+                flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
+                redirect(controller:"product", action:"importAsCsv",params:[tag:tags[0]])
+//            }
+//            catch (MysqlDataTruncation e) {
+//                flash.message = "MySQL Data truncation error: " + e.message
+//            }
+//            catch (SQLException e) {
+//                flash.message = "SQL Error: " + e.message + " " + e.cause?.message?.encodeAsHTML()
+//            }
+//            catch (Exception e) {
+//                flash.message = "Exception: " + e.message + " " + e.cause?.message?.encodeAsHTML()
+//            }
 		}
-		render(view: 'importAsCsv', model: [command:command, tags: tags, existingProductsMap: existingProductsMap, columns:columns, productsHaveBeenImported: true])
+		render(view: 'importAsCsv', model: [command:command, tags: tags, columns:columns, productsHaveBeenImported: true])
 		
     }
 
