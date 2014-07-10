@@ -33,6 +33,7 @@
         <table id="dataTable">
             <thead>
                 <th>Rank</th>
+                <th>Code</th>
                 <th>Product</th>
                 <th>Count</th>
                 <th>Quantity</th>
@@ -96,21 +97,22 @@
             "aoColumns": [
 
                 //{ "mData": "id", "bVisible":false }, // 0
-                { "mData": "rank", "sWidth": "5%" }, // 0
-                { "mData": "name" }, // 0
-                { "mData": "count", "sWidth": "5%"  }, // 1
-                { "mData": "quantity", "sWidth": "5%"  } // 2
+                { "mData": "rank", "sWidth": "1%" }, // 1
+                { "mData": "productCode", "sWidth": "1%" }, // 2
+                { "mData": "name" }, // 3
+                { "mData": "count", "sWidth": "5%"  }, // 4
+                { "mData": "quantity", "sWidth": "5%"  } // 5
                 //
 
             ],
             "bUseRendered": false,
-            "aaSorting": [[ 2, "desc" ], [3, "desc"]],
+            "aaSorting": [[ 3, "desc" ], [4, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 //console.log(nRow);
                 //console.log(aData);
                 //console.log(iDisplayIndex);
 
-                $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
+                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
                         aData["name"] + '</a>');
                 return nRow;
             }

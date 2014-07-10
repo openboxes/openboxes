@@ -13,7 +13,6 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
-import java_cup.runtime.virtual_parse_stack
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
@@ -1457,6 +1456,7 @@ class JsonController {
                     product {
                         groupProperty('id')
                         groupProperty('name')
+                        groupProperty('productCode')
                     }
                     countDistinct('id', "occurrences")
                     sum("quantity", "quantity")
@@ -1469,7 +1469,7 @@ class JsonController {
             }
 
             def count = 1;
-            data.results = results.collect { [ id: it[0], name: it[1], count: it[2], quantity: it[3], rank: count++]  }
+            data.results = results.collect { [ id: it[0], productCode: it[2], name: it[1], count: it[3], quantity: it[4], rank: count++]  }
 
 
 
