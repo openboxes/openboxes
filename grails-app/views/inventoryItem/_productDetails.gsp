@@ -283,19 +283,24 @@
 						</g:else>
 					</td>				
 				</tr>
-
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.pricePerUnit.label"/></label>
+                    </td>
+                    <td class="value middle">
+                        <p>
+                            $${g.formatNumber(number: (productInstance?.pricePerUnit?:0), format: '###,###,##0.00##') } USD
+                        </p>
+                    </td>
+                </tr>
                 <tr class="prop">
                     <td class="label">
                         <label><warehouse:message code="product.totalValue.label"/></label>
                     </td>
                     <td class="value middle">
-                        <g:if test="${productInstance?.pricePerUnit > 0 && totalQuantity > 0 }">
-                            $${g.formatNumber(number: (totalQuantity*productInstance?.pricePerUnit), format: '###,###,###.00') }
-                            USD
-                        </g:if>
-                        <g:else>
-                            $0.00 USD
-                        </g:else>
+                        <p>
+                            $${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') } USD
+                        </p>
                     </td>
                 </tr>
 
@@ -316,6 +321,21 @@
                     ${productInstance?.productCode }
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label>${warehouse.message(code: 'product.description.label') }</label>
+                </td>
+                <td class="value">
+                    <g:set var="maxLength" value="${productInstance?.description?.length() }"/>
+                    <g:if test="${maxLength > 50 }">
+                        <span title="${productInstance?.description }">${productInstance?.description?.substring(0,50)}...</span>
+                    </g:if>
+                    <g:else>
+                        ${productInstance?.description }
+                    </g:else>
+                </td>
+            </tr>
+
 
             <tr class="prop">
                 <td class="label">
@@ -376,6 +396,19 @@
                     </span>
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.brandName.label"/></label>
+                </td>
+                <td class="value" id="brandName">
+                    <g:if test="${productInstance?.brandName }">
+                        ${productInstance?.brandName }
+                    </g:if>
+                    <g:else>
+                        <span class="fade"><warehouse:message code="default.none.label"/></span>
+                    </g:else>
+                </td>
+            </tr>
 
             <tr class="prop">
                 <td class="label">
@@ -394,19 +427,18 @@
             </tr>
             <tr class="prop">
                 <td class="label">
-                    <label><warehouse:message code="product.brandName.label"/></label>
+                    <label><warehouse:message code="product.manufacturerName.label"/></label>
                 </td>
-                <td class="value" id="brandName">
-                    <span class="">
-                        <g:if test="${productInstance?.brandName }">
-                            ${productInstance?.brandName }
-                        </g:if>
-                        <g:else>
-                            <span class="fade"><warehouse:message code="default.none.label"/></span>
-                        </g:else>
-                    </span>
+                <td class="value" id="manufacturerName">
+                    <g:if test="${productInstance?.manufacturerName }">
+                        ${productInstance?.manufacturerName }
+                    </g:if>
+                    <g:else>
+                        <span class="fade"><warehouse:message code="default.none.label"/></span>
+                    </g:else>
                 </td>
             </tr>
+
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.modelNumber.label"/></label>
@@ -466,6 +498,19 @@
                             <span class="fade"><warehouse:message code="default.none.label"/></span>
                         </g:else>
                     </span>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.vendorName.label"/></label>
+                </td>
+                <td class="value" id="vendorName">
+                    <g:if test="${productInstance?.vendorName }">
+                        ${productInstance?.vendorName }
+                    </g:if>
+                    <g:else>
+                        <span class="fade"><warehouse:message code="default.none.label"/></span>
+                    </g:else>
                 </td>
             </tr>
             <g:if test="${productInstance?.modelNumber }">

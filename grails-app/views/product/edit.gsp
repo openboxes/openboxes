@@ -278,6 +278,17 @@
                                 <table>
                                     <tbody>
                                     <tr class="prop">
+                                        <td class="name middle"><label for="brandName"><warehouse:message
+                                                code="product.brandName.label" /></label></td>
+                                        <td
+                                                class="value ${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
+                                            <g:autoSuggestString id="brandName" name="brandName" size="50" class="text"
+                                                                 jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                 value="${productInstance?.brandName}"
+                                                                 placeholder="e.g. Advil, Tylenol"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
                                         <td class="name middle"><label for="manufacturer"><warehouse:message
                                                 code="product.manufacturer.label" /></label></td>
                                         <td
@@ -290,17 +301,6 @@
                                                                  value="${productInstance?.manufacturer}"
                                                                  placeholder="e.g. Pfizer, Beckton Dickson"/>
 
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name middle"><label for="brandName"><warehouse:message
-                                                code="product.brandName.label" /></label></td>
-                                        <td
-                                            class="value ${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
-                                            <g:autoSuggestString id="brandName" name="brandName" size="50" class="text"
-                                                                 jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                                 value="${productInstance?.brandName}"
-                                                                 placeholder="e.g. Advil, Tylenol"/>
                                         </td>
                                     </tr>
 
