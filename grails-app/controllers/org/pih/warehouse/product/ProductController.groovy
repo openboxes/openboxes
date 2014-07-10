@@ -962,7 +962,7 @@ class ProductController {
 			//println "\n\nTAGS " + tags + " " + tags.class
 
             // Import products
-            command.products = productService.validateProducts(csv, tags)
+            command.products = productService.validateProducts(csv)
 
 //            try {
                 productService.importProducts(command.products, tags)
