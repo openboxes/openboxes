@@ -766,6 +766,7 @@
                                                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
                                                 <th class="center"><warehouse:message code="inventoryLevel.maxQuantity.label"/></th>
                                                 <th class="center"><warehouse:message code="inventoryLevel.preferred.label"/></th>
+                                                <th class="center"><warehouse:message code="default.lastUpdated.label"/></th>
                                                 <th><warehouse:message code="default.actions.label"/></th>
                                             </tr>
                                         </thead>
@@ -814,6 +815,9 @@
                                                     </td>
                                                     <td class="center">
                                                         ${inventoryLevelInstance?.preferred }
+                                                    </td>
+                                                    <td class="center">
+                                                        <g:formatDate date="${inventoryLevelInstance?.lastUpdated }"/>
                                                     </td>
 
                                                     <td>

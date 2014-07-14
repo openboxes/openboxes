@@ -14,12 +14,16 @@
                     <div class="megaButton">
                         <g:link controller="inventoryBrowser" action="index" class="list">
                             <warehouse:message code="inventory.browse.label" default="Inventory browser" />
+                            <span class="beta">Beta</span>
                         </g:link>
+
                     </div>
                     <div class="megaButton">
                         <g:link controller="inventorySnapshot" action="list" class="list">
                             <warehouse:message code="inventory.snapshot.label" default="Inventory snapshots" />
+                            <span class="beta">Beta</span>
                         </g:link>
+
                     </div>
                 </div>
             </div>

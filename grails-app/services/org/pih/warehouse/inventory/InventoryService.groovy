@@ -30,6 +30,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.reporting.Consumption
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
@@ -3786,62 +3787,109 @@ class InventoryService implements ApplicationContextAware {
         return results
     }
 
+    /**
+     * Generic product summary widget on the dashboard.
+     *
+     * @param location
+     * @return
+     */
+    def getGenericProductSummary(location) {
 
-    def getProductGroupByStatusMap(location) {
+        def genericProductMap = [:]
 
-        def productGroupMap = [:]
-        def quantityMap = getQuantityByProductGroup(location)
 
+        // Create list of entries with quantity on hand for each product
         def entries = []
+        def quantityMap = getQuantityByProductGroup(location)
         quantityMap.each { key, value ->
             entries << [product: key, genericProduct: key.genericProduct, currentQuantity: (value>0)?value:0]    // make sure currentQuantity >= 0
         }
         entries.sort { it.product.name }
 
-        //def inventoryStatusMap = getInventoryStatusAndLevel(location)
+
+        // Get the inventory levels for all products at the given location
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
         println inventoryLevelMap
-        productGroupMap = entries.inject([:].withDefault { [status:null,name:null,product:null,genericProduct:null,type:null,minQuantity:0,reorderQuantity:0,maxQuantity:0,currentQuantity:0,inventoryLevel:null,productCount:0,products:[],hasPreferred:false,inventoryLevelLastUpdated:null] } ) { map, entry ->
+
+        // Group entries by generic product
+        genericProductMap = entries.inject([:].withDefault { [
+                status:null,
+                name:null,
+                minQuantity:0,
+                reorderQuantity:0,
+                maxQuantity:0,
+                currentQuantity:0,
+                hasPreferred:false,
+                lastUpdated:null,
+                // Debugging information
+                productCount:0,
+                product:null,
+                genericProduct:null,
+                type:null,
+                inventoryLevel:null,
+                message:"",
+                products:[]]
+        } ) { map, entry ->
             def product = entry?.product
             def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
             def nameKey = entry?.genericProduct?.description?:entry?.product?.name
             map[nameKey].name = nameKey
-            map[nameKey].product = entry?.product?.id
-            map[nameKey].genericProduct = entry?.genericProduct?.id
 
-            map[nameKey].type = entry?.genericProduct?"GenericProduct":"Product"
+            if (entry?.genericProduct) {
+                map[nameKey].genericProduct = entry?.genericProduct?.id
+                map[nameKey].type = "Generic Product"
+            }
+            else {
+                map[nameKey].product = entry?.product?.id
+                map[nameKey].type = "Product"
+            }
             map[nameKey].currentQuantity += entry.currentQuantity?:0
             map[nameKey].productCount++
 
-            // If this inventory level is preferred and there's no other preferred
-            if (inventoryLevel?.preferred && !map[nameKey].hasPreferred) {
-                map[nameKey].minQuantity = inventoryLevel?.minQuantity?:0
-                map[nameKey].reorderQuantity = inventoryLevel?.reorderQuantity?:0
-                map[nameKey].maxQuantity = inventoryLevel?.maxQuantity?:0
-                map[nameKey].inventoryLevel = "Preferred item"
-                map[nameKey].inventoryLevelLastUpdated = inventoryLevel?.lastUpdated
-                map[nameKey].hasPreferred = true
-            }
-            else {
-                // If there are more than one (preferred) inventory levels then we should use the latest
-                if (inventoryLevel?.preferred && map[nameKey].hasPreferred) {
-                    map[nameKey].inventoryLevel = "More than one preferred item"
+            // If there's no preferred already
+            if (!map[nameKey].hasPreferred) {
+                // If this inventory level is preferred
+                if (inventoryLevel?.preferred) {
+                    map[nameKey].hasPreferred = true
+                    map[nameKey].minQuantity = inventoryLevel?.minQuantity?:0
+                    map[nameKey].reorderQuantity = inventoryLevel?.reorderQuantity?:0
+                    map[nameKey].maxQuantity = inventoryLevel?.maxQuantity?:0
+                    map[nameKey].inventoryLevel = inventoryLevel
+                    map[nameKey].lastUpdated = inventoryLevel?.lastUpdated
+                    map[nameKey].message = "INFO: Using preferred inventory level (${product?.productCode})."
                 }
+                // Otherwise, use the inventory level that was last updated
                 else {
-                    map[nameKey].inventoryLevel = "No preferred items"
-                    def lastUpdated1 = inventoryLevel?.lastUpdated
-                    def lastUpdated2 = map[nameKey]?.inventoryLevelLastUpdated
                     // jgreenspan says:
                     // I think that if a flag is not set then it should default to the most recently updated inventory level.
                     // If this is difficult to do then the report can show an error when there is no flag. Then this will force us to select a flag.
+                    def lastUpdated1 = inventoryLevel?.lastUpdated
+                    def lastUpdated2 = map[nameKey]?.lastUpdated
+
+                    // If there's no existing inventory level OR current inventory level was updated after the existing
+                    // inventory level then we should use the current inventory level
                     if (!lastUpdated2 || (lastUpdated1 && lastUpdated2 && lastUpdated1.after(lastUpdated2))) {
                         map[nameKey].minQuantity = inventoryLevel?.minQuantity?:0
                         map[nameKey].reorderQuantity = inventoryLevel?.reorderQuantity?:0
                         map[nameKey].maxQuantity = inventoryLevel?.maxQuantity?:0
-                        map[nameKey].inventoryLevelLastUpdated = lastUpdated1
+                        map[nameKey].inventoryLevel = inventoryLevel
+                        map[nameKey].lastUpdated = lastUpdated1
                     }
+                    map[nameKey].message = "WARN: No preferred items, using last updated inventory level (${inventoryLevel?.product?.productCode})."
                 }
             }
+            // If there are more than one (preferred) inventory levels then we should use the latest
+            else {
+                if (inventoryLevel?.preferred) {
+                    map[nameKey].minQuantity = 0
+                    map[nameKey].reorderQuantity = 0
+                    map[nameKey].maxQuantity = 0
+                    map[nameKey].message = "ERROR: More than one preferred item, cannot determine inventory level to use."
+                }
+            }
+
+            // FIXME Remove this once we're confident that the report looks ok.
+            // DEBUG Keep track of each of the products for debugging purposes
             map[nameKey].products << [
                     product:entry.product?.name,
                     productCode: entry?.product?.productCode,
@@ -3856,11 +3904,13 @@ class InventoryService implements ApplicationContextAware {
             map
         }
 
-        productGroupMap.each { k, v ->
-            productGroupMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
+
+        // Assign status based on inventory level values
+        genericProductMap.each { k, v ->
+            genericProductMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
             //InventoryUtil.getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
         }
-        return productGroupMap.values().groupBy { it.status }
+        return genericProductMap.values().groupBy { it.status }
 
     }
 
@@ -3923,6 +3973,70 @@ class InventoryService implements ApplicationContextAware {
         }
         println "getStatusMessage(${inventoryStatus}, ${minQuantity}, ${reorderQuantity}, ${maxQuantity}, ${currentQuantity}) = ${statusMessage}"
         return statusMessage
+    }
+
+    /**
+     * Get fast moving items based on requisition data.
+     *
+     * @param location
+     * @param date
+     * @param max
+     * @return
+     */
+    def getFastMovers(location, date, max) {
+        def startTime = System.currentTimeMillis()
+        def data = [:]
+        try {
+            data.location = location.id
+            data.startDate = date-30
+            data.endDate = date
+
+            def criteria = RequisitionItem.createCriteria()
+            def results = criteria.list {
+                requisition {
+                    eq("destination", location)
+                    between("dateRequested", date-30, date)
+                }
+                projections {
+                    //product {
+                    //    groupProperty('id')
+                    //    groupProperty('name')
+                    //    groupProperty('productCode')
+                    //}
+                    groupProperty("product")
+                    countDistinct('id', "occurrences")
+                    sum("quantity", "quantity")
+                }
+                order('occurrences','desc')
+                order('quantity','desc')
+                if (max) { maxResults(max) }
+            }
+
+            def quantityMap = getQuantityByProductMap(location.inventory)
+            //println "quantityMap: " + quantityMap
+
+            def count = 1;
+            data.results = results.collect {
+                [
+                        rank: count++,
+                        id: it[0].id,
+                        productCode: it[0].productCode,
+                        name: it[0].name,
+                        genericProduct: it[0]?.genericProduct?.name?:"",
+                        category: it[0]?.category?.name?:"",
+                        requisitionCount: it[1],
+                        quantityRequested: it[2],
+                        quantityOnHand: (quantityMap[Product.get(it[0].id)]?:0),
+                ]
+            }
+            data.responseTime = (System.currentTimeMillis() - startTime) + " ms"
+
+
+        } catch (Exception e) {
+            log.error("Error occurred while getting requisition items " + e.message, e)
+            data = e.message
+        }
+        return data
     }
 
 }

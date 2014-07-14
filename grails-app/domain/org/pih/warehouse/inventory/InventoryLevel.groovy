@@ -60,7 +60,7 @@ class InventoryLevel {
         return InventoryUtil.getStatusMessage(status, minQuantity, reorderQuantity, maxQuantity, currentQuantity)
     }
 
-
+    String toString() { return "${product?.productCode}:${preferred}:${minQuantity}:${reorderQuantity}:${maxQuantity}:${lastUpdated}"}
 
 
 }

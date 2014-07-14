@@ -1,5 +1,8 @@
 <div class="box">
-    <h2><warehouse:message code="inventory.genericProductSummary.label" default="Inventory status by generic product"/></h2>
+    <h2>
+        <warehouse:message code="inventory.genericProductSummary.label" default="Inventory status by generic product"/>
+        <span class="beta">Beta</span>
+    </h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="alertSummary">
     		<table class="zebra">
@@ -10,7 +13,7 @@
                     </td>
 
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'STOCK_OUT']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT']">
                             <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
                         </g:link>
                     </td>
@@ -24,7 +27,7 @@
                         <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'STOCK_OUT_OBSOLETE']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT_OBSOLETE']">
                             <warehouse:message code="inventory.listOutOfStockObsolete.label" default="Stocked out, but obsolete"/>
                         </g:link>
                     </td>
@@ -39,7 +42,7 @@
                     </td>
 
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'LOW_STOCK']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'LOW_STOCK']">
                             <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
                         </g:link>
                     </td>
@@ -53,7 +56,7 @@
                     </td>
 
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'REORDER']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'REORDER']">
                             <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
                         </g:link>
                     </td>
@@ -69,7 +72,7 @@
                     </td>
 
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'OVERSTOCK']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'OVERSTOCK']">
                             <warehouse:message code="inventory.listOverStock.label" />
                         </g:link>
                     </td>
@@ -83,7 +86,7 @@
                     </td>
 
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'IN_STOCK']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK']">
                             <warehouse:message code="inventory.listInStock.label" />
                         </g:link>
                     </td>
@@ -97,7 +100,7 @@
                         <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
                     <td>
-                        <g:link controller="json" action="listByProductGroup" params="[status:'IN_STOCK_OBSOLETE']">
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK_OBSOLETE']">
                             <warehouse:message code="inventory.listInStockObsolete.label" default="In stock, but obsolete"/>
                         </g:link>
                     </td>
@@ -117,7 +120,7 @@
                             <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle" title='${warehouse.message(code:"default.total.label",default:"Total")}'/>
                         </th>
                         <th>
-                            <g:link controller="json" action="listByProductGroup" params="[status:'ALL']">
+                            <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'ALL']">
                                 <warehouse:message code="default.total.label" />
                             </g:link>
                         </th>
@@ -138,19 +141,19 @@
         $.ajax({
             dataType: "json",
             timeout: 60000,
-            url: "${request.contextPath}/json/getProductGroupAlerts?location.id=${session.warehouse.id}",
+            url: "${request.contextPath}/json/getGenericProductSummary?location.id=${session.warehouse.id}",
             success: function (data) {
                 console.log(data);
                 var totalCount =0
                 $(".indicator").each(function( index ) {
                     var status = this.id;
-                    var count = (data.productGroupByStatusMap[status])?data.productGroupByStatusMap[status].length:0;
+                    var count = (data.genericProductByStatusMap[status])?data.genericProductByStatusMap[status].length:0;
                     totalCount += count;
                     var countLink =
 
-                    $("#" + status).html("<a href='${request.contextPath}/json/listByProductGroup?status=" + status + "'>" + count + "</a>");
+                    $("#" + status).html("<a href='${request.contextPath}/dashboard/downloadGenericProductSummaryAsCsv?status=" + status + "'>" + count + "</a>");
                 });
-                $("#TOTAL").html("<a href='${request.contextPath}/json/listByProductGroup?status=ALL'>" + totalCount + "</a>");
+                $("#TOTAL").html("<a href='${request.contextPath}/dashboard/downloadGenericProductSummaryAsCsv?status=ALL'>" + totalCount + "</a>");
             },
             error: function(xhr, status, error) {
 

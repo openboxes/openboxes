@@ -234,48 +234,17 @@ class JsonController {
 		render (quantityOnHand?:"0")
 	}
 
-    def listByProductGroup = {
-        def startTime = System.currentTimeMillis()
-        def location = Location.get(session?.warehouse?.id)
-        def productGroupByStatusMap = inventoryService.getProductGroupByStatusMap(location)
-        def data = (params.status == "ALL") ? productGroupByStatusMap.values().flatten() : productGroupByStatusMap[params.status]
-
-        def sw = new StringWriter()
-        if (data) {
-            def columns = data[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
-            sw.append(columns.join(",")).append("\n")
-            data.each { row ->
-                def values = row.values().collect { value ->
-                    if (value?.toString()?.isNumber()) {
-                        value
-                    }
-                    else if (value instanceof Collection) {
-                        StringEscapeUtils.escapeCsv(value.toString())
-                    }
-                    else {
-                        StringEscapeUtils.escapeCsv(value.toString())
-                    }
-                }
-                sw.append(values.join(","))
-                sw.append("\n")
-            }
-        }
-        response.setHeader("Content-disposition", "attachment; filename='InventoryStatus-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
-        render(contentType: "text/csv", text:sw.toString())
-        return;
-    }
-
 
     @Cacheable("dashboardCache")
-    def getProductGroupAlerts = {
+    def getGenericProductSummary = {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session?.warehouse?.id)
-        def productGroupByStatusMap = inventoryService.getProductGroupByStatusMap(location)
+        def genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
 
 
         render ([elapsedTime: (System.currentTimeMillis()-startTime),
-                totalCount:productGroupByStatusMap.values().size(),
-                productGroupByStatusMap: productGroupByStatusMap] as JSON)
+                totalCount:genericProductByStatusMap.values().size(),
+                genericProductByStatusMap: genericProductByStatusMap] as JSON)
 
     }
 
@@ -1428,57 +1397,21 @@ class JsonController {
     }
 
     /**
-     * Dashboard > Most requested items
+     * Dashboard > Fast movers
      */
-    def getMostRequestedItems = {
-
-        def data = [:]
+    def getFastMovers = {
         println "getRequisitionItems: " + params
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-        try {
-            def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-            def date = new Date()
-            if (params.date) {
-                date = dateFormat.parse(params.date)
-                date.clearTime()
-            }
-            data.location = location.id
-            data.startDate = date-30
-            data.endDate = date
-
-            def criteria = RequisitionItem.createCriteria()
-            def results = criteria.list {
-                requisition {
-                    eq("destination", location)
-                    between("dateRequested", date-30, date)
-                }
-                projections {
-                    product {
-                        groupProperty('id')
-                        groupProperty('name')
-                        groupProperty('productCode')
-                    }
-                    countDistinct('id', "occurrences")
-                    sum("quantity", "quantity")
-                }
-                order('occurrences','desc')
-                order('quantity','desc')
-                if (params.max) {
-                    maxResults(params.max as int)
-                }
-            }
-
-            def count = 1;
-            data.results = results.collect { [ id: it[0], productCode: it[2], name: it[1], count: it[3], quantity: it[4], rank: count++]  }
-
-
-
-        } catch (Exception e) {
-            log.error("Error occurred while getting requisition items " + e.message, e)
-            data = e.message
+        def date = new Date()
+        if (params.date) {
+            date = dateFormat.parse(params.date)
+            date.clearTime()
         }
+        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
 
-        render ([aaData: data.results?:[]] as JSON)
+        def data = inventoryService.getFastMovers(location, date, params.max as int)
+
+        render ([aaData: data?.results?:[]] as JSON)
     }
 
 

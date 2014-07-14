@@ -11,7 +11,24 @@
 
 <div class="box">
     <h2>
-        <warehouse:message code="requisitionItems.mostRequested.label" default="Most requested items over the past month (fast-movers)"/>
+
+        <div class="action-menu" style="position:absolute;top:5px;right:5px">
+            <button class="action-btn">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+            </button>
+            <div class="actions">
+                <div class="action-menu-item">
+                    <g:link controller="dashboard" action="downloadFastMoversAsCsv">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <warehouse:message code="dashboard.downloadFastMoversAsCsv.label" default="Download fast movers as CSV"/>
+                    </g:link>
+
+                </div>
+            </div>
+        </div>
+
+        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast moving items (last 30 days)"/>
+        <span class="beta">Beta</span>
         <%--
         <span class="action-menu">
             <button class="action-btn">
@@ -29,21 +46,22 @@
         --%>
     </h2>
 
+
 	<div class="widget-content" style="padding:0px;; margin:0">
         <table id="dataTable">
             <thead>
                 <th>Rank</th>
                 <th>Code</th>
                 <th>Product</th>
-                <th>Count</th>
-                <th>Quantity</th>
+                <th># Requisitions</th>
+                <th>Quantity Requested</th>
+                <th>Quantity On Hand</th>
             </thead>
             <tbody>
 
             </tbody>
         </table>
 	</div>
-    <div class="clearfix"></div>
     <br/><br/>
 </div>
 <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
@@ -59,7 +77,7 @@
             "bJQueryUI": false,
             "bAutoWidth": true,
             "sPaginationType": "two_button",
-            "sAjaxSource": "${request.contextPath}/json/getMostRequestedItems",
+            "sAjaxSource": "${request.contextPath}/json/getFastMovers",
             "fnServerParams": function ( data ) {
                 //console.log("server data " + data);
                 //var locationId = $("#locationId").val();
@@ -74,7 +92,7 @@
                     "url": sSource,
                     "data": aoData,
                     "success": fnCallback,
-                    "timeout": 30000,   // optional if you want to handle timeouts (which you should)
+                    "timeout": 60000,   // optional if you want to handle timeouts (which you should)
                     "error": handleAjaxError // this sets up jQuery to give me errors
                 } );
             },
@@ -100,8 +118,9 @@
                 { "mData": "rank", "sWidth": "1%" }, // 1
                 { "mData": "productCode", "sWidth": "1%" }, // 2
                 { "mData": "name" }, // 3
-                { "mData": "count", "sWidth": "5%"  }, // 4
-                { "mData": "quantity", "sWidth": "5%"  } // 5
+                { "mData": "requisitionCount", "sWidth": "5%"  }, // 4
+                { "mData": "quantityRequested", "sWidth": "5%"  }, // 5
+                { "mData": "quantityOnHand", "sWidth": "5%"  } // 5
                 //
 
             ],

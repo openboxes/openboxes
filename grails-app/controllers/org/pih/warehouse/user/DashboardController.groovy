@@ -12,6 +12,7 @@ package org.pih.warehouse.user
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
@@ -25,6 +26,8 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.LocalizationUtil
+
+import java.text.SimpleDateFormat
 
 class DashboardController {
 
@@ -456,6 +459,76 @@ class DashboardController {
 		}
 		
 	}
+
+    def downloadGenericProductSummaryAsCsv = {
+        def location = Location.get(session?.warehouse?.id)
+        def genericProductSummary = inventoryService.getGenericProductSummary(location)
+        def data = (params.status == "ALL") ? genericProductSummary.values().flatten() : genericProductSummary[params.status]
+
+        def sw = new StringWriter()
+        if (data) {
+            def columns = data[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
+            sw.append(columns.join(",")).append("\n")
+            data.each { row ->
+                def values = row.values().collect { value ->
+                    if (value?.toString()?.isNumber()) {
+                        value
+                    }
+                    else if (value instanceof Collection) {
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                    else {
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                }
+                sw.append(values.join(","))
+                sw.append("\n")
+            }
+        }
+        response.setHeader("Content-disposition", "attachment; filename='GenericProductSummary-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
+        render(contentType: "text/csv", text:sw.toString())
+        return;
+    }
+
+    def downloadFastMoversAsCsv = {
+        println "exportFastMoversAsCsv: " + params
+        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+
+        def date = new Date()
+        if (params.date) {
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            date = dateFormat.parse(params.date)
+            date.clearTime()
+        }
+
+        def data = inventoryService.getFastMovers(location, date, params.max)
+        def sw = new StringWriter()
+        if (data) {
+            // Write column headers
+            def columns = data.results[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
+            sw.append(columns.join(",")).append("\n")
+
+            // Write all data
+            data.results.each { row ->
+                def values = row.values().collect { value ->
+                    if (value?.toString()?.isNumber()) {
+                        value
+                    }
+                    else if (value instanceof Collection) {
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                    else {
+                        StringEscapeUtils.escapeCsv(value.toString())
+                    }
+                }
+                sw.append(values.join(","))
+                sw.append("\n")
+            }
+        }
+        response.setHeader("Content-disposition", "attachment; filename='FastMovers-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
+        render(contentType: "text/csv", text:sw.toString())
+        return;
+    }
     
 }
 
