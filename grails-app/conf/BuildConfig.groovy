@@ -17,6 +17,9 @@ grails.project.test.reports.dir	= "target/test-reports"
 
 grails.plugin.location.spock='spock/'
 
+// Development configuration property used to enable xrebel features
+//grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
+
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
 	inherits( "global" ) {
@@ -83,9 +86,7 @@ grails.project.dependency.resolution = {
         runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
         runtime( ':excel-import:0.3' ) { excludes 'poi-contrib', 'poi-scratchpad' }
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
-        //runtime (":external-config-reload:1.4.0") {
-        //    exclude "spock-grails-support"
-        //}
+        runtime (":external-config-reload:1.4.0") { excludes "spock-grails-support" }
         runtime ':quartz2:0.2.2'
 
         test (name:'geb', version:'0.6.3')
