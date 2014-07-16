@@ -155,7 +155,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         dateRequested(nullable: false)
         //validator: { value -> value <= new Date()})
         requestedDeliveryDate(nullable: false)
-        //monthRequested(nullable: true)
+
+        // FIXME Even though Grails complains that "derived properties may not be constrained", when you remove the constraint there are validation errors on Requisition
+        // OB-3180 Derived properties may not be constrained. Property [monthRequested] of domain class org.pih.warehouse.requisition.Requisition will not be checked during validation.
+        monthRequested(nullable: true)
         //validator: { value ->
         //    def tomorrow = new Date().plus(1)
         //    tomorrow.clearTime()
