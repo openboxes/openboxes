@@ -155,7 +155,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         dateRequested(nullable: false)
         //validator: { value -> value <= new Date()})
         requestedDeliveryDate(nullable: false)
-        monthRequested(nullable: true)
+        //monthRequested(nullable: true)
         //validator: { value ->
         //    def tomorrow = new Date().plus(1)
         //    tomorrow.clearTime()
