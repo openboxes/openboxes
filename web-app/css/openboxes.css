@@ -3011,3 +3011,4 @@ table.dataTable tbody tr.even td.sorting_1 { background-color: #fff; }
 
 table.dataTable tbody tr.odd td.sorting_2 { background-color: #f7f7f7;; }
 table.dataTable tbody tr.even td.sorting_2 { background-color: #fff; }
+#dataTable_processing { height: 60px; }

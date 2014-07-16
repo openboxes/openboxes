@@ -140,7 +140,7 @@
 
         $.ajax({
             dataType: "json",
-            timeout: 60000,
+            timeout: 120000,
             url: "${request.contextPath}/json/getGenericProductSummary?location.id=${session.warehouse.id}",
             success: function (data) {
                 console.log(data);

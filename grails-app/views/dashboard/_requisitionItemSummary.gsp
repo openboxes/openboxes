@@ -92,7 +92,7 @@
                     "url": sSource,
                     "data": aoData,
                     "success": fnCallback,
-                    "timeout": 60000,   // optional if you want to handle timeouts (which you should)
+                    "timeout": 120000,   // optional if you want to handle timeouts (which you should)
                     "error": handleAjaxError // this sets up jQuery to give me errors
                 } );
             },
@@ -104,7 +104,7 @@
 //            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner-large.gif' /><br/>Loading..."
+                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> <br/><br/> Loading... "
             },
             //"fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,

@@ -72,7 +72,7 @@
         //$( "#progressPercentage").html('')
         $.ajax({
             dataType: "json",
-            timeout: 60000,
+            timeout: 120000,
             url: "${request.contextPath}/json/getTotalStockValue?location.id=${session.warehouse.id}",
             //data: data,
             success: function (data) {
