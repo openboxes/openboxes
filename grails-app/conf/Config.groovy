@@ -12,6 +12,7 @@ import grails.util.GrailsUtil
 import org.apache.log4j.AsyncAppender
 import org.apache.log4j.Level
 import org.apache.log4j.net.SMTPAppender
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 
 // Locations to search for config files that get merged into the main config
@@ -426,6 +427,10 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 
 // Barcode scanner
 openboxes.scannerDetection.enabled = true
+
+// Stock Card > Consumption > Reason codes
+// Examples: Stock out, Low stock, Expired, Damaged, Could not locate, Insufficient quantity reconditioned
+openboxes.stockCard.consumption.reasonCodes = [ ReasonCode.STOCKOUT, ReasonCode.LOW_STOCK, ReasonCode.EXPIRED, ReasonCode.DAMAGED, ReasonCode.COULD_NOT_LOCATE, ReasonCode.INSUFFICIENT_QUANTITY_RECONDITIONED]
 
 // Localization configuration - default and supported locales
 locale.defaultLocale = 'en'
