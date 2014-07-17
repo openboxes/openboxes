@@ -354,15 +354,6 @@ class ProductService {
 	List getQuickCategories() {
 		List quickCategories = new ArrayList();
 		String quickCategoryConfig = grailsApplication.config.inventoryBrowser.quickCategories;
-
-		/*
-		Category.findAll().each {
-			if (it.parentCategory == null && !quickCategories.contains(it)) {
-				quickCategories.add(it);
-			}
-		}
-		*/
-
 		if (quickCategoryConfig) {
 			quickCategoryConfig.split(",").each {
 				Category c = Category.findByName(it);

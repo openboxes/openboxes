@@ -48,8 +48,6 @@
 
 				<g:form controller="dashboard" action="chooseLocation">
 					<div class="box">
-
-
                         <h2>
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                             ${warehouse.message(code: 'dashboard.chooseLocation.label')}
@@ -72,71 +70,65 @@
 
                         </div>
                         --%>
-						<div id="chooseLocationSelect">
-                            <table>
-                                <tbody>
-									<g:set var="count" value="${0 }"/>
-									<g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/>
-									<g:each var="entry" in="${session.loginLocationsMap}" status="i">
+                        <g:if test="${session.loginLocationsMap && !session.loginLocationsMap.isEmpty() }">
+                            <div id="chooseLocationSelect">
+                                <table>
+                                    <tbody>
+                                        <g:set var="count" value="${0 }"/>
+                                        <g:each var="entry" in="${session.loginLocationsMap}" status="i">
+                                            <tr>
+                                                <td class="top left" >
+                                                    <h3>${entry.key?:warehouse.message(code:'locationGroup.empty.label') }</h3>
+                                                    <g:set var="locationGroup" value="${entry.key }"/>
+                                                    <g:each var="warehouse" in="${entry.value.sort() }" status="status">
+                                                        <div class="left" style="margin: 2px;">
+                                                            <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
+                                                                <format:metadata obj="${warehouse}"/>
+                                                            </a>
+                                                        </div>
+                                                    </g:each>
+                                                </td>
+                                            </tr>
+                                        </g:each>
+                                        <%--
+                                        <tr class="prop">
+                                            <td class="">
+                                            </td>
+                                            <td class="middle">
+                                                <g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
+                                                Remember my location and log me in automatically.
+
+                                                ${session.user.rememberLastLocation}
+                                                ${session.user.warehouse }
+                                            </td>
+                                        </tr>
                                         <tr>
-                                            <td class="top left" >
-                                                <h3>${entry.key?:warehouse.message(code:'default.none.label') }</h3>
-                                                <g:set var="locationGroup" value="${entry.key }"/>
-                                                <g:each var="warehouse" in="${entry.value.sort() }" status="status">
-                                                    <div class="left" style="margin: 2px;">
-                                                        <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-                                                            <format:metadata obj="${warehouse}"/>
-                                                        </a>
-                                                    </div>
-                                                </g:each>
+                                            <td>
+                                                <g:if test="${session?.user?.warehouse }">
+                                                    <warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/>
+                                                </g:if>
 
                                             </td>
                                         </tr>
-									</g:each>
-                                    <tr>
-                                        <td class="top left">
-                                            <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-                                            <g:each var="warehouse" in="${nullLocationGroup }" status="status">
-                                                <div class="left" style="margin: 1px;">
-                                                    <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
-                                                        <format:metadata obj="${warehouse}"/>
-                                                    </a>
-                                                </div>
-                                            </g:each>
-                                        </td>
-                                    </tr>
-									<%--
-									<tr class="prop">
-										<td class="">
-										</td>
-										<td class="middle">
-											<g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
-											Remember my location and log me in automatically.
+                                        --%>
 
-											${session.user.rememberLastLocation}
-											${session.user.warehouse }
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<g:if test="${session?.user?.warehouse }">
-												<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/>
-											</g:if>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </g:if>
 
-										</td>
-									</tr>
-									--%>
-									<g:unless test="${session.loginLocations }">
-										<div class="warehouse">
-											<warehouse:message code="dashboard.noWarehouse.message"/>
-										</div>
-										<div class="warehouse">
-											<warehouse:message code="dashboard.requiredActivities.message" args="[grailsApplication.config.app.loginLocation.requiredActivities]"/>
-										</div>
-									</g:unless>
-								</tbody>
-							</table>
-						</div>
+                        <g:unless test="${session.loginLocations }">
+                            <div style="padding:10px;">
+                                <h3>
+                                    <warehouse:message code="dashboard.noWarehouse.message"/>
+                                </h3>
+                                <div>
+                                    <warehouse:message code="dashboard.requiredActivities.message"
+                                                       args="[grailsApplication.config.openboxes.chooseLocation.requiredActivities]"/>
+                                </div>
+                            </div>
+                        </g:unless>
+
 						<%--
 						<table>
 							<tr>

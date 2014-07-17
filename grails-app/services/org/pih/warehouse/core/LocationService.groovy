@@ -7,7 +7,10 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core;
+package org.pih.warehouse.core
+
+import org.apache.commons.collections.comparators.NullComparator
+import util.ConfigHelper;
 
 // import java.text.DecimalFormat
 // import java.text.SimpleDateFormat
@@ -18,36 +21,40 @@ class LocationService {
 	boolean transactional = true
 	
 	
-	List getAllLocations() { 
+	def getAllLocations() {
 		return Location.findAllByActive(true);
 	}
-	
-	List getLoginLocations() { 
-		return getLoginLocations(null)
-	}
-	
-	
-	List getLoginLocations(Integer currentLocationId) { 
+
+	def getLoginLocations(Integer currentLocationId) {
 		return getLoginLocations(Location.get(currentLocationId))
 	}
 	
-	List getLoginLocations(Location currentLocation) { 
-		def locations = []
-		def requiredActivities = grailsApplication.config.openboxes.loginLocation.requiredActivities
+	def getLoginLocations(Location currentLocation) {
+        log.info "Get login locations (currentLocation=${currentLocation?.name})"
+
+        // Get all locations that match the required activity (using inclusive OR)
+		def locations = new HashSet()
+		def requiredActivities = ConfigHelper.listValue(grailsApplication.config.openboxes.chooseLocation.requiredActivities)
 		if (requiredActivities) {
 			requiredActivities.each { activity ->
 				locations += getAllLocations()?.findAll { it.supports(activity) }
 			}			
 		}
-		if (currentLocation) { 
-			locations = locations - currentLocation
-		}
 		return locations
 	}
-	
-	
-	Map getLoginLocationsMap(Location currentLocation) { 
-		return getLoginLocations(currentLocation).sort { it.locationGroup }.groupBy { it.locationGroup }
+
+
+	Map getLoginLocationsMap(Location currentLocation) {
+        log.info "TEST Get login locations map (currentLocation=${currentLocation?.name})"
+        def locationMap = [:]
+        def nullHigh = new NullComparator(true)
+        def locations = getLoginLocations(currentLocation)
+        if (locations) {
+            locationMap = locations.groupBy { it?.locationGroup }
+            locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
+        }
+        return locationMap;
+        //return getLoginLocations(currentLocation).sort { it?.locationGroup }.reverse().groupBy { it?.locationGroup }
 	}
 	
 	List getDepots() {

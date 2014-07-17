@@ -189,48 +189,18 @@
                                                     <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
                                                 </a>
                                                 <span id="warehouseMenu" title="${warehouse.message(code:'dashboard.chooseLocation.label')}" style="display: none; padding: 10px;">
-                                                    <%--
-                                                    <g:isUserNotInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_MANAGER]">
-                                                        <div class="error">
-                                                            ${warehouse.message(code:'auth.needAdminRoleToChangeLocation.message')}
-                                                        </div>
-                                                    </g:isUserNotInRole>
-                                                    --%>
-
-                                                    <%--<g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_MANAGER]">--%>
-                                                        <div style="max-height: 400px; overflow: auto;">
-                                                            <table>
-                                                                <g:set var="count" value="${0 }"/>
-                                                                <g:set var="nullLocationGroup" value="${session.loginLocationsMap.remove(null) }"/>
-                                                                <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                                                    <tr class="prop">
-                                                                        <td class="name">
-                                                                            <h3>${entry.key }</h3>
-                                                                        </td>
-                                                                        <td class="value">
-                                                                            <div>
-                                                                                <g:each var="warehouse" in="${entry.value.sort() }">
-                                                                                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                                                                    <div class="left" style="margin: 1px;">
-                                                                                        <a class="button big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                                                                            <format:metadata obj="${warehouse}"/>
-                                                                                        </a>
-                                                                                    </div>
-                                                                                </g:each>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                </g:each>
-                                                                <tr class="prop">
-                                                                    <td class="name">
-                                                                        <h3>${warehouse.message(code: 'default.others.label', default: 'Others')}</h3>
-                                                                    </td>
-                                                                    <td class="value">
+                                                    <div style="max-height: 400px; overflow: auto;">
+                                                        <table>
+                                                            <g:set var="count" value="${0 }"/>
+                                                            <g:each var="entry" in="${session.loginLocationsMap}" status="i">
+                                                                <tr>
+                                                                    <td class="top left">
+                                                                        <h3>${entry.key ?: warehouse.message(code:'locationGroup.empty.label') }</h3>
                                                                         <div>
-                                                                            <g:each var="warehouse" in="${nullLocationGroup }" status="status">
+                                                                            <g:each var="warehouse" in="${entry.value.sort() }">
                                                                                 <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
                                                                                 <div class="left" style="margin: 1px;">
-                                                                                    <a href='${createLink(action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}' class="button big">
+                                                                                    <a class="button big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
                                                                                         <format:metadata obj="${warehouse}"/>
                                                                                     </a>
                                                                                 </div>
@@ -238,7 +208,8 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            </table>
+                                                            </g:each>
+                                                        </table>
                                                         <%--
                                                         <div class="prop">
                                                             <g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
@@ -248,13 +219,12 @@
                                                             ${session.user.warehouse }
                                                         </div>
                                                         --%>
-                                                            <g:unless test="${session.loginLocationsMap }">
-                                                                <div style="background-color: black; color: white;" class="warehouse button">
-                                                                    <warehouse:message code="dashboard.noWarehouse.message"/>
-                                                                </div>
-                                                            </g:unless>
-                                                        </div>
-                                                    <%--</g:isUserInRole>--%>
+                                                        <g:unless test="${session.loginLocationsMap }">
+                                                            <div style="background-color: black; color: white;" class="warehouse button">
+                                                                <warehouse:message code="dashboard.noWarehouse.message"/>
+                                                            </div>
+                                                        </g:unless>
+                                                    </div>
                                                 </span>
                                             </li>
                                         </g:if>

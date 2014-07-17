@@ -52,7 +52,7 @@ grails {
 }
 
 /* Indicates which activities are required for a location to allow logins */
-openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
+openboxes.chooseLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
 /* Grails resources plugin */
 grails.resources.adhoc.includes = []
@@ -284,9 +284,9 @@ log4j = {
 			'net.sf.ehcache.hibernate',
             //'org.hibernate.SQL',
             //'org.hibernate.type',
-            'org.hibernate.cache'
+            //'org.jumpmind.symmetric.service.impl.PurgeService',
+            'org.hibernate.cache',
             'org.apache.ddlutils'
-            //'org.jumpmind.symmetric.service.impl.PurgeService'
 
 	info    'org.liquibase',
             'com.opensymphony.clickstream',
@@ -303,15 +303,15 @@ log4j = {
 			'BootStrap',
 			'liquibase',
 			'com.gargoylesoftware.htmlunit'
-            //'org.jumpmind'
 
    debug 	'org.apache.cxf',
             'grails.plugin.rendering',
-           //'org.hibernate.transaction',
-           //'org.hibernate.jdbc',
-           //'org.hibernate.SQL'
-
-           //'com.gargoylesoftware.htmlunit',
+            //'com.unboundid'
+            //'org.hibernate.transaction',
+            //'org.jumpmind',
+            //'org.hibernate.jdbc',
+            //'org.hibernate.SQL'
+            //'com.gargoylesoftware.htmlunit',
             'org.apache.http.wire'        // shows traffic between htmlunit and server
 
    trace    'org.hibernate.type.descriptor.sql.BasicBinder'
@@ -415,6 +415,14 @@ openboxes.uservoice.widget.position = "bottom-left"
 // JIRA Issue Collector
 openboxes.jira.issue.collector.enabled = true
 openboxes.jira.issue.collector.url = "https://openboxes.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_USgc5zl3-1988229788/6318/12/1.4.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=fb813fdb"
+
+// OpenBoxes Feedback
+openboxes.mail.feedback.enabled = false
+openboxes.mail.feedback.recipients = ["feedback@openboxes.com"]
+
+// OpenBoxes Error Emails (bug reports)
+openboxes.mail.errors.enabled = true
+openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 
 // Barcode scanner
 openboxes.scannerDetection.enabled = true

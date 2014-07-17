@@ -73,9 +73,14 @@ dataSource.password=openboxes
 # OpenBoxes mail settings - disabled by default
 grails.mail.enabled=false
 
-# Application settings
-#inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
-#openboxes.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
+# OpenBoxes > Inventory Browser > Quick categories
+#openboxes.inventoryBrowser.quickCategories=ARVs,MEDICAL SUPPLIES,FOOD,EQUIPMENT,MEDICINE
+
+# OpenBoxes > Choose Location > Required Activities
+# The supported activities required in order for a location a location to show up on Choose Location page.
+# Possible values: MANAGE_INVENTORY, PLACE_ORDER, PLACE_REQUEST, FULFILL_ORDER, FULFILL_REQUEST, SEND_STOCK, RECEIVE_STOCK, EXTERNAL
+#
+#openboxes.chooseLocation.requiredActivities = "MANAGE_INVENTORY"
 
 # If you wish to not set up any test data, you can indicate this per the below 
 # (eg. if you are running from a copy of a production db)

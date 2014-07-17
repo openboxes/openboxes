@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 import org.pih.warehouse.core.Location
 
 class InitializationFilters {
@@ -19,16 +19,18 @@ class InitializationFilters {
 			before = {
 				try {
 					// Make sure all session variables are initialized
-					if (!session.loginLocations) {
+					if (!session.loginLocations || session.loginLocations.isEmpty() || params?.reset) {
+                        log.info "Initializing login locations ..."
 						Location currentLocation = Location.get(session?.warehouse?.id)
                         session._showTime = true
-						session.loginLocations = locationService.getLoginLocations(currentLocation) 			
-						session.loginLocationsMap = locationService.getLoginLocationsMap(currentLocation)			
+                        session.loginLocations = locationService.getLoginLocations(currentLocation)
+                        session.loginLocationsMap = locationService.getLoginLocationsMap(currentLocation)
 					}
 					
 					if (!session.rootCategory) { 
 						session.rootCategory = productService.getRootCategory()
-					} 
+                        //session.quickCategories = productService.getQuickCategories()
+					}
 					if (!session.inventoryCategoryFilters) { 
 						session.inventoryCategoryFilters = [];
 					}
