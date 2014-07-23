@@ -28,7 +28,7 @@ You must not remove this notice, or any other, from this software.
 
 #### Basic setup instructions for developers
 
-If you are a user/implementer, please check out our [Installation](wiki/Installation) page.
+These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](https://github.com/openboxes/openboxes/wiki/Installation) page.
 
 ##### Install dependencies
 
