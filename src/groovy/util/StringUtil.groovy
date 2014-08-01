@@ -9,9 +9,24 @@
 **/ 
 package util
 
+import groovy.text.SimpleTemplateEngine
+import java.text.MessageFormat
+
+
 class StringUtil {
 	
 	public static String mask(String value, String mask) {		
 		return value.replaceFirst(".*", { match -> return "".padLeft(match.length(), mask)})
 	}
+
+    public static String substitute(text, binding) {
+        def engine = new SimpleTemplateEngine()
+        def template = engine.createTemplate(text).make(binding)
+        return template.toString()
+    }
+
+    public static String format(text, args) {
+        return MessageFormat.format(text, args)
+
+    }
 }

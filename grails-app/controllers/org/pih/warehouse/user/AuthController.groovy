@@ -19,6 +19,8 @@ import org.pih.warehouse.product.Product
 class AuthController {
 
 	def mailService;
+    def userService
+    def authService
     def grailsApplication
 	
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"];
@@ -57,17 +59,18 @@ class AuthController {
      * Performs the authentication logic.
      */
 	def handleLogin = {
-		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
+        log.info "Handle login " + params
 
-        // FIXME Handle setting timezone based on configuration
-		TimeZone userTimezone = TimeZone.getTimeZone("America/New_York")
-		String browserTimezone = request.getParameter("browserTimezone")
-		if (browserTimezone != null) {
-			userTimezone = TimeZone.getTimeZone(browserTimezone)
-		}
-		session.timezone = userTimezone;
-		
+		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
 		if (userInstance) {
+
+            // FIXME Handle setting timezone based on configuration
+            TimeZone userTimezone = TimeZone.getTimeZone("America/New_York")
+            String browserTimezone = request.getParameter("browserTimezone")
+            if (browserTimezone != null) {
+                userTimezone = TimeZone.getTimeZone(browserTimezone)
+            }
+            session.timezone = userTimezone;
 
             // Check if user is active -- redirect back to login page
 			if (!userInstance?.active) {
@@ -78,8 +81,8 @@ class AuthController {
 
             // Passwords match
 			// Compare encoded/hashed password as well as in cleartext (support existing cleartext passwords)			
-			if (userInstance.password == params.password.encodeAsPassword() || userInstance.password == params.password) {			
-
+			//if (userInstance.password == params.password.encodeAsPassword() || userInstance.password == params.password) {
+            if (userService.authenticate(params.username, params.password)) {
 				// Need to fetch the manager and roles in order to avoid 
 				// Hibernate error ("could not initialize proxy - no Session")				
 				// def warehouse = userInstance?.warehouse?.name;

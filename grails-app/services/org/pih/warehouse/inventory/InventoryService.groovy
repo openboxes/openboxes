@@ -1372,6 +1372,12 @@ class InventoryService implements ApplicationContextAware {
 		return quantityMap
 	}
 
+
+    Map getQuantityByInventoryItemMap(location, products) {
+        def transactionEntries = getTransactionEntriesByInventoryAndProduct(location.inventory, products)
+        return getQuantityByInventoryItemMap(transactionEntries)
+    }
+
 	/**
 	 * Converts list of passed transactions entries into a quantity
 	 * map indexed by inventory item
@@ -3971,7 +3977,7 @@ class InventoryService implements ApplicationContextAware {
         else {
             statusMessage = "UNAVAILABLE"
         }
-        println "getStatusMessage(${inventoryStatus}, ${minQuantity}, ${reorderQuantity}, ${maxQuantity}, ${currentQuantity}) = ${statusMessage}"
+        //log.info "getStatusMessage(${inventoryStatus}, ${minQuantity}, ${reorderQuantity}, ${maxQuantity}, ${currentQuantity}) = ${statusMessage}"
         return statusMessage
     }
 

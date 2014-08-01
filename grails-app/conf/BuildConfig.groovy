@@ -54,7 +54,7 @@ grails.project.dependency.resolution = {
 		compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
         compile "org.jadira.usertype:usertype.jodatime:1.9"
 
-        //compile "com.unboundid:unboundid-ldapsdk:2.3.6"
+        compile "com.unboundid:unboundid-ldapsdk:2.3.6"
         //runtime ":resources:1.2.RC2"
         //runtime ":cached-resources:1.0"
 
@@ -83,12 +83,11 @@ grails.project.dependency.resolution = {
         test(name:'spock', version:'0.6')
         */
 
-        runtime( ':mail:1.0-SNAPSHOT' ) { excludes 'mail', 'spring-test' }
-        runtime( ':excel-import:0.3' ) { excludes 'poi-contrib', 'poi-scratchpad' }
+        runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
+        runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
-        runtime (":external-config-reload:1.4.0") { excludes "spock-grails-support" }
-        runtime ':quartz2:0.2.2'
-
+        runtime (':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
+        runtime (':quartz2:2.1.6.2')
         test (name:'geb', version:'0.6.3')
 
 

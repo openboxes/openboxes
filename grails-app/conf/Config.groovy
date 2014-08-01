@@ -428,6 +428,31 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 // Barcode scanner
 openboxes.scannerDetection.enabled = true
 
+
+// LDAP configuration
+openboxes.ldap.enabled = true
+openboxes.ldap.context.managerDn = "cn=read-only-admin,dc=example,dc=com"
+openboxes.ldap.context.managerPassword = "password"
+//openboxes.ldap.context.server = "ldap://ldap.forumsys.com:389"
+openboxes.ldap.context.server.host = "ldap.forumsys.com"
+openboxes.ldap.context.server.port = 389
+
+// LDAP Search
+openboxes.ldap.search.base = "dc=example,dc=com"
+openboxes.ldap.search.filter="(uid={0})"
+openboxes.ldap.search.searchSubtree = true
+openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
+
+//openboxes.ldap.authorities.retrieveGroupRoles = false
+//openboxes.ldap.authorities.groupSearchBase ='DC=example,DC=com'
+//openboxes.ldap.authorities.groupSearchFilter = 'member={0}'
+//openboxes.ldap.authorities.role.ROLE_ADMIN = "ou=mathematicians,dc=example,dc=com"
+//openboxes.ldap.authorities.role.ROLE_MANAGER = "ou=scientists,dc=example,dc=com"
+//openboxes.ldap.authorities.role.ROLE_ASSISTANT = "ou=assistants,dc=example,dc=com"
+//openboxes.ldap.authorities.role.ROLE_BROWSER = "ou=browsers,dc-example,dc=com"
+
+
+
 // Stock Card > Consumption > Reason codes
 // Examples: Stock out, Low stock, Expired, Damaged, Could not locate, Insufficient quantity reconditioned
 openboxes.stockCard.consumption.reasonCodes = [ ReasonCode.STOCKOUT, ReasonCode.LOW_STOCK, ReasonCode.EXPIRED, ReasonCode.DAMAGED, ReasonCode.COULD_NOT_LOCATE, ReasonCode.INSUFFICIENT_QUANTITY_RECONDITIONED]
