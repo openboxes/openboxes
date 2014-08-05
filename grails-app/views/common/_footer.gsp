@@ -35,6 +35,11 @@
             <warehouse:message code="default.ipAddress.label" default="IP Address"/>: &nbsp;
             <b>${request.getRemoteAddr()}</b>
 		</span>
+        &nbsp;&nbsp; | &nbsp;&nbsp;
+        <span>
+            <warehouse:message code="default.hostname.label" default="Hostname"/>: &nbsp;
+            <b>${session.hostname?:"Unknown"}</b>
+        </span>
         <g:if test="${session.warehouse && session.user && session._showTime}">
             &nbsp;&nbsp; | &nbsp;&nbsp;
             <span>

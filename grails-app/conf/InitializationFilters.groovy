@@ -18,7 +18,12 @@ class InitializationFilters {
 		sessionCheck(controller:'*', action:'*') {
 			before = {
 				try {
-					// Make sure all session variables are initialized
+
+                    if (!session.hostname) {
+                        session.hostname = InetAddress.getLocalHost().getHostName() + " (" + request.getHeader('Host') + ")"
+                    }
+
+                    // Make sure all session variables are initialized
 					if (!session.loginLocations || session.loginLocations.isEmpty() || params?.reset) {
                         log.info "Initializing login locations ..."
 						Location currentLocation = Location.get(session?.warehouse?.id)
