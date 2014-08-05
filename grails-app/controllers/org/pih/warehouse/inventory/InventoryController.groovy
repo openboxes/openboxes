@@ -1258,7 +1258,7 @@ class InventoryController {
 	
 	
 	def createTransaction = { 
-		log.debug("createTransaction params " + params)		
+		log.info("createTransaction params " + params)
 		def command = new TransactionCommand();
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
@@ -1269,24 +1269,36 @@ class InventoryController {
 			flash.message = "Cannot create transaction for unknown transaction type";			
 			redirect(controller: "inventory", action: "browse")
 		}
-		
+
+        def products = []
+
 		// Process productId parameters from inventory browser
 		if (params.product?.id) {
 			def productIds = params.list('product.id')
-			def products = productIds.collect { String.valueOf(it); }
-			command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
+			productIds = productIds.collect { String.valueOf(it); }
+            if (productIds) {
+                products = Product.getAll(productIds)
+                command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds);
+            }
 		}
 		// If given a list of inventory items, we just return those inventory items
 		else if (params?.inventoryItem?.id) { 
 			def inventoryItemIds = params.list('inventoryItem.id')
 			def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
-			command?.productInventoryItems = inventoryItems.groupBy { it.product } 
+
+            def productIds = inventoryItems.collect { it?.product?.id }
+            if (productIds) {
+                products = Product.getAll(productIds)
+            }
+			command?.productInventoryItems = inventoryItems.groupBy { it.product }
 		}
-		
+
+        println "Product inventory items " + command?.productInventoryItems
+
 		command.transactionInstance = transactionInstance
 		command.warehouseInstance = warehouseInstance
 
-		command.quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory);
+		command.quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory, products);
 		command.transactionTypeList = TransactionType.list();
 		command.locationList = Location.list();
 		
@@ -1333,7 +1345,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
+					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
@@ -1409,7 +1421,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction?.hasErrors() && transaction?.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
+					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
@@ -1476,7 +1488,7 @@ class InventoryController {
 				log.debug("Find inventory item " + it.product + " " + it.lotNumber)
 				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
 				log.debug("Found inventory item? " + inventoryItem)
-				
+
 				// If the inventory item doesn't exist, we create a new one
 				if (!inventoryItem) {
 					inventoryItem = new InventoryItem();
@@ -1510,7 +1522,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
 					transactionInstance.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transactionInstance?.transactionNumber
+					flash.message = "Successfully saved transaction " + transactionInstance?.transactionNumber?:transactionInstance?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transactionInstance?.id)
 				}
@@ -1591,7 +1603,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) { 
 					transaction.save(failOnError: true)				
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber
+					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)					
 				} 

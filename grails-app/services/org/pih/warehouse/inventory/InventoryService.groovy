@@ -1654,6 +1654,19 @@ class InventoryService implements ApplicationContextAware {
 		return getQuantityByInventoryItemMap(transactionEntries);
 	}
 
+    /**
+     * Get a map of quantity values for all available inventory items in the given inventory.
+     *
+     * @param inventory
+     * @param products
+     * @return
+     */
+    Map<InventoryItem, Integer> getQuantityForInventory(Inventory inventory, List<Product> products) {
+        def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products)
+        return getQuantityByInventoryItemMap(transactionEntries);
+    }
+
+
 	/**
 	 * Fetches and populates a StockCard Command object
 	 *
