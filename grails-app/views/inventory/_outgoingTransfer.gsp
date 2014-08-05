@@ -59,7 +59,7 @@
 				</td>
 				<td class="value">
 					<span class="value">
-						<g:textArea cols="100%" rows="5" name="transactionInstance.comment"
+						<g:textArea cols="120" rows="5" name="transactionInstance.comment"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -107,6 +107,7 @@
 											<tr class="row">
 												<td>
 													<span class="${onHandQuantity >0? '':'fade'}">
+                                                        ${product?.productCode}
 														<format:product product="${product }"/>
 													</span>
 												</td>
@@ -168,7 +169,9 @@
 								<warehouse:message code="default.button.save.label"/>
 							</button>
 							&nbsp;
-							<g:link controller="inventory" action="browse">${warehouse.message(code: 'default.button.cancel.label')}</g:link>
+							<g:link controller="inventory" action="browse" class="button icon trash">
+                                ${warehouse.message(code: 'default.button.cancel.label')}
+                            </g:link>
 						</div>
 					</td>
 				</tr>

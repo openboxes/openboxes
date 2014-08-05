@@ -11,10 +11,13 @@
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
+                    <%--
 					<span>
 						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
 								value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>								
+					</span>
+				    --%>
+                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	
 			<tr class="prop">
@@ -23,7 +26,7 @@
 				</td>
 				<td class="value">
 					<span class="value">
-						<g:textArea cols="80" rows="1" name="transactionInstance.comment" value="${command?.transactionInstance?.comment }"></g:textArea>
+						<g:textArea cols="120" rows="5" name="transactionInstance.comment" value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
 				</td>
@@ -116,11 +119,11 @@
 			<tr class="prop">
 				<td colspan="7">
 					<div class="center">
-						<button type="submit" name="save">								
+						<button type="submit" name="save" class="button icon approve">
 							<warehouse:message code="default.button.save.label"/>
 						</button>
 						&nbsp;
-						<g:link controller="inventory" action="browse">
+						<g:link controller="inventory" action="browse" class="button icon trash">
 							${warehouse.message(code: 'default.button.back.label')}
 						</g:link>
 						

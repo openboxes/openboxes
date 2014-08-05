@@ -41,7 +41,7 @@
 				</td>
 				<td class="value">
 					<span class="comment">
-						<g:textArea cols="100%" rows="10" name="transactionInstance.comment"
+						<g:textArea cols="120" rows="5" name="transactionInstance.comment"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -166,6 +166,7 @@
 										<tr class="prop row">
 											<td class="left">
 												<span class="productName">
+                                                    ${product?.productCode}
 													<format:product product="${product }"/>
 												</span>
 												<g:hiddenField name="transactionEntries[${i }].product.id" value="${product?.id }"/>
@@ -236,7 +237,7 @@
 							<warehouse:message code="default.button.save.label"/>
 						</button>
 						&nbsp;
-						<g:link controller="inventory" action="browse">
+						<g:link controller="inventory" action="browse" class="button icon trash">
 							${warehouse.message(code: 'default.button.cancel.label')}
 						</g:link>
 					</div>
