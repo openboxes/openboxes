@@ -31,7 +31,6 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import util.InventoryUtil
-
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -1008,7 +1007,12 @@ class JsonController {
 		terms?.each{ term ->
             // Get all products that match terms
             def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, location.inventory, 25, 0)
-            quantityMap = getQuantityByProductMapCached(location, products);
+
+            // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
+            if (products) {
+                quantityMap = getQuantityByProductMapCached(location, products);
+                println "Quantity map: " + quantityMap?.size()
+            }
             items.addAll(products)
 		}
 		
