@@ -58,6 +58,8 @@ grails.project.dependency.resolution = {
         //runtime ":resources:1.2.RC2"
         //runtime ":cached-resources:1.0"
 
+        runtime 'org.springframework:spring-test:3.0.5.RELEASE'
+
         test "org.codehaus.geb:geb-spock:0.6.3"
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
         test ('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
