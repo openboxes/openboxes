@@ -214,7 +214,7 @@
                                                 ${warehouse.message(code: 'requisitionItem.orderIndex.label', default: 'Sort order')}
                                             </th>
                                         </tr>
-                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems.sort()}" status="i">
+                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems?.sort()}" status="i">
                                             <tr class="${i%2?'even':'odd'}">
                                                 <td>
                                                     ${requisitionItem?.product?.productCode}
