@@ -12,8 +12,11 @@ package org.pih.warehouse.product
 import com.google.zxing.BarcodeFormat
 import com.mysql.jdbc.MysqlDataTruncation
 import grails.converters.JSON
+
+import javax.activation.MimetypesFileTypeMap
 import java.sql.SQLException
 import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -591,13 +594,15 @@ class ProductController {
 
                 File file = new File(filename)
                 println "Path: " + file.absolutePath
+                def contentType = new MimetypesFileTypeMap().getContentType(file)
+                println "ContentType: " + contentType
 
                 documentInstance = new Document(
                     size: file.size(),
                     name: file.name,
                     filename: file.name,
                     fileContents: file.bytes,
-                    contentType: "image")
+                    contentType: contentType)
 
                 if (documentInstance?.validate() && !documentInstance?.hasErrors()) {
                     log.info "Saving document " + documentInstance;
@@ -766,23 +771,46 @@ class ProductController {
 			response.sendError(404)
 		}
 	}
-	
+
+    def downloadDocument = {
+        log.info "viewImage: " + params
+        def documentInstance = Document.get(params.id);
+        if (documentInstance) {
+            response.setHeader "Content-disposition", "attachment;filename=${documentInstance.filename}"
+            response.contentType = documentInstance.contentType
+            response.outputStream << documentInstance.fileContents
+            response.outputStream.flush()
+        }
+    }
+
 	/**
-	 * View user's profile photo
+	 * View document
 	 */
 	def viewImage = {
         log.info "viewImage: " + params
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {
-			documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
-			/*
-			 println "resize image " + params.width + " " + params.height
-			 println params
-			 byte[] bytes = documentInstance.fileContents
-			 println documentInstance.contentType
-			 resizeImage(bytes, response.outputStream, params.width as int, params.height as int)
-			 //response.outputStream << bytes
-			 */
+            if (documentInstance.isImage()) {
+    			documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
+            }
+            else {
+                // For Grails 2.3.x
+                //final Resource image = grailsResourceLocator.findResourceForURI('/images/icons/pdf.png')
+                //render file: image.inputStream, contentType: 'image/png'
+
+                // Strip out the most common mime type tree names
+                def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
+                def servletContext = ServletContextHolder.servletContext
+                def imageContent = servletContext.getResource("/images/icons/${documentType}.png")
+                if (!imageContent) {
+                    imageContent = servletContext.getResource('/images/icons/silk/page.png')
+                }
+                response.contentType = 'image/png'
+                response.outputStream << imageContent.bytes
+                response.outputStream.flush()
+
+
+            }
 		}
 		else {
 			//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
@@ -795,7 +823,27 @@ class ProductController {
         log.info "viewThumbnail: " + params
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {
-			documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
+            if (documentInstance.isImage()) {
+                documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
+            }
+            else {
+                // For Grails 2.3.x
+                //final Resource image = grailsResourceLocator.findResourceForURI('/images/icons/pdf.png')
+                //render file: image.inputStream, contentType: 'image/png'
+
+                // Strip out the most common mime type tree names
+                def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
+                def servletContext = ServletContextHolder.servletContext
+                def imageContent = servletContext.getResource("/images/icons/${documentType}.png")
+                if (!imageContent) {
+                    imageContent = servletContext.getResource('/images/icons/silk/page.png')
+                }
+                response.contentType = 'image/png'
+                response.outputStream << imageContent.bytes
+                response.outputStream.flush()
+
+            }
+
 			//byte[] bytes = documentInstance.fileContents
 			//resizeImage(bytes, response.outputStream, width, height)
 		}

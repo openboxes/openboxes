@@ -40,7 +40,7 @@ class Document implements Serializable {
 		cache true
 	}
 	
-	static transients = ["size"]
+	static transients = ["size", "image"]
 
 	static constraints = {
 		name(nullable:true, maxSize: 255)		
@@ -55,6 +55,14 @@ class Document implements Serializable {
 	}
 
 	String toString() { return "$name"; }
-	String getSize() { return fileContents?.length; } 
+	Integer getSize() { return fileContents?.length?:0; }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isImage() {
+        return contentType?.startsWith("image/")
+    }
 	
 }

@@ -87,26 +87,32 @@ class DocumentService {
 	
 	
 	public void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
+
+        log.info("Scale image " + document.filename + " width=" + width + " height=" + height + " contentType=" + document.contentType)
 		File file
 		FileInputStream fileInputStream
 		try { 
 			file = writeImage(document)
 			def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".")+1)
-			log.debug "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
-			fileInputStream = new FileInputStream(file)			
+			log.info "Scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
+			fileInputStream = new FileInputStream(file)
 			def builder = new SimpleImageBuilder()
-			def result = builder.image(stream: fileInputStream) {
-                fit(width: width, height: height) {
-                    save(stream: outputStream, format: extension?.toLowerCase())
+            if (builder) {
+                def result = builder.image(stream: fileInputStream) {
+                    fit(width: width, height: height) {
+                        save(stream: outputStream, format: extension?.toLowerCase())
+                    }
                 }
+            }
+            else {
+                log.warn("Unable to scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension)
             }
 
 		} catch (Exception e) { 
-			log.error("Error scaling image " + document?.filename + ": " + e.message, e)
-			e.printStackTrace();
+			log.warn("Error scaling image " + document?.filename + ": " + e.message, e)
 		} finally { 
-			fileInputStream?.close();
-			file?.delete();
+			if (fileInputStream) fileInputStream?.close();
+			if (file) file?.delete();
 		}
 	}
 

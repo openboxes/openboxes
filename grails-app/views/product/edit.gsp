@@ -947,12 +947,15 @@
                                                         <g:each var="document" in="${productInstance?.documents }" status="i">
                                                             <tr class="prop ${i%2?'even':'odd' }" >
                                                                 <td>
-                                                                    <g:link action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                                                        <img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
-                                                                    </g:link>
+                                                                   <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
+                                                                        <img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}"
+                                                                             class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />
+                                                                   </g:link>
                                                                 </td>
                                                                 <td>
-                                                                    ${document.filename }
+                                                                    <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
+                                                                        ${document.filename }
+                                                                    </g:link>
                                                                 </td>
                                                                 <td>
                                                                     ${document.contentType }
@@ -964,8 +967,18 @@
                                                                     ${document.lastUpdated }
                                                                 </td>
                                                                 <td>
-                                                                    <img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}"
-                                                                        class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />
+                                                                    <%--
+                                                                    <g:link controller="document" action="edit" id="${document?.id}" params="['product.id':productInstance?.id]">
+                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+                                                                    </g:link>
+                                                                    --%>
+                                                                    <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
+                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Download" />
+                                                                    </g:link>
+                                                                    <g:link controller="product" action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" />
+                                                                    </g:link>
+
                                                                 </td>
                                                             </tr>
                                                         </g:each>
