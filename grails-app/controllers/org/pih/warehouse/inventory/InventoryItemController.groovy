@@ -109,7 +109,6 @@ class InventoryItemController {
         def quantityMap = [:]
         if (!products.isEmpty()) {
             quantityMap = inventoryService.getQuantityByProductMap(location, products)
-            //quantityMap = inventoryService.getQuantityByInventoryItemMap(location, products)
         }
         def totalQuantity = quantityMap.values().sum()?:0
 
