@@ -503,10 +503,10 @@ class DashboardController {
 
         def data = inventoryService.getFastMovers(location, date, params.max)
         def sw = new StringWriter()
-        if (data) {
+        if (data?.results) {
             // Write column headers
-            def columns = data.results[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
-            sw.append(columns.join(",")).append("\n")
+            def columns = data?.results[0]?.keySet()?.collect { value -> StringEscapeUtils.escapeCsv(value) }
+            sw.append(columns?.join(",")).append("\n")
 
             // Write all data
             data.results.each { row ->
@@ -521,9 +521,12 @@ class DashboardController {
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
                 }
-                sw.append(values.join(","))
+                sw.append(values?.join(","))
                 sw.append("\n")
             }
+        }
+        else {
+            sw.append("${warehouse.message(code:'fastMovers.empty.message')}")
         }
         response.setHeader("Content-disposition", "attachment; filename='FastMovers-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
         render(contentType: "text/csv", text:sw.toString())
