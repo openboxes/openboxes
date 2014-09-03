@@ -31,13 +31,13 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>                            
 						<td valign="top" class="value">
-							<g:textField name="lotNumber" value="${itemInstance?.lotNumber}"/>
+							<g:textField name="lotNumber" value="${itemInstance?.lotNumber}" class="text lotNumber"/>
 						</td>
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.expirationDate.label"/></label></td>                            
 						<td valign="top" class="">
-							<g:datePicker name="expirationDate" value="" precision="month" default="none" value="${itemInstance?.expirationDate }" noSelection="['':'']"/>
+							<g:datePicker name="expirationDate" precision="day" default="none" value="${itemInstance?.expirationDate }" noSelection="['':'']"/>
 						</td>
 					</tr>
 				</tbody>

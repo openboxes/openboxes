@@ -1,9 +1,7 @@
 
-	<div id="showLotNumbers" >
+	<div id="showLotNumbers" class="box">
+        <h2><warehouse:message code="inventory.showLotNumbers.label"/></h2>
 			<g:form controller="inventoryItem" action="create">	
-						
-			
-		
 			<table>
 				<thead>
 					<tr class="odd">
@@ -11,10 +9,8 @@
 						<th><warehouse:message code="default.lotSerialNo.label"/></th>
 						<th><warehouse:message code="default.expires.label"/></th>
 						<th class="center middle" ><warehouse:message code="default.qty.label"/></th>
-						<g:hasErrors bean="${flash.itemInstance}">													
-							<th></th>
-						</g:hasErrors>
-					</tr>											
+                        <th></th>
+					</tr>
 				</thead>
 				<tbody>
 					<g:if test="${!commandInstance?.lotNumberList}">
@@ -105,7 +101,7 @@
 								</g:link>
 								<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
 									<span class="lotNumber">
-									${itemInstance?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.message"/></span>' }							
+									   ${itemInstance?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.message"/></span>' }
 									</span>
 								</g:link>
 							</td>														
@@ -118,43 +114,47 @@
 								</g:else>
 							</td>
 							<td class="top center">
-								<g:set var="styleClass" value=""/>
-								<g:if test="${itemQuantity<0}">
-									<g:set var="styleClass" value="color: red;"/>																	
-								</g:if>
-								<span style="${styleClass}">${itemQuantity }</span> 
+								${itemQuantity?:"N/A" }
 															
 							</td>
-							
+                            <td>
+
+                            </td>
+                            <%--
 							<g:hasErrors bean="${flash.itemInstance}">
 								<td>
 									<g:if test="${selected }">
 										<div class="errors dialog">
-											<g:eachError bean="${flash.itemInstance}">
+											<g:eachError bean="${flash.itemInstance}" >
 												<warehouse:message error="${it}"/>
 											</g:eachError>																	
 										</div>
 									</g:if>																									
 								</td>
-							</g:hasErrors>	
+							</g:hasErrors>
+						    --%>
 						</tr>
 												
 					</g:each>
 						<g:isUserManager>
-							<tr>
-								<td>	
+							<tr class="prop">
+								<td class="middle center">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
 									
 								</td>
 								<td>
 									<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-									<g:textField name="lotNumber" class="text lotNumber" />
+									<g:textField name="lotNumber" class="text lotNumber" placeholder="Enter lot number"/>
 								</td>
 								<td>
 									<g:set var="yearStart" value="${new Date().format('yyyy')as int}"/>
-									<g:set var="yearEnd" value="${2020}"/>
-									<g:datePicker name="expirationDate" precision="month" noSelection="['null':'']" value=""
+									<g:set var="yearEnd" value="${2050}"/>
+									<g:datePicker name="expirationDate" precision="day" noSelection="['null':'']" value=""
 										years="${yearStart..yearEnd }"/>						
 								</td>
+                                <td class="center">
+                                    N/A
+                                </td>
 								<td class="center">
 									<button class="button icon add">
 										<warehouse:message code="default.button.add.label"/>
@@ -172,7 +172,9 @@
 									${warehouse.message(code: 'default.total.label') }
 								</label>
 							</td>
-							<td></td>
+							<td>
+
+							</td>
 							<td style="text-align: center; vertical-align: middle;">
 								<span style="font-size: 1em;"> 
 									<g:set var="styleClass" value="color: black;"/>																	
@@ -182,11 +184,9 @@
 									<span style="${styleClass }">${commandInstance.totalQuantity }</span> 
 								</span>
 							</td>
-							<g:hasErrors bean="${flash.itemInstance}">
-								<td style="border: 0px;">
-								
-								</td>
-							</g:hasErrors>
+                            <td>
+
+                            </td>
 						</tr>
 					</tfoot>
 				</g:if>
