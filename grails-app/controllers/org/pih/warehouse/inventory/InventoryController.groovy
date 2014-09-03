@@ -747,7 +747,7 @@ class InventoryController {
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name?:"") + ","
-            csv += '"' + (product?.genericProduct?.description?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product?.genericProduct?.description?:"") + ","
             csv += '"' + (inventoryItem?.lotNumber?:"")  + '"' + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy')  + '"' + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
