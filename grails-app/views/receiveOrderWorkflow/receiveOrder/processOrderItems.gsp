@@ -107,7 +107,7 @@
 															</td>
 															<td nowrap="true">
 																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<g:datePicker name="orderItems[${i }].expirationDate" precision="month" default="none" noSelection="['':'']"
+																	<g:datePicker name="orderItems[${i }].expirationDate" precision="day" default="none" noSelection="['':'']"
 																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />					
 																</g:if>
 															</td>															
@@ -236,7 +236,7 @@
 					<g:textField name="orderItems[{{= Index }}].lotNumber" value="{{= LotNumber}}" size="10" class="updateable"/>
 				</td>
 				<td nowrap="true">
-					<g:datePicker name="orderItems[{{= Index }}].expirationDate" precision="month" default="none" value="" noSelection="['':'']"
+					<g:datePicker name="orderItems[{{= Index }}].expirationDate" precision="day" default="none" value="" noSelection="['':'']"
 						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>					
 				</td>															
 				<td>

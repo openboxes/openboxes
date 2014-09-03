@@ -109,7 +109,7 @@
 													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
 														value="${transactionEntry?.lotNumber }"/>
 														
-													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="month" noSelection="['':'']"
+													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
 														value="${transactionEntry?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 													
 													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'cancel.label') }"/>
@@ -196,7 +196,7 @@
 													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
 														value="${command?.transactionEntries[i]?.lotNumber }"/>
 														
-													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="month" noSelection="['':'']"
+													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
 														value="${command?.transactionEntries[i]?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 																										
 													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>

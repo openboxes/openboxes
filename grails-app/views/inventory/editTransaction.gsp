@@ -238,7 +238,7 @@
 		                                    	</td>
 		                                    	<td class="center">
 		                                    		<span class="expirationFieldSection" style="display:none;">
-		                                    			<g:datePicker class="expirationDateField" name="expirationDate" precision="month" default="none" noSelection="['':'']"/>
+		                                    			<g:datePicker class="expirationDateField" name="expirationDate" precision="day" default="none" noSelection="['':'']"/>
 		                                    		</span>
 		                                    		<span class="expirationLabel"></span>
 		                                    	</td>
