@@ -17,10 +17,12 @@ class LoggingFilters {
 		all(controller:'*', action:'*') {
 			before = {
                 try {
+
                     def sessionId = session?.id
                     def userId = session?.user?.username
                     def serverUrl = CH.config.grails.serverURL
                     def clickStreamUrl = "${serverUrl}/stream/view/${sessionId}"
+                    def hostname = InetAddress.getLocalHost().getHostName()
                     //RequestContextHolder.getRequestAttributes()?.getSessionId()
                     //String clickstreamAsString = ClickstreamUtil.getClickstreamAsString(session.clickstream)
                     //log.info "SessionID " + sessionId
@@ -34,6 +36,8 @@ class LoggingFilters {
                     MDC.put('queryString', request?.queryString?:"No query string")
                     MDC.put('serverUrl', CH?.config?.grails?.serverURL?:"No server URL")
                     MDC.put('clickStreamUrl', sessionId?clickStreamUrl:"No clickstream")
+                    MDC.put('hostname', hostname?:"No hostname")
+
                 } catch (Exception e) {
                     log.warn("Error occurred while adding attributes to Mapped Diagnostic Context: ${e.message}", e)
 
@@ -54,6 +58,7 @@ class LoggingFilters {
                     MDC.remove('serverUrl')
                     MDC.remove('queryString')
                     MDC.remove('clickStreamUrl')
+                    MDC.remove('hostname')
                 } catch (Exception e) {
                     log.warn("Error occurred while removing attributes from Mapped Diagnostic Context: ${e.message}", e)
                 }

@@ -269,6 +269,12 @@ class ReportService implements ApplicationContextAware {
 		}		
 	}
 
+    /**
+     * Generate PDF for the given URL and write it to the given output stream.
+     *
+     * @param url
+     * @param outputStream
+     */
 	void generatePdf(String url, OutputStream outputStream) {
         def html = ""
 		log.info "Generate PDF for URL " + url
@@ -306,6 +312,13 @@ class ReportService implements ApplicationContextAware {
         }
 	}
 
+    /**
+     * Load XML document from string.
+     *
+     * @param xml
+     * @return
+     * @throws Exception
+     */
     public static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -313,6 +326,12 @@ class ReportService implements ApplicationContextAware {
         return builder.parse(is);
     }
 
+    /**
+     * Get HTML content for the given URL.
+     *
+     * @param url
+     * @return
+     */
 	private getHtmlContent(String url) { 
 		
 		HttpClient httpclient = new DefaultHttpClient();
@@ -333,6 +352,12 @@ class ReportService implements ApplicationContextAware {
 		}
 	}
 
+    /**
+     * Generate a PDF for the given URL.
+     *
+     * @param url
+     * @return
+     */
     private byte[] buildPdf(url) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ITextRenderer renderer = new ITextRenderer();
@@ -342,6 +367,12 @@ class ReportService implements ApplicationContextAware {
         return baos.toByteArray();
     }
 
+    /**
+     * Calculate the quantity on hand for each generic product stocked at the given location.
+     *
+     * @param locationId
+     * @return
+     */
     //@Cacheable("quantityOnHandCache")
     def calculateQuantityOnHandByProductGroup(locationId) {
         def items = []
@@ -391,7 +422,6 @@ class ReportService implements ApplicationContextAware {
 
 
         // Group entries by product group
-
         // Removed products:[]
         def productGroupMap = items.inject([:].withDefault { [id:null,name:null,status:null,productCodes:[],unitPrice:0,totalValue:0,numProducts:0,numInventoryLevels:0,
                 onHandQuantity:0,minQuantity:0,maxQuantity:0,reorderQuantity:0,inventoryStatus:null,hasInventoryLevel:false,hasProductGroup:false,inventoryLevelId:null] } ) { map, item ->
@@ -408,12 +438,12 @@ class ReportService implements ApplicationContextAware {
 
             if (item.inventoryLevel) {
                 map[item.genericProduct].numInventoryLevels++
-                map[item.genericProduct].hasInventoryLevel = true
 
                 // Make sure we're using the latest version of the inventory level (the one where values are not set to 0)
-                def currentInventoryLevel = map[item.genericProduct].inventotryLevel
-                if (!currentInventoryLevel) {
+                def currentInventoryLevel = map[item.genericProduct].inventoryLevel
+                if (!currentInventoryLevel || !currentInventoryLevel.preferred) {
                     // || item?.inventoryLevel?.lastUpdated?.after(currentInventoryLevel.lastUpdated)
+                    map[item.genericProduct].hasInventoryLevel = true
                     map[item.genericProduct].inventoryLevelId = item?.inventoryLevel?.id
                     map[item.genericProduct].inventoryLevel = item.inventoryLevel
                     map[item.genericProduct].inventoryStatus = item?.inventoryLevel?.status?.name()
@@ -448,10 +478,8 @@ class ReportService implements ApplicationContextAware {
         def zeroInventoryLevels = productGroupMap.findAll { k,v -> v.numInventoryLevels == 0 }
         def multipleInventoryLevels = productGroupMap.findAll { k,v -> v.numInventoryLevels > 1 }
         def singleInventoryLevel = productGroupMap.findAll { k,v -> v.numInventoryLevels == 1 }
-
         def hasInventoryLevelCount = hasInventoryLevel.size()
         def hasNoInventoryLevelCount = hasNoInventoryLevel.size()
-
         def zeroInventoryLevelsCount = zeroInventoryLevels.size()
         def multipleInventoryLevelsCount = multipleInventoryLevels.size()
         def singleInventoryLevelCount = singleInventoryLevel.size()

@@ -3130,7 +3130,8 @@ class InventoryService implements ApplicationContextAware {
         Integer maxSize = inventoryItemKeys.size()
 
         if (n > maxSize) {
-            throw new RuntimeException("You cannot request more items than are available at this location [requested=${n},available=${maxSize}].")
+            throw new RuntimeException("There are only ${maxSize} items available at this location -- this report requires at least ${n} items.")
+            //n = maxSize
         }
 
         Random random = new Random()

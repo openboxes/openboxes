@@ -134,11 +134,11 @@
 	                        </tr>
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for="comments"><warehouse:message code="documents.label" /></label>
+	                            	<label for="documents"><warehouse:message code="documents.label" /></label>
 	                            </td>                            
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.documents }">
-										<table>
+										<table id="documents">
 											<thead>
 												<tr class="odd">
 													<th><warehouse:message code="document.filename.label" /></th>

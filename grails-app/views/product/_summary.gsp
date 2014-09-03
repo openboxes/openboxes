@@ -98,16 +98,17 @@
             </td>
             <td>
                 <div class="button-container">
-                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button  ${actionName=='showStockCard'?'active':''}">
+                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon log ${actionName=='showStockCard'?'active':''}">
                         ${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
                     </g:link>
-                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button ${actionName=='edit'?'active':''}">
+                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button icon edit ${actionName=='edit'?'active':''}">
                         ${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
                     </g:link>
-                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button ${actionName=='showRecordInventory'?'active':''}">
+                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]"
+                            class="button icon add ${actionName=='showRecordInventory'?'active':''}">
                         ${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
                     </g:link>
-                    <g:link controller='inventory' action='browse' class="button">
+                    <g:link controller='inventory' action='browse' class="button icon search">
                         ${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
                     </g:link>
                 </div>
