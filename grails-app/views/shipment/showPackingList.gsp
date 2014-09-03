@@ -88,7 +88,7 @@
 												${shipmentItem?.lotNumber}
 											</td>
 											<td class="center">
-												<g:formatDate date="${shipmentItem?.expirationDate}" format="MMM yyyy"/>
+												<g:formatDate date="${shipmentItem?.expirationDate}" format="d MMM yyyy"/>
 											</td>
 											<td class="center">
 												${shipmentItem?.quantity}

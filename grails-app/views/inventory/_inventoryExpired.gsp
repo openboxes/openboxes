@@ -79,7 +79,7 @@
 													${inventoryItem?.lotNumber }
 												</td>
 												<td>
-													<format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>
+													<format:date obj="${inventoryItem?.expirationDate }" format="d MMM yyyy"/>
 												</td>
 												<td>
 													${command?.quantityMap[inventoryItem]}

@@ -97,7 +97,7 @@
 																${inventoryItem?.lotNumber ?: warehouse.message(code: 'inventory.noLotNumber.message') }
 																<g:if test="${inventoryItem?.expirationDate }"> 
 																	(<warehouse:message code="default.expires.label"/> 
-																		<format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																		<format:date obj="${inventoryItem?.expirationDate }" format="d MMM yyyy"/>)
 																</g:if>
 															</option>														
 														</g:each>
@@ -122,7 +122,7 @@
 														<g:if test="${transactionEntry?.inventoryItem?.expirationDate }">
 															<span class="expirationDate fade">
 																(<warehouse:message code="default.expires.label"/> 
-																	<format:date obj="${transactionEntry?.inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																	<format:date obj="${transactionEntry?.inventoryItem?.expirationDate }" format="d MMM yyyy"/>)
 															</span>
 														</g:if>
 													</g:if>
@@ -131,7 +131,7 @@
 														<g:if test="${transactionEntry?.expirationDate }">  
 															<span class="expirationDate fade">
 																(<warehouse:message code="default.expires.label"/> 
-																	<format:date obj="${transactionEntry?.expirationDate }" format="MMM yyyy"/>)
+																	<format:date obj="${transactionEntry?.expirationDate }" format="d MMM yyyy"/>)
 															</span>
 														</g:if>
 													</g:else>
@@ -184,7 +184,7 @@
 																${inventoryItem?.lotNumber ?: warehouse.message(code: 'inventory.noLotNumber.message')} 
 																<g:if test="${inventoryItem?.expirationDate }"> 
 																	(<warehouse:message code="default.expires.label"/> 
-																		<format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																		<format:date obj="${inventoryItem?.expirationDate }" format="d MMM yyyy"/>)
 																</g:if>
 															</option>														
 														</g:each>
@@ -209,7 +209,7 @@
 													<g:if test="${command?.transactionEntries[i]?.inventoryItem?.expirationDate }"> 
 														<span class="expirationDate fade">
 															(<warehouse:message code="default.expires.label"/>
-																<format:date obj="${command?.transactionEntries[i]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>)
+																<format:date obj="${command?.transactionEntries[i]?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>)
 														</span>
 													</g:if>
 													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="${warehouse.message(code: 'undo.label') }"/>

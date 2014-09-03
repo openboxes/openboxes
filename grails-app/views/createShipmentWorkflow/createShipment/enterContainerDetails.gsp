@@ -364,7 +364,7 @@
 															</div>
 														</td>
 														<td class="center middle">
-															<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="MMMMM yyyy"/>
+															<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMMMM yyyy"/>
 															
 														</td>
 														<td class="left middle">

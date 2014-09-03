@@ -179,7 +179,7 @@
 																	${orderItem?.lotNumber } 
 																	<g:if test="${orderItem?.expirationDate }">
 																		<span class="fade">(expires
-																			<g:formatDate date="${orderItem?.expirationDate }" format="MMM yyyy"/>)
+																			<g:formatDate date="${orderItem?.expirationDate }" format="d MMM yyyy"/>)
 																		</span>
 																	</g:if>
 																</td>

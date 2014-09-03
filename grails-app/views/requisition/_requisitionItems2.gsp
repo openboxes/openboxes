@@ -18,7 +18,7 @@
                         </g:if>
                         <g:else>
                             <g:if test="${requisition?.dateVerified}">
-                                <g:formatDate date="${requisition?.dateVerified}" format="dd MMMMM yyyy"/>
+                                <g:formatDate date="${requisition?.dateVerified}" format="d MMMMM yyyy"/>
                             </g:if>
                             <g:else>
                                 ${warehouse.message(code:'default.none.label')}

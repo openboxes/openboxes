@@ -741,7 +741,7 @@
 
                                         <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
                                             <span class="expirationDate">
-                                                <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                                                <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                                             </span>
                                         </g:if>
                                         <g:else>

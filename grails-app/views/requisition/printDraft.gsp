@@ -115,7 +115,7 @@
                         </td>
                         <td>${requisitionItem?.product?.name}</td>
 	                    <td>${picklistItems[j]?.inventoryItem?.lotNumber}</td>
-	                    <td><g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/></td>
+	                    <td><g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="d MMM yyyy"/></td>
                         <td class="center border-right">
                         	${requisitionItem?.quantity?:0}
                         	${requisitionItem?.product?.unitOfMeasure?:"EA"}

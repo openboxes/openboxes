@@ -86,7 +86,7 @@
                                         <g:if test="${inventoryItem?.expirationDate}">
                                             <g:formatDate
                                                     date="${inventoryItem?.expirationDate}"
-                                                    format="MMM yyyy"/>
+                                                    format="d MMM yyyy"/>
                                         </g:if>
                                         <g:else>
                                             <span class="fade"><warehouse:message code="default.never.label"/></span>

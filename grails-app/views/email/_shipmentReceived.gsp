@@ -276,7 +276,7 @@
                         ${shipmentItem?.inventoryItem?.lotNumber}
                     </td>
                     <td>
-                        <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                        <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                     </td>
                     <td>
                         ${shipmentItem?.inventoryItem?.product?.getBinLocation(session.warehouse.id)}

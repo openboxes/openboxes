@@ -41,7 +41,7 @@
                                     </td>
                                     <td>
                                         <g:if test="${command?.toDate && command?.fromDate}">
-                                            <g:formatDate date="${command.fromDate}" format="dd MMM yyyy"/> - <g:formatDate date="${command.toDate}" format="dd MMM yyyy"/>
+                                            <g:formatDate date="${command.fromDate}" format="d MMM yyyy"/> - <g:formatDate date="${command.toDate}" format="d MMM yyyy"/>
                                         </g:if>
                                     </td>
                                 </tr>

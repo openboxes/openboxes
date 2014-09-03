@@ -64,7 +64,7 @@ eventRunAppStart = {
 
 
 	metadata.'app.revisionNumber' = revisionNumber
-	metadata.'app.buildDate' = new java.text.SimpleDateFormat("dd MMM yyyy hh:mm:ss a").format(new java.util.Date());
+	metadata.'app.buildDate' = new java.text.SimpleDateFormat("d MMM yyyy hh:mm:ss a").format(new java.util.Date());
 	metadata.'app.buildNumber' = buildNumber.toString()
 	//metadata.persist()
 }
@@ -86,7 +86,7 @@ eventCreateWarStart = { warName, stagingDir ->
     ant.propertyfile(file:"${stagingDir}/WEB-INF/classes/application.properties") {
 		entry(key:"app.buildNumber", value:buildNumber)
 		entry(key:"app.revisionNumber", value:revisionNumber)
-		entry(key:"app.buildDate", value:new java.text.SimpleDateFormat("dd MMM yyyy hh:mm:ss a").format(new java.util.Date()))
+		entry(key:"app.buildDate", value:new java.text.SimpleDateFormat("d MMM yyyy hh:mm:ss a").format(new java.util.Date()))
 	}
 }
 

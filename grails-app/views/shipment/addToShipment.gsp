@@ -100,7 +100,7 @@
 														</td>
 														<td nowrap="nowrap">
 															<g:if test="${item?.inventoryItem?.expirationDate }">
-																<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="MMM yyyy"/>								
+																<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="d MMM yyyy"/>
 															</g:if>
 															<g:else>
 																<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
@@ -161,7 +161,7 @@
 														</td>
 														<td nowrap="nowrap">
 															<g:if test="${item?.inventoryItem?.expirationDate }">
-																<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="MMM yyyy"/>								
+																<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="d MMM yyyy"/>
 															</g:if>
 															<g:else>
 																<span class="fade">${warehouse.message(code: 'default.never.label')}</span>

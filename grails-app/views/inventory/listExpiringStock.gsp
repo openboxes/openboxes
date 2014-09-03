@@ -132,7 +132,7 @@
                                                 </td>
                                                 <td class="checkable center" >
                                                     <span class="fade">
-                                                        <g:formatDate date="${inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                                                        <g:formatDate date="${inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                                                     </span>
                                                 </td>
                                                 <td class="checkable center">

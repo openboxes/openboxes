@@ -82,7 +82,7 @@
                         </td>
                         <td class="middle center">
                             <g:if test="${picklistItems}">
-                                <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                                <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                             </g:if>
                         </td>
                         <td class="center middle">

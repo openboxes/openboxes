@@ -86,35 +86,38 @@ class ReportController {
 
         try {
             inventoryItems = inventoryService.getInventorySampling(location, count);
+
+            if (inventoryItems) {
+
+                println inventoryItems
+                //sw.append(csvrows[0].keySet().join(",")).append("\n")
+                sw.append("Product Code").append(",")
+                sw.append("Product").append(",")
+                sw.append("Lot number").append(",")
+                sw.append("Expiration date").append(",")
+                sw.append("Bin location").append(",")
+                sw.append("On hand quantity").append(",")
+                sw.append("\n")
+                inventoryItems.each { inventoryItem ->
+                    if (inventoryItem) {
+                        def inventoryLevel = inventoryItem?.product?.getInventoryLevel(location.id)
+                        sw.append('"' + (inventoryItem?.product?.productCode?:"").toString()?.replace('"','""') + '"').append(",")
+                        sw.append('"' + (inventoryItem?.product?.name?:"").toString()?.replace('"','""') + '"').append(",")
+                        sw.append('"' + (inventoryItem?.lotNumber?:"").toString()?.replace('"','""') + '"').append(",")
+                        sw.append('"' + inventoryItem?.expirationDate.toString()?.replace('"','""') + '"').append(",")
+                        sw.append('"' + (inventoryLevel?.binLocation?:"")?.toString()?.replace('"','""') + '"').append(",")
+                        sw.append("\n")
+                    }
+                }
+            }
+
         } catch (RuntimeException e) {
             log.error (e.message)
             sw.append(e.message)
         }
 
 
-        if (inventoryItems) {
 
-            println inventoryItems
-            //sw.append(csvrows[0].keySet().join(",")).append("\n")
-            sw.append("Product Code").append(",")
-            sw.append("Product").append(",")
-            sw.append("Lot number").append(",")
-            sw.append("Expiration date").append(",")
-            sw.append("Bin location").append(",")
-            sw.append("On hand quantity").append(",")
-            sw.append("\n")
-            inventoryItems.each { inventoryItem ->
-                if (inventoryItem) {
-                    def inventoryLevel = inventoryItem?.product?.getInventoryLevel(location.id)
-                    sw.append('"' + (inventoryItem?.product?.productCode?:"").toString()?.replace('"','""') + '"').append(",")
-                    sw.append('"' + (inventoryItem?.product?.name?:"").toString()?.replace('"','""') + '"').append(",")
-                    sw.append('"' + (inventoryItem?.lotNumber?:"").toString()?.replace('"','""') + '"').append(",")
-                    sw.append('"' + inventoryItem?.expirationDate.toString()?.replace('"','""') + '"').append(",")
-                    sw.append('"' + (inventoryLevel?.binLocation?:"")?.toString()?.replace('"','""') + '"').append(",")
-                    sw.append("\n")
-                }
-            }
-        }
 
         //render sw.toString()
 
