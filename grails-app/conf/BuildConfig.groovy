@@ -47,7 +47,7 @@ grails.project.dependency.resolution = {
         compile 'mysql:mysql-connector-java:5.1.26'
 
         compile 'com.google.zxing:javase:2.0'
-        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
+        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.6') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
         compile 'org.apache.commons:commons-email:1.2'
         //compile 'org.apache.httpcomponents:httpcore:4.2.1'
         compile 'commons-lang:commons-lang:2.6'
