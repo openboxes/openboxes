@@ -10,4 +10,4 @@ before_install:
 - sudo apt-get update
 - sudo apt-get install grails-1.3.7
 
-script: grails test-app unit:
+script: "grails test-app unit:"
