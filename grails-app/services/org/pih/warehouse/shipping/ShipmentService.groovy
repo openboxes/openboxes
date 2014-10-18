@@ -162,7 +162,7 @@ class ShipmentService {
 		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate, 
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 		
-		println " * Recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
+		log.info "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
 		return shipments
 	}
 	
@@ -188,9 +188,9 @@ class ShipmentService {
 			}
 			shipmentList.objectList.add(it);
 			shipmentMap.put(key, shipmentList)
-		}	
-		
-		println " * Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
+		}
+
+        log.info "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return shipmentMap;
 	}
@@ -364,7 +364,7 @@ class ShipmentService {
 		def shipments = Shipment.withCriteria { 
 			eq("destination", location) 
 		}
-		println " * Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get shipments by destination " + (System.currentTimeMillis() - startTime) + " ms"
 		return shipments
 	}
 	
@@ -378,7 +378,7 @@ class ShipmentService {
 		def shipments = Shipment.withCriteria { 
 			eq("origin", location);
 		}
-		println " * Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return shipments
 	}
@@ -396,7 +396,7 @@ class ShipmentService {
 	 */
 	List<Shipment> getShipments(String terms, ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate, Date lastUpdatedStart, Date lastUpdatedEnd) {
 
-        println "Get shipments: " + terms + " " + shipmentType + " " + origin + " " + destination + " " + lastUpdatedStart + " " + lastUpdatedEnd
+        log.info "Get shipments: " + terms + " " + shipmentType + " " + origin + " " + destination + " " + lastUpdatedStart + " " + lastUpdatedEnd
 
         def shipments = Shipment.withCriteria {
             and {
@@ -415,7 +415,7 @@ class ShipmentService {
 
         }
 
-        println "Shipments: " + shipments.size()
+        log.info "Shipments: " + shipments.size()
 		
 		// now filter by event code and eventdate
 		shipments = shipments.findAll( { def status = it.getStatus()
@@ -521,7 +521,7 @@ class ShipmentService {
 		shipmentTo.addToContainers(container)
 
 		def shipmentItems = ShipmentItem.findAllByContainer(container)
-		println "Shipment items " + shipmentItems?.size()
+        log.info "Shipment items " + shipmentItems?.size()
 		shipmentItems.each { shipmentItem ->
 			shipmentFrom.removeFromShipmentItems(shipmentItem)
 			shipmentTo.addToShipmentItems(shipmentItem)
