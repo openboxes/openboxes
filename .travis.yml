@@ -8,6 +8,6 @@ jdk:
 before_install:
 - sudo add-apt-repository -y ppa:groovy-dev/grails
 - sudo apt-get update
-- sudo apt-get install grails-1.3.7
+- sudo apt-get install grails-1.3.9
 
 script: "grails test-app unit: --non-interactive"
