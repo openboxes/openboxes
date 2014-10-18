@@ -31,34 +31,81 @@
                         <div class="box">
                             <h2>${warehouse.message(code:'default.filters.label')}</h2>
                             <g:form action="list" method="get">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <label><warehouse:message code="product.search.label"/></label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <g:textField name="q" value="${params.q }" class="text" style="width:100%;"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <button type="submit" class="button icon search">
-                                                ${warehouse.message(code: 'default.button.find.label')}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </table>
+                                <g:hiddenField name="sort" value="${params.sort}"/>
+                                <g:hiddenField name="order" value="${params.order}"/>
+                                <div class="filter-list-item">
+                                    <label><warehouse:message code="product.name.label"/></label>
+                                    <p>
+                                        <g:textField name="q" value="${params.q }" class="text" style="width:100%;"/>
+                                    </p>
+                                </div>
+                                <div class="filter-list-item">
+                                    <label><warehouse:message code="category.label"/></label>
+                                    <p>
+                                        <g:selectCategory id="categoryId"
+                                                          name="categoryId"
+                                                          multiple="false"
+                                                          class="chzn-select-deselect"
+                                                          noSelection="['null':'']"
+                                                          style="width:100%;"
+                                                          value="${params.list('categoryId')}"/>
+
+                                    </p>
+                                    <p>
+                                        <g:checkBox name="includeCategoryChildren" value="${params.includeCategoryChildren}"/>
+                                        <label>${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}</label>
+                                    </p>
+                                </div>
+                                <div class="filter-list-item">
+                                    <label><warehouse:message code="product.tags.label"/></label>
+                                    <p>
+                                        <g:selectTags id="tagId"
+                                                          name="tagId"
+                                                          class="chzn-select-deselect"
+                                                          noSelection="['null':'']"
+                                                          style="width:100%;"
+                                                          value="${params.list('tagId')}"/>
+                                    </p>
+                                </div>
+                                <div class="filter-list-item">
+                                    <label><warehouse:message code="default.limit.label" default="Limit"/></label>
+                                    <p>
+                                        <g:select id="max"
+                                                      name="max"
+                                                      class="chzn-select-deselect"
+                                                      noSelection="['null':'']"
+                                                      style="width:100%;"
+                                                      optionKey="key"
+                                                      optionValue="value"
+                                                      from="[10:10, 25:25, 50:50, 100:100, 250:250, 500:500, 1000:1000]"
+                                                      value="${params.max}"/>
+                                    </p>
+                                </div>
+
+                                <div class="filter-list-item center middle">
+                                    <button type="submit" class="button icon search">
+                                        ${warehouse.message(code: 'default.button.find.label')}
+                                    </button>
+
+
+
+                                </div>
 
                             </g:form>
                         </div>
                     </div>
 
+
                     <div class="yui-u">
 
                         <div class="box">
-                            <h2>${warehouse.message(code:'default.results.label')}</h2>
+                            <h2>
+                                Showing ${productInstanceTotal > params.max ? params.max : productInstanceTotal} of ${productInstanceTotal} ${warehouse.message(code:'products.label')}
+                                <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button icon arrowdown">${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}</g:link>
+
+                            </h2>
+
+
                             <table>
                                 <thead>
                                     <tr>
@@ -66,16 +113,16 @@
                                         <th></th>
                                         --%>
                                         <th>${warehouse.message(code:'product.productCode.label')}</th>
-                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
-                                        <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" />
-                                        <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" />
-                                        <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" />
-                                        <g:sortableColumn property="vendor" title="${warehouse.message(code: 'product.vendor.label')}" />
-                                        <g:sortableColumn property="vendorCode" title="${warehouse.message(code: 'product.vendorCode.label')}" />
-                                        <g:sortableColumn property="createdBy" title="${warehouse.message(code: 'default.createdBy.label')}" />
-                                        <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" />
-                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'default.dateCreated.label')}" />
-                                        <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" />
+                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" params="${params}"/>
+                                        <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" params="${params}"/>
+                                        <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" params="${params}"/>
+                                        <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" params="${params}" />
+                                        <g:sortableColumn property="vendor" title="${warehouse.message(code: 'product.vendor.label')}" params="${params}"/>
+                                        <g:sortableColumn property="vendorCode" title="${warehouse.message(code: 'product.vendorCode.label')}" params="${params}"/>
+                                        <g:sortableColumn property="createdBy" title="${warehouse.message(code: 'default.createdBy.label')}" params="${params}"/>
+                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'default.dateCreated.label')}" params="${params}"/>
+                                        <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" params="${params}"/>
+                                        <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" params="${params}"/>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -117,10 +164,10 @@
                                                 ${productInstance?.createdBy }
                                             </td>
                                             <td align="center">
-                                                ${productInstance?.updatedBy }
+                                                ${productInstance?.dateCreated }
                                             </td>
                                             <td align="center">
-                                                ${productInstance?.dateCreated }
+                                                ${productInstance?.updatedBy }
                                             </td>
                                             <td align="center">
                                                 ${productInstance?.lastUpdated }

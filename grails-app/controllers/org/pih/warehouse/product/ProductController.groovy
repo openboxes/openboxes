@@ -155,22 +155,41 @@ class ProductController {
 	}
 
 	def list = {
+        log.info "list products " + params
+
 		def productInstanceList = []
 		def productInstanceTotal = 0;
 
-		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		params.max = Math.min(params.max ? params.int('max') : 10, 1000)
 
-		if (params.q) {
-			productInstanceList = Product.findAllByNameLike("%" + params.q + "%", params)
-			productInstanceTotal = Product.countByNameLike("%" + params.q + "%", params);
-		}
-		else {
-			productInstanceList = Product.list(params)
-			productInstanceTotal = Product.count()
-		}
+//        if (params.q) {
+//            productInstanceList = Product.findAllByNameLike("%" + params.q + "%", params)
+//            productInstanceTotal = Product.countByNameLike("%" + params.q + "%", params);
+//        }
+//        else {
+//            productInstanceList = Product.list(params)
+//            productInstanceTotal = Product.count()
+//        }
 
-		[productInstanceList: productInstanceList, productInstanceTotal: productInstanceTotal]
+        def category = params.categoryId ? Category.load(params.categoryId) : null
+        def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
+        params.name = params.q
+        params.description = params.q
+        params.brandName = params.q
+        params.manufacturer = params.q
+        params.manufacturerCode = params.q
+        params.vendor = params.q
+        params.vendorCode = params.q
+        params.productCode = params.q
+        params.unitOfMeasure = params.q
+
+
+        productInstanceList = productService.getProducts(params.q, category, tags, params)
+        flash.productIds = productInstanceList.collect { it.id }
+
+		[productInstanceList: productInstanceList, productInstanceTotal: productInstanceList.totalCount]
 	}
+
 
 	def create = {
         def startTime = System.currentTimeMillis()
@@ -859,9 +878,8 @@ class ProductController {
      * @params product.id
      */
 	def exportProducts = { 
-		println params
+		println "export products: " + params
 		def productIds = params.list('product.id')
-		
 		println "Product IDs: " + productIds
 		def products = productService.getProducts(productIds.toArray())
 		if (products) { 
@@ -885,16 +903,21 @@ class ProductController {
      * Export all products as CSV
      */
 	def exportAsCsv = {
-		def products = Product.list()
+        log.info "Export as CSV: " + params
 
-		if (products) {
+		//def products = session.productIds ? Product.getAll(session.productIds) : Product.list()
+
+        def products = Product.list()
+
+        if (products) {
 			def date = new Date();
 			response.setHeader("Content-disposition",
 					"attachment; filename='Products-${date.format("yyyyMMdd-hhmmss")}.csv'")
 			response.contentType = "text/csv"
 			def csv = productService.exportProducts(products)
-			println "export products: " + csv
-			render csv 
+			//println "export products: " + csv
+
+            render csv
 		}
 		else {
 			render(text: 'No products found', status: 404)

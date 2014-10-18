@@ -275,7 +275,19 @@ class ProductService {
     }
     */
 
+    List<Product> getProducts(String query, Category category, List<Tag> tags, params) {
+        //def params = [name: query]
 
+        return getProducts(category, tags, params)
+
+    }
+
+    /**
+     * Get all products that match the given product identifiers.
+     *
+     * @param ids
+     * @return
+     */
 	List<Product> getProducts(String [] ids) {
 		def products = []
 		if (ids) {
@@ -284,11 +296,19 @@ class ProductService {
 		return products
 	}
 
-    def getProducts(Category category, List<Tag> tags, Map params) {
-        println "get products: " + params
+    /**
+     * Get all products that match category, tags, and other search parameters.
+     *
+     * @param category
+     * @param tags
+     * @param params
+     * @return
+     */
+    def getProducts(Category category, List<Tag> tagsInput, Map params) {
+        println "get products where category=" + category + ", tags=" + tagsInput + ", params=" + params
 
         def criteria = Product.createCriteria()
-        def results = criteria.list(max:params.max?:10, offset:params.offset) {
+        def results = criteria.list(max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc") {
             and {
                 if (category) {
                     if (params.includeCategoryChildren) {
@@ -305,32 +325,46 @@ class ProductService {
                     }
                 }
 
-                if (params.name) ilike("name", params.name + "%")
-                if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
-                if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
-                if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
-                if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
-                if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
-                if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
-                if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
-                if (params.createdById) eq("createdBy.id", params.createdById)
-                if (params.updatedById) eq("updatedBy.id", params.updatedById)
 
-                if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
-                if (params.productCodeIsNull) isNull("productCode")
-                if (params.brandNameIsNull) isNull("brandName")
-                if (params.manufacturerIsNull) isNull("manufacturer")
-                if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
-                if (params.vendorIsNull) isNull("vendor")
-                if (params.vendorCodeIsNull) isNull("vendorCode")
 
+                if (tagsInput) {
+                    tags {
+                        'in'("id", tagsInput.collect { it.id } )
+                    }
+                }
+
+                or {
+                    if (params.name) ilike("name", params.name + "%")
+                    if (params.description) ilike("description", params.description + "%")
+                    if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
+                    if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
+                    if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
+                    if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
+                    if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
+                    if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
+                    if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
+                    if (params.createdById) eq("createdBy.id", params.createdById)
+                    if (params.updatedById) eq("updatedBy.id", params.updatedById)
+
+                    if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
+                    if (params.productCodeIsNull) isNull("productCode")
+                    if (params.brandNameIsNull) isNull("brandName")
+                    if (params.manufacturerIsNull) isNull("manufacturer")
+                    if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
+                    if (params.vendorIsNull) isNull("vendor")
+                    if (params.vendorCodeIsNull) isNull("vendorCode")
+                }
             }
         }
 
         return results
     }
 
-
+    /**
+     * Get the root category.
+     *
+     * @return
+     */
 	Category getRootCategory() {
 		def rootCategory = Category.getRootCategory()
 		if (!rootCategory) { 
@@ -691,7 +725,8 @@ class ProductService {
 	 * @return
 	 */
 	String exportProducts() {
-		return exportProducts(Product.list())
+        def products = Product.list()
+		return exportProducts(products)
 	}
 
 	
@@ -831,6 +866,21 @@ class ProductService {
 		}
 		return popularTags		
 	}
+
+
+    /**
+     * Add a list of tags to each of the given products.
+     *
+     * @param products
+     * @param tags
+     * @return
+     */
+    def addTagsToProducts(products, tags) {
+        log.info "Add tags ${tags} to products ${products}"
+        products.each { product ->
+            addTagsToProduct(product, tags)
+        }
+    }
 	
 	/**
      * Add the list of tags to the given product.
@@ -839,6 +889,7 @@ class ProductService {
 	 * @param tags
 	 */
 	def addTagsToProduct(product, tags) {
+        log.info "Add tags ${tags} to product ${product}"
 		if (tags) {
 			tags.each { tagName ->
                 if (tagName) {
@@ -856,6 +907,7 @@ class ProductService {
      * @return
      */
     def addTagToProduct(product, tagName) {
+        log.info "Add tags ${tagName} to product ${product}"
 
         // Check if the product already has the given tag
         def tag = product.tags.find { it.tag == tagName }
@@ -867,27 +919,25 @@ class ProductService {
 
             // Or create a brand new one
             if (!tag) {
+                log.info "Tag ${tagName} does not exist so creating it"
                 tag = new Tag(tag: tagName)
                 tag.save(flush:true)
             }
+            log.info "Product " + product.properties
             product.addToTags(tag)
-            product.merge(flush:true)
+            if (product.id) {
+                log.info "Before merge " + product.properties
+                product = product.merge()
+                log.info "After merge " + product.properties
+            }
+            product.save(flush:true)
+        }
+        else {
+            log.info "Product ${product} already contains tag ${tag}"
         }
     }
 
-    /**
-     * Add a list of tags to each of the given products.
-     *
-     * @param products
-     * @param tags
-     * @return
-     */
-    def addTagsToProducts(products, tags) {
-        products.each { product ->
-            addTagsToProduct(product, tags)
-        }
 
-    }
 	
 	/**
 	 * Delete a tag from the given product and delete the tag.
