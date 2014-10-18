@@ -76,19 +76,21 @@ class SelectTagLib {
 
 
     def selectTag = { attrs, body ->
-        attrs.from = Tag.list()
-        //attrs.multiple = true
+        def tags = Tag.list(sort:"tag").collect { [ id: it.id, name: it.tag, productCount: it?.products?.size() ]}
+        println tags
+        attrs.from = tags
         attrs.value = attrs.value
         attrs.optionKey = "id"
-        attrs.optionValue = { it?.tag + " (" + it?.products?.size() + ")" }
+        attrs.optionValue = { it.name + " (" + it.productCount + ")" }
         out << g.select(attrs)
     }
     def selectTags = { attrs, body ->
-        attrs.from = Tag.list()
+        def tags = Tag.list(sort:"tag").collect { [ id: it.id, name: it.tag, productCount: it?.products?.size() ]}
+        attrs.from = tags
         attrs.multiple = true
         attrs.value = attrs.value
         attrs.optionKey = "id"
-        attrs.optionValue = { it?.tag + " (" + it?.products?.size() + ")" }
+        attrs.optionValue = { it.name + " (" + it?.productCount + ")" }
         out << g.select(attrs)
     }
 
