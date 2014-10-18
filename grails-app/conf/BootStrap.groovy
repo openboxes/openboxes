@@ -110,6 +110,15 @@ class BootStrap {
         //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
 
 
+        // Debug logging used to figure out what log4j properties are ruining it for the rest of us
+        this.getClass().getClassLoader().getResources("log4j.properties").each {
+            println "log4j.properties => " + it
+        }
+
+        this.getClass().getClassLoader().getResources("log4j.xml").each {
+            println "log4j.xml => " +  it
+        }
+
     }
 
 
