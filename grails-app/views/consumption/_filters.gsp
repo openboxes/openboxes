@@ -4,6 +4,9 @@
     line-height: 26px;
 }
 
+#accordion .ui-accordion-content {
+    max-height: 200px;
+}
 </style>
 <div class="filters">
 	<g:form method="POST" controller="consumption" action="show">
@@ -39,7 +42,7 @@
                     <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" size="18"/>
                 </td>
             </tr>
-            <tr>
+            <tr class="prop">
                 <td colspan="2">
                     <h3>
                         <warehouse:message code="consumption.products.label" default="Product(s)"/>
@@ -62,7 +65,7 @@
                 </td>
             </tr>
 
-            <tr>
+            <tr class="prop">
                 <td colspan="2">
                     <h3>
                         <warehouse:message code="consumption.fromLocations.label" default="Source(s)"/>
@@ -72,79 +75,87 @@
                 </td>
             </tr>
 
+            <g:if test="${command?.toLocations}">
+                <tr class="prop">
+                    <td colspan="2">
+                        <h3>
+                            <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
 
-            <tr>
-                <td colspan="2">
-                    <h3>
-                        <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
-                    </h3>
-                    <g:unless test="${!command.toLocations}">
-                        <div class="right">
-                            <a id="selectAllLocations">Select all</a>&nbsp;|&nbsp;
-                            <a id="selectNoLocations">Select none</a>
+                            <g:unless test="${!command.toLocations}">
+                                <div class="right">
+                                    <a id="selectAllLocations">Select All</a>&nbsp;|&nbsp;
+                                    <a id="selectNoLocations">Select None</a>
+                                </div>
+                            </g:unless>
+                        </h3>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td colspan="2">
+                        <div> <!-- style="max-height: 300px; overflow: auto; border: 1px lightgrey solid"-->
+                            <div id="toLocation-accordion">
+                                <g:set var="count" value="${0}"/>
+                                <g:unless test="${command.toLocations}">
+                                    <div class="empty fade center">
+                                        <warehouse:message code="consumption.chooseFromLocation.message" default="You must choose at least one source"/>
+                                    </div>
+                                </g:unless>
+                                <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
+                                    <g:each var="locationTypeEntry" in="${entry.value.groupBy{it.locationType}}">
+                                        <fieldset>
+                                            <legend>
+                                                ${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')} &rsaquo;
+                                                <format:metadata obj="${locationTypeEntry}"/>
+                                            </legend>
+                                            <div style="max-height: 150px; overflow: auto;">
+                                                <table >
+                                                    <tbody>
+                                                        <g:each var="toLocation" in="${locationTypeEntry.value}">
+                                                            <tr>
+                                                                <td class="middle center" width="1%">
+                                                                    <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
+                                                                    <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
+                                                                    <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
+                                                                </td>
+                                                                <td class="middle">
+                                                                    <format:metadata obj="${toLocation}"/>
+                                                                </td>
+                                                            </tr>
+                                                        </g:each>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </fieldset>
+                                    </g:each>
+                                </g:each>
+                                <%--
+                                <g:each var="toLocation" in="${command.toLocations}" status="i">
+                                    <div>
+                                        <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
+                                        <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
+                                        <g:hiddenField name="toLocations[${i}].id" value="${toLocation?.id}"/>
+                                        <b><format:metadata obj="${toLocation?.locationType}"/></b>
+                                        <format:metadata obj="${toLocation}"/>
+                                    </div>
+                                </g:each>
+                                --%>
+                            </div>
                         </div>
-                    </g:unless>
-
-                </td>
-            </tr>
-            <tr class="">
-                <td colspan="2">
-                    <div style="max-height: 300px; overflow: auto; border: 1px lightgrey solid">
-                        <g:set var="count" value="${0}"/>
                         <g:unless test="${command.toLocations}">
-                            <div class="empty fade center">
-                                <warehouse:message code="consumption.chooseFromLocation.message" default="You must choose at least one source"/>
+                            <div class="center">
+                                <warehouse:message code="consumption.destinations.message" default=""/>
                             </div>
                         </g:unless>
-                        <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
-                            <div class="">
-
-                                <g:each var="locationTypeEntry" in="${entry.value.groupBy{it.locationType}}">
-                                    <label>
-                                        ${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')}
-                                    &rsaquo;
-                                        <format:metadata obj="${locationTypeEntry}"/>
-                                    </label>
-                                    <table >
-                                        <tbody>
-                                            <g:each var="toLocation" in="${locationTypeEntry.value}">
-                                                <tr>
-                                                    <td class="middle center" width="1%">
-                                                        <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
-                                                        <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
-                                                        <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
-                                                    </td>
-                                                    <td class="middle">
-                                                        <format:metadata obj="${toLocation}"/>
-                                                    </td>
-                                                </tr>
-                                            </g:each>
-                                        </tbody>
-                                    </table>
-                                </g:each>
-                            </div>
-                        </g:each>
-                        <%--
-                        <g:each var="toLocation" in="${command.toLocations}" status="i">
-                            <div>
-                                <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
-                                <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
-                                <g:hiddenField name="toLocations[${i}].id" value="${toLocation?.id}"/>
-                                <b><format:metadata obj="${toLocation?.locationType}"/></b>
-                                <format:metadata obj="${toLocation}"/>
-                            </div>
-                        </g:each>
-                        --%>
-
-                    </div>
-                    <g:unless test="${command.toLocations}">
-                        <div class="center">
-                            <warehouse:message code="consumption.destinations.message" default=""/>
-                        </div>
-                    </g:unless>
+                    </td>
+                </tr>
+            </g:if>
+            <tr class="prop">
+                <td colspan="2">
+                    <h3>
+                        <warehouse:message code="consumption.report.output.label" default="Report Output"/>
+                    </h3>
                 </td>
             </tr>
-
             <tr>
                 <td>
                     <label>
@@ -160,7 +171,6 @@
                     </span>
                 </td>
             </tr>
-
             <tr>
                 <td colspan="2">
                     <label>
@@ -168,12 +178,13 @@
                     </label>
                     <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
 
+
                 </td>
             </tr>
 
             <tr>
                 <td colspan="2">
-                    <label><warehouse:message code="consumption.additionalColumns.label" default="Choose additional columns"/></label>
+                    <label><warehouse:message code="consumption.additionalColumns.label" default="Additional columns"/></label>
                     <select name="selectedProperties" multiple="true" class="chzn-select-deselect" style="height: 100px;">
                         <g:each var="property" in="${command.productDomain.properties}">
                             <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
@@ -206,14 +217,14 @@
                     --%>
                 </td>
             </tr>
-
             <tr>
                 <td class="center" colspan="2">
                     <div>
                         <button class="button icon search">
-                            <warehouse:message code="default.runReport.label" default="Run report"/>
+                            <warehouse:message code="default.button.getData.label" default="Get data"/>
                         </button>
-                        <g:link controller="consumption" action="show" class="button icon trash">${warehouse.message(code:'consumption.parameters.reset.label', default: 'Reset parameters')}</g:link>
+                        &nbsp;
+                        <g:link controller="consumption" action="show">${warehouse.message(code:'default.button.reset.label', default: 'Reset')}</g:link>
                         <%--
                         <a href="#" id="parameters-toggle" class="button icon settings">
                             <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>
@@ -251,6 +262,13 @@
         //    var checked = ($(this).attr("checked") == 'checked');
         //    $(".checkbox").attr("checked", checked);
         //});
+
+//        $("#toLocation-accordion").accordion({
+//            collapsible: true,
+//            active: 'none',
+//            autoHeight: false,
+//            navigation: true
+//        });
 
     });
 </script>

@@ -192,7 +192,6 @@
 
                                 <tr>
                                     <th></th>
-                                    <th></th>
                                     <th class="border-right"><warehouse:message code="product.label"/></th>
 
                                     <%--
@@ -245,11 +244,13 @@
                                             ${(numberOfMonthsLeft<3&&numberOfMonthsLeft>0)?'error':} ${(numberOfMonthsLeft<0)?'notice':''}"
                                         --%>
                                         <td>${i+1}</td>
-                                        <td><a href="javascript:void(-1);" data-id="${product.id}" class="product-details-toggle-btn button">Details</a></td>
                                         <td class="border-right">
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
                                                 ${product?.productCode} ${product?.name}
                                             </g:link>
+
+                                            &nbsp;
+                                            <a href="javascript:void(-1);" data-id="${product.id}" class="product-details-toggle-btn">more info</a>
                                             <div id="product-details-box-${product?.id}" class="box product-details-box" style="display:none">
                                                 <table >
                                                     <tr>
