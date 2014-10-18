@@ -166,7 +166,7 @@ log4j = {
 	// Used to debug hibernate/SQL queries
 	//trace 'org.hibernate.type'
 	//debug 'org.hibernate.SQL'
-	
+
 	System.setProperty 'mail.smtp.port', mail.error.port.toString()
     System.setProperty 'mail.smtp.connectiontimeout', "5000"
     System.setProperty 'mail.smtp.timeout', "5000"
@@ -256,6 +256,9 @@ log4j = {
 	root {
 		error 'stdout', 'smtp'
 		additivity = false
+		//error 'smtp'
+		//info 'stdout'
+		//additivity: false
 	}
 
 
@@ -311,12 +314,12 @@ log4j = {
             //'org.hibernate.transaction',
             //'org.jumpmind',
             //'org.hibernate.jdbc',
-            //'org.hibernate.SQL'
+            //'org.hibernate.SQL',
             //'com.gargoylesoftware.htmlunit',
             'org.apache.http.wire'        // shows traffic between htmlunit and server
 
-   trace    'org.hibernate.type.descriptor.sql.BasicBinder'
-           //'org.hibernate.type'
+   //trace    'org.hibernate.type.descriptor.sql.BasicBinder',
+   //        'org.hibernate.type'
 
 
 }
