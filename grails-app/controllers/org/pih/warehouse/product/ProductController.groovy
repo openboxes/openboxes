@@ -183,7 +183,6 @@ class ProductController {
         params.productCode = params.q
         params.unitOfMeasure = params.q
 
-
         productInstanceList = productService.getProducts(params.q, category, tags, params)
         flash.productIds = productInstanceList.collect { it.id }
 

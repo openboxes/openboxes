@@ -1,5 +1,6 @@
 package org.pih.warehouse.product
 
+import grails.orm.PagedResultList
 import grails.test.ControllerUnitTestCase
 
 // import org.pih.warehouse.MessageTagLib;
@@ -31,10 +32,20 @@ class ProductControllerTests extends ControllerUnitTestCase{
 		def category = new Category(id: "123", name: "category 123")
 		def product1 = new Product(id:"1234", name: "product 1234", category: category, lastUpdated: currentDate, dateCreated: currentDate)
 		def product2 = new Product(id:"1236", name: "product 1236", category: category, lastUpdated: currentDate, dateCreated: currentDate)
-		mockDomain(Product, [product1, product2])
+		def products = [product1, product2]
+		mockDomain(Product, products)
 		mockDomain(Category, [category])
 
+		def productServiceMock = mockFor(ProductService)
+		productServiceMock.demand.getProducts(1..1) { arg1, arg2, arg3, arg4 ->
+			println "Get products from mock service " + products
+			return new PagedResultList(Product.list(), 2);
+		}
+		controller.productService = productServiceMock.createMock()
 		def model = controller.list()
+		println "Model " + model.class + " "
+		println model.productInstanceList
+		println model.productInstanceTotal
 
 
 		assertEquals 2, model.productInstanceTotal
