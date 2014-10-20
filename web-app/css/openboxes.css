@@ -897,7 +897,7 @@ button.action-btn, button.previous, button.next {
     padding: 0px;
 }
 .black-top {
-    border-top: 1px solid black;
+    border-top: 3px solid lightgrey;
 }
 .capitalize {
     text-transform: capitalize;

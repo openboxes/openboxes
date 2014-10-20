@@ -30,6 +30,18 @@
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
+			<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
+				<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
+				&nbsp;${warehouse.message(code: 'order.placeOrder.label')}
+			</g:link>
+		</div>
+		<div class="action-menu-item">
+			<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}">
+				<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
+				<warehouse:message code="order.print.label" default="Print purchase order"/>
+			</g:link>
+		</div>
+		<div class="action-menu-item">
 			<g:link controller="order" action="addComment" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
 				&nbsp;${warehouse.message(code: 'order.addComment.label')} 
@@ -40,27 +52,12 @@
 				<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
 				&nbsp;${warehouse.message(code: 'order.addDocument.label')} 
 			</g:link>				
-		</div>		
-        <div class="action-menu-item">
-            <g:link target="_blank" controller="order" action="print"
-                    id="${orderInstance?.id}">
-                <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-                <warehouse:message code="order.download.label" default="Download purchase order"/>
-                <span class="fade">(.pdf)</span>
-            </g:link>
-        </div>
+		</div>
+
         <div class="action-menu-item">
             <hr/>
         </div>
-
-
-		<div class="action-menu-item">
-			<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
-				<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
-				&nbsp;${warehouse.message(code: 'order.placeOrder.label')} 
-			</g:link>				
-		</div>		
-		<g:if test="${!hideDelete}">					
+		<g:if test="${!hideDelete}">
 			<div class="action-menu-item">
 				<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />

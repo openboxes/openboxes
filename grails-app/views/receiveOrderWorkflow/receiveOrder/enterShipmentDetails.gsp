@@ -28,31 +28,67 @@
 			<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
 			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>			
 			<div class="dialog">
-				<fieldset>
+				<div class="box">
+					<h2>${warehouse.message(code:'order.wizard.enterShipmentDetails.label', default: 'Enter shipment details')}</h2>
 					<g:render template="../order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
 					<table>
 						<tbody>
-						
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='orderedBy'><warehouse:message code="order.shipmentType.label"/>:</label>
+									<label for='origin'><warehouse:message code="order.origin.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
-										optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
+									<div id="origin">
+										${order?.origin?.name}
+
+									</div>
+								</td>
+							</tr>
+
+							<tr class='prop'>
+								<td valign='top' class='name'>
+									<label for='shipmentType.id'><warehouse:message code="order.shipmentType.label"/>:</label>
+								</td>
+								<td valign='top'class='value'>
+									<div style="width:200px">
+										<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" class="chzn-select-deselect"
+												  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
+
+									</div>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='orderedBy'><warehouse:message code="shipping.recipient.label"/>:</label>
+									<label for='destination'><warehouse:message code="order.origin.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<div class="ui-widget">
-										<g:select class="comboBox updateable" name="recipient.id" from="${org.pih.warehouse.core.Person.list()}" 
+									<div id="destination">
+										${order?.destination?.name}
+
+									</div>
+								</td>
+							</tr>
+
+							<tr class='prop'>
+								<td valign='top' class='name'>
+									<label for='recipient.id'><warehouse:message code="shipping.recipient.label"/>:</label>
+								</td>
+								<td valign='top'class='value'>
+									<div style="width:200px">
+										<g:select class="chzn-select-deselect " name="recipient.id" from="${org.pih.warehouse.core.Person.list().sort()}"
 											optionKey="id" optionValue="name" value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
 									</div>									
 								</td>
 							</tr>
+							<tr class='prop'>
+								<td valign='top' class='name'>
+									<label for='dateOrdered'><warehouse:message code="order.dateOrdered.label"/>:</label>
+								</td>
+								<td valign='top'class='value'>
+									<div id="dateOrdered"><g:formatDate date="${orderCommand.dateOrdered}" format="MMM dd, yyyy"/></div>
+								</td>
+							</tr>
+
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='shippedOn'><warehouse:message code="shipping.shippedOn.label"/>:</label>
@@ -92,7 +128,7 @@
 					</div>
 					
 					
-				</fieldset>
+				</div>
 			</g:form>
 		</div>
 	</div>

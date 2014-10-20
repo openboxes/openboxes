@@ -92,32 +92,24 @@ class OrderController {
         }
     }
 
-	def placeOrder = { 
-		def orderInstance = Order.get(params.id)
+	def placeOrder = {
+		log.info "Issue order " + params
+		def orderInstance = orderService.placeOrder(params.id)
 		if (orderInstance) {
-			
-			if (orderInstance?.orderItems?.size() > 0) { 
-				orderInstance.status = OrderStatus.PLACED;
-				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-					flash.message = "${warehouse.message(code: 'order.orderHasBeenPlacedWithVendor.message', args: [orderInstance?.description, orderInstance?.origin?.name])}"
-					redirect(action: "show", id: orderInstance.id)
-				}
-				else {
-					flash.message = "${warehouse.message(code: 'order.errorPlacingOrder.message')}"
-					render(view: "show", model: [orderInstance: orderInstance])
-				}
-			}
-			else { 
-				flash.message = "${warehouse.message(code: 'order.order.mustContainAtLeastOneItem.message.message')}"
-				redirect(action: "show", id: orderInstance.id)
+			if (orderInstance.hasErrors()) {
+				render(view: 'show', model: [orderInstance: orderInstance])
+			} else {
+				flash.message = "${warehouse.message(code: 'order.orderHasBeenPlacedWithVendor.message', args: [orderInstance?.orderNumber, orderInstance?.origin?.name])}"
+				redirect(action: 'show', id: orderInstance.id)
 			}
 		}
-		else { 
-			redirect("show", id: orderInstance?.id)
-			
+		else {
+			flash.message = "${warehouse.message(code: 'order.notFound.message', args: [params.id], default:'Order {0} was not found.')}"
+			redirect(action:"list")
 		}
-				
 	}
+
+
 
 	
     def update = {
@@ -338,6 +330,7 @@ class OrderController {
 		render(view: "receive", model: [orderCommand: command])
 	}
 
+	/*
 	def addOrderShipment = {  
 		def orderCommand = orderService.getOrder(params.id, session.user.id)
 		int index = Integer.valueOf(params?.index)
@@ -356,8 +349,8 @@ class OrderController {
 		}
 		render(view: "receive", model: [orderCommand: orderCommand])
 		//redirect(action: "receive")
-	} 
-	
+	}
+
 	def removeOrderShipment = { 
 		log.info("Remove order shipment " + params)
 		def orderCommand = session.orderCommand
@@ -367,7 +360,8 @@ class OrderController {
 		//render(view: "receive", model: [orderCommand: orderCommand])
 		redirect(action: "receive")
 	}
-		
+	*/
+
 
 	def fulfill = {
 		def orderInstance = Order.get(params.id)

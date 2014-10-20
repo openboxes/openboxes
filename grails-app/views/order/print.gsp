@@ -36,163 +36,202 @@
 </g:hasErrors>
 
 <g:if test="${orderInstance}">
-    <div class="left">
-        <div class="logo">
-            <g:if test="${session?.warehouse?.logo }">
-                <a href="${createLink(uri: '/dashboard/index')}">
-                    <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
-                </a>
-            </g:if>
-            <g:else>
-                <a href="${createLink(uri: '/dashboard/index')}">
-                    <span class="middle"><warehouse:message code="default.openboxes.label"/></span></a>
-            </g:else>
-        </div>
-    </div>
-    <div class="right">
-        <div class="title">
-            <warehouse:message code="order.label"/>
-        </div>
-        <table width="25%">
-            <tr>
-                <td>
-                    <warehouse:message code="order.orderNumber.label"/>
-                </td>
-                <td>
-                    <b>${orderInstance?.orderNumber}</b>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <warehouse:message code="order.dateOrdered.label" default="Date ordered"/>
-                </td>
-                <td>
-                    <b><g:formatDate date="${new Date()}" format="dd MMM yyyy"/></b>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
+    <div class="header">
 
+        <div class="left">
+            <div class="logo">
+                <g:if test="${session?.warehouse?.logo }">
+                    <a href="${createLink(uri: '/dashboard/index')}">
+                        <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
+                    </a>
+                </g:if>
+                <g:else>
+                    <a href="${createLink(uri: '/dashboard/index')}">
+                        <span class="middle"><warehouse:message code="default.openboxes.label"/></span></a>
+                </g:else>
+            </div>
+        </div>
+        <div class="right">
+            <div class="title">
+                <warehouse:message code="order.label"/>
+            </div>
+            <table width="25%">
+                <tr>
+                    <td>
+                        <warehouse:message code="order.orderNumber.label"/>
+                    </td>
+                    <td>
+                        <b>${orderInstance?.orderNumber}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <warehouse:message code="order.dateOrdered.label" default="Date ordered"/>
+                    </td>
+                    <td>
+                        <b><g:formatDate date="${new Date()}" format="dd MMM yyyy"/></b>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+        </div>
     </div>
     <div class="clear"></div>
 
+    <div class="content">
 
-<div>
-    <table>
-        <tr>
-            <td>
-                <i><warehouse:message code="order.purchaseFrom.label" default="Purchase From"/></i><br/>
-                <b>${orderInstance?.origin?.name }</b><br/>
-                <g:if test="${orderInstance?.origin?.address}">
-                    ${orderInstance?.origin?.address?.address}<br/>
-                    <g:if test="${orderInstance?.origin?.address?.address2}">
-                        ${orderInstance?.origin?.address?.address2}<br/>
-                    </g:if>
-                    ${orderInstance?.origin?.address?.city},
-                    ${orderInstance?.origin?.address?.stateOrProvince}<br/>
-                    ${orderInstance?.origin?.address?.country}<br/>
-                    ${orderInstance?.destination?.address?.description}
-                </g:if>
-            </td>
-            <td>
-                <i><warehouse:message code="order.deliverTo.label" default="Deliver To"/></i><br/>
-                ${orderInstance?.orderedBy?.name }<br/>
-                <b>${orderInstance?.destination?.name }</b><br/>
-                <g:if test="${orderInstance?.destination?.address}">
-                    ${orderInstance?.destination?.address?.address}<br/>
-                    <g:if test="${orderInstance?.destination?.address?.address2}">
-                        ${orderInstance?.destination?.address?.address2}<br/>
-                    </g:if>
-                    ${orderInstance?.destination?.address?.city}
-                    ${orderInstance?.destination?.address?.stateOrProvince}<br/>
-                    ${orderInstance?.destination?.address?.country}<br/>
-                    ${orderInstance?.destination?.address?.description}
-                </g:if>
-            </td>
-        </tr>
-    </table>
-</div>
-<div>
-    <table >
-        <tr>
-            <td colspan="5">
-                <div class="list">
-                    <g:set var="status" value="${0 }"/>
-                    <table class="order-items">
-                        <thead>
+
+        <div class="report-summary" >
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <h2>Summary</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%">
+                        <table>
                             <tr>
-                                <th class="center bottom">
-                                    <warehouse:message code="number.label" default="No."/>
-                                </th>
-                                <th class="bottom">
-                                    <warehouse:message code="product.productCode.label"/>
-                                </th>
-                                <th class="bottom">
-                                    <warehouse:message code="product.name.label"/>
-                                </th>
-                                <th class="left bottom">
-                                    <warehouse:message code="orderItem.quantity.label" default="Quantity"/>
-                                </th>
-                                <th class="left bottom">
-                                    <warehouse:message code="product.unitOfMeasure.label" default="Unit of measure"/>
-                                </th>
-                                <th class="center bottom">
-                                    <warehouse:message code="orderItem.unitPrice.label" default="Unit price"/>
-                                </th>
-                                <th class="center bottom">
-                                    <warehouse:message code="orderItem.totalPrice.label" default="Total amount"/>
-                                </th>
-
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                        <g:each var="orderItem" in="${orderInstance?.orderItems }" status="i">
-                            <tr style="${i%2?'odd':'even'}">
-                                <td class="center">
-                                    ${i+1 }
+                                <td class="top left" width="25%">
+                                    <label><warehouse:message code="order.orderedFrom.label" default="Supplier"/></label>
                                 </td>
-                                <td>
-                                    ${orderItem?.product?.productCode}
-                                </td>
-                                <td>
-                                    <format:product product="${orderItem?.product}"/>
-                                </td>
-                                <td class="right">
-                                    ${orderItem?.quantity }
-                                </td>
-                                <td class="center">
-                                    ${orderItem?.product?.unitOfMeasure?:"EA"}
-                                </td>
-                                <td class="right">
-                                    <g:formatNumber number="${orderItem?.unitPrice}" type="currency" currencyCode="USD"/>
-                                </td>
-                                <td class="right">
-                                    <g:formatNumber number="${orderItem?.totalPrice()}" type="currency" currencyCode="USD"/>
+                                <td class="top left" width="75%">
+                                    <b>${orderInstance?.origin?.name }</b>
+                                    <g:if test="${orderInstance?.origin?.address}">
+                                        <br/>
+                                        ${orderInstance?.origin?.address?.address}<br/>
+                                        <g:if test="${orderInstance?.origin?.address?.address2}">
+                                            ${orderInstance?.origin?.address?.address2}<br/>
+                                        </g:if>
+                                        ${orderInstance?.origin?.address?.city},
+                                        ${orderInstance?.origin?.address?.stateOrProvince}<br/>
+                                        ${orderInstance?.origin?.address?.country}<br/>
+                                        ${orderInstance?.destination?.address?.description}
+                                    </g:if>
                                 </td>
                             </tr>
+                        </table>
 
-                        </g:each>
-                        </tbody>
-                        <tfoot>
+
+                    </td>
+                    <td width="50%">
+                        <table>
                             <tr>
-                                <th colspan="6">
-                                    <warehouse:message code="default.total.label"/>
-                                </th>
-                                <th class="right"><g:formatNumber number="${orderInstance?.totalPrice()}" type="currency" currencyCode="USD"/></th>
+                                <td class="top" width="25%">
+                                    <label><warehouse:message code="order.shipTo.label" default="Ship To"/></label>
+                                </td>
+                                <td class="top left" width="75%">
+                                    <div>
+                                        <b>${orderInstance?.destination?.name }</b>
+                                    </div>
+                                    <div>
+                                        c/o ${orderInstance?.orderedBy?.name }
+                                    </div>
+                                    <g:if test="${orderInstance?.destination?.address}">
+                                        <br/>
+                                        ${orderInstance?.destination?.address?.address}<br/>
+                                        <g:if test="${orderInstance?.destination?.address?.address2}">
+                                            ${orderInstance?.destination?.address?.address2}<br/>
+                                        </g:if>
+                                        ${orderInstance?.destination?.address?.city}
+                                        ${orderInstance?.destination?.address?.stateOrProvince}<br/>
+                                        ${orderInstance?.destination?.address?.country}<br/>
+                                        ${orderInstance?.destination?.address?.description}
+                                    </g:if>
+                                </td>
                             </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </td>
-        </tr>
-    </table>
-</div>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="report-details">
+            <table >
+                <tr>
+                    <td colspan="5">
+                        <h2>Details</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        <div class="list">
+                            <g:set var="status" value="${0 }"/>
+                            <table class="order-items">
+                                <thead>
+                                    <tr>
+                                        <th class="center bottom">
+                                            <warehouse:message code="number.label" default="No."/>
+                                        </th>
+                                        <th class="bottom">
+                                            <warehouse:message code="product.productCode.label"/>
+                                        </th>
+                                        <th class="bottom">
+                                            <warehouse:message code="product.name.label"/>
+                                        </th>
+                                        <th class="center bottom">
+                                            <warehouse:message code="orderItem.quantity.label" default="Quantity"/>
+                                        </th>
+                                        <th class="center bottom">
+                                            <warehouse:message code="product.uom.label" default="UOM"/>
+                                        </th>
+                                        <th class="center bottom">
+                                            <warehouse:message code="orderItem.unitPrice.label" default="Unit price"/>
+                                        </th>
+                                        <th class="center bottom">
+                                            <warehouse:message code="orderItem.totalPrice.label" default="Total amount"/>
+                                        </th>
 
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                <g:each var="orderItem" in="${orderInstance?.orderItems }" status="i">
+                                    <tr style="${i%2?'odd':'even'}">
+                                        <td class="center">
+                                            ${i+1 }
+                                        </td>
+                                        <td>
+                                            ${orderItem?.product?.productCode}
+                                        </td>
+                                        <td>
+                                            <format:product product="${orderItem?.product}"/>
+                                        </td>
+                                        <td class="right">
+                                            ${orderItem?.quantity }
+                                        </td>
+                                        <td class="center">
+                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
+                                        </td>
+                                        <td class="right">
+                                            <g:formatNumber number="${orderItem?.unitPrice}" type="currency" currencyCode="USD"/>
+                                        </td>
+                                        <td class="right">
+                                            <g:formatNumber number="${orderItem?.totalPrice()}" type="currency" currencyCode="USD"/>
+                                        </td>
+                                    </tr>
+
+                                </g:each>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="6">
+                                            <warehouse:message code="default.total.label"/>
+                                        </th>
+                                        <th class="right"><g:formatNumber number="${orderInstance?.totalPrice()}" type="currency" currencyCode="USD"/></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </g:if>
 
 <script>

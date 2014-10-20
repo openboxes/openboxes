@@ -30,9 +30,6 @@
 			</g:link>				
 		</div>		
 		<div class="action-menu-item">
-			<hr/>
-		</div>
-		<div class="action-menu-item">
 			<g:link name="receiveOrderLink" controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
 				&nbsp;${warehouse.message(code: 'order.receiveOrder.label')} 
@@ -45,6 +42,9 @@
 			</g:link>				
 		</div>
 		<g:if test="${!hideDelete}">
+			<div class="action-menu-item">
+				<hr/>
+			</div>
 			<div class="action-menu-item">
 				<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />

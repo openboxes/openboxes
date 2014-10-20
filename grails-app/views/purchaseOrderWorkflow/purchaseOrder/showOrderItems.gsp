@@ -23,19 +23,24 @@
         </g:hasErrors>
 
         <div class="dialog">
-            <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
+
             <div class="box">
                 <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
+                <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
                 <table style="">
                     <thead>
                         <tr class="odd">
-                            <g:sortableColumn property="type" title="${warehouse.message(code:'default.type.label')}" />
-                            <g:sortableColumn property="name" title="${warehouse.message(code:'default.name.label')}" />
+                            <th><warehouse:message code="default.actions.label"/></th>
+                            <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
+                            <g:sortableColumn property="product.productCode" title="${warehouse.message(code:'product.productCode.label')}" />
+                            <g:sortableColumn property="product.name" title="${warehouse.message(code:'product.name.label')}" />
+                            <g:sortableColumn property="product.vendor" title="${warehouse.message(code:'vendor.name.label', default: 'Vendor')}" />
+                            <g:sortableColumn property="product.manufacturer" title="${warehouse.message(code:'manufacturer.name.label', default: 'Manufacturer')}" />
+
                             <g:sortableColumn property="quantity" title="${warehouse.message(code:'default.quantity.label')}" />
-                            <g:sortableColumn property="unitOfMeasure" title="${warehouse.message(code:'product.unitOfMeasure.label')}" />
+                            <g:sortableColumn property="unitOfMeasure" title="${warehouse.message(code:'default.uom.label', default: 'UOM')}" class="center"/>
                             <g:sortableColumn class="right" property="unitPrice" title="${warehouse.message(code:'order.unitPrice.label')}" />
                             <g:sortableColumn class="right" property="totalPrice" title="${warehouse.message(code:'order.totalPrice.label')}" />
-                            <th><warehouse:message code="default.actions.label"/></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,25 +48,7 @@
                         <g:each var="orderItem" in="${order?.orderItems}">
                             <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
                                 <g:hiddenField name="orderItems[${i }].order.id" value="${orderItem?.order?.id }" size="5"/>
-                                <td class="middle">
-                                    ${orderItem?.orderItemType }
-                                </td>
-                                <td class="middle">
-                                    ${orderItem?.description?.encodeAsHTML()}
-                                </td>
-                                <td class="middle">
-                                    ${orderItem?.quantity }
-                                    <g:hiddenField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"/>
-                                </td>
-                                <td class="middle">
-                                    ${orderItem?.product?.unitOfMeasure?:"EA"}
-                                </td>
-                                <td class="right middle">
-                                    <g:formatNumber number="${orderItem?.unitPrice ?: 0.00 }" type="currency" currencyCode="USD"/>
-                                </td>
-                                <td class="right middle">
-                                    <g:formatNumber number="${orderItem?.totalPrice() }"  type="currency" currencyCode="USD" />
-                                </td>
+
                                 <td class="actionButtons">
                                     <g:if test="${orderItem?.id }">
                                         <a href="javascript:void(-1);" id="edit-item-dialog-${orderItem?.id}" class="button icon edit edit-item-button" data-order-item-id="${orderItem?.id}">
@@ -72,38 +59,66 @@
                                         </g:link>
                                     </g:if>
                                 </td>
+
+                                <td class="middle">
+                                    ${i}
+                                </td>
+                                <td class="middle">
+                                    ${orderItem?.product?.productCode}
+                                </td>
+                                <td class="middle">
+                                    ${orderItem?.product?.name?:orderItem?.description?.encodeAsHTML()}
+                                </td>
+                                <td class="middle">
+                                    ${orderItem?.product?.vendor?:"N/A"}
+                                    <g:if test="${orderItem?.product?.vendorCode}">
+                                        #${orderItem?.product?.vendorCode}
+                                    </g:if>
+                                </td>
+                                <td class="middle">
+                                    ${orderItem?.product?.manufacturer?:"N/A"}
+                                    <g:if test="${orderItem?.product?.manufacturerCode}">
+                                       #${orderItem?.product?.manufacturerCode}
+                                    </g:if>
+                                </td>
+                                <td class="middle">
+                                    ${orderItem?.quantity }
+                                    <g:hiddenField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"/>
+                                </td>
+                                <td class="middle center">
+                                    ${orderItem?.product?.unitOfMeasure?:"EA"}
+                                </td>
+                                <td class="right middle">
+                                    <g:formatNumber number="${orderItem?.unitPrice ?: 0.00 }" format="###,###,##0.00##"/>
+                                </td>
+                                <td class="right middle">
+                                    <g:formatNumber number="${orderItem?.totalPrice() }"  type="currency" currencyCode="USD" />
+                                </td>
                             </tr>
                         </g:each>
                         <g:unless test="${order?.orderItems}">
                             <tr>
-                                <td colspan="7">
-                                    <div style="margin: 10px" class="fade center empty">
-                                        <p name="numItemInOrder"><warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/></p>
+                                <td colspan="10">
+                                    <div class="fade center empty">
+                                        <p name="numItemInOrder">
+                                            <warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/>
+                                            <button class="button icon add add-item-button">${warehouse.message(code:'order.button.addItem.label', default: 'Add item')}</button>
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
 
                         </g:unless>
-                        <tr>
-                            <td class="middle left" colspan="6">
-                            </td>
-                            <td class="middle left">
-                                <button id="add-item-button" class="button icon add">${warehouse.message(code:'order.button.addItem.label', default: 'Add item')}</button>
-                            </td>
-
-                        </tr>
                     </tbody>
                     <tfoot>
                         <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
-                            <td colspan="5">
+                            <th>
+                                <button class="button icon add add-item-button">${warehouse.message(code:'order.button.addItem.label', default: 'Add item')}</button>
+                            </th>
+                            <th colspan="9" class="right">
                                 <warehouse:message code="default.total.label"/>
-                            </td>
-                            <td class="right">
                                 <g:formatNumber number="${order?.totalPrice()?:0.0 }" type="currency" currencyCode="USD"/>
-                            </td>
-                            <td>
-
-                            </td>
+                            </th>
                         </tr>
                     </tfoot>
 
@@ -130,9 +145,19 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
+                                <td valign='top' class='name'>
+                                    <label for='unitOfMeasure'><warehouse:message code="product.unitOfMeasure.label"/>:</label>
+                                </td>
+                                <td valign='top' class='value'>
+                                    <g:hiddenField name="unitOfMeasure" value="each"/>
+                                    each
+                                </td>
+                            </tr>
+                            <tr class='prop'>
                                 <td valign='top' class='name'><label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label></td>
                                 <td valign='top' class='value'>
                                     <input type="text" id="unitPrice" name='unitPrice' value="" size="10" class="text" />
+                                    <span class="fade"><warehouse:message code="order.unitPrice.helpText" default="Up to four decimal places (e.g. 0.0001)"/></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -151,62 +176,61 @@
                     </table>
                 </g:form>
             </div>
-            <div id="edit-item-dialog" class="dialog box">
-                <g:form action="purchaseOrder" method="post">
-                    <g:hiddenField id="edit-orderId" name="order.id" value="" />
-                    <g:hiddenField id ="edit-orderItemId" name="orderItem.id" value=""/>
-                    <table>
-                        <tbody>
-                        <tr class='prop'>
-                            <td valign='top' class='name'>
-                                <label for='product'><warehouse:message code="product.label"/>:</label>
-                            </td>
-                            <td valign='top' class='value' nowrap="nowrap">
-                                <div id="edit-product-name"></div>
-                                <input type="hidden" id="edit-product-id"/>
-                            </td>
-                        </tr>
-                        <tr class='prop'>
-                            <td valign='top' class='name'>
-                                <label for='quantity'><warehouse:message code="default.quantity.label"/>:</label>
-                            </td>
-                            <td valign='top' class='value'>
-                                <input type="text" id="edit-quantity" name='quantity' value="" size="10" class="text" />
-                            </td>
-                        </tr>
-                        <tr class='prop'>
-                            <td valign='top' class='name'>
-                                <label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label>
-                            </td>
-                            <td valign='top' class='value'>
-                                <input type="text" id="edit-unitPrice" name='unitPrice' value="" size="10" class="text" />
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="value" colspan="2">
-                                <div class="buttons">
-                                    <span class="formButton">
-                                        <g:submitButton name="addItem" value="${warehouse.message(code:'order.saveItem.label', default: 'Save item')}" class="button"></g:submitButton>
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </g:form>
-            </div>
 
-            <g:form action="purchaseOrder" autocomplete="off">
-                <div class="buttons" style="border-top: 1px solid lightgrey;">
-                    <g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
-                    <g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}" class="button"></g:submitButton>
-<%--
-                    <g:link action="purchaseOrder" event="cancel" class="button"><warehouse:message code="default.button.cancel.label"/></g:link>
---%>
-                </div>
-            </g:form>
 		</div>
-
+        <div id="edit-item-dialog" class="dialog box">
+            <g:form action="purchaseOrder" method="post">
+                <g:hiddenField id="edit-orderId" name="order.id" value="" />
+                <g:hiddenField id ="edit-orderItemId" name="orderItem.id" value=""/>
+                <table>
+                    <tbody>
+                    <tr class='prop'>
+                        <td valign='top' class='name'>
+                            <label for='product'><warehouse:message code="product.label"/>:</label>
+                        </td>
+                        <td valign='top' class='value' nowrap="nowrap">
+                            <div id="edit-product-name"></div>
+                            <input type="hidden" id="edit-product-id"/>
+                        </td>
+                    </tr>
+                    <tr class='prop'>
+                        <td valign='top' class='name'>
+                            <label for='quantity'><warehouse:message code="default.quantity.label"/>:</label>
+                        </td>
+                        <td valign='top' class='value'>
+                            <input type="text" id="edit-quantity" name='quantity' value="" size="10" class="text" />
+                        </td>
+                    </tr>
+                    <tr class='prop'>
+                        <td valign='top' class='name'>
+                            <label for='unitOfMeasure'><warehouse:message code="product.unitOfMeasure.label"/>:</label>
+                        </td>
+                        <td valign='top' class='value'>
+                            <div id="edit-uom"></div>
+                        </td>
+                    </tr>
+                    <tr class='prop'>
+                        <td valign='top' class='name'>
+                            <label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label>
+                        </td>
+                        <td valign='top' class='value'>
+                            <input type="text" id="edit-unitPrice" name='unitPrice' value="" size="10" class="text" />
+                            <span class="fade"><warehouse:message code="order.unitPrice.helpText" default="Up to four decimal places (e.g. 0.0001)"/></span>
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="value" colspan="2">
+                            <div class="buttons">
+                                <span class="formButton">
+                                    <g:submitButton name="addItem" value="${warehouse.message(code:'order.saveItem.label', default: 'Save item')}" class="button"></g:submitButton>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </g:form>
+        </div>
 	</div>
 	<g:comboBox />
     <script type="text/javascript">
@@ -232,9 +256,9 @@
 
 
         $(document).ready(function(){
-            $("#add-item-dialog").dialog({autoOpen:false, modal: true, width: 600, height: 300, title: "Add item to purchase order"});
-            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 600, height: 300, title: "Add item to purchase order"});
-            $("#add-item-button").click(function(event){
+            $("#add-item-dialog").dialog({autoOpen:false, modal: true, width: 600, height: 350, title: "Add item to purchase order"});
+            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 600, height: 350, title: "Add item to purchase order"});
+            $(".add-item-button").click(function(event){
                 event.preventDefault();
                 $("#add-item-dialog").dialog("open");
             });
@@ -250,6 +274,7 @@
                         $("#edit-product-id").val(data.product.id);
                         $("#edit-product-name").html(data.product.productCode + " " + data.product.name);
                         $("#edit-orderId").val(data.order.id);
+                        $("#edit-uom").text(data.product.unitOfMeasure);
                         $("#edit-orderItemId").val(data.id);
                         $("#edit-quantity").val(data.quantity);
                         $("#edit-unitPrice").val(data.unitPrice);

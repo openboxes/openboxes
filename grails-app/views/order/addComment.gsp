@@ -35,14 +35,16 @@
 								<table>
 									<tbody>
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="default.to.label" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" /></label></td>
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
-												<g:select id="recipient.id" class="comboBox" name='recipient.id' noSelection="${['':'Select one ...']}" 
-			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
+												<div style="width:300px">
+													<g:select id="recipient.id" class="chzn-select-deselect" name='recipient.id' noSelection="${['':'Select one ...']}"
+															  from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
+												</div>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="default.from.label"/></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.sender.label"/></label></td>
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'sender', 'errors')}">
 				                            	<g:hiddenField name="sender.id" value="${session.user.id }"/>
 			                                     ${session.user.firstName} ${session.user.lastName} <span class="fade">(${session.user.username})</span>
@@ -51,39 +53,20 @@
 										<tr class="prop">
 				                            <td valign="top" class="name"><label><warehouse:message code="default.comment.label"/></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
-			                                    <g:textArea name="comment" cols="60" rows="10" value="${commentInstance?.comment }"/>
+			                                    <g:textArea name="comment" cols="100" rows="10" value="${commentInstance?.comment }"/>
 			                                </td>
 				                        </tr>  	        
-										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="default.dateCreated.label" /></label></td>                            
-				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'dateCreated', 'errors')}">
-												${commentInstance?.dateCreated }
-			                                </td>
-				                        </tr>  	        
-										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="default.lastUpdated.label" /></label></td>                            
-				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'lastUpdated', 'errors')}">
-												${commentInstance?.lastUpdated}
-			                                </td>
-				                        </tr>  	        
-											
-										<tr class="prop">
-											<td valign="top" class="name"></td>
-											<td valign="top" class="value">
-												<div class="buttons">
-													<button type="submit" class="positive">
-														<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" 
-															alt="Save" /><warehouse:message code="default.button.save.label"/></button>
-													<g:link controller="order" action="show" id="${orderInstance?.id}" class="negative">
-														<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-															alt="Cancel" /><warehouse:message code="default.button.cancel.label"/></g:link>
-												</div>				
-											</td>
-										</tr>
-								</tbody>
-							</table>
-						</g:form>
-					</fieldset>
+									</tbody>
+								</table>
+								<div class="buttons">
+									<button type="submit" class="button icon approve">
+										<warehouse:message code="default.button.save.label"/></button>
+									<g:link controller="order" action="show" id="${orderInstance?.id}" class="button icon trash">
+										<warehouse:message code="default.button.cancel.label"/></g:link>
+								</div>
+
+							</g:form>
+					</div>
 				</td>
 			</tr>
 		</table>

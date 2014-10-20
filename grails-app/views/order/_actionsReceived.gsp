@@ -18,6 +18,12 @@
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
+			<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}">
+				<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
+				<warehouse:message code="order.print.label" default="Print purchase order"/>
+			</g:link>
+		</div>
+		<div class="action-menu-item">
 			<g:link controller="order" action="addComment" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
 				&nbsp;${warehouse.message(code: 'order.addComment.label')} 

@@ -37,6 +37,7 @@ class DatePickerTagLib {
         def minDate = attrs.minDate ? "new Date('${attrs.minDate}')": null
         def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')": null
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
+		def placeholder = attrs.placeholder ?: '';
 		// def showHint = attrs.showHint ?: false;
 		
 		if (value) { 
@@ -51,7 +52,8 @@ class DatePickerTagLib {
 		
 		def html = """
 			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='${cssClass} text' size="${size}" ${readOnly?"readonly='readonly'":""}/>
+			<input id='${id}-datepicker' name='${name}-datepicker' type='text'
+					placeholder='${placeholder}' class='${cssClass} text' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {

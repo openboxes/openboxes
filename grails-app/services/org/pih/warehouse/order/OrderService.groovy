@@ -9,7 +9,9 @@
 **/ 
 package org.pih.warehouse.order
 
+import grails.validation.ValidationException
 import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
@@ -23,6 +25,7 @@ class OrderService {
 	def productService
 	def shipmentService;
 	def identifierService
+	def inventoryService
 	
 	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
@@ -124,12 +127,21 @@ class OrderService {
 			
 			// Ignores any null order items and makes sure that the order item has a product and quantity
 			if (orderItemCommand && orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
+
+				// Find or create a new inventory item based on the product and lot number provided
+				def inventoryItem = null
+
+				InventoryItem.withNewSession {
+					inventoryItem = inventoryService.findOrCreateInventoryItem(orderItemCommand.productReceived, orderItemCommand.lotNumber, orderItemCommand.expirationDate)
+				}
+
 				def shipmentItem = new ShipmentItem();
 				shipmentItem.lotNumber = orderItemCommand.lotNumber
 				shipmentItem.expirationDate = orderItemCommand.expirationDate
 				shipmentItem.product = orderItemCommand.productReceived;
 				shipmentItem.quantity = orderItemCommand.quantityReceived;
 				shipmentItem.recipient = orderCommand?.recipient;
+				shipmentItem.inventoryItem = inventoryItem
 				shipmentInstance.addToShipmentItems(shipmentItem)
 				
 				def orderShipment = new OrderShipment(shipmentItem:shipmentItem, orderItem:orderItemCommand?.orderItem)
@@ -192,6 +204,29 @@ class OrderService {
 			throw new OrderException(message: "Unable to save order due to errors", order: order)
 		}
 	}
+
+	Order placeOrder(String id) {
+		def orderInstance = Order.get(id)
+		if (orderInstance) {
+			if (orderInstance?.status >= OrderStatus.PLACED) {
+				orderInstance.errors.rejectValue("status", "order.hasAlreadyBeenPlaced.message")
+			}
+			else {
+				if (orderInstance?.orderItems?.size() > 0) {
+					orderInstance.status = OrderStatus.PLACED;
+					if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+						return orderInstance
+					}
+				} else {
+					orderInstance.errors.rejectValue("orderItems", "order.mustContainAtLeastOneItem.message")
+				}
+			}
+		}
+		return orderInstance
+
+	}
+
+
 	
 	/**
 	 *

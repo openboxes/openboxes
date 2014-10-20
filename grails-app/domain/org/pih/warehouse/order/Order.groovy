@@ -117,7 +117,8 @@ class Order implements Serializable {
 	}
 	
 	def totalPrice() { 
-		return orderItems.collect { it.totalPrice() }.sum();
+		def totalPrice = orderItems.collect { it.totalPrice() }.sum();
+		return totalPrice ?: 0
 	}
 	
 }

@@ -26,10 +26,12 @@
 				
 		<g:form action="receiveOrder" autocomplete="off">
 			<div class="dialog">
-				<fieldset>
+				<div class="box">
+					<h2>${warehouse.message(code: 'order.wizard.receiveItems.label', default: 'Receive order items')}</h2>
 					<g:render template="../order/summary" model="[orderInstance:order, currentState:'processOrderItems']"/>
+					<hr/>
 					<table>
-						<tr>
+						<tr class="">
 							<td style="padding: 0px;">
 								<div>
 									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
@@ -39,27 +41,34 @@
 									<g:hiddenField name="deliveredOn" value="${formatDate(format:'MM/dd/yyyy', date: orderCommand?.deliveredOn )}"/>
 								
 									<g:if test="${orderItems }">
-										<table id="orderItemsTable" border="0">
+										<table id="orderItemsTable">
 											<thead>
 												<tr class="even">
-													<th class="center" align="center" colspan="4">
-														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
-														<warehouse:message code="order.itemsOrdered.label"/>
+													<th class="center" align="center" colspan="6">
+														<h2>
+															<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
+															<warehouse:message code="order.itemsOrdered.label"/>
+														</h2>
 													</th>
-													<th class="center" align="center" colspan="4" style="border-left: 1px solid lightgrey;">
-														<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-														<warehouse:message code="order.itemsReceived.label"/>
+													<th class="center" align="center" colspan="5" style="border-left: 1px solid lightgrey;">
+														<h2>
+															<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
+															<warehouse:message code="order.itemsReceived.label"/>
+														</h2>
 													</th>
 												</tr>
 												<tr class="even">
-													<td><warehouse:message code="default.type.label"/></td>
-													<td><warehouse:message code="default.description.label"/></td>
-													<td class="center"><warehouse:message code="order.ordered.label"/></td>										
-													<td class="center"><warehouse:message code="order.remaining.label"/></td>	
-													<td style="border-left: 1px solid lightgrey;"><warehouse:message code="order.received.label"/></td>										
-													<td width="250px"><warehouse:message code="product.label"/></td>										
-													<td width="100px"><warehouse:message code="product.lotNumber.label"/></td>		
-													<td><warehouse:message code="default.expires.label"/></td>
+													<th><warehouse:message code="default.type.label"/></th>
+													<th><warehouse:message code="product.productCode.label"/></th>
+													<th><warehouse:message code="product.name.label"/></th>
+													<th><warehouse:message code="product.uom.label"/></th>
+													<th class="center"><warehouse:message code="order.ordered.label"/></th>
+													<th class="center"><warehouse:message code="order.remaining.label"/></th>
+													<th style="border-left: 1px solid lightgrey;"><warehouse:message code="order.received.label"/></th>
+													<th><warehouse:message code="product.label"/></th>
+													<th><warehouse:message code="product.lotNumber.label"/></th>
+													<th><warehouse:message code="default.expires.label"/></th>
+													<th></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -78,7 +87,13 @@
 																<g:if test="${orderItem?.primary }">${orderItem?.type }</g:if>
 															</td>
 															<td>
-																<g:if test="${orderItem?.primary }">${orderItem?.description }</g:if>
+																<g:if test="${orderItem?.primary }">${orderItem?.orderItem?.product?.productCode }</g:if>
+															</td>
+															<td>
+																<g:if test="${orderItem?.primary }">${orderItem?.orderItem?.product.name?:orderItem?.description }</g:if>
+															</td>
+															<td>
+																<g:if test="${orderItem?.primary }">${orderItem?.orderItem?.product.unitOfMeasure?:"each" }</g:if>
 															</td>
 															<td class="center">
 																<g:if test="${orderItem?.primary }">${orderItem?.quantityOrdered}</g:if>
@@ -88,35 +103,39 @@
 																	${orderItem?.quantityOrdered - orderItem?.orderItem?.quantityFulfilled()}
 																</g:if>
 															</td>
-															<td class="center" style="border-left: 1px solid lightgrey;">
-																
-																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<input type="text" name='orderItems[${i }].quantityReceived' value="${orderItem?.quantityReceived }" size="5" class="center updateable" />
-																</g:if>
-															</td>
-															<td>
-																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="${request.contextPath }/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${format.product(product:orderItem?.productReceived)}"/>	
-																</g:if>
-															</td>
-															<td>
-																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
-																</g:if>
-															</td>
-															<td nowrap="true">
-																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
+															<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
+																<td class="center" style="border-left: 1px solid lightgrey;">
+
+																	<input type="text" name='orderItems[${i }].quantityReceived' value="${orderItem?.quantityReceived }" size="5"
+																		   class="center updateable text" />
+																</td>
+
+
+																<td>
+																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived"
+																				   jsonUrl="${request.contextPath }/json/findProductByName" styleClass="text"
+																				   width="200" valueId="${orderItem?.productReceived?.id }"
+																				   valueName="${format.product(product:orderItem?.productReceived)}"/>
+																</td>
+																<td>
+																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="text updateable"/>
+																</td>
+																<td nowrap="true">
 																	<g:datePicker name="orderItems[${i }].expirationDate" precision="day" default="none" noSelection="['':'']"
-																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />					
-																</g:if>
-															</td>															
-															<td>
-																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
+																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />
+																</td>
+																<td>
 																	<span class="buttons" style="padding: 0px;">
-																		<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" class="btnAdd" style="vertical-align: middle"/>
+																		<button alt="Add another item" class="btnAdd button icon add"
+																				style="vertical-align: middle">${warehouse.message(code:'default.splitItem.label', default:'Split item')}</button>
 																	</span>
-																</g:if>
-															</td>
+																</td>
+															</g:if>
+															<g:else>
+																<td colspan="5" style="border-left: 1px solid lightgrey" class="center fade">
+																	${warehouse.message(code:'order.orderItemHasBeenReceived.message', default:'This order item has already been received')}
+																</td>
+															</g:else>
 														</tr>
 														<g:set var="i" value="${i+1 }"/>
 													</g:each>
@@ -136,14 +155,14 @@
 						</tr>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton>
-						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
-						<%-- 
+						<g:submitButton name="next" value="${warehouse.message(code:'default.button.save.label')}" class="button"></g:submitButton>
+						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
+						<%--
 						<g:submitButton name="finish" value="${warehouse.message(code:'default.button.saveAndExit.label')}"></g:submitButton>								
 						--%>
-						<g:link action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
+						<g:link action="receiveOrder" event="cancel" class="button"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
-				</fieldset>
+				</div>
 			</div>
 		</g:form>
 	</div>
@@ -163,31 +182,34 @@
 				}
 			}
 		}
-	}					
-	$(".btnDel").livequery(function(){
-		$(this).click(function(event) {					
-			//removeItem($(this).val());
-			event.preventDefault();
-			$(this).parent().parent().parent().remove();
-			$("#orderItemsTable").alternateRowColors();
-		});
-    });			
-	    
-	$(".btnAdd").click(function(event) {
-		event.preventDefault();
-		//console.log($(this));
-		var index = currentIndex++;
-		var currentRow = $(this).parent().parent().parent();
-		var value = currentRow.find(".value");
-		var valueText = currentRow.find(".autocomplete");
-		var orderItemId = currentRow.find(".orderItemId");
- 		var item = { Id: '0', Index: index, ProductId: value.val(), ProductName: valueText.val(), LotNumber: "", ExpirationDate: "", 
- 		  				OrderItemId: orderItemId.val(), Template: '#new-item-template' };
-		currentRow.after($(item.Template).tmpl(item));	
-		$("#orderItemsTable").alternateRowColors();
-	});
+	}
+
 
 	$(document).ready(function() {
+
+		$(".btnDel").livequery(function(){
+			$(this).click(function(event) {
+				//removeItem($(this).val());
+				event.preventDefault();
+				$(this).parent().parent().parent().remove();
+				$("#orderItemsTable").alternateRowColors();
+			});
+		});
+
+		$(".btnAdd").click(function(event) {
+			event.preventDefault();
+			//console.log($(this));
+			var index = currentIndex++;
+			var currentRow = $(this).parent().parent().parent();
+			var value = currentRow.find(".value");
+			var valueText = currentRow.find(".autocomplete");
+			var orderItemId = currentRow.find(".orderItemId");
+			var item = { Id: '0', Index: index, ProductId: value.val(), ProductName: valueText.val(), LotNumber: "", ExpirationDate: "",
+				OrderItemId: orderItemId.val(), Template: '#new-item-template' };
+			currentRow.after($(item.Template).tmpl(item));
+			$("#orderItemsTable").alternateRowColors();
+		});
+
 		jQuery.fn.alternateRowColors = function() {
 			$('tbody tr:odd', this).removeClass('odd').addClass('even');
 			$('tbody tr:even', this).removeClass('even').addClass('odd');
@@ -220,19 +242,23 @@
 				</td>
 				<td>
 				</td>
-				<td class="center">
+				<td>
 				</td>
-				<td class="center">
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
 				</td>
 				<td class="center" style="border-left: 1px solid lightgrey;">
-					<input type="text" name='orderItems[{{= Index }}].quantityReceived' value="" size="5" class="center updateable" />
+					<input type="text" name='orderItems[{{= Index }}].quantityReceived' value="" size="5" class="center updateable text" />
 				</td>
 				<td>
 					<input id="productReceived{{= Index}}.id" class="value" type="hidden" name="orderItems[{{= Index }}].productReceived.id" value="{{= ProductId}}"/>
-					<input id="productReceived{{= Index}}.text" class="autocomplete" type="text" name="productReceived{{= Index}}.text" value="{{= ProductName}}" style="width: 200px;">
+					<input id="productReceived{{= Index}}.text" class="autocomplete text" type="text" name="productReceived{{= Index}}.text" value="{{= ProductName}}" style="width: 200px;">
 				</td>
 				<td>
-					<g:textField name="orderItems[{{= Index }}].lotNumber" value="{{= LotNumber}}" size="10" class="updateable"/>
+					<g:textField name="orderItems[{{= Index }}].lotNumber" value="{{= LotNumber}}" size="10" class="updateable text"/>
 				</td>
 				<td nowrap="true">
 					<g:datePicker name="orderItems[{{= Index }}].expirationDate" precision="day" default="none" value="" noSelection="['':'']"
@@ -240,7 +266,7 @@
 				</td>															
 				<td>
 					<span class="buttons" style="padding: 0px;">
-						<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="delete" class="btnDel" style="vertical-align: middle"/>
+						<button alt="Delete item" class="btnDel button icon trash">${warehouse.message(code:'default.deleteItem.label', default:'Delete item')}</button>
 					</span>
 				</td>
 			</tr>

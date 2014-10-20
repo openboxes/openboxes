@@ -48,15 +48,17 @@ class PurchaseOrderWorkflowController {
 			}
 			on("success").to("enterOrderDetails")
 			on("showOrderItems").to("showOrderItems")
-			//on("confirmOrder").to("confirmOrder")			
+
+			//on("confirmOrder").to("confirmOrder")
 		}
 		
 		
 		enterOrderDetails {
 			on("next") {
-				log.info params
+				log.info "Enter order details " + params
 				
 				flow.order.properties = params
+				log.info "Order " + flow.order.properties
 				try { 
 					if (!orderService.saveOrder(flow.order)) {
 						return error()
@@ -66,6 +68,7 @@ class PurchaseOrderWorkflowController {
 				}
 			}.to("showOrderItems")
             on("showOrderItems").to("showOrderItems")
+			on("enterOrderDetails").to("enterOrderDetails")
 			on("cancel").to("cancel")
 			on("finish").to("finish")
 		}
@@ -141,7 +144,9 @@ class PurchaseOrderWorkflowController {
 				flow.orderItem = null
 				
 			}.to("showOrderItems")
-			
+
+
+
 			on("next") {
 				log.info "confirm order " + params
 				flow.order.properties = params
@@ -152,18 +157,12 @@ class PurchaseOrderWorkflowController {
 					
 			}.to("finish")
             on("enterOrderDetails").to("enterOrderDetails")
+			on("showOrderItems").to("showOrderItems")
 			on("cancel").to("cancel")
 			on("finish").to("finish")
 			on("error").to("showOrderItems")
 		}
-		/*
-		confirmOrder  {
-			on("back").to("showOrderItems")
-			on("next").to("finish")
-			on("error").to("confirmOrder")
-			on(Exception).to("confirmOrder")
-		}
-		*/
+
 		finish {
 			
 			action {
@@ -175,7 +174,8 @@ class PurchaseOrderWorkflowController {
 					if (!orderService.saveOrder(flow.order)) {
 						return error()
 					}
-					else { 
+					else {
+						flash.message = "You have successfully created a new purchase order.  Please select Issue PO "
 						return success()
 					} 
 					
@@ -190,7 +190,8 @@ class PurchaseOrderWorkflowController {
 			//redirect(controller:"order", action: "list")
             redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
 		}
-		showOrder { 
+		showOrder {
+
 			redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
 		}
 		
