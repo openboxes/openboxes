@@ -29,7 +29,7 @@ class MailService {
 	def grailsApplication 
 	def config = ConfigurationHolder.config
 	def prefix = "${config.grails.mail.prefix}" //[OpenBoxes
-	def from = "${config.grails.mail.from}" // openboxes@pih.org
+	def from = "${config.grails.mail.from}" // info@openboxes.com
 	def host= "${config.grails.mail.host}" // localhost
 	def port = Integer.parseInt ("${config.grails.mail.port}") // 25;
 
