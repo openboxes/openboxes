@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.order
 
+import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
@@ -407,7 +408,66 @@ class OrderController {
 		
 	}
 
-    def print = {
+	def download = {
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+			//render(text: 'Unable to find purchase order found', status: 404)
+
+		}
+		else {
+
+			def date = new Date();
+			response.setHeader("Content-disposition", "attachment; filename='PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv'")
+			response.contentType = "text/csv"
+			def csv = "PO Number,${orderInstance?.orderNumber}\n" +
+					"Description,${StringEscapeUtils.escapeCsv(orderInstance?.description)}\n" +
+					"Vendor,${StringEscapeUtils.escapeCsv(orderInstance?.origin.name)}\n" +
+					"Ship to,${orderInstance?.destination?.name}\n" +
+					"Ordered by,${orderInstance?.orderedBy?.name} ${orderInstance?.orderedBy?.email}\n" +
+					"\n"
+
+			csv += 	"${warehouse.message(code:'product.productCode.label')}," +
+					"${warehouse.message(code:'product.name.label')}," +
+					"${warehouse.message(code:'product.vendorCode.label')}," +
+					"${warehouse.message(code:'orderItem.quantity.label')}," +
+					"${warehouse.message(code:'product.unitOfMeasure.label')}," +
+					"${warehouse.message(code:'orderItem.unitPrice.label')}," +
+					"${warehouse.message(code:'orderItem.totalPrice.label')}" +
+					"\n"
+
+			def totalPrice = 0.0
+			orderInstance?.listOrderItems()?.each { orderItem ->
+				totalPrice += orderItem.totalPrice()?:0
+				csv +=	"${orderItem?.product?.productCode}," +
+						"${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
+						"${orderItem?.product?.vendorCode?:''}," +
+						"${orderItem?.quantity}," +
+						"${orderItem?.product?.unitOfMeasure}," +
+						"${formatNumber(number:orderItem?.unitPrice, maxFractionDigits: 4)}," +
+						"${formatNumber(number:orderItem?.totalPrice(), maxFractionDigits: 2)}" +
+						"\n"
+			}
+			csv += ",,,,,${formatNumber(number:totalPrice,maxFractionDigits: 2)}\n"
+			render csv
+
+		}
+	}
+
+	def upload = {
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [orderInstance: orderInstance]
+		}
+	}
+
+
+	def print = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
