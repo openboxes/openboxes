@@ -1255,7 +1255,7 @@ class JsonController {
      * Stock Card > Snapshot graph
      */
     def getQuantityOnHandByMonth = {
-        println params;
+        log.info params;
         def dates = []
         def format = "MMM-yy"
         def numMonths = (params.numMonths as int)?:12
@@ -1266,7 +1266,15 @@ class JsonController {
         today.clearTime()
 
 
-        if (numMonths >= 7) {
+        if (numMonths >= 24) {
+            use(groovy.time.TimeCategory) {
+                numMonths.times { i ->
+                    dates << (today - (i+1).months)
+                }
+            }
+            format = "yyyy"
+        }
+        else if (numMonths > 12) {
             use(groovy.time.TimeCategory) {
                 numMonths.times { i ->
                     dates << (today - (i+1).months)
@@ -1274,13 +1282,21 @@ class JsonController {
             }
             format = "MMM-yy"
         }
+        else if (numMonths >= 6) {
+            use(groovy.time.TimeCategory) {
+                numMonths.times { i ->
+                    dates << (today - (i+1).months)
+                }
+            }
+            format = "MMM-yyyy"
+        }
         else if (numMonths >= 2) {
             use(groovy.time.TimeCategory) {
                 (numMonths*4).times { i ->
                     dates << (today - (i+1).weeks)
                 }
             }
-            format = "'Week' W"
+            format = "'wk' w"
         }
         else {
             use(groovy.time.TimeCategory) {
@@ -1290,11 +1306,12 @@ class JsonController {
             }
             format = "dd-MMM"
         }
-        println "dates: " + dates
-
+        log.info "dates: " + dates
+        dates = dates.sort()
+        log.info "dates sorted: " + dates
 
         // initialize data
-        def data = dates.sort().inject([:].withDefault { [label: null, days: 0, totalQuantity: 0, maxQuantity: 0, month: 0, year: 0, day: 0] }) { map, date ->
+        def data = dates.inject([:].withDefault { [label: null, date: null, days: 0, totalQuantity: 0, maxQuantity: 0, month: 0, year: 0, day: 0] }) { map, date ->
             def dateKey = date.format(format)
             map[dateKey].label = dateKey
             map[dateKey].day = date.day
@@ -1306,21 +1323,26 @@ class JsonController {
             map
         }
 
-        def newData = []
+        log.info "Data initialized " + data
+
+
+        // Get all inventory snapshots for the current product and location
         //def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
         def inventorySnapshots = InventorySnapshot.createCriteria().list() {
             eq("product", product)
             eq("location", location)
             between("date", dates[0], dates[dates.size()-1])
+            order("date", "asc")
         }
 
-
-        println "dates: " + dates
-        println "inventorySnapshots: " + inventorySnapshots*.date
+        def newData = []
+        log.info "dates: " + dates
+        log.info "inventorySnapshots: " + inventorySnapshots*.date
         if (inventorySnapshots) {
             def items = inventorySnapshots.collect { [date:it.date, quantityOnHand:it.quantityOnHand] }
-            items.each { item ->
+            items.sort { it.date }.each { item ->
                 def dateKey = item.date.format(format)
+                data[dateKey].date = item.date
                 data[dateKey].label = dateKey
                 data[dateKey].month = item.date.month
                 data[dateKey].day = item.date.day
@@ -1335,6 +1357,8 @@ class JsonController {
 
 
             data.each { key, value ->
+                log.info "KEY: " + key
+                log.info "VALUE: " + value
                 if (value.days) {
                     //newData << [key, (value.totalQuantity/value.days) ]
                     newData << [key, (value.maxQuantity) ]

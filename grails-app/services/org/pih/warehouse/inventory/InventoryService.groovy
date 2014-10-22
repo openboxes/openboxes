@@ -3610,7 +3610,7 @@ class InventoryService implements ApplicationContextAware {
                     }
                 //}
             }
-            log.info "Saved inventory snapshot for products over locations"
+            log.info "Saved inventory snapshot for products=ALL, location=${location}, date=${date}"
         } catch (Exception e) {
             log.error("Unable to complete inventory snapshot process", e)
         }
@@ -3628,7 +3628,7 @@ class InventoryService implements ApplicationContextAware {
                 updateInventorySnapshot(date, product, location, quantity)
                 //}
             }
-            log.info "Saved inventory snapshot for products over locations"
+			log.info "Saved inventory snapshot for product=${product.productCode}, location=${location}, dates=ALL"
         } catch (Exception e) {
             log.error("Unable to complete inventory snapshot process", e)
         }
@@ -3636,7 +3636,7 @@ class InventoryService implements ApplicationContextAware {
 
 
 
-    def createOrUpdateInventorySnapshot(date, location, product) {
+    def createOrUpdateInventorySnapshot(Date date, Location location, Product product) {
         try {
             def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
             println "Date ${date}, location ${location}: " + inventorySnapshots
@@ -3645,7 +3645,7 @@ class InventoryService implements ApplicationContextAware {
                 def quantity = getQuantity(product, location, date)
                 updateInventorySnapshot(date, product, location, quantity)
             }
-            log.info "Saved inventory snapshot for products over locations"
+			log.info "Saved inventory snapshot for product=${product.productCode}, location=${location}, date=${date}"
         } catch (Exception e) {
             log.error("Unable to complete inventory snapshot process", e)
         }

@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.product.Product" %>
 <style>
     #placeholder { width: 100%; height: 400px; border: 0px solid black; }
     .legend table { width: auto; }
@@ -16,40 +17,45 @@
         <tr>
             <td class="middle right">
                 <label for="numMonths">
-                    <warehouse:message code="default.duration.label" default="Num of months"/></label>
+                    <warehouse:message code="default.duration.label" default="Duration"/></label>
             </td>
             <td class="middle">
-                <g:select id="numMonths" name="numMonths" value="${params.numMonths?:12}" from="[1:'Last 1 month', 2:'Last 2 months',3:'Last 3 months',6:'Last 6 months',9:'Last 9 months',12:'Last 12 months',18:'Last 18 months',24:'Last 24 months',36:'Last 36 months']" optionKey="key" optionValue="value"></g:select>
+                <g:select id="numMonths" name="numMonths" value="${params.numMonths?:12}"
+                          from="[1:'Last 1 month', 2:'Last 2 months',3:'Last 3 months',6:'Last 6 months',9:'Last 9 months',12:'Last 12 months',18:'Last 18 months',24:'Last 2 years',36:'Last 3 years',48:'Last 4 years',60:'Last 5 years',60:'Last 5 years',72:'Last 6 years',84:'Last 7 years',96:'Last 8 years',108:'Last 9 years',120:'Last 10 years']" optionKey="key" optionValue="value"></g:select>
             </td>
         </tr>
 
     </table>
 
-
     <div class="demo-container">
-        <div id="placeholder" class="demo-placeholder" style="height:400px;"></div>
+        <div id="placeholder" class="demo-placeholder" style="height:400px; padding: 10px"></div>
     </div>
-    <div class="right">
+    <div class="right" style="margin:5px;">
 
-        <a href="javascript:downloadGraph();">Download graph</a>
-
+        <%--
+        <a href="javascript:downloadGraph();" class="button icon graph">Download graph</a>
+        --%>
         <g:remoteLink controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"
-                      onSuccess="javascript:plotGraph(12);"
+                      class="button icon reload"
                       params="['product.id':product.id,'location.id':session.warehouse.id]">Refresh data</g:remoteLink>
 
     </div>
+
 </div>
+
+
 
 
 
 <%--<script src="${createLinkTo(dir:'js/flot/', file:'jquery.js')}" type="text/javascript" ></script>--%>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.categories.js')}" type="text/javascript" ></script>
+<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.canvas.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.resize.js')}" type="text/javascript" ></script>
 
 <script type="text/javascript">
 
-    $(function() {
+    $( document ).ready(function() {
 
         $("#numMonths").change(function() {
             var numMonths = $(this).val();
@@ -142,7 +148,8 @@
     }
 
     function downloadGraph() {
-        var myCanvas = $("#placeholder").getCanvas();
+        var graph = $("#placeholder");
+        var myCanvas = graph.getCanvas();
                 //var myCanvas = myGraph.getCanvas();
         var image = myCanvas.toDataURL();
         image = image.replace("image/png","image/octet-stream");
