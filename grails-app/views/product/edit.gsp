@@ -47,7 +47,7 @@
                             <li><a href="#tabs-status"><warehouse:message code="product.stockLevel.label" default="Stock levels"/></a></li>
                             <%--<li><a href="#tabs-tags"><warehouse:message code="product.tags.label"/></a></li>--%>
                             <li><a href="#tabs-synonyms"><warehouse:message code="product.synonyms.label"/></a></li>
-                            <li><a href="#tabs-productGroups"><warehouse:message code="product.productGroups.label"/></a></li>
+                            <li><a href="#tabs-productGroups"><warehouse:message code="product.substitutions.label"/></a></li>
 							<li><a href="#tabs-packages"><warehouse:message code="packages.label"/></a></li>
 							<li><a href="#tabs-documents"><warehouse:message code="product.documents.label"/></a></li>
                             <li><a href="#tabs-attributes"><warehouse:message code="product.attributes.label" default="Attributes"/></a></li>
@@ -653,7 +653,7 @@
 
                         <div id="tabs-productGroups" style="padding: 10px;" class="ui-tabs-hide">
                             <div class="box">
-                                <h2><warehouse:message code="product.productGroups.label" default="Product groups"/></h2>
+                                <h2><warehouse:message code="product.substitutions.label" default="Substitutions"/></h2>
                                 <g:render template="productGroups" model="[product: productInstance, productGroups:productInstance?.productGroups]"/>
                             </div>
                         </div>

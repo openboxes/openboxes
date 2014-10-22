@@ -1,5 +1,5 @@
 <div class="box">
-    <h2><warehouse:message code="product.alternativeProducts.label"/></h2>
+    <h2><warehouse:message code="product.substitutions.label"/></h2>
     <table >
         <thead>
             <tr class="odd">

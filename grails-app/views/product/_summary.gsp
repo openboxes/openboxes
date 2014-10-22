@@ -98,17 +98,21 @@
             </td>
             <td>
                 <div class="button-container">
-                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button  ${actionName=='showStockCard'?'active':''}">
-                        ${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
+                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
+						<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
+						${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
                     </g:link>
-                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button ${actionName=='edit'?'active':''}">
+                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
+						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                         ${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
                     </g:link>
-                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button ${actionName=='showRecordInventory'?'active':''}">
-                        ${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
+                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button">
+						<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
+						${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
                     </g:link>
                     <g:link controller='inventory' action='browse' class="button">
-                        ${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
+						<img src="${resource(dir: 'images/icons/silk', file: 'application_form_magnify.png')}" />&nbsp;
+						${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
                     </g:link>
                 </div>
             </td>
