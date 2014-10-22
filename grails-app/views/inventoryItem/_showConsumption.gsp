@@ -65,104 +65,108 @@
                 </tr>
                 <tr class="prop data fade">
                     <td colspan="7">
-                        <table class="box fade">
-                            <tr>
-                                <th><warehouse:message code="requisition.dateRequested.label"/></th>
-                                <th><warehouse:message code="requisition.requestNumber.label"/></th>
-                                <th><warehouse:message code="requisition.status.label"/></th>
-                                <th><warehouse:message code="requisition.origin.label"/></th>
-                                <th><warehouse:message code="requisitionItem.status.label"/></th>
-                                <th><warehouse:message code="requisitionItem.cancelReasonCode.label"/></th>
-                                <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
-                                <th class="center middle"><warehouse:message code="requisitionItem.quantityCanceled.label"/></th>
-                                <th class="center middle"><warehouse:message code="requisitionItem.quantityApproved.label"/></th>
-                                <th class="center middle"><warehouse:message code="requisitionItem.quantityPicked.label"/></th>
-                                <th class="center middle"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
+                        <div class="box">
+                            <h2>${entry.key}</h2>
+                            <table>
+                                <tr>
+                                    <th><warehouse:message code="requisition.dateRequested.label"/></th>
+                                    <th><warehouse:message code="requisition.requestNumber.label"/></th>
+                                    <th><warehouse:message code="requisition.status.label"/></th>
+                                    <th><warehouse:message code="requisition.origin.label"/></th>
+                                    <th><warehouse:message code="requisitionItem.status.label"/></th>
+                                    <th><warehouse:message code="requisitionItem.cancelReasonCode.label"/></th>
+                                    <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
+                                    <th class="center middle"><warehouse:message code="requisitionItem.quantityCanceled.label"/></th>
+                                    <th class="center middle"><warehouse:message code="requisitionItem.quantityApproved.label"/></th>
+                                    <th class="center middle"><warehouse:message code="requisitionItem.quantityPicked.label"/></th>
+                                    <th class="center middle"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
 
-                            </tr>
-
-
-                            <g:set var="innerQuantityRequested" value="${0}"/>
-                            <g:set var="innerQuantityApproved" value="${0}"/>
-                            <g:set var="innerQuantityCanceled" value="${0}"/>
-                            <g:set var="innerQuantityPicked" value="${0}"/>
-                            <g:set var="innerQuantityIssued" value="${0}"/>
-                            <g:each var="requisitionItem" in="${entry.value.sort { it.requisition.dateRequested }}" status="j">
-
-                                <g:set var="quantityRequested" value="${requisitionItem?.quantity?:0}"/>
-                                <g:set var="quantityApproved" value="${requisitionItem?.quantityApproved?:0}"/>
-                                <g:set var="quantityCanceled" value="${requisitionItem?.quantityCanceled?:0}"/>
-                                <g:set var="quantityPicked" value="${requisitionItem?.calculateQuantityPicked()?:0}"/>
-                                <g:set var="quantityIssued" value="${quantityRequested - quantityCanceled}"/>
-
-                                <g:set var="innerQuantityRequested" value="${innerQuantityRequested + quantityRequested}"/>
-                                <g:set var="innerQuantityApproved" value="${innerQuantityApproved + quantityApproved}"/>
-                                <g:set var="innerQuantityCanceled" value="${innerQuantityCanceled + quantityCanceled}"/>
-                                <g:set var="innerQuantityPicked" value="${innerQuantityPicked + quantityPicked}"/>
-                                <g:set var="innerQuantityIssued" value="${innerQuantityIssued + quantityIssued}"/>
-
-
-                                <tr class="prop ${j%2?'odd':'even'}">
-                                    <td>
-                                        <g:formatDate date="${requisitionItem.requisition.dateRequested}" format="MMM dd"/>
-                                    </td>
-                                    <td>
-                                        <g:link controller="requisition" action="show" id="${requisitionItem?.requisition?.id}">
-                                            ${requisitionItem.requisition.requestNumber}
-                                        </g:link>
-                                    </td>
-                                    <td>
-                                        ${requisitionItem.requisition.status}
-                                    </td>
-                                    <td>
-                                        ${requisitionItem.requisition.origin}
-                                    </td>
-                                    <td>
-                                        ${requisitionItem.status}
-                                    </td>
-                                    <td>
-                                        ${requisitionItem.cancelReasonCode}
-                                    </td>
-                                    <td class="center middle">
-                                        ${quantityRequested}
-                                    </td>
-                                    <td class="center middle">
-                                        ${quantityCanceled}
-                                    </td>
-                                    <td class="center middle">
-                                        ${quantityApproved}
-                                    </td>
-                                    <td class="center middle">
-                                        ${quantityPicked}
-                                    </td>
-                                    <td class="center middle">
-                                        ${quantityIssued}
-                                    </td>
                                 </tr>
-                            </g:each>
-                            <tfoot>
-                            <tr>
-                                <td colspan="6">
 
-                                </td>
-                                <td class="center">
-                                    <g:formatNumber number="${innerQuantityRequested}" maxFractionDigits="0"/>
-                                </td>
-                                <td class="center">
-                                    <g:formatNumber number="${innerQuantityCanceled}" maxFractionDigits="0"/>
-                                </td>
-                                <td class="center">
-                                    <g:formatNumber number="${innerQuantityApproved}" maxFractionDigits="0"/>
-                                </td>
-                                <td class="center">
-                                    <g:formatNumber number="${innerQuantityPicked}" maxFractionDigits="0"/>
-                                </td>
-                                <td class="center">
-                                    <g:formatNumber number="${innerQuantityIssued}" maxFractionDigits="0"/>
-                                </td>
-                            </tr>
-                            </tfoot>
-                        </table>
+
+                                <g:set var="innerQuantityRequested" value="${0}"/>
+                                <g:set var="innerQuantityApproved" value="${0}"/>
+                                <g:set var="innerQuantityCanceled" value="${0}"/>
+                                <g:set var="innerQuantityPicked" value="${0}"/>
+                                <g:set var="innerQuantityIssued" value="${0}"/>
+                                <g:each var="requisitionItem" in="${entry.value.sort { it.requisition.dateRequested }}" status="j">
+
+                                    <g:set var="quantityRequested" value="${requisitionItem?.quantity?:0}"/>
+                                    <g:set var="quantityApproved" value="${requisitionItem?.quantityApproved?:0}"/>
+                                    <g:set var="quantityCanceled" value="${requisitionItem?.quantityCanceled?:0}"/>
+                                    <g:set var="quantityPicked" value="${requisitionItem?.calculateQuantityPicked()?:0}"/>
+                                    <g:set var="quantityIssued" value="${quantityRequested - quantityCanceled}"/>
+
+                                    <g:set var="innerQuantityRequested" value="${innerQuantityRequested + quantityRequested}"/>
+                                    <g:set var="innerQuantityApproved" value="${innerQuantityApproved + quantityApproved}"/>
+                                    <g:set var="innerQuantityCanceled" value="${innerQuantityCanceled + quantityCanceled}"/>
+                                    <g:set var="innerQuantityPicked" value="${innerQuantityPicked + quantityPicked}"/>
+                                    <g:set var="innerQuantityIssued" value="${innerQuantityIssued + quantityIssued}"/>
+
+
+                                    <tr class="prop ${j%2?'odd':'even'}">
+                                        <td>
+                                            <g:formatDate date="${requisitionItem.requisition.dateRequested}" format="MMM dd"/>
+                                        </td>
+                                        <td>
+                                            <g:link controller="requisition" action="show" id="${requisitionItem?.requisition?.id}">
+                                                ${requisitionItem.requisition.requestNumber}
+                                            </g:link>
+                                        </td>
+                                        <td>
+                                            ${requisitionItem.requisition.status}
+                                        </td>
+                                        <td>
+                                            ${requisitionItem.requisition.origin}
+                                        </td>
+                                        <td>
+                                            ${requisitionItem.status}
+                                        </td>
+                                        <td>
+                                            ${requisitionItem.cancelReasonCode}
+                                        </td>
+                                        <td class="center middle">
+                                            ${quantityRequested}
+                                        </td>
+                                        <td class="center middle">
+                                            ${quantityCanceled}
+                                        </td>
+                                        <td class="center middle">
+                                            ${quantityApproved}
+                                        </td>
+                                        <td class="center middle">
+                                            ${quantityPicked}
+                                        </td>
+                                        <td class="center middle">
+                                            ${quantityIssued}
+                                        </td>
+                                    </tr>
+                                </g:each>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6">
+
+                                        </td>
+                                        <td class="center">
+                                            <g:formatNumber number="${innerQuantityRequested}" maxFractionDigits="0"/>
+                                        </td>
+                                        <td class="center">
+                                            <g:formatNumber number="${innerQuantityCanceled}" maxFractionDigits="0"/>
+                                        </td>
+                                        <td class="center">
+                                            <g:formatNumber number="${innerQuantityApproved}" maxFractionDigits="0"/>
+                                        </td>
+                                        <td class="center">
+                                            <g:formatNumber number="${innerQuantityPicked}" maxFractionDigits="0"/>
+                                        </td>
+                                        <td class="center">
+                                            <g:formatNumber number="${innerQuantityIssued}" maxFractionDigits="0"/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
 
 
                     </td>
