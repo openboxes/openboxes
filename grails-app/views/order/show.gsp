@@ -49,7 +49,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
+                                    <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                                         <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}">
                                             <td>
                                                 <g:if test="${orderItem?.product }">
@@ -103,7 +103,7 @@
 
                         </div>
                         <div id="tabs-shipments" style="padding: 10px;" class="ui-tabs-hide">
-                            <g:if test="${orderInstance?.shipments() }">
+                            <g:if test="${orderInstance?.listShipments() }">
                                 <table>
                                     <thead>
                                     <tr class="odd">
@@ -112,7 +112,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <g:each var="shipmentInstance" in="${orderInstance?.shipments()}" status="i">
+                                    <g:each var="shipmentInstance" in="${orderInstance?.listShipments()}" status="i">
                                         <tr>
                                             <td>
                                                 <format:metadata obj="${shipmentInstance?.shipmentType}"/>

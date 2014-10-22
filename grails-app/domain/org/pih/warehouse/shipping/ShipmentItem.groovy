@@ -82,7 +82,7 @@ class ShipmentItem implements Comparable, Serializable {
 	}
 	
 
-	def orderItems() {
+	def listOrderItems() {
 		return orderShipments.collect{it.orderItem}
 	}
 

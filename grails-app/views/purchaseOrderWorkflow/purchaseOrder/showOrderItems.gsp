@@ -45,7 +45,7 @@
                     </thead>
                     <tbody>
                         <g:set var="i" value="${0 }"/>
-                        <g:each var="orderItem" in="${order?.orderItems}">
+                        <g:each var="orderItem" in="${order?.listOrderItems()}">
                             <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
                                 <g:hiddenField name="orderItems[${i }].order.id" value="${orderItem?.order?.id }" size="5"/>
 
@@ -64,10 +64,14 @@
                                     ${i}
                                 </td>
                                 <td class="middle">
-                                    ${orderItem?.product?.productCode}
+                                    <g:link controller="inventoryItem" action="showStockCard" id="${orderItem?.product?.id}">
+                                        ${orderItem?.product?.productCode}
+                                    </g:link>
                                 </td>
                                 <td class="middle">
-                                    ${orderItem?.product?.name?:orderItem?.description?.encodeAsHTML()}
+                                    <g:link controller="inventoryItem" action="showStockCard" id="${orderItem?.product?.id}">
+                                        ${orderItem?.product?.name?:orderItem?.description?.encodeAsHTML()}
+                                    </g:link>
                                 </td>
                                 <td class="middle">
                                     ${orderItem?.product?.vendor?:"N/A"}
@@ -102,18 +106,20 @@
                                     <div class="fade center empty">
                                         <p name="numItemInOrder">
                                             <warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/>
-                                            <button class="button icon add add-item-button">${warehouse.message(code:'order.button.addItem.label', default: 'Add item')}</button>
                                         </p>
                                     </div>
                                 </td>
                             </tr>
-
                         </g:unless>
+                        <tr class="prop">
+                            <td colspan="10" class="center">
+                                <button class="button icon add add-item-button">${warehouse.message(code:'order.button.addItem.label', default: 'Add line item')}</button>
+                            </td>
+                        </tr>
                     </tbody>
                     <tfoot>
                         <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
                             <th>
-                                <button class="button icon add add-item-button">${warehouse.message(code:'order.button.addItem.label', default: 'Add item')}</button>
                             </th>
                             <th colspan="9" class="right">
                                 <warehouse:message code="default.total.label"/>
@@ -157,7 +163,7 @@
                                 <td valign='top' class='name'><label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label></td>
                                 <td valign='top' class='value'>
                                     <input type="text" id="unitPrice" name='unitPrice' value="" size="10" class="text" />
-                                    <span class="fade"><warehouse:message code="order.unitPrice.helpText" default="Up to four decimal places (e.g. 0.0001)"/></span>
+                                    <div class="fade"><warehouse:message code="order.unitPrice.hint"/></div>
                                 </td>
                             </tr>
                         </tbody>
@@ -215,7 +221,7 @@
                         </td>
                         <td valign='top' class='value'>
                             <input type="text" id="edit-unitPrice" name='unitPrice' value="" size="10" class="text" />
-                            <span class="fade"><warehouse:message code="order.unitPrice.helpText" default="Up to four decimal places (e.g. 0.0001)"/></span>
+                            <div class="fade"><warehouse:message code="order.unitPrice.hint"/></div>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -256,8 +262,8 @@
 
 
         $(document).ready(function(){
-            $("#add-item-dialog").dialog({autoOpen:false, modal: true, width: 600, height: 350, title: "Add item to purchase order"});
-            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 600, height: 350, title: "Add item to purchase order"});
+            $("#add-item-dialog").dialog({autoOpen:false, modal: true, width: 800, height: 400, title: "Add line item"});
+            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 800, height: 400, title: "Edit line item"});
             $(".add-item-button").click(function(event){
                 event.preventDefault();
                 $("#add-item-dialog").dialog("open");

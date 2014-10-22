@@ -91,7 +91,7 @@ class OrderService {
 		orderCommand.orderedBy = Person.get(orderInstance?.orderedBy?.id)
 		orderCommand.dateOrdered = orderInstance?.dateOrdered
 		orderCommand.order = orderInstance;
-		orderInstance?.orderItems?.each {
+		orderInstance?.listOrderItems()?.each {
 			def orderItemCommand = new OrderItemCommand();
 			orderItemCommand.primary = true;
 			orderItemCommand.orderItem = it
@@ -112,7 +112,7 @@ class OrderService {
 	 */
 	OrderCommand saveOrderShipment(OrderCommand orderCommand) { 
 		def shipmentInstance = new Shipment()
-		def shipments = orderCommand?.order?.shipments();
+		def shipments = orderCommand?.order?.listShipments();
 		def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1;
 		
 		shipmentInstance.name = orderCommand?.order?.description + " - " + "Shipment #"  + numberOfShipments 
@@ -131,6 +131,7 @@ class OrderService {
 				// Find or create a new inventory item based on the product and lot number provided
 				def inventoryItem = null
 
+				// Need to use new session here otherwise it flushes the current session and causes an error
 				InventoryItem.withNewSession {
 					inventoryItem = inventoryService.findOrCreateInventoryItem(orderItemCommand.productReceived, orderItemCommand.lotNumber, orderItemCommand.expirationDate)
 				}

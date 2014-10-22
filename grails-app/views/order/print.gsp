@@ -190,7 +190,7 @@
 
                                 <tbody>
 
-                                <g:each var="orderItem" in="${orderInstance?.orderItems }" status="i">
+                                <g:each var="orderItem" in="${orderInstance?.listOrderItems() }" status="i">
                                     <tr style="${i%2?'odd':'even'}">
                                         <td class="center">
                                             ${i+1 }

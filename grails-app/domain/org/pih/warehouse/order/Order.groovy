@@ -112,8 +112,13 @@ class Order implements Serializable {
 		return (status == OrderStatus.RECEIVED)
 	}
 	
-	def shipments() { 
-		return orderItems.collect { it.shipments() }.flatten().unique() { it?.id }
+	def listShipments() {
+		return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
+	}
+
+
+	def listOrderItems() {
+		return orderItems.sort { it.dateCreated }
 	}
 	
 	def totalPrice() { 

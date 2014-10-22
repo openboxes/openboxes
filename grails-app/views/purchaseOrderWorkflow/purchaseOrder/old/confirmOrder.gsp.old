@@ -82,7 +82,7 @@
 												</tr>
 											</thead>
 											<tbody>
-												<g:each var="orderItem" in="${order.orderItems}" status="i">
+												<g:each var="orderItem" in="${order.listOrderItems()}" status="i">
 													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 														<td>
 															<g:if test="${orderItem?.product }">

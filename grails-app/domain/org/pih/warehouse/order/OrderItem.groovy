@@ -115,7 +115,7 @@ class OrderItem implements Serializable {
 	 * 
 	 * @return
 	 */
-	def shipments() { 
+	def listShipments() {
 		def shipments = []
 		orderShipments.each { 
 			try { 
