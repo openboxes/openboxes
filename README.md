@@ -104,22 +104,30 @@ grails.mail.enabled=false
 
 NOTE: If you are running in development mode with a copy of an existing production database, you will need to
 instruct the application to not setup test fixtures automatically by uncommenting the above property:
+```
 openboxes.fixtures.enabled=false
+```
 
-##### Compile or "upgrade" grails version and plugins for grails
-Either of these actions should start the dependency resolution process.  
+##### Upgrade the project to the currently installed grails version 
+Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
 
-**IMPORTANT** You may need to run either of these commands multiple times in order to resolve all dependencies.
+```    
+grails upgrade
+```
+OR
 
 ```    
 grails compile
 ```
 
-OR
+The `grails compile` step is not necessary since `grails run-app` will invoke the compilation step, but it doesn't hurt anything.
 
-```    
-grails upgrade
-```
+If you see any errors, run the command again.  
+
+**IMPORTANT** That last line is important.  Because of some quirkiness with the way older versions of Grails resolve dependencies and generates config files, you may need to run either of these commands multiple times in order to resolve all dependencies and generate the config files.
+
+Once the dependency resolution phase has completed, all dependencies will be stored in a local ivy cache (usually under `$USER_HOME/.grails/ivy-cache`).  You do not have to worry about this, just know that the dependencies are now on your machine and Grails will attempt to find them there before it tries to resolve them in a remote repository. 
+
 ##### Start application 
 The application can be run in development mode.  This starts the application running in an instance of Tomcat within the Grails console.
 You may need to run 'grails run-app' several times in order to download all dependencies.
@@ -133,4 +141,17 @@ http://localhost:8080/openboxes
 ```
 
 ##### Log into OpenBoxes 
-You can use the default accounts (manager:password OR admin:password) and create your own accounts.
+You can use the default accounts (manager:password OR admin:password).  Once you are logged in as an admin, you can create own account.  Or you can use the signup form to create a new account.
+
+### Troubleshooting
+#### Problem
+```
+Caused by: java.io.FileNotFoundException: Could not open ServletContext resource [/WEB-INF/applicationContext.xml]
+```
+#### Solution
+Execute the grails upgrade command in order to generate the files nece
+```
+$ grails upgrade
+```
+See the following stackoverflow article:
+http://stackoverflow.com/questions/24243027/grails-spring-security-sample-application-not-working
