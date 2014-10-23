@@ -17,9 +17,9 @@ By using this software in any fashion, you are agreeing to be bound by
 the terms of this license.
 You must not remove this notice, or any other, from this software.
 
-### Setup dev environment
+### Setup development environment
 
-####Dependencies
+#### Install Dependencies
 
 * [Eclipse IDE for Java EE Developers](http://www.eclipse.org/downloads)
 * Java 1.6
@@ -32,7 +32,7 @@ You must not remove this notice, or any other, from this software.
 
 These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](https://github.com/openboxes/openboxes/wiki/Installation) page.
 
-##### Install dependencies
+##### 1. Install dependencies
 
 * Install dependencies above
 * Install latest version of GVM (http://gvmtool.net/)
@@ -41,7 +41,7 @@ These instructions are for developers only.  If you are a user/implementer, plea
 gvm install grails 1.3.7
 ```
 
-##### Clone repository 
+##### 2. Clone repository 
 * If you are a not core contributor, fork [openboxes git repository](https://github.com/openboxes/openboxes)
 * If you are a core contributor:
 ```
@@ -49,17 +49,17 @@ git clone git@github.com:openboxes/openboxes.git
 ```
 Otherwise, replace git url with the one of your forked repository
 
-##### Create openboxes database 
+##### 3. Create openboxes database 
 ```
 mysql -u root -p -e 'create database openboxes default charset utf8;'
 ```
-##### Create openboxes user 
+##### 4. Create openboxes user 
 ```
 mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
 ```
 
-##### Create Openboxes configuration file 
-Add `$HOME/.grails/openboxes-config.properties`
+##### 5. Create Openboxes configuration file 
+Edit `$HOME/.grails/openboxes-config.properties`
 
 ```
 # Database connection settings
@@ -108,7 +108,7 @@ instruct the application to not setup test fixtures automatically by uncommentin
 openboxes.fixtures.enabled=false
 ```
 
-##### Upgrade the project to the currently installed grails version 
+##### 6. Upgrade the project to the currently installed grails version 
 Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
 
 ```    
@@ -128,19 +128,19 @@ If you see any errors, run the command again.
 
 Once the dependency resolution phase has completed, all dependencies will be stored in a local ivy cache (usually under `$USER_HOME/.grails/ivy-cache`).  You do not have to worry about this, just know that the dependencies are now on your machine and Grails will attempt to find them there before it tries to resolve them in a remote repository. 
 
-##### Start application 
+##### 7. Start application in development mode
 The application can be run in development mode.  This starts the application running in an instance of Tomcat within the Grails console.
 You may need to run 'grails run-app' several times in order to download all dependencies.
 ```
 grails run-app
 ```
 
-##### Open application in Google Chrome 
+##### 8. Open application in Google Chrome 
 ```
 http://localhost:8080/openboxes
 ```
 
-##### Log into OpenBoxes 
+##### 9. Log into OpenBoxes 
 You can use the default accounts (manager:password OR admin:password).  Once you are logged in as an admin, you can create own account.  Or you can use the signup form to create a new account.
 
 ### Troubleshooting
