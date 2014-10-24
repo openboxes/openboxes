@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import grails.test.*
+import org.pih.warehouse.core.Location
 
 class OrderTests extends GrailsUnitTestCase {
     protected void setUp() {
@@ -20,7 +21,38 @@ class OrderTests extends GrailsUnitTestCase {
         super.tearDown()
     }
 
-    void testSomething() {
+    void testListOrderItemsWithEmptyOrder() {
+        Order order = new Order()
+        mockDomain(Order, [order])
+        assertNotNull order.listOrderItems()
+    }
 
+    void testListOrderItems() {
+        Order order = new Order()
+        mockDomain(Order, [order])
+        order.addToOrderItems([id: 1, dateCreated: new Date()-2])
+        order.addToOrderItems([id: 2, dateCreated: new Date()-3])
+        order.addToOrderItems([id: 3, dateCreated: new Date()-1])
+        println order.listOrderItems()
+        def orderItems = order.listOrderItems()
+        assertNotNull orderItems
+        assert orderItems.size() == 3
+
+        List<Integer> sortedItems = order.listOrderItems()*.id
+        // Was having an issue with the test, but then realized it was due to fact that IDs are strings
+        //assertEquals ([2,1,3], sortedItems)
+        assertEquals (["2","1","3"], sortedItems)
+
+        // For good measure
+        assertEquals "2", sortedItems[0]
+        assertEquals "1", sortedItems[1]
+        assertEquals "3", sortedItems[2]
+    }
+
+
+    void testTotalPriceWithEmptyOrder() {
+        Order order = new Order()
+        mockDomain(Order, [order])
+        assertEquals(0, order.totalPrice())
     }
 }

@@ -118,7 +118,7 @@ class Order implements Serializable {
 
 
 	def listOrderItems() {
-		return orderItems.sort { it.dateCreated }
+		return orderItems ? orderItems.sort { it.dateCreated } : []
 	}
 	
 	def totalPrice() { 
