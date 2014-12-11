@@ -39,7 +39,17 @@
                     <table>
                         <tbody>
                             <tr class='prop'>
-                                <td class='name top'><label for='description'>
+                                <td valign='top' class='name middle'>
+                                    <label for='orderNumber'><warehouse:message code="order.orderNumber.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
+                                    <input type="text" id="orderNumber" name='orderNumber'
+                                           value="${order?.orderNumber?.encodeAsHTML()}" size="50" class="text"
+                                           placeholder="${warehouse.message(code:'order.orderNumber.placeholder')}"/>
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td class='name top'><label for='status'>
                                     <warehouse:message code="order.status.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'status','errors')}'>
@@ -49,6 +59,33 @@
                                                   optionValue="${{format.metadata(obj:it)}}" value="${order?.status}"
                                                   noSelection="['':warehouse.message(code:'')]" />
 
+                                    </div>
+
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.orderedOn.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>
+                                    <g:jqueryDatePicker
+                                            id="dateOrdered"
+                                            name="dateOrdered"
+                                            value="${order?.dateOrdered?:new Date() }"
+                                            format="MM/dd/yyyy"
+                                            size="30"
+                                            showTrigger="false" />
+                                </td>
+                            </tr>
+
+
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='origin.id'>
+                                    <warehouse:message code="order.orderFrom.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+                                    <div style="width: 300px;">
+                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
+                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
                                     </div>
 
                                 </td>
@@ -70,51 +107,6 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td valign='top' class='name middle'>
-                                    <label for='orderNumber'><warehouse:message code="order.orderNumber.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
-                                    <input type="text" id="orderNumber" name='orderNumber'
-                                           value="${order?.orderNumber?.encodeAsHTML()}" size="50" class="text"
-                                           placeholder="${warehouse.message(code:'order.orderNumber.placeholder')}"/>
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.orderedOn.label"/></label></td>
-                                <td valign='top'
-                                    class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>
-                                    <g:jqueryDatePicker
-                                            id="dateOrdered"
-                                            name="dateOrdered"
-                                            value="${order?.dateOrdered?:new Date() }"
-                                            format="MM/dd/yyyy"
-                                            size="30"
-                                            showTrigger="false" />
-                                </td>
-                            </tr>
-
-                            <tr class='prop'>
-                                <td class='name top'><label for='description'>
-                                    <warehouse:message code="default.description.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
-                                    <textarea type="text" id="description" name='description' rows="3" placeholder="${warehouse.message(code:'order.description.placeholder')}" cols="80" class="text">${order?.description?.encodeAsHTML()}</textarea>
-
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='origin.id'>
-                                    <warehouse:message code="order.orderFrom.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-                                    <div style="width: 300px;">
-                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
-                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
-                                    </div>
-
-                                </td>
-                            </tr>
-                            <tr class='prop'>
                                 <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.orderedBy.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
@@ -124,7 +116,16 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr class='prop'>
+                                <td class='name top'><label for='description'>
+                                    <warehouse:message code="default.description.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
+                                    <textarea type="text" id="description" name='description' rows="5"
+                                              placeholder="${warehouse.message(code:'order.description.placeholder')}" cols="100" class="text large">${order?.description?.encodeAsHTML()}</textarea>
 
+                                </td>
+                            </tr>
 
                         </tbody>
                     </table>
