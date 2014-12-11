@@ -69,7 +69,7 @@ beans = {
 		jdbcUrl = CH.config.dataSource.url 
 		//connection test settings
 		idleConnectionTestPeriod = 2 * 60 * 60 // 2 hours
-		initialPoolSize = 50
+		initialPoolSize = 10
 		maxPoolSize = 100
 		maxStatements = 180
 		// test connections 
