@@ -445,11 +445,11 @@ class OrderController {
 						"${orderItem?.product?.vendorCode?:''}," +
 						"${orderItem?.quantity}," +
 						"${orderItem?.product?.unitOfMeasure}," +
-						"${formatNumber(number:orderItem?.unitPrice, maxFractionDigits: 4)}," +
-						"${formatNumber(number:orderItem?.totalPrice(), maxFractionDigits: 2)}" +
+						"${StringEscapeUtils.escapeCsv(formatNumber(number:orderItem?.unitPrice, maxFractionDigits: 4))}," +
+						"${StringEscapeUtils.escapeCsv(formatNumber(number:orderItem?.totalPrice(), maxFractionDigits: 2))}" +
 						"\n"
 			}
-			csv += ",,,,,${formatNumber(number:totalPrice,maxFractionDigits: 2)}\n"
+			csv += ",,,,,,${StringEscapeUtils.escapeCsv(formatNumber(number:totalPrice,maxFractionDigits: 2))}\n"
 			render csv
 
 		}
