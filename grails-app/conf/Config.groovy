@@ -297,6 +297,7 @@ log4j = {
             'org.codehaus.groovy.grails.web.pages',		// GSP			'com.mchange',
             'org.springframework',
 			'org.hibernate',
+			'com.mchange',
 			'org.pih.warehouse',
 			'grails.app',
             'grails.app.controller',
@@ -433,7 +434,7 @@ openboxes.scannerDetection.enabled = true
 
 
 // LDAP configuration
-openboxes.ldap.enabled = true
+openboxes.ldap.enabled = false
 openboxes.ldap.context.managerDn = "cn=read-only-admin,dc=example,dc=com"
 openboxes.ldap.context.managerPassword = "password"
 //openboxes.ldap.context.server = "ldap://ldap.forumsys.com:389"
