@@ -186,12 +186,13 @@ class UserService {
      * @return
      */
     def authenticate(username, password) {
-        def authenticated = false
-        def ldapEnabled = grailsApplication.config.openboxes.ldap.enabled?:false;
-        if (ldapEnabled) {
-            authenticated = authenticateUsingLdap(username, password)
-        }
-        return authenticated || authenticateUsingDatabase(username, password)
+        //def authenticated = false
+        //def ldapEnabled = grailsApplication.config.openboxes.ldap.enabled?:false;
+        //if (ldapEnabled) {
+        //    authenticated = authenticateUsingLdap(username, password)
+        //}
+        //return authenticated || authenticateUsingDatabase(username, password)
+        return authenticateUsingDatabase(username, password)
 
     }
 
