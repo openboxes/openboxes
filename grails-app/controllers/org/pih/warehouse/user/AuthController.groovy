@@ -59,8 +59,6 @@ class AuthController {
      * Performs the authentication logic.
      */
 	def handleLogin = {
-        log.info "Handle login " + params
-
 		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
 		if (userInstance) {
 
