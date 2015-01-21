@@ -719,10 +719,13 @@
                                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
                                 <tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''} shipmentItem">
                                     <g:if test="${newContainer }">
-                                        <td class="container top left" rowspan="${rowspan }">
+                                        <td class="top left" >
                                             <g:render template="container" model="[container:shipmentItem?.container]"/>
                                         </td>
                                     </g:if>
+									<g:else>
+										<td></td>
+									</g:else>
                                     <td>
                                         ${shipmentItem?.inventoryItem?.product?.productCode}
                                     </td>
