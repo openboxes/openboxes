@@ -11,6 +11,9 @@ google_analytics: ['UA-37396941-2', 'OpenBoxes']
 
 pages:
 
+# About:
+- ['index.md', 'About', 'OpenBoxes']
+
 # Installation
 - ['installation/index.md', 'Installation',  'Installation']
 - ['installation/ubuntu.md', 'Installation', 'Ubuntu']
@@ -22,9 +25,11 @@ pages:
 
 # Developer Guide
 # Continuous Integration
+# User Guide
+# HowTo
+# Cloud
 
-# About:
-- ['index.md', 'About', 'OpenBoxes']
-- ['release-notes.md', 'About', 'Release Notes']
+# Releases:
+- ['release-notes.md', 'Releases', 'Release Notes']
 
 
