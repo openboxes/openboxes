@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=master)](https://travis-ci.org/openboxes/openboxes)
+[![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=latest)](https://readthedocs.org/projects/openboxes/?badge=latest)
 
 OpenBoxes
 =========
