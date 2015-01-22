@@ -1,0 +1,30 @@
+site_name: OpenBoxes
+site_description: 
+site_author: Justin Miranda
+theme: readthedocs
+repo_url: https://github.com/openboxes/openboxes
+include_search: true
+#use_absolute_urls: true
+use_directory_urls: true
+copyright: Copyright &copy; 2015, OpenBoxes
+google_analytics: ['UA-37396941-2', 'OpenBoxes']
+
+pages:
+
+# Installation
+- ['installation/index.md', 'Installation',  'Installation']
+- ['installation/ubuntu.md', 'Installation', 'Ubuntu']
+#- ['installation/mac.md', 'Installation', 'Mac OS X']
+#- ['installation/windows.md', 'Installation', 'Windows']
+
+# Configuration
+- ['configuration.md', 'Configuration', 'Configuration']
+
+# Developer Guide
+# Continuous Integration
+
+# About:
+- ['index.md', 'About', 'OpenBoxes']
+- ['release-notes.md', 'About', 'Release Notes']
+
+
