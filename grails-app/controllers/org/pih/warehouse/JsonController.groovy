@@ -280,7 +280,7 @@ class JsonController {
     def getTotalStockValue = {
         def location = Location.get(session?.warehouse?.id)
         def result = inventoryService.getTotalStockValue(location)
-        def totalValue = g.formatNumber(number: result.totalStockValue, type: 'currency', currencyCode: 'USD')
+        def totalValue = g.formatNumber(number: result.totalStockValue)
 
         def map = [totalStockValue:result.totalStockValue, hitCount: result.hitCount, missCount: result.missCount, totalCount: result.totalCount]
         render map as JSON
@@ -1181,7 +1181,8 @@ class JsonController {
         def totalValue = 0
         totalValue = aaData.sum { it.totalValue?:0 }
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
-        numberFormat.currency = Currency.getInstance("USD")
+        String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode?:"USD"
+        numberFormat.currency = Currency.getInstance(currencyCode)
         numberFormat.maximumFractionDigits = 2
         numberFormat.minimumFractionDigits = 2
         def totalValueFormatted = numberFormat.format(totalValue?:0)

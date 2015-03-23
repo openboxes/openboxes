@@ -96,12 +96,12 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
                                 <th class="center border-right"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
-                                <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit (USD)"/></th>
-                                <th class="center"><warehouse:message code="product.totalValue.label" default="Total value (USD)"/></th>
+                                <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
+                                <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
                             </tr>
                             <g:each var="entry" in="${quantityMap.sort()}" status="i">
                                 <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
-                                <tr class="${i%2?'odd':'even'}">
+                                <tr class="prop ${i%2?'odd':'even'}">
                                     <td>
                                         <g:if test="${statusMap}">
                                             <g:set var="status" value="${statusMap[entry?.key]}"/>
@@ -117,7 +117,7 @@
                                     </td>
                                     <td>
                                         <g:link controller="inventoryItem" action="showStockCard" id="${entry.key.id}">
-                                            ${entry.key}
+                                            ${entry?.key?.name}
                                         </g:link>
                                     </td>
                                     <td>
@@ -193,7 +193,8 @@
                                     <th colspan="16">
                                         <div class="title right middle">
                                             <warehouse:message code="inventory.totalValue.label" default="Total value"/>
-                                            <g:formatNumber number="${totalStockValue}" type="currency" currencyCode="USD"/>
+                                            <g:formatNumber number="${totalStockValue}"/>
+                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </div>
 
                                     </th>

@@ -29,7 +29,7 @@ class MessageTagLib {
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 
         // If we just want the default behavior, uncomment the next three lines and comment out the rest of the method
-        Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+        Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
         out << defaultTagLib.message.call(attrs)
         return;
@@ -87,7 +87,7 @@ class MessageTagLib {
 
         // Display message in debug mode
         if (session.useDebugLocale) {
-            def locales = grailsApplication.config.locale.supportedLocales
+            def locales = grailsApplication.config.openboxes.locale.supportedLocales
             def localized = [:]
             def message = ""
             locales.each {
@@ -98,7 +98,7 @@ class MessageTagLib {
             }
             def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 
-            Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
             attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
 
             def image = (!hasOthers) ? 'decline' : 'accept';
@@ -123,7 +123,7 @@ class MessageTagLib {
         }
         // Display message normally
         else {
-            Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
             attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
             out << defaultTagLib.message.call(attrs)
         }

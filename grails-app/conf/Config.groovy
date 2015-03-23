@@ -18,10 +18,10 @@ import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 grails.config.locations = [ 
-	"classpath:${appName}-config.groovy",
 	"classpath:${appName}-config.properties",
-	"file:${userHome}/.grails/${appName}-config.groovy",
-	"file:${userHome}/.grails/${appName}-config.properties"
+	"classpath:${appName}-config.groovy",
+	"file:${userHome}/.grails/${appName}-config.properties",
+	"file:${userHome}/.grails/${appName}-config.groovy"
 ]
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
 
@@ -311,6 +311,7 @@ log4j = {
 
    debug 	'org.apache.cxf',
             'grails.plugin.rendering',
+		   	'org.apache.commons.mail',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
@@ -455,15 +456,18 @@ openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
 //openboxes.ldap.authorities.role.ROLE_ASSISTANT = "ou=assistants,dc=example,dc=com"
 //openboxes.ldap.authorities.role.ROLE_BROWSER = "ou=browsers,dc-example,dc=com"
 
-
-
 // Stock Card > Consumption > Reason codes
 // Examples: Stock out, Low stock, Expired, Damaged, Could not locate, Insufficient quantity reconditioned
 openboxes.stockCard.consumption.reasonCodes = [ ReasonCode.STOCKOUT, ReasonCode.LOW_STOCK, ReasonCode.EXPIRED, ReasonCode.DAMAGED, ReasonCode.COULD_NOT_LOCATE, ReasonCode.INSUFFICIENT_QUANTITY_RECONDITIONED]
 
 // Localization configuration - default and supported locales
-locale.defaultLocale = 'en'
-locale.supportedLocales = ['en','fr','es']
+openboxes.locale.defaultLocale = 'en'
+openboxes.locale.supportedLocales = ['en','fr','es']
+
+// Currency configuration
+openboxes.locale.defaultCurrencyCode = "USD"
+openboxes.locale.defaultCurrencySymbol = "\$"
+//openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"

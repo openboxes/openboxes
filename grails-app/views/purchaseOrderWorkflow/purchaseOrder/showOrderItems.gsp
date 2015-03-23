@@ -94,9 +94,11 @@
                                 </td>
                                 <td class="right middle">
                                     <g:formatNumber number="${orderItem?.unitPrice ?: 0.00 }" format="###,###,##0.00##"/>
+                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </td>
                                 <td class="right middle">
-                                    <g:formatNumber number="${orderItem?.totalPrice() }"  type="currency" currencyCode="USD" />
+                                    <g:formatNumber number="${orderItem?.totalPrice() }" />
+                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </td>
                             </tr>
                         </g:each>
@@ -123,7 +125,8 @@
                             </th>
                             <th colspan="9" class="right">
                                 <warehouse:message code="default.total.label"/>
-                                <g:formatNumber number="${order?.totalPrice()?:0.0 }" type="currency" currencyCode="USD"/>
+                                <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
+                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                             </th>
                         </tr>
                     </tfoot>

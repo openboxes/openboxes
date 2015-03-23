@@ -208,10 +208,10 @@
                                             ${orderItem?.product?.unitOfMeasure?:"EA"}
                                         </td>
                                         <td class="right">
-                                            <g:formatNumber number="${orderItem?.unitPrice}" type="currency" currencyCode="USD"/>
+                                            <g:formatNumber number="${orderItem?.unitPrice}" />
                                         </td>
                                         <td class="right">
-                                            <g:formatNumber number="${orderItem?.totalPrice()}" type="currency" currencyCode="USD"/>
+                                            <g:formatNumber number="${orderItem?.totalPrice()}"/>
                                         </td>
                                     </tr>
 
@@ -222,7 +222,10 @@
                                         <th colspan="6">
                                             <warehouse:message code="default.total.label"/>
                                         </th>
-                                        <th class="right"><g:formatNumber number="${orderInstance?.totalPrice()}" type="currency" currencyCode="USD"/></th>
+                                        <th class="right">
+                                            <g:formatNumber number="${orderInstance?.totalPrice()}"/>
+                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </th>
                                     </tr>
                                 </tfoot>
                             </table>

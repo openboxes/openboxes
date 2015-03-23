@@ -390,11 +390,12 @@
                                         <td class="name middle"><label for="pricePerUnit"><warehouse:message
                                                 code="product.pricePerUnit.label"/></label></td>
                                         <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
-                                            <g:textField name="pricePerUnit"
+                                            <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
                                                          value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
                                                          class="text" size="50" />
 
-                                            <span class="fade">USD</span>
+                                            <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
+
                                         </td>
                                     </tr>
 
@@ -430,12 +431,12 @@
                                 </button>
                                 &nbsp;
                                 <g:if test="${productInstance?.id }">
-                                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }'>
+                                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
                                         ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
                                     </g:link>
                                 </g:if>
                                 <g:else>
-                                    <g:link controller="inventory" action="browse">
+                                    <g:link controller="inventory" action="browse" class="button icon remove">
                                         ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
                                     </g:link>
                                 </g:else>
@@ -1054,7 +1055,9 @@
 													${pkg?.uom?.code }/${pkg?.quantity }
 												</td>
                                                 <td>
-                                                    <g:formatNumber number="${pkg?.price}" type="currency" currencyCode="USD" />
+                                                    <g:formatNumber number="${pkg?.price}" />
+                                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+
                                                 </td>
 												<td>
 													${pkg?.gtin?:warehouse.message(code:'default.none.label') }

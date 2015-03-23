@@ -98,15 +98,15 @@
                                 </label>
                             </td>
                             <td class="value">
-                                <g:each in="${grailsApplication.config.locale.supportedLocales}" var="l">
+                                <g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
                                     <g:set var="locale" value="${new Locale(l)}"/>
                                     <g:if test="${session?.user?.locale==locale}">
-                                        ${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
+                                        ${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))}
                                     </g:if>
                                     <g:else>
                                         <a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'returnUrl':request.forwardURI])}">
                                             <!-- fetch the display for locale based on the current locale -->
-                                            ${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
+                                            ${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))}
                                         </a>
                                     </g:else>
                                     &nbsp;|&nbsp;

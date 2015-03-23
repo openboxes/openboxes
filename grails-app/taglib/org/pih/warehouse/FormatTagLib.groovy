@@ -21,7 +21,7 @@ class FormatTagLib {
 	static namespace = "format"
 	def grailsApplication
 
-	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+	//Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
 	
 	/**
 	 * Formats a Date
@@ -85,7 +85,7 @@ class FormatTagLib {
 	  * Attributes:
 	  * product (required): the product to display 
 	  * locale (optional): the locale to localize for; if no locale is specified, the locale associated with the current user is used; 
-	  * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.locale.defaultLocale); 
+	  * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.openboxes.locale.defaultLocale);
 	  * 				   if the locale attribute is specified, but set to "null", the "default" name is returned
 	  * 
 	  * Currently simply displays the localized name of the product
@@ -94,7 +94,7 @@ class FormatTagLib {
 	 	if (attrs.product != null) {
 			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-             Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
              Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 def value = "";
              //if (attrs?.product?.productCode) {
@@ -115,7 +115,7 @@ class FormatTagLib {
 	 * Attributes:
 	 * category (required): the category to display 
 	 * locale (optional): the locale to localize for; if no locale is specified, the locale associated with the current user is used; 
-	 * 				      if no current user, the system default locale is used, (specified in grailsApplication.config.locale.defaultLocale); 
+	 * 				      if no current user, the system default locale is used, (specified in grailsApplication.config.openboxes.locale.defaultLocale);
 	 * 				      if the locale attribute is specified, but set to "null", the "default" name is returned
 	 * 
 	 * Currently simply displays the localized name of the category
@@ -124,7 +124,7 @@ class FormatTagLib {
 		if (attrs.category) {
 			// use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			// (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-            Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			
 			// default format is to display the localized name of the catergory
@@ -145,7 +145,7 @@ class FormatTagLib {
 	  * Attributes:
 	  * obj (required): the object to localize--tag currently supports standard OpenBoxes objects, as well as Strings, and Enums
 	  * locale (optional): the locale to localize for; if no locale is specified, the locale associated with the current user is used; 
-	  * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.locale.defaultLocale); 
+	  * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.openboxes.locale.defaultLocale);
 	  * 				   if the locale attribute is specified, but set to "null", the "default" name is returned
 	  * 
 	  * If the obj is a String, the tag assumes the string is in format "Default Value|fr:French Value|es:Spanish Value"
@@ -158,7 +158,7 @@ class FormatTagLib {
 		 if (attrs.obj != null) {
 			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-             Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
              Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 
 			 // handle String; localize the string directly

@@ -39,6 +39,7 @@ class ReportService implements ApplicationContextAware {
 	def inventoryService
 	def shipmentService
 	def localizationService
+	def grailsApplication
 	
 	ApplicationContext applicationContext
 	
@@ -430,7 +431,8 @@ class ReportService implements ApplicationContextAware {
 
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
         //numberFormat.maximumFractionDigits = 2
-        numberFormat.currency = Currency.getInstance("USD")
+		String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode?:"USD"
+		numberFormat.currency = Currency.getInstance(currencyCode)
         numberFormat.maximumFractionDigits = 2
         numberFormat.minimumFractionDigits = 2
 

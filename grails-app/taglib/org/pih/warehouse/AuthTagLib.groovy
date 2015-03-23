@@ -54,7 +54,7 @@ class AuthTagLib {
         }
     }
 	
-	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+	//Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
 	/*
 	def isUserInRole = { attrs, body ->	
 		def user = User.get(session?.user?.id)		

@@ -289,7 +289,8 @@
                     </td>
                     <td class="value middle">
                         <p>
-                            $${g.formatNumber(number: (productInstance?.pricePerUnit?:0), format: '###,###,##0.00##') } USD
+                            ${g.formatNumber(number: (productInstance?.pricePerUnit?:0), format: '###,###,##0.00##')}
+                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </p>
                     </td>
                 </tr>
@@ -299,7 +300,8 @@
                     </td>
                     <td class="value middle">
                         <p>
-                            $${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') } USD
+                            ${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') }
+                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </p>
                     </td>
                 </tr>

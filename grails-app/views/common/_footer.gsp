@@ -13,13 +13,13 @@
 		<warehouse:message code="default.locale.label"/>: &nbsp;  	
 		<!-- show all supported locales -->
 		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-		<g:each in="${grailsApplication.config.locale.supportedLocales}" var="l">
+		<g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
 			<g:set var="locale" value="${new Locale(l)}"/>
 			<g:set var="selected" value="${locale == session?.user?.locale || locale == session?.locale }"/>
 			<a class="${selected?'selected':''}" href="${createLink(controller: 'user', action: 'updateAuthUserLocale',
 				params: ['locale':locale,'targetUri':targetUri])}">
 				<!-- fetch the display for locale based on the current locale -->
-				${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
+				${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))}
 			</a>
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">

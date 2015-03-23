@@ -49,7 +49,7 @@ class PicklistController {
         //def filename = "Picklist - ${requisition.requestNumber}"
         //[requisition:requisition, picklist: picklist, location:location]
 
-        //def defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+        //def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         //def locale = session?.user?.locale ?: session.locale ?: defaultLocale;
 
         //println "location ${location}"
@@ -82,7 +82,7 @@ class PicklistController {
 
     def renderHtml = {
 
-        def defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+        def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         def locale = session?.user?.locale ?: session.locale ?: defaultLocale;
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)

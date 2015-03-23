@@ -41,7 +41,6 @@
                                         <th><warehouse:message code="default.type.label" /></th>
                                         <th><warehouse:message code="product.productCode.label" /></th>
                                         <th><warehouse:message code="product.label" /></th>
-                                        <th><warehouse:message code="product.unitOfMeasure.label" /></th>
                                         <th><warehouse:message code="order.qtyOrdered.label" /></th>
                                         <th><warehouse:message code="order.qtyFulfilled.label" /></th>
                                         <th><warehouse:message code="order.unitPrice.label" /></th>
@@ -76,20 +75,21 @@
                                                     ${orderItem?.description }
                                                 </g:else>
                                             </td>
-                                            <td>
-                                                ${orderItem?.product?.unitOfMeasure?:""}
-                                            </td>
                                             <td class="order-item-quantity">
                                                 ${orderItem?.quantity}
+                                                ${orderItem?.product?.unitOfMeasure?:"EA"}
                                             </td>
                                             <td class="order-item-fullfilled">
                                                 ${orderItem?.quantityFulfilled()}
+                                                ${orderItem?.product?.unitOfMeasure?:"EA"}
                                             </td>
                                             <td class="">
-                                                <g:formatNumber number="${orderItem?.unitPrice}" format="###,###,##0.00##"/>
+                                                <g:formatNumber number="${orderItem?.unitPrice?:0}" />
+                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                             </td>
                                             <td class="">
-                                                <g:formatNumber number="${orderItem?.totalPrice()?:0}" type="currency" currencyCode="USD"/>
+                                                <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
+                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 
                                             </td>
                                         </tr>
@@ -99,7 +99,7 @@
                             </g:if>
                             <g:else>
                                 <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
-                            </g:else>
+                        </g:else>
 
                         </div>
                         <div id="tabs-shipments" style="padding: 10px;" class="ui-tabs-hide">

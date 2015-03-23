@@ -2,7 +2,6 @@
     <table id="productGroupTable" class="zebra">
         <thead>
             <tr>
-                <th><warehouse:message code="productGroup.type.label" default="Type"/></th>
                 <th><warehouse:message code="productGroup.label" default="Description"/></th>
                 <th><warehouse:message code="productGroup.products.label" default="Products"/></th>
                 <th><warehouse:message code="default.actions.label" default="Actions"/></th>
@@ -11,20 +10,21 @@
         <tbody>
             <g:each var="productGroup" in="${productGroups}">
                 <tr>
-                    <td class="middle">
-                        Substitutable
-                    </td>
-                    <td class="middle">
+                    <td class="top">
                         <g:link controller="productGroup" action="show" id="${productGroup.id}">
                             ${productGroup.description}
                         </g:link>
                     </td>
                     <td class="middle">
-                        <ul>
+                        <table>
                             <g:each in="${productGroup.products}" var="product">
-                                <li><g:link controller="product" action="edit" id="${product.id}" fragment="tabs-2">${product.productCode} &rsaquo; ${product.name}</g:link></li>
+                                <tr>
+                                    <td><g:link controller="product" action="edit" id="${product.id}" fragment="tabs-2">${product.productCode} &rsaquo; ${product.name}</g:link></td>
+                                </tr>
                             </g:each>
-                        </ul>
+                        </table>
+
+
                     </td>
                     <td class="middle">
                         <g:link controller="productGroup" action="show" id="${productGroup.id}" class="button icon search">
@@ -35,7 +35,7 @@
                         </g:link>
                         <g:remoteLink controller="product" action="removeFromProductGroups" update="productGroups" class="button icon trash"
                                       id="${productGroup.id}" params="[productId:product.id]">
-                            <warehouse:message code="default.button.unklink.label" default="Unlink"/>
+                            <warehouse:message code="default.button.unlink.label" default="Unlink"/>
                         </g:remoteLink>
 
                         <%--
@@ -65,7 +65,7 @@
                         <g:autoSuggestString id="productGroup" name="productGroup" size="80" class="medium text"
                                              jsonUrl="${request.contextPath}/json/autoSuggestProductGroups"
                                              value=""
-                                             placeholder=""/>
+                                             placeholder="${warehouse.message(code:'product.addProductGroup.label', default: 'Enter product group name')}"/>
 
                         <button  class="button icon add">${warehouse.message(code:'default.button.add.label')}</button>
                     </g:formRemote>

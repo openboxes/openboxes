@@ -62,7 +62,7 @@
                     <td class="value">
                         <div class="middle">
                             <g:textField name="price" value="${packageInstance?.price }" size="10" class="medium text"/>
-                            ${warehouse.message(code:'default.currency.usd.label', default:'USD')}
+							${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </div>
                     </td>
                 </tr>
