@@ -40,7 +40,16 @@ class Person implements Comparable, Serializable {
 		
 	}
 	
-	int compareTo(obj) { obj.id <=> id }
+	int compareTo(Object obj) {
+
+		def sortOrder =
+			obj.lastName <=> lastName ?:
+				obj.firstName <=> firstName ?:
+						obj.email <=> email ?:
+							obj?.id <=> id
+		return sortOrder;
+
+	}
 	
 	String toString() { return "$firstName $lastName"; }
 	String getName() { return "$firstName $lastName"; }

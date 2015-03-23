@@ -50,7 +50,7 @@
 									<label for='shipmentType.id'><warehouse:message code="order.shipmentType.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<div style="width:200px">
+									<div style="width:300px">
 										<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" class="chzn-select-deselect"
 												  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
 
@@ -59,7 +59,7 @@
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='destination'><warehouse:message code="order.origin.label"/>:</label>
+									<label for='destination'><warehouse:message code="order.destination.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
 									<div id="destination">
@@ -74,10 +74,10 @@
 									<label for='recipient.id'><warehouse:message code="shipping.recipient.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<div style="width:200px">
-										<g:select class="chzn-select-deselect " name="recipient.id" from="${org.pih.warehouse.core.Person.list().sort()}"
-											optionKey="id" optionValue="name" value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
-									</div>									
+									<div  style="width:300px">
+										<g:select class="chzn-select-deselect" name="recipient.id" from="${org.pih.warehouse.core.Person.list().sort()}"
+											optionKey="id" optionValue='${{ it.lastName + ", " + it.firstName + " (" + it.email + ")" }}' value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
+									</div>
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -97,7 +97,8 @@
 									<g:jqueryDatePicker 
 										id="shippedOn" 
 										name="shippedOn" 
-										class="updateable"
+										class="updateable large text"
+										size="30"
 										value="${orderCommand?.shippedOn }" 
 										format="MM/dd/yyyy"
 										showTrigger="false" />
@@ -112,6 +113,7 @@
 										id="deliveredOn" 
 										name="deliveredOn" 
 										class="updateable"
+										size="30"
 										value="${orderCommand?.deliveredOn }" 
 										format="MM/dd/yyyy"
 										showTrigger="false" />
