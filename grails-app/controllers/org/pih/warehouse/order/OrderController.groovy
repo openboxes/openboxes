@@ -438,18 +438,26 @@ class OrderController {
 					"\n"
 
 			def totalPrice = 0.0
+
 			orderInstance?.listOrderItems()?.each { orderItem ->
 				totalPrice += orderItem.totalPrice()?:0
+
+				String quantityString = formatNumber(number:orderItem?.quantity, maxFractionDigits: 1, minFractionDigits: 1)
+				String unitPriceString = formatNumber(number:orderItem?.unitPrice, maxFractionDigits: 4, minFractionDigits: 2)
+				String totalPriceString = formatNumber(number:orderItem?.totalPrice(), maxFractionDigits: 2, minFractionDigits: 2)
+
 				csv +=	"${orderItem?.product?.productCode}," +
 						"${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
 						"${orderItem?.product?.vendorCode?:''}," +
-						"${orderItem?.quantity}," +
-						"${orderItem?.product?.unitOfMeasure}," +
-						"${StringEscapeUtils.escapeCsv(formatNumber(number:orderItem?.unitPrice, maxFractionDigits: 4))}," +
-						"${StringEscapeUtils.escapeCsv(formatNumber(number:orderItem?.totalPrice(), maxFractionDigits: 2))}" +
+						"${quantityString}," +
+						"${orderItem?.product?.unitOfMeasure?:'EA'}," +
+						"${StringEscapeUtils.escapeCsv(unitPriceString)}," +
+						"${StringEscapeUtils.escapeCsv(totalPriceString)}" +
 						"\n"
 			}
-			csv += ",,,,,,${StringEscapeUtils.escapeCsv(formatNumber(number:totalPrice,maxFractionDigits: 2))}\n"
+
+			String totalPriceString = formatNumber(number:totalPrice,maxFractionDigits: 2, minFractionDigits: 2)
+			csv += ",,,,,,${StringEscapeUtils.escapeCsv(totalPriceString)}\n"
 			render csv
 
 		}
