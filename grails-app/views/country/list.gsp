@@ -14,9 +14,9 @@
 		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>
 				
 		<!-- Combo-handled YUI CSS files: -->
-		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/datatable/assets/skins/sam/datatable.css">
+		<link rel="stylesheet" type="text/css" href="//yui.yahooapis.com/combo?2.8.0r4/build/datatable/assets/skins/sam/datatable.css">
 		<!-- Combo-handled YUI JS files: -->
-		<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/yahoo-dom-event/yahoo-dom-event.js&2.8.0r4/build/connection/connection-min.js&2.8.0r4/build/element/element-min.js&2.8.0r4/build/datasource/datasource-min.js&2.8.0r4/build/datatable/datatable-min.js&2.8.0r4/build/json/json-min.js"></script>
+		<script type="text/javascript" src="//yui.yahooapis.com/combo?2.8.0r4/build/yahoo-dom-event/yahoo-dom-event.js&2.8.0r4/build/connection/connection-min.js&2.8.0r4/build/element/element-min.js&2.8.0r4/build/datasource/datasource-min.js&2.8.0r4/build/datatable/datatable-min.js&2.8.0r4/build/json/json-min.js"></script>
 		<script type="text/javascript">
 		  YAHOO.util.Event.addListener(window, "load", function() {
 		      YAHOO.example.Basic = function() {

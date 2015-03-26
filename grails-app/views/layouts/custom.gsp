@@ -99,12 +99,12 @@
         <div id="breadcrumb">
             <g:render template="/common/breadcrumb"/>
         </div>
-    <%--
-    <div class="box center" style="margin:0;">
-        <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
-                        jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-    </div>
-    --%>
+        <%--
+        <div class="box center" style="margin:0;">
+            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
+                            jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
+        </div>
+        --%>
     </g:if>
 
 
@@ -314,8 +314,10 @@
         //    messageError: "Uh oh... something went wrong. Please try again."
         //});
 
-        // Instantiate megamenu
+        // Megamenu
         $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
+
+        // Chozen select default
         $(".chzn-select").chosen({ width: '100%' });
         $(".chzn-select-deselect").chosen({ allow_single_deselect:true, width: '100%' });
 
@@ -501,7 +503,7 @@
         UserVoice.push(['addTrigger', {
             mode: 'contact',
             trigger_style: 'tab',
-            trigger_position: 'bottom-right',
+            trigger_position: '${grailsApplication.config.openboxes.uservoice.widget.position?:"bottom-right"}',
             //accent_color: '#448dd6',
             //trigger_color: '#448dd6',
             trigger_background_color: '#448dd6',
@@ -514,6 +516,18 @@
         // Autoprompt for Satisfaction and SmartVote (only displayed under certain conditions)
         //UserVoice.push(['autoprompt', {}]);
     </script>
+</g:if>
+<!-- Live Chat -->
+<g:if test="${grailsApplication.config.openboxes.zopim.widget.enabled}">
+    <!--Start of Zopim Live Chat Script-->
+    <script type="text/javascript">
+        window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s=
+                d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set.
+                _.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute("charset","utf-8");
+            $.src="//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA";z.t=+new Date;$.
+                    type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");
+    </script>
+    <!--End of Zopim Live Chat Script-->
 </g:if>
 <r:layoutResources/>
 

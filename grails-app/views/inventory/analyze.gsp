@@ -165,14 +165,14 @@
 </div>
 
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-route.min.js"></script>
     <script src="${createLinkTo(dir:'js/angular-translate.min.js', file:'angular-translate.min.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'analytics/app.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'analytics/controllers.js')}" type="text/javascript" ></script>
-    <script src="https://rawgithub.com/eligrey/FileSaver.js/master/FileSaver.js" type="text/javascript"></script>
-    <script src="https://rawgithub.com/bouil/angular-google-chart/gh-pages/ng-google-chart.js" type="text/javascript"></script>
+    <script src="//rawgithub.com/eligrey/FileSaver.js/master/FileSaver.js" type="text/javascript"></script>
+    <script src="//rawgithub.com/bouil/angular-google-chart/gh-pages/ng-google-chart.js" type="text/javascript"></script>
 </body>
 </html>

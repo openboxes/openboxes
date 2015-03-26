@@ -94,16 +94,16 @@
     $(function(){
         var derivers = $.pivotUtilities.derivers;
 
-        $.getJSON("/openboxes/inventory/calculateQuantityOnHandByProduct2", function(data) {
+        $.getJSON("/${request.contextPath}/json/calculateQuantityOnHandByProduct", function(data) {
             $("#output").pivotUI(data, {
-                //derivedAttributes: {
-                //    "Age Bin": derivers.bin("Age", 10),
-                //    "Gender Imbalance": function(mp) {
-                //        return mp["Gender"] == "Male" ? 1 : -1;
-                //    }
-                //},
-                //rows: ["name"],
-                //cols: ["genericProduct"],
+                derivedAttributes: {
+                    "Age Bin": derivers.bin("Age", 10),
+                    "Gender Imbalance": function(mp) {
+                        return mp["Gender"] == "Male" ? 1 : -1;
+                    }
+                },
+                rows: ["name"],
+                cols: ["totalValue"],
                 rendererName: "Heatmap"
             });
         });
