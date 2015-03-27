@@ -23,4 +23,23 @@ class PersonTests extends GrailsUnitTestCase {
         assert list == [person2, person5, person4, person1, person8, person7, person3, person6]
 
     }
+
+
+    @Test
+    void validate_shouldRequireValidEmail() {
+
+        def person1 = new Person(id: 1, firstName: "Rene", lastName: "Merida", email: "")
+        assert !person1.validate()
+
+        def person2 = new Person(id: 2, firstName: "Levi", lastName: "Bermudez", email: null)
+        assert !person2.validate()
+
+        def person3 = new Person(id: 2, firstName: "Kendra", lastName: "Nishioka", email: "email@something")
+        assert !person3.validate()
+
+        def person4 = new Person(id: 2, firstName: "Terese", lastName: "Decato", email: "email@something.com")
+        assert person4.validate()
+
+    }
+
 }

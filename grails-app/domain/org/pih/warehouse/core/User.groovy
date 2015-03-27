@@ -38,12 +38,13 @@ class User extends Person {
     static transients = ["passwordConfirm"]
     static constraints = {
         active(nullable: true)
-        username(nullable: false, blank: false, unique: true, maxSize: 255)
-        password(nullable: false, blank: false, minSize: 6, maxSize: 255, validator: { password, obj ->
+        username(blank: false, unique: true, maxSize: 255)
+        password(blank: false, minSize: 6, maxSize: 255, validator: { password, obj ->
             def passwordConfirm = obj.properties['passwordConfirm']
             if (passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
             passwordConfirm == password ? true : ['invalid.matchingpasswords']
         })
+        passwordConfirm(blank: false)
         locale(nullable: true)
         lastLoginDate(nullable: true)
         //useSavedLocation(nullable:true)

@@ -63,4 +63,31 @@ class UserTests extends GrailsUnitTestCase {
         assertNull user.getHighestRole()
 
     }
+
+
+    @Test
+    void validate_shouldRequirePassword() {
+        mockDomain(User)
+
+        User user1 = new User(username: null, password: null)
+        user1.validate()
+        println user1.errors
+
+        assertNotNull user1.errors["email"]
+        assertNotNull user1.errors["username"]
+        assertNotNull user1.errors["password"]
+        assertNotNull user1.errors["firstName"]
+        assertNotNull user1.errors["lastName"]
+
+        User user2 = new User(username: "", password: "")
+        user2.validate()
+        println user2.errors
+
+        assertNotNull user1.errors["email"]
+        assertNotNull user1.errors["username"]
+        assertNotNull user1.errors["password"]
+        assertNotNull user1.errors["firstName"]
+        assertNotNull user1.errors["lastName"]
+
+    }
 }

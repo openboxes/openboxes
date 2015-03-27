@@ -27,56 +27,52 @@
 					</g:hasErrors>		
 								
 					<div id="loginBox" class="box">
+
+						<h2>
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
+						</h2>
 						<table>
-							<thead>
-								<tr>
-									<td class="left middle" colspan="2">
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
-										<span class="middle title">
-											Signup for an account
-										</span>				
-									</td>
-								</tr>							
-								<tr>
-									<td class="left middle" colspan="2">
-										<hr/>
-									</td>
-								</tr>								
-							</thead>						
 							<tbody>
-					            <tr class="propOff">
+								<tr class="">
+									<td>
+
+									</td>
+								</tr>
+								<tr class="">
+									<td class="name middle right">
+										<label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
+									</td>
+									<td class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
+									</td>
+								</tr>
+					            <tr class="">
 					                <td class="name middle right" width="35%">
 					                    <label for="firstName"><warehouse:message code="user.firstName.label" default="First Name" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
-					                    <g:textField name="firstName" value="${userInstance?.firstName}" class="text" size="30"/>
+					                    <g:textField name="firstName" value="${userInstance?.firstName}" class="text" size="40"/>
 					                </td>
 					            </tr>
 	
-					            <tr class="propOff">
+					            <tr class="">
 					                <td class="name middle right">
 					                    <label for="lastName"><warehouse:message code="user.lastName.label" default="Last Name" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
-					                    <g:textField name="lastName" value="${userInstance?.lastName}" class="text" size="30"/>
+					                    <g:textField name="lastName" value="${userInstance?.lastName}" class="text" size="40"/>
 					                </td>
 					            </tr>
 
-					            <tr class="">
-					                <td class="name middle right">
-					                    <label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
-					                </td>
-					                <td class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
-					                    <g:textField name="email" value="${userInstance?.email}" class="text" size="30"/>
-					                </td>
-					            </tr>
 						    <tr class="">
 						        <td class="middle right">
 						          <label for="locale"><warehouse:message code="default.locale.label"/></label>
 						        </td>
 						        <td class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-						            <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
-											  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="large"/>
+									<div style="width: 235px">
+										<g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
+												  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
+									</div>
 						        </td>
 						    </tr>	
 						
@@ -85,7 +81,7 @@
 					                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
 					                </td>
 					                <td class="${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-					                    <g:textField name="username" value="${userInstance?.username}" class="text"  size="30" />
+					                    <g:textField name="username" value="${userInstance?.username}" class="text"  size="40" />
 					                </td>
 					            </tr>
 
@@ -95,7 +91,7 @@
 					                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-					                    <g:passwordField name="password" value="${userInstance?.password}" class="text" size="30"/>
+					                    <g:passwordField name="password" value="${userInstance?.password}" class="text" size="40"/>
 					                </td>
 					            </tr>
 						    
@@ -104,7 +100,7 @@
 					                  <label for="passwordConfirm"><warehouse:message code="user.confirmPassword.label" default="Confirm Password" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
-					                    <g:passwordField name="passwordConfirm" value="${userInstance?.passwordConfirm}" class="text" size="30" />
+					                    <g:passwordField name="passwordConfirm" value="${userInstance?.passwordConfirm}" class="text" size="40" />
 					                </td>
 					            </tr>	
 								<tr class="">	

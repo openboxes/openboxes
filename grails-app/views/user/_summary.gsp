@@ -1,15 +1,15 @@
 				<div class="${(userInstance?.active) ? 'active':'inactive'} summary">
-					<table style="width:auto;">
+					<table>
 						<tr>
-	            			<td class="top">
+	            			<td class="top" width="1%">
 								<g:render template="actions"/>
 							</td>
-							<td>
+							<td width="1%">
                                 <div class="nailthumb-container">
                                     <g:userPhoto user="${userInstance}"/>
                                 </div>
 							</td>
-							<td>
+							<td width="10%">
 		            			<span style="font-weight: bold; font-size: 1.2em; color: grey;">
 		            				${fieldValue(bean: userInstance, field: "firstName")} 
 		            				${fieldValue(bean: userInstance, field: "lastName")}

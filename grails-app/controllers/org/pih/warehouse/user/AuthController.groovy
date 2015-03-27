@@ -143,13 +143,16 @@ class AuthController {
 	/**
 	 * Handle account registration.
 	 */
-	def handleSignup = { 		
-		
+	def handleSignup = {
+
 		def userInstance = new User();
 		if ("POST".equalsIgnoreCase(request.getMethod())) { 			
 			userInstance.properties = params
-			userInstance.password = params.password.encodeAsPassword();
-			userInstance.passwordConfirm = params.passwordConfirm.encodeAsPassword();			
+
+			if (params.password) {
+				userInstance.password = params.password.encodeAsPassword();
+				userInstance.passwordConfirm = params.passwordConfirm.encodeAsPassword();
+			}
 			userInstance.active = Boolean.FALSE;
 			
 			// Create account 
@@ -209,7 +212,8 @@ class AuthController {
 				}
 				
 			}			
-			else { 
+			else {
+				log.info ("There will be errors: " + userInstance.errors)
 				// Reset the password to what the user entered
 				userInstance.password = params.password;
 				userInstance.passwordConfirm = params.passwordConfirm;

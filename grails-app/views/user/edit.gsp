@@ -33,6 +33,15 @@
                                     <h2><warehouse:message code="user.details.label" default="Details"/></h2>
                                     <table>
                                         <tbody>
+
+                                            <tr class="prop">
+                                                <td valign="top" class="name">
+                                                    <label for="email"><warehouse:message code="user.email.label" /></label>
+                                                </td>
+                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+                                                    <g:textField name="email" value="${userInstance?.email}" class="text" size="40" />
+                                                </td>
+                                            </tr>
                                             <tr class="prop">
                                                 <td valign="top" class="name">
                                                   <label for="username"><warehouse:message code="user.username.label" /></label>
@@ -78,23 +87,17 @@
                                                 </td>
                                             </tr>
 
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                  <label for="email"><warehouse:message code="user.email.label" /></label>
-                                                </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
-                                                    <g:textField name="email" value="${userInstance?.email}" class="text" size="40" />
-                                                </td>
-                                            </tr>
+
                                             <tr class="prop">
                                                 <td valign="top" class="name">
                                                   <label for="locale"><warehouse:message code="default.locale.label"/></label>
                                                 </td>
                                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
                                                     <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
-                                                              optionValue="displayName" value="${userInstance?.locale}" noSelection="['null':'']"/>
+                                                              optionValue="displayName" value="${userInstance?.locale}" noSelection="['null':'']" class="chzn-select-deselect"/>
                                                 </td>
                                             </tr>
+                                        <%--
                                             <tr class="prop">
                                                 <td valign="top" class="name"><warehouse:message
                                                         code="default.timezone.label" default="Timezone" /></td>
@@ -105,7 +108,7 @@
                                                     <g:timeZoneSelect name="myTimeZone" value="" />
                                                 </td>
                                             </tr>
-
+                                        --%>
 
                                         </tbody>
                                     </table>
@@ -133,7 +136,9 @@
                                                     </td>
                                                     <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
                                                         <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
-                                                        <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}" optionKey="id" value="${userInstance?.roles}" noSelection="${['null': noAccessLabel]}" multiple="true"/>
+                                                        <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
+                                                                  optionKey="id" value="${userInstance?.roles}"
+                                                                  noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
                                                     </td>
                                                 </tr>
                                             </g:isUserAdmin>
@@ -143,7 +148,7 @@
                                                 </td>
                                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
                                                     <g:select name="warehouse.id" from="${org.pih.warehouse.core.Location.list()?.sort()}"
-                                                              optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']"/>
+                                                              optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']" class="chzn-select-deselect"/>
 
                                                     <div class="fade">
                                                         <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}" />
@@ -176,6 +181,7 @@
                                                                             <g:select name="locationRolePairs.${location.id}"
                                                                                       value="${locationRolePairs[location.id]}"
                                                                                       from="${adminAndBrowser}"
+                                                                                    class="chzn-select-deselect"
                                                                                       optionKey="id" noSelection="${['': defaultLabel]}"/>
                                                                         </td>
                                                                     </tr>

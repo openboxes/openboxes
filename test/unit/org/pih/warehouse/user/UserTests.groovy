@@ -58,13 +58,15 @@ class UserTests extends GrailsUnitTestCase {
 		//def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN"))
 		//mockForConstraintsTests(User, [user1])
 
-		def user3 = new User(username: 'otherTester', password: 'password', firstName: 'Tester', lastName: 'Testerson III', locale: new Locale("en", "EN"))
+		def user3 = new User(username: 'otherTester', password: 'password', email: "valid@email.com", firstName: 'Tester', lastName: 'Testerson III', locale: new Locale("en", "EN"))
 		user3.validate();
+
+		println user3.errors
 		assertTrue user3.validate()
 	}
 
     @Test
-	void testList_shouldPassWhen() {
+	void testList_shouldReturnOneUser() {
 		mockDomain(User, [new User(username: "username", password: "password", firstName: "First", lastName: "Last", locale: new Locale("en", "EN"))])
 		def users = User.list()
 		println users
