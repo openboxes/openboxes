@@ -28,6 +28,8 @@ class PersonTests extends GrailsUnitTestCase {
     @Test
     void validate_shouldRequireValidEmail() {
 
+        mockDomain(Person)
+
         def person1 = new Person(id: 1, firstName: "Rene", lastName: "Merida", email: "")
         assert !person1.validate()
 

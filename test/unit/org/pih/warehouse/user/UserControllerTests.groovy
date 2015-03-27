@@ -13,7 +13,7 @@ class UserControllerTests extends ControllerUnitTestCase{
     }
 
     void testUpdateRoles(){
-      User user = new User(id:"u1234", password: "password", username:"peter")
+      User user = new User(id:"u1234", password: "password", username:"peter", email: "peter@openboxes.com")
       mockDomain(User, [user])
       Role roleBrowser = new Role(id:"r1", roleType: RoleType.ROLE_BROWSER)
       Role roleManager = new Role(id:"r2", roleType: RoleType.ROLE_MANAGER)
