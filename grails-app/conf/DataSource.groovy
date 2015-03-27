@@ -40,7 +40,11 @@ environments {
 			use_sql_comments = true
 		}
 	}
-
+	test {
+		dataSource {
+			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
+		}
+	}
 	production {
 		dataSource {
 			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
