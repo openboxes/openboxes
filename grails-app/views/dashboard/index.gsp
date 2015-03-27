@@ -13,20 +13,20 @@
 	    	<div id="dashboard">
 	    		<table>
 					<tr>
-						<td width="30%">
+						<td width="33%">
                             <g:render template="requisitionItemSummary"/>
                             <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="receiptSummary"/>
                             <g:render template="shipmentSummary"/>
                             <g:render template="indicatorSummary"/>
 						</td>
-                        <td width="30%">
+                        <td width="33%">
                             <g:render template="valueSummary"/>
                             <g:render template="productSummary"/>
                             <g:render template="genericProductSummary"/>
                             <g:render template="expiringSummary"/>
                         </td>
-						<td width="40%">
+						<td width="33%">
                             <g:render template="activitySummary"/>
                             <g:render template="tagSummary" model="[tags:tags]"/>
 						</td>
