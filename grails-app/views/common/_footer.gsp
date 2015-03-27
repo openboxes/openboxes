@@ -1,14 +1,14 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
-		&copy; 2014 <a href="openboxes.com">OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+		&copy; 2015 <a href="openboxes.com">OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
+        <warehouse:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
+        <warehouse:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
     </div>
     <div class="center" style="line-height: 2em;">
-		<warehouse:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<%-- <warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;--%>
 		<warehouse:message code="default.locale.label"/>: &nbsp;  	
 		<!-- show all supported locales -->
@@ -39,6 +39,11 @@
         <span>
             <warehouse:message code="default.hostname.label" default="Hostname"/>: &nbsp;
             <b>${session.hostname?:"Unknown"}</b>
+        </span>
+        &nbsp;&nbsp; | &nbsp;&nbsp;
+        <span>
+            <warehouse:message code="default.timezone.label" default="Timezone"/>: &nbsp;
+            <b>${session?.timezone?.ID}</b>
         </span>
         <g:if test="${session.warehouse && session.user && session._showTime}">
             &nbsp;&nbsp; | &nbsp;&nbsp;
