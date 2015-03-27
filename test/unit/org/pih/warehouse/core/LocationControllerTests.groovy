@@ -27,7 +27,7 @@ class LocationControllerTests extends ControllerUnitTestCase {
 			new Location(id: "1", name: "Boston", locationType: depot, locationGroup: boston),
 			new Location(id: "2", name: "Miami", locationType: depot, locationGroup: boston),
 			new Location(id: "3", name: "Mirebalais", locationType: depot, locationGroup: mirebalais),
-			new Location(id: "4", name: "Mirebalais > Pediatrics", locationType: ward, , locationGroup: mirebalais)
+			new Location(id: "4", name: "Mirebalais > Pediatrics", locationType: ward, locationGroup: mirebalais)
 		])
 		mockDomain(LocationType, [depot, ward])
 		mockDomain(LocationGroup, [boston, mirebalais])
