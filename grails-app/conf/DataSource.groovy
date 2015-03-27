@@ -35,18 +35,12 @@ environments {
 		dataSource {	
 			//dbCreate = "update"
 			url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
+			loggingSql = true
+			format_sql = true
+			use_sql_comments = true
 		}
 	}
-	test {
-		dataSource {			
-			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-        	}
-	}
-	loadtest {
-		dataSource {			
-			url = "jdbc:mysql://localhost:3306/openboxes_loadtest?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-        }
-	}
+
 	production {
 		dataSource {
 			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
@@ -57,24 +51,9 @@ environments {
 			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
-	qa {
-		dataSource {
-			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-		}
-	}
 	diff {
 		dataSource {
 			url = "jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-		}
-	}
-	root {
-		dataSource {
-			url = "jdbc:mysql://localhost:3306/openboxes_root?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-		}
-	}
-	client {
-		dataSource {
-			url = "jdbc:mysql://localhost:3306/openboxes_client?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
     aws {
