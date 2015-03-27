@@ -15,7 +15,7 @@ pages:
 - ['index.md', 'About', 'OpenBoxes']
 
 # Installation
-- ['installation/index.md', 'Installation',  'Installation']
+- ['installation/index.md', 'Installation',  'Overview']
 - ['installation/ubuntu.md', 'Installation', 'Ubuntu']
 #- ['installation/mac.md', 'Installation', 'Mac OS X']
 #- ['installation/windows.md', 'Installation', 'Windows']
