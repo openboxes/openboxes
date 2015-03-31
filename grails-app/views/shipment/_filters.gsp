@@ -91,14 +91,13 @@
                 </tr>
                 --%>
                 <tr class="prop">
-                    <td>
-                        <label>${warehouse.message(code: 'default.updatedBetween.label', default: 'Last updated between')}</label>
-
-                        <div class="center middle">
+                    <td colspan="2">
+                        <div>
+                            <label>${warehouse.message(code: 'default.updatedBetween.label', default: 'Last updated between')}</label>
+                        </div>
+                        <div>
                             <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
                                                 value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="20"/>
-
-                            and
 
                             <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
                                                 value="${lastUpdatedTo}" format="MM/dd/yyyy" size="20"/>

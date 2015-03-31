@@ -23,30 +23,38 @@
 
                         <g:set var="shipments" value="${shipments.sort { it.status.code }}"/>
                         <g:set var="shipmentMap" value="${shipments.groupBy { it.status.code }}"/>
-                        <div class="tabs">
-                            <ul>
+                        <g:if test="${shipments.size()}">
+                            <div class="tabs">
+                                <ul>
+                                    <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
+                                        <li>
+                                            <a href="#${shipmentStatusCode }">
+                                                <format:metadata obj="${shipmentStatusCode }"/>
+                                                <span class="fade">(${shipmentMap[shipmentStatusCode]?.size() })</span>
+                                            </a>
+                                        </li>
+                                    </g:each>
+                                </ul>
                                 <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
-                                    <li>
-                                        <a href="#${shipmentStatusCode }">
-                                            <format:metadata obj="${shipmentStatusCode }"/>
-                                            <span class="fade">(${shipmentMap[shipmentStatusCode]?.size() })</span>
-                                        </a>
-                                    </li>
+                                    <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
+                                        <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode]]"/>
+
+                                    </div>
                                 </g:each>
-                            </ul>
-                            <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
-                                <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
-                                    <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode]]"/>
-
-                                </div>
-                            </g:each>
-                        </div>
-
-                        <g:if test="${shipments.size()==0}">
-                            <div class=""><warehouse:message
-                                    code="shipping.noShipmentsMatchingConditions.message" />
                             </div>
                         </g:if>
+                        <g:else>
+
+                            <div class="box">
+
+                                <h2>${warehouse.message(code:'shipments.label')}</h2>
+                                <div class="center empty">
+                                    <warehouse:message
+                                            code="shipping.noShipmentsMatchingConditions.message" />
+
+                                </div>
+                            </div>
+                        </g:else>
                     </g:form>
                 </div>
             </div>
