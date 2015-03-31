@@ -174,6 +174,16 @@
 
 						<table>
 							<tbody>
+
+								<g:unless test="${shipmentInstance.comments}">
+
+									<tr>
+										<td colspan="2">
+											<div class="fade center empty"><warehouse:message code="default.noComments.label" /></div>
+										</td>
+									</tr>
+								</g:unless>
+
 								<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 									<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}" >
                                         <td width="1%">
@@ -215,38 +225,16 @@
 
 								</g:each>	
 								
-								<tr class="prop">
-									<td colspan="3" class="center">
+								<tr class="">
+									<td colspan="3" class="left">
 										<g:form action="saveComment">
 											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-                                            <table>
-                                                <tr>
-                                                    <td class="right" width="1%"><label><warehouse:message code="comment.sender.label" default="From:"/></label></td>
-                                                    <td>${session.user.name}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="right"><label><warehouse:message code="comment.recipient.label" default="To:"/></label></td>
-                                                    <td><g:selectUser name="recipientId"
-                                                                      placeholder="Select a user"
-                                                                      noSelection="['null':'Choose a user [optional]']"
-                                                                      value="${shipmentInstance?.recipient?.id}" class="chzn-select-deselect"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="right">
-                                                        <label><warehouse:message code="comment.label" default="Comments"/></label>
-                                                    </td>
-                                                    <td>
-                                                        <div style="padding:1px;">
-                                                            <g:textArea name="comment" rows="5" style="width:100%" placeholder="${warehouse.message(code:'default.comment.message')}"/>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                            </table>
-
-
-
-
+											<div>
+												<label><warehouse:message code="comment.label" default="Comments"/></label>
+											</div>
+											<div style="padding:1px;">
+												<g:textArea name="comment" rows="5" style="width:100%" placeholder="${warehouse.message(code:'default.comment.message')}"/>
+											</div>
 
 		                                    <div class="buttons">
 												<button type="submit" class="button icon add"><warehouse:message code="default.button.add.label"/></button>
