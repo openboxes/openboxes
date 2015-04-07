@@ -59,30 +59,35 @@
 
         			</div>
         		</td>
-				<td class="right">
+				<td class="right" width="1%">
         			<div id="product-status" class="title">
+
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 							<g:if test="${totalQuantity <= 0}">
-								<g:if test="${latestInventoryDate}">
-									<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
-								</g:if>								
+								<span class="tag tag-danger"><warehouse:message code="product.noStock.label"/></span>
 							</g:if>
 							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-								<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
+								<span class="tag tag-danger"><warehouse:message code="product.lowStock.label"/></span>
 							</g:elseif>
 							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-								<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>
+								<span class="tag tag-warning"><warehouse:message code="product.reorder.label"/></span>
+							</g:elseif>
+							<g:elseif test="${totalQuantity > inventoryLevelInstance?.maxQuantity}">
+								<span class="tag tag-danger"><warehouse:message code="product.overStock.label"/></span>
 							</g:elseif>
 							<g:else>
-								<span style="color: green;"><warehouse:message code="product.inStock.label"/></span>
+								<span class="tag tag-success"><warehouse:message code="product.inStock.label"/></span>
 							</g:else>
-						</g:if>			
+						</g:if>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-							<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
+							<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>safsafsa
 						</g:elseif>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-							<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-						</g:elseif>        			
+							<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>fsafsa
+						</g:elseif>
+						<g:else>
+							none
+						</g:else>
         			</div>
 			
 				</td>
