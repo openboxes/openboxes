@@ -39,7 +39,17 @@
                     <table>
                         <tbody>
                             <tr class='prop'>
-                                <td valign='top' class='name middle'>
+                                <td class='name top'><label for='description'>
+                                    <warehouse:message code="default.name.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
+                                    <g:textField type="text" id="description" name='description'
+                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.description?.encodeAsHTML()}"/>
+
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td valign='name top' class='name middle'>
                                     <label for='orderNumber'><warehouse:message code="order.orderNumber.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
@@ -111,22 +121,11 @@
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
                                     <div style="width: 300px;">
-                                        <g:select class="chzn-select-deselect" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}"
+                                        <g:select class="chzn-select-deselect" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort()}"
                                                   optionKey="id" value="${order?.orderedBy?.id}" noSelection="['null':'']" />
                                     </div>
                                 </td>
                             </tr>
-                            <tr class='prop'>
-                                <td class='name top'><label for='description'>
-                                    <warehouse:message code="default.description.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
-                                    <textarea type="text" id="description" name='description' rows="5"
-                                              placeholder="${warehouse.message(code:'order.description.placeholder')}" cols="100" class="text large">${order?.description?.encodeAsHTML()}</textarea>
-
-                                </td>
-                            </tr>
-
                         </tbody>
                     </table>
                     <div class="buttons">
