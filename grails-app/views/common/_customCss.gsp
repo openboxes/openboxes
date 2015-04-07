@@ -1,9 +1,7 @@
 	<style>
 		<g:if test="${session?.warehouse?.fgColor && session?.warehouse?.bgColor }">
 			#hd {
-				padding: 0px;
-				margin: 0px; 
-				background-color: #${session.warehouse.bgColor}; 
+				background-color: #${session.warehouse.bgColor};
 				color: #${session.warehouse.fgColor}; 
 			}
             /*

@@ -18,74 +18,12 @@
 		    </div>
 		    
 		    <div id="bannerRight" class="yui-u">
-		    	<div id="loggedIn" style="vertical-align:middle;" >
+		    	<div id="loggedIn">
 					<ul>
-
-
                         <li>
                             <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
                                             jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
                         </li>
-
-
-                        <li>
-                            <span class="action-menu">
-                                <button class="action-hover-btn button icon comment big">
-                                    <warehouse:message code="default.help.label" default="Help"/>
-                                </button>
-                                <ul class="actions" style="text-align:left;">
-
-                                    <li class="action-menu-item">
-                                        <g:link url="http://openboxes.atlassian.net/wiki/questions" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}"/>
-                                            <warehouse:message code="docs.faq.label" default="FAQ"/>
-                                        </g:link>
-                                    </li>
-                                    <li class="action-menu-item">
-                                        <g:link url="https://www.dropbox.com/sh/okkhdne14rju65d/JD9TpTUOt6" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'book_red.png')}"/>
-                                            <warehouse:message code="docs.userGuide.label" default="User Guide"/>
-                                        </g:link>
-                                    </li>
-                                    <li class="action-menu-item">
-                                        <g:link url="https://groups.google.com/forum/#!forum/openboxes" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'comment.png')}"/>
-                                            <warehouse:message code="docs.forum.label" default="Forum"/>
-                                        </g:link>
-                                    </li>
-                                    <li class="action-menu-item">
-                                        <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}"/>
-                                            <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
-                                        </g:link>
-                                    </li>
-                                    <li>
-                                        <hr/>
-                                    </li>
-                                    <li class="action-menu-item">
-                                        <g:link url="https://openboxes.atlassian.net/secure/CreateIssue!default.jspa" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}"/>
-                                            <warehouse:message code="docs.reportBug.label" default="Report a Bug"/>
-                                        </g:link>
-                                    </li>
-                                    <li class="action-menu-item">
-                                        <g:link url="mailto:support@openboxes.com" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'email.png')}"/>
-                                            <warehouse:message code="docs.contactSupport.label" default="Contact Support"/>
-                                        </g:link>
-                                    </li>
-                                    <li class="action-menu-item">
-                                        <g:link url="mailto:feedback@openboxes.com" data-uv-trigger="contact" style="color: #666;" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'lightbulb.png')}"/>
-                                            <warehouse:message code="docs.provideFeedback.label" default="Provide Feedback"/>
-                                        </g:link>
-                                    </li>
-
-                                </ul>
-                            </span>
-
-                        </li>
-
 					    <g:if test="${session.user}">
                             <%--
                             <li>
@@ -188,28 +126,51 @@
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
                                                     <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
                                                 </a>
-                                                <span id="warehouseMenu" title="${warehouse.message(code:'dashboard.chooseLocation.label')}" style="display: none; padding: 10px;">
-                                                    <div style="max-height: 400px; overflow: auto;">
-                                                        <table>
+                                                <div id="warehouseMenu" title="${warehouse.message(code:'dashboard.chooseLocation.label')}" style="display: none; padding: 10px;">
+                                                    <div>
+
+                                                        <div id="location-tabs">
+                                                            <ul>
+                                                                <g:each var="entry" in="${session.loginLocationsMap}" status="i">
+                                                                    <li><a href="#tabs-${i}">${entry.key ?: warehouse.message(code:'locationGroup.empty.label') }</a></li>
+                                                                </g:each>
+                                                            </ul>
+                                                            <g:each var="entry" in="${session.loginLocationsMap}" status="i">
+                                                                <div id="tabs-${i}">
+                                                                    <g:each var="warehouse" in="${entry.value.sort() }">
+                                                                        <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+                                                                        <div class="left" style="margin: 1px; ">
+                                                                            <a class="button big icon pin" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+                                                                                <format:metadata obj="${warehouse}"/>
+                                                                            </a>
+                                                                        </div>
+                                                                    </g:each>
+                                                                </div>
+                                                            </g:each>
+                                                        </div>
+                                                        <script>
+                                                            $( "#location-tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+                                                            $( "#location-tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+                                                        </script>
+
+                                                        <%--
                                                             <g:set var="count" value="${0 }"/>
                                                             <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                                                <tr>
-                                                                    <td class="top left">
-                                                                        <h3>${entry.key ?: warehouse.message(code:'locationGroup.empty.label') }</h3>
-                                                                        <div>
-                                                                            <g:each var="warehouse" in="${entry.value.sort() }">
-                                                                                <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                                                                <div class="left" style="margin: 1px;">
-                                                                                    <a class="button big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                                                                        <format:metadata obj="${warehouse}"/>
-                                                                                    </a>
-                                                                                </div>
-                                                                            </g:each>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
+                                                                <h3>${entry.key ?: warehouse.message(code:'locationGroup.empty.label') }</h3>
+                                                                <div>
+                                                                    <p>
+                                                                        <g:each var="warehouse" in="${entry.value.sort() }">
+                                                                            <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+                                                                            <div class="left" style="margin: 1px;">
+                                                                                <a class="button big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+                                                                                    <format:metadata obj="${warehouse}"/>
+                                                                                </a>
+                                                                            </div>
+                                                                        </g:each>
+                                                                    </p>
+                                                                </div>
                                                             </g:each>
-                                                        </table>
+                                                            --%>
                                                         <%--
                                                         <div class="prop">
                                                             <g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
@@ -225,7 +186,7 @@
                                                             </div>
                                                         </g:unless>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </li>
                                         </g:if>
                                         <li class="action-menu-item">
@@ -257,6 +218,62 @@
                             </g:if>
 
                         </g:if>
+
+                        <li>
+                            <span class="action-menu">
+                                <button class="action-hover-btn button icon comment big">
+                                    <warehouse:message code="default.support.label" default="Support"/>
+                                </button>
+                                <ul class="actions" style="text-align:left;">
+
+                                    <li class="action-menu-item">
+                                        <g:link url="http://openboxes.readthedocs.org/en/latest/" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>
+                                            <warehouse:message code="docs.userGuide.label" default="User Guide"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="http://openboxes.atlassian.net/wiki/questions" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}"/>
+                                            <warehouse:message code="docs.faq.label" default="FAQ"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://groups.google.com/forum/#!forum/openboxes" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'comment.png')}"/>
+                                            <warehouse:message code="docs.forum.label" default="Forum"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}"/>
+                                            <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
+                                        </g:link>
+                                    </li>
+                                    <li>
+                                        <hr/>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="https://openboxes.atlassian.net/secure/CreateIssue!default.jspa" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}"/>
+                                            <warehouse:message code="docs.reportBug.label" default="Report a Bug"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="mailto:support@openboxes.com" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'email.png')}"/>
+                                            <warehouse:message code="docs.contactSupport.label" default="Email Support"/>
+                                        </g:link>
+                                    </li>
+                                    <li class="action-menu-item">
+                                        <g:link url="mailto:feedback@openboxes.com" data-uv-trigger="contact" style="color: #666;" target="_blank">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'lightbulb.png')}"/>
+                                            <warehouse:message code="docs.provideFeedback.label" default="Request a New Feature"/>
+                                        </g:link>
+                                    </li>
+                                </ul>
+                            </span>
+                        </li>
                     </ul>
 				</div>
 		    </div>

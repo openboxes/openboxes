@@ -1588,11 +1588,8 @@ h2 {
     width: 100% !important;
 }
 .logo {
-    /*
     font-size: 2em;
     font-weight: bold;
-    */
-    font-size: 20px;
     line-height: 30px;
     font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
     text-transform: lowercase;
@@ -1671,7 +1668,8 @@ hr.space {background:#fff;color:#fff;}
 
 #hd {
     vertical-align: bottom;
-    margin: 5px;
+    padding: 5px;
+    margin: 0px;
     /*
     border-bottom: 1px solid lightgrey;
     background-color: white;
