@@ -486,6 +486,12 @@
 						</g:link>
 					</div>
                     <div class="megaButton">
+                        <g:link controller="eventType" action="list"
+                                class="eventType">
+                            <warehouse:message code="location.eventTypes.label" default="Event types" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
                         <g:link controller="person" action="list" class="people">
                             <warehouse:message code="person.list.label" />
                         </g:link>

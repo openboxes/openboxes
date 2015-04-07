@@ -35,11 +35,9 @@ class EventType implements Comparable, Serializable {
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)
 		eventCode(nullable:false)		
-		
 		dateCreated(display:false)
 		lastUpdated(display:false)
-		
-		optionValue(display:false)		
+		optionValue(display:false)
 	}
 	
 	static mapping = {

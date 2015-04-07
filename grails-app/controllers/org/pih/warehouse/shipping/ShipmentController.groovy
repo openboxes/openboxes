@@ -692,7 +692,9 @@ class ShipmentController {
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
-	
+
+
+
 	def editDocument = {
 		def shipmentInstance = Shipment.get(params?.shipmentId);
 		def documentInstance = Document.get(params?.documentId);
@@ -818,9 +820,10 @@ class ShipmentController {
 	def deleteEvent = {		
 		def event = Event.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
-		if (shipment && event && event.eventType?.eventCode != EventCode.CREATED) {   // not allowed to delete a "created" event
-			shipment.removeFromEvents(event).save();
+		if (shipment && event) {   // not allowed to delete a "created" event
+			shipment.removeFromEvents(event)
 			event.delete();
+			shipment.save();
 			flash.message = "${warehouse.message(code: 'shipping.deletedEventFromShipment.message', args: [params.id])}"
 		}
 		else {

@@ -9,9 +9,12 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.donation.Donor
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.receiving.Receipt
 
@@ -252,7 +255,7 @@ class Shipment implements Comparable, Serializable {
 		return isIncomingOrOutgoing(currentLocation)
 	}
 	*/
-	
+
 	Boolean isReceiveAllowed() { 
 		return hasShipped() && !wasReceived()
 	}
@@ -331,10 +334,12 @@ class Shipment implements Comparable, Serializable {
 			sortOrder: sortOrder
 		)
 		
-		this.addToContainers(container)
+		addToContainers(container)
 			
 		return container
 	}
+
+
 
     /**
      * Get all recipients for this shipment
@@ -375,5 +380,82 @@ class Shipment implements Comparable, Serializable {
 		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInPounds() }.sum()
 	}
 
+
+	Collection findAllParentContainers() {
+		return containers.findAll { !it.parentContainer }
+	}
+
+	Collection findAllChildContainers(Container container) {
+		return Container.findAllByShipmentAndParentContainer(this, container)
+	}
+
+	Container findContainerByName(String name) {
+		return containers.find { it.name.equalsIgnoreCase(name) }
+	}
+
+	Container addNewPallet(palletName) {
+		ContainerType palletType = ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
+		Container pallet = addNewContainer(palletType)
+		pallet.name = palletName
+		return pallet;
+	}
+
+
+	Container findOrCreatePallet(String palletName) {
+		Container pallet = findContainerByName(palletName)
+		if (!pallet) {
+			pallet = addNewPallet(palletName)
+		}
+		return pallet
+	}
+
+	Collection findShipmentItemsByContainer(container) {
+		return ShipmentItem?.findAllByShipmentAndContainer(this, container)
+	}
+
+	Integer countShipmentItemsByContainer(container) {
+		return ShipmentItem?.countByShipmentAndContainer(this, container)
+	}
+
+	TimeDuration timeToProcess() {
+		return timeDuration(dateScheduled(), dateShipped())
+	}
+	TimeDuration timeInTransit() {
+		return timeDuration(dateShipped(), dateDelivered())
+	}
+	TimeDuration timeInCustoms() {
+		return timeDuration(dateCustomsEntry(), dateCustomsRelease())
+	}
+	TimeDuration timeDuration(Date startDate, Date endDate) {
+		if (startDate && endDate) {
+			return TimeCategory.minus(endDate, startDate)
+		}
+		return null
+	}
+
+	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container) {
+		return ShipmentItem.findByInventoryItemAndContainer(inventoryItem, container)
+	}
+
+	Date dateScheduled() {
+		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SCHEDULED }
+		return event?.eventDate ?: dateCreated
+	}
+	Date dateShipped() {
+		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SHIPPED }
+		return event?.eventDate ?: actualShippingDate ?: expectedShippingDate
+	}
+	Date dateDelivered() {
+		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.RECEIVED || event?.eventType?.eventCode == EventCode.DELIVERED }
+		return event?.eventDate ?: actualDeliveryDate ?: new Date()
+	}
+	Date dateCustomsEntry() {
+		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_ENTRY }
+		return event?.eventDate
+	}
+	Date dateCustomsRelease() {
+		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_RELEASE }
+		return event?.eventDate
+	}
 }
 
