@@ -610,7 +610,7 @@ th.desc a {
 -------------------------------------------------------------- */
 
 
-label       { font-weight: normal; }
+label       { font-weight: normal; white-space: nowrap; }
 fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
 legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
@@ -946,8 +946,10 @@ button.action-btn, button.previous, button.next {
 
 .box-slim {
     border: 1px solid lightgrey;
-    margin: 1px;
-
+    margin: 5px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    text-align:center;
 }
 
 .wizard-box {
@@ -1180,7 +1182,6 @@ body {
     padding: 0px;
 }
 
-
 #dashboard {
     margin: 0px;
 }
@@ -1212,6 +1213,7 @@ img {
 
 a:hover {
     /*font-weight: bold;*/
+
 }
 .fade {
     color: #aaa;
@@ -2189,8 +2191,30 @@ img.photo_tiny {
     width: 300px;
 }
 
-span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}
-span.tag a { font-weight: normal; color: #82ad2b; text-decoration:none; font-size: 11px;  }
+.tag {
+    border: 1px solid #a5d24a;
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    display: block;
+    float: left;
+    padding: 5px;
+    white-space: nowrap;
+    text-wrap:none;
+    text-decoration:none;
+    background: #cde69c;
+    color: #638421;
+    margin-right: 5px;
+    margin-bottom:5px;
+    font-family: helvetica;
+    font-size:13px;
+}
+.tag a { font-weight: normal; color: #82ad2b; text-decoration:none; font-size: 11px; text-wrap: none; }
+.tag-danger { color: #a94442; background-color: #f2dede; border-color: #ebccd1; }
+.tag-success { color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; }
+.tag-info { color: #31708f; background-color: #d9edf7; border-color: #bce8f1; }
+.tag-warning { color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; }
+
+
 
 /*span.lotNumber { 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; color: black; font-weight: bold; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px; }*/
 .lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
@@ -3026,3 +3050,6 @@ input {
     box-sizing : border-box;
 }
 
+.childContainer .tag {
+    margin-left: 25px;
+}

@@ -16,8 +16,7 @@
             </g:if>
             <div>
             
-				<div class="buttonBar">            	
-
+				<div class="buttonBar">
                     <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
 	            	<g:isUserAdmin>
                         <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>

@@ -58,8 +58,9 @@
                         </td>
                         <td class="middle">
                             <g:if test="${itemInstance?.expirationDate}">
-                                <prettytime:display date="${itemInstance?.expirationDate}"/>
-                                <span class="fade">(<format:date obj="${itemInstance?.expirationDate}"  format="MMM dd, yyyy"/>)</span>
+                                <format:date obj="${itemInstance?.expirationDate}"  format="MMM dd, yyyy"/>
+
+                                <span class="fade">(<prettytime:display date="${itemInstance?.expirationDate}"/>)</span>
 
                             </g:if>
                             <g:else>

@@ -722,12 +722,12 @@
                                                         </button>
                                                         &nbsp;
                                                         <g:if test="${productInstance?.id }">
-                                                            <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon arrowleft">
+                                                            <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="">
                                                                 ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
                                                             </g:link>
                                                         </g:if>
                                                         <g:else>
-                                                            <g:link controller="inventory" action="browse" class="button icon arrowleft">
+                                                            <g:link controller="inventory" action="browse" class="">
                                                                 ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
                                                             </g:link>
                                                         </g:else>

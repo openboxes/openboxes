@@ -19,20 +19,39 @@
 	                <g:renderErrors bean="${attributeInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+
+			<div class="buttonBar">
+				<g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
+				<g:isUserAdmin>
+					<g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
+				</g:isUserAdmin>
+			</div>
+
+
             <g:form method="post" >
-            	<fieldset>
                 	<g:hiddenField name="id" value="${attributeInstance?.id}" />
                 	<g:hiddenField name="version" value="${attributeInstance?.version}" />
-	                <div class="dialog">
-	                    <table>
+	                <div class="box">
+						<h2>${attributeInstance.name}</h2>
+
+						<table>
 	                        <tbody>
-	                        
+
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="name"><warehouse:message code="default.id.label" default="ID" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'id', 'errors')}">
+										${attributeInstance?.id?:"new"}
+									</td>
+								</tr>
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="name"><warehouse:message code="default.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${attributeInstance?.name}" />
+	                                    <g:textField name="name" value="${attributeInstance?.name}" class="text" size="100" />
 	                                </td>
 	                            </tr>
 	                        
@@ -47,13 +66,13 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="options"><warehouse:message code="attribute.options.label" default="Options" /></label>
+	                                  <label for="option"><warehouse:message code="attribute.options.label" default="Options" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'options', 'errors')}">
                                 		<table id="optionsTable">
 		                                    <tr id="optionRowTemplate" style="display:none;">
 		                                    	<td>
-				                                    <g:textField name="option" value="${option}" size="60"/>
+				                                    <g:textField name="option" value="${option}" size="60" class="text medium"/>
 		                                    		<a href="#">
 		                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png') }" style="vertical-align: middle;"/>
 		                                    		</a>
@@ -95,17 +114,15 @@
 		                        	<td valign="top" class="name"></td>
 		                        	<td valign="top" class="value">            	
 						                <div class="buttons left">
-						                    <g:actionSubmit class="save" action="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-						                </div>
-						                
-						                <g:link action="list">&lsaquo; <warehouse:message code="attribute.backToAttributes.link"/></g:link>
-		    						</td>                    	
+						                    <g:actionSubmit class="button" action="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+						                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+							                <g:link action="list" class="button"><warehouse:message code="default.button.cancel.label"/></g:link>
+										</div>
+		    						</td>
 	                        	</tr>	                        
 	                        </tbody>
 	                    </table>
 	                </div>
-                </fieldset>
             </g:form>
         </div>
     </body>

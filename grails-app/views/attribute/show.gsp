@@ -13,7 +13,20 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
+
+
+            <div class="buttonBar">
+                <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
+                <g:isUserAdmin>
+                    <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
+                </g:isUserAdmin>
+            </div>
+
+
+            <div class="box">
+
+                <h2>${attributeInstance.name}</h2>
+
                 <table>
                     <tbody>
                     
@@ -61,13 +74,12 @@
                     
                     
 						<tr class="prop">
-                        	<td valign="top"></td>
-                        	<td valign="top">                         
+                        	<td valign="top" colspan="2">
 					            <div class="buttons">
 					                <g:form>
 					                    <g:hiddenField name="id" value="${attributeInstance?.id}" />
-					                    <g:actionSubmit class="edit" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
+					                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 					                </g:form>
 					            </div>
 							</td>
