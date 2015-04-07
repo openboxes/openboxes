@@ -29,9 +29,9 @@ class MailService {
 	def grailsApplication 
 	def config = ConfigurationHolder.config
 	def prefix = "${config.grails.mail.prefix}" //[OpenBoxes
-	def from = "${config.grails.mail.from}" // info@openboxes.com
-	def host= "${config.grails.mail.host}" // localhost
-	def port = Integer.parseInt ("${config.grails.mail.port}") // 25;
+	def defaultFrom = "${config.grails.mail.from}" // info@openboxes.com
+	def defaultHost= "${config.grails.mail.host}" // localhost
+	def defaultPort = Integer.parseInt ("${config.grails.mail.port}") // 25;
 
 	def addBccAddresses(email) { 		
 		def bccAddresses = "${grailsApplication.config.grails.mail.bcc}"
@@ -98,17 +98,17 @@ class MailService {
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
 				email.setCharset("UTF-8");
-				email.setHostName(host)				
+				email.setHostName(defaultHost)
 				
 				// override port
-				if (port) email.setSmtpPort(port)
-				
+				email.setSmtpPort(port?:defaultPort)
+
 				to.each { 
 					email.addTo(it) 
 				}
 				
 				//addBccAddresses(email)
-				email.setFrom(from)
+				email.setFrom(defaultFrom)
 				email.setSubject("${prefix} " + subject)
 				email.setMsg(msg)		
 				email.send()
@@ -175,15 +175,15 @@ class MailService {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setCharset("UTF-8");
-				email.setHostName(host)
+				email.setHostName(defaultHost)
 				to.each { 
 					email.addTo(it) 
 				}
 				
 				//addBccAddresses(email)
-				email.setFrom(from)
-				if (port) email.setSmtpPort(port)
-				email.setSubject("${prefix} " + subject)		
+				email.setFrom(defaultFrom)
+				email.setSmtpPort(port?:defaultPort)
+				email.setSubject("${prefix} " + subject)
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);
 				email.send();	  
@@ -289,11 +289,12 @@ class MailService {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setCharset("UTF-8");
-				email.setHostName(host);
+				email.setHostName(defaultHost);
 				
 				// Override smtp port
-				if (port) email.setSmtpPort(port)
-				email.setFrom(from);
+				email.setSmtpPort(port?:defaultPort)
+
+				email.setFrom(defaultFrom);
 				toList.each { to -> email.addTo(to) }
 				if (ccList) { 
 					ccList.each { cc -> email.addCc(cc) }
@@ -350,11 +351,11 @@ class MailService {
                 // Create the email message
                 HtmlEmail email = new HtmlEmail();
                 email.setCharset("UTF-8");
-                email.setHostName(message.host?:host);
-                email.setSmtpPort(message.port?:port)
+                email.setHostName(message.host?:defaultHost);
+                email.setSmtpPort(message.port?:defaultPort)
 
                 // Set from, to, cc, subject, and body
-                email.setFrom(message.from?:from)
+                email.setFrom(message.from?:defaultFrom)
                 email.setSubject("${prefix} ${message.subject}");
                 email.setHtmlMsg(message.body);
                 email.setTo(message.to.collect{new InternetAddress(it)})
