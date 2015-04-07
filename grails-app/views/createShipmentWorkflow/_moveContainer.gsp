@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(document).ready(function(){					
-		$("#dlgMoveContainer").dialog({ autoOpen: true, modal: true });	
+		$("#dlgMoveContainer").dialog({ autoOpen: true, modal: true, width: 800 });
 	});			
 </script>
 
@@ -24,7 +24,7 @@
 							<label><warehouse:message code="default.to.label"/></label>
 						</td>                            
 						<td valign="top" class="value">
-							<g:select optionKey="id" optionValue="name"
+							<g:select optionKey="id" optionValue="name" class="chzn-select-deselect"
 								name="shipment.id" id="shipment" from="${shipments}"/>
 						</td>
 					</tr>

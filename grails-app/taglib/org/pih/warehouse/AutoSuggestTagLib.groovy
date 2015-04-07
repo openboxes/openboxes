@@ -14,7 +14,7 @@ package org.pih.warehouse
 class AutoSuggestTagLib {
 
     def chooseSubstitute = { attrs, body ->
-        attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+        attrs.id = (attrs.id) ? attrs.id : "chooseSubstitute_" + (new Random()).nextInt()
         attrs.name = attrs.name
         attrs.valueId = (attrs.valueId)?attrs.valueId:"";
         attrs.valueName = (attrs.valueName)?attrs.valueName:"";
@@ -27,8 +27,7 @@ class AutoSuggestTagLib {
 
         out << g.render(template: '/taglib/chooseSubstitute', model: [attrs:attrs]);
     }
-		
-	
+
 	def autoSuggest_v2 = { attrs, body ->
 		attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
 		attrs.name = attrs.name
@@ -55,7 +54,8 @@ class AutoSuggestTagLib {
 		def name = attrs.name
 		def valueId = (attrs.valueId)?attrs.valueId:"";
 		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def width = (attrs.width) ? attrs.width : '300px';
+		def width = (attrs.width) ? attrs.width : 300;
+		def size = (attrs.size) ? attrs.size : 30;
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 		def styleClass = attrs.styleClass ?: ''
@@ -66,15 +66,16 @@ class AutoSuggestTagLib {
 		// def suggestDisplay = (showValue) ? "none" : "inline";
 		def spanDisplay = "none";
 		def suggestDisplay = "inline";
-    def valueDataBind = attrs.valueDataBind ? "data-bind='${attrs.valueDataBind}'" : ""
-    def textDataBind = attrs.valueDataBind ? "data-bind='${attrs.textDataBind}'" : ""
+		def valueDataBind = attrs.valueDataBind ? "data-bind='${attrs.valueDataBind}'" : ""
+		def textDataBind = attrs.valueDataBind ? "data-bind='${attrs.textDataBind}'" : ""
 		
 		def html = """
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
-				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}" ${valueDataBind }/>
+				<input id="${id}-id" class="value" type="hidden" name="${name}.id" value="${valueId}" ${valueDataBind}/>
+				<input id="${id}-value" class="value" type="hidden" name="${name}.value" value="${valueId}" ${valueDataBind }/>
 				<input id="${id}-suggest" type="text" ${textDataBind} 
 					class="autocomplete ${styleClass}" name="${name}.name" placeholder="${placeholder}" value="${valueName}" 
-					style="width: ${width}px; display: ${suggestDisplay};">
+					style="width: ${width}px; display: ${suggestDisplay};" size="${size}">
 				
 				<script language="javascript">
 					\$(document).ready(function() {
@@ -112,12 +113,14 @@ class AutoSuggestTagLib {
 								if (!ui.item) { 
 									\$(this).prev().val("null").trigger("change");
 									\$(this).val("");				// set the value in the textbox to empty string
-                  \$("#${id}-suggest").trigger("selected");
+                  					\$("#${id}-suggest").trigger("selected");
 								}
 								return false;
 							},
 							select: function(event, ui) {
-								if (ui.item) { 
+								if (ui.item) {
+									console.log(ui.item);
+									\$("#${id}-id").val(ui.item.id).trigger("change");
 									\$(this).prev().val(ui.item.value).trigger("change");;
 									\$(this).val(ui.item.valueText);
 								}

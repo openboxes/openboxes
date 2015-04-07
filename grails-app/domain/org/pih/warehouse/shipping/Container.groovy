@@ -125,20 +125,41 @@ class Container implements Comparable, java.io.Serializable {
 	 * Adds a new container to this container of the specified type
 	 */
 	Container addNewContainer (ContainerType containerType) {
-		def sortOrder = (this.containers) ? this.containers.size() : 0
+		def sortOrder = (containers) ? containers.size() : 0
 		
 		def container = new Container(
+			parentContainer: this,
 			containerType: containerType, 
-			shipment: this.shipment,
+			shipment: shipment,
 			sortOrder: sortOrder
 		)
 		
-		this.addToContainers(container)
-		this.shipment.addToContainers(container)
+		addToContainers(container)
+		shipment.addToContainers(container)
 		
 		return container
 	}
-	
+
+
+	Container findContainerByName(String name) {
+		return containers.find { it.name.equalsIgnoreCase(name) }
+	}
+
+	Container findOrCreateBox(String boxName) {
+		Container box = findContainerByName(boxName)
+		if (!box) {
+			box = addNewBox(this, boxName)
+		}
+		return box
+	}
+
+	Container addNewBox(Container parentContainer, String boxName) {
+		Container box = addNewContainer(ContainerType.findById(Constants.BOX_CONTAINER_TYPE_ID))
+		box.name = boxName
+		return box;
+
+	}
+
 	
 	/**
 	 * Adds a new item to the container

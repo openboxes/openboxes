@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(document).ready(function(){					
-		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '600px'});
+		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: 800});
 
         $(".updateQuantity").blur( function() {
             var total = parseInt($(totalItemQuantity).text());
@@ -55,7 +55,7 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="default.to.label"/></label></td>                            
 						<td valign="top" class="value">
-							<div style="height: 350px; overflow: auto;">
+							<div style="height: 200px; overflow: auto;">
 								<g:set var="count" value="${1 }"/>
 								<table>
 									<tr class="${count++ % 2 ? 'odd':'even' }">
@@ -70,10 +70,10 @@
 										</td>
 										<td>
 											<g:if test="${itemToMove.container}">
-												<g:textField id="newQuantity-0" class="updateQuantity" name="quantity-0" size="8" value="0"></g:textField>
+												<g:textField id="newQuantity-0" class="updateQuantity text" name="quantity-0" size="8" value="0"></g:textField>
 											</g:if>
 											<g:else>
-												<g:textField id="currentQuantity" class="currentQuantity readonly" name="quantity-0" size="8" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
+												<g:textField id="currentQuantity" class="currentQuantity readonly text" name="quantity-0" size="8" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
 											</g:else>
 										</td>
 									</tr>
@@ -87,10 +87,10 @@
 											</td>
 											<td>
 												<g:if test="${containerTo != itemToMove.container}">
-													<g:textField id="newQuantity-${containerTo?.id}" class="updateQuantity" name="quantity-${containerTo?.id}" size="8" value="0"></g:textField>
+													<g:textField id="newQuantity-${containerTo?.id}" class="updateQuantity text" name="quantity-${containerTo?.id}" size="8" value="0"></g:textField>
 												</g:if>
 												<g:else>
-													<g:textField id="currentQuantity" class="currentQuantity readonly" name="quantity-${containerTo?.id}" size="8" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
+													<g:textField id="currentQuantity" class="currentQuantity readonly text" name="quantity-${containerTo?.id}" size="8" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
 												</g:else>
 											</td>
 										</tr>									
@@ -98,14 +98,14 @@
 								</table>
 								
 							</div>
-							<g:hiddenField id="totalQuantity" class="totalQuantity" name="totalQuantity" disabled="true" value="${itemToMove?.quantity}"/>
+							<g:hiddenField id="totalQuantity" class="totalQuantity" name="totalQuantity" disabled="disabled" value="${itemToMove?.quantity}"/>
 						</td>
 					</tr>
 					<tr>
 						<td colspan="2">
 							<div class="buttons center">
-								<g:submitButton name="moveItemToContainer" value="${warehouse.message(code:'default.button.move.label')}"></g:submitButton>
-								<button name="cancelDialog" type="reset" onclick="$('#dlgMoveItem').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
+								<g:submitButton name="moveItemToContainer" value="${warehouse.message(code:'default.button.move.label')}" class="button"></g:submitButton>
+								<button name="cancelDialog" type="reset" onclick="$('#dlgMoveItem').dialog('close');" class="button"><warehouse:message code="default.button.cancel.label" /></button>
 							</div>
 						</td>
 					</tr>

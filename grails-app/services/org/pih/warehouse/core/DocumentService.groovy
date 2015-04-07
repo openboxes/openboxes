@@ -580,6 +580,165 @@ class DocumentService {
 		return outputStream;
 	}
 
+
+	boolean generatePartialPackingList(OutputStream outputStream, Shipment shipmentInstance) {
+
+		Workbook workbook = new HSSFWorkbook();
+		CreationHelper createHelper = workbook.getCreationHelper();
+		Sheet sheet = workbook.createSheet();
+
+		// Bold font
+		Font boldFont = workbook.createFont();
+		boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+
+		// Bold cell style
+		CellStyle labelStyle = workbook.createCellStyle();
+		labelStyle.setFont(boldFont);
+
+		CellStyle tableHeaderCenterStyle = workbook.createCellStyle();
+		CellStyle tableHeaderLeftStyle = workbook.createCellStyle();
+
+		// Bold and align center cell style
+		CellStyle boldAndCenterStyle = workbook.createCellStyle();
+		boldAndCenterStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		boldAndCenterStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		//boldAndCenterStyle.setWrapText(true)
+
+		// Align center cell style
+		CellStyle tableDataCenterStyle = workbook.createCellStyle();
+		tableDataCenterStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		tableDataCenterStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+		// Align center cell style
+		CellStyle tableDataPalletStyle = workbook.createCellStyle();
+		tableDataPalletStyle.setAlignment(CellStyle.ALIGN_LEFT);
+		tableDataPalletStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+		// Align left cell style
+		CellStyle tableDataLeftStyle = workbook.createCellStyle();
+		tableDataLeftStyle.setAlignment(CellStyle.ALIGN_LEFT);
+		tableDataLeftStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+		// Align left cell style
+		CellStyle tableDataDateStyle = workbook.createCellStyle();
+		tableDataDateStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		tableDataDateStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		tableDataDateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
+
+
+		// Wrap text cell style
+		CellStyle wrapTextCellStyle = workbook.createCellStyle();
+		wrapTextCellStyle.setWrapText(true);
+
+		// Date cell style
+		CellStyle dateStyle = workbook.createCellStyle();
+		dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
+		dateStyle.setAlignment(CellStyle.ALIGN_LEFT);
+		dateStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+		// Date cell style
+		CellStyle timestampStyle = workbook.createCellStyle();
+		timestampStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy hh:mm:ss"));
+		timestampStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+		timestampStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+		sheet.setColumnWidth((short)0, (short) ((50 * 3) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)1, (short) ((50 * 3) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)2, (short) ((50 * 3) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)3, (short) ((50 * 10) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)4, (short) ((50 * 5) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)5, (short) ((50 * 3) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)6, (short) ((50 * 3) / ((double) 1 / 20)))
+		sheet.setColumnWidth((short)7, (short) ((50 * 3) / ((double) 1 / 20)))
+
+		// SHIPMENT NAME
+		int counter = 0;
+		int CELL_INDEX = 0;
+
+		// ITEM TABLE HEADER
+		Row row = sheet.createRow((short)counter++);
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'container.pallet.label', default: 'Pallet'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'container.box.label', default: 'Box'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.productCode.label', default:'SKU'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'product.label'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventory.lotNumber.label'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventoryItem.expires.label'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.qty.label'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
+		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+		def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
+		shipmentInstance.shipmentItems.sort(). each { itemInstance ->
+
+			CELL_INDEX = 0
+			log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
+			row = sheet.createRow((short)counter++);
+
+			if (itemInstance?.container?.parentContainer) {
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.parentContainer?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+			}
+			else if (itemInstance?.container) {
+				row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+			}
+			else {
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+			}
+
+			row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode);
+			row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name);
+			row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.lotNumber);
+			row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+			row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.expirationDate);
+			row.getCell(CELL_INDEX++).setCellStyle(tableDataDateStyle);
+
+			row.createCell(CELL_INDEX).setCellValue(itemInstance?.quantity);
+			row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+			row.setHeightInPoints(30.0)
+			previousContainer = itemInstance?.container?.name
+		}
+
+		log.info ("workbook " + workbook)
+		workbook.write(outputStream)
+
+		return true
+
+	}
+
 	
 	
 	void generatePackingList(OutputStream outputStream, Shipment shipmentInstance) { 

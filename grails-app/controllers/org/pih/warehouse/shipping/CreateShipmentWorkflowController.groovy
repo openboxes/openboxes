@@ -9,12 +9,19 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.hibernate.StaleObjectStateException
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionException
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.web.multipart.MultipartFile
 
 class CreateShipmentWorkflowController {
-	
+
 	def mailService
 	def reportService
 	def shipmentService
@@ -171,6 +178,7 @@ class CreateShipmentWorkflowController {
     	}
     	
     	enterContainerDetails {
+
     		on("back") {
     			// TODO: figure out why this isn't working
     			// flow.shipmentInstance.properties = params
@@ -192,17 +200,35 @@ class CreateShipmentWorkflowController {
 				
 				[ selectedContainer : selectedContainer ]
 			}.to("enterContainerDetails")
-			
+
+
+
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
 			}.to("sendShipment")	// formerly showDetails
 			
 			on("save") {
-				shipmentService.saveShipment(flow.shipmentInstance)	
+				try {
+					shipmentService.saveShipment(flow.shipmentInstance)
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
 			}.to("finish")
 			
 			on("cancel").to("finish")
-			
+
+
+			on ("sortContainers") {
+				log.info("Sort containers" + params)
+				try {
+					shipmentService.sortContainers(params.get("container[]"))
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
+			}.to ("enterContainerDetails")
+
 			on("editContainer") {
 				// set the container we will to edit
 				flash.containerToEdit = Container.get(params.containerToEditId)
@@ -220,10 +246,15 @@ class CreateShipmentWorkflowController {
 			on("saveContainer").to("saveContainerAction")
 			
 			on("deleteContainer") {
-				def container = Container.get(params.container.id)	
-				shipmentService.deleteContainer(container)
-				flow.selectedContainer = null;
-				
+				try {
+					def container = Container.get(params.container.id)
+					def containerName = container?.name
+					shipmentService.deleteContainer(container)
+					flash.message = "Successfully deleted container ${containerName}. Moved all of its items into unpacked items."
+					flow.selectedContainer = null;
+				} catch (Exception e) {
+					flash.message = e.message
+				}
 			}.to("enterContainerDetails")
 			
 			on("cloneContainer") {
@@ -237,9 +268,15 @@ class CreateShipmentWorkflowController {
 			
 			on("saveBox").to("saveBoxAction")
 			
-			on("deleteBox") {		
-				def box = Container.get(params.box.id)
-				shipmentService.deleteContainer(box)
+			on("deleteBox") {
+				try {
+					def box = Container.get(params.box.id)
+					def boxName = box?.name
+					shipmentService.deleteContainer(box)
+					flash.message = "Successfully deleted box ${boxName}. Moved all of its items into unpacked items."
+				} catch (Exception e) {
+					flash.message = e.message
+				}
 			}.to("enterContainerDetails")
 			
 			on("cloneBox") {
@@ -260,10 +297,13 @@ class CreateShipmentWorkflowController {
 			
 			on("updateItem").to("updateItemAction")
 			
-			on("deleteItem"){	
-				def item = ShipmentItem.get(params.item.id)
-				shipmentService.deleteShipmentItem(item)
-				
+			on("deleteItem"){
+				try {
+					ShipmentItem shipmentItem = ShipmentItem.get(params.item.id)
+					shipmentService.deleteShipmentItem(shipmentItem)
+				} catch (Exception e) {
+					flash.message = e.message
+				}
 			}.to("enterContainerDetails")
 			
 			on("addContainer") {
@@ -299,7 +339,134 @@ class CreateShipmentWorkflowController {
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
 				flash.addItemToContainerId = params.container.id
 			}.to("saveItemAction")
-			
+
+			on("addContainers") {
+				try {
+					shipmentService.createContainers(params.id, params.containerId, params.containerTypeId, params.containerText)
+					flash.message = "Created containers"
+				} catch (ShipmentException e) {
+					flash.message = e.message
+				}
+			}.to("enterContainerDetails")
+
+			on("addShipmentItem") {
+				try {
+					shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
+					flash.message = "Added shipment item"
+				} catch (ShipmentItemException e) {
+					flash.message = e.message
+					[itemInstance: e.shipmentItem]
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
+			}.to("enterContainerDetails")
+
+			on("deleteContainers") {
+				log.info "Delete containers from shipment " + params
+				try {
+					shipmentService.deleteContainers(params.id, params.list("containerId"), false)
+					flash.message = "Delete selected containers"
+				} catch (ShipmentException e) {
+					flash.message = e.message
+				}
+
+			}.to("enterContainerDetails")
+
+			on("deleteContainersAndItems") {
+				log.info "Delete containers and items from shipment " + params
+				try {
+					shipmentService.deleteContainers(params.id, params.list("containerId"), true)
+					flash.message = "Delete selected containers and items"
+				} catch (ShipmentException e) {
+					flash.message = e.message
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
+			}.to("enterContainerDetails")
+
+			on("importPackingList") {
+				log.info "Import packing list into shipment " + params
+
+				try {
+					MultipartFile multipartFile = request.getFile('fileContents')
+					if (multipartFile.empty) {
+						flash.message = "File cannot be empty. Please select a packing list to import."
+						return
+					}
+
+					if (shipmentService.importPackingList(params.id, multipartFile.inputStream)) {
+						flash.message = "Successfully imported all packing list items. "
+
+					} else {
+						flash.message = "Failed to import packing list items due to an unknown error."
+
+					}
+				} catch (ShipmentItemException e) {
+					//flow.shipmentInstance.discard()
+					[itemInstance: e.shipmentItem]
+				} catch (Exception e) {
+					log.error("Failed to import packing list due to the following error: " + e.message, e)
+					flash.message = "Failed to import packing list due to the following error: " + e.message
+				}
+
+			}.to("enterContainerDetails")
+
+
+			on("exportPackingList") {
+				log.info "Export packing list for shipment " + params
+				Shipment shipment = Shipment.get(params.id)
+				if (!shipment) {
+					throw new Exception("Could not locate shipment with ID " + params.id)
+				}
+
+				try {
+
+					response.contentType = "application/vnd.ms-excel"
+					response.setHeader 'Content-disposition', "attachment; filename=\"Shipment ${shipment?.shipmentNumber} - Packing List.xls\""
+
+					// Write the file to the response
+					shipmentService.exportPackingList(params.id, response.outputStream)
+					response.outputStream.flush();
+					response.outputStream.close();
+					flash.message = "Successfully exported all packing list items. "
+
+
+				} catch (ShipmentItemException e) {
+					[itemInstance: e.shipmentItem]
+				} catch (Exception e) {
+					log.error("Failed to export packing list due to the following error: " + e.message, e)
+					flash.message = "Failed to export packing list due to the following error: " + e.message
+				}
+
+			}.to("enterContainerDetails")
+
+			on("moveShipmentItemToContainer") {
+				log.info "Move shipment item to parent container " + params
+				try {
+					shipmentService.moveShipmentItemToContainer(params.shipmentItem, params.container)
+					flash.message = "Successfully moved shipment item ${params.shipmentItem} to container ${params.container}"
+				} catch (ShipmentException e) {
+					flash.message = e.message
+				}
+
+			}.to("enterContainerDetails")
+
+			on("moveContainerToContainer") {
+				log.info "Move childContainer item to parent container " + params
+				try {
+					shipmentService.moveContainerToContainer(params.childContainer, params.parentContainer)
+					flash.message = "Successfully moved child container ${params.childContainer} to parent container ${params.parentContainer}"
+				} catch (ShipmentException e) {
+					flash.message = e.message
+				}
+
+
+
+			}.to("enterContainerDetails")
+
+
 			on("moveItemToContainer").to("moveItemAction")
 			on("moveContainerToShipment").to("moveContainerAction")
 			/**
@@ -312,7 +479,7 @@ class CreateShipmentWorkflowController {
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
-			on("enterContainerDetails").to("enterContainerDetails")
+			//on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
     	}
@@ -385,6 +552,10 @@ class CreateShipmentWorkflowController {
 							triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 							
 						}
+						catch (ShipmentException e) {
+							command.shipment = e.shipment
+							return error()
+						}
 						catch (TransactionException e) {
 							command.transaction = e.transaction
 							//shipmentInstance = Shipment.get(params.id)
@@ -442,8 +613,13 @@ class CreateShipmentWorkflowController {
     			}
     			else {
 					log.info "# containers: " + flow?.shipmentInstance?.containers?.size()
-					shipmentService.saveContainer(container)
-					
+					try {
+
+						shipmentService.saveContainer(container)
+					} catch (HibernateOptimisticLockingFailureException e) {
+						flash.message = e?.cause?.message?:e?.message
+						invalid()
+					}
     				// save a reference to this container if we need to clone it
     				if (flash.cloneQuantity) { flash.cloneContainer = container }
     				
@@ -720,11 +896,11 @@ class CreateShipmentWorkflowController {
 					def container = Container.get(params?.container?.id)
 					//def product = Product.get(params?.product?.id)
 					def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
-					if (!inventoryItem) { 
+					if (!inventoryItem) {
 						inventoryItem = new InventoryItem(params)
 						inventoryItem = inventoryService.findOrCreateInventoryItem(inventoryItem)
-					}					
-					
+					}
+
 					// Create a new shipment item
 					// FIXME product: product, lotNumber: params.lotNumber
 					def shipmentItem = new ShipmentItem(
@@ -762,19 +938,27 @@ class CreateShipmentWorkflowController {
 						valid()
 					}
 
-				} catch (RuntimeException e) {					
+				} catch (ShipmentItemException e) {
+					if (!flow.itemInstance) {
+						flow.itemInstance = new ShipmentItem();
+					}
+					flow.itemInstance.errors.reject(e?.message)
+					invalid()
+				} catch (HibernateOptimisticLockingFailureException e) {
+					flash.message = e?.cause?.message?:e?.message
+					invalid()
+				} catch (RuntimeException e) {
 					log.error("Error saving shipment item ", e)
 					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
-					if (!flow.itemInstance) 
+					if (!flow.itemInstance) {
 						flow.itemInstance = new ShipmentItem();
-					
+					}
 					// If there are no errors already (added from the save or
 					// validation method, then we should add the generic error message from the exception)
 					flow.itemInstance.errors.reject(e.message)
-
-						
 					invalid();
 				}
+
 			}
 			on("valid").to("enterContainerDetails")
 			on("invalid").to("enterContainerDetails")

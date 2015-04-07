@@ -18,13 +18,7 @@ class AutoSuggestStringTagLib {
 
     //@Cacheable("autoSuggestStringTagCache")
 	def autoSuggestString = { attrs, body ->
-        println "autoSuggestString: " + attrs
-        def startTime = System.currentTimeMillis()
-
 		out << g.render(template: '/taglib/autoSuggestString', model: [attrs:attrs]);
-
-        println "autoSuggestString: " + (System.currentTimeMillis() - startTime) + " ms"
-
 	}
 	
 	def autoSuggestString_v1 = { attrs, body ->

@@ -55,16 +55,19 @@
 							<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message
-										code="shipping.freightForwarder.label" /></label></td>
+										code="shipping.freightForwarder.label" /></label>
+
+										<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
+										</g:link>
+									</td>
 									<td valign="top" class="value">
 									
 										<g:selectShipper id="shipperInput" 
-											name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }"
+											name="shipperInput.id" class="chzn-select-deselect" value="${shipmentInstance?.shipmentMethod?.shipper?.id }"
                                             noSelection="['null':'']"/>
 										
-										<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
-										</g:link>	
+
 									</td>
 								</tr>
 							</g:if>
@@ -91,7 +94,7 @@
 									<td valign="top" class="name"><label><format:metadata obj="${referenceNumberType}" /></label></td>
 									<td valign="top" class="value">
 										<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" 
-											size="20" class="text" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
+											size="20" class="text" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" />
 									</td>
 								</tr>
 							</g:each>
@@ -104,8 +107,8 @@
 										class="value ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
 										nowrap="nowrap">
 											<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" 
-												class="text" size="10"/> 
-											<span class="fade"><warehouse:message code="shipping.statedValueExplanation.message"/></span>
+												class="text" size="20" placeholder="0.00"/>
+											<div class="fade"><warehouse:message code="shipping.statedValueExplanation.message"/></div>
 									</td>
 								</tr>	
 							</g:if>			
@@ -117,17 +120,17 @@
 										class="value ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 										nowrap="nowrap">
 											<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" 
-											 	class="text" size="10"/> 
-											<span class="fade"><warehouse:message code="shipping.totalValueExplanation.message"/></span>
+											 	class="text" size="20" placeholder="0.00"/>
+											<div class="fade"><warehouse:message code="shipping.totalValueExplanation.message"/></div>
 									</td>
 								</tr>	
 							</g:if>			
 							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message
-										code="default.comments.label"/></label></td>
-									<td valign="top">
-										<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="80" rows="3"/>
+										code="default.comments.label" default="Additional comments"/></label></td>
+									<td valign="top" class="value">
+										<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="80" rows="6"/>
 									</td>
 								</tr>	
 							</g:if>					

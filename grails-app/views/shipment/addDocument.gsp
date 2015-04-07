@@ -20,77 +20,73 @@
 		</g:hasErrors>
 			
 
-		<fieldset>
-			<g:render template="summary" />
-			<div>
-				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
-				<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
-					<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-					<g:hiddenField name="documentId" value="${documentInstance?.id}" />
-					<table>
-						<tbody>
-							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message
-									code="document.type.label" /></label></td>
-								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label class="optional"><warehouse:message
+		<g:render template="summary" />
+		<div class="box">
+			<h2>Edit document</h2>
+			<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
+			<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
+				<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+				<g:hiddenField name="documentId" value="${documentInstance?.id}" />
+				<table>
+					<tbody>
+						<tr class="prop">
+							<td valign="top" class="name"><label><warehouse:message
 									code="default.name.label" /></label>
-								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'name', 'errors')}">
-									<g:textField name="name" value="${documentInstance?.name}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label class="optional"><warehouse:message
-									code="document.number.label" /></label>
-								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'documentNumber', 'errors')}">
-									<g:textField name="documentNumber" value="${documentInstance?.documentNumber}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message
-									code="document.selectFile.label" /></label>
-								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
-									<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
-									<g:if test="${!documentInstance.id}">
-										<input name="fileContents" type="file" />
-									</g:if>
-									<g:else>
-										${documentInstance.filename}
-									</g:else>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"></td>
-								<td valign="top" class="value">
-									<div class="buttons">
-													<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
-										<button type="submit" class="positive"><img
-											src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
-														
-										&nbsp;
-										<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">
-											<warehouse:message code="default.button.cancel.label" /> 
-										</g:link>
-									</div>				
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</g:uploadForm>
-			</div>
-		</fieldset>
+							</td>
+							<td valign="top"
+								class="value ${hasErrors(bean: documentInstance, field: 'name', 'errors')}">
+								<g:textField name="name" value="${documentInstance?.name}" class="text" size="80"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><warehouse:message
+								code="document.type.label" /></label></td>
+							<td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
+									<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}"
+										class="chzn-select-deselect" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><warehouse:message
+								code="document.number.label" /></label>
+							</td>
+							<td valign="top"
+								class="value ${hasErrors(bean: documentInstance, field: 'documentNumber', 'errors')}">
+								<g:textField name="documentNumber" value="${documentInstance?.documentNumber}" class="text" size="80" />
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><warehouse:message
+								code="document.file.label" default="File"/></label>
+							</td>
+							<td valign="top"
+								class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
+								<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
+								<g:if test="${!documentInstance.id}">
+									<input name="fileContents" type="file" />
+								</g:if>
+								<g:else>
+									${documentInstance.filename}
+									<input name="fileContents" type="file" />
+								</g:else>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+				<div class="buttons">
+					<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+					<button type="submit" class="button">${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
+
+					&nbsp;
+					<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">
+						<warehouse:message code="default.button.cancel.label" />
+					</g:link>
+				</div>
+
+
+			</g:uploadForm>
+		</div>
 	</div>
 </body>
 </html>

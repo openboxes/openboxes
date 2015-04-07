@@ -63,8 +63,15 @@ class Constants {
 	static final String SUPPLIER_LOCATION_TYPE_ID = "4"
 	
 	// direct references to containers by primary key
-	static final String BOX_CONTAINER_TYPE_ID = "4"	
-	
+	static final String DEFAULT_CONTAINER_TYPE_ID = "1"
+	static final String PALLET_CONTAINER_TYPE_ID = "2"
+	static final String SUITCASE_CONTAINER_TYPE_ID = "3"
+	static final String BOX_CONTAINER_TYPE_ID = "4"
+	static final String TRUNK_CONTAINER_TYPE_ID = "5"
+	static final String ITEM_CONTAINER_TYPE_ID = "6"
+	static final String OTHER_CONTAINER_TYPE_ID = "7"
+	static final String CRATE_CONTAINER_TYPE_ID = "8"
+
 	// Characters that should be included with each of the random number types 	
 	static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
 	static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"

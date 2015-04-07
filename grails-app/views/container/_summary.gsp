@@ -1,13 +1,10 @@
 <table>
 	<tr>
 		<td>
-		
 			<warehouse:message code="shipment.numItems.label" />:
-			<label> ${container?.shipmentItems?.size() }
-			</label>
+			<label> ${container?.shipmentItems?.size()?:0 }</label>
 			
-			<warehouse:message
-					code="default.weight.label" />:
+			<warehouse:message code="default.weight.label" />:
 			<label> 
 			<g:if test="${container?.weight }">
 				<g:formatNumber format="#,##0.00"
@@ -49,9 +46,10 @@
 			<g:else>
 				<warehouse:message code="default.none.label" />
 			</g:else>
-			</label>		
-		
-		
+			</label>
+		</td>
+		<td class="right">
+
 		</td>
 	
 	</tr>

@@ -1,24 +1,29 @@
-                                            
+<%@ page import="org.pih.warehouse.shipping.ShipmentItem" %>
+
 <html>
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title><warehouse:message code="shipping.addShipmentItems.label"/></title>  
-         
+         <title><warehouse:message code="shipping.addShipmentItems.label"/></title>
+
          <style>
 	         .ui-autocomplete { height: 250px; overflow-y: scroll; overflow-x: hidden;}
 	 		.draggable { cursor: move; } 
 	 		.droppable { /*padding: 10px; border: 0px dashed lightgrey;*/ } 
 	 		.sortable { }
 	 		.ui-state-highlight { font-weight: bold; color: black; }  
-	 		.strikethrough { color: lightgrey; } 
+	 		.strikethrough { color: lightgrey; }
+			.ui-state-highlight { height: 2.5em; line-height: 2.2em; }
+			 #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+			 #sortable tr { margin: 0 5px 5px 5px; padding: 5px; font-size: 1.2em; height: 1.5em; }
+			 html>body #sortable tr { height: 1.5em; line-height: 1.2em; }
 
 			tr.selected { 
 	 			border-top: 1px solid lightgrey;
-	 			border-bottom: 1px solid lightgrey;			
+	 			border-bottom: 1px solid lightgrey;
 			}
 	 		tr.selected .containerName a { 
-	 			color: red;
+	 			color: #666;
 	 			font-weight: bold;
 	 		}	 		
 	 		tr.not-selected { 
@@ -31,11 +36,11 @@
     </head>
     <body>
     
-	 	<!-- 			 	
-	 		Hack used to refresh the shipment containers when sorting (because we're using AJAX)	 		
+	 	<%--
+	 		Hack used to refresh the shipment containers when sorting (because we're using AJAX)
 	 		${shipmentInstance?.refresh() }
-	 	-->
-    
+	 	--%>
+
 		<div class="body">
 			<g:if test="${message}">
 				<div class="message">${message}</div>
@@ -45,7 +50,6 @@
 					<g:renderErrors bean="${containerInstance}" as="list" />
 				</div>				
 			</g:hasErrors> 
-			
 			<g:hasErrors bean="${itemInstance}">
 				<div class="errors">
 					<g:renderErrors bean="${itemInstance}" as="list" />
@@ -99,298 +103,345 @@
 		 		<g:if test="${itemToMove }">
 		 			<g:render template="moveItem" model="['item':itemToMove]"/>
 		 		</g:if>
-			 	
-				<%-- Main content section --%>
-				<g:set var="containerList" value="${shipmentInstance?.containers?new ArrayList(shipmentInstance?.containers):shipmentInstance?.containers}" />
-				<table>
-			 		<tbody>		
-			 			<tr>
-				 			<td colspan="2">
-				 				<g:render template="shipmentButtons"/>				 						 				
-					 			<g:render template="containerButtons" model="[container:selectedContainer]"/>	
-				 			</td>
-			 			</tr>
-			 		
-				 		<tr class="">
-					 		<%-- 
-					 		
-					 				Display the pallets & boxes in this shipment 
-					 		
-					 		--%> 
-							<g:if test="${containerList }">
-					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey; padding: 0px;">
-									<div class="box" >
-										<g:set var="count" value="${0 }"/>	
-										<h2 class="center"><warehouse:message code="containers.label"/></h2>
-                                        <table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">
-											<thead>
 
-												<tr class="">													
-													<th class="left middle">
-														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
-															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
-														</g:link>
-													</th>
-													<th colspan="3" class="center middle">														
-														${containerList?.indexOf(selectedContainer)+2} of ${containerList?.size()+1 }
-													</th>
-													<th class="right middle">
-														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']">
-															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}" class="middle"/>
-														</g:link>
-													</th>
-												</tr>															
-											</thead>
-											<tbody>
-												<!-- 
-												
-													UNPACKED ITEMS 
-												
-												-->				
-												<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
-												<tr class="droppable ${count++%2==0?'odd':'even' } ${styleClass }" container="null">
+
+				<div class="buttonBar">
+					<g:render template="shipmentButtons"/>
+					<g:render template="containerButtons" model="[container:selectedContainer]"/>
+
+					<div class="button-group">
+						<g:link class="button icon reload" controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" id="${shipmentInstance?.id}" params="[skipTo: 'Packing']">
+							<warehouse:message code="shipping.reload.label" default="Reload"/></g:link>
+					</div>
+				</div>
+
+
+				<div class="yui-gd">
+					<div class="yui-u first">
+
+
+						${flow?.shipmentInstance}
+						<%-- Display the pallets & boxes in this shipment --%>
+
+						<div class="box" >
+							<g:set var="count" value="${0 }"/>
+							<h2><warehouse:message code="containers.label"/></h2>
+
+							<g:form action="createShipment">
+								<g:hiddenField name="id" value="${shipmentInstance?.id}" />
+								<table class="sortable"><%-- data-update-url="${createLink(controller:'json', action:'sortContainers')}" --%>
+									<thead>
+										<tr>
+											<td class="left middle" colspan="3">
+												<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']" class="button icon arrowleft">
+													Previous
+												</g:link>
+											</td>
+											<td class="right middle" colspan="2">
+												<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']" class="button icon arrowright">
+													Next
+												</g:link>
+											</td>
+										</tr>
+									</thead>
+									<tbody>
+										<!-- UNPACKED ITEMS -->
+										<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
+										<tr class="droppable ${styleClass }" container="null">
+											<td width="1%">
+												<g:checkBox name="containerId" value="${null }" checked="${false}" disabled="${true}"/>
+
+											</td>
+											<td class="left" width="5%">
+												<span class="action-menu" >
+													<button id="unpackedItemsActionBtn" class="action-btn">
+														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+													</button>
+													<div class="actions left">
+														<g:render template="containerMenuItems" model="[container:containerInstance]"/>
+														<g:render template="shipmentMenuItems"/>
+													</div>
+												</span>
+											</td>
+
+											<td class="middle">
+												<div class="containerName">
+													<g:link action="createShipment" event="enterContainerDetails" style="display: block;">
+														<warehouse:message code="shipping.unpackedItems.label"/>
+													</g:link>
+												</div>
+											</td>
+											<td class="middle right">
+												${shipmentInstance?.countShipmentItemsByContainer(null)} items
+											</td>
+											<td class="right">
+												<span class="sorthandle"></span>
+											</td>
+										</tr>
+
+										<!-- ALL OTHER PALLETS, CRATES, BOXES -->
+										<g:if test="${shipmentInstance?.containers }">
+											<%--shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }--%>
+											<g:each var="containerInstance" in="${shipmentInstance?.findAllParentContainers()?.sort { it.sortOrder }}">
+												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
+												<tr id="container_${containerInstance?.id }" class="droppable ${styleClass } connectable parentContainer" container="${containerInstance?.id }">
+													<td width="1%">
+														<g:checkBox name="containerId" value="${containerInstance?.id}" checked="${false}"/>
+													</td>
 													<td class="left">
-														<span class="action-menu" >
-															<button id="unpackedItemsActionBtn" class="action-btn">
+														<span class="action-menu">
+															<button id="containerActionBtn-${containerInstance?.id }" class="action-btn">
 																<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 															</button>
 															<div class="actions left">
-																<g:render template="containerMenuItems" model="[container:containerInstance]"/>																
-																<g:render template="shipmentMenuItems"/>
+																<g:render template="containerMenuItems" model="[container:containerInstance]"/>
 															</div>
 														</span>
 													</td>
-													<td class="middle"><span class="fade">${count }.</span></td>
-													<td class="middle">
-														<div class="containerName">														
-															<g:link action="createShipment" event="enterContainerDetails" style="display: block;"> 
-																<warehouse:message code="shipping.unpackedItems.label"/>
-															</g:link>
+
+													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="left">
+														<div class="draggable draghandle tag" childContainer="${containerInstance?.id}">
+															<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
+															&nbsp;
+															<span class="containerName">
+																<a name="container-${containerInstance.id }"></a>
+																<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]">
+																	${containerInstance?.name}
+																</g:link>
+															</span>
 														</div>
 													</td>
-													<td class="middle center">
-														<div class="numberCircle">
-															<g:set var="unpackedShipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container == null})}"/>
-											        		${unpackedShipmentItems?.size() }
-											        	</div> 
+													<td class="middle right">
+														${containerInstance?.shipmentItems?.size() } items
+
 													</td>
-													<td class="right">	
+													<td class="right">
+														<!--sortOrder:${containerInstance?.sortOrder}-->
 														<span class="sorthandle"></span>
-													</td> 
-												</tr>		
-												
-												<!-- 
-												
-													ALL OTHER PALLETS, CRATES, BOXES 
-													
-												-->													
-												<g:if test="${shipmentInstance?.containers }">
-													<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
-														<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
-														<tr id="container_${containerInstance?.id }" class="droppable ${styleClass } ${count++%2==0?'odd':'even' } connectable" container="${containerInstance?.id }">
-															<td class="left">
-																<span class="action-menu">
-																	<button id="containerActionBtn-${containerInstance?.id }" class="action-btn">
-																		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-																	</button>
-																	<div class="actions left">
-																		<g:render template="containerMenuItems" model="[container:containerInstance]"/>
-																	</div>
-																</span>
-															</td>
-															<td class="middle"><span class="fade">${count }.</span></td>
-															<td style="vertical-align: middle;" id="${containerInstance?.id }" class="left">													
-																<div class="containerName">
-																	<a name="container-${containerInstance.id }"></a>
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" style="display: block;">
-																		${containerInstance?.name}
-																	</g:link>
+													</td>
+												</tr>
+
+												<g:set var="childContainers" value="${shipmentInstance?.findAllChildContainers(containerInstance)?.sort() }"/>
+												<g:each var="childContainerInstance" in="${childContainers}">
+													<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
+													<tr id="container_${childContainerInstance?.id }" class="childContainer droppable ${styleClass }" container="${childContainerInstance?.id }">
+														<td width="1%">
+															<g:checkBox name="containerId" value="${childContainerInstance?.id}" checked="${false}"/>
+														</td>
+														<td class="left">
+															<span class="action-menu" >
+																<button id="childContainerActionBtn-${childContainerInstance?.id }" class="action-btn">
+																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+																</button>
+																<div class="actions" style="position: absolute; z-index: 1; display: none;">
+																	<g:render template="containerMenuItems" model="[container:childContainerInstance]"/>
 																</div>
-															</td>
-															<td class="middle right">
-													        	<div class="numberCircle">
-													        		${containerInstance?.shipmentItems?.size() }
-													        	</div> 
-															</td>
-															<td class="right">	
-																<span class="sorthandle"></span>
-															</td> 
-														</tr>
-														
-														<g:each var="childContainerInstance" in="${shipmentInstance?.containers?.findAll { it.parentContainer == containerInstance}?.sort() }">
-															<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
-															<tr id="container_${containerInstance?.id }" class="${styleClass } ${count++%2==0?'odd':'even' }">
-																<td class="left">									
-																	<span class="action-menu" >
-																		<button id="childContainerActionBtn-${childContainerInstance?.id }" class="action-btn">
-																			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-																		</button>
-																		<div class="actions" style="position: absolute; z-index: 1; display: none;">
-																			<g:render template="containerMenuItems" model="[container:childContainerInstance]"/>
-																		</div>
-																	</span>
-																</td>
-																<td class="middle"><span class="fade">${count }.</span></td>
-																<td class="middle">
-																	<div class="containerName">
-																		<img src="${resource(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>
-																		<a name="container-${childContainerInstance.id }"></a>
-																		<%-- fragment="container-${childContainerInstance?.id }" --%>
-																		<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]">
-																			${childContainerInstance?.name}
-																		</g:link>
-																	</div>
-																</td>
-																<td class="middle right">
-																	<div class="numberCircle">
-														        		${childContainerInstance?.shipmentItems?.size() }
-														        	</div> 																
-																
-																</td>
-																<td class="right">
-																	<%-- <span class="sorthandle"></span>--%>
-																</td>
-															</tr>
-														</g:each>
-													</g:each>
-												</g:if>
-											</tbody>
-										</table>
-									</div>			 			
-					 			</td>
-							</g:if>
-				 			
-				 			<%-- 
+															</span>
+														</td>
 
-		 							Display the contents of the currently selected container 
+														<td class="middle">
+															<div class="draggable draghandle tag" childContainer="${childContainerInstance?.id}">
+																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
+																&nbsp;
 
-				 			--%>			 			
-				 			<td valign="top" style="padding: 0px;">		
-								<div class="box">
-                                    <h2>
-                                        <span class="middle">
-                                            <g:if test="${selectedContainer}">
-                                                <g:if test="${selectedContainer.parentContainer }">
-                                                    ${selectedContainer?.parentContainer?.name } &rsaquo;
-                                                </g:if>
-                                                ${selectedContainer?.name }
-                                            </g:if>
-                                            <g:else>
-                                                <warehouse:message code="shipping.unpackedItems.label" />
-                                            </g:else>
-                                        </span>
+																<span class="containerName">
+																	<a name="container-${childContainerInstance.id }"></a>
+																	<%-- fragment="container-${childContainerInstance?.id }" --%>
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]">
+																		${childContainerInstance?.name}
+																	</g:link>
+																</span>
+															</div>
+														</td>
+														<td class="middle right">
+															${childContainerInstance?.shipmentItems?.size()?:0 } items
+														</td>
+														<td class="right">
+															<!--sortOrder:${containerInstance?.sortOrder}-->
+															<%-- <span class="sorthandle"></span>--%>
+														</td>
+													</tr>
 
+												</g:each>
+											</g:each>
+										</g:if>
+										<tr class="droppable fade not-selected" container="trash" style="height: 44px;">
+											<td colspan="5" class="center middle">
+												<div >
+													<img src="${resource(dir: 'images/icons/silk', file: 'bin_empty.png')}"/>
+													<warehouse:message code="shipment.trash.label" default="Drop here to remove from shipment"/>
 
-                                    </h2>
-									<table style="border: 0px solid lightgrey">
+												</div>
+
+											</td>
+										</tr>
+
+									</tbody>
+									<tfoot>
 										<tr>
-											<td class="left" style="width:1%;">
-												<div class="action-menu" >
-													<button id="selectedContainerActionBtn" class="action-btn">
+											<td colspan="5">
+												<div>
+
+													<div class="button-group">
+														<a id="btnAddContainers" href="javascript:void(0);" class="button">Add packing units</a>
+
+													</div>
+													<div class="button-group">
+														<g:submitButton name="deleteContainers" value="Delete selected" class="button icon trash"></g:submitButton>
+														<g:submitButton name="deleteContainersAndItems" value="Delete selected (including Items)" class="button icon trash"></g:submitButton>
+
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</g:form>
+						</div>
+					</div>
+					<div class="yui-u">
+
+
+						<div class="box-slim">
+							<g:form action="createShipment">
+								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
+								<g:hiddenField name="containerId" value="${selectedContainer?.id}"/>
+								<g:autoSuggest id="inventoryItem" name="inventoryItem" jsonUrl="${request.contextPath }/json/findInventoryItems" placeholder="Enter lot number or product code" styleClass="text" size="60"/>
+								<g:textField name="quantity" value="" class="text" placeholder="Quantity" size="5"/>
+								<g:submitButton name="addShipmentItem" value="Add item" class="button icon add"></g:submitButton>
+							</g:form>
+						</div>
+
+						<%-- Display the contents of the currently selected container --%>
+						<div class="box">
+							<h2>
+								<span class="middle">
+									<g:if test="${selectedContainer}">
+										<g:if test="${selectedContainer.parentContainer }">
+											${selectedContainer?.parentContainer?.name } &rsaquo;
+										</g:if>
+										${selectedContainer?.name }
+									</g:if>
+									<g:else>
+										<warehouse:message code="shipping.unpackedItems.label" />
+									</g:else>
+								</span>
+							</h2>
+							<table style="border: 0px solid lightgrey">
+								<tr>
+									<td class="left" style="width:1%;">
+										<div class="action-menu" >
+											<button id="selectedContainerActionBtn" class="action-btn">
+												<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+											</button>
+											<div class="actions">
+												<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
+												<g:render template="shipmentMenuItems" />
+
+											</div>
+										</div>
+									</td>
+									<td class="middle left">
+
+											<div class="">
+												<g:render template="/container/summary" model="[container:selectedContainer]"/>
+											</div>
+									</td>
+								</tr>
+							</table>
+
+							<table>
+								<thead>
+								<tr class="prop">
+									<th class="middle"></th>
+									<th class="middle"></th>
+									<th class="middle center"><warehouse:message code="product.productCode.label"/></th>
+									<th class="middle"><warehouse:message code="product.label"/></th>
+									<th class="middle"><warehouse:message code="default.lotSerialNo.label"/></th>
+									<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
+									<th class="left middle"><warehouse:message code="default.qty.label"/></th>
+									<th class="middle"><warehouse:message code="shipping.recipients.label"/></th>
+								</tr>
+								</thead>
+								<tbody>
+								<%--
+								<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
+								<g:set var="shipmentItems" value="${shipmentInstance?.findShipmentItemsByContainer(selectedContainer)}"/>
+								--%>
+								<g:set var="shipmentItems" value="${org.pih.warehouse.shipping.ShipmentItem?.findAllByShipmentAndContainer(shipmentInstance, selectedContainer)}"/>
+								<g:if test="${shipmentItems }">
+									<g:set var="count" value="${0 }"/>
+									<g:each var="shipmentItem" in="${shipmentItems?.sort()}">
+										<tr id="shipmentItemRow-${shipmentItem?.id }" class="${(count++%2)?'odd':'even' }">
+
+											<td nowrap="nowrap" class="left">
+												<div class="action-menu">
+													<button id="shipmentItemActionBtn-${shipmentItem?.id }" class="action-btn">
 														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 													</button>
 													<div class="actions">
-														<g:render template="containerMenuItems" model="[container:selectedContainer]"/>													
-														<g:render template="shipmentMenuItems" />													
-														
+														<g:render template="itemMenuItems" model="[itemInstance:shipmentItem]"/>
 													</div>
-												</div>	
+												</div>
+												<%--
+                                                <span id="${shipmentItem?.id }" class="draggable">
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" class="middle"/>
+                                                </span>
+                                                --%>
 											</td>
-											<td class="middle left">
-												<g:if test="${selectedContainer}">
-													<div class="">										
-														<g:render template="/container/summary" model="[container:selectedContainer]"/>
-										 			</div>	
-												</g:if>
+											<td>
+												<div class="draggable draghandle tag" shipmentItem="${shipmentItem?.id }">
+													<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
+													&nbsp;
+													${shipmentItem?.product?.productCode}
+													(${shipmentItem?.quantity}
+													${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')})
+												</div>
+											</td>
+											<td class="center middle">
+												${shipmentItem?.product?.productCode}
+											</td>
+											<td class="middle">
+												<div>
+													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
+														<format:product product="${shipmentItem?.inventoryItem?.product}"/>
+													</g:link>
+												</div>
+											</td>
+											<td class="middle">
+												<div class="lotNumber">
+													${shipmentItem?.inventoryItem?.lotNumber}
+												</div>
+											</td>
+											<td class="center middle">
+												<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
+											</td>
+											<td class="left middle">
+												${shipmentItem?.quantity}
+												${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+											</td>
+
+											<td class="left middle">
+												${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}
 											</td>
 										</tr>
-									</table>									
-								
-									<table>
-										<thead>
-											<tr>
-												<th class="middle"><warehouse:message code="default.actions.label"/></th>
-												<th class="left middle"><warehouse:message code="default.qty.label"/></th>
-                                                <th class="middle center"><warehouse:message code="product.productCode.label"/></th>
-												<th class="middle"><warehouse:message code="product.label"/></th>
-												<th class="middle"><warehouse:message code="default.lotSerialNo.label"/></th>
-												<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
-												<th class="middle"><warehouse:message code="shipping.recipients.label"/></th>
-											</tr>
-										</thead>									
-										<tbody>
-											<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
-											<g:if test="${shipmentItems }">
-												<g:set var="count" value="${0 }"/>
-												<g:each var="shipmentItem" in="${shipmentItems?.sort()}">		
-													<tr id="shipmentItemRow-${shipmentItem?.id }" class="${(count++%2)?'odd':'even' }">
-														
-														<td nowrap="nowrap" class="left">
-															<div class="action-menu">
-																<button id="shipmentItemActionBtn-${shipmentItem?.id }" class="action-btn">
-																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-																</button>
-																<div class="actions">
-																	<g:render template="itemMenuItems" model="[itemInstance:shipmentItem]"/>
-																</div>
-															</div>		
-															<%-- 						
-															<span id="${shipmentItem?.id }" class="draggable">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" class="middle"/>
-															</span>
-															--%>
-														</td>
-														<td class="left middle">
-															<span class="draggable draghandle" shipmentItem="${shipmentItem?.id }">
-																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
-																&nbsp;
-																${shipmentItem?.quantity}
-																${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-															</span>
-														</td>
-                                                        <td class="center middle">
-                                                            ${shipmentItem?.product?.productCode}
-                                                        </td>
-														<td class="middle">
-															<div>
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
-                                                                    <format:product product="${shipmentItem?.inventoryItem?.product}"/>
-																</g:link>
-															</div>
-														</td>
-														<td class="middle">
-															<div class="lotNumber">
-															${shipmentItem?.inventoryItem?.lotNumber}
-															</div>
-														</td>
-														<td class="center middle">
-															<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMMMM yyyy"/>
-															
-														</td>
-														<td class="left middle">
-															${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}
-														</td>
-													</tr>
-												</g:each>
-											</g:if>
-											<g:unless test="${shipmentItems }">
-												<tr class="none">
-													<td colspan="7" class="middle center" style="height: 200px;">
-														<div class="middle center">
-															<span class="fade">
-																<warehouse:message code="shipment.noShipmentItems.message"/>
-															</span>
-														</div>																								
-													</td>
-												</tr>
-											</g:unless>
-										</tbody>
-									</table>								
-								</div>			 			
-				 			</td>
-				 		</tr>
-				 	</tbody>
-			 	</table>
+									</g:each>
+								</g:if>
+								<g:unless test="${shipmentItems }">
+									<tr class="none">
+										<td colspan="8">
+											<div class="middle center fade empty">
+												<warehouse:message code="shipment.noShipmentItems.message"/>
+											</div>
+										</td>
+									</tr>
+								</g:unless>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
 			</div>
 			<div class="buttons">
 				<g:form action="createShipment" method="post" >
@@ -400,33 +451,206 @@
 					<button name="_eventId_cancel" class="button"><warehouse:message code="default.button.cancel.label"/></button>
 	            </g:form>
 			</div>
-        </div>        
-        
-        
-        
+        </div>
+
+
+	<div id="dlgAddContents" title="Import Packing List">
+		<div>
+		<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
+			<g:uploadForm action="createShipment">
+				<g:hiddenField name="id" value="${shipmentInstance?.id}" />
+				<table>
+					<tbody>
+					<tr class="prop">
+						<td valign="top" class="name"><label><warehouse:message
+								code="document.selectFile.label" /></label>
+						</td>
+						<td valign="top" class="value">
+							<input name="fileContents" type="file" />
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				<div class="buttons">
+					<g:submitButton name="importPackingList" value="Import Packing List" class="button icon add"></g:submitButton>
+				</div>
+			</g:uploadForm>
+		</div>
+	</div>
+
+	<div id="dlgAddContainers" title="Add packages">
+		<div >
+		<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
+			<g:form action="createShipment">
+				<g:hiddenField name="id" value="${shipmentInstance?.id}" />
+				<table>
+					<tbody>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label><warehouse:message code="container.type.label" /></label>
+							</td>
+							<td valign="top" class="value">
+								<g:select name="containerTypeId" optionKey="id" optionValue="name"
+										  from="${org.pih.warehouse.shipping.ContainerType.list()}" noSelection="['':'']" class="chzn-select-deselect containerTextComponent"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label><warehouse:message code="default.name.label" /></label>
+							</td>
+							<td valign="top" class="value">
+								<g:textField id="container-text-name" name="name" value="" placeholder="Enter the default name (e.g. Pallet, Box)" class="text medium containerTextComponent" size="80"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label><warehouse:message code="shipment.startIndex.label" default="Starting index"/></label>
+							</td>
+							<td valign="top" class="value">
+								<g:textField id="container-text-start" name="start" value="${1}" placeholder="Enter the number you want to start with" class="text medium containerTextComponent"  size="80"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label><warehouse:message code="shipment.numberOfContainers.label" default="Number of containers"/></label>
+							</td>
+							<td valign="top" class="value">
+								<g:textField id="container-text-count" name="numberOfContainers" value="" placeholder="How many containers do you want to create?" class="text medium containerTextComponent"  size="80"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label><warehouse:message code="shipment.parentContainer.label" default="Parent Container"/></label>
+							</td>
+							<td valign="top" class="value">
+								<g:select name="containerId" class="chzn-select-deselect containerTextComponent"
+										  optionKey="id" optionValue="name" noSelection="['':'Choose parent container or leave empty']"
+										  from="${shipmentInstance?.findAllParentContainers()}" value="${selectedContainer?.id}"></g:select>
+							</td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label><warehouse:message code="shipment.containerText.label" default="Create the following containers"/></label>
+
+							</td>
+							<td valign="top" class="value">
+								<g:textArea id="container-text" name="containerText" rows="10" style="width:100%"></g:textArea>
+							</td>
+						</tr>
+
+
+					</tbody>
+				</table>
+				<div class="buttons">
+					<g:submitButton name="addContainers" value="Add packing units" class="button icon add"></g:submitButton>
+
+				</div>
+
+			</g:form>
+		</div>
+	</div>
+
+	<script>
+
+		function refreshContainerText() {
+			var name = $("#container-text-name").val() || "Container";
+			var start = $("#container-text-start").val() || 1;
+			var count = $("#container-text-count").val() || 1;
+			var end = parseInt(start) + parseInt(count)
+			var containerText = ""
+			for (var i=start; i<end; i++) {
+				containerText += (name + " " + i);
+				if (i<end-1) {
+					containerText += "\n"
+				}
+			}
+			$("#container-text").val(containerText);
+		}
+	</script>
+	<script>
+
+		$(document).ready(function() {
+
+			$(".containerTextComponent").change(function(event) {
+				refreshContainerText();
+			});
+
+			$("#btnAddContents").click(function(event){
+				$("#dlgAddContents").dialog('open');
+			});
+			$("#dlgAddContents").dialog({
+				autoOpen: false,
+				modal: true,
+				width: 600
+			});
+		});
+	</script>
+	<script>
+		$(document).ready(function() {
+			$("#btnAddContainers").click(function(event){
+				$("#dlgAddContainers").dialog('open');
+			});
+			$("#dlgAddContainers").dialog({
+				autoOpen: false,
+				modal: true,
+				width: 800
+			});
+		});
+	</script>
+
         <%--
         <g:render template="/createShipmentWorkflow/moveDraggableItem"/>
 		--%>        
 		<script>
+
+
 			$(document).ready(function() {
 				
-				$(".sortable tbody").sortable({
+				var sortable = $(".sortable tbody").sortable({
 				    handle : '.sorthandle', 
-				    //axis : "y",
-				    //helper: "clone",
-				    //forcePlaceholderSize: true,
-				    //placeholder: "ui-state-highlight",
-					//connectWith: ".connectable",				    
-				    update : function() { 
-						var updateUrl = "${createLink(controller:'json', action:'sortContainers') }";						
-						var sortOrder = $(this).sortable('serialize'); 
-						$.post(updateUrl, sortOrder);
-						$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd")
-							.filter(":even").addClass("even");
+				    axis : "y",
+				    helper: "clone",
+				    forcePlaceholderSize: true,
+					containment: ".sortable",
+					placeholder: "ui-state-highlight",
+					connectWith: ".connectable",
+					items: "> tr.parentContainer",
+				    update : function() {
+						//var updateUrl = "${createLink(controller:'json', action:'sortContainers') }";
+						var sortOrder = $(this).sortable('serialize');
+						console.log(sortOrder);
+						//$.post(updateUrl, sortOrder);
+						//$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd")
+						//	.filter(":even").addClass("even");
+
+
+						//var sortOrder = $(this).sortable('serialize');
+						//console.log(sortOrder);
+						$.ajax ({
+							type: "POST",
+							url: "${request.contextPath}/createShipmentWorkflow/createShipment",
+							data: sortOrder + "&_eventId=sortContainers&execution=${request.flowExecutionKey}",
+							dataType: "json",
+							cache: false,
+							success: function(data) {
+								console.log(data);
+							},
+							error: function (jqXHR, textStatus, errorThrown) {
+								console.log(jqXHR);
+								console.log(textStatus);
+								console.log(errorThrown);
+							}
+						});
+
+
+						// Refresh page to make sure that changes are refreshed
+						location.reload();
 				    }
 				});
-			
-			
+
+
+
 				//$('.selectable').selectable();
 				$('.draggable').draggable({
 					handle		: ".draghandle",
@@ -437,15 +661,18 @@
 					autoSize	: true,
 					ghosting	: true,
 					onStart		: function ( event ) { alert("started") },
-					onStop		: function() { $('.droppable').each(function() { this.expanded = false; }); }				
+					onStop		: function() { $('.droppable').each(function() { this.expanded = false; }); }
 				});
 	
 				$('.droppable').droppable( {
 					accept: '.draggable',
 					tolerance: 'intersect',
 					//greedy: true,
-					over: function(event, ui) { 
-						$( this ).addClass( "ui-state-highlight" );						
+					over: function(event, ui) {
+						console.log(event);
+						console.log(ui);
+						console.log($(this));
+						$( this ).addClass( "ui-state-highlight" );
 					},
 					out: function(event, ui) { 
 						$( this ).removeClass( "ui-state-highlight" );
@@ -453,26 +680,47 @@
 					drop: function( event, ui ) {
 						//alert("dropped");
 						//ui.draggable.hide();
-						ui.draggable.addClass( "strikethrough" );
-						$( this ).removeClass( "ui-state-highlight" );
-						var shipmentItem = ui.draggable.attr("shipmentItem");
-						var container = $(this).attr("container");
-						$("#shipmentItemRow-" + shipmentItem).hide();
-						moveShipmentItemToContainer(shipmentItem, container);
-						window.location.reload();
-						//alert("Move item " + shipmentItem + " to container " + container);
-						/*								
-						//ui.draggable.hide();
-						//ui.draggable.addClass( "strikethrough" );
-						//$( this ).removeClass( "ui-state-highlight" );
-						
-						//var moveTo = $(this).attr("id");
-						
-						//var url = "${request.contextPath}/category/moveItem?child=" + child + "&newParent=" + parent;
-						//window.location.replace(url);
-						//moveItemToContainer(itemId, moveTo);
-						//$("#shipmentItemRow-" + itemId).hide();						
-						*/
+
+						//if (confirm("Are you sure?")) {
+
+							var shipmentItem = ui.draggable.attr("shipmentItem");
+							var childContainer = ui.draggable.attr("childContainer");
+							var parentContainer = $(this).attr("container");
+
+							if (shipmentItem) {
+								moveShipmentItemToContainer(shipmentItem, parentContainer);
+							}
+							else if (childContainer) {
+								if (childContainer != parentContainer) {
+									moveContainerToContainer(childContainer, parentContainer);
+								}
+							}
+
+							$("#shipmentItemRow-" + shipmentItem).hide();
+							//ui.draggable.addClass( "strikethrough" );
+							console.log(shipmentItem);
+							console.log(childContainer);
+							console.log(parentContainer);
+
+							//alert("Move item " + shipmentItem + " to container " + container);
+							/*
+							//ui.draggable.hide();
+							//ui.draggable.addClass( "strikethrough" );
+							//$( this ).removeClass( "ui-state-highlight" );
+
+							//var moveTo = $(this).attr("id");
+
+							//var url = "${request.contextPath}
+							/category/moveItem?child=" + child + "&newParent=" + parent;
+							//window.location.replace(url);
+							//moveItemToContainer(itemId, moveTo);
+							//$("#shipmentItemRow-" + itemId).hide();
+							*/
+
+							location.reload();
+						//}
+						$(this).removeClass("ui-state-highlight");
+
 					}
 				});
 				
@@ -509,19 +757,73 @@
 	            return updateQuantity;
 			}
 
-			function moveShipmentItemToContainer(shipmentItem, container) { 
-				$.post('${request.contextPath}/json/moveShipmentItemToContainer', 
-	                {shipmentItem: shipmentItem, container: container}, 
-		                function(data) {
-							// do nothing for now
-							//console(data);
-                    		//var item = $("<li>");
-                    		//var link = $("<a>").attr("href", "${request.contextPath}/person/show/" + data.id).html(data.firstName + " " + data.lastName);
-                    		//item.append(link);
-                    		//$('#messages').append("new message");
-                		}, 'json');
+			function moveShipmentItemToContainer(shipmentItem, container) {
+
+
+				//var data = {shipmentItem: shipmentItem, container: container}
+				var data = "shipmentItem=" + shipmentItem + "&container=" + container
+				$.ajax({
+					type: "POST",
+					url: "${request.contextPath}/createShipmentWorkflow/createShipment",
+					data: data + "&_eventId=moveShipmentItemToContainer&execution=${request.flowExecutionKey}",
+					dataType: "json",
+					cache: false,
+					success: function (data) {
+						//console.log(data);
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						//console.log(jqXHR);
+						//console.log(textStatus);
+						//console.log(errorThrown);
+					}
+				});
+
+				%{--$.post('${request.contextPath}/json/moveShipmentItemToContainer', --}%
+	                %{--{shipmentItem: shipmentItem, container: container}, --}%
+		                %{--function(data) {--}%
+							%{--console.log(data);--}%
+							%{--// do nothing for now--}%
+							%{--//console(data);--}%
+                    		%{--//var item = $("<li>");--}%
+                    		%{--//var link = $("<a>").attr("href", "${request.contextPath}/person/show/" + data.id).html(data.firstName + " " + data.lastName);--}%
+                    		%{--//item.append(link);--}%
+                    		%{--//$('#messages').append("new message");--}%
+                		%{--}, 'json');--}%
 			}
 
+			function moveContainerToContainer(childContainer, parentContainer) {
+
+				//var data = { childContainer: childContainer, parentContainer: parentContainer };
+				var data = "childContainer=" + childContainer + "&parentContainer=" + parentContainer;
+
+				$.ajax({
+					type: "POST",
+					url: "${request.contextPath}/createShipmentWorkflow/createShipment",
+					data: data + "&_eventId=moveContainerToContainer&execution=${request.flowExecutionKey}",
+					dataType: "json",
+					cache: false,
+					success: function (data) {
+						//console.log(data);
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						//console.log(jqXHR);
+						//console.log(textStatus);
+						//console.log(errorThrown);
+					}
+				});
+
+				%{--$.post('${request.contextPath}/json/moveContainerToContainer',--}%
+						%{--{ childContainer: childContainer, parentContainer: parentContainer },--}%
+						%{--function(data) {--}%
+							%{--console.log(data);--}%
+							%{--// do nothing for now--}%
+							%{--//console(data);--}%
+							%{--//var item = $("<li>");--}%
+							%{--//var link = $("<a>").attr("href", "${request.contextPath}/person/show/" + data.id).html(data.firstName + " " + data.lastName);--}%
+							%{--//item.append(link);--}%
+							%{--//$('#messages').append("new message");--}%
+						%{--}, 'json');--}%
+			}
 
 		</script> 				
         

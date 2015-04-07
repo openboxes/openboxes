@@ -7,8 +7,8 @@
 	</div>
 	<div class="action-menu-item">														
 		<g:link action="createShipment" event="moveItem" params="[itemToMoveId:itemInstance?.id]">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_out.png')}" alt="Move Item" style="vertical-align: middle"/>&nbsp;
-			<warehouse:message code="shipping.moveItem.label"/>
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'cut.png')}" alt="Split Item" style="vertical-align: middle"/>&nbsp;
+			<warehouse:message code="shipping.splitItem.label" default="Split Item"/>
 		</g:link>
 	</div>
 	<div class="action-menu-item">														

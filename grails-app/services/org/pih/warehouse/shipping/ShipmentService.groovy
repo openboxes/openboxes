@@ -10,6 +10,16 @@
 package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.CreationHelper
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.util.CellRangeAddress
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
@@ -26,6 +36,7 @@ class ShipmentService {
 	def productService
 	def inventoryService;
 	def identifierService
+	def documentService
 
 	
 	/**
@@ -469,6 +480,50 @@ class ShipmentService {
 		//}
 		moveContainer(oldContainer, newShipment)		
 	}
+
+	void moveShipmentItemToContainer(String shipmentItemId, String containerId) {
+		log.info "Move shipment item ${shipmentItemId} to container ${containerId} "
+		def shipmentItem = ShipmentItem.get(shipmentItemId);
+		if (shipmentItem) {
+			if (containerId.equals("trash")) {
+				log.info "Removing item " + shipmentItem + " from " + shipmentItem?.container
+				shipmentItem.container = null;
+				shipmentItem.shipment.removeFromShipmentItems(shipmentItem)
+				shipmentItem.delete(flush: true);
+			} else {
+				def container = Container.get(containerId);
+				log.info "Move item " + shipmentItem + " from " + shipmentItem?.container + " to " + container
+				shipmentItem.container = container;
+				shipmentItem.save(flush: true);
+			}
+		}
+
+	}
+
+	void moveContainerToContainer(String childContainerId, String parentContainerId) {
+		log.info "Move child container ${childContainerId} to parent container ${parentContainerId} "
+		def childContainer = Container.get(childContainerId);
+		if (childContainer) {
+			if (parentContainerId.equals("trash")) {
+				log.info "Removing container " + childContainer + " from shipment " + childContainer.shipment
+				deleteContainer(childContainer)
+			} else {
+				def parentContainer = Container.get(parentContainerId);
+				log.info "Move container " + childContainer + " from container " + childContainer?.parentContainer + " to container " + parentContainer
+				// Cannot move a child container into another child container
+				if (parentContainer?.parentContainer) {
+					throw new ShipmentException(message: "Moving a container into a sub-container in currently not supported.", shipment: childContainer?.shipment)
+				}
+				if (childContainer.containers && parentContainer) {
+					throw new ShipmentException(message: "Moving a container with subcontainers into another container is currently not supported.", shipment: childContainer?.shipment)
+				}
+
+				childContainer.parentContainer = parentContainer
+				childContainer.shipment.save(flush:true);
+			}
+		}
+
+	}
 	
 	/**
 	 * Move a container from one shipment to the given shipment.
@@ -633,10 +688,49 @@ class ShipmentService {
 	void addToShipmentItems(ShipmentItem shipmentItem, Shipment shipment) {
 		// Need to set the shipment here for validation purposes
 		shipmentItem.shipment = shipment;
-		if (validateShipmentItem(shipmentItem)) { 
-			shipment.addToShipmentItems(shipmentItem);
-			shipment.save()			
+
+		// Check if it requires validation
+		boolean validated = true
+		if (shipment?.origin?.isWarehouse()) {
+			validated = validateShipmentItem(shipmentItem)
 		}
+
+		if (validated) {
+			shipment.addToShipmentItems(shipmentItem);
+			shipment.save()
+		}
+	}
+
+	boolean addToShipmentItems(String shipmentId, String containerId, String inventoryItemId, Integer quantity) {
+		Shipment shipment = Shipment.get(shipmentId)
+		Container container = Container.get(containerId)
+		InventoryItem inventoryItem = InventoryItem.get(inventoryItemId)
+		if (!inventoryItem) {
+			throw new ShipmentItemException(message: "Could not locate inventory item with ID " + inventoryItemId)
+		}
+		ShipmentItem shipmentItem = new ShipmentItem();
+		shipmentItem.inventoryItem = inventoryItem
+		shipmentItem.lotNumber = inventoryItem.lotNumber
+		shipmentItem.expirationDate = inventoryItem.expirationDate
+		shipmentItem.product = inventoryItem.product
+		shipmentItem.quantity = quantity
+		shipmentItem.container = container
+		shipmentItem.shipment =  shipment
+		addToShipmentItems(shipmentItem, shipment)
+	}
+
+
+	void sortContainers(containerIds) {
+
+		containerIds.eachWithIndex { id, index ->
+			def container = Container.get(id)
+			container.sortOrder = index
+			container.save(flush:true);
+			println ("container " + container.name + " saved at index " + index)
+		}
+		//container.shipment.save(flush:true)
+		//container.shipment.refresh()
+
 	}
 
 	
@@ -655,7 +749,8 @@ class ShipmentService {
 			throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
 		}
 		
-		if (shipmentItem.quantity > onHandQuantity) { 
+		if (shipmentItem.quantity > onHandQuantity) {
+			shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
 			throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
 		}
 		return true;
@@ -670,7 +765,59 @@ class ShipmentService {
 	void deleteShipment(Shipment shipment) { 
 		shipment.delete(flush:true)
 	}
-	
+
+
+	void createContainers(shipmentId, containerId, containerTypeId, containerText) {
+		log.info "Adding containers to shipment "
+
+		Shipment shipment = Shipment.get(shipmentId)
+		Container parentContainer = Container.get(containerId)
+		if (shipment) {
+			containerText.split("\n").each { name ->
+				def containerType = ContainerType.get(containerTypeId)
+				if (!containerType) {
+					throw new ShipmentException(message: "You must specify a container type when creating new containers", shipment: shipment)
+				}
+
+				Container container = shipment.addNewContainer(containerType)
+				container.name = name
+				if (parentContainer) {
+					container.parentContainer = parentContainer
+				}
+				saveContainer(container)
+			}
+		}
+	}
+
+
+	void deleteContainers(id, containerIds, boolean deleteItems) {
+		Shipment shipment = Shipment.get(id)
+		if (shipment) {
+			if (!containerIds) {
+				throw new ShipmentException(message: "You must select at least one container to delete", shipment:shipment)
+			}
+			containerIds.each { containerId ->
+				Container container = Container.get(containerId)
+				println ("Contains items: " + container.shipmentItems)
+				if (!deleteItems && container.shipmentItems) {
+					throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
+				}
+				else {
+					container.shipmentItems.each { shipmentItem ->
+						shipment.removeFromShipmentItems(shipmentItem)
+						shipmentItem.delete()
+					}
+
+				}
+				shipment.removeFromContainers(container);
+				if (container?.parentContainer) {
+					container?.parentContainer?.removeFromContainers(container)
+				}
+				container.delete();
+			}
+		}
+	}
+
 	/**
 	 * Deletes a container, but leaves all shipment items 
 	 * 
@@ -704,7 +851,11 @@ class ShipmentService {
 					
 		// remove the container itself from the parent shipment
 		shipment.removeFromContainers(container)
-		
+
+		// remove from parent container
+		if (container.parentContainer) {
+			container.parentContainer.removeFromContainers(container)
+		}
 		//container.shipment.save()
 		container.delete()
 	}
@@ -715,10 +866,12 @@ class ShipmentService {
 	 * 
 	 * @param item
 	 */
-	void deleteShipmentItem(ShipmentItem shipmentItem) {		
-		def shipment = Shipment.get(shipmentItem.shipment.id)
-		shipment.removeFromShipmentItems(shipmentItem)
-		shipmentItem.delete(flush:true)				
+	void deleteShipmentItem(ShipmentItem shipmentItem) {
+		if (shipmentItem) {
+			def shipment = Shipment.get(shipmentItem.shipment.id)
+			shipment.removeFromShipmentItems(shipmentItem)
+			shipmentItem.delete(flush: true)
+		}
 	}
 	
 	/**
@@ -867,11 +1020,11 @@ class ShipmentService {
 		try { 
 			if (!shipDate || shipDate > new Date()) {
 				shipmentInstance.errors.reject("shipment.invalid.invalidShipDate", "Shipping date [" + shipDate + "] must occur on or before today.") 
-				throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
+				//throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
 			}				
 			if (shipmentInstance.hasShipped()) { 
 				shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has already shipped")
-				throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
+				//throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
 			}
 			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
 			if (!shipmentInstance.hasErrors()) {				
@@ -1400,5 +1553,108 @@ class ShipmentService {
 
         return true;
     }
+
+
+	boolean exportPackingList(String shipmentId, OutputStream outputStream) {
+		Shipment shipment = Shipment.get(shipmentId)
+		documentService.generatePartialPackingList(outputStream, shipment)
+	}
+
+
+	boolean importPackingList(String shipmentId, InputStream inputStream) {
+		try {
+
+			Shipment shipment = Shipment.get(shipmentId)
+			HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+			HSSFSheet worksheet = workbook.getSheetAt(0);
+
+			Iterator<Row> rowIterator = worksheet.iterator();
+			Row row
+			while (rowIterator.hasNext()) {
+				row = rowIterator.next();
+
+				if(row.getRowNum()==0) {
+					continue
+				}
+
+
+				Iterator<Cell> cellIterator = row.cellIterator();//Read every column for every row that is READ
+				while(cellIterator.hasNext()) {
+					Cell cell = cellIterator.next(); //Fetch CELL
+					switch(cell.getCellType()) { //Identify CELL type
+						case Cell.CELL_TYPE_NUMERIC:
+							System.out.print("#" + cell.getNumericCellValue() + "\t\t"); //print numeric value
+							break;
+						case Cell.CELL_TYPE_STRING:
+							System.out.print("*" + cell.getStringCellValue() + "\t\t"); //print string value
+							break;
+					}
+				}
+				System.out.println("");
+
+				def palletName = row.getCell(0).getStringCellValue()
+				def boxName = row.getCell(1).getStringCellValue()
+				def productCode = row.getCell(2).getStringCellValue()
+				def productName = row.getCell(3).getStringCellValue()
+				def lotNumber = row.getCell(4).getStringCellValue()
+				def expirationDate = row.getCell(5).getDateCellValue()
+				def quantity = row.getCell(6).getNumericCellValue()
+
+				log.info ("palletName: " + palletName)
+				log.info ("boxName: " + boxName)
+				log.info ("productCode: " + productCode)
+				log.info ("productName: " + productName)
+				log.info ("lotNumber: " + lotNumber)
+				log.info ("expirationDateString: " + expirationDate)
+				log.info ("quantity: " + quantity)
+
+				Product product = Product.findByProductCode(productCode)
+				if (!product) {
+					throw new RuntimeException("Unable to find product with product code " + productCode)
+				}
+
+				Container pallet = palletName ? shipment.findOrCreatePallet(palletName) : null
+				Container box = boxName ? pallet.findOrCreateBox(boxName) : null
+				Container container =  box ?: pallet ?: null
+
+				InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(product, lotNumber, expirationDate)
+				log.info ("Inventory item: " + inventoryItem)
+				log.info ("Container " + container)
+
+				// Check to see if a shipment item already exists within the given container
+				ShipmentItem shipmentItem = shipment?.findShipmentItem(inventoryItem, container)
+
+
+				// Create a new shipment item if not found
+				if (!shipmentItem) {
+					shipmentItem = new ShipmentItem(
+							product: product,
+							lotNumber: inventoryItem.lotNumber ?: '',
+							expirationDate: inventoryItem?.expirationDate,
+							inventoryItem: inventoryItem,
+							quantity: quantity,
+							container: container);
+					addToShipmentItems(shipmentItem, shipment)
+				}
+				// Modify quantity for existing shipment item
+				else {
+					shipmentItem.quantity = quantity;
+				}
+			}
+		} catch (ShipmentItemException e) {
+			log.error("Unable to import packing list items due to exception: " + e.message, e)
+			throw e;
+
+		} catch (Exception e) {
+			log.error("Unable to import packing list items due to exception: " + e.message, e)
+			//throw new RuntimeException("make sure this causes a rollback", e)
+			throw new RuntimeException(e.message)
+		}
+		finally {
+			inputStream.close();
+		}
+
+		return true
+	}
 
 }

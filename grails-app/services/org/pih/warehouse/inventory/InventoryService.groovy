@@ -1229,7 +1229,7 @@ class InventoryService implements ApplicationContextAware {
 
 		log.debug("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
 		if (!location) {
-			throw new RuntimeException("Your warehouse has not been initialized");
+			throw new RuntimeException("Must specify location in order to calculate quantity");
 		}
 		else {
 			location = Location.get(location?.id)

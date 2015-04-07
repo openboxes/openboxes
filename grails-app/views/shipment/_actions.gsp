@@ -95,8 +95,8 @@
 
         <div class="action-menu-item">
             <g:link controller="shipment" action="addComment" id="${shipmentInstance.id}">
-                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'note_add.png')}"
-                     class="middle"/>&nbsp;<warehouse:message code="shipping.addNote.label"/></g:link>
+                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'comment_add.png')}"
+                     class="middle"/>&nbsp;<warehouse:message code="shipping.addComment.label" default="Add comment"/></g:link>
         </div>
 
         <div class="action-menu-item">
