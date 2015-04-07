@@ -76,6 +76,11 @@ class ReportController {
         return;
     }
 
+	def showInventoryReport = {
+
+
+	}
+
 
     def showInventorySamplingReport = {
 
