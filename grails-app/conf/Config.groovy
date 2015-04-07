@@ -416,10 +416,10 @@ jqueryValidationUi {
 
 // UserVoice widget
 openboxes.uservoice.widget.enabled = true
-openboxes.uservoice.widget.position = "bottom-left"
+openboxes.uservoice.widget.position = "right"
 
 // UserVoice widget
-openboxes.zopim.widget.enabled = true
+openboxes.zopim.widget.enabled = false
 openboxes.zopim.widget.url = "//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA"
 
 // JIRA Issue Collector
