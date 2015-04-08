@@ -65,18 +65,30 @@ class CreateShipmentWorkflowController {
     		
     	enterShipmentDetails {
     		on("next") {
-    			bindData(flow.shipmentInstance, params)
-    		    				
-    			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
-					return error()
-    			}
-    			else {
-    				shipmentService.saveShipment(flow.shipmentInstance)
-    				
-    				// set (or reset) the shipment workflow here, since the shipment type may have change
-    				flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
-    			}	
-    		}.to("enterTrackingDetails")
+
+				try {
+					flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
+					bindData(flow.shipmentInstance, params)
+
+					if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) {
+						return error()
+					}
+					else {
+						shipmentService.saveShipment(flow.shipmentInstance)
+
+						// set (or reset) the shipment workflow here, since the shipment type may have change
+						flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
+					}
+
+				} catch (ShipmentException e) {
+					flash.message = e.message
+
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
+
+			}.to("enterTrackingDetails")
     		
     		on("save") {
     			bindData(flow.shipmentInstance, params)
@@ -397,11 +409,12 @@ class CreateShipmentWorkflowController {
 					}
 
 					if (shipmentService.importPackingList(params.id, multipartFile.inputStream)) {
+						// refresh the shipment instance from database
+						flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
 						flash.message = "Successfully imported all packing list items. "
 
 					} else {
 						flash.message = "Failed to import packing list items due to an unknown error."
-
 					}
 				} catch (ShipmentItemException e) {
 					//flow.shipmentInstance.discard()

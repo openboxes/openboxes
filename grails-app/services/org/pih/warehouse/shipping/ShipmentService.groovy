@@ -1560,85 +1560,143 @@ class ShipmentService {
 		documentService.generatePartialPackingList(outputStream, shipment)
 	}
 
+	List parsePackingList(InputStream inputStream) {
+
+		List packingListItems = []
+
+		HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+		HSSFSheet worksheet = workbook.getSheetAt(0);
+
+		Iterator<Row> rowIterator = worksheet.iterator();
+		int cell = 0
+		Row row
+		while (rowIterator.hasNext()) {
+			row = rowIterator.next();
+
+			// Skip the first row
+			if (row.getRowNum() == 0) {
+				continue
+			}
+
+//			Iterator<Cell> cellIterator = row.cellIterator();//Read every column for every row that is READ
+//			while (cellIterator.hasNext()) {
+//				Cell cell = cellIterator.next(); //Fetch CELL
+//				switch (cell.getCellType()) { //Identify CELL type
+//					case Cell.CELL_TYPE_NUMERIC:
+//						System.out.print("#" + cell.getNumericCellValue() + "\t\t"); //print numeric value
+//						break;
+//					case Cell.CELL_TYPE_STRING:
+//						System.out.print("*" + cell.getStringCellValue() + "\t\t"); //print string value
+//						break;
+//				}
+//			}
+//			System.out.println("");
+
+			try {
+				cell = 0;
+				def palletName = row.getCell(cell++)?.getStringCellValue()
+				def boxName = row.getCell(cell++)?.getStringCellValue()
+				def productCode = row.getCell(cell++)?.getStringCellValue()
+				def productName = row.getCell(cell++)?.getStringCellValue()
+				def lotNumber = row.getCell(cell++)?.getStringCellValue()
+				def expirationDate = row.getCell(cell++)?.getDateCellValue()
+				def quantity = row.getCell(cell++)?.getNumericCellValue()
+
+				log.info("palletName: " + palletName)
+				log.info("boxName: " + boxName)
+				log.info("productCode: " + productCode)
+				log.info("productName: " + productName)
+				log.info("lotNumber: " + lotNumber)
+				log.info("expirationDateString: " + expirationDate)
+				log.info("quantity: " + quantity)
+
+				packingListItems << [palletName: palletName, boxName: boxName, productCode: productCode, productName: productName, lotNumber: lotNumber, expirationDate: expirationDate, quantity: quantity]
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Error parsing XLS file at row " + (row.rowNum+1) + " cell " + cell + " caused by: " + e.message, e)
+			}
+		}
+		return packingListItems
+	}
+
+	boolean validatePackingList(List packingListItems, Location location) {
+
+		packingListItems.each { item ->
+			// Find a product using the product code
+			Product product = Product.findByProductCode(item.productCode)
+			if (!product) {
+				throw new RuntimeException("Cannot find product with product code " + item.productCode)
+			}
+			item.product = product
+
+			// If the location is a warehouse (it manages inventory) then we need to ensure that there's enough of the
+			// item in stock before we add it to the shipment. If the location is a supplier, we don't care.
+			if (location?.isWarehouse()) {
+				def onHandQuantity = inventoryService.getQuantity(location, product, item.lotNumber)
+				log.info("Checking shipment item quantity [" + item.quantity + "] vs onhand quantity [" + onHandQuantity + "]");
+
+				if (item.quantity > onHandQuantity) {
+					throw new RuntimeException("Quantity to ship exceeds quantity on hand for item " + item.productCode + " at location " + location?.name)
+				}
+			}
+		}
+		return true;
+	}
+
 
 	boolean importPackingList(String shipmentId, InputStream inputStream) {
 		try {
 
 			Shipment shipment = Shipment.get(shipmentId)
-			HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
-			HSSFSheet worksheet = workbook.getSheetAt(0);
 
-			Iterator<Row> rowIterator = worksheet.iterator();
-			Row row
-			while (rowIterator.hasNext()) {
-				row = rowIterator.next();
-
-				if(row.getRowNum()==0) {
-					continue
-				}
+			List packingListItems = parsePackingList(inputStream)
 
 
-				Iterator<Cell> cellIterator = row.cellIterator();//Read every column for every row that is READ
-				while(cellIterator.hasNext()) {
-					Cell cell = cellIterator.next(); //Fetch CELL
-					switch(cell.getCellType()) { //Identify CELL type
-						case Cell.CELL_TYPE_NUMERIC:
-							System.out.print("#" + cell.getNumericCellValue() + "\t\t"); //print numeric value
-							break;
-						case Cell.CELL_TYPE_STRING:
-							System.out.print("*" + cell.getStringCellValue() + "\t\t"); //print string value
-							break;
+			if (validatePackingList(packingListItems, shipment?.origin)) {
+
+				packingListItems.each { item ->
+
+					log.info("product: " + item.product)
+					log.info("palletName: " + item.palletName)
+					log.info("boxName: " + item.boxName)
+					log.info("productCode: " + item.productCode)
+					log.info("productName: " + item.productName)
+					log.info("lotNumber: " + item.lotNumber)
+					log.info("expirationDateString: " + item.expirationDate)
+					log.info("quantity: " + item.quantity)
+
+					// Find or create an inventory item given the product, lot number, and expiration date
+					InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(item.product, item.lotNumber, item.expirationDate)
+					log.info("Inventory item: " + inventoryItem)
+
+					// Find or create the pallet and box (if provided). Items are added to Unpacked Items by default.
+					Container pallet = item.palletName ? shipment.findOrCreatePallet(item.palletName) : null
+					Container box = item.boxName ? pallet.findOrCreateBox(item.boxName) : null
+
+					// The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
+					Container container = box ?: pallet ?: null
+					log.info("Container " + container)
+
+					// Check to see if a shipment item already exists within the given container
+					ShipmentItem shipmentItem = shipment?.findShipmentItem(inventoryItem, container)
+					// Create a new shipment item if not found
+					if (!shipmentItem) {
+						shipmentItem = new ShipmentItem(
+								product: item.product,
+								lotNumber: inventoryItem.lotNumber ?: '',
+								expirationDate: inventoryItem?.expirationDate,
+								inventoryItem: inventoryItem,
+								container: container,
+								quantity: item.quantity,
+						);
+						addToShipmentItems(shipmentItem, shipment)
 					}
-				}
-				System.out.println("");
-
-				def palletName = row.getCell(0).getStringCellValue()
-				def boxName = row.getCell(1).getStringCellValue()
-				def productCode = row.getCell(2).getStringCellValue()
-				def productName = row.getCell(3).getStringCellValue()
-				def lotNumber = row.getCell(4).getStringCellValue()
-				def expirationDate = row.getCell(5).getDateCellValue()
-				def quantity = row.getCell(6).getNumericCellValue()
-
-				log.info ("palletName: " + palletName)
-				log.info ("boxName: " + boxName)
-				log.info ("productCode: " + productCode)
-				log.info ("productName: " + productName)
-				log.info ("lotNumber: " + lotNumber)
-				log.info ("expirationDateString: " + expirationDate)
-				log.info ("quantity: " + quantity)
-
-				Product product = Product.findByProductCode(productCode)
-				if (!product) {
-					throw new RuntimeException("Unable to find product with product code " + productCode)
-				}
-
-				Container pallet = palletName ? shipment.findOrCreatePallet(palletName) : null
-				Container box = boxName ? pallet.findOrCreateBox(boxName) : null
-				Container container =  box ?: pallet ?: null
-
-				InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(product, lotNumber, expirationDate)
-				log.info ("Inventory item: " + inventoryItem)
-				log.info ("Container " + container)
-
-				// Check to see if a shipment item already exists within the given container
-				ShipmentItem shipmentItem = shipment?.findShipmentItem(inventoryItem, container)
-
-
-				// Create a new shipment item if not found
-				if (!shipmentItem) {
-					shipmentItem = new ShipmentItem(
-							product: product,
-							lotNumber: inventoryItem.lotNumber ?: '',
-							expirationDate: inventoryItem?.expirationDate,
-							inventoryItem: inventoryItem,
-							quantity: quantity,
-							container: container);
-					addToShipmentItems(shipmentItem, shipment)
-				}
-				// Modify quantity for existing shipment item
-				else {
-					shipmentItem.quantity = quantity;
+					// Modify quantity and container for existing shipment items
+					else {
+						//shipmentItem.inventoryItem = inventoryItem
+						shipmentItem.container = container
+						shipmentItem.quantity = item.quantity;
+					}
 				}
 			}
 		} catch (ShipmentItemException e) {
