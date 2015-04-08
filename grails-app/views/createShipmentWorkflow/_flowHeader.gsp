@@ -1,58 +1,34 @@
 <div class="wizard-box">
-	<div class="wizard-steps ">
+	<div class="wizard-steps">
+        <g:set var="wizardSteps" value="${['Details':'enterShipmentDetails', 'Tracking':'enterTrackingDetails', 'Pack':'enterContainerDetails', 'Send':'sendShipment']}"/>
 
-        <g:if test="${shipmentInstance?.id}">
-            <div class="${currentState.equals('Details')?'active-step':''}">
-                <g:link action="createShipment" event="enterShipmentDetails">
-                    <span class="badge">1</span>
-                    <warehouse:message code="shipping.enterShipmentDetails.label"/>
-                </g:link>
-            </div>
-            <div class="${currentState.equals('Tracking')?'active-step':''}">
-                <g:link action="createShipment" event="enterTrackingDetails">
-                    <span class="badge">2</span>
-                    <warehouse:message code="shipping.enterTrackingDetails.label"/>
-                </g:link>
-            </div>
-            <div class="${currentState.equals('Pack')?'active-step':''}">
-                <g:link action="createShipment" event="enterContainerDetails">
-                    <span class="badge">3</span>
-                    <warehouse:message code="shipping.enterContainerDetails.label"/>
-                </g:link>
-            </div>
-            <div class="${currentState.equals('Send')?'active-step':''}">
-                <g:link action="createShipment" event="sendShipment">
-                    <span class="badge">4</span>
-                    <warehouse:message code="shipping.sendShipment.label"/>
-                </g:link>
-            </div>
-        </g:if>
-        <g:else>
-            <div class="${currentState.equals('Details')?'active-step':''}">
-                <g:link action="createShipment" event="enterShipmentDetails">
-                    <span class="badge">1</span>
-                    <warehouse:message code="shipping.enterShipmentDetails.label"/>
-                </g:link>
-            </div>
-            <div class="${currentState.equals('Tracking')?'active-step':''}">
-                <a href="#">
-                    <span class="badge">2</span>
-                    <warehouse:message code="shipping.enterTrackingDetails.label"/>
-                </a>
-            </div>
-            <div class="${currentState.equals('Pack')?'active-step':''}">
-                <a href="#">
-                    <span class="badge">3</span>
-                    <warehouse:message code="shipping.enterContainerDetails.label"/>
-                </a>
-            </div>
-            <div class="${currentState.equals('Send')?'active-step':''}">
-                <a href="#">
-                    <span class="badge">4</span>
-                    <warehouse:message code="shipping.sendShipment.label"/>
-                </a>
-            </div>
+        <g:each var="wizardStep" in="${wizardSteps}" status="status">
 
-        </g:else>
-	</div>
-</div>	
+            <g:set var="index" value="${wizardSteps?.keySet()?.findIndexOf{ it == currentState}}"/>
+
+            <g:if test="${index == status}">
+                <g:set var="styleClass" value="active-step"/>
+            </g:if>
+            <g:elseif test="${index > status}">
+                <g:set var="styleClass" value="completed-step"/>
+            </g:elseif>
+            <g:else>
+                <g:set var="styleClass" value=""/>
+            </g:else>
+            <div class="${styleClass}">
+                <g:if test="${shipmentInstance?.id}">
+                    <g:link action="createShipment" event="${wizardStep?.value}">
+                        <span>${status+1}</span>
+                        <warehouse:message code="shipping.${wizardStep?.value}.label"/>
+                    </g:link>
+                </g:if>
+                <g:else>
+                    <a href="#">
+                        <span>${status+1}</span>
+                        <warehouse:message code="shipping.${wizardStep?.value}.label"/>
+                    </a>
+                </g:else>
+            </div>
+        </g:each>
+    </div>
+</div>
