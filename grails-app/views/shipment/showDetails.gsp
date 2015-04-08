@@ -1,5 +1,3 @@
-<%@ page import="groovy.time.TimeCategory" %>
-
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -350,57 +348,57 @@
 									</tr>
 								</g:each>
 							</tbody>
-							<tfoot>
-								<tr class="prop">
-									<td colspan="5">
-										<g:form controller="shipment" action="saveEvent" method="POST">
-											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-											<g:hiddenField name="eventId" value="${eventInstance?.id}" />
-											<table>
-												<tbody>
 
-													<tr class="prop">
-														<td valign="top" class="name"><label><warehouse:message code="shipping.eventType.label"/></label></td>
-														<td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
-															<g:if test="${!eventInstance?.eventType}">
-																<g:select id="eventType.id" name='eventType.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
-																		  from='${org.pih.warehouse.core.EventType.list()}' optionKey="id"
-																		  optionValue="name" value="${eventInstance?.eventType}" class="chzn-select-deselect">
-																</g:select>
-															</g:if>
-															<g:else>
-																<g:hiddenField name="eventType.id" value="${eventInstance?.eventType?.id}"/>
-																<format:metadata obj="${eventInstance?.eventType}"/>
-															</g:else>
-														</td>
-													</tr>
-													<tr class="prop">
-														<td valign="top" class="name"><label><warehouse:message code="location.label" /></label></td>
-														<td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
-															<g:select id="eventLocation.id" name='eventLocation.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
-																	  from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
-																	  value="${eventInstance?.eventLocation?.id}" class="chzn-select-deselect">
-															</g:select>
-														</td>
-													</tr>
-													<tr class="prop">
-														<td valign="top" class="name"><label><warehouse:message code="shipping.eventDate.label" /></label></td>
-														<td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
-															<g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
 
-															<button type="submit" class="button icon add">
-																<warehouse:message code="default.button.add.label"/>
-															</button>
 
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</g:form>
-									</td>
-								</tr>
-							</tfoot>
 						</table>
+						<div class="box">
+							<g:form controller="shipment" action="saveEvent" method="POST">
+								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+								<g:hiddenField name="eventId" value="${eventInstance?.id}" />
+								<table>
+									<tbody>
+
+									<tr class="prop">
+										<td valign="top" class="name"><label><warehouse:message code="shipping.eventType.label"/></label></td>
+										<td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
+											<g:if test="${!eventInstance?.eventType}">
+												<g:select id="eventType.id" name='eventType.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
+														  from='${org.pih.warehouse.core.EventType.list()}' optionKey="id"
+														  optionValue="name" value="${eventInstance?.eventType}" class="chzn-select-deselect">
+												</g:select>
+											</g:if>
+											<g:else>
+												<g:hiddenField name="eventType.id" value="${eventInstance?.eventType?.id}"/>
+												<format:metadata obj="${eventInstance?.eventType}"/>
+											</g:else>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label><warehouse:message code="location.label" /></label></td>
+										<td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
+											<g:select id="eventLocation.id" name='eventLocation.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
+													  from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
+													  value="${eventInstance?.eventLocation?.id}" class="chzn-select-deselect">
+											</g:select>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label><warehouse:message code="shipping.eventDate.label" /></label></td>
+										<td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
+											<g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
+
+											<button type="submit" class="button icon add">
+												<warehouse:message code="default.button.add.label"/>
+											</button>
+
+										</td>
+									</tr>
+									</tbody>
+								</table>
+							</g:form>
+
+						</div>
 					</div>
 
                     <g:if test="${shipmentInstance?.outgoingTransactions || shipmentInstance?.incomingTransactions }">
@@ -622,48 +620,41 @@
 							   		</td>
 								</tr>
 							</tbody>
-							<tfoot>
-								<tr >
-									<td colspan="3">
-										<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
-											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-											<g:hiddenField name="documentId" value="${documentInstance?.id}" />
-
-                                            <table>
-                                                <tr>
-                                                    <td width="1%">
-                                                        <label><warehouse:message code="document.documentType.label" default="Document type"/></label>
-                                                    </td>
-                                                    <td>
-                                                        <g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}"
-                                                                  noSelection="['null':'Choose a document type']"
-                                                                  value="${documentInstance?.documentType?.id}"
-                                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}"
-                                                                  class="chzn-select-deselect"/>
-
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <label><warehouse:message code="document.label" default="Document"/></label>
-                                                    </td>
-                                                    <td>
-                                                        <input name="fileContents" type="file" />
-														<button type="submit" class="button icon arrowup right">${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
-                                                    </td>
-
-                                                </tr>
-                                            </table>
-											<%--
-											<g:textField name="name" value="${documentInstance?.name}" />
-											<g:textField name="documentNumber" value="${documentInstance?.documentNumber}" />
-											--%>
-
-										</g:uploadForm>
-									</td>
-								</tr>
-							</tfoot>
 						</table>
+						<div class="box">
+
+							<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
+								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+								<g:hiddenField name="documentId" value="${documentInstance?.id}" />
+
+								<table>
+									<tr class="prop">
+										<td width="1%" class="name">
+											<label><warehouse:message code="document.documentType.label" default="Document type"/></label>
+										</td>
+										<td class="value">
+											<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}"
+													  noSelection="['null':'Choose a document type']"
+													  value="${documentInstance?.documentType?.id}"
+													  optionKey="id" optionValue="${{format.metadata(obj:it)}}"
+													  class="chzn-select-deselect"/>
+
+										</td>
+									</tr>
+									<tr class="prop">
+										<td class="name">
+											<label><warehouse:message code="document.label" default="Document"/></label>
+										</td>
+										<td class="value">
+											<input name="fileContents" type="file" />
+											<button type="submit" class="button icon arrowup right">${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
+										</td>
+
+									</tr>
+								</table>
+
+							</g:uploadForm>
+						</div>
 					</div>
 				</div>
 
@@ -787,8 +778,6 @@
 
 						</table>
 					</div>
-					<hr/>
-
 					<div id="comments" class="box">
 						<h2>
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="note" style="vertical-align: middle"/>
@@ -798,6 +787,8 @@
 						<table>
 							<tbody>
 
+
+							<%--
 							<g:unless test="${shipmentInstance.comments}">
 
 								<tr>
@@ -806,7 +797,7 @@
 									</td>
 								</tr>
 							</g:unless>
-
+							--%>
 							<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 								<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}" >
 									<td width="1%">

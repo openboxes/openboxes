@@ -112,7 +112,7 @@
 
 				</td>
 
-				<td class="right">
+				<td class="right" width="1%">
 					<div class="tag tag-alert">
 						${shipmentInstance?.status?.name}
 					</div>
