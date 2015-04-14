@@ -693,6 +693,7 @@ class JsonController {
 					items = items.collect() {						
 						
 						[
+                            id: it.id,
                             label:  it.name + " (" +  it.email + ") ",
                             value: it.id,
 							valueText: it.name,
