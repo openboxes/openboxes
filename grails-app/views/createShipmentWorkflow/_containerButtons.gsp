@@ -30,6 +30,8 @@
 </div>
 
 <div class="button-group">
+
+	<a href="javascript:void(0);" class="btnAddContainers button icon add">Add packing units</a>
 	<button id="btnAddContents" class="button icon log">
 		<warehouse:message code="shipping.importPackingList.label" default="Import packing list"/></button>
 

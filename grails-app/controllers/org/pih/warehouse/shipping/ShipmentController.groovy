@@ -368,9 +368,9 @@ class ShipmentController {
 			shipmentInstance.receipt = receiptInstance
 			receiptInstance.shipment = shipmentInstance
 
-			
+
 			// check for errors
-			if(receiptInstance.hasErrors() || !receiptInstance.validate()) {					
+			if(receiptInstance.hasErrors() || !receiptInstance.validate()) {
 				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
 				return
 			}
@@ -379,8 +379,15 @@ class ShipmentController {
 			//def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
 			def creditStockOnReceipt = true
 			// actually process the receipt
-			shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse, creditStockOnReceipt);
+			try {
+				shipmentService.receiveShipment(shipmentInstance?.id, params.comment, session?.user?.id, session.warehouse?.id, creditStockOnReceipt);
 
+			} catch (Exception e) {
+				log.error ("Error occurred while receiving shipment " + e.message, e)
+				flash.message = e.message
+				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
+				return
+			}
 
 			if (!shipmentInstance.hasErrors() ) {
                 def recipients = new HashSet()

@@ -1142,8 +1142,11 @@ class ShipmentService {
 	 * @param user
 	 * @param location
 	 */
-	void receiveShipment(Shipment shipmentInstance, String comment, User user, Location location, Boolean creditStockOnReceipt) { 
-		
+	void receiveShipment(String shipmentId, String comment, String userId, String locationId, Boolean creditStockOnReceipt) {
+
+		User user = User.get(userId)
+		Location location = Location.get(locationId)
+		Shipment shipmentInstance = Shipment.get(shipmentId)
 		//try {
 			
 			if (!shipmentInstance.hasShipped()) { 

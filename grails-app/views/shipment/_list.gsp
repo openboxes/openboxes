@@ -8,10 +8,16 @@
 					${warehouse.message(code: 'default.actions.label')}
 				</th>
 				--%>
-				<th style="width: 1%">
+				<th>
 				</th>
-				<th style="width: 33%">
+				<th class="center">
+					${warehouse.message(code: 'shipping.shipmentNumber.label')}
+				</th>
+				<th>
 					${warehouse.message(code: 'shipping.shipment.label')}
+				</th>
+				<th class="center">
+					${warehouse.message(code: 'shipping.shipmentItems.label', default: "Items")}
 				</th>
 				<th>
                     <label class="block"><warehouse:message
@@ -57,11 +63,20 @@
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
 						style="vertical-align: middle; width: 24px; height: 24px;" />
 					</td>
+					<td class="middle center">
+						<g:link action="showDetails" id="${shipmentInstance.id}">
+							${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
+						</g:link>
+					</td>
+
 					<td class="middle left shipment-name">
                         <g:link action="showDetails" id="${shipmentInstance.id}">
-                            ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 							${fieldValue(bean: shipmentInstance, field: "name")}
-						</g:link></td>
+						</g:link>
+					</td>
+					<td class="middle center">
+						${shipmentInstance?.countShipmentItems()}
+					</td>
 					<td class="middle">
                         ${fieldValue(bean: shipmentInstance, field: "origin.name")}
 					</td>

@@ -417,6 +417,10 @@ class Shipment implements Comparable, Serializable {
 		return ShipmentItem?.countByShipmentAndContainer(this, container)
 	}
 
+	Integer countShipmentItems() {
+		return ShipmentItem.countByShipment(this)
+	}
+
 	TimeDuration timeToProcess() {
 		return timeDuration(dateScheduled(), dateShipped())
 	}
@@ -443,11 +447,11 @@ class Shipment implements Comparable, Serializable {
 	}
 	Date dateShipped() {
 		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SHIPPED }
-		return event?.eventDate ?: actualShippingDate ?: expectedShippingDate
+		return event?.eventDate ?: actualShippingDate
 	}
 	Date dateDelivered() {
 		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.RECEIVED || event?.eventType?.eventCode == EventCode.DELIVERED }
-		return event?.eventDate ?: actualDeliveryDate ?: new Date()
+		return event?.eventDate ?: actualDeliveryDate
 	}
 	Date dateCustomsEntry() {
 		Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_ENTRY }

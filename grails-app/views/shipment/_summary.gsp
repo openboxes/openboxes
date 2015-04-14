@@ -1,42 +1,41 @@
 <div class="summary">
 	<table id="shipmentSummary" border="0">
-		<tbody>			
+		<tbody>
 			<tr>
 				<td style="width: 1%" class="middle center">
 					<g:if test="${shipmentInstance?.shipmentType }">
 						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
-							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />					
+							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />
 					</g:if>
 					<g:else>
 						<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry.png')}"
-							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle;" />					
+							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle;" />
 					</g:else>
 				</td>
-                <td width="1%">
+                <td width="1%" class="middle">
                     <div>
                         <g:render template="../shipment/actions" />
                     </div>
                 </td>
 				<td class="middle">
 
-					<g:if test="${!shipmentInstance.id}">
-						<div class="title">
-							New Shipment
-						</div>
-					</g:if>
-
 					<div class="title">
-						${shipmentInstance?.shipmentNumber}
-						<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
-							${shipmentInstance?.name}
-						</g:link>
+						<g:if test="${!shipmentInstance.id}">
+							New Shipment
+						</g:if>
+						<g:else>
+							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
+								${shipmentInstance?.shipmentNumber}
+								${shipmentInstance?.name}
+							</g:link>
+						</g:else>
 					</div>
-				
+
 					<div>
 						<g:if test="${shipmentInstance?.shipmentType }">
 							<span class="shipmentType">
-								<warehouse:message code="shipping.shipmentType.label"/>:						
-								<label>${format.metadata(obj:shipmentInstance?.shipmentType)}</label> 
+								<warehouse:message code="shipping.shipmentType.label"/>:
+								<label>${format.metadata(obj:shipmentInstance?.shipmentType)}</label>
 							</span>
 						</g:if>
 						<g:if test="${shipmentInstance?.origin }">
@@ -51,8 +50,6 @@
 								<label>${format.metadata(obj:shipmentInstance?.destination)}</label>
 							</span>
 						</g:if>
-					</div>
-					<div>
 						<%--
 						<g:if test="${shipmentInstance?.status?.code }">
 							<span class="shipment-status">
@@ -64,31 +61,31 @@
 						<g:if test="${!shipmentInstance?.hasShipped() }">
 							<g:if test="${shipmentInstance?.expectedShippingDate }">
 								<span class="expectedShippingDate">
-									<warehouse:message code="shipping.expectedShippingDate.label"/>:						
-									<label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label> 
+									<warehouse:message code="shipping.expectedShippingDate.label"/>:
+									<label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label>
 								</span>
 							</g:if>
 						</g:if>
 						<g:else>
 							<span class="actualShippingDate">
-								<warehouse:message code="shipping.actualShippingDate.label"/>:						
-								<label><format:date obj="${shipmentInstance?.actualShippingDate}"/></label> 
+								<warehouse:message code="shipping.actualShippingDate.label"/>:
+								<label><format:date obj="${shipmentInstance?.actualShippingDate}"/></label>
 							</span>
 						</g:else>
 						<g:if test="${!shipmentInstance?.wasReceived() }">
 							<g:if test="${shipmentInstance?.expectedDeliveryDate }">
 								<span class="expectedDeliveryDate">
-									<warehouse:message code="shipping.expectedDeliveryDate.label"/>:						
+									<warehouse:message code="shipping.expectedDeliveryDate.label"/>:
 									<label>
 										<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
-									</label> 
+									</label>
 								</span>
 							</g:if>
 						</g:if>
 						<g:else>
 							<span class="actualDeliveryDate">
-								<warehouse:message code="shipping.actualDeliveryDate.label"/>:						
-								<label><format:date obj="${shipmentInstance?.actualDeliveryDate}"/></label> 
+								<warehouse:message code="shipping.actualDeliveryDate.label"/>:
+								<label><format:date obj="${shipmentInstance?.actualDeliveryDate}"/></label>
 							</span>
 						</g:else>
 
@@ -96,6 +93,15 @@
 							<span>
 								<warehouse:message code="shipment.numItems.label"/>:
 								<label>${shipmentInstance?.shipmentItems?.size()?:0 }</label>
+							</span>
+						</g:if>
+						<g:if test="${shipmentInstance?.totalValue}">
+							<span>
+								<warehouse:message code="shipping.totalValue.label"/>:
+								<label>
+									<g:formatNumber format="###,###,##0.00" number="${shipmentInstance?.totalValue ?: 0.00 }" />
+									${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+								</label>
 							</span>
 						</g:if>
 
@@ -112,12 +118,12 @@
 
 				</td>
 
-				<td class="right" width="1%">
+				<td class="right middle" width="1%">
 					<div class="tag tag-alert">
 						${shipmentInstance?.status?.name}
 					</div>
 				</td>
-				
+
 			</tr>
 		</tbody>
 	</table>

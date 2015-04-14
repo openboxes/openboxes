@@ -29,25 +29,25 @@
 
                 <div class="box">
                     <h2>
-                        <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="event" style="vertical-align: middle"/>
+                        <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"/>
                         <label><warehouse:message code="receiving.label"/></label>
                     </h2>
 
                     <table>
                         <tbody>
                         <tr class="prop">
-                            <td class="name middle"  style="width: 10%;">
+                            <td class="name middle">
                                 <label><warehouse:message code="shipping.origin.label" /></label>
                             </td>
-                            <td class="value" style="width: 30%;">
+                            <td class="value">
                                 ${shipmentInstance?.origin?.name }
                             </td>
                         </tr>
                         <tr class="prop">
-                            <td class="name middle"  style="width: 10%;">
+                            <td class="name middle">
                                 <label><warehouse:message code="shipping.destination.label" /></label>
                             </td>
-                            <td class="value" style="width: 30%;">
+                            <td class="value">
                                 ${shipmentInstance?.destination?.name }
                             </td>
                         </tr>
@@ -59,20 +59,23 @@
                             <td valign="top"
                                 class="value ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
                                 nowrap="nowrap">
+                                <%--
                                 <g:jqueryDatePicker name="actualDeliveryDate"
                                                     value="${receiptInstance?.actualDeliveryDate}" format="MM/dd/yyyy" />
+                                --%>
+                                <g:datePicker name="actualDeliveryDate" value="${receiptInstance?.actualDeliveryDate}" precision="minute" noSelection="['':'']"/>
                             </td>
                         </tr>
                         <tr class="prop">
-                            <td class="name middle"  style="width: 10%;">
+                            <td class="name middle">
                                 <label><warehouse:message code="shipping.recipient.label" /></label>
                             </td>
-                            <td class="value" style="width: 30%;">
+                            <td class="value">
                                 <g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName"
-                                               width="300"
-                                               styleClass="text"
-                                               valueId="${receiptInstance?.recipient?.id}"
-                                               valueName="${receiptInstance?.recipient?.name}"/>
+                                       width="300"
+                                       styleClass="text"
+                                       valueId="${receiptInstance?.recipient?.id}"
+                                       valueName="${receiptInstance?.recipient?.name}"/>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -80,7 +83,7 @@
                                 <label><warehouse:message code="default.comment.label" /></label>
                             </td>
                             <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
-                                <g:textArea name="comment" cols="60" rows="3"/>
+                                <g:textArea name="comment" cols="80" rows="10"/>
                             </td>
                         </tr>
                         </tbody>
@@ -89,7 +92,6 @@
 
                 <div class="box ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}">
                     <h2>
-                        <img src="${createLinkTo(dir:'images/icons',file:'box.png')}" alt="event" style="vertical-align: middle"/>
                         <label><warehouse:message code="shipping.itemsToReceive.label" default="Items to be received"/></label>
                     </h2>
 

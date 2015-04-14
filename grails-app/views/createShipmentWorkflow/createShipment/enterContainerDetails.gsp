@@ -172,7 +172,9 @@
 												</div>
 											</td>
 											<td class="middle right">
-												${shipmentInstance?.countShipmentItemsByContainer(null)} items
+												<g:link action="createShipment" event="enterContainerDetails" params="['containerId':null]">
+													${shipmentInstance?.countShipmentItemsByContainer(null)} items
+												</g:link>
 											</td>
 											<td class="right">
 												<span class="sorthandle"></span>
@@ -212,7 +214,9 @@
 														</div>
 													</td>
 													<td class="middle right">
-														${containerInstance?.shipmentItems?.size() } items
+														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]">
+															${containerInstance?.shipmentItems?.size() } items
+														</g:link>
 
 													</td>
 													<td class="right">
@@ -254,7 +258,9 @@
 															</div>
 														</td>
 														<td class="middle right">
-															${childContainerInstance?.shipmentItems?.size()?:0 } items
+															<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]">
+																${childContainerInstance?.shipmentItems?.size()?:0 } items
+															</g:link>
 														</td>
 														<td class="right">
 															<!--sortOrder:${containerInstance?.sortOrder}-->
@@ -280,15 +286,12 @@
 									<tfoot>
 										<tr>
 											<td colspan="5">
-												<div>
+												<div class="center">
 
 													<div class="button-group">
-														<a id="btnAddContainers" href="javascript:void(0);" class="button">Add packing units</a>
-
-													</div>
-													<div class="button-group">
+														<a href="javascript:void(0);" class="btnAddContainers button">Add packing units</a>
 														<g:submitButton name="deleteContainers" value="Delete selected" class="button icon trash"></g:submitButton>
-														<g:submitButton name="deleteContainersAndItems" value="Delete selected (including Items)" class="button icon trash"></g:submitButton>
+														<g:submitButton name="deleteContainersAndItems" value="Delete selected (incl. items)" class="button icon trash"></g:submitButton>
 
 													</div>
 												</div>
@@ -487,6 +490,14 @@
 					<tbody>
 						<tr class="prop">
 							<td valign="top" class="name">
+								<label><warehouse:message code="default.name.label" /></label>
+							</td>
+							<td valign="top" class="value">
+								<g:textField id="container-text-name" name="name" value="" placeholder="Enter the default name (e.g. Pallet, Box)" class="text medium containerTextComponent" size="80"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
 								<label><warehouse:message code="container.type.label" /></label>
 							</td>
 							<td valign="top" class="value">
@@ -496,10 +507,10 @@
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label><warehouse:message code="default.name.label" /></label>
+								<label><warehouse:message code="shipment.numberOfContainers.label" default="Number of containers"/></label>
 							</td>
 							<td valign="top" class="value">
-								<g:textField id="container-text-name" name="name" value="" placeholder="Enter the default name (e.g. Pallet, Box)" class="text medium containerTextComponent" size="80"/>
+								<g:textField id="container-text-count" name="numberOfContainers" value="" placeholder="How many containers do you want to create?" class="text medium containerTextComponent"  size="80"/>
 							</td>
 						</tr>
 						<tr class="prop">
@@ -508,14 +519,6 @@
 							</td>
 							<td valign="top" class="value">
 								<g:textField id="container-text-start" name="start" value="${1}" placeholder="Enter the number you want to start with" class="text medium containerTextComponent"  size="80"/>
-							</td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">
-								<label><warehouse:message code="shipment.numberOfContainers.label" default="Number of containers"/></label>
-							</td>
-							<td valign="top" class="value">
-								<g:textField id="container-text-count" name="numberOfContainers" value="" placeholder="How many containers do you want to create?" class="text medium containerTextComponent"  size="80"/>
 							</td>
 						</tr>
 						<tr class="prop">
@@ -588,7 +591,7 @@
 	</script>
 	<script>
 		$(document).ready(function() {
-			$("#btnAddContainers").click(function(event){
+			$(".btnAddContainers").click(function(event){
 				$("#dlgAddContainers").dialog('open');
 			});
 			$("#dlgAddContainers").dialog({

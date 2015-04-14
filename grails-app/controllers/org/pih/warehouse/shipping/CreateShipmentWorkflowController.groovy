@@ -61,6 +61,7 @@ class CreateShipmentWorkflowController {
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
 			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
     	}
     		
     	enterShipmentDetails {
@@ -86,6 +87,7 @@ class CreateShipmentWorkflowController {
 				} catch (Exception e) {
 					flash.message = e.message
 				}
+
 
 
 			}.to("enterTrackingDetails")
@@ -119,6 +121,7 @@ class CreateShipmentWorkflowController {
 			on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
     	}
     	
     	enterTrackingDetails {
@@ -187,6 +190,7 @@ class CreateShipmentWorkflowController {
 			on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
     	}
     	
     	enterContainerDetails {
@@ -495,8 +499,11 @@ class CreateShipmentWorkflowController {
 			//on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
     	}
-		
+
+
+
 		sendShipment {
 						
 			// All transition buttons on the bottom of the page
@@ -518,6 +525,7 @@ class CreateShipmentWorkflowController {
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
 			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
 			
 			
 		}
@@ -630,6 +638,10 @@ class CreateShipmentWorkflowController {
 
 						shipmentService.saveContainer(container)
 					} catch (HibernateOptimisticLockingFailureException e) {
+						flash.message = e?.cause?.message?:e?.message
+						invalid()
+					}
+					catch (Exception e) {
 						flash.message = e?.cause?.message?:e?.message
 						invalid()
 					}
@@ -819,8 +831,15 @@ class CreateShipmentWorkflowController {
 					invalid()
     			}
 				else {
-					shipmentService.saveContainer(box)
-					
+
+					try {
+						shipmentService.saveContainer(box)
+					}
+					catch (Exception e) {
+						flash.message = e.message
+						invalid()
+					}
+
 					// save a reference to this box if we need to clone it
 					if (flash.cloneQuantity) { flash.cloneContainer = box }
 					
@@ -1032,7 +1051,14 @@ class CreateShipmentWorkflowController {
     	showDetails {
     		redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])
     	}
-    	
+
+//		showDetails {
+//			action {
+//				redirect(controller: "shipment", action: "showDetails", id: shipmentInstance?.id)
+//			}
+//
+//		}
+
     	finish {
     		if (flow.shipmentInstance.id) {
     			redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])

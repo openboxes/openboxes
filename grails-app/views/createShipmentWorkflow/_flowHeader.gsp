@@ -17,7 +17,7 @@
             </g:else>
             <div class="${styleClass}">
                 <g:if test="${shipmentInstance?.id}">
-                    <g:link action="createShipment" event="${wizardStep?.value}">
+                    <g:link controller="createShipmentWorkflow" action="createShipment" event="${wizardStep?.value}" id="${shipmentInstance?.id}">
                         <span>${status+1}</span>
                         <warehouse:message code="shipping.${wizardStep?.value}.label"/>
                     </g:link>
