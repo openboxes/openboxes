@@ -13,7 +13,7 @@
 
         <g:render template="summary"/>
 
-        <g:if test="${flash.message}">
+		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
 		<g:hasErrors bean="${shipmentInstance}">
@@ -113,33 +113,6 @@
 									<warehouse:message code="default.lbs.label"/>
 								</td>
 							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label><warehouse:message
-											code="shipping.timeToProcess.label" default="Time to process" /></label>
-								</td>
-								<td valign="top" class="value">
-									${shipmentInstance?.timeToProcess()?:"<span class='fade'>N/A</span>"}
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label><warehouse:message
-											code="shipping.timeInCustoms.label" default="Time in customs"/></label>
-								</td>
-								<td valign="top" class="value">
-									${shipmentInstance?.timeInCustoms()?:"<span class='fade'>N/A</span>"}
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label><warehouse:message
-											code="shipping.timeInTransit.label" default="Time in transit"/></label>
-								</td>
-								<td valign="top" class="value">
-									<g:if test="${shipmentInstance?.isPending()}">~</g:if>${shipmentInstance?.timeInTransit()?:"<span class='fade'>N/A</span>"}
-								</td>
-							</tr>
 							<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')||!shipmentWorkflow?.isExcluded('statedValue')}">
 								<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
 									<tr class="prop">
@@ -147,12 +120,8 @@
 											<label><warehouse:message code="shipping.totalValue.label" /></label><br/>
 										</td>
 										<td valign="top" class="value">
-											<g:if test="${shipmentInstance.totalValue}">
-												$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
-											</g:if>
-											<g:else>
-												<span class="fade"><warehouse:message code="default.na.label"/></span>
-											</g:else>
+											<g:formatNumber format="###,###,##0.00" number="${shipmentInstance?.totalValue ? shipmentInstance?.totalValue : 0.00 }" />
+											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</td>
 									</tr>
 								</g:if>
@@ -272,6 +241,34 @@
 									</tr>
 								</g:if>
 								--%>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label><warehouse:message
+												code="shipping.timeToProcess.label" default="Time to process" /></label>
+									</td>
+									<td valign="top" class="value">
+										<g:relativeTime timeDuration="${shipmentInstance?.timeToProcess()}"/>
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label><warehouse:message
+												code="shipping.timeInCustoms.label" default="Time in customs"/></label>
+									</td>
+									<td valign="top" class="value">
+										<g:relativeTime timeDuration="${shipmentInstance?.timeInCustoms()}"/>
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label><warehouse:message
+												code="shipping.timeInTransit.label" default="Time in transit"/></label>
+									</td>
+									<td valign="top" class="value">
+										<g:relativeTime timeDuration="${shipmentInstance?.timeInTransit()}"/>
+									</td>
+								</tr>
+
 
 							</tbody>
 						</table>
@@ -738,7 +735,7 @@
 										<g:if test="${shipmentInstance?.wasReceived()}">
 											<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
 											<td class="center" style="white-space:nowrap;${shipmentItem?.receiptItem?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}">
-												<g:formatNumber number="${shipmentItem?.receiptItem?.quantityReceived }"/>
+												<g:formatNumber number="${shipmentItem?.receiptItem?.quantityReceived }" format="###,##0"/>
 											</td>
 											<%--
 											<td class="center">
@@ -752,7 +749,7 @@
 												<span class="fade">${shipmentItem?.recipient?.email}</span>
 											</g:if>
 											<g:else>
-												<warehouse:message code="default.none.label"/>
+
 											</g:else>
 										</td>
 										<td class="left" >
@@ -760,7 +757,7 @@
 												${shipmentItem?.receiptItem?.comment}
 											</g:if>
 											<g:else>
-												<warehouse:message code="default.none.label"/>
+
 											</g:else>
 										</td>
 

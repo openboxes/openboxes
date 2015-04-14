@@ -12,7 +12,8 @@ package org.pih.warehouse
 // import java.text.SimpleDateFormat;
 // import java.util.Date;
 
-import com.ocpsoft.pretty.time.PrettyTime;
+import com.ocpsoft.pretty.time.PrettyTime
+import groovy.time.TimeDuration;
 
 class DateTagLib {
    	
@@ -35,7 +36,35 @@ class DateTagLib {
 			}
 		}
 	}
-	
+
+	def relativeTime = { attrs, body ->
+		TimeDuration timeDuration = attrs.timeDuration;
+		if (timeDuration) {
+			if (timeDuration.years > 0) {
+				out << "${timeDuration.years} years, ${timeDuration.days} days"
+			}
+			else if (timeDuration.days > 0) {
+				out << "${timeDuration.days} days"
+			}
+			else if (timeDuration.hours > 0) {
+				out << "${timeDuration.hours} hours"
+			}
+			else if (timeDuration.minutes > 0) {
+				out << "${timeDuration.minutes} minutes"
+			}
+			else if (timeDuration.seconds > 0) {
+				out << "${timeDuration.seconds} seconds"
+			}
+			else {
+				out << "<span class='fade'>none</span>";
+			}
+
+		}
+		else {
+			out << "<span class='fade'>none</span>";
+		}
+	}
+
 	def prettyDateFormat = { attrs, body ->
 		def date = (attrs.date)?:new Date();
 		def p = new PrettyTime();
