@@ -477,7 +477,9 @@ class CreateShipmentWorkflowController {
 					flash.message = "Successfully moved child container ${params.childContainer} to parent container ${params.parentContainer}"
 				} catch (ShipmentException e) {
 					flash.message = e.message
-				}
+				} catch (Exception e) {
+                    flash.message = e.message
+                }
 
 
 

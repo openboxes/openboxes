@@ -790,7 +790,7 @@ class ShipmentService {
 	}
 
 
-	void deleteContainers(id, containerIds, boolean deleteItems) {
+	void deleteContainers(String id, List containerIds, boolean deleteItems) {
 		Shipment shipment = Shipment.get(id)
 		if (shipment) {
 			if (!containerIds) {
@@ -825,17 +825,35 @@ class ShipmentService {
 	 */
 	void deleteContainer(Container container) {
 
-		// nothing to do if null
-		if (!container) { return }
-		
+        // nothing to do if null
+        if (!container) {
+            return
+        }
+
+        List containerIds = []
+        if (container.containers) {
+            container?.containers.each {
+                containerIds << it.id
+            }
+        }
+        containerIds << container.id
+        deleteContainers(container?.shipment?.id, containerIds, true)
+    }
+
+    void deleteContainerKeepItems(Container container) {
+        // nothing to do if null
+        if (!container) {
+            return
+        }
+
 		def shipment = container.shipment
-		
+
 		// first we need recursively call method to handle deleting all the child containers
 		def childContainers = container.containers.collect { it }   // make a copy to avoid concurrent modification
-		childContainers.each { 
-			deleteContainer(it) 
+		childContainers.each {
+			deleteContainer(it)
 		}
-		
+
 		// remove all items in the container from the parent shipment
 		container.getShipmentItems().each { shipmentItem ->
 			//shipment.removeFromShipmentItems(it)
@@ -1571,7 +1589,7 @@ class ShipmentService {
 		HSSFSheet worksheet = workbook.getSheetAt(0);
 
 		Iterator<Row> rowIterator = worksheet.iterator();
-		int cell = 0
+		int cellIndex = 0
 		Row row
 		while (rowIterator.hasNext()) {
 			row = rowIterator.next();
@@ -1596,14 +1614,14 @@ class ShipmentService {
 //			System.out.println("");
 
 			try {
-				cell = 0;
-				def palletName = row.getCell(cell++)?.getStringCellValue()
-				def boxName = row.getCell(cell++)?.getStringCellValue()
-				def productCode = row.getCell(cell++)?.getStringCellValue()
-				def productName = row.getCell(cell++)?.getStringCellValue()
-				def lotNumber = row.getCell(cell++)?.getStringCellValue()
-				def expirationDate = row.getCell(cell++)?.getDateCellValue()
-				def quantity = row.getCell(cell++)?.getNumericCellValue()
+				cellIndex = 0;
+				def palletName = getStringCellValue(row.getCell(cellIndex++))
+				def boxName = getStringCellValue(row.getCell(cellIndex++))
+				def productCode = getStringCellValue(row.getCell(cellIndex++))
+				def productName = getStringCellValue(row.getCell(cellIndex++))
+				def lotNumber = getStringCellValue(row.getCell(cellIndex++))
+				def expirationDate = getDateCellValue(row.getCell(cellIndex++))
+				def quantity = getNumericCellValue(row.getCell(cellIndex++))
 
 				log.info("palletName: " + palletName)
 				log.info("boxName: " + boxName)
@@ -1615,12 +1633,62 @@ class ShipmentService {
 
 				packingListItems << [palletName: palletName, boxName: boxName, productCode: productCode, productName: productName, lotNumber: lotNumber, expirationDate: expirationDate, quantity: quantity]
 			}
-			catch (Exception e) {
-				throw new RuntimeException("Error parsing XLS file at row " + (row.rowNum+1) + " cell " + cell + " caused by: " + e.message, e)
+			catch (IllegalStateException e) {
+				log.error("Error parsing XLS file " + e.message, e)
+                throw new RuntimeException("Error parsing XLS file at row " + (row.rowNum+1) + " column " + cellIndex + " caused by: " + e.message, e)
 			}
+            catch (Exception e) {
+                log.error("Error parsing XLS file " + e.message, e)
+                throw new RuntimeException("Error parsing XLS file at row " + (row.rowNum+1) + " column " + cellIndex + " caused by: " + e.message, e)
+
+            }
+
+
 		}
 		return packingListItems
 	}
+
+    Date getDateCellValue(Cell cell) {
+        Date value
+        try {
+            value = cell.getDateCellValue()
+        }
+        catch (IllegalStateException e) {
+            log.warn("Error parsing string cell value: " + e.message, e)
+            throw e;
+        }
+        return value
+
+    }
+
+    String getStringCellValue(Cell cell) {
+        String value
+        if (cell) {
+            try {
+                value = cell.getStringCellValue()
+            }
+            catch (IllegalStateException e) {
+                log.warn("Error parsing string cell value: " + e.message, e)
+                value = Integer.valueOf((int) cell.getNumericCellValue())
+            }
+        }
+        return value?.trim()
+    }
+
+    double getNumericCellValue(Cell cell) {
+        double value
+        if (cell) {
+            try {
+                value = cell.getNumericCellValue()
+            }
+            catch (IllegalStateException e) {
+                log.warn("Error parsing numeric cell value: " + e.message, e)
+                throw e;
+            }
+        }
+        return value
+    }
+
 
 	boolean validatePackingList(List packingListItems, Location location) {
 
