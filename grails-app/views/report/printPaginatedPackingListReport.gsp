@@ -5,7 +5,7 @@
 	    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
         <title><warehouse:message code="report.showShippingReport.label" /></title>    
         <style>
-        	.header { font-size: 24pt; padding: 10px; }
+        	.header { font-size: 24px; padding: 10px; }
         
         </style>
     </head>    
@@ -35,42 +35,89 @@
 		   			
 		   				<div class="page" style="page-break-after: always;">
 			   			
-				    		<table id="packinglist-items" style="width: 99%;" class="fs-repeat-header">
+				    		<table id="packinglist-items" width="100%" class="fs-repeat-header">
 				    			<thead>
 				    				<tr>
-				    					<td colspan="7">
-					    					<table>
+				    					<td colspan="7" class="center" width="99%">
+					    					<table border="0">
 												<thead>
 													<tr>
-														<td class="left">
-															<img src="${createLinkTo(dir:'images/',file:'hands.jpg')}" width="65" height="65" />
+														<td class="left middle" width="1%">
+                                                            <g:displayLogo location="${session?.warehouse?.id}"/>
 														</td>
-														<td class="center">
-															<div class="title">			
-																<warehouse:message code="report.shippingReport.heading"/>	
-															</div>		
+														<td class="left middle">
+															<div class="title">
+                                                                <warehouse:message code="report.shippingReport.title"/>
+															</div>
 															<div class="subtitle">
 																${command?.shipment?.name?.encodeAsHTML() }
 															</div>
-															<div class="subtitle">
-																<warehouse:message code="report.shippingReport.title"/>															
-																${command?.shipment?.origin?.name?.encodeAsHTML() } -
-																${command?.shipment?.destination?.name?.encodeAsHTML() }
-
-															</div>
-														</td>			
-														<td class="right">
-															<img src="${createLinkTo(dir:'images/',file:'hands.jpg')}"  width="65" height="65"/>
-														</td>				
+														</td>
+                                                        <td class="center middle" width="1%">
+                                                            <g:displayBarcode data="${command?.shipment?.shipmentNumber}" height="50" width="120" showData="${true}"/>
+                                                        </td>
 													</tr>
 												</thead>
 											</table>
-				    					</td>
+                                            <br/>
+                                            <div class="center">
+
+                                                <table style="width: 50%">
+                                                    <tr class="prop">
+                                                        <td>
+                                                            <label><warehouse:message code="shipping.shipmentNumber.label"/></label>
+
+                                                        </td>
+                                                        <td>
+                                                            ${command?.shipment?.shipmentNumber?.encodeAsHTML() }
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="shipping.expectedShippingDate.label"/></label>
+
+                                                        </td>
+                                                        <td>
+                                                            <g:formatDate date="${command?.shipment?.expectedShippingDate }"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="shipping.expectedDeliveryDate.label"/></label>
+
+                                                        </td>
+                                                        <td>
+                                                            <g:formatDate date="${command?.shipment?.expectedDeliveryDate }"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="shipping.origin.label"/></label>
+
+                                                        </td>
+                                                        <td>
+                                                            ${command?.shipment?.origin?.name?.encodeAsHTML() }
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label><warehouse:message code="shipping.destination.label"/></label>
+                                                        </td>
+                                                        <td>
+                                                            ${command?.shipment?.destination?.name?.encodeAsHTML() }
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+
+                                        </td>
 				    				</tr>
 				    				<tr>
 				    					<td colspan="7" class="center">
-				    						<div class="header">							   				
-								   				${packingListEntry?.key?.encodeAsHTML() }
+				    						<div class="header">
+                                                <g:render template="/shipment/container" model="[container:packingListEntry?.key]"/>
+
 							   				</div>
 				    					</td>
 				    				</tr>
@@ -78,6 +125,9 @@
 				    					<th class="center bottom">
 				    						<warehouse:message code="report.number.label"/>
 				    					</th>
+                                        <th class="">
+
+                                        </th>
                                         <th class="bottom">
                                             <warehouse:message code="product.productCode.label"/>
                                         </th>
@@ -109,6 +159,10 @@
 											<td class="center">
 												${i+1 }							
 											</td>
+                                            <td>
+                                                <g:displayBarcode data="${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}"
+                                                                  height="50" width="120" showData="${false}"/>
+                                            </td>
                                             <td>
                                                 ${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}
                                             </td>

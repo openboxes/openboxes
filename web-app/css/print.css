@@ -16,11 +16,6 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
     margin: 10px;
 }
 
-.title{
-    clear: both;
-    text-align: center;
-    margin: 10px;
-}
 .canceled {
     color: lightgrey;
     text-decoration: line-through;

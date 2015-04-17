@@ -40,7 +40,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="" size="10" class="text"/> 
+						<g:textField id="quantity" name="quantity" value="" size="10" class="text"/>
 					</td>
 				</tr>  	        
 				<tr class="prop">
@@ -56,19 +56,19 @@
 					<td colspan="2">
 						<div class="buttons center">
 							<g:if test="${itemToEdit}">
-								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
+								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>
 								<%-- 
 								<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"></g:submitButton>
 								--%>
 							</g:if>
 							<g:else>
-								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
+								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>
 							</g:else>
 							<g:if test="${containerId}">
-								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
+								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}" class="button"></g:submitButton>
 							</g:if>
-							<button name="cancelDialog" type="reset" onclick="$('.ui-dialog-titlebar-close').click();"><warehouse:message code="default.button.cancel.label"/></button>
-							<button class="show-search-form">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>
+							<button name="cancelDialog" type="reset" onclick="$('.ui-dialog-titlebar-close').click();" class="button"><warehouse:message code="default.button.cancel.label"/></button>
+							<button class="show-search-form button">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>
 						</div>
 					</td>
 				</tr>

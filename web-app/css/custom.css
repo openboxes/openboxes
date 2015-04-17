@@ -645,10 +645,17 @@ h2 {
 }
 
 
-.title { 
-	font-size: 1.2em;	
+.title {
+    line-height: 1.5em;
+	font-size: 1.5em;
 	font-weight: bold;
 	color: #666;
+}
+.subtitle {
+    font-size: 1.2em;
+    line-height: 1.2em;
+    font-weight: bolder;
+    color: #666;
 }
 
 .buttons { 
@@ -838,10 +845,6 @@ ul.megamenu {
 	padding: 0;
 	margin: 0;
 }
-
-
-
-
 
 /* not sure if these are needed any longer, so we should look into getting rid of these 
 -------------------------------------------------------------*/

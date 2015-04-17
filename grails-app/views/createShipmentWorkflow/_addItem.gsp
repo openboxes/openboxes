@@ -2,14 +2,13 @@
 
 	<div id="itemSearchForm" >
 		<h4><warehouse:message code="shipping.itemSearch.label"/></h4>
-		<div style="text-align: left;">
+		<div style="text-align: center;">
 			<table>
 				<tbody>
 					<tr>
-						<td style="text-align: left">
-							<g:autoSuggestSearchable id="searchable" name="searchable" minLength="3"
-								jsonUrl="${request.contextPath }/json/findInventoryItems" width="590" styleClass="middle text"
-                            />
+						<td class="center">
+							<g:autoSuggestSearchable id="searchable" name="searchable" minLength="3" width="600" placeholder="Enter at least 3 characters to view results"
+								jsonUrl="${request.contextPath }/json/findInventoryItems" styleClass="middle text"/>
                             <div class="fade">Type at least 3 characters to see results</div>
 						</td>
 					</tr>
@@ -21,9 +20,6 @@
 	<div id="itemFoundForm" style="display: none">
 		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemFound"/>
 		<g:form name="editItemFound" action="createShipment">
-			<h3>
-				<warehouse:message code="shipping.enterQuantityAndRecipient.label"/>
-			</h3>
 			<table>
 				<tbody>
 					<g:render template="itemFoundFields" model="['containerId':addItemToContainerId]"/>		
@@ -31,11 +27,7 @@
 			</table>
 		</g:form>
 	</div>							
-				
-					
-
-	
-</div>	
+</div>
 				     
 <script>
 	$(document).ready(function() {
@@ -48,7 +40,6 @@
 			autoOpen: true, 
 			modal: true, 
 			width: 700,
-            height: 400,
 			open: function() { }
 		});				
 		

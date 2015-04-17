@@ -47,16 +47,16 @@
 					<td>
 						<div class="left">
 							<g:if test="${itemToEdit}">
-								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
+								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>
 							</g:if>
 							<g:else>
-								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
+								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>
 							</g:else>
-							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
+							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');" class="button"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
 						<g:if test="${addItemToContainerId}">
 							<div class="left">
-								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
+								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}" class="button"></g:submitButton>
 							</div>
 						</g:if>
 					</td>

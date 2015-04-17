@@ -143,7 +143,7 @@
                                             <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'} ${lastContainer!=shipmentItem?.container?'top':'' }">
                                                 <td style="text-align: left;" class="middle">
                                                     <g:if test="${isNewContainer}">
-                                                        <g:render template="container" model="[container:shipmentItem?.container]"/>
+                                                        <g:render template="container" model="[container:shipmentItem?.container,showDetails:false]"/>
                                                     </g:if>
                                                 </td>
                                                 <td class="center middle">

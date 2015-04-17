@@ -114,15 +114,15 @@
 						<td>
 							<div class="left">
 								<g:if test="${item}">
-									<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
+									<g:submitButton class="button" name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
 								</g:if>
 								<g:else>
 									<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
 									<g:if test="${addItemToContainerId}">									
-										<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"/>
+										<g:submitButton class="button" name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"/>
 									</g:if>
 								</g:else>
-								<button name="cancelDialog" type="reset" onclick="$('#dlgAddIncomingItem').dialog('close');">
+								<button name="cancelDialog" type="reset" onclick="$('#dlgAddIncomingItem').dialog('close');" class="button" >
 									<warehouse:message code="default.button.cancel.label"/>
 								</button>
 							</div>
@@ -135,7 +135,7 @@
 		
 		<g:if test="${!item }">
 			<hr/>
-			<a href="javascript:void(0);" class="back">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></a>	
+			<a href="javascript:void(0);" class="button">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></a>
 		</g:if>
 	</div>		
 </div>	

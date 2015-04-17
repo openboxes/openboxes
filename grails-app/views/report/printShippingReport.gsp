@@ -53,9 +53,7 @@
 				<table id="details-table">
 					<tr>				
 						<td class="label">
-							<label>
-								<warehouse:message code="report.containerNumber.label"/>
-							</label>
+							<label><warehouse:message code="report.containerNumber.label"/></label>
 						</td>
 						<td class="value underline">
 							<span class="value">
@@ -66,9 +64,7 @@
 						
 						</td>
 						<td class="label">
-							<label>
-								<warehouse:message code="report.plate.label"/>
-							</label>
+							<label><warehouse:message code="report.plate.label"/></label>
 						</td>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>						
@@ -76,9 +72,7 @@
 					</tr>
 					<tr>
 						<td class="label">
-							<label>
-								<warehouse:message code="report.origin.label"/>
-							</label>				
+							<label><warehouse:message code="report.origin.label"/></label>
 						</td>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.origin?.name }</span>							
@@ -87,9 +81,7 @@
 						
 						</td>
 						<td class="label">
-							<label>
-								<warehouse:message code="report.destination.label"/>
-							</label>
+							<label><warehouse:message code="report.destination.label"/></label>
 						</td>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.destination?.name }</span>
@@ -159,12 +151,7 @@
 												</td>
 												<td class="left" rowspan="${rowspan }">
 													<g:if test="${newContainer }">
-														<g:if test="${checklistEntry?.shipmentItem?.container }">
-															${checklistEntry?.shipmentItem?.container?.name} 	
-														</g:if>
-														<g:else>
-															<warehouse:message code="shipping.unpacked.label"/>
-														</g:else>
+														<g:render template="../shipment/container" model="[container:checklistEntry?.shipmentItem?.container]"/>
 													</g:if>
 												</td>
                                                 <td>

@@ -694,7 +694,7 @@
 									<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''} shipmentItem">
 										<g:if test="${newContainer }">
 											<td class="top left" >
-												<g:render template="container" model="[container:shipmentItem?.container]"/>
+												<g:render template="container" model="[container:shipmentItem?.container,showDetails:true]"/>
 											</td>
 										</g:if>
 										<g:else>

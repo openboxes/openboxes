@@ -4,16 +4,9 @@
 	<div class="yui-gf">				
 		<div id="banner">
 		    <div id="bannerLeft" class="yui-u first" >
-				<div class="logo" >
-                    <g:if test="${session?.warehouse?.logo }">
-                        <a href="${createLink(uri: '/dashboard/index')}">
-                            <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
-                        </a>
-                    </g:if>
-                    <g:else>
-                        <a href="${createLink(uri: '/dashboard/index')}">
-                            <span class="middle"><warehouse:message code="default.openboxes.label"/></span></a>
-                    </g:else>
+				<div class="logo">
+                    <g:displayLogo location="${session?.warehouse?.id}"/>
+
 				</div>
 		    </div>
 		    
