@@ -402,6 +402,19 @@ class CreateShipmentWorkflowController {
 
 			}.to("enterContainerDetails")
 
+            on("deleteAllContainersAndItems") {
+                log.info "Delete all containers and items from shipment " + params
+                try {
+                    shipmentService.deleteAllContainers(params.id, true)
+                    flash.message = "Delete all containers and items"
+                } catch (ShipmentException e) {
+                    flash.message = e.message
+                } catch (Exception e) {
+                    flash.message = e.message
+                }
+
+            }.to("enterContainerDetails")
+
 			on("importPackingList") {
 				log.info "Import packing list into shipment " + params
 

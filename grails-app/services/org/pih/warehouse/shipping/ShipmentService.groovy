@@ -790,6 +790,13 @@ class ShipmentService {
 	}
 
 
+    void deleteAllContainers(String id, boolean deleteItems) {
+        Shipment shipment = Shipment.get(id)
+        List containerIds = shipment?.findAllParentContainers()*.id
+        deleteContainers(id, containerIds, deleteItems)
+    }
+
+
 	void deleteContainers(String id, List containerIds, boolean deleteItems) {
 		Shipment shipment = Shipment.get(id)
 		if (shipment) {
@@ -1623,6 +1630,7 @@ class ShipmentService {
 				def expirationDate = getDateCellValue(row.getCell(cellIndex++))
 				def quantity = getNumericCellValue(row.getCell(cellIndex++))
 
+                log.info("----------------------------")
 				log.info("palletName: " + palletName)
 				log.info("boxName: " + boxName)
 				log.info("productCode: " + productCode)
@@ -1654,7 +1662,7 @@ class ShipmentService {
             value = cell.getDateCellValue()
         }
         catch (IllegalStateException e) {
-            log.warn("Error parsing string cell value: " + e.message, e)
+            log.warn("Error parsing string cell value [${cell}]: " + e.message)
             throw e;
         }
         return value
@@ -1668,7 +1676,7 @@ class ShipmentService {
                 value = cell.getStringCellValue()
             }
             catch (IllegalStateException e) {
-                log.warn("Error parsing string cell value: " + e.message, e)
+                log.warn("Error parsing string cell value [${cell}]: " + e.message)
                 value = Integer.valueOf((int) cell.getNumericCellValue())
             }
         }
@@ -1682,7 +1690,7 @@ class ShipmentService {
                 value = cell.getNumericCellValue()
             }
             catch (IllegalStateException e) {
-                log.warn("Error parsing numeric cell value: " + e.message, e)
+                log.warn("Error parsing numeric cell value [${cell}]: " + e.message)
                 throw e;
             }
         }
@@ -1699,6 +1707,18 @@ class ShipmentService {
 				throw new RuntimeException("Cannot find product with product code " + item.productCode)
 			}
 			item.product = product
+
+
+            log.info ("item pallet " + item.pallet)
+            log.info ("item box " + item.box)
+
+
+            // there's a pallet
+            if (!item.palletName && item?.boxName) {
+                throw new RuntimeException("You must enter a valid Pallet if using the Box column for item " + item.productCode)
+            }
+
+            //throw new RuntimeException("Expected a different exception")
 
 			// If the location is a warehouse (it manages inventory) then we need to ensure that there's enough of the
 			// item in stock before we add it to the shipment. If the location is a supplier, we don't care.
@@ -1742,7 +1762,7 @@ class ShipmentService {
 
 					// Find or create the pallet and box (if provided). Items are added to Unpacked Items by default.
 					Container pallet = item.palletName ? shipment.findOrCreatePallet(item.palletName) : null
-					Container box = item.boxName ? pallet.findOrCreateBox(item.boxName) : null
+					Container box = item.boxName ? pallet?.findOrCreateBox(item.boxName) : null
 
 					// The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
 					Container container = box ?: pallet ?: null

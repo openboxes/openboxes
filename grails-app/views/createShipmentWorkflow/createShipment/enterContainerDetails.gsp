@@ -290,8 +290,8 @@
 
 													<div class="button-group">
 														<a href="javascript:void(0);" class="btnAddContainers button">Add packing units</a>
-														<g:submitButton name="deleteContainers" value="Delete selected" class="button icon trash"></g:submitButton>
-														<g:submitButton name="deleteContainersAndItems" value="Delete selected (incl. items)" class="button icon trash"></g:submitButton>
+														<g:submitButton name="deleteContainersAndItems" value="Delete Selected" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"></g:submitButton>
+														<g:submitButton name="deleteAllContainersAndItems" value="Delete All" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"></g:submitButton>
 
 													</div>
 												</div>
