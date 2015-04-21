@@ -68,8 +68,8 @@ class UserController {
 		else {
 			
 			try { 
-				def subject = "${warehouse.message(code:'system.testEmailSubject.label')}"
-				def body = g.render(template:"/email/userCanReceiveEmail", model:[userInstance:userInstance])
+				String subject = "${warehouse.message(code:'system.testEmailSubject.label')}"
+				String body = g.render(template:"/email/userCanReceiveEmail", model:[userInstance:userInstance])
 					
 				mailService.sendHtmlMail(subject, body, userInstance?.email)
 				flash.message = "Email successfully sent to " + userInstance?.email
