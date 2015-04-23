@@ -31,7 +31,7 @@ class ShipmentService {
 
     boolean transactional = true
 
-    def mailService;
+    MailService mailService;
 	def sessionFactory;
 	def productService
 	def inventoryService;

@@ -19,7 +19,7 @@ import util.ConfigHelper;
 
 class ErrorsController {
 
-	def mailService
+	MailService mailService
 	def userService
     def grailsApplication
 

@@ -11,6 +11,7 @@ package org.pih.warehouse.user
 
 import grails.util.GrailsUtil
 import org.apache.commons.mail.EmailException
+import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -18,7 +19,7 @@ import org.pih.warehouse.product.Product
 
 class AuthController {
 
-	def mailService;
+	MailService mailService;
     def userService
     def authService
     def grailsApplication

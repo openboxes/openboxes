@@ -31,7 +31,7 @@ class ShipmentController {
     def userService
 	def reportService;
 	def inventoryService;
-	def mailService
+	MailService mailService
 	
 	def dataSource
 	def sessionFactory

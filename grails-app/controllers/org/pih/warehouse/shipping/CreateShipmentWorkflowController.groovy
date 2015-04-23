@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile
 
 class CreateShipmentWorkflowController {
 
-	def mailService
+	MailService mailService
 	def reportService
 	def shipmentService
 	def inventoryService

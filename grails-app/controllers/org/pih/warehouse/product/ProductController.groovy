@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import com.google.zxing.BarcodeFormat
 import com.mysql.jdbc.MysqlDataTruncation
 import grails.converters.JSON
+import org.pih.warehouse.core.MailService
 
 import javax.activation.MimetypesFileTypeMap
 import java.sql.SQLException
@@ -37,7 +38,7 @@ class ProductController {
 
     def dataService
 	def userService;
-	def mailService;
+	MailService mailService;
 	def productService;
 	def documentService;
 	def inventoryService;

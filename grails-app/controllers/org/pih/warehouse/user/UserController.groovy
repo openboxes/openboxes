@@ -23,7 +23,7 @@ import java.awt.Graphics2D
 class UserController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
-    def mailService;
+    MailService mailService;
 	def userService
 	
     /**
