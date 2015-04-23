@@ -52,13 +52,13 @@ openboxes.system.defaultTimezone=America/Chicago
 
 
 ### Email configuration 
-The default email configuration properties are:
+The default email configuration properties.
 ```
 grails.mail.host=localhost
 grails.mail.port=25
 ```
 
-If you want to use a service like Mandrill add the following properties:
+Add the following properties if you want to use a service like Mandrill as your SMTP server.
 ```
 grails.mail.enabled=true
 grails.mail.debug=true
@@ -69,7 +69,7 @@ grails.mail.username=<username>
 grails.mail.password=<password>
 ```
 
-If you want to use Gmail add the following properties:
+Add the following properties if you want to use Gmail as your SMTP server.
 ```
 grails.mail.enabled=true
 grails.mail.debug=true
