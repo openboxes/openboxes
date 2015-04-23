@@ -11,6 +11,8 @@ package org.pih.warehouse.admin
 
 import grails.util.GrailsUtil
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.core.MailService
+import org.springframework.web.multipart.MultipartFile
 import util.ClickstreamUtil
 
 //import java.net.HttpURLConnection;
@@ -27,11 +29,16 @@ import sun.misc.BASE64Encoder;
 class AdminController {
 
     def sessionFactory // inject Hibernate sessionFactory
-	def mailService;
+	MailService mailService;
 	def grailsApplication
 	def config = ConfigurationHolder.config
+
+
+
 	def index = { }
-    def controllerActions = { 
+
+
+    def controllerActions = {
 			
 		List actionNames = []
 		grailsApplication.controllerClasses.sort { it.logicalPropertyName }.each { controller ->
@@ -101,6 +108,54 @@ class AdminController {
         redirect(action: "showSettings")
     }
 
+
+	def sendMail = {
+
+        println "sendMail: " + params
+
+        if (request.method == "POST") {
+            try {
+                withForm {
+                    MultipartFile multipartFile = request.getFile('file')
+                    if (!multipartFile.empty) {
+                        byte[] bytes = multipartFile.bytes
+
+                        println multipartFile.contentType
+                        println multipartFile.originalFilename
+                        println multipartFile.name
+
+                        def emailMessageMap = [
+                                from: session?.user?.email,
+                                to: params.list("to"),
+                                cc: [],
+                                bcc: [],
+                                subject: params["subject"],
+                                body: params["message"],
+                                attachment: multipartFile?.bytes,
+                                attachmentName: multipartFile?.originalFilename,
+                                mimeType: multipartFile?.contentType
+                        ]
+                        mailService.sendHtmlMailWithAttachment(emailMessageMap);
+                        flash.message = "Multipart email with subject ${params.subject} and attachment ${multipartFile.originalFilename} has been sent to ${params.to}"
+                    } else {
+                        if (params.includeHtml) {
+                            mailService.sendHtmlMail(params.subject, params.message, params.to)
+                            flash.message = "HTML email with subject ${params.subject} has been sent to ${params.to}"
+                        } else {
+                            mailService.sendMail(params.subject, params.message, params.to)
+                            flash.message = "Text email with subject ${params.subject} has been sent to ${params.to}"
+                        }
+                    }
+                }.invalidToken {
+                    flash.message = "Invalid token"
+                }
+            } catch (Exception e) {
+                flash.message = "Unable to send email due to error: " + e.message
+            }
+        }
+
+
+    }
 
 	
 	def download = { UpgradeCommand command ->
