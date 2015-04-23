@@ -34,7 +34,7 @@ Unable to load specified config location file:/usr/local/tomcat6/.grails/openbox
 | `openboxes.system.defaultTimezone` | No | Not currently supported. | America/Chicago |
 
 ### Email configuration 
-The default email settings are:
+The default email configuration properties are:
 ```
 grails.mail.host=localhost
 grails.mail.port=25
@@ -44,15 +44,17 @@ If you want to use a service like Mandrill add the following properties:
 ```
 grails.mail.enabled=true
 grails.mail.debug=true
+grails.mail.from=<from-email>
 grails.mail.host=smtp.mandrillapp.com
 grails.mail.port=587
 grails.mail.username=<username>
 grails.mail.password=<password>
-grails.mail.from=<from-email>
 ```
 
-If you want to use Gmail, add the following properties:
+If you want to use Gmail add the following properties:
 ```
+grails.mail.enabled=true
+grails.mail.debug=true
 grails.mail.from=<from-email>
 grails.mail.host=smtp.gmail.com
 grails.mail.port=465
@@ -60,9 +62,19 @@ grails.mail.username=<your-username>
 grails.mail.password=<password-generated-from-google-accounts>
 grails.mail.props = ["mail.smtp.auth":"true", "mail.smtp.socketFactory.port":"465", "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory", "mail.smtp.socketFactory.fallback":"false"]
 ```
+NOTE: I have not been able to able to get the Gmail configuration to work, but I'm sure someone with more time and intelligence will have no trouble figuring it out.
+
+### Identifier Formats
+You can configure all of the identifiers according to your specifications (N = Numeric, L = Letter, A = Alphanumeric). The default configuration looks like the following, but feel free to configure identifiers however you'd like. Once the format has been choosen, values for these identifiers are randomly generated when an item is created. There's also a Quartz process that runs in the background that generates a unique identifier for any object that does not currently have one.
+```
+openboxes.identifier.order.format = NNNLLL
+openboxes.identifier.product.format = LLNN
+openboxes.identifier.requisition.format = NNNLLL
+openboxes.identifier.shipment.format = NNNLLL
+openboxes.identifier.transaction.format = AAA-AAA-AAA
+```
 
 ## Example openboxes-config.properties
-
 ```
 # OpenBoxes administrator emails
 openboxes.admin.email=justin.miranda@gmail.com,jmiranda@pih.org
