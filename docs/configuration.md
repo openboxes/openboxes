@@ -20,18 +20,36 @@ Unable to load specified config location file:/usr/local/tomcat6/.grails/openbox
 
 ### Database connection properties
 
-| Setting | Required | Description | Example |
+
+| Setting | Required | Description |
 | ---- | ---- | ---- | ---- |
-| `dataSource.url` | Yes | JDBC connection string | jdbc:mysql://localhost:3306/openboxes |
-| `dataSource.username` | Yes | JDBC username | openboxes |
-| `dataSource.password` | Yes | JDBC password | openboxes |
+| `dataSource.url` | Yes | JDBC connection string |
+| `dataSource.username` | Yes | JDBC username |
+| `dataSource.password` | Yes | JDBC password |
+
+#### Example
+```
+dataSource.url=jdbc:mysql://localhost:3306/openboxes
+dataSource.username=<username>
+dataSource.password=<password>
+```
+
 
 ### Application properties
 
-| Setting | Required | Description | Example |
+| Setting | Required | Description |
 | ---- | ---- | ---- | ---- |
-| `openboxes.signup.defaultRoles` | No | Used to specify default roles assigned to newly registered users (implies automatic activation).  Should only be used in cases where you either trust your registered users (e.g. app is running on LAN) or you don't care what users are allowed to do (e.g. demo server).  | ROLE_MANAGER,ROLE_ASSISTANT |
-| `openboxes.system.defaultTimezone` | No | Not currently supported. | America/Chicago |
+| openboxes.signup.defaultRoles | No | Used to specify default roles assigned to newly registered users (implies automatic activation).  Should only be used in cases where you either trust your registered users (e.g. app is running on LAN) or you don't care what users are allowed to do (e.g. demo server). |
+| openboxes.system.defaultTimezone | No | Not currently supported. | 
+| openboxes.fixtures.enabled | No | Only used on local machines when dataSource.url is overriden. When set to true this will trigger the creation of data fixtures used for testing.  | 
+
+#### Example
+```
+openboxes.fixtures.enabled=false
+openboxes.signup.defaultRoles=ROLE_MANAGER,ROLE_ASSISTANT
+openboxes.system.defaultTimezone=America/Chicago
+```
+
 
 ### Email configuration 
 The default email configuration properties are:
