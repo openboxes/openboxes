@@ -26,14 +26,38 @@ class MailService {
 
 	boolean transactional = false
 	def userService
-	def grailsApplication 
+	def grailsApplication
 	def config = ConfigurationHolder.config
-	def prefix = "${config.grails.mail.prefix}" //[OpenBoxes
-	def defaultFrom = "${config.grails.mail.from}" // info@openboxes.com
-	def defaultHost= "${config.grails.mail.host}" // localhost
-	def defaultPort = Integer.parseInt ("${config.grails.mail.port}") // 25;
 
-	def addBccAddresses(email) { 		
+    String getDefaultFrom() {
+        return config.grails.mail.from
+    }
+
+    String getDefaultHost() {
+        return config.grails.mail.host
+    }
+
+    Integer getDefaultPort() {
+        Integer.parseInt(config.grails.mail.port)
+    }
+
+    String getUsername() {
+        return config.grails.mail.username
+    }
+
+    String getPassword() {
+        return config.grails.mail.password
+    }
+
+    Boolean getDebug() {
+        return config.grails.mail.debug
+    }
+
+    String getPrefix() {
+        return config.grails.mail.prefix
+    }
+
+    def addBccAddresses(email) {
 		def bccAddresses = "${grailsApplication.config.grails.mail.bcc}"
 		println "Add BCC addresses to email: " + bccAddresses
 		if (bccAddresses) {
@@ -110,7 +134,16 @@ class MailService {
 				//addBccAddresses(email)
 				email.setFrom(defaultFrom)
 				email.setSubject("${prefix} " + subject)
-				email.setMsg(msg)		
+				email.setMsg(msg)
+
+                if (debug) {
+                    email.setDebug(debug)
+
+                }
+                // Authenticate
+                if (username && password) {
+					email.setAuthentication(username, password)
+                }
 				email.send()
 			} catch (Exception e) { 
 				log.error("Error sending plaintext email message with subject " + subject + " to " + to, e);
@@ -186,7 +219,13 @@ class MailService {
 				email.setSubject("${prefix} " + subject)
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);
-				email.send();	  
+
+                // Authenticate
+                if (username && password) {
+                    email.setAuthentication(username, password)
+                }
+
+				email.send();
 			} catch (Exception e) { 
 				log.error("Error sending HTML email message with subject " + subject + " to " + to, e);	
 				throw e	
@@ -308,7 +347,13 @@ class MailService {
                 if (fromUser) {
                     email.setFrom(fromUser.email, fromUser.name)
                 }
-				//email.setTextMsg(subject);
+
+                // Authenticate
+                if (username && password) {
+                    email.setAuthentication(username, password)
+                }
+
+                //email.setTextMsg(subject);
 			  
 				// Create the attachment
 				//EmailAttachment attachment = new EmailAttachment();
@@ -362,6 +407,11 @@ class MailService {
                 if (message.cc) email.setCc(message.cc.collect{new InternetAddress(it)})
                 if (message.bcc) email.setBcc(message.bcc.collect{new InternetAddress(it)})
 
+                // Authenticate
+                if (username && password) {
+                    email.setAuthentication(username, password)
+                }
+
                 // add the attachment
                 email.attach(new ByteArrayDataSource(message.attachment, message.mimeType),
                         message.attachmentName, message.attachmentName, EmailAttachment.ATTACHMENT);
@@ -392,7 +442,13 @@ class MailService {
 				email.setCharset("UTF-8");
 				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject)
-				// add more information to email
+
+                // Authenticate
+                if (username && password) {
+                    email.setAuthentication(username, password)
+                }
+
+                // add more information to email
 				email.send();
 			} catch (Exception e) {
 				log.error("Error sending HTML email message with subject " + subject, e);

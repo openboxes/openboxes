@@ -49,6 +49,13 @@ grails {
 		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
 		host = "localhost"
 		port = "25"
+
+        // Authentication disabled by default
+		username = null
+		password = null
+
+        // Disable debug mode by default
+        debug = false
 	}
 }
 
@@ -162,7 +169,7 @@ environments {
 
 // log4j configuration
 log4j = {
-	
+
 	// Used to debug hibernate/SQL queries
 	//trace 'org.hibernate.type'
 	//debug 'org.hibernate.SQL'
@@ -170,21 +177,21 @@ log4j = {
 	System.setProperty 'mail.smtp.port', mail.error.port.toString()
     System.setProperty 'mail.smtp.connectiontimeout', "5000"
     System.setProperty 'mail.smtp.timeout', "5000"
-	
+
     if (mail.error.starttls)
 		System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
-	
+
 	// Example of changing the log pattern for the default console
 	appenders {
 		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
 		//println "mail.error.server: '${mail.error.server}'"
 		//println "mail.error.username: '${mail.error.username}'"
 		//println "mail.error.password: '${mail.error.password}'"
-		
-		// Only enable SMTP appender when mail is enabled 
-        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {		
+
+		// Only enable SMTP appender when mail is enabled
+        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
 	        def smtpAppender
-			def conversionPattern = 
+			def conversionPattern =
 				"Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
 				"Thread: [%t]%n" +
                 "Username: %X{username}%n" +
@@ -210,21 +217,21 @@ log4j = {
 					layout: pattern(conversionPattern: conversionPattern))
 			}
 			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
-			else if ("dynamic".equals(mail.error.appender)) { 
+			else if ("dynamic".equals(mail.error.appender)) {
 				smtpAppender = new DynamicSubjectSMTPAppender(
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
 					subject: mail.error.subject + " %m",
-					threshold: Level.ERROR,				
+					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					//SMTPUsername: mail.error.username,
 					//SMTPPassword: mail.error.password,
 					SMTPDebug: mail.error.debug,
 					layout: pattern(conversionPattern: conversionPattern))
-			}			
-			// Default SMTP error appender does not allow configurable subject line 
-			else { 				
+			}
+			// Default SMTP error appender does not allow configurable subject line
+			else {
 				smtpAppender = new SMTPAppender(
 					name: 'smtp',
 					to: mail.error.to,
@@ -236,14 +243,14 @@ log4j = {
 					SMTPDebug: mail.error.debug,
 					//SMTPPassword: mail.error.password,
 					layout: pattern(conversionPattern: conversionPattern))
-			} 
-			
+			}
+
 			// These are common attributes for each of the appenders
 			if (mail.error.server) smtpAppender.SMTPHost = mail.error.server
 			if (mail.error.username) smtpAppender.SMTPUsername = mail.error.username
 			if (mail.error.password) smtpAppender.SMTPPassword = mail.error.password
 			//if (mail.error.debug) smtpAppender.SMTPDebug = mail.error.debug
-			
+
 			println "Using " + mail.error.appender + " SMTP appender " + smtpAppender.class.name
         	appender smtpAppender
 
@@ -252,7 +259,7 @@ log4j = {
             appender asyncAppender
         }
     }
-	
+
 	root {
 		error 'stdout', 'smtp'
 		additivity = false
@@ -267,7 +274,7 @@ log4j = {
 
 	// We get some annoying stack trace when cleaning this class up after functional tests
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
-            'org.hibernate.impl.SessionFactoryObjectFactory',  
+            'org.hibernate.impl.SessionFactoryObjectFactory',
             'com.gargoylesoftware.htmlunit.DefaultCssErrorHandler',
             'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
             //'org.jumpmind.symmetric.config.PropertiesFactoryBean'
