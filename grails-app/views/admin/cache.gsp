@@ -18,7 +18,7 @@
 
             
                 <div class="box">
-                    <h3><warehouse:message code="admin.cacheSettings.header" default="Cache settings"/></h3>
+                    <h2><warehouse:message code="admin.cacheSettings.header" default="Cache settings"/></h2>
                     <table>
                         <tr class="prop">
                             <td class="name">

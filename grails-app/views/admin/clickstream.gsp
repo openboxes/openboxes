@@ -18,7 +18,7 @@
 
 
                 <div class="box">
-                    <h3><warehouse:message code="clickstream.label" default="Clickstream"/></h3>
+                    <h2><warehouse:message code="clickstream.label" default="Clickstream"/></h2>
                     <table>
                         <tr class="prop">
                             <td class="name">
@@ -91,6 +91,20 @@
                                 <%= session.clickstream.getLastRequest() %>
                             </td>
                         </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <label>
+                                    Actions
+                                </label>
+                            </td>
+                            <td class="value">
+                                <g:link controller="admin" action="clickstream" params="[format:'csv']" class="button icon log">
+                                    <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
+                                </g:link>
+                            </td>
+                        </tr>
+
+
 
                         <tr class="prop">
                             <td class="name">
@@ -100,11 +114,9 @@
                             </td>
                             <td class="value">
 
-                                <g:link controller="admin" action="clickstream" params="[format:'csv']" class="button icon log">
-                                    <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
-                                </g:link>
 
-                                <div class="box">
+
+                                <div class="box" style="padding: 10px;">
                                     <label>Limit</label>
                                     <a href="?">All</a> |
                                     <a href="?limit=10">10</a> |
