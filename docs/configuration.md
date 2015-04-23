@@ -33,8 +33,33 @@ Unable to load specified config location file:/usr/local/tomcat6/.grails/openbox
 | `openboxes.signup.defaultRoles` | No | Used to specify default roles assigned to newly registered users (implies automatic activation).  Should only be used in cases where you either trust your registered users (e.g. app is running on LAN) or you don't care what users are allowed to do (e.g. demo server).  | ROLE_MANAGER,ROLE_ASSISTANT |
 | `openboxes.system.defaultTimezone` | No | Not currently supported. | America/Chicago |
 
-> More to come ...
+### Email configuration 
+The default email settings are:
+```
+grails.mail.host=localhost
+grails.mail.port=25
+```
 
+If you want to use a service like Mandrill add the following properties:
+```
+grails.mail.enabled=true
+grails.mail.debug=true
+grails.mail.host=smtp.mandrillapp.com
+grails.mail.port=587
+grails.mail.username=<username>
+grails.mail.password=<password>
+grails.mail.from=<from-email>
+```
+
+If you want to use Gmail, add the following properties:
+```
+grails.mail.from=<from-email>
+grails.mail.host=smtp.gmail.com
+grails.mail.port=465
+grails.mail.username=<your-username>
+grails.mail.password=<password-generated-from-google-accounts>
+grails.mail.props = ["mail.smtp.auth":"true", "mail.smtp.socketFactory.port":"465", "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory", "mail.smtp.socketFactory.fallback":"false"]
+```
 
 ## Example openboxes-config.properties
 
