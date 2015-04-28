@@ -1042,53 +1042,53 @@ class ShipmentService {
 	 */
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate, Boolean debitStockOnSend) { 
 		log.info "Send shipment ${shipmentInstance?.name}"
-		try { 
-			if (!shipDate || shipDate > new Date()) {
-				shipmentInstance.errors.reject("shipment.invalid.invalidShipDate", "Shipping date [" + shipDate + "] must occur on or before today.") 
-				//throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
-			}				
-			if (shipmentInstance.hasShipped()) { 
-				shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has already shipped")
-				//throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
-			}
-			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
-			if (!shipmentInstance.hasErrors()) {				
-				// Add comment to shipment (as long as there's an actual comment 
-				// after trimming off the extra spaces)
-				if (comment) {
-					shipmentInstance.addToComments(new Comment(comment: comment, sender: userInstance))
-				}
-					
-				// Add a Shipped event to the shipment									
-				createShipmentEvent(shipmentInstance, shipDate, EventCode.SHIPPED, locationInstance);
-																
-				// Save updated shipment instance (adding an event and comment)
-				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
-					
-					// TODO only need to create a transaction if the source is a depot - (we need to think about this)
-					if (shipmentInstance.origin?.isWarehouse() && debitStockOnSend) {
-						inventoryService.createSendShipmentTransaction(shipmentInstance)
-					}
-				}
-				else { 
-					throw new ShipmentException(message: "Failed to send shipment due to errors ", shipment: shipmentInstance)
-				}
-				
-			}
-			
-			// Shipment has errors or it has already shipped or ship date is 
-			else {
+		try {
+            if (!shipDate || shipDate > new Date()) {
+                shipmentInstance.errors.reject("shipment.invalid.invalidShipDate", "Shipping date [" + shipDate + "] must occur on or before today.")
+                //throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
+            }
+            if (shipmentInstance.hasShipped()) {
+                shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has already shipped")
+                //throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
+            }
+            // don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
+            if (!shipmentInstance.hasErrors()) {
+                // Add comment to shipment (as long as there's an actual comment
+                // after trimming off the extra spaces)
+                if (comment) {
+                    shipmentInstance.addToComments(new Comment(comment: comment, sender: userInstance))
+                }
+
+                // Add a Shipped event to the shipment
+                createShipmentEvent(shipmentInstance, shipDate, EventCode.SHIPPED, locationInstance);
+
+                // Save updated shipment instance (adding an event and comment)
+                if (!shipmentInstance.hasErrors() && shipmentInstance.save()) {
+
+                    // TODO only need to create a transaction if the source is a depot - (we need to think about this)
+                    if (shipmentInstance.origin?.isWarehouse() && debitStockOnSend) {
+                        inventoryService.createSendShipmentTransaction(shipmentInstance)
+                    }
+                }
+                else {
+                    throw new ShipmentException(message: "Failed to send shipment due to errors ", shipment: shipmentInstance)
+                }
+
+            }
+
+            // Shipment has errors or it has already shipped or ship date is
+            else {
 				log.error("Failed to send shipment due to errors")
-				// TODO: make this a better error message
-				throw new ShipmentException(message: "Failed to send shipment ", shipment: shipmentInstance)
-			}
-		} catch (Exception e) { 
-			// rollback all updates 
+			    // TODO: make this a better error message
+			    throw new ShipmentException(message: "Failed to send shipment", shipment: shipmentInstance)
+		    }
+		} catch (Exception e) {
+			// rollback all updates
 			log.error(e);
 			throw e
 			//shipmentInstance.errors.reject("shipment.invalid", e.message);  // this didn't seem to be working properly
-		}				
-	} 	
+		}
+	}
 	
 	
 	/**
@@ -1118,7 +1118,7 @@ class ShipmentService {
 			log.info ("Event does not exist")
 			
 			// enforce that we are only storing the date component here
-			eventDate.clearTime()
+			//eventDate.clearTime()
 			
 			def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location);
 			if (!eventInstance.hasErrors() && eventInstance.save()) { 
