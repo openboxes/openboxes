@@ -11,17 +11,26 @@
     </head>
     <body>
         <div class="body">
-        	<g:if test="${message}">
-				<div class="message">${message}</div>
-			</g:if> 
-			<g:hasErrors bean="${command}">
+            ${flash.message}
+        	<g:if test="${flash.message}">
+				<div class="message">${flash.message}</div>
+			</g:if>
+            <g:if test="${message}">
+                <div class="message">${message}</div>
+            </g:if>
+            <g:hasErrors bean="${command}">
 				<div class="errors">
 					<g:renderErrors bean="${command}" as="list" />
 				</div>
-			</g:hasErrors> 
-			
-			
-			
+			</g:hasErrors>
+			<g:hasErrors bean="${shipmentInstance}">
+				<div class="errors">
+					<g:renderErrors bean="${shipmentInstance}" as="list" />
+				</div>
+			</g:hasErrors>
+
+
+
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<g:hiddenField name="shipment.id" value="${shipmentInstance?.id}"/>
@@ -98,36 +107,28 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-                                        <label><warehouse:message code="default.dates.label" default="Dates"/></label>
+										<label>
+											<warehouse:message code="shipping.expectedShippingDate.label" />:
+										</label>
                                     </td>
                                     <td class="value">
-
-
-                                        <table style="width:auto;">
-                                            <tr>
-                                                <td>
-                                                    <label>
-                                                        <warehouse:message code="shipping.expectedShippingDate.label" />:
-                                                    </label>
-                                                    <div>
-                                                    <format:date obj="${shipmentInstance?.expectedShippingDate}"
-                                                                 format="dd/MMM/yyyy"/>
-                                                    </div>
-                                                </td>
-                                                <td ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}>
-                                                    <label>
-                                                        <warehouse:message code="shipping.actualShippingDate.label" />:
-                                                    </label>
-                                                    <div>
-                                                    <g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
-                                                                        value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                        </table>
+										<format:date obj="${shipmentInstance?.expectedShippingDate}"
+													 format="dd/MMM/yyyy"/>
 									</td>
 								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label>
+											<warehouse:message code="shipping.actualShippingDate.label" />:
+										</label>
+									</td>
+									<td class="value ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}">
+                                        <g:datePicker name="actualShippingDate"
+                                                      value="${shipmentInstance?.actualShippingDate?:new Date()}" precision="minute" noSelection="['':'']"/>
+
+									</td>
+								</tr>
+
 
 								<%-- 								
 								<tr class="prop">

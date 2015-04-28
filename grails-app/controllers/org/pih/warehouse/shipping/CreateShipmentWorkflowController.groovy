@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.hibernate.StaleObjectStateException
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import org.springframework.web.multipart.MultipartFile
@@ -557,10 +558,10 @@ class CreateShipmentWorkflowController {
 				}
 
 				
-				def transactionInstance
-				def userInstance = User.get(session.user.id)
-				def shipmentInstance = Shipment.get(params.id)
-				//def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+				Transaction transactionInstance
+				User userInstance = User.get(session.user.id)
+				Shipment shipmentInstance = Shipment.get(params.id)
+				ShipmentWorkflow shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 		
 				// This probably shouldn't occur, but we can leave it for now
 				if (!shipmentInstance) {
@@ -589,15 +590,24 @@ class CreateShipmentWorkflowController {
 							
 						}
 						catch (ShipmentException e) {
-							command.shipment = e.shipment
-							return error()
+                            flash.message = e.message
+                            flow.shipmentInstance = Shipment.get(params.id)
+                            flow.shipmentInstance.errors = e.shipment.errors
+                            flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+                            return error()
 						}
 						catch (TransactionException e) {
 							command.transaction = e.transaction
-							//shipmentInstance = Shipment.get(params.id)
-							//shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+                            flow.shipmentInstance = Shipment.get(params.id)
+                            flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 							return error()
 						}
+                        catch (RuntimeException e) {
+                            flash.message = e.message
+                            flow.shipmentInstance = Shipment.get(params.id)
+                            flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+                            return error()
+                        }
 										
 						if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
 							//flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
@@ -607,7 +617,8 @@ class CreateShipmentWorkflowController {
 							return success()
 							
 						}
-						else { 
+						else {
+                            log.info "test 4"
 							return error();
 						}
 					}
