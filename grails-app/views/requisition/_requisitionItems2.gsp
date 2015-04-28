@@ -8,23 +8,7 @@
             <g:hiddenField name="id" value="${requisition?.id}"/>
             <table style="width:auto;">
                 <tr>
-                    <td class="center middle">
-                        <label>
-                            ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
-                        </label>
 
-                        <g:if test="${params.edit}">
-                            <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="day"/>
-                        </g:if>
-                        <g:else>
-                            <g:if test="${requisition?.dateVerified}">
-                                <g:formatDate date="${requisition?.dateVerified}" format="d MMMMM yyyy"/>
-                            </g:if>
-                            <g:else>
-                                ${warehouse.message(code:'default.none.label')}
-                            </g:else>
-                        </g:else>
-                    </td>
                     <td class="center middle">
                         <label>
                             ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
@@ -36,6 +20,23 @@
                         <g:else>
                             <g:if test="${requisition.verifiedBy}">
                                 ${requisition?.verifiedBy?.name}
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.none.label')}
+                            </g:else>
+                        </g:else>
+                    </td>
+                    <td class="center middle">
+                        <label>
+                            ${warehouse.message(code:'requisition.dateVerified.label', default: 'Date verified')}
+                        </label>
+
+                        <g:if test="${params.edit}">
+                            <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="minute"/>
+                        </g:if>
+                        <g:else>
+                            <g:if test="${requisition?.dateVerified}">
+                                <g:formatDate date="${requisition?.dateVerified}" format="d MMM yyyy hh:mm a"/>
                             </g:if>
                             <g:else>
                                 ${warehouse.message(code:'default.none.label')}
