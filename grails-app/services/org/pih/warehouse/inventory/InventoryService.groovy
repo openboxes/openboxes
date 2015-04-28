@@ -647,7 +647,7 @@ class InventoryService implements ApplicationContextAware {
             }
         }
 
-        println "Expiration alerts: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Expiration alerts: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return expirationAlerts
 
@@ -770,10 +770,12 @@ class InventoryService implements ApplicationContextAware {
 
 
     def getDashboardAlerts(Location location) {
+		log.info "Dashboard alerts for ${location}"
+
         long startTime = System.currentTimeMillis()
         def quantityMap = getQuantityByProductMap(location.inventory)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        println inventoryLevelMap.keySet().size()
+        log.info inventoryLevelMap.keySet().size()
 
         def totalStock = quantityMap
         def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
@@ -976,10 +978,10 @@ class InventoryService implements ApplicationContextAware {
     def getLowStock(Location location) {
 		long startTime = System.currentTimeMillis()
 		def quantityMap = getQuantityByProductMap(location.inventory)
-        println ("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
+        log.info ("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        println ("getInventoryLevelMap: " + (System.currentTimeMillis() - startTime) + " ms")
-        println inventoryLevelMap.keySet().size()
+        log.info ("getInventoryLevelMap: " + (System.currentTimeMillis() - startTime) + " ms")
+        log.info inventoryLevelMap.keySet().size()
 		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
         def lowStock = quantityMap.findAll { product,quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
@@ -1470,7 +1472,7 @@ class InventoryService implements ApplicationContextAware {
         log.debug "products: " + products.size()
 		def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
-        println "quantityMap: " + quantityMap.keySet()
+        log.info "quantityMap: " + quantityMap.keySet()
 
         // FIXME Hacky way to make sure all products that have been passed in have an entry in the quantity map
         // FIXME Requires a proper implementation for hashCode/equals methods which was disabled due to a different bug
@@ -2096,7 +2098,7 @@ class InventoryService implements ApplicationContextAware {
 				order("dateCreated", "asc")
 			}
 		}
-        println "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
+        log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
 
 
 		return transactionEntries;
@@ -3124,7 +3126,7 @@ class InventoryService implements ApplicationContextAware {
         def inventoryItems = []
         Map<InventoryItem, Integer> inventoryItemMap = getQuantityForInventory(location.inventory);
 
-        println inventoryItemMap
+        log.info inventoryItemMap
 
         List inventoryItemKeys = inventoryItemMap.keySet().asList()
         Integer maxSize = inventoryItemKeys.size()
@@ -3191,7 +3193,7 @@ class InventoryService implements ApplicationContextAware {
         def transactionEntries = []
         if (date) {
             def products = Tag.get(tag?.id)?.products
-            println "Products: " + products
+            log.info "Products: " + products
             transactionEntries = criteria.list {
                 if (products) {
                     inventoryItem {
@@ -3428,7 +3430,7 @@ class InventoryService implements ApplicationContextAware {
         def importer = new InventoryExcelImporter(command.importFile.absolutePath)
         def data = importer.data
         assert data != null
-        println "Data to be imported: " + data
+        log.info "Data to be imported: " + data
 
         def transaction = new Transaction()
         transaction.transactionDate = command.date
@@ -3702,7 +3704,7 @@ class InventoryService implements ApplicationContextAware {
             outboundQuantity = shipmentItems.sum { it.quantity }
 
         } catch (Exception e) {
-            println ("Error " + e.message)
+            log.info ("Error " + e.message)
         }
 
         [inboundQuantity, outboundQuantity]
@@ -3720,7 +3722,7 @@ class InventoryService implements ApplicationContextAware {
         def batchEnded = System.currentTimeMillis()
         def seconds = (batchEnded-lastBatchStarted)/1000
         //def total = (batchEnded-startTime)/1000
-        println "Flushed last batch ... took ${seconds}s"
+        log.info "Flushed last batch ... took ${seconds}s"
         lastBatchStarted = batchEnded
     }
 
@@ -3828,7 +3830,7 @@ class InventoryService implements ApplicationContextAware {
 
         // Get the inventory levels for all products at the given location
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
-        println inventoryLevelMap
+        log.info inventoryLevelMap
 
         // Group entries by generic product
         genericProductMap = entries.inject([:].withDefault { [

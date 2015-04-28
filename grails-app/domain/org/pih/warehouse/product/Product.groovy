@@ -331,10 +331,10 @@ class Product implements Comparable, Serializable {
         def status = ""
         def inventoryLevel = getInventoryLevel(locationId)
         def latestInventoryDate = latestInventoryDate(locationId)
-        println "Location " + locationId
-        println "Current quantity = " + currentQuantity
-        println "Status: " + inventoryLevel?.status
-        println "Latest inventory " + latestInventoryDate
+        log.info "Location " + locationId
+        log.info "Current quantity = " + currentQuantity
+        log.info "Status: " + inventoryLevel?.status
+        log.info "Latest inventory " + latestInventoryDate
         return inventoryLevel?.statusMessage(currentQuantity)
     }
 

@@ -77,7 +77,7 @@ class SelectTagLib {
 
     def selectTag = { attrs, body ->
         def tags = Tag.list(sort:"tag").collect { [ id: it.id, name: it.tag, productCount: it?.products?.size() ]}
-        println tags
+        log.info tags
         attrs.from = tags
         attrs.value = attrs.value
         attrs.optionKey = "id"
@@ -187,7 +187,7 @@ class SelectTagLib {
 
 
 	def selectWardOrPharmacy = { attrs, body ->
-        println "select ward or pharmacy"
+        log.info "select ward or pharmacy"
         def currentLocation = Location.get(session.warehouse.id)
         def locations = []
         if (currentLocation) {
@@ -257,7 +257,7 @@ class SelectTagLib {
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
 
-        println "get all locations " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "get all locations " + (System.currentTimeMillis() - startTime) + " ms"
 
 
 		attrs.optionKey = 'id'
@@ -270,7 +270,7 @@ class SelectTagLib {
 		else { 
 			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		}
-        println "render select location " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "render select location " + (System.currentTimeMillis() - startTime) + " ms"
 		//out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
 
         out << g.select(attrs)
