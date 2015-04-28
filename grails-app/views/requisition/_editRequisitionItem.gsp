@@ -133,7 +133,9 @@ shouldSubstitute=${shouldSubstitute}
                 </g:elseif>
                 <g:else>
                     ${requisitionItem?.product?.productCode}
-                    ${requisitionItem?.product} (${requisitionItem?.product?.unitOfMeasure})
+                    <format:product product="${requisitionItem?.product}"/>
+
+                    (${requisitionItem?.product?.unitOfMeasure})
                 </g:else>
             </td>
 
@@ -361,7 +363,7 @@ shouldSubstitute=${shouldSubstitute}
                     </td>
                     <td class="middle">
                         ${requisitionItem?.product?.productCode}
-                        ${requisitionItem?.product}
+                        <format:product product="${requisitionItem?.product}"/>
                         (${requisitionItem?.product?.unitOfMeasure})
                     </td>
                 </tr>
@@ -773,7 +775,7 @@ shouldSubstitute=${shouldSubstitute}
                     </td>
                     <td class="middle">
                         ${requisitionItem?.product?.productCode}
-                        ${requisitionItem?.product}
+                        <format:product product="${requisitionItem?.product}"/>
                         (${requisitionItem?.product?.unitOfMeasure})
                     </td>
                 </tr>

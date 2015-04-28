@@ -269,7 +269,7 @@
                             </g:elseif>
                             <g:else>
                                 ${requisitionItem?.product?.productCode}
-                                ${requisitionItem?.product} (${requisitionItem?.product?.unitOfMeasure})
+                                ${requisitionItem?.product?.name} (${requisitionItem?.product?.unitOfMeasure})
                             </g:else>
                         </td>
                         <td class="center middle">

@@ -367,7 +367,8 @@
                     </td>
                     <td class="middle">
                         ${selectedRequisitionItem?.product?.productCode}
-                        ${selectedRequisitionItem?.product}
+                        <format:product product="${selectedRequisitionItem?.product}"/>
+
                     </td>
                 </tr>
                 <tr>
@@ -432,7 +433,8 @@
                     </td>
                     <td>
                         ${selectedRequisitionItem?.product?.productCode}
-                        ${selectedRequisitionItem?.product}
+                        <format:product product="${selectedRequisitionItem?.product}"/>
+
                     </td>
                     <td>
                         <g:selectUnitOfMeasure product="${selectedRequisitionItem?.product}"/>
@@ -507,7 +509,7 @@
                     </td>
                     <td>
                         ${selectedRequisitionItem?.product?.productCode}
-                        ${selectedRequisitionItem?.product}
+                        <format:product product="${selectedRequisitionItem?.product}"/>
                     </td>
                 </tr>
                 <tr>

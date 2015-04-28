@@ -221,7 +221,7 @@
                                                 </td>
                                                 <td>
                                                     <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
-                                                    ${requisitionItem?.product}
+                                                    <format:product product="${requisitionItem?.product}"/>
                                                 </td>
                                                 <td>
                                                     ${requisitionItem?.quantity}

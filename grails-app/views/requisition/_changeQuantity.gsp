@@ -20,7 +20,7 @@
                 </td>
                 <td class="middle">
                     ${selectedRequisitionItem?.product?.productCode}
-                    ${selectedRequisitionItem?.product}
+                    <format:product product="${selectedRequisitionItem?.product}"/>
                 </td>
             </tr>
             <tr>

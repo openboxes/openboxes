@@ -29,7 +29,7 @@
 						<label>Product</label>
 					</td>
 					<td class="value">
-						${requestItem.product}
+						<format:product product="${requestItem?.product}"/>
 					</td>
 				</tr>
 				<tr class="prop">

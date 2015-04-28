@@ -9,7 +9,7 @@
             <tr>
                 <td>
                     ${selectedRequisitionItem?.product?.productCode}
-                    ${selectedRequisitionItem?.product}
+                    <format:product product="${selectedRequisitionItem?.product}"/>
                 </td>
                 <td>
                     <g:selectUnitOfMeasure product="${selectedRequisitionItem?.product}"/>

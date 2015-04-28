@@ -415,7 +415,7 @@
                                                                         ${requisitionItem?.product?.productCode}
                                                                     </td>
                                                                     <td>
-                                                                        ${requisitionItem?.product}
+                                                                        <format:product product="${requisitionItem?.product}"/>
                                                                     </td>
                                                                     <td>
                                                                         ${requisitionItem?.quantity}
