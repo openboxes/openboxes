@@ -69,7 +69,8 @@ class InventoryItemController {
             cmd.warehouseInstance = Location.get(session?.warehouse?.id)
             // now populate the rest of the commmand object
             def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-
+			//log.info "get stock card command: " + (System.currentTimeMillis() - startTime) + " ms"
+			//startTime = System.currentTimeMillis()
             // populate the pending shipments
             // TODO: move this into the service layer after we find a way to add shipping service to inventory service
             // (that is, find a workaround to GRAILS-5080)
@@ -77,9 +78,15 @@ class InventoryItemController {
             commandInstance.pendingShipmentList =
                 shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
+            //log.info "get pending shipments: " + (System.currentTimeMillis() - startTime) + " ms"
+            //startTime = System.currentTimeMillis()
+
             def quantityMap = inventoryService.getQuantityOnHand(commandInstance.warehouseInstance, commandInstance?.productInstance)
 
-            log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+            //log.info "get quantity on hand: " + (System.currentTimeMillis() - startTime) + " ms"
+            //startTime = System.currentTimeMillis()
+
+
             [ commandInstance: commandInstance, quantityMap: quantityMap ]
         } catch (ProductException e) {
             flash.message = e.message
@@ -105,7 +112,7 @@ class InventoryItemController {
         def location = Location.get(session?.warehouse?.id)
 
         def products = product.alternativeProducts() as List
-        println "Products " + products
+        log.info "Products " + products
         def quantityMap = [:]
         if (!products.isEmpty()) {
             quantityMap = inventoryService.getQuantityByProductMap(location, products)
@@ -145,7 +152,7 @@ class InventoryItemController {
             requisitionService.getPendingRequisitionItems(commandInstance.warehouseInstance, commandInstance?.productInstance)
         def requisitionMap = requisitionItems.groupBy { it.requisition }
 
-        println "requisitionmap: " + requisitionMap
+		log.info "requisitionmap: " + requisitionMap
         if (requisitionMap) {
             requisitionMap.keySet().each {
                 def quantity = requisitionMap[it].sum() { it.quantity }
@@ -306,7 +313,7 @@ class InventoryItemController {
             result = inventoryItems[product].collect { ((InventoryItem)it).toJson() }
         }
         String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
-        println "record inventory " + jsonString
+		log.info "record inventory " + jsonString
 
 		[ commandInstance : commandInstance, product : jsonString]
 	}
@@ -333,9 +340,9 @@ class InventoryItemController {
 		
 	//	def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
 
-        println "commandInstance.recordInventoryRows: "
+		log.info "commandInstance.recordInventoryRows: "
         cmd?.recordInventoryRows.each {
-           println "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
+			log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
         }
 
 		render(view: "showRecordInventory", model: [ commandInstance : cmd ])
@@ -828,8 +835,8 @@ class InventoryItemController {
 					flash.message = "${warehouse.message(code: 'inventoryItem.savedTransactionEntry.label')}"
 				} 
 				else {
-					transactionInstance.errors.each { println it }
-					transactionEntry.errors.each { println it }
+					transactionInstance.errors.each { log.info it }
+					transactionEntry.errors.each { log.info it }
 						flash.message = "${warehouse.message(code: 'inventoryItem.inventoryItem.unableToSaveTransactionEntry.message.label')}"
 				}
 				
