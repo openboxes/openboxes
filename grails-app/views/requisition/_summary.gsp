@@ -108,7 +108,9 @@
 					</td>
 					<td>
                         <div class="top title right">
-                            <format:metadata obj="${requisition?.status }"/>
+                            <div class="tag tag-alert">
+                                <format:metadata obj="${requisition?.status }"/>
+                            </div>
                         </div>
 
                         <%--
@@ -157,6 +159,43 @@
     <g:render template="/requisition/flowHeader" model="[requisition:requisition]"/>
     --%>
     <g:if test="${requisition?.id}">
+
+        <div class="wizard-box">
+            <div class="wizard-steps">
+                <g:set var="currentState" value="${actionName}"/>
+                <g:set var="wizardSteps" value="${['show':'show', 'edit':'edit', 'review':'review', 'pick':'pick', 'confirm':'confirm', 'transfer':'transfer']}"/>
+
+                <g:each var="wizardStep" in="${wizardSteps}" status="status">
+
+                    <g:set var="index" value="${wizardSteps?.keySet()?.findIndexOf{ it == currentState}}"/>
+
+                    <g:if test="${index == status}">
+                        <g:set var="styleClass" value="active-step"/>
+                    </g:if>
+                    <g:elseif test="${index > status}">
+                        <g:set var="styleClass" value="completed-step"/>
+                    </g:elseif>
+                    <g:else>
+                        <g:set var="styleClass" value=""/>
+                    </g:else>
+                    <div class="${styleClass}">
+                        <g:if test="${requisition?.id}">
+                            <g:link controller="requisition" action="${wizardStep?.value}" event="${wizardStep?.value}" id="${requisition?.id}">
+                                <span>${status+1}</span>
+                                <warehouse:message code="requisition.wizard.${wizardStep?.value}.label" default="${wizardStep?.value}"/>
+                            </g:link>
+                        </g:if>
+                        <g:else>
+                            <a href="#">
+                                <span>${status+1}</span>
+                                <warehouse:message code="requisition.wizard.${wizardStep?.value}.label" default="${wizardStep?.value}"/>
+                            </a>
+                        </g:else>
+                    </div>
+                </g:each>
+            </div>
+
+        <%--
         <div>
             <div class="button-group">
                 <g:link controller="requisition" action="list" class="button icon log">
@@ -188,6 +227,7 @@
                     <warehouse:message code="requisition.wizard.issue.label" default="Issue"/>
                 </g:link>
             </div>
+            --%>
 
             <div class="right button-group">
                 <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank" class="button">

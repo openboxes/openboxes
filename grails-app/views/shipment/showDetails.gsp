@@ -746,7 +746,7 @@
 										<td class="left">
 											<g:if test="${shipmentItem?.recipient }">
 												${shipmentItem?.recipient?.name}
-												<span class="fade">${shipmentItem?.recipient?.email}</span>
+												<div class="fade">${shipmentItem?.recipient?.email}</div>
 											</g:if>
 											<g:else>
 
