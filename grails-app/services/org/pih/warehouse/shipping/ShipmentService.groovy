@@ -1125,7 +1125,7 @@ class ShipmentService {
 				shipmentInstance.addToEvents(eventInstance);
 			}
 			else { 
-				shipementInstance.errors.reject("shipment.shipmentEvents.invalid");
+				shipmentInstance.errors.reject("shipment.shipmentEvents.invalid");
 			}
 		}
 
