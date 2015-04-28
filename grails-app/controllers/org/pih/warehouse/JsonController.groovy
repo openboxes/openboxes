@@ -95,18 +95,18 @@ class JsonController {
         def password = "0p3nb0x3s"
         String urlString = "http://www.syslang.com/frengly/controller?action=translateREST&src=${source.encodeAsHTML()}&dest=${destination}&text=${text.encodeAsHTML()}&email=${email}&password=${password}"
         try {
-            println "Before " + urlString
+            log.info "Before " + urlString
             def url = new URL(urlString)
             def connection = url.openConnection()
-            println "content type; " + connection.contentType
+            log.info "content type; " + connection.contentType
             if(connection.responseCode == 200){
                 def xml = connection.content.text
-                println "XML: " + xml
+                log.info "XML: " + xml
                 def root = new XmlParser(false, true).parseText(xml)
                 translation = root.translation.text()
             }
             else {
-                println "connection " + connection.responseCode
+                log.info "connection " + connection.responseCode
 
             }
         } catch (Exception e) {
@@ -127,7 +127,7 @@ class JsonController {
 
             // Get translation from message source
 			def message = messageSource.getMessage(params.code, null, params.resolvedMessage, session?.user?.locale?:"en")
-		    println "get translation for code " + params.code + ", " + session?.user?.locale + " = " + message
+            log.info "get translation for code " + params.code + ", " + session?.user?.locale + " = " + message
 
             //try {
             //    localization.translation = getTranslation(message, "en", session?.user?.locale?.toString()?:"en")
@@ -146,7 +146,7 @@ class JsonController {
         if (!localization.translation)
             localization.translation = localization.text
 
-        println "localization.toJson() = " + (localization.toJson() as JSON)
+        log.info "localization.toJson() = " + (localization.toJson() as JSON)
 
 
 		render localization.toJson() as JSON;
@@ -159,12 +159,12 @@ class JsonController {
 		log.info "ID: " + data.id
 		def locale = session?.user?.locale
 		def localization = Localization.get(data?.id?.toString())
-        println "found localization " + localization
+        log.info "found localization " + localization
 		if (!localization) {
-            println "Nope.  Looking by code and locale"
+            log.info "Nope.  Looking by code and locale"
 			localization = Localization.findByCodeAndLocale(data.code, locale?.toString())
 		    if (!localization) {
-                println "Nope. Creating empty localization "
+                log.info "Nope. Creating empty localization "
 			    localization = new Localization();
 		    }
         }
@@ -174,10 +174,10 @@ class JsonController {
 		localization.code = data.code
 		localization.locale = locale
 
-        println localization.id
-		println localization.code
-		println localization.text
-		println localization.locale
+        log.info localization.id
+        log.info localization.code
+        log.info localization.text
+        log.info localization.locale
 		def jsonResponse = []
 
         // Attempt to save localization
@@ -396,8 +396,8 @@ class JsonController {
 		render results as JSON;
 	}
 
-	def autoSuggest = {		
-		println "autoSuggest: " + params
+	def autoSuggest = {
+        log.info "autoSuggest: " + params
 		def searchTerm = "%" + params.term + "%";
 		def c = Product.createCriteria()
 		def results = c.list {
@@ -411,7 +411,7 @@ class JsonController {
 	}
 
     def autoSuggestProductGroups = {
-        println "autoSuggest: " + params
+        log.info "autoSuggest: " + params
         def searchTerms = params.term.split(" ")
         //def searchTerm = "%" + params.term + "%";
         def c = ProductGroup.createCriteria()
@@ -445,7 +445,7 @@ class JsonController {
 	}
 	
 	def findPrograms = {
-		println "find programs " + params
+        log.info "find programs " + params
 		def searchTerm = params.term + "%";
 		def c = Requisition.createCriteria()
 		
@@ -476,8 +476,8 @@ class JsonController {
 		render results as JSON;
 	}
 	
-	def findRxNormDisplayNames = { 
-		println "findRxNormDisplayNames: " + params
+	def findRxNormDisplayNames = {
+        log.info "findRxNormDisplayNames: " + params
 		def results = []
 		try {
 			def url = new URL("http://rxnav.nlm.nih.gov/REST/displaynames")
@@ -533,7 +533,7 @@ class JsonController {
 			container = Container.get(id)
 			container.sortOrder = index 
 			container.save(flush:true);
-			println ("container " + container.name + " saved at index " + index)
+            log.info ("container " + container.name + " saved at index " + index)
 		}
 		container.shipment.save(flush:true)
         //container.shipment.refresh()
@@ -542,14 +542,14 @@ class JsonController {
 	}
 
     def sortRequisitionItems = {
-        println "sort requisition items " + params
+        log.info "sort requisition items " + params
 
         def requisitionItem
         params.get("requisitionItem[]").eachWithIndex { id, index ->
             requisitionItem = RequisitionItem.get(id)
             requisitionItem.orderIndex = index
             requisitionItem.save(flush:true);
-            println ("requisitionItem " + id + " saved at index " + index)
+            log.info ("requisitionItem " + id + " saved at index " + index)
         }
         requisitionItem.requisition.refresh()
         render(text: "", contentType: "text/plain")
@@ -576,8 +576,6 @@ class JsonController {
 		if (params.term) {
 			// Improved the performance of the auto-suggest by moving 
 			def tempItems = inventoryService.findInventoryItems(params.term)
-
-            println tempItems
 
 			if (tempItems) {
 
@@ -722,7 +720,7 @@ class JsonController {
 			e.printStackTrace();
 		
 		}
-        println "returning ${items?.size()} items: " + items
+        log.info "returning ${items?.size()} items: " + items
         render items as JSON;
 
 
@@ -799,7 +797,8 @@ class JsonController {
 				
 				
 				// Convert product attributes to JSON object attributes
-				[	
+				[
+                    id: product?.id,
 					product: product,
 					category: product?.category,
 					quantity: productQuantity,
@@ -918,7 +917,7 @@ class JsonController {
             */
 
         }
-        println result
+        log.info result
         render result.sort { "${it.group}${it.value}" } as JSON
     }
 
@@ -965,7 +964,7 @@ class JsonController {
             */
 
         }
-        println result
+        log.info result
         render result.sort { "${it.group}${it.value}" } as JSON
     }
 
@@ -1003,7 +1002,7 @@ class JsonController {
             // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
             if (products) {
                 quantityMap = getQuantityByProductMapCached(location, products);
-                println "Quantity map: " + quantityMap?.size()
+                log.info "Quantity map: " + quantityMap?.size()
             }
             items.addAll(products)
 		}
@@ -1097,7 +1096,7 @@ class JsonController {
     @Cacheable("quantityOnHandCache")
     def calculateQuantityOnHandByProduct = {
 
-        println "Calculating quantity on hand by product ..." + params
+        log.info "Calculating quantity on hand by product ..." + params
 
         def items = []
         def startTime = System.currentTimeMillis()
@@ -1142,7 +1141,7 @@ class JsonController {
         def totalValue = items.sum { it.totalValue }
         def data = [totalValue:totalValue,items:items,elapsedTime:elapsedTime,allStockCount:items.size(),inStockCount:inStockCount,reorderStockCount:reorderStockCount,lowStockCount:lowStockCount,outOfStockCount:outOfStockCount,overStockCount:overStockCount]
 
-        println "Elapsed time " + elapsedTime + " s"
+        log.info "Elapsed time " + elapsedTime + " s"
         //render "${params.callback}(${result as JSON})"
         render text: "${params.callback}(${data as JSON})", contentType: "application/javascript", encoding: "UTF-8"
 
@@ -1159,7 +1158,7 @@ class JsonController {
         if (params["status[]"]) {
             def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
             params["status[]"].split(",").each {
-                println "Add entries from data.productGroupDetails[${it}]"
+                log.info "Add entries from data.productGroupDetails[${it}]"
                 def entry = data.productGroupDetails[it]
                 if (entry) {
                     aaData += entry.values()
@@ -1178,7 +1177,7 @@ class JsonController {
         numberFormat.minimumFractionDigits = 2
         def totalValueFormatted = numberFormat.format(totalValue?:0)
         //def totalValue = aaData.collect { it.totalValue }.sum()
-        println "totalValue = " + totalValueFormatted
+        log.info "totalValue = " + totalValueFormatted
 
         render (["aaData":aaData,
                 "processingTime":"Took " + (System.currentTimeMillis()-startTime) + " ms to process",
@@ -1208,7 +1207,7 @@ class JsonController {
 
 
     def scanBarcode = {
-        println "Scan barcode: " + params
+        log.info "Scan barcode: " + params
 
         def url
         def type
@@ -1360,7 +1359,7 @@ class JsonController {
                 }
             }
         }
-        println "newData: " + newData
+        log.info "newData: " + newData
 
 
         render ([label: "${product?.name}", location: "${location.name}", data:newData] as JSON);
@@ -1370,7 +1369,7 @@ class JsonController {
      * Analytics > Inventory Snapshot data table
      */
     def getInventorySnapshotsByDate = {
-        println "getInventorySnapshotsByDate: " + params
+        log.info "getInventorySnapshotsByDate: " + params
         def data = []
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
 
@@ -1382,8 +1381,8 @@ class JsonController {
             }
             def location = Location.get(params?.location?.id?:session?.warehouse?.id)
             //inventoryService.getQuantityForInventory(location.inventory)
-            println date
-            println location
+            log.info date
+            log.info location
             def inventorySnapshots = InventorySnapshot.findAllByLocationAndDate(location, date)
             inventorySnapshots.each {
                 data << [date: it.date, location: it.location.name, product: it.product.name, productGroup: it?.product?.genericProduct?.name, quantityOnHand: it.quantityOnHand]
@@ -1413,7 +1412,7 @@ class JsonController {
             return;
         }
 
-        println "render data " + data
+        log.info "render data " + data
         render (["aaData":data, "iTotalRecords": data.size()?:0, "iTotalDisplayRecords": data.size()?:0, "sEcho": 1] as JSON)
     }
 
@@ -1421,7 +1420,7 @@ class JsonController {
      * Dashboard > Fast movers
      */
     def getFastMovers = {
-        println "getRequisitionItems: " + params
+        log.info "getRequisitionItems: " + params
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         def date = new Date()
         if (params.date) {
