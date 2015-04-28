@@ -441,8 +441,8 @@ openboxes.mail.feedback.recipients = ["feedback@openboxes.com"]
 openboxes.mail.errors.enabled = true
 openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 
-// Barcode scanner
-openboxes.scannerDetection.enabled = true
+// Barcode scanner (disabled by default)
+openboxes.scannerDetection.enabled = false
 
 
 // LDAP configuration
