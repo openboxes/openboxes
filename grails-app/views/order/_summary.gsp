@@ -57,7 +57,7 @@
     </div>
 </g:if>
 --%>
-<div>
+<div class="summary">
 	<g:if test="${orderInstance?.id}">
 		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
 		<g:set var="isAddingDocument" value="${request.request.requestURL.toString().contains('addDocument')}"/>
@@ -68,100 +68,25 @@
                         <g:render template="/order/actions" model="[orderInstance:orderInstance]"/>
                     </td>
 					<td>
-                        <g:link controller="order" action="show" id="${orderInstance?.id}"><warehouse:message code="order.label"/> ${orderInstance?.orderNumber}</g:link>
-                        <div class="order-title" style="font-size: 1.5em; font-weight: bold; line-height: 1em;">
-							${orderInstance?.description}
+                        <div class="title">
+                            <g:link controller="order" action="show" id="${orderInstance?.id}">${orderInstance?.description}</g:link>
 						</div>
+                        <div class="subtitle">
+                            <g:link controller="order" action="show" id="${orderInstance?.id}"><warehouse:message code="order.label"/> ${orderInstance?.orderNumber}</g:link>
+                        </div>
+
                     </td>
-                    <td class="top right">
+                    <td class="top right" width="1%">
+                        <div class="tag tag-alert">
+                            <format:metadata obj="${orderInstance?.status}"/>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr class="odd prop">
+                    <td></td>
+                    <td>
                         <div>
-                            <label class="fade">${warehouse.message(code: 'order.status.label')}</label>
-                            <b><format:metadata obj="${orderInstance?.status}"/></b>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td colspan="3">
-
-                        <div class="left">
-
-                            <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
-                                <g:if test="${orderInstance?.id}">
-                                    <warehouse:message code="order.wizard.showOrder.label" default="View purchase order"/>
-                                </g:if>
-                                <g:else>
-                                    <warehouse:message code="order.wizard.createOrder.label" default="Create purchase order"/>
-                                </g:else>
-                            </g:link>
-
-                            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
-                            </g:link>
-
-                            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
-                            </g:link>
-
-                            <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
-                            </g:link>
-
-                            <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
-                            </g:link>
-                        </div>
-
-                        <div class="right">
-
-                            <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.printOrder.label" default="Print"/>
-                            </g:link>
-
-                            <g:link controller="order" action="download" id="${orderInstance?.id}" class="button" target="_blank">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.downloadOrder.label" default="Download"/>
-                            </g:link>
-
-                            <g:if test="${!orderInstance?.isPlaced()}">
-                                <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" >
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
-                                    ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
-                            </g:if>
-                            <g:else>
-                                <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" disabled="disabled" >
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
-                                    ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
-
-                            </g:else>
-                            <g:if test="${!orderInstance?.isReceived() && orderInstance?.isPlaced() }">
-                                <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                                    ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
-                                </g:link>
-                            </g:if>
-                            <g:else>
-                                <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button" onClick="alert('You cannot perform this action at this time.'); return false;">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                                    ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
-                                </g:link>
-                            </g:else>
-                        </div>
-
-                    </td>
-
-                </tr>
-                <tr class="prop">
-
-                    <td colspan="3">
-						<div>
-
-
                             <table>
                                 <tr>
                                     <td>
@@ -213,12 +138,12 @@
                                     </td>
                                 </tr>
                             </table>
-						</div>
-					</td>
-
-				</tr>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
 			</tbody>
-		</table>			
+		</table>
 	</g:if>
 
 	<g:else>
@@ -226,21 +151,18 @@
 			<tbody>			
 				<tr>
 					<td>
-						<div>
-							<span style="font-size: 1.5em; font-weight: bold; line-height: 1em;">
-								<g:if test="${orderInstance?.description}">
-									${orderInstance?.description }
-								</g:if>
-								<g:else>
-									<warehouse:message code="order.untitled.label"/>
-								</g:else>
-							</span>							
-						</div> 
+						<div class="title">
+                            <g:if test="${orderInstance?.description}">
+                                ${orderInstance?.description }
+                            </g:if>
+                            <g:else>
+                                <warehouse:message code="order.untitled.label"/>
+                            </g:else>
+						</div>
 					</td>										
-					<td style="text-align: right;">
-                        <div>
-                            <label class="fade">${warehouse.message(code: 'order.status.label')}</label>
-                            <b><warehouse:message code="default.new.label"/></b>
+					<td width="1%" class="right">
+                        <div class="tag tag-alert">
+                            <warehouse:message code="default.new.label"/>
                         </div>
 					</td>
 				</tr>
@@ -248,4 +170,84 @@
 		</table>
 
 	</g:else>
+</div>
+<div class="buttonBar">
+    <div class="button-group">
+        <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
+            <g:if test="${orderInstance?.id}">
+                <warehouse:message code="order.wizard.showOrder.label" default="View purchase order"/>
+            </g:if>
+            <g:else>
+                <warehouse:message code="order.wizard.createOrder.label" default="Create purchase order"/>
+            </g:else>
+        </g:link>
+
+        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
+        </g:link>
+
+        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
+        </g:link>
+    </div>
+
+    <div class="button-group">
+
+        <g:if test="${!orderInstance?.isPlaced()}">
+            <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" >
+                <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
+                ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
+        </g:if>
+        <g:else>
+            <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" disabled="disabled" >
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
+                ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
+
+        </g:else>
+        <g:if test="${!orderInstance?.isReceived() && orderInstance?.isPlaced() }">
+            <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
+                ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
+            </g:link>
+        </g:if>
+        <g:else>
+            <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button" onClick="alert('You cannot perform this action at this time.'); return false;">
+                <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
+                ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
+            </g:link>
+        </g:else>
+    </div>
+
+
+    <div class="button-group">
+
+        <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
+        </g:link>
+
+        <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
+        </g:link>
+    </div>
+
+    <div class="button-group">
+
+        <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank">
+            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.printOrder.label" default="Print"/>
+        </g:link>
+
+        <g:link controller="order" action="download" id="${orderInstance?.id}" class="button" target="_blank">
+            <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.downloadOrder.label" default="Download"/>
+        </g:link>
+    </div>
+
+
+
 </div>

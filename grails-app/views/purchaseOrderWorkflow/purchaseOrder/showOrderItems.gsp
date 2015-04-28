@@ -23,10 +23,10 @@
         </g:hasErrors>
 
         <div class="dialog">
+            <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
 
             <div class="box">
                 <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
-                <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
                 <table style="">
                     <thead>
                         <tr class="odd">
@@ -265,8 +265,8 @@
 
 
         $(document).ready(function(){
-            $("#add-item-dialog").dialog({autoOpen:false, modal: true, width: 800, height: 400, title: "Add line item"});
-            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 800, height: 400, title: "Edit line item"});
+            $("#add-item-dialog").dialog({autoOpen:false, modal: true, width: 800, title: "Add line item"});
+            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 800, title: "Edit line item"});
             $(".add-item-button").click(function(event){
                 event.preventDefault();
                 $("#add-item-dialog").dialog("open");

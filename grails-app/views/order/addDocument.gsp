@@ -19,11 +19,11 @@
 				<g:renderErrors bean="${orderInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-			
+
+		<g:render template="summary" />
 
 		<div class="box">
-			<h2>${warehouse.message(code:'document.add.label')}</h2>
-			<g:render template="summary" />
+			<h2><warehouse:message code="default.add.label" args="[entityName]" /></h2>
 			<div>
 				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
 				<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">

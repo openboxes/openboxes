@@ -20,10 +20,13 @@
                         <g:renderErrors bean="${orderInstance}" as="list" />
                     </div>
                 </g:hasErrors>
+
+                <g:render template="summary" model="[orderInstance:orderInstance,currentState:'showOrder']"/>
+
+
                 <div class="box">
                     <h2>${warehouse.message(code:'order.wizard.showOrder.label')}</h2>
 
-                    <g:render template="summary" model="[orderInstance:orderInstance,currentState:'showOrder']"/>
 
                     <div class="tabs tabs-ui">
                         <ul>

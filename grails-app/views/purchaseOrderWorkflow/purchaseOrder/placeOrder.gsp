@@ -24,9 +24,11 @@
 
 
         <div class="dialog">
+
+            <g:render template="/order/summary" model="[orderInstance:order,currentState:'placeOrder']"/>
+
             <div class="box">
                 <h2><warehouse:message code="order.wizard.placeOrder.label"/></h2>
-                <g:render template="/order/summary" model="[orderInstance:order,currentState:'placeOrder']"/>
                 <div class="empty center" style="margin:15px">
                     <div>
                         Are you sure you want to place this purchase order with the supplier?

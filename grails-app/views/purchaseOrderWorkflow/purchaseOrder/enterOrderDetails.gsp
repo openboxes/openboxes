@@ -7,8 +7,7 @@
 </head>
 <body>
 	<div class="nav">
-		<span class="linkButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a>
-		</span>
+		<span class="linkButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a></span>
 	</div>
 	<div class="body">
 		<g:if test="${flash.message}">
@@ -30,12 +29,9 @@
 		</g:each>
 		<g:form action="purchaseOrder" method="post">
 			<div class="dialog">
-
-
+                <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
-                    <h2><warehouse:message code="order.wizard.editOrder.label"/></h2>
-                    <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
-
+                    <h2><warehouse:message code="order.enterOrderDetails.label" /></h2>
                     <table>
                         <tbody>
                             <tr class='prop'>
@@ -128,10 +124,10 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="buttons">
-                        <g:submitButton name="next" value="${warehouse.message(code:'default.button.save.label')}" class="button"></g:submitButton>
-                        <g:link action="purchaseOrder" event="cancel" class="button"><warehouse:message code="default.button.back.label"/></g:link>
-                    </div>
+                </div>
+                <div class="buttons">
+                    <g:submitButton name="next" value="${warehouse.message(code:'default.button.save.label')}" class="button"></g:submitButton>
+                    <g:link action="purchaseOrder" event="cancel" class="button"><warehouse:message code="default.button.back.label"/></g:link>
                 </div>
             </div>
 		</g:form>
