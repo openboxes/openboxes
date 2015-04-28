@@ -71,7 +71,7 @@
 	    </div>
 	</g:if>
 	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
-	<div id="error-dialog" class="dialog" title="Bug Report">
+	<div id="error-dialog" class="dialog" title="Report a Bug">
         <g:if test="${util.ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)}">
             <div id="errors"></div>
             <g:form controller="errors" action="processError" onsubmit="return checkFormSubmission();">
@@ -89,27 +89,25 @@
                 <table>
                     <tr class="prop">
                         <td class="name">
-                            <label><warehouse:message code="error.reportedBy.label"/></label>
-                        </td>
-                        <td class="value">
-                            ${session?.user?.name }
-                            (<a href="mailto:${session?.user?.email }" target="_blank">${session?.user?.email }</a>)
-                        </td>
-                    </tr>
-                    <tr class="prop">
-                        <td class="name">
                             <label><warehouse:message code="error.reportedTo.label"/></label>
                         </td>
                         <td class="value">
                             <g:set var="recipients" value="${util.ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients)}"/>
                             <g:if test="${recipients}">
-                                Support (<a href="mailto:${recipients.join(";")}" target="_blank">${recipients.join(";")}</a>)
+                                Support <a href="mailto:${recipients.join(";")}" target="_blank">${recipients.join(";")}</a>
                             </g:if>
                             <g:else>
-                                OpenBoxes Support (<a href="mailto:errors@openboxes.com" target="_blank">errors@openboxes.com</a>)
-
+                                OpenBoxes Support <a href="mailto:errors@openboxes.com" target="_blank">errors@openboxes.com</a>
                             </g:else>
-
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td class="name">
+                            <label><warehouse:message code="error.reportedBy.label"/></label>
+                        </td>
+                        <td class="value">
+                            ${session?.user?.name }
+                            <a href="mailto:${session?.user?.email }" target="_blank">${session?.user?.email }</a>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -117,19 +115,17 @@
                             <label><warehouse:message code="error.summary.label"/></label>
                         </td>
                         <td class="value">
-                            <g:textField name="summary" class="text" size="100"
-                                value="${summary }" placeholder="${warehouse.message(code:'error.summary.message') }"/>
+                            <g:textField name="summary" class="text" size="80"
+                                value="" placeholder="${warehouse.message(code:'error.summary.message') }"/>
                             <br/>
                         </td>
                     </tr>
-
-
                     <tr class="prop">
                         <td class="name">
                             <label><warehouse:message code="error.details.label"/></label>
                         </td>
                         <td class="value">
-                            <g:textArea id="comments" name="comments" cols="120" rows="10"
+                            <g:textArea id="comments" name="comments" cols="80" rows="10"
                                 placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>
                         </td>
                     </tr>
