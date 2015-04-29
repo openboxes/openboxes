@@ -146,6 +146,11 @@
             alert( 'The server took too long to send the data.' );
         }
         else {
+            // User probably refreshed page or clicked on a link, so this isn't really an error
+            if(xhr.readyState == 0 || xhr.status == 0) {
+                return;
+            }
+
             if (xhr.responseText) {
                 var error = eval("(" + xhr.responseText + ")");
                 alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);
