@@ -1365,56 +1365,7 @@ class JsonController {
         render ([label: "${product?.name}", location: "${location.name}", data:newData] as JSON);
     }
 
-    /**
-     * Analytics > Inventory Snapshot data table
-     */
-    def getInventorySnapshotsByDate = {
-        log.info "getInventorySnapshotsByDate: " + params
-        def data = []
-        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
 
-        try {
-            def date = new Date()
-            if (params.date) {
-                date = dateFormat.parse(params.date)
-                date.clearTime()
-            }
-            def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-            //inventoryService.getQuantityForInventory(location.inventory)
-            log.info date
-            log.info location
-            def inventorySnapshots = InventorySnapshot.findAllByLocationAndDate(location, date)
-            inventorySnapshots.each {
-                data << [date: it.date, location: it.location.name, product: it.product.name, productGroup: it?.product?.genericProduct?.name, quantityOnHand: it.quantityOnHand]
-            }
-
-            /*
-            def results = InventorySnapshot.executeQuery("""
-                select i.date, i.location.name, i.product, i.quantityOnHand
-                from InventorySnapshot i, Product p
-                where i.location = :location
-                and i.product = p
-                and i.date >= :startDate
-                and i.date < :endDate
-                """, [location:location, startDate: date, endDate: date+1])
-
-            println results.size()
-            results.each {
-                def product = results[0][2]
-                data << [date:results[0][0], location: results[0][1], product: product.name, productGroup: product?.genericProduct?.name, quantityOnHand: it[0][3]]
-
-            }
-            */
-        }
-        catch (Exception e) {
-            response.status = 500
-            render ([errorMessage: e.message] as JSON)
-            return;
-        }
-
-        log.info "render data " + data
-        render (["aaData":data, "iTotalRecords": data.size()?:0, "iTotalDisplayRecords": data.size()?:0, "sEcho": 1] as JSON)
-    }
 
     /**
      * Dashboard > Fast movers

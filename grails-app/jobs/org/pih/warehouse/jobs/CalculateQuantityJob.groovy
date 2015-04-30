@@ -30,8 +30,6 @@ class CalculateQuantityJob {
         println "Location: " + location
         println "Date: " + date
 
-
-
         if (product && date && location) {
             println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(date, location, product)
@@ -39,7 +37,6 @@ class CalculateQuantityJob {
         else if (product && location) {
             println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(location, product)
-
         }
         else if (date && location) {
             println "Triggered calculate quantity job for all products at ${location} on ${date}"
@@ -49,16 +46,20 @@ class CalculateQuantityJob {
             println "Triggered calculate quantity job for all locations, products on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(date)
         }
+        else if (location) {
+            println "Triggered calculate quantity job for all products at location ${location} over all dates"
+            inventoryService.createOrUpdateInventorySnapshot(location)
+        }
         else {
             println "Triggered calculate quantity job for all dates, locations, products"
             def transactionDates = inventoryService.getTransactionDates()
             transactionDates.each { transactionDate ->
                 log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
                 inventoryService.createOrUpdateInventorySnapshot(transactionDate)
-                println "Finished calculate quantity job ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
-                println "=".multiply(60)
             }
         }
+        println "Finished calculate quantity on hand job for triple (${location}, ${product}, ${date}): " + (System.currentTimeMillis() - startTime) + " ms"
+        println "=".multiply(60)
     }
 
 

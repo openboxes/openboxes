@@ -2,20 +2,29 @@
 <head>
     <title>Inventory Snapshots</title>
     <meta name="layout" content="analytics" />
-
-
 </head>
 
 <div id="body">
-    <h2>${session.warehouse.name}</h2>
+
+    <div class="button-bar pull-right">
+        <a id="download-button" href="#" data-link="${g.createLink(controller:'inventorySnapshot', action:'download')}" class="btn btn-default">Download</a>
+    </div>
+
+    <h1 class="title">Current Stock <small>${session.warehouse.name}</small> <small>${params?.date}</small></h1>
 
 
     <table id="dataTable" class="display" cellspacing="0" width="100%">
         <thead>
             <tr>
+                <%--
+                <th>Date</th>
+                <th>Location</th>--%>
                 <th>Product</th>
+                <th>Category</th>
                 <th>Product group</th>
+                <th>Tags</th>
                 <th>QoH</th>
+                <th>UoM</th>
             </tr>
         </thead>
         <tbody>
@@ -30,22 +39,29 @@
 <r:script disposition="defer">
     $( document ).ready(function() {
 
+        $("#download-button").click(function(event) {
+            event.preventDefault();
+            var link = $(this).data("link");
+            var location = $("#locationId").val();
+            var date = $("#date").val();
+            link += "?date=" + date + "&location.id=" + location;
+            window.location.href = link;
+
+        });
+
         var dataTable = $('#dataTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 12,
+            "iDisplayLength": 10,
             "bScrollCollapse": true,
             "bJQueryUI": false,
             "bAutoWidth": true,
-            "sPaginationType": "full_numbers",
-            "sAjaxSource": "${request.contextPath}/json/getInventorySnapshotsByDate",
+            "sAjaxSource": "${request.contextPath}/inventorySnapshot/findByDateAndLocation",
             "fnServerParams": function ( data ) {
-                console.log("server data " + data);
-                var locationId = $("#locationId").val();
-                var date = $("#date").val();
-                data.push({ name: "location.id", value: locationId });
-                data.push({ name: "date", value: date })
-
+                data.push({ name: "location.id", value: $("#locationId").val() });
+                data.push({ name: "date", value: $("#date").val() })
+                console.log("server post data ");
+                console.log(data);
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
@@ -71,15 +87,18 @@
             "fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,
             "aLengthMenu": [
-                [25, 50, 100, 500, 1000, -1],
-                [25, 50, 100, 500, 1000, "All"]
+                [10, 25, 50, 100, 500, 1000, -1],
+                [10, 25, 50, 100, 500, 1000, "All"]
             ],
             "aoColumns": [
-                //{ "mData": "date" }, // 0
-                //{ "mData": "location" }, // 1
+               // { "mData": "date" }, // 0
+               // { "mData": "location" }, // 1
                 { "mData": "product" }, // 2
+                { "mData": "category" }, // 2
                 { "mData": "productGroup" }, // 2
-                { "mData": "quantityOnHand" } // 2
+                { "mData": "tags" }, // 2
+                { "mData": "quantityOnHand" }, // 2
+                { "mData": "unitOfMeasure" } // 2
                 //
                 //{ "mData": "id", "bSearchable": false, "bVisible": false },
                 //{ "mData": "inventoryLevelId", "bSearchable": false, "bVisible": false },
@@ -112,12 +131,35 @@
 
 
         function refreshData(event) {
-            console.log("refreshData");
+            console.log("refreshing data ");
+            console.log(event);
             event.preventDefault();
             //var dataTable = $('#dataTable').dataTable();
             dataTable.fnClearTable();
-            dataTable.fnReloadAjax('${request.contextPath}/json/getInventorySnapshotsByDate');
-            //dataTable.fnDraw();
+            dataTable.fnReloadAjax('${request.contextPath}/inventorySnapshot/findByDateAndLocation');
+            dataTable.fnDraw();
+        }
+
+        function triggerServerUpdate(event) {
+            console.log("trigger server update");
+            console.log(event);
+            var response = $.ajax( {
+                "dataType": 'json',
+                "type": "POST",
+                "async": false,
+                "url": "${request.contextPath}/inventorySnapshot/update",
+                "data": $('form').serialize(),
+                "timeout": 30000,   // optional if you want to handle timeouts (which you should)
+                "success": handleAjaxSuccess,
+                "error": handleAjaxError // this sets up jQuery to give me errors
+            } );
+
+            alert(response.responseText);
+        }
+
+
+        function handleAjaxSuccess() {
+            console.log("success");
         }
 
         function handleAjaxError( xhr, status, error ) {
@@ -140,28 +182,37 @@
             dataTable.fnProcessingDisplay( false );
         }
 
+        function fnCallback() {
+            console.log("data response success");
+        }
 
         function fnInitComplete(obj1, obj2, obj3) {
             // no op
         }
 
-        $(".datepicker").datepicker({ autoclose: true });
-        $('.datepicker').datepicker('setDate', new Date(2014, 3, 28));
-        $('.datepicker').datepicker('update');
-        //$('#dob').val('');
-
-
+        $(".datepicker").datepicker({ autoclose: true }).on('changeDate', onDateChange);
+        //$('.datepicker').datepicker('update', new Date());
 
         //$('#startDate').datepicker();
         //$('#endDate').datepicker();
         //$('#location\\.id').chosen({disable_search_threshold: 30});
-        //$("#date").change( function (event) {
+        function onDateChange(event) {
+            console.log("date picker change");
+            console.log(event);
+            refreshData(event);
+        }
+
+        //$('#refresh-btn').click( function (event) {
         //    event.preventDefault();
-        //    refreshData();
+        //
+        //    refreshData(event);
         //});
 
-        $('#refresh-btn').click( function (event) {
-            refreshData(event);
+
+        $("#trigger-btn").click( function(event) {
+            event.preventDefault();
+            alert("This may take some time ...");
+            triggerServerUpdate(event);
         });
 
 

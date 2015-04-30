@@ -5,7 +5,8 @@
     <meta name="layout" content="analytics" />
     <title><warehouse:message code="openboxes.analytics.title" default="OpenBoxes Analytics"/> | <g:layoutTitle/></title>
 
-
+    <!-- Include Favicon -->
+    <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
     <!-- CSS Stylesheets -->
     <!--<link rel="stylesheet" type="text/css" href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">-->
@@ -109,7 +110,7 @@
 
             <footer>
                 <p>
-                &copy; OpenBoxes 2014
+                &copy; OpenBoxes 2015
                 </p>
             </footer>
 

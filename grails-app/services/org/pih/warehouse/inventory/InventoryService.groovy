@@ -3566,8 +3566,48 @@ class InventoryService implements ApplicationContextAware {
 
     }
 
+    //@Cacheable("inventorySnapshotCache")
+	def findInventorySnapshotByDateAndLocation(Date date, Location location) {
+        def data = []
+        if (location && date) {
+            //def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
+            def inventorySnapshots = InventorySnapshot.findAllByLocationAndDate(location, date)
+            inventorySnapshots.each {
+                data << [   date           : it.date,
+                            location       : it.location.name,
+                            category       : it.product?.category?.name,
+                            product        : it.product.name,
+                            productGroup   : it?.product?.genericProduct?.name,
+                            quantityOnHand : it.quantityOnHand,
+                            tags           :   it.product.tagsToString(),
+                            unitOfMeasure  : it?.product?.unitOfMeasure?:"EA"
+                ]
+            }
 
-    def createOrUpdateInventorySnapshot(date) {
+            /*
+           def results = InventorySnapshot.executeQuery("""
+               select i.date, i.location.name, i.product, i.quantityOnHand
+               from InventorySnapshot i, Product p
+               where i.location = :location
+               and i.product = p
+               and i.date >= :startDate
+               and i.date < :endDate
+               """, [location:location, startDate: date, endDate: date+1])
+
+           println results.size()
+           results.each {
+               def product = results[0][2]
+               data << [date:results[0][0], location: results[0][1], product: product.name, productGroup: product?.genericProduct?.name, quantityOnHand: it[0][3]]
+
+           }
+           */
+
+        }
+        return data;
+	}
+
+
+    def createOrUpdateInventorySnapshot(Date date) {
         def startTime = System.currentTimeMillis()
         date.clearTime()
         def locations = getDepotLocations()
@@ -3579,7 +3619,7 @@ class InventoryService implements ApplicationContextAware {
                 createOrUpdateInventorySnapshot(date, location)
             }
             else {
-                log.warn "Skipping inventory snapshot for date ${date}, location ${location.name} as it appears to have already been computed"
+                log.warn "Skipping inventory snapshot for date ${date}, location ${location.name} as it appears to have already been calculated"
             }
         }
 
@@ -3587,11 +3627,11 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def createOrUpdateInventorySnapshot(date, location) {
+    def createOrUpdateInventorySnapshot(Date date, Location location) {
         try {
             def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
-            println "Date ${date}, location ${location}: " + inventorySnapshots
-            if (inventorySnapshots == 0) {
+            log.info "Date ${date}, location ${location}: " + inventorySnapshots
+            //if (inventorySnapshots == 0) {
                 log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
                 //Location.withSession {
                     if (!location.isAttached()) {
@@ -3611,7 +3651,7 @@ class InventoryService implements ApplicationContextAware {
                         }
                     }
                 //}
-            }
+            //}
             log.info "Saved inventory snapshot for products=ALL, location=${location}, date=${date}"
         } catch (Exception e) {
             log.error("Unable to complete inventory snapshot process", e)
@@ -3654,7 +3694,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def updateInventorySnapshot(date, product, location, onHandQuantity) {
+    def updateInventorySnapshot(Date date, Product product, Location location, Integer onHandQuantity) {
         //log.info "Updating inventory snapshot for product " + product.name + " @ " + location.name
         try {
             def inventorySnapshot = InventorySnapshot.findWhere(date: date, location: location, product:product)
@@ -3720,9 +3760,9 @@ class InventoryService implements ApplicationContextAware {
 
     def printStatus() {
         def batchEnded = System.currentTimeMillis()
-        def seconds = (batchEnded-lastBatchStarted)/1000
+        def milliseconds = (batchEnded-lastBatchStarted)
         //def total = (batchEnded-startTime)/1000
-        log.info "Flushed last batch ... took ${seconds}s"
+        log.info "Flushed last batch ... took ${milliseconds} ms"
         lastBatchStarted = batchEnded
     }
 

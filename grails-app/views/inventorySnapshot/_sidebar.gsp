@@ -1,4 +1,4 @@
-<form role="form" controlle="inventorySnapshot" action="index" class="well form-search">
+<form role="form" controlle="inventorySnapshot" action="index" class="form-search">
 
     <%--
     <div class="form-group">
@@ -30,6 +30,13 @@
     </div>
     --%>
     <div class="form-group">
+        <label><i class="icon icon-map-marker"></i> <warehouse:message code="default.location.label" default="Location"/></label>
+        <div>
+            ${session?.warehouse?.name}
+            <input id="location.id" name="location.id" type="hidden" value="${session.warehouse.id}"/>
+        </div>
+    </div>
+    <div class="form-group">
         <label><i class="icon icon-calendar"></i> <warehouse:message code="default.date.label" default="Date"/></label>
         <div>
             <input id="date" name="date" class="datepicker" value=""/>
@@ -45,11 +52,10 @@
     </div>
     --%>
     <hr/>
+    <%--
     <div class="form-actions">
-        <button id="refresh-btn" class="btn btn-primary">Refresh</button>
-        <button id="do-btn" class="btn btn-default">Do Something</button>
-        <%--
-        <button id="submit-btm" class="btn btn-default" target="_blank">Export</button>
-        --%>
+        <button id="refresh-btn" class="btn btn-primary">Refresh Data</button>
+        <button id="refresh-btn" class="btn btn-default">Reload Data</button>
     </div>
+    --%>
 </form>
