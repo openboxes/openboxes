@@ -82,18 +82,16 @@
 
 <g:render template="/common/navbar" />
 
-<input type="hidden" id="locationId" name="locationId" value="${session.warehouse.id}"/>
-
 
 <div id='content' class="body">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-3 col-md-2 sidebar">
+            <div class="col-sm-4 col-md-2 sidebar">
 
                 <g:render template="sidebar"/>
 
             </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div class="col-sm-8 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
                 <g:if test="${flash.message}">
                     <div id="message" class="alert alert-warning">

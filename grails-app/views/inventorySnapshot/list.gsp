@@ -6,8 +6,12 @@
 
 <div id="body">
 
+    <div id="message" class="alert alert-success">Choose a date using the datepicker.</div>
+
     <div class="button-bar pull-right">
         <a id="download-button" href="#" data-link="${g.createLink(controller:'inventorySnapshot', action:'download')}" class="btn btn-default">Download</a>
+
+
     </div>
 
     <h1 class="title">Current Stock <small>${session.warehouse.name}</small> <small>${params?.date}</small></h1>
@@ -19,9 +23,10 @@
                 <%--
                 <th>Date</th>
                 <th>Location</th>--%>
+                <th>SKU</th>
                 <th>Product</th>
-                <th>Category</th>
                 <th>Product group</th>
+                <th>Category</th>
                 <th>Tags</th>
                 <th>QoH</th>
                 <th>UoM</th>
@@ -39,14 +44,71 @@
 <r:script disposition="defer">
     $( document ).ready(function() {
 
+        $(".datepicker").datepicker({ autoclose: true }).on('changeDate', onDateChange);
+        $('.datepicker').datepicker('update', new Date());
+
+
+        $("#refresh-button").click(function(event) {
+            event.preventDefault();
+            refreshData(event);
+        });
+
+        //$("#refreshme-button").click(function(event) {
+        //    event.preventDefault();
+        //    var link = $(this).data("link");
+        //    var location = $("#locationid").val();
+        //    var date = $("#date").val();
+        //    link += "?date=" + date + "&location.id=" + location;
+        //    window.location.href = link;
+        //});
+
+
         $("#download-button").click(function(event) {
             event.preventDefault();
             var link = $(this).data("link");
-            var location = $("#locationId").val();
+            var location = $("#locationid").val();
             var date = $("#date").val();
             link += "?date=" + date + "&location.id=" + location;
             window.location.href = link;
+        });
 
+        $("#trigger-button").click(function(event) {
+            event.preventDefault();
+            var link = $(this).data("link");
+            var user = $("#userid").val();
+            var allLocations = $("#allLocations").attr("checked");
+            var location = $("#locationid").val();
+            var date = $("#date").val();
+
+            if (location && date) {
+                var data = [];
+
+                if(!$('#allLocations').is(':checked')) {
+                    data.push({ name: "location.id", value: $("#locationid").val() });
+                }
+
+                data.push({ name: "date", value: $("#date").val() })
+                console.log("server post data ");
+                console.log(data);
+
+                $.ajax( {
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": link,
+                    "data": data,
+                    "success": function(data, textStatus, xhr) {
+                        console.log(data);
+                        console.log(textStatus);
+                        console.log(xhr);
+                        $("#message").html(data.message);
+                    },
+                    "timeout": 30000,   // optional if you want to handle timeouts (which you should)
+                    "error": handleAjaxError // this sets up jQuery to give me errors
+                });
+            }
+            else {
+                alert("Please choose a location and date.")
+            }
         });
 
         var dataTable = $('#dataTable').dataTable( {
@@ -58,7 +120,7 @@
             "bAutoWidth": true,
             "sAjaxSource": "${request.contextPath}/inventorySnapshot/findByDateAndLocation",
             "fnServerParams": function ( data ) {
-                data.push({ name: "location.id", value: $("#locationId").val() });
+                data.push({ name: "location.id", value: $("#locationid").val() });
                 data.push({ name: "date", value: $("#date").val() })
                 console.log("server post data ");
                 console.log(data);
@@ -93,9 +155,10 @@
             "aoColumns": [
                // { "mData": "date" }, // 0
                // { "mData": "location" }, // 1
+                { "mData": "productCode" }, // 2
                 { "mData": "product" }, // 2
-                { "mData": "category" }, // 2
                 { "mData": "productGroup" }, // 2
+                { "mData": "category" }, // 2
                 { "mData": "tags" }, // 2
                 { "mData": "quantityOnHand" }, // 2
                 { "mData": "unitOfMeasure" } // 2
@@ -154,7 +217,7 @@
                 "error": handleAjaxError // this sets up jQuery to give me errors
             } );
 
-            alert(response.responseText);
+            successMessage(response.responseText);
         }
 
 
@@ -168,19 +231,31 @@
             console.log(status);
             console.log(error);
             if ( status === 'timeout' ) {
-                alert( 'The server took too long to send the data.' );
+                errorMessage('The server took too long to send the data.' );
             }
             else {
                 if (xhr.responseText) {
                     var error = eval("(" + xhr.responseText + ")");
-                    alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);
+                    //alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);
+                    errorMessage("<div>An error occurred on the server.  Please contact your system administrator.</div>" + error.errorMessage);
                 } else {
-                    alert('An unknown error occurred on the server.  Please contact your system administrator.');
+                    errorMessage('An unknown error occurred on the server.  Please contact your system administrator.');
                 }
             }
             console.log(dataTable);
             dataTable.fnProcessingDisplay( false );
         }
+
+        function errorMessage(message) {
+            $("#message").removeClass("alert-success").addClass("alert-danger").html(message)
+
+        }
+
+        function successMessage(message) {
+            $("#message").removeClass("alert-danger").addClass("alert-success").html(message)
+
+        }
+
 
         function fnCallback() {
             console.log("data response success");
@@ -190,8 +265,7 @@
             // no op
         }
 
-        $(".datepicker").datepicker({ autoclose: true }).on('changeDate', onDateChange);
-        //$('.datepicker').datepicker('update', new Date());
+
 
         //$('#startDate').datepicker();
         //$('#endDate').datepicker();

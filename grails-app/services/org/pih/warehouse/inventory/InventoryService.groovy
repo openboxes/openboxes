@@ -3567,6 +3567,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
     //@Cacheable("inventorySnapshotCache")
+    /*
 	def findInventorySnapshotByDateAndLocation(Date date, Location location) {
         def data = []
         if (location && date) {
@@ -3576,35 +3577,56 @@ class InventoryService implements ApplicationContextAware {
                 data << [   date           : it.date,
                             location       : it.location.name,
                             category       : it.product?.category?.name,
+                            productCode    : it.product.productCode,
                             product        : it.product.name,
-                            productGroup   : it?.product?.genericProduct?.name,
+                            productGroup   : null, //it?.product?.genericProduct?.name,
                             quantityOnHand : it.quantityOnHand,
-                            tags           :   it.product.tagsToString(),
+                            tags           : it.product.tagsToString(),
                             unitOfMeasure  : it?.product?.unitOfMeasure?:"EA"
                 ]
             }
-
-            /*
-           def results = InventorySnapshot.executeQuery("""
-               select i.date, i.location.name, i.product, i.quantityOnHand
-               from InventorySnapshot i, Product p
-               where i.location = :location
-               and i.product = p
-               and i.date >= :startDate
-               and i.date < :endDate
-               """, [location:location, startDate: date, endDate: date+1])
-
-           println results.size()
-           results.each {
-               def product = results[0][2]
-               data << [date:results[0][0], location: results[0][1], product: product.name, productGroup: product?.genericProduct?.name, quantityOnHand: it[0][3]]
-
-           }
-           */
-
         }
         return data;
 	}
+	*/
+
+    def findInventorySnapshotByDateAndLocation(Date date, Location location) {
+        def data = []
+        if (location && date) {
+
+            long startTime = System.currentTimeMillis()
+            def results = InventorySnapshot.executeQuery("""
+                    select i.date, i.location.name as location, product, category.name, i.quantityOnHand, pg
+                    from InventorySnapshot i, Product product, Category category
+                    left outer join product.productGroups as pg
+                    where i.location = :location
+                    and i.date = :date
+                    and i.product = product
+                    and i.product.category = category
+                    """, [location:location, date: date])
+
+            log.info "Results: " + results.size()
+            log.info "Query response time: " + (System.currentTimeMillis() - startTime)
+            startTime = System.currentTimeMillis()
+
+            results.each {
+                Product product = it[2]
+                data << [
+                        date                : it[0],
+                        location            : it[1],
+                        category            : it[3],
+                        productCode         : product.productCode,
+                        product             : product.name,
+                        productGroup        : it[5]*.description?.join(":")?:"", //product?.genericProduct?.name,
+                        tags                : product?.tagsToString(),
+                        quantityOnHand      : it[4],
+                        unitOfMeasure       : product?.unitOfMeasure?:"EA"
+                ]
+            }
+            log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
+        }
+        return data
+    }
 
 
     def createOrUpdateInventorySnapshot(Date date) {

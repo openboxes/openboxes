@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.product.Product
@@ -103,6 +104,23 @@ class InventorySnapshotController {
 
     }
 
+
+    def refresh = {
+        log.info ("Refresh inventory snapshot data: " + params)
+        User user = User.get(session?.user?.id)
+        Location location = Location.get(params?.location?.id)
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
+
+            CalculateQuantityJob.triggerNow([date:date,productId:params.product?.id,locationId:location?.id,userId:user?.id])
+        } catch (Exception e) {
+            log.error("An error occurred " + e.message, e);
+            render([message: "An error occurred: " + e.message] as JSON)
+        }
+        render([message: "Triggered data refresh at " + new Date().format("MMM dd yyyy hh:mm:ss a") + ". You will receive an email to '${user?.email}' when the process has completed. This may take several minutes."] as JSON)
+    }
+
     def download = {
 
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
@@ -126,15 +144,10 @@ class InventorySnapshotController {
 
     def findByDateAndLocation = {
         log.info "getInventorySnapshotsByDate: " + params
-        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-
         try {
-            def date
-            if (params.date) {
-                date = dateFormat.parse(params.date)
-                date.clearTime()
-            }
-            def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
+            Location location = Location.get(params?.location?.id?:session?.warehouse?.id)
 
             List data = inventoryService.findInventorySnapshotByDateAndLocation(date, location)
             render(["aaData": data, "iTotalRecords": data.size() ?: 0, "iTotalDisplayRecords": data.size() ?: 0, "sEcho": 1] as JSON)
