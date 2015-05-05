@@ -154,7 +154,7 @@
                                         <label>${property.key}</label>
                                     </td>
                                     <td>
-                                        <g:if test="${property?.key?.contains('password') }">
+                                        <g:if test="${property.key?.contains('password') && property.value }">
                                             ${util.StringUtil.mask(property.value, "*")}
                                         </g:if>
                                         <g:else>
@@ -182,8 +182,8 @@
                                             <label>${property.key }</label>
                                         </td>
                                         <td class="value">
-                                            <g:if test="${property?.key?.contains('password') }">
-                                                ${util.StringUtil.mask(property.value, "*")}
+                                            <g:if test="${property?.key?.contains('password') && property.value}">
+                                                ${util.StringUtil.mask(property?.value, "*")}
                                             </g:if>
                                             <g:else>
                                                 ${property.value }
