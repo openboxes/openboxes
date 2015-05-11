@@ -409,6 +409,21 @@ class Shipment implements Comparable, Serializable {
 		return pallet
 	}
 
+	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container) {
+        ShipmentItem shipmentItem = ShipmentItem.withCriteria(uniqueResult: true) {
+            eq('shipment', this)
+            if (container) {
+                eq('container', container)
+            }
+            else {
+                isNull('container')
+            }
+            eq('inventoryItem', inventoryItem)
+        }
+        return shipmentItem
+    }
+
+
 	Collection findShipmentItemsByContainer(container) {
 		return ShipmentItem?.findAllByShipmentAndContainer(this, container)
 	}
@@ -435,10 +450,6 @@ class Shipment implements Comparable, Serializable {
 			return TimeCategory.minus(endDate, startDate)
 		}
 		return null
-	}
-
-	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container) {
-		return ShipmentItem.findByInventoryItemAndContainer(inventoryItem, container)
 	}
 
 	Date dateScheduled() {
