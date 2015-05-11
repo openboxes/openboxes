@@ -382,7 +382,12 @@ class CreateShipmentWorkflowController {
 			on("deleteContainers") {
 				log.info "Delete containers from shipment " + params
 				try {
-					shipmentService.deleteContainers(params.id, params.list("containerId"), false)
+
+                    def containerIds = params.list("containerId")
+                    if (!containerIds) {
+                        throw new ShipmentException(message: "You must select at least one container to delete", shipment:Shipment.load(params.id))
+                    }
+                    shipmentService.deleteContainers(params.id, containerIds, false)
 					flash.message = "Delete selected containers"
 				} catch (ShipmentException e) {
 					flash.message = e.message
@@ -393,7 +398,11 @@ class CreateShipmentWorkflowController {
 			on("deleteContainersAndItems") {
 				log.info "Delete containers and items from shipment " + params
 				try {
-					shipmentService.deleteContainers(params.id, params.list("containerId"), true)
+                    def containerIds = params.list("containerId")
+                    if (!containerIds) {
+                        throw new ShipmentException(message: "You must select at least one container to delete", shipment:Shipment.load(params.id))
+                    }
+					shipmentService.deleteContainers(params.id, containerIds, true)
 					flash.message = "Delete selected containers and items"
 				} catch (ShipmentException e) {
 					flash.message = e.message
@@ -407,7 +416,7 @@ class CreateShipmentWorkflowController {
                 log.info "Delete all containers and items from shipment " + params
                 try {
                     shipmentService.deleteAllContainers(params.id, true)
-                    flash.message = "Delete all containers and items"
+                    flash.message = "Successfully deleted all containers and items"
                 } catch (ShipmentException e) {
                     flash.message = e.message
                 } catch (Exception e) {
@@ -440,35 +449,6 @@ class CreateShipmentWorkflowController {
 				} catch (Exception e) {
 					log.error("Failed to import packing list due to the following error: " + e.message, e)
 					flash.message = "Failed to import packing list due to the following error: " + e.message
-				}
-
-			}.to("enterContainerDetails")
-
-
-			on("exportPackingList") {
-				log.info "Export packing list for shipment " + params
-				Shipment shipment = Shipment.get(params.id)
-				if (!shipment) {
-					throw new Exception("Could not locate shipment with ID " + params.id)
-				}
-
-				try {
-
-					response.contentType = "application/vnd.ms-excel"
-					response.setHeader 'Content-disposition', "attachment; filename=\"Shipment ${shipment?.shipmentNumber} - Packing List.xls\""
-
-					// Write the file to the response
-					shipmentService.exportPackingList(params.id, response.outputStream)
-					response.outputStream.flush();
-					response.outputStream.close();
-					flash.message = "Successfully exported all packing list items. "
-
-
-				} catch (ShipmentItemException e) {
-					[itemInstance: e.shipmentItem]
-				} catch (Exception e) {
-					log.error("Failed to export packing list due to the following error: " + e.message, e)
-					flash.message = "Failed to export packing list due to the following error: " + e.message
 				}
 
 			}.to("enterContainerDetails")

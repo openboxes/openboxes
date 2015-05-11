@@ -794,34 +794,41 @@ class ShipmentService {
         Shipment shipment = Shipment.get(id)
         List containerIds = shipment?.findAllParentContainers()*.id
         deleteContainers(id, containerIds, deleteItems)
+
+        // Delete all unpacked items
+        shipment.unpackedShipmentItems.each { shipmentItem ->
+            shipment.removeFromShipmentItems(shipmentItem)
+            shipmentItem.delete()
+            //shipment.save()
+        }
+
     }
 
 
 	void deleteContainers(String id, List containerIds, boolean deleteItems) {
+        log.info "Delete containers " + containerIds + " from shipment " + id
 		Shipment shipment = Shipment.get(id)
 		if (shipment) {
-			if (!containerIds) {
-				throw new ShipmentException(message: "You must select at least one container to delete", shipment:shipment)
-			}
-			containerIds.each { containerId ->
-				Container container = Container.get(containerId)
-				println ("Contains items: " + container.shipmentItems)
-				if (!deleteItems && container.shipmentItems) {
-					throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
-				}
-				else {
-					container.shipmentItems.each { shipmentItem ->
-						shipment.removeFromShipmentItems(shipmentItem)
-						shipmentItem.delete()
-					}
+            if (containerIds) {
+                containerIds.each { containerId ->
+                    Container container = Container.get(containerId)
+                    println("Contains items: " + container.shipmentItems)
+                    if (!deleteItems && container.shipmentItems) {
+                        throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
+                    } else {
+                        container.shipmentItems.each { shipmentItem ->
+                            shipment.removeFromShipmentItems(shipmentItem)
+                            shipmentItem.delete()
+                        }
 
-				}
-				shipment.removeFromContainers(container);
-				if (container?.parentContainer) {
-					container?.parentContainer?.removeFromContainers(container)
-				}
-				container.delete();
-			}
+                    }
+                    shipment.removeFromContainers(container);
+                    if (container?.parentContainer) {
+                        container?.parentContainer?.removeFromContainers(container)
+                    }
+                    container.delete();
+                }
+            }
 		}
 	}
 
@@ -1712,8 +1719,6 @@ class ShipmentService {
                 throw new RuntimeException("You must enter a valid Pallet if using the Box column for item " + item.productCode)
             }
 
-            //throw new RuntimeException("Expected a different exception")
-
 			// If the location is a warehouse (it manages inventory) then we need to ensure that there's enough of the
 			// item in stock before we add it to the shipment. If the location is a supplier, we don't care.
 			if (location?.isWarehouse()) {
@@ -1725,6 +1730,7 @@ class ShipmentService {
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -1760,7 +1766,7 @@ class ShipmentService {
 
 					// The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
 					Container container = box ?: pallet ?: null
-					log.info("Container " + container)
+					log.info("Container: " + container)
 
 					// Check to see if a shipment item already exists within the given container
 					ShipmentItem shipmentItem = shipment?.findShipmentItem(inventoryItem, container)
@@ -1783,10 +1789,19 @@ class ShipmentService {
 						shipmentItem.quantity = item.quantity;
 					}
 				}
+
+                log.info "Packing list items " + packingListItems
+                log.info "Shipment items  " + shipment?.shipmentItems
+
+                if(packingListItems?.size() != shipment?.shipmentItems?.size()) {
+                    throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but only added ${shipment?.shipmentItems?.size()} shipment items. This usually means that you are trying to add identical items to the same pallet. Please check your packing list for duplicate items.", shipment: shipment)
+                }
+
 			}
 		} catch (ShipmentItemException e) {
 			log.error("Unable to import packing list items due to exception: " + e.message, e)
-			throw e;
+            throw new RuntimeException(e.message)
+			//throw e;
 
 		} catch (Exception e) {
 			log.error("Unable to import packing list items due to exception: " + e.message, e)
