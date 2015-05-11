@@ -1073,6 +1073,44 @@ class ShipmentController {
 		
 		redirect(controller: "inventory", action: "browse")
 	}
+
+
+
+	def exportPackingList = {
+		log.info "Export packing list for shipment " + params
+		Shipment shipment = Shipment.get(params.id)
+		if (!shipment) {
+			throw new Exception("Could not locate shipment with ID " + params.id)
+		}
+
+		OutputStream outputStream = null
+		try {
+            // Write the file to the response
+            ByteArrayOutputStream baos = new ByteArrayOutputStream()
+			response.contentType = "application/vnd.ms-excel"
+			response.setHeader 'Content-disposition', "attachment; filename=\"Shipment ${shipment?.shipmentNumber} - Packing List.xls\""
+			shipmentService.exportPackingList(params.id, baos)
+            response.outputStream << baos.toByteArray()
+            response.outputStream.flush();
+			return;
+
+		} catch (IOException e) {
+			flash.message = "Failed to export packing list due to the following error: " + e.message
+		} catch (Exception e) {
+			log.warn("Failed to export packing list due to the following error: " + e.message, e)
+			flash.message = "Failed to export packing list due to the following error: " + e.message
+		} finally {
+			if (outputStream != null){
+				try {
+					outputStream.close()
+				} catch (IOException e) {
+					log.error('IOException occurred while closing output stream', e)
+				}
+			}
+		}
+        redirect(controller: "shipment", action: "showDetails", id: params.id)
+	}
+
 }
 
 class ReceiveShipmentCommand implements Serializable {

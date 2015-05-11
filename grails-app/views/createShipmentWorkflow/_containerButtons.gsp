@@ -35,7 +35,7 @@
 	<button id="btnAddContents" class="button icon log">
 		<warehouse:message code="shipping.importPackingList.label" default="Import packing list"/></button>
 
-	<g:link controller="createShipmentWorkflow" action="createShipment" event="exportPackingList" id="${shipmentInstance.id}" class="button icon arrowdown">
+	<g:link controller="shipment" action="exportPackingList" id="${shipmentInstance.id}" class="button icon arrowdown">
 		<warehouse:message code="shipping.exportPackingList.label" default="Export packing list"/>
 	</g:link>
 
