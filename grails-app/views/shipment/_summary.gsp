@@ -32,6 +32,12 @@
 					</div>
 
 					<div>
+						<g:if test="${shipmentInstance?.shipmentNumber }">
+							<span class="shipmentNumber">
+								<warehouse:message code="shipping.shipmentNumber.label"/>:
+								<label>${format.metadata(obj:shipmentInstance?.shipmentNumber)}</label>
+							</span>
+						</g:if>
 						<g:if test="${shipmentInstance?.shipmentType }">
 							<span class="shipmentType">
 								<warehouse:message code="shipping.shipmentType.label"/>:
