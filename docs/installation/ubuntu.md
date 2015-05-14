@@ -11,7 +11,7 @@
 
 If you wanted to do this from the shell use wget with the following URL to get the latest WAR file.
 ```
-$ wget https://github.com/openboxes/openboxes/releases/download/v0.6.6/openboxes.war
+$ wget https://github.com/openboxes/openboxes/releases/download/v0.7.0/openboxes.war
 ```
 
 ### Create database 
