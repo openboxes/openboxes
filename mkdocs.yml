@@ -24,6 +24,8 @@ pages:
 - ['configuration.md', 'Configuration', 'Configuration']
 
 # Developer Guide
+- ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
+
 # Continuous Integration
 # User Guide
 # HowTo
