@@ -1639,8 +1639,9 @@ class ShipmentService {
 				log.info("lotNumber: " + lotNumber)
 				log.info("expirationDateString: " + expirationDate)
 				log.info("quantity: " + quantity)
-
-				packingListItems << [palletName: palletName, boxName: boxName, productCode: productCode, productName: productName, lotNumber: lotNumber, expirationDate: expirationDate, quantity: quantity]
+                if (productCode && quantity > 0) {
+                    packingListItems << [palletName: palletName, boxName: boxName, productCode: productCode, productName: productName, lotNumber: lotNumber, expirationDate: expirationDate, quantity: quantity]
+                }
 			}
 			catch (IllegalStateException e) {
 				log.error("Error parsing XLS file " + e.message, e)
@@ -1658,26 +1659,29 @@ class ShipmentService {
 	}
 
     Date getDateCellValue(Cell cell) {
-        Date value
-        try {
-            value = cell.getDateCellValue()
-        }
-        catch (IllegalStateException e) {
-            log.warn("Error parsing string cell value [${cell}]: " + e.message)
-            throw e;
+        Date value = null
+        if (cell) {
+            try {
+                value = cell.getDateCellValue()
+            }
+            catch (IllegalStateException e) {
+                log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
+                //value = Date.parse("dd-MMM-yyyy", getStringCellValue(cell))
+                throw e;
+            }
         }
         return value
 
     }
 
     String getStringCellValue(Cell cell) {
-        String value
+        String value = null
         if (cell) {
             try {
                 value = cell.getStringCellValue()
             }
             catch (IllegalStateException e) {
-                log.warn("Error parsing string cell value [${cell}]: " + e.message)
+                log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
                 value = Integer.valueOf((int) cell.getNumericCellValue())
             }
         }
@@ -1685,14 +1689,16 @@ class ShipmentService {
     }
 
     double getNumericCellValue(Cell cell) {
-        double value
+        double value = 0.0
         if (cell) {
             try {
                 value = cell.getNumericCellValue()
             }
             catch (IllegalStateException e) {
-                log.warn("Error parsing numeric cell value [${cell}]: " + e.message)
+                log.warn("Error parsing numeric cell value [${cell}]: " + e.message, e)
+                //value = Double.parseDouble(getStringCellValue(cell))
                 throw e;
+
             }
         }
         return value
@@ -1794,7 +1800,7 @@ class ShipmentService {
                 log.info "Shipment items  " + shipment?.shipmentItems
 
                 if(packingListItems?.size() != shipment?.shipmentItems?.size()) {
-                    throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but only added ${shipment?.shipmentItems?.size()} shipment items. This usually means that you are trying to add identical items to the same pallet. Please check your packing list for duplicate items.", shipment: shipment)
+                    throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but there were ${shipment?.shipmentItems?.size()} items added to the shipment. This usually means that you are trying to add identical items to the same pallet or you are trying to import a packing list that does not contain items that have already been added to the shipment. Please review your packing list for duplicate or missing items.", shipment: shipment)
                 }
 
 			}
