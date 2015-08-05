@@ -16,7 +16,7 @@ import java.text.MessageFormat
 class StringUtil {
 	
 	public static String mask(String value, String mask) {		
-		return value.replaceFirst(".*", { match -> return "".padLeft(match.length(), mask)})
+		return value ? value?.replaceFirst(".*", { match -> return "".padLeft(match.length(), mask)}) : value
 	}
 
     public static String substitute(text, binding) {
