@@ -1,0 +1,15 @@
+./grails-liquibase.bzr-grailsPlugins.iml
+./grails-liquibase.bzr.iml
+./liquibase.grails.iml
+./target
+./test
+./web-app
+./grails-app/controllers
+./grails-app/domain
+./grails-app/i18n
+./grails-app/services
+./grails-app/taglib
+./grails-app/views
+./grails-app/conf/hibernate
+./grails-app/conf/spring
+./grails-app/utils

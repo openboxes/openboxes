@@ -324,11 +324,11 @@ log4j = {
             //'org.jumpmind',
             //'org.hibernate.jdbc',
             //'org.hibernate.SQL',
-            //'com.gargoylesoftware.htmlunit',
+		   	//'com.gargoylesoftware.htmlunit',
             'org.apache.http.wire'        // shows traffic between htmlunit and server
 
    //trace    'org.hibernate.type.descriptor.sql.BasicBinder',
-   //        'org.hibernate.type'
+   //         'org.hibernate.type'
 
 
 }
@@ -504,33 +504,3 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYearMonthDay, class: org.joda.time.YearMonthDay
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYears, class: org.joda.time.Years
 }
-
-// App-info configuration
-grails.plugins.dynamicController.mixins = [
-    'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.HibernateControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'app.info.custom.example.MyConfigControllerMixin' :
-            'com.burtbeckwith.appinfo_test.AdminManageController'
-]

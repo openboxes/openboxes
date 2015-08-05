@@ -16,6 +16,7 @@ grails.project.test.reports.dir	= "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.plugin.location.spock='spock/'
+grails.plugin.location.liquibase='liquibase/'
 
 // Development configuration property used to enable xrebel features
 //grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
@@ -36,8 +37,9 @@ grails.project.dependency.resolution = {
 
 		mavenLocal()
 		mavenCentral()
-        //mavenRepo "http://download.java.net/maven/2/"
+
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
+        mavenRepo "http://repo.grails.org/grails/plugins/"
 	}
 	
 	dependencies {
@@ -61,7 +63,9 @@ grails.project.dependency.resolution = {
 
         runtime 'org.springframework:spring-test:3.0.5.RELEASE'
 
-        test "org.codehaus.geb:geb-spock:0.6.3"
+        test ("org.codehaus.geb:geb-spock:0.6.3") {
+            exclude 'spock'
+        }
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
         test ('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
         test ('org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0')  { excludes "htmlunit" }
@@ -88,9 +92,9 @@ grails.project.dependency.resolution = {
 
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
-        runtime (':hibernate:1.3.7') { excludes 'antlr' }
-        runtime (':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
-        runtime (':quartz2:2.1.6.2')
+        runtime(':hibernate:1.3.7') { excludes 'antlr' }
+        runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
+        runtime(':quartz2:2.1.6.2')
         test (name:'geb', version:'0.6.3')
 
 
