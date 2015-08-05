@@ -155,6 +155,7 @@ class InventorySnapshotController {
 
         }
         catch (Exception e) {
+            log.error("Exception occurred: " + e.message, e)
             response.status = 500
             render ([errorMessage: e.message] as JSON)
             return;

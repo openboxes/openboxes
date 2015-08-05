@@ -3595,14 +3595,19 @@ class InventoryService implements ApplicationContextAware {
         if (location && date) {
 
             long startTime = System.currentTimeMillis()
+
+            //, productGroups, tags
+            //left outer join fetch product.productGroups as productGroups
+            //left outer join fetch product.tags as tags
+            //
             def results = InventorySnapshot.executeQuery("""
-                    select i.date, i.location.name as location, product, category.name, i.quantityOnHand, pg
+                    select i.date, i.location.name as location, product, category.name, i.quantityOnHand
                     from InventorySnapshot i, Product product, Category category
-                    left outer join product.productGroups as pg
                     where i.location = :location
                     and i.date = :date
                     and i.product = product
                     and i.product.category = category
+                    group by i.date, i.location.name, product
                     """, [location:location, date: date])
 
             log.info "Results: " + results.size()
@@ -3617,8 +3622,10 @@ class InventoryService implements ApplicationContextAware {
                         category            : it[3],
                         productCode         : product.productCode,
                         product             : product.name,
-                        productGroup        : it[5]*.description?.join(":")?:"", //product?.genericProduct?.name,
-                        tags                : product?.tagsToString(),
+                        productGroup        : product.genericProduct?.name,
+                        tags                : product.tagsToString(),
+                        //productGroup        : it[5]*.description?.join(":")?:"", //product?.genericProduct?.name,
+                        //tags                : it[6]*.tag?.join(","),
                         quantityOnHand      : it[4],
                         unitOfMeasure       : product?.unitOfMeasure?:"EA"
                 ]
@@ -3641,7 +3648,7 @@ class InventoryService implements ApplicationContextAware {
                 createOrUpdateInventorySnapshot(date, location)
             }
             else {
-                log.warn "Skipping inventory snapshot for date ${date}, location ${location.name} as it appears to have already been calculated"
+                log.warn "Skipping inventory snapshot for date ${date}, location ${location.name} as ${count} inventory snapshots already exist"
             }
         }
 
@@ -3664,11 +3671,12 @@ class InventoryService implements ApplicationContextAware {
                         //def productQuantityMap = getQuantityByProductMap(location.inventory)
                         def quantityMap = getQuantityOnHandAsOfDate(location, date)
                         def products = quantityMap.keySet();
+                        log.info "Saving inventory snapshot for ${products?.size()} products"
                         products.eachWithIndex { product, index ->
                             def onHandQuantity = quantityMap[product]
                             updateInventorySnapshot(date, product, location, onHandQuantity)
                             if (index % 50 == 0) {
-                                cleanUpGorm()
+                                cleanUpGorm(index)
                             }
                         }
                     }
@@ -3736,7 +3744,78 @@ class InventoryService implements ApplicationContextAware {
         }
     }
 
-    def calculatePendingQuantity(product, location) {
+
+	def createOrUpdateInventoryItemSnapshot(Date date) {
+		def startTime = System.currentTimeMillis()
+		date.clearTime()
+		def locations = getDepotLocations()
+		locations.each { location ->
+
+			def count = InventoryItemSnapshot.countByDateAndLocation(date, location)
+			if (count == 0) {
+				log.info "Creating or updating inventory item snapshot for date ${date} and location ${location.name} ..."
+				createOrUpdateInventoryItemSnapshot(date, location)
+			}
+			else {
+				log.warn "Skipping inventory item snapshot for date ${date} and location ${location.name} as ${count} inventory item snapshots already exist"
+			}
+		}
+		println "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+	}
+
+    def createOrUpdateInventoryItemSnapshot(Date date, Location location) {
+        try {
+            if (!location.isAttached()) {
+                location.attach()
+            }
+            def inventoryItemSnapshots = InventoryItemSnapshot.countByDateAndLocation(date, location)
+            log.info "Date ${date}, location ${location}: " + inventoryItemSnapshots
+            log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
+            // Only process locations with inventory
+            if (location.inventory) {
+
+                def onHandQuantityMap = getQuantityForInventory(location.inventory)
+                def inventoryItems = onHandQuantityMap.keySet();
+
+                log.info "Saving inventory snapshot for ${inventoryItems?.size()} inventory items"
+
+                inventoryItems.eachWithIndex { inventoryItem, index ->
+                    def onHandQuantity = onHandQuantityMap[inventoryItem]
+                    updateInventoryItemSnapshot(date, inventoryItem, location, onHandQuantity)
+                    if (index % 50 == 0) {
+                        cleanUpGorm(index)
+                    }
+                }
+            }
+            log.info "Saved inventory snapshot for all products at location=${location.name} on date=${date}"
+        } catch (Exception e) {
+            log.error("Unable to complete inventory snapshot process", e)
+        }
+    }
+
+	def updateInventoryItemSnapshot(Date date, InventoryItem inventoryItem, Location location, Integer quantityOnHand) {
+		//log.info "Updating inventory snapshot for product " + product.name + " @ " + location.name
+		try {
+			def inventoryItemSnapshot = InventoryItemSnapshot.findWhere(date: date, location: location, product:inventoryItem?.product, inventoryItem: inventoryItem)
+			if (!inventoryItemSnapshot) {
+				inventoryItemSnapshot = new InventoryItemSnapshot(date: date, location: location, product: inventoryItem?.product, inventoryItem: inventoryItem)
+			}
+			//def pendingQuantity = calculatePendingQuantity(product, location)
+			inventoryItemSnapshot.quantityOnHand = quantityOnHand?:0
+			//inventorySnapshot.quantityInbound = pendingQuantity[0]?:0
+			//inventorySnapshot.quantityOutbound = pendingQuantity[1]?:0
+			//inventorySnapshot.lastUpdated = new Date()
+			inventoryItemSnapshot.save()
+		}
+		catch (Exception e) {
+			log.error("Error saving inventory snapshot for inventory item " + inventoryItem + " and location " + location.name, e)
+			throw e;
+		}
+	}
+
+
+
+	def calculatePendingQuantity(product, location) {
         def inboundQuantity = 0;
         def outboundQuantity = 0;
         try {
@@ -3772,19 +3851,19 @@ class InventoryService implements ApplicationContextAware {
         [inboundQuantity, outboundQuantity]
     }
 
-    def cleanUpGorm() {
+    def cleanUpGorm(index) {
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
         propertyInstanceMap.get().clear()
-        printStatus()
+        printStatus(index)
     }
 
-    def printStatus() {
+    def printStatus(index) {
         def batchEnded = System.currentTimeMillis()
         def milliseconds = (batchEnded-lastBatchStarted)
         //def total = (batchEnded-startTime)/1000
-        log.info "Flushed last batch ... took ${milliseconds} ms"
+        log.info "Flushed last batch ${index} ... took ${milliseconds} ms"
         lastBatchStarted = batchEnded
     }
 
@@ -4105,7 +4184,7 @@ class InventoryService implements ApplicationContextAware {
                         id: it[0].id,
                         productCode: it[0].productCode,
                         name: it[0].name,
-                        genericProduct: it[0]?.genericProduct?.name?:"",
+                        //genericProduct: it[0]?.genericProduct?.name?:"",
                         category: it[0]?.category?.name?:"",
                         requisitionCount: it[1],
                         quantityRequested: it[2],
