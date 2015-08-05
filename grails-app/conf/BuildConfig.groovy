@@ -16,7 +16,7 @@ grails.project.test.reports.dir	= "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.plugin.location.spock='spock/'
-grails.plugin.location.liquibase='liquibase/'
+//grails.plugin.location.liquibase='liquibase/'
 
 // Development configuration property used to enable xrebel features
 //grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
