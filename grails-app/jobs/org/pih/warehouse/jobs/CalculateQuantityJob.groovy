@@ -15,7 +15,7 @@ class CalculateQuantityJob {
 
     static triggers = {
         //simple startDelay: 300000, repeatInterval: 1000l * 60 * 10 * 1 * 60 * 24;  // startDelay: 5 minutes, repeatInterval: every 24 hours
-		cron name:'cronTrigger', cronExpression: '0 0 3 * * ?' // cronExpression: at 4am
+		cron name:'cronTrigger', cronExpression: '0 15 4 * * ?' // cronExpression: at 4am
         //cron name:'cronTrigger', startDelay:300000, cronExpression: '0/6 * 15 * * ?' // cronExpression:
 	}
 
