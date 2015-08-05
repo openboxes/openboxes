@@ -16,7 +16,7 @@ grails.project.test.reports.dir	= "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.plugin.location.spock='spock/'
-//grails.plugin.location.liquibase='liquibase/'
+grails.plugin.location.liquibase='liquibase/'
 
 // Development configuration property used to enable xrebel features
 //grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
@@ -73,6 +73,8 @@ grails.project.dependency.resolution = {
 		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
         test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 		test 'dumbster:dumbster:1.6'
+        test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
+
 
 	}
 	plugins {
@@ -90,12 +92,19 @@ grails.project.dependency.resolution = {
         test(name:'spock', version:'0.6')
         */
 
+
+
+        //runtime(":liquibase:1.9.3.6") { excludes 'data-source' }
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
         runtime(':hibernate:1.3.7') { excludes 'antlr' }
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
         runtime(':quartz2:2.1.6.2')
-        test (name:'geb', version:'0.6.3')
+
+        //test(":spock:0.6") {
+        //    exclude "spock-grails-support"
+        //}
+        test(name:'geb', version:'0.6.3') { }
 
 
         // Dependencies that we want to use but cannot due to errors
