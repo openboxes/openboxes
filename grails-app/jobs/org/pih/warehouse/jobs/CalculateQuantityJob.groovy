@@ -14,9 +14,9 @@ class CalculateQuantityJob {
     def mailService
 
     static triggers = {
-        //simple startDelay: 300000, repeatInterval: 1000l * 60 * 10 * 1 * 60 * 24;  // startDelay: 5 minutes, repeatInterval: every 24 hours
-		cron name:'cronTrigger', cronExpression: '0 0 20 * * ?' // cronExpression: at 4am
-        //cron name:'cronTrigger', startDelay:300000, cronExpression: '0/6 * 15 * * ?' // cronExpression:
+        // cron job needs to be triggered after the staging deployment
+		cron name:'cronTrigger', cronExpression: '0 30 7 * * ?' // cronExpression: at 4am
+
 	}
 
 	def execute(context) {
