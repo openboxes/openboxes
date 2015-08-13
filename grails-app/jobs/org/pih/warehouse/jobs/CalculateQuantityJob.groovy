@@ -7,17 +7,17 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 
 class CalculateQuantityJob {
 
     def inventoryService
     def mailService
 
+    // cron job needs to be triggered after the staging deployment
     static triggers = {
-        // cron job needs to be triggered after the staging deployment
-		cron name:'cronTrigger', cronExpression: '0 30 7 * * ?' // cronExpression: at 4am
-
-	}
+		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+    }
 
 	def execute(context) {
         def startTime = System.currentTimeMillis()
