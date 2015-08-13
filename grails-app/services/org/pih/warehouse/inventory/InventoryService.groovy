@@ -654,6 +654,19 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+	def getInventoryItemSnapshot(Location location, Integer daysToExpiry) {
+        def results = InventoryItemSnapshot.executeQuery("""
+            SELECT a.inventoryItem, a.quantityOnHand, DATEDIFF(a.inventoryItem.expirationDate, current_date) as daysToExpiry
+            FROM InventoryItemSnapshot a
+            WHERE a.date = (select max(b.date) from InventoryItemSnapshot b)
+            AND a.location = :location
+            AND a.quantityOnHand > 0
+            AND DATEDIFF(a.inventoryItem.expirationDate, current_date) <= :daysToExpiry
+            ORDER BY a.inventoryItem.expirationDate ASC
+            """, [location:location, daysToExpiry:daysToExpiry])
+        return results
+	}
+
 
 	/**
 	 * Get all expired inventory items for the given category and location.
@@ -665,21 +678,14 @@ class InventoryService implements ApplicationContextAware {
 	List getExpiredStock(Category category, Location location) {
 		
 		long startTime = System.currentTimeMillis()
-		def today = new Date();
-
 		
 		// Stock that has already expired
-		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
+		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc']);
 
 		log.debug expiredStock
 
-		def quantityMap = getQuantityForInventory(location.inventory)
+		Map<InventoryItem, Integer> quantityMap = getQuantityByLocation(location)
 		expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
-
-		// Get the set of categories BEFORE we filter
-		//def categories = [] as Set
-		//categories.addAll(expiredStock.collect { it.product.category })
-		//categories = categories.findAll { it != null }
 
 		// FIXME poor man's filter
 		if (category) {
@@ -705,7 +711,7 @@ class InventoryService implements ApplicationContextAware {
 
 		// Get all stock expiring ever (we'll filter later)
 		def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc']);
-		def quantityMap = getQuantityForInventory(location.inventory)
+		def quantityMap = getQuantityByLocation(location)
 		expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
 		if (category) {
 			expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
@@ -1643,8 +1649,23 @@ class InventoryService implements ApplicationContextAware {
 		return quantityOnHand;
 	}
 
+    /**
+     * Get the most recent quantity on hand from inventory item snapshot table. If there are no
+     * records in the inventory item snapshot table then we calculate the QoH from transactions.
+     *
+     * @param location
+     * @return
+     */
+    Map<InventoryItem, Integer> getQuantityByLocation(Location location) {
+        Map<InventoryItem, Integer> quantityMap = getMostRecentInventoryItemSnapshot(location)
+        if (!quantityMap) {
+            quantityMap = getQuantityForInventory(location?.inventory)
+        }
+        return quantityMap;
+    }
+
 	/**
-	 * Get a map of quantity values for all available inventory items in the given inventory.
+	 * Calculate quantity on hand values for all available inventory items at the given inventory.
 	 *
      * FIXME Use sparingly - this is very expensive because it calculates the QoH over an entire inventory.
      *
@@ -1657,7 +1678,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
     /**
-     * Get a map of quantity values for all available inventory items in the given inventory.
+     * Calculate quantity on hand values for all available inventory items in the given inventory.
      *
      * @param inventory
      * @param products
@@ -1668,6 +1689,25 @@ class InventoryService implements ApplicationContextAware {
         return getQuantityByInventoryItemMap(transactionEntries);
     }
 
+
+    Map<InventoryItem, Integer> getMostRecentInventoryItemSnapshot(Location location) {
+        Map quantityMap = [:]
+        def results = InventoryItemSnapshot.executeQuery("""
+            SELECT a.inventoryItem, a.quantityOnHand, DATEDIFF(a.inventoryItem.expirationDate, current_date) as daysToExpiry
+            FROM InventoryItemSnapshot a
+            WHERE a.date = (select max(b.date) from InventoryItemSnapshot b)
+            AND a.location = :location
+            AND a.quantityOnHand > 0
+            ORDER BY a.inventoryItem.expirationDate ASC
+            """, [location:location])
+
+
+        results.each {
+            quantityMap[it[0]] = it[1]
+        }
+
+        return quantityMap
+    }
 
 	/**
 	 * Fetches and populates a StockCard Command object
@@ -3877,10 +3917,17 @@ class InventoryService implements ApplicationContextAware {
             calculateQuantityOnHand(product, location)
         }
         return quantityMap
-
     }
 
+    def calculateQuantityOnHand(InventoryItem inventoryItem, Location location) {
+        throw new UnsupportedOperationException("Method has not been implemented yet")
+    }
+
+
+
     def calculateQuantityOnHand(Product product, Location location) {
+		long startTime = System.currentTimeMillis()
+
         def quantityOnHand = 0
         def stockCountDate = null
         def mostRecentStockCount = getMostRecentQuantityOnHand(product, location)
@@ -3898,7 +3945,7 @@ class InventoryService implements ApplicationContextAware {
         println "quantityDebit: " + quantityDebit
         println "quantityCredit: " + quantityCredit
 
-
+		log.info ("Time to calculate quantity on hand: " + (System.currentTimeMillis() - startTime) + " ms")
         return quantityOnHand - quantityDebit + quantityCredit
     }
 

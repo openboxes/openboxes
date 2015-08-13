@@ -663,13 +663,13 @@ class InventoryController {
 
 
 	def listExpiredStock = { 
-		def warehouse = Location.get(session.warehouse.id)
+		def location = Location.get(session.warehouse.id)
 		def categorySelected = (params.category) ? Category.get(params.category) : null;		
-		def expiredStock = inventoryService.getExpiredStock(categorySelected, warehouse);
-		def categories = expiredStock?.collect { it.product.category }?.unique()
-		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+		def inventoryItems = inventoryService.getExpiredStock(categorySelected, location);
+		def categories = inventoryItems?.collect { it.product.category }?.unique()
+		def quantityMap = inventoryService.getQuantityByLocation(location)
         def expiredStockMap = [:]
-        expiredStock.each { inventoryItem ->
+		inventoryItems.each { inventoryItem ->
             expiredStockMap[inventoryItem] = quantityMap[inventoryItem]
         }
         if (params.format == "csv") {
@@ -679,7 +679,7 @@ class InventoryController {
             return;
         }
 		
-		[inventoryItems:expiredStock, quantityMap:quantityMap, categories:categories, categorySelected:categorySelected]
+		[inventoryItems:inventoryItems, quantityMap:quantityMap, categories:categories, categorySelected:categorySelected]
 	}
 	
 	
@@ -687,11 +687,11 @@ class InventoryController {
 		def threshold = (params.threshold) ? params.threshold as int : 0;
 		def category = (params.category) ? Category.get(params.category) : null;
 		def location = Location.get(session.warehouse.id)		
-		def expiringStock = inventoryService.getExpiringStock(category, location, threshold)
-		def categories = expiringStock?.collect { it?.product?.category }?.unique().sort { it.name } ;
-		def quantityMap = inventoryService.getQuantityForInventory(location.inventory)
+		def inventoryItems = inventoryService.getExpiringStock(category, location, threshold)
+		def categories = inventoryItems?.collect { it?.product?.category }?.unique().sort { it.name } ;
+		def quantityMap = inventoryService.getQuantityByLocation(location)
         def expiringStockMap = [:]
-        expiringStock.each { inventoryItem ->
+		inventoryItems.each { inventoryItem ->
             expiringStockMap[inventoryItem] = quantityMap[inventoryItem]
         }
 
@@ -702,7 +702,7 @@ class InventoryController {
             return;
         }
 
-		[inventoryItems:expiringStock, quantityMap:quantityMap, categories:categories, 
+		[inventoryItems:inventoryItems, quantityMap:quantityMap, categories:categories,
 			categorySelected:category, thresholdSelected:threshold ]
 	}
 

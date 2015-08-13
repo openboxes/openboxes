@@ -55,8 +55,7 @@
 
                         </div>
                         <h2>
-                            <warehouse:message code="default.results.label" default="Results"/>
-                            | ${inventoryItems.size()} expiring inventory items
+							<warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
                         </h2>
 						<table>
 							<tr>					

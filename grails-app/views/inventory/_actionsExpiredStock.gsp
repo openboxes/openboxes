@@ -1,6 +1,6 @@
 <div class="action-menu" style="padding: 1px;">
 	<button class="action-btn">
-		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/> <warehouse:message code="default.actions.label" default="Actions"/>
 	</button>
 	<div class="actions">
 		<div class="action-menu-item">														
@@ -26,7 +26,7 @@
 		</div>		
 		
 	</div>
-</span>
+</div>
 
 <script>
 	$(document).ready(function() {
