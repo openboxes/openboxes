@@ -100,12 +100,17 @@ grails.project.dependency.resolution = {
         runtime(':hibernate:1.3.7') { excludes 'antlr' }
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
         runtime(':quartz2:2.1.6.2')
+        runtime(":resources:1.1.6")
+        runtime(":zipped-resources:1.0") { excludes 'resources' }
+        runtime(":cached-resources:1.0") { excludes 'resources' }
+        runtime(":cache-headers:1.1.5")
+        runtime(":jquery:1.7.2")
+        runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
 
         //test(":spock:0.6") {
         //    exclude "spock-grails-support"
         //}
         test(name:'geb', version:'0.6.3') { }
-
 
         // Dependencies that we want to use but cannot due to errors
         //compile ":standalone:1.0"
