@@ -111,6 +111,7 @@ grails.project.dependency.resolution = {
         //    exclude "spock-grails-support"
         //}
         test(name:'geb', version:'0.6.3') { }
+        test ":code-coverage:1.2.5" //2.0.3-3
 
         // Dependencies that we want to use but cannot due to errors
         //compile ":standalone:1.0"

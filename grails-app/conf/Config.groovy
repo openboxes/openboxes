@@ -443,7 +443,9 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"// "0 30 7 * * ?"
+
+// Background jobs
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
 
 // LDAP configuration
 openboxes.ldap.enabled = false
