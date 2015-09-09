@@ -29,7 +29,7 @@ class CalculateQuantityJob {
         // System uses yesterday by default if a date is not provided
         if (!date) {
             log.info "Date is being set to yesterday"
-            date = new Date() - 1
+            date = new Date()
             date.clearTime()
         }
 
