@@ -12,7 +12,7 @@
 grails.project.class.dir = "target/classes"
 grails.project.docs.output.dir = "web-app/docs"
 grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir	= "target/test-reports"
+grails.project.test.reports.dir = "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.plugin.location.spock='spock/'
@@ -26,12 +26,12 @@ grails.project.dependency.resolution = {
 	inherits( "global" ) {
 		// uncomment to disable ehcache
 		// excludes 'ehcache'
-        excludes "xml-apis"
+		excludes "xml-apis"
 	}
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 	repositories {
-        //grailsRepo "http://grails.org/plugins"
-        grailsPlugins()
+		//grailsRepo "http://grails.org/plugins"
+		grailsPlugins()
 		grailsHome()
 		grailsCentral()
 
@@ -97,7 +97,8 @@ grails.project.dependency.resolution = {
         //runtime(":liquibase:1.9.3.6") { excludes 'data-source' }
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
-        runtime(':hibernate:1.3.7') { excludes 'antlr' }
+        runtime(':hibernate:1.3.9') { excludes 'antlr' }
+        runtime(':tomcat:1.3.9') 
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
         runtime(':quartz2:2.1.6.2')
         runtime(":resources:1.1.6")
