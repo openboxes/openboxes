@@ -117,6 +117,10 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
+
+// request parameters to mask when logging exceptions
+grails.exceptionresolver.params.exclude = ['password']
+
 grails.validateable.packages = [
 	'org.pih.warehouse.inventory', 
 	'org.pih.warehouse.fulfillment',
@@ -342,6 +346,7 @@ log4j = {
    debug 	'org.apache.cxf',
             'grails.plugin.rendering',
 		   	'org.apache.commons.mail',
+            'grails.plugins.raven',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
