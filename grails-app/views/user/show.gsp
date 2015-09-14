@@ -57,8 +57,7 @@
                             <td valign="top" class="name"><label><warehouse:message
                                     code="default.timezone.label" default="Timezone" /></label></td>
                             <td valign="top" class="value">
-                                ${session?.timezone?.ID}
-                                ${session?.timezone?.displayName}
+                                ${userInstance?.timezone}
                             </td>
                         </tr>
 						<tr class="prop">
