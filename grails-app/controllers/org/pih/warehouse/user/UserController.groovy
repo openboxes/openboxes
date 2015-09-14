@@ -239,6 +239,11 @@ class UserController {
                 updateRoles(userInstance, params.locationRolePairs)
             }
 
+			if (params.timezone) {
+				session.timezone = TimeZone.getTimeZone(params.timezone)
+
+			}
+
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
                 // if this is the current user, update reference to that user in the session
                 if (session.user.id == userInstance?.id) {
