@@ -110,7 +110,7 @@ class UserService {
                 eq("active", Boolean.valueOf(params.status))
             }
 
-            order("lastName", "desc")
+            //order("lastName", "desc")
         }
 
         return results;

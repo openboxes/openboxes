@@ -35,9 +35,9 @@ environments {
 		dataSource {	
 			//dbCreate = "update"
 			url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-			loggingSql = true
-			format_sql = true
-			use_sql_comments = true
+			loggingSql = false
+			format_sql = false
+			use_sql_comments = false
 		}
 	}
 	test {

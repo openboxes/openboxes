@@ -19,6 +19,7 @@ class User extends Person {
     String password;            // encrypted password
     String passwordConfirm;        // password confirm used on signup and password reset
     Locale locale;                // the user's locale
+    String timezone
 
     Date lastLoginDate;            // keep track of the user's last login
     Location warehouse;        // keep track of the user's last warehouse
@@ -46,6 +47,7 @@ class User extends Person {
         })
         passwordConfirm(blank: false)
         locale(nullable: true)
+        timezone(nullable:true)
         lastLoginDate(nullable: true)
         //useSavedLocation(nullable:true)
         warehouse(nullable: true)
