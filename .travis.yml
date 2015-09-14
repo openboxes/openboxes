@@ -1,11 +1,15 @@
 language: groovy
-
 jdk:
 - openjdk7
-
 before_install:
 - sudo add-apt-repository -y ppa:groovy-dev/grails
 - sudo apt-get update
 - sudo apt-get install grails-1.3.9
-
-script: "grails test-app unit: --non-interactive"
+script: 'grails test-app unit: --non-interactive'
+cache:
+  directories:
+  - "$HOME/.grails"
+  - "$HOME/.ivy2"
+notifications:
+  slack:
+    secure: NJ2bhtLK2Xn0vPfq/lAxehuwLshp50Uep1mHMTbiQ7WK/YxNhLbrjgIbh9ZcM/UxZ4AhYX3Wv4VUI9iyEa06XUNTtxaM3ia8Eqao1wTVMl9N0RvU+VgHINORmyZZlf4MNBOZItwsmZT2b094gAfPIg7r8VuCo1wVqGjubVfTeUQ=
