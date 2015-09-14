@@ -78,9 +78,11 @@ grails.project.dependency.resolution = {
 
 	}
 	plugins {
-        compile ":rendering:0.4.4"
 
-        runtime( ':constraints:0.6.0' )
+		compile ":rendering:0.4.4"
+		compile ":raven:0.5.8"
+
+		runtime( ':constraints:0.6.0' )
         runtime( ':jquery-validation:1.9' ) { // 1.7.3
             excludes 'constraints'
         }
@@ -91,9 +93,6 @@ grails.project.dependency.resolution = {
            we've included our own build of it.
         test(name:'spock', version:'0.6')
         */
-
-
-
         //runtime(":liquibase:1.9.3.6") { excludes 'data-source' }
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
