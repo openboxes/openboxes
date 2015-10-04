@@ -21,8 +21,8 @@
         <thead>
             <tr>
                 <%--
-                <th>Date</th>
-                <th>Location</th>--%>
+                <th>Date</th>--%>
+                <th>Location</th>
                 <th>SKU</th>
                 <th>Product</th>
                 <th>Product group</th>
@@ -154,7 +154,7 @@
             ],
             "aoColumns": [
                // { "mData": "date" }, // 0
-               // { "mData": "location" }, // 1
+                { "mData": "location" }, // 1
                 { "mData": "productCode" }, // 2
                 { "mData": "product" }, // 2
                 { "mData": "productGroup" }, // 2
