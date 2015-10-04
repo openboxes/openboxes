@@ -28,35 +28,34 @@ class CalculateQuantityJob {
 
         // System uses yesterday by default if a date is not provided
         if (!date) {
-            log.info "Date is being set to yesterday"
+            log.info "Date is being set to midnight tonight"
             date = new Date()
-            date.clearTime()
+            //date.clearTime()
         }
 
         log.info "Executing calculate quantity job for date=${date}, user=${user}, location=${location}, product=${product}, mergedJobDataMap=${context.mergedJobDataMap}"
 
-
+        // Triggered ??
         if (product && date && location) {
             println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(date, location, product)
         }
+        // Triggered by the inventory snapshot tab off the product page
         else if (product && location) {
             println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(location, product)
         }
+        // Triggered by the Inventory Snapshot page
         else if (date && location) {
             println "Triggered calculate quantity job for all products at ${location} on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(date, location)
             inventoryService.createOrUpdateInventoryItemSnapshot(date, location)
         }
+        // Triggered by the CalculateQuantityJob
         else if (date) {
             println "Triggered calculate quantity job for all locations and products on ${date}"
             inventoryService.createOrUpdateInventorySnapshot(date)
             inventoryService.createOrUpdateInventoryItemSnapshot(date)
-        }
-        else if (location) {
-            println "Triggered calculate quantity job for all products at location ${location} over all dates"
-            inventoryService.createOrUpdateInventorySnapshot(location)
         }
         else {
             println "Triggered calculate quantity job for all dates, locations, products"
