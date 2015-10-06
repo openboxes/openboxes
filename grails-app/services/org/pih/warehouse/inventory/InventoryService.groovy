@@ -3708,9 +3708,9 @@ class InventoryService implements ApplicationContextAware {
 							products.eachWithIndex { product, index ->
 								//log.info "Saving inventory snapshot for product[${index}]: " + product
 								def onHandQuantity = quantityMap[product]
-								def insertStmt = "insert into inventory_snapshot(version,date,location_id,product_id,inventory_item_id,quantity_on_hand) " +
-										"values (0,'${dateString}','${location?.id}','${product?.id}',NULL,${onHandQuantity}) " +
-										"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}"
+								def insertStmt = "insert into inventory_snapshot(id,version,date,location_id,product_id,inventory_item_id,quantity_on_hand,date_created,last_updated) " +
+										"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${product?.id}',NULL,${onHandQuantity},now(),now()) " +
+										"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity},last_updated=now()"
 								stmt.addBatch(insertStmt)
 							}
 							stmt.executeBatch()
@@ -4030,7 +4030,7 @@ class InventoryService implements ApplicationContextAware {
 
         // Get the inventory levels for all products at the given location
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
-        log.info inventoryLevelMap
+        //log.info inventoryLevelMap
 
         // Group entries by generic product
         genericProductMap = entries.inject([:].withDefault { [
