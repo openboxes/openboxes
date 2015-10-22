@@ -24,18 +24,21 @@ You must not remove this notice, or any other, from this software.
 
 #### Install Dependencies
 
-* [Eclipse IDE for Java EE Developers](http://www.eclipse.org/downloads)
+Required
 * Java 7
 * MySQL 5.5+
 * Tomcat 7 (optional for dev envrionment)
 * [SDK Man] (http://sdkman.io/install.html)
 * [Grails 1.3.9](http://grails.org/download/archive/Grails)
 
+Optional
+* [IntelliJ IDEA 14.1] (https://www.jetbrains.com/idea/download/)
+
 #### Basic setup instructions for developers
 
 These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](https://github.com/openboxes/openboxes/wiki/Installation) page.
 
-##### 1. Install dependencies
+##### 1. Install Dependencies
 Install dependencies above
 
 ##### 2. Install Grails
