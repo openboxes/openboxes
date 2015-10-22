@@ -27,7 +27,6 @@ You must not remove this notice, or any other, from this software.
 Required
 * Java 7
 * MySQL 5.5+
-* Tomcat 7 (optional for dev envrionment)
 * [SDK Man] (http://sdkman.io/install.html)
 * [Grails 1.3.9](http://grails.org/download/archive/Grails)
 
