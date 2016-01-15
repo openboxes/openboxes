@@ -51,6 +51,7 @@ public enum ReasonCode {
     NOT_ON_STOCK_LIST(18),
     INSUFFICIENT_QUANTITY_RECONDITIONED(19),
     SUBSTITUTION_WITHIN_PRODUCT_GROUP(20),
+    SUPPLIED_BY_GOVERNMENT(21),
     OTHER(100)
 
 
@@ -81,6 +82,7 @@ public enum ReasonCode {
                 SUPPLY_MAX_QUANTITY,
                 NOT_ON_STOCK_LIST,
                 INSUFFICIENT_QUANTITY_RECONDITIONED,
+                SUPPLIED_BY_GOVERNMENT,
                 OTHER]
     }
 
@@ -101,6 +103,7 @@ public enum ReasonCode {
                 SUPPLY_MAX_QUANTITY,
                 NOT_ON_STOCK_LIST,
                 INSUFFICIENT_QUANTITY_RECONDITIONED,
+                SUPPLIED_BY_GOVERNMENT,
                 OTHER
         ]
 	}
@@ -120,6 +123,7 @@ public enum ReasonCode {
                 SUPPLY_MAX_QUANTITY,
                 NOT_ON_STOCK_LIST,
                 INSUFFICIENT_QUANTITY_RECONDITIONED,
+                SUPPLIED_BY_GOVERNMENT,
                 OTHER
         ]
     }
@@ -134,6 +138,7 @@ public enum ReasonCode {
                 SUPPLY_MAX_QUANTITY,
                 NOT_ON_STOCK_LIST,
                 INSUFFICIENT_QUANTITY_RECONDITIONED,
+                SUPPLIED_BY_GOVERNMENT,
                 OTHER
         ]
     }
