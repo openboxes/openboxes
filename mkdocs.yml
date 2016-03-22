@@ -12,7 +12,9 @@ google_analytics: ['UA-37396941-2', 'OpenBoxes']
 pages:
 
 # About:
-- ['index.md', 'About', 'OpenBoxes']
+- ['index.md', 'About', 'Introduction']
+- ['index.md', 'About', 'Benefits']
+- ['index.md', 'About', 'Drawbacks']
 
 # Installation
 - ['installation/index.md', 'Installation',  'Overview']
@@ -21,9 +23,15 @@ pages:
 #- ['installation/windows.md', 'Installation', 'Windows']
 
 # Configuration
-- ['configuration.md', 'Configuration', 'Configuration']
+- ['configuration.md', 'Configuration Guide', 'Configuration']
+
+# Configuration
+- ['user-guide/introduction.md', 'User Guide', 'Introduction']
+
 
 # Developer Guide
+- ['developer-guide/introduction.md', 'Developer Guide', 'Introduction']
+- ['developer-guide/getting-started.md', 'Developer Guide', 'Getting Started']
 - ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
 
 # Continuous Integration
