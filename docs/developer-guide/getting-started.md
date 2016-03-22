@@ -22,8 +22,6 @@ sudo apt-get install openjdk7
 sudo apt-get install mysql-server
 ```
 
-
-
 ##### 2. Install Grails
 Check that you have SDK Man installed properly (otherwise follow instructions on the skdman install page).
 ```
