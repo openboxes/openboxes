@@ -1,10 +1,11 @@
 <html>
-   <head>
+    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="messagePrefix" value="${incoming ? 'shipping.shipmentsTo' : 'shipping.shipmentsFrom'}"/>
         <title><warehouse:message code="${messagePrefix}.label" args="[session.warehouse.name]"/></title>
-    </head>    
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.css" type="text/css" media="all" />
+   </head>
     <body>
         <div class="body">
             <g:if test="${flash.message}">
@@ -16,10 +17,14 @@
 
                 </div>
                 <div class="yui-u">
-                    <g:form action="list" method="post">
+
+
+                    <g:form name="listForm" action="bulkReceiveShipments" method="post">
                         <g:if test="${incoming}">
                             <g:hiddenField name="type" value="incoming"/>
                         </g:if>
+
+
 
                         <g:set var="shipments" value="${shipments.sort { it.status.code }}"/>
                         <g:set var="shipmentMap" value="${shipments.groupBy { it.status.code }}"/>
@@ -37,8 +42,27 @@
                                 </ul>
                                 <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
                                     <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
-                                        <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode]]"/>
 
+
+                                        <g:if test="${shipmentStatusCode== org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
+                                            <div class="button-group">
+                                                <button id="bulkReceive" type="submit" class="button icon approve">
+                                                    <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
+                                                </button>
+                                                <button id="bulkMarkAsReceived" type="submit" class="button icon tag">
+                                                    <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
+                                                </button>
+                                            </div>
+                                        </g:if>
+                                        <g:if test="${shipmentStatusCode== org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+                                            <div class="button-group">
+                                                <button id="bulkRollback" type="submit" class="button icon approve">
+                                                    <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                                                </button>
+                                            </div>
+                                        </g:if>
+
+                                        <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode], statusCode:shipmentStatusCode]"/>
                                     </div>
                                 </g:each>
                             </div>
@@ -59,7 +83,10 @@
                 </div>
             </div>
 			
-        </div>		
+        </div>
+
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 		<script type="text/javascript">
 			$(function() { 		
 				//$(".clear-dates").click(function() {
@@ -84,8 +111,39 @@
 
 		    	var index = $('.tabs li a').index($('a[href="#add"]').get(0));
 		    	$('.tabs').tabs({selected: index});
-				
+
+
+                $("#bulkReceive").click(function(event){
+                    event.preventDefault();
+                    $("#listForm").attr("action", "bulkReceiveShipments")
+                    $("#listForm").submit();
+                });
+
+                $("#bulkRollback").click(function(event){
+                    event.preventDefault();
+                    $("#listForm").attr("action", "bulkRollbackShipments")
+                    $("#listForm").submit();
+                });
+
+                $("#bulkMarkAsReceived").click(function(event){
+                    event.preventDefault();
+                    $("#listForm").attr("action", "markShipmentsAsReceived")
+                    $("#listForm").submit();
+                });
+
+
+                $(".checkAll").change(function () {
+                    var status = $(this).data("status");
+                    $("input:checkbox." + status).prop('checked', $(this).prop("checked"));
+                });
+
 			});
+
+            $(document).ready(function(){
+                $('.dataTable').dataTable({
+                    "bJQueryUI": true
+                });
+            });
         </script>
         
     </body>
