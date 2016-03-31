@@ -94,21 +94,23 @@
                         <g:set var="today" value="${new Date() }" />
                         <format:metadata obj="${shipmentInstance?.status.code}" />
                         <g:if test="${shipmentInstance?.status.date}">
-    						<g:if test="${shipmentInstance?.status?.date?.equals(today) }">
-								<warehouse:message code="default.today.label" />
-							</g:if>
-							<g:else>
-								<g:prettyDateFormat date="${shipmentInstance?.status?.date}" />
-							</g:else>
+                            <div title="${g.formatDate(date: shipmentInstance?.status?.date)}">
+                                <g:if test="${shipmentInstance?.status?.date?.equals(today) }">
+                                    <warehouse:message code="default.today.label" />
+                                </g:if>
+                                <g:else>
+                                    <g:prettyDateFormat date="${shipmentInstance?.status?.date}" />
+                                </g:else>
+                            </div>
 							<%--
-						<format:date obj="${shipmentInstance?.status.date}"/>
-						--%>
+						        <format:date obj="${shipmentInstance?.status.date}"/>
+    						--%>
 						</g:if>
                         <g:else>
 						- Expected to ship
-						<%--
-						<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
-						--%>
+                            <%--
+                                <format:date obj="${shipmentInstance?.expectedShippingDate}"/>
+                            --%>
 							<g:if
 								test="${shipmentInstance?.expectedShippingDate?.equals(today) }">
 								<warehouse:message code="default.today.label" />
@@ -117,9 +119,13 @@
 								<g:prettyDateFormat
 									date="${shipmentInstance?.expectedShippingDate}" />
 							</g:else>
-						</g:else></td>
-					<td class="middle center"><format:date
-							obj="${shipmentInstance?.lastUpdated}" /></td>
+						</g:else>
+                    </td>
+					<td class="middle center">
+                        <div title="${g.formatDate(date: shipmentInstance?.lastUpdated)}">
+                            ${g.formatDate(date: shipmentInstance?.lastUpdated)}
+                        </div>
+                    </td>
 				</tr>
 			</g:each>
 		</tbody>

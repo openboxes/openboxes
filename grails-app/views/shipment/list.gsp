@@ -140,7 +140,9 @@
 			});
 
             $(document).ready(function(){
-                $('.dataTable').dataTable();
+                $('.dataTable').dataTable({
+                    "bJQueryUI": true
+                });
             });
         </script>
         
