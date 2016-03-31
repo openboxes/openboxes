@@ -1,6 +1,6 @@
 <div class="list box">
     <h2>${warehouse.message(code:'shipments.label')}</h2>
-	<table>
+	<table id="shipments" class="dataTable">
 		<thead>
 			<tr>
                 <%--
@@ -8,6 +8,9 @@
 					${warehouse.message(code: 'default.actions.label')}
 				</th>
 				--%>
+				<th>
+                    <g:checkBox class="checkAll" data-status="${statusCode}" name="checkAll"/>
+				</th>
 				<th>
 				</th>
 				<th class="center">
@@ -58,6 +61,9 @@
 						</div>
 					</td>
 					--%>
+                    <td>
+                        <g:checkBox class="${shipmentInstance?.status.code}" name="shipment.id" value="${shipmentInstance.id}" checked="${params['shipment.id']}" />
+                    </td>
 					<td class="center middle"><img
 						src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
@@ -84,10 +90,11 @@
                         ${fieldValue(bean: shipmentInstance, field: "destination.name")}
 					</td>
 
-					<td class="middle"><g:set var="today" value="${new Date() }" /> <format:metadata
-							obj="${shipmentInstance?.status.code}" /> <g:if
-							test="${shipmentInstance?.status.date}">
-						<g:if test="${shipmentInstance?.status?.date?.equals(today) }">
+					<td class="middle">
+                        <g:set var="today" value="${new Date() }" />
+                        <format:metadata obj="${shipmentInstance?.status.code}" />
+                        <g:if test="${shipmentInstance?.status.date}">
+    						<g:if test="${shipmentInstance?.status?.date?.equals(today) }">
 								<warehouse:message code="default.today.label" />
 							</g:if>
 							<g:else>
@@ -96,7 +103,8 @@
 							<%--
 						<format:date obj="${shipmentInstance?.status.date}"/>
 						--%>
-						</g:if> <g:else>
+						</g:if>
+                        <g:else>
 						- Expected to ship
 						<%--
 						<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
