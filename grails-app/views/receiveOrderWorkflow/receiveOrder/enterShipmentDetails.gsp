@@ -28,9 +28,11 @@
 			<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
 			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>			
 			<div class="dialog">
-				<div class="box">
+
+			<g:render template="../order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
+
+			<div class="box">
 					<h2>${warehouse.message(code:'order.wizard.enterShipmentDetails.label', default: 'Enter shipment details')}</h2>
-					<g:render template="../order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
 					<table>
 						<tbody>
 							<tr class='prop'>
