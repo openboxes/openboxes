@@ -1,6 +1,6 @@
 <div class="list box">
     <h2>${warehouse.message(code:'shipments.label')}</h2>
-	<table id="shipments" class="dataTable">
+	<table class="dataTable">
 		<thead>
 			<tr>
                 <%--

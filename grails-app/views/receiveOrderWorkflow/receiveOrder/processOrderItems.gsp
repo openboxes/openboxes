@@ -26,9 +26,9 @@
 				
 		<g:form action="receiveOrder" autocomplete="off">
 			<div class="dialog">
+				<g:render template="../order/summary" model="[orderInstance:order, currentState:'processOrderItems']"/>
 				<div class="box">
 					<h2>${warehouse.message(code: 'order.wizard.receiveItems.label', default: 'Receive order items')}</h2>
-					<g:render template="../order/summary" model="[orderInstance:order, currentState:'processOrderItems']"/>
 					<hr/>
 					<table>
 						<tr class="">

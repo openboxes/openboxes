@@ -27,7 +27,7 @@ class OrderService {
 	def identifierService
 	def inventoryService
 	
-	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
+	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, User orderedBy, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
 			and {
 				eq("destination", orderPlacedBy)
@@ -35,6 +35,7 @@ class OrderService {
 				if (status) { eq("status", status) }
 				if (orderedFromDate) { ge("dateOrdered", orderedFromDate) }
 				if (orderedToDate) { le("dateOrdered", orderedToDate) }
+				if (orderedBy) { eq("orderedBy", orderedBy)}
 			}
 		}
 		return orders
@@ -172,8 +173,8 @@ class OrderService {
 			
 			// FIXME 
 			// receiptInstance.validate() && !receiptInstance.hasErrors()
-			if (!receiptInstance.hasErrors() && receiptInstance.save()) { 
-				shipmentService.receiveShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation, true);
+			if (!receiptInstance.hasErrors() && receiptInstance.save()) {
+                shipmentService.receiveShipment(shipmentInstance?.id, null, orderCommand?.currentUser?.id, orderCommand?.currentLocation?.id, true);
 			}
 			else { 
 				throw new ShipmentException(message: "Unable to save receipt ", shipment: shipmentInstance)
