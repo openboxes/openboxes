@@ -19,8 +19,8 @@ pages:
 # Installation
 - ['installation/index.md', 'Installation',  'Overview']
 - ['installation/ubuntu.md', 'Installation', 'Ubuntu']
-#- ['installation/mac.md', 'Installation', 'Mac OS X']
-#- ['installation/windows.md', 'Installation', 'Windows']
+- ['installation/mac.md', 'Installation', 'Mac OS X']
+- ['installation/windows.md', 'Installation', 'Windows']
 
 # Configuration
 - ['configuration.md', 'Configuration Guide', 'Configuration']
