@@ -57,7 +57,8 @@
     </div>
 </g:if>
 --%>
-<div class="summary">
+
+<div class="summary box">
 	<g:if test="${orderInstance?.id}">
 		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
 		<g:set var="isAddingDocument" value="${request.request.requestURL.toString().contains('addDocument')}"/>
@@ -69,11 +70,10 @@
                     </td>
 					<td>
                         <div class="title">
-                            <g:link controller="order" action="show" id="${orderInstance?.id}">${orderInstance?.description}</g:link>
+                            <g:link controller="order" action="show" id="${orderInstance?.id}">
+                                <small><warehouse:message code="order.label"/> ${orderInstance?.orderNumber}</small>
+                                ${orderInstance?.description}</g:link>
 						</div>
-                        <div class="subtitle">
-                            <g:link controller="order" action="show" id="${orderInstance?.id}"><warehouse:message code="order.label"/> ${orderInstance?.orderNumber}</g:link>
-                        </div>
 
                     </td>
                     <td class="top right" width="1%">
@@ -81,9 +81,8 @@
                             <format:metadata obj="${orderInstance?.status}"/>
                         </div>
                     </td>
-
                 </tr>
-                <tr class="odd prop">
+                <tr class=" prop">
                     <td></td>
                     <td>
                         <div>

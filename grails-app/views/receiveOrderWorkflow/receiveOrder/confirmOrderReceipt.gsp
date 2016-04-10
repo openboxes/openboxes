@@ -36,9 +36,10 @@
 		</g:hasErrors>
 		
 		<g:form action="receiveOrder" method="post">
+			<g:render template="../order/summary" model="[orderInstance:order,currentState:'confirmOrderReceipt']"/>
+
 			<div class="dialog">
 				<fieldset>
-					<g:render template="../order/summary" model="[orderInstance:order,currentState:'confirmOrderReceipt']"/>
 
 					<table>
 						<tbody>

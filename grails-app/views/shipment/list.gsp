@@ -4,7 +4,6 @@
         <meta name="layout" content="custom" />
         <g:set var="messagePrefix" value="${incoming ? 'shipping.shipmentsTo' : 'shipping.shipmentsFrom'}"/>
         <title><warehouse:message code="${messagePrefix}.label" args="[session.warehouse.name]"/></title>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.css" type="text/css" media="all" />
    </head>
     <body>
         <div class="body">
@@ -18,14 +17,10 @@
                 </div>
                 <div class="yui-u">
 
-
                     <g:form name="listForm" action="bulkReceiveShipments" method="post">
                         <g:if test="${incoming}">
                             <g:hiddenField name="type" value="incoming"/>
                         </g:if>
-
-
-
                         <g:set var="shipments" value="${shipments.sort { it.status.code }}"/>
                         <g:set var="shipmentMap" value="${shipments.groupBy { it.status.code }}"/>
                         <g:if test="${shipments.size()}">
@@ -86,7 +81,6 @@
         </div>
 
 
-        <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 		<script type="text/javascript">
 			$(function() { 		
 				//$(".clear-dates").click(function() {
@@ -139,11 +133,6 @@
 
 			});
 
-            $(document).ready(function(){
-                $('.dataTable').dataTable({
-                    "bJQueryUI": true
-                });
-            });
         </script>
         
     </body>

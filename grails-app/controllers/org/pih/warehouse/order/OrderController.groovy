@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -37,17 +38,25 @@ class OrderController {
 		def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+        def orderedBy = params.orderedById ? User.get(params.orderedById) : null
 				
-		def orders = orderService.getOrdersPlacedByLocation(destination, origin, status, statusStartDate, statusEndDate)
+		def orders = orderService.getOrdersPlacedByLocation(destination, origin, orderedBy, status, statusStartDate, statusEndDate)
 		
 		// sort by order date
 		orders = orders.sort( { a, b ->
 			return b.dateOrdered <=> a.dateOrdered
 		} )
 
+		def totalPrice = 0.00
+		if (orders) {
+			totalPrice = orders.sum { it.totalPrice() }
+		}
+
+        def orderedByList = orders.collect { it.orderedBy }.unique()
+
 		[ orders:orders, origin:origin?.id, destination:destination?.id,
 		  status:status, statusStartDate:statusStartDate, statusEndDate:statusEndDate,
-		  suppliers : suppliers
+		  suppliers : suppliers, totalPrice:totalPrice, orderedByList: orderedByList
 		]
     }
 
