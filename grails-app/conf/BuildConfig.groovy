@@ -40,6 +40,7 @@ grails.project.dependency.resolution = {
 
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
         mavenRepo "http://repo.grails.org/grails/plugins/"
+        mavenRepo "http://repo.grails.org/grails/core/"
 	}
 	
 	dependencies {
