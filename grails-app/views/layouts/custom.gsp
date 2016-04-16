@@ -533,6 +533,15 @@
                     type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");
     </script>
     <!--End of Zopim Live Chat Script-->
+
+    <g:if test="${session.user}">
+        <script>
+            $zopim(function() {
+                $zopim.livechat.setName('${session?.user?.name}');
+                $zopim.livechat.setEmail('${session?.user?.email}');
+            });
+        </script>
+    </g:if>
 </g:if>
 <r:layoutResources/>
 
