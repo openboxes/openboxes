@@ -4018,7 +4018,6 @@ class InventoryService implements ApplicationContextAware {
 
         // Get the inventory levels for all products at the given location
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
-        log.info inventoryLevelMap
 
         // Group entries by generic product
         genericProductMap = entries.inject([:].withDefault { [
