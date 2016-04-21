@@ -58,7 +58,7 @@
 </g:if>
 --%>
 
-<div class="summary box">
+<div id="order-summary" class="summary">
 	<g:if test="${orderInstance?.id}">
 		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
 		<g:set var="isAddingDocument" value="${request.request.requestURL.toString().contains('addDocument')}"/>
@@ -90,21 +90,21 @@
                                 <tr>
                                     <td>
                                         <div class="order-number">
-                                            <label class="fade"><warehouse:message code="order.orderNumber.label"/></label>
-                                            <b>${orderInstance?.orderNumber}</b>
+                                            <label><warehouse:message code="order.orderNumber.label"/></label>
+                                            ${orderInstance?.orderNumber}
                                         </div>
                                     </td>
                                     <td>
                                         <div class="ordered-date">
-                                            <label class="fade"><warehouse:message code="order.dateOrdered.label"/></label>
-                                            <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
+                                            <label><warehouse:message code="order.dateOrdered.label"/></label>
+                                            <format:date obj="${orderInstance?.dateOrdered}"/>
                                         </div>
                                     </td>
                                     <td>
                                         <g:if test="${orderInstance?.orderedBy }">
                                             <div class="ordered-by">
-                                                <label class="fade"><warehouse:message code="order.orderedBy.label"/></label>
-                                                <b>${orderInstance?.orderedBy?.name }</b>
+                                                <label><warehouse:message code="order.orderedBy.label"/></label>
+                                                ${orderInstance?.orderedBy?.name }
                                             </div>
                                         </g:if>
                                     </td>
@@ -112,26 +112,24 @@
                                 <tr>
                                     <td>
                                         <div class="total-price">
-                                            <label class="fade"><warehouse:message code="order.totalPrice.label"/></label>
-                                            <b><g:formatNumber number="${orderInstance?.totalPrice()?:0 }"/>
-                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</b>
+                                            <label><warehouse:message code="order.totalPrice.label"/></label>
+                                            <g:formatNumber number="${orderInstance?.totalPrice()?:0 }"/>
+                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </div>
-
-
                                     </td>
                                     <td>
                                         <g:if test="${orderInstance?.destination }">
                                             <div class="destination">
-                                                <label class="fade"><warehouse:message code="order.destination.label"/></label>
-                                                <b>${orderInstance?.destination?.name }</b>
+                                                <label><warehouse:message code="order.destination.label"/></label>
+                                                ${orderInstance?.destination?.name }
                                             </div>
                                         </g:if>
 
                                     </td>
                                     <td>
                                         <div class="origin">
-                                            <label class="fade"><warehouse:message code="order.origin.label"/></label>
-                                            <b>${orderInstance?.origin?.name }</b>
+                                            <label><warehouse:message code="order.origin.label"/></label>
+                                            ${orderInstance?.origin?.name }
                                         </div>
 
                                     </td>
