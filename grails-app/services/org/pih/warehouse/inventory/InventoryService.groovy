@@ -3172,18 +3172,15 @@ class InventoryService implements ApplicationContextAware {
         Integer maxSize = inventoryItemKeys.size()
 
         if (n > maxSize) {
-            throw new RuntimeException("You cannot request more items than are available at this location [requested=${n},available=${maxSize}].")
+            n = maxSize
+            //throw new RuntimeException("You cannot request more items than are available at this location [requested=${n},available=${maxSize}].")
         }
 
         Random random = new Random()
         def randomIntegerList = []
         (1..n).each {
-            println "n: " + n
-            println "maxSize: " + maxSize
             def randomIndex = random.nextInt(maxSize)
-            println "randomIndex: " + randomIndex
             def inventoryItem = inventoryItemKeys.get(randomIndex)
-            println "lotNumber: " + inventoryItem.lotNumber
             inventoryItems << inventoryItem
         }
         return inventoryItems;
