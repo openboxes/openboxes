@@ -25,7 +25,7 @@
 						</g:if>
 						<g:else>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
-								${shipmentInstance?.shipmentNumber}
+								<small>${shipmentInstance?.shipmentNumber}</small>
 								${shipmentInstance?.name}
 							</g:link>
 						</g:else>
