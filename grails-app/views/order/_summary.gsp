@@ -71,7 +71,7 @@
 					<td>
                         <div class="title">
                             <g:link controller="order" action="show" id="${orderInstance?.id}">
-                                <small><warehouse:message code="order.label"/> ${orderInstance?.orderNumber}</small>
+                                <small>${orderInstance?.orderNumber}</small>
                                 ${orderInstance?.description}</g:link>
 						</div>
 
@@ -189,6 +189,15 @@
             <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
         </g:link>
+        <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
+        </g:link>
+
+        <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
+        </g:link>
     </div>
 
     <div class="button-group">
@@ -216,35 +225,19 @@
                 ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
             </g:link>
         </g:else>
-    </div>
-
-
-    <div class="button-group">
-
-        <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
-        </g:link>
-
-        <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
-        </g:link>
-    </div>
-
-    <div class="button-group">
-
         <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank">
             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.printOrder.label" default="Print"/>
+            <warehouse:message code="order.wizard.printOrder.label" default="Print PO"/>
         </g:link>
 
         <g:link controller="order" action="download" id="${orderInstance?.id}" class="button" target="_blank">
             <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.downloadOrder.label" default="Download"/>
+            <warehouse:message code="order.wizard.downloadOrder.label" default="Download Order"/>
+        </g:link>
+        <g:link controller="order" action="downloadOrderItems" id="${orderInstance?.id}" class="button" target="_blank">
+            <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+            <warehouse:message code="order.wizard.downloadOrderItems.label" default="Download Items Only"/>
         </g:link>
     </div>
-
-
-
 </div>
+

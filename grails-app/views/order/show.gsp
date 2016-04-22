@@ -38,10 +38,9 @@
                         </ul>
                         <div id="tabs-items" style="padding: 10px;" class="ui-tabs-hide">
                             <g:if test="${orderInstance?.orderItems }">
-                                <table>
+                                <table class="table table-bordered">
                                     <thead>
                                     <tr class="odd">
-                                        <th><warehouse:message code="default.type.label" /></th>
                                         <th><warehouse:message code="product.productCode.label" /></th>
                                         <th><warehouse:message code="product.label" /></th>
                                         <th><warehouse:message code="order.qtyOrdered.label" /></th>
@@ -53,17 +52,6 @@
                                     <tbody>
                                     <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                                         <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}">
-                                            <td>
-                                                <g:if test="${orderItem?.product }">
-                                                    <warehouse:message code="product.label" />
-                                                </g:if>
-                                                <g:elseif test="${orderItem?.category }">
-                                                    <warehouse:message code="category.label" />
-                                                </g:elseif>
-                                                <g:else>
-                                                    <warehouse:message code="default.unclassified.label" />
-                                                </g:else>
-                                            </td>
                                             <td>
                                                 ${orderItem?.product?.productCode?:""}
                                             </td>
@@ -98,6 +86,18 @@
                                         </tr>
                                     </g:each>
                                     </tbody>
+                                    <tfoot>
+                                        <tr class="">
+                                            <th colspan="5" class="left">
+                                                <warehouse:message code="default.total.label"/>
+                                            </th>
+                                            <th colspan="1" class="left">
+                                                <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
+                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                            </th>
+                                        </tr>
+                                    </tfoot>
+
                                 </table>
                             </g:if>
                             <g:else>

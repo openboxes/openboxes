@@ -186,7 +186,7 @@
 						<span class="formButton"> 
 							<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
 							<g:submitButton name="submit" value="${warehouse.message(code:'default.button.finish.label')}" class="button"></g:submitButton>
-							<g:link action="receiveOrder" event="cancel" class="button"><warehouse:message code="default.button.cancel.label"/></g:link>
+
 						</span>
 					</div>
 				</fieldset>

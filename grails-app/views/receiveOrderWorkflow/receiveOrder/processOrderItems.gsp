@@ -64,7 +64,7 @@
 													<th><warehouse:message code="product.uom.label"/></th>
 													<th class="center"><warehouse:message code="order.ordered.label"/></th>
 													<th class="center"><warehouse:message code="order.remaining.label"/></th>
-													<th style="border-left: 1px solid lightgrey;"><warehouse:message code="order.received.label"/></th>
+													<th class="center" style="border-left: 1px solid lightgrey;"><warehouse:message code="order.received.label"/></th>
 													<th><warehouse:message code="product.label"/></th>
 													<th><warehouse:message code="product.lotNumber.label"/></th>
 													<th><warehouse:message code="default.expires.label"/></th>
@@ -118,10 +118,10 @@
 																				   valueName="${format.product(product:orderItem?.productReceived)}"/>
 																</td>
 																<td>
-																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="text updateable"/>
+																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="20" class="text updateable"/>
 																</td>
 																<td nowrap="true">
-																	<g:datePicker name="orderItems[${i }].expirationDate" precision="day" default="none" noSelection="['':'']"
+																	<g:datePicker name="orderItems[${i }].expirationDate" precision="day" default="none" class="chzn-select" noSelection="['':'']"
 																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />
 																</td>
 																<td>
@@ -155,12 +155,8 @@
 						</tr>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="next" value="${warehouse.message(code:'default.button.save.label')}" class="button"></g:submitButton>
 						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
-						<%--
-						<g:submitButton name="finish" value="${warehouse.message(code:'default.button.saveAndExit.label')}"></g:submitButton>								
-						--%>
-						<g:link action="receiveOrder" event="cancel" class="button"><warehouse:message code="default.button.cancel.label"/></g:link>
+						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}" class="button"></g:submitButton>
 					</div>
 				</div>
 			</div>
