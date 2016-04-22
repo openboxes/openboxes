@@ -135,10 +135,12 @@ class OrderService {
 				// Find or create a new inventory item based on the product and lot number provided
 				def inventoryItem = null
 
-				// Need to use new session here otherwise it flushes the current session and causes an error
-				InventoryItem.withNewSession {
-					inventoryItem = inventoryService.findOrCreateInventoryItem(orderItemCommand.productReceived, orderItemCommand.lotNumber, orderItemCommand.expirationDate)
-				}
+				// Need to use withSession here otherwise it flushes the current session and causes an error
+                InventoryItem.withSession { session ->
+                    inventoryItem = inventoryService.findOrCreateInventoryItem(orderItemCommand.productReceived, orderItemCommand.lotNumber, orderItemCommand.expirationDate)
+                    session.flush()
+                    session.clear()
+                }
 
 				def shipmentItem = new ShipmentItem();
 				shipmentItem.lotNumber = orderItemCommand.lotNumber

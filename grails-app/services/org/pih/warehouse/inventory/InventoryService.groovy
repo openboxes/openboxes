@@ -2079,7 +2079,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.lotNumber = lotNumber
 			inventoryItem.expirationDate = expirationDate;
 			inventoryItem.product = product
-			inventoryItem.save()
+			inventoryItem.save(flush:true)
 		}
 		return inventoryItem
 
