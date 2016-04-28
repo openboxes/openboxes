@@ -127,7 +127,6 @@
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
 							<g:submitButton class="button" name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
-							<g:link class="button" action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 						</span>
 					</div>
 					

@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import org.apache.commons.lang.RandomStringUtils
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
@@ -138,13 +139,20 @@ class IdentifierService {
         def products = Product.findAll("from Product as p where productCode is null or productCode = ''")
         products.each { product ->
             try {
-                println "Assigning identifier to product " + product.id + " " + product.name
-                product.productCode = generateProductIdentifier()
-                if (!product.merge(flush: true, validate: false)) {
-                    println product.errors
+                def productCode = generateProductIdentifier()
+                println "Assigning identifier ${productCode} to product " + product.id + " " + product.name
+
+                // Check to see if there's already a product with that product code
+                if (!Product.findByProductCode(productCode)) {
+                    product.productCode = productCode
+                    if (!product.merge(flush: true, validate: false)) {
+                        println product.errors
+                    }
                 }
+            } catch (MySQLIntegrityConstraintViolationException e) {
+                log.warn ("Unable to assign identifier due to constraint violation: " + e.message, e)
             } catch (Exception e) {
-                println("Unable to assign identifier to product with ID " + product?.id + ": " + e.message)
+                log.warn("Unable to assign identifier to product with ID " + product?.id + ": " + e.message, e)
             }
         }
     }

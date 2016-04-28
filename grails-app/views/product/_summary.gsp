@@ -36,7 +36,7 @@
 							</g:if>
 						</div>	
 			            <div id="product-title" class="title">
-			            	${productInstance?.productCode }
+			            	<small>${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
 			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
 			                </g:link>				

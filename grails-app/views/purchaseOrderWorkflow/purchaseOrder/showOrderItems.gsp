@@ -3,6 +3,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <title><warehouse:message code="order.addOrderItems.label"/></title>
+<style>
+    .dlg { display: none; }
+</style>
+
 </head>
 <body>
 	<div class="body">
@@ -116,6 +120,7 @@
                         <tr class="prop">
                             <td colspan="10" class="center">
                                 <button class="button icon add add-item-button">${warehouse.message(code:'order.button.addItem.label', default: 'Add line item')}</button>
+                                <button id="btnImportItems" class="button icon add">${warehouse.message(code:'order.button.importItems.label', default: 'Import line items')}</button>
                             </td>
                         </tr>
                     </tbody>
@@ -134,7 +139,7 @@
                 </table>
             </div>
 
-            <div id="add-item-dialog" class="dialog box">
+            <div id="add-item-dialog" class="dlg box">
                 <g:form action="purchaseOrder" method="post">
                     <g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
                     <g:hiddenField name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
@@ -187,7 +192,7 @@
             </div>
 
 		</div>
-        <div id="edit-item-dialog" class="dialog box">
+        <div id="edit-item-dialog" class="dlg box">
             <g:form action="purchaseOrder" method="post">
                 <g:hiddenField id="edit-orderId" name="order.id" value="" />
                 <g:hiddenField id ="edit-orderItemId" name="orderItem.id" value=""/>
@@ -237,10 +242,33 @@
                         </td>
                     </tr>
                     </tbody>
+
                 </table>
             </g:form>
         </div>
-	</div>
+
+        <div id="dlgImportItems" class="dlg box" title="Import Order Items">
+            <div>
+            <!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
+                <g:uploadForm controller="order" action="importOrderItems">
+
+                    <g:hiddenField name="id" value="${order?.id}" />
+
+
+
+                    <h3><warehouse:message code="importOrderItems.chooseOrderItemFile.label" default="Choose import file"/></h3>
+
+                    <input name="fileContents" type="file" />
+
+
+                    <div class="buttons">
+                        <g:submitButton name="importOrderItems" value="Import Order Items" class="button icon add"></g:submitButton>
+                    </div>
+                </g:uploadForm>
+            </div>
+        </div>
+
+    </div>
 	<g:comboBox />
     <script type="text/javascript">
         $( function() {
@@ -297,10 +325,21 @@
                 $("#edit-item-dialog").dialog("open");
             });
 
+            $("#btnImportItems").click(function(event){
+                $("#dlgImportItems").dialog('open');
+            });
+            $("#dlgImportItems").dialog({
+                autoOpen: false,
+                modal: true,
+                width: 600
+            });
+
+
 
         });
 
 
     </script>
+
 </body>
 </html>
