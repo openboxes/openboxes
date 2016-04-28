@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.springframework.web.multipart.MultipartFile
 
 // import java.util.Date
 
@@ -472,6 +473,86 @@ class OrderController {
 		}
 	}
 
+	def downloadOrderItems = {
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+			//render(text: 'Unable to find purchase order found', status: 404)
+
+		}
+		else {
+
+			def date = new Date();
+			response.setHeader("Content-disposition", "attachment; filename='PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv'")
+			response.contentType = "text/csv"
+			def csv = ""
+
+			csv += 	"${warehouse.message(code:'product.productCode.label')}," +
+					"${warehouse.message(code:'product.name.label')}," +
+					"${warehouse.message(code:'product.vendorCode.label')}," +
+					"${warehouse.message(code:'orderItem.quantity.label')}," +
+					"${warehouse.message(code:'product.unitOfMeasure.label')}," +
+					"${warehouse.message(code:'orderItem.unitPrice.label')}," +
+                    "${warehouse.message(code:'orderItem.totalPrice.label')}," +
+					"\n"
+
+			def totalPrice = 0.0
+
+			orderInstance?.listOrderItems()?.each { orderItem ->
+				totalPrice += orderItem.totalPrice()?:0
+
+				String quantityString = formatNumber(number:orderItem?.quantity, maxFractionDigits: 1, minFractionDigits: 1)
+				String unitPriceString = formatNumber(number:orderItem?.unitPrice, maxFractionDigits: 4, minFractionDigits: 2)
+				String totalPriceString = formatNumber(number:orderItem?.totalPrice(), maxFractionDigits: 2, minFractionDigits: 2)
+
+				csv +=	"${orderItem?.product?.productCode}," +
+						"${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
+						"${orderItem?.product?.vendorCode?:''}," +
+						"${quantityString}," +
+						"${orderItem?.product?.unitOfMeasure?:'EA'}," +
+						"${StringEscapeUtils.escapeCsv(unitPriceString)}," +
+						"${StringEscapeUtils.escapeCsv(totalPriceString)}" +
+						"\n"
+			}
+			render csv
+
+		}
+	}
+
+    def importOrderItems = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+
+            try {
+                MultipartFile multipartFile = request.getFile('fileContents')
+                if (multipartFile.empty) {
+                    flash.message = "File cannot be empty. Please select a packing list to import."
+                    redirect(action: "show", id: params.id)
+                    return;
+                }
+                List lineItems = orderService.parseOrderItems(multipartFile.inputStream)
+                log.info "Line items: " + lineItems
+
+                if (orderService.importOrderItems(params.id, lineItems)) {
+                    flash.message = "Successfully imported ${lineItems?.size()} order line items. "
+
+                } else {
+                    flash.message = "Failed to import packing list items due to an unknown error."
+                }
+            } catch (Exception e) {
+                log.error("Failed to import packing list due to the following error: " + e.message, e)
+                flash.message = "Failed to import packing list due to the following error: " + e.message
+            }
+        }
+        redirect(action: "show", id: params.id)
+    }
+
+
 	def upload = {
 		def orderInstance = Order.get(params.id)
 		if (!orderInstance) {
@@ -531,8 +612,23 @@ class OrderController {
 
 
         }
-
     }
+
+
+	def rollbackOrderStatus = {
+
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			orderService.rollbackOrderStatus(params.id)
+
+		}
+		redirect(action: "show", id: params.id)
+
+	}
 
 	
 	
