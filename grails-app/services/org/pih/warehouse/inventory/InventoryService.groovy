@@ -2078,7 +2078,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.lotNumber = lotNumber
 			inventoryItem.expirationDate = expirationDate;
 			inventoryItem.product = product
-			inventoryItem.save()
+			inventoryItem.save(flush:true)
 		}
 		return inventoryItem
 
@@ -3171,18 +3171,15 @@ class InventoryService implements ApplicationContextAware {
         Integer maxSize = inventoryItemKeys.size()
 
         if (n > maxSize) {
-            throw new RuntimeException("You cannot request more items than are available at this location [requested=${n},available=${maxSize}].")
+            n = maxSize
+            //throw new RuntimeException("You cannot request more items than are available at this location [requested=${n},available=${maxSize}].")
         }
 
         Random random = new Random()
         def randomIntegerList = []
         (1..n).each {
-            println "n: " + n
-            println "maxSize: " + maxSize
             def randomIndex = random.nextInt(maxSize)
-            println "randomIndex: " + randomIndex
             def inventoryItem = inventoryItemKeys.get(randomIndex)
-            println "lotNumber: " + inventoryItem.lotNumber
             inventoryItems << inventoryItem
         }
         return inventoryItems;
@@ -4030,7 +4027,6 @@ class InventoryService implements ApplicationContextAware {
 
         // Get the inventory levels for all products at the given location
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory)?.groupBy { it.product }
-        //log.info inventoryLevelMap
 
         // Group entries by generic product
         genericProductMap = entries.inject([:].withDefault { [
