@@ -2,6 +2,7 @@
     <g:form id="listForm" action="list" method="GET">
         <g:hiddenField name="type" value="${params.type}"/>
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
+
         <div class="box">
             <h2><warehouse:message code="default.filters.label"/></h2>
             <table>
@@ -81,7 +82,6 @@
                 <tr class="prop">
                     <td>
                         <label><warehouse:message code="order.orderedBy.label"/></label>
-
                         <div>
                             <g:select id="orderedById" name="orderedById" class="chzn-select-deselect"
                                       from="${orderedByList}"
@@ -103,6 +103,7 @@
                         <a href="javascript:void(0);" id="clearStartDate">clear</a>
                     </td>
                 </tr>
+
                 <tr class="prop">
                     <td>
                         <label class="block">${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
@@ -112,12 +113,8 @@
                                                 value="${statusEndDate}" format="MM/dd/yyyy"/>
                         </div>
                         <a href="javascript:void(0);" id="clearEndDate">clear</a>
-
                     </td>
                 </tr>
-
-
-
 
                 <tr class="prop">
                     <td colspan="2">
@@ -137,10 +134,3 @@
         </div>
     </g:form>
 </div>
-
-
-
-
-
-
-
