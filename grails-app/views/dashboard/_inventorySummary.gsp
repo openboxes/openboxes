@@ -86,29 +86,19 @@ $(window).load(function(){
                 console.log(data);
                 var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
                 var progress = data.hitCount / data.totalCount
+                var progressSummary = data.hitCount + " out of " + data.totalCount;
+                var progressPercentage = progress*100;
+
                 $('#totalStockValue').html(value);
 
-                if (progress < 0.1) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 10% of all products");
+                if (progress < 1.0) {
+                    $("#totalStockSummary").html("* Pricing data is available for ${progressPercentage}%of all products");
                 }
-                else if (progress < 0.25) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 25% of all products");
+                else if (progress >= 1.0) {
+                    $("#totalStockSummary").html("* Pricing data is available for all products");
                 }
-                else if (progress < 0.5) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 50% of all products");
-                }
-                else if (progress < 0.75) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 75% of all products");
-                }
-                else if (progress < 0.90) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 90% of all products");
-                }
-                else {
-                    $("#totalStockSummary").html("* Pricing data is available for more than 90% of all products");
-                }
-                var progressSummary = data.hitCount + " out of " + data.totalCount;
+
                 $('#progressSummary').html(progressSummary);
-                var progressPercentage = progress*100;
                 $( "#progressbar" ).progressbar({ value: progressPercentage });
                 $( "#progressPercentage").html("<span title='" + progressSummary + "'>" + formatPercentage(progressPercentage) + "</span>");
 

@@ -845,26 +845,39 @@ class ProductService {
 		def tags = Tag.findAllByIsActive(true);
         return tags;
 	}
-	
+
 	/**
      * Get all popular tags
      *
 	 * @return  all tags that have a product
 	 */
-	def getPopularTags() {
+	def getPopularTags(Integer limit) {
 		def popularTags = [:]
-		String sql = """select tag.id, count(*)
-            from product_tag join tag on tag.id = product_tag.tag_id
+		String sql = """
+            select tag.id, count(*) as count
+            from product_tag
+            join tag on tag.id = product_tag.tag_id
             where tag.is_active = true
-            group by tag.tag order by tag.tag"""
-		def sqlQuery = sessionFactory.currentSession.createSQLQuery(sql)		
-		println sqlQuery
-		def list = sqlQuery.list()
-		list.each { 
-			Tag tag = Tag.get(it[0])
-			popularTags[tag] = it[1]	
+            group by tag.tag
+            order by count(*) desc
+            """
+
+
+        // FIXME Convert the query above to HQL so we don't have to worry about N+1 query below
+		def sqlQuery = sessionFactory.currentSession.createSQLQuery(sql)
+        if (limit > 0) {
+            sqlQuery.setMaxResults(limit)
+        }
+        def list = sqlQuery.list()
+		list.each {
+            Tag tag = Tag.load(it[0])
+			popularTags[tag] = it[1]
 		}
 		return popularTags		
+	}
+
+	def getPopularTags() {
+		return getPopularTags(0)
 	}
 
 

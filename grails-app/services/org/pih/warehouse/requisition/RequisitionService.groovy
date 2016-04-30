@@ -40,12 +40,28 @@ class RequisitionService {
     */
 
     def getRequisitionStatistics(destination, origin) {
-        return getRequisitionStatistics(destination, origin, null)
+        return getRequisitionStatistics(destination, origin, null, null)
     }
 
-    def getRequisitionStatistics(destination, origin, user) {
-        def statistics = [:]
+    def getRequisitionStatistics(Location destination, Location origin) {
+        return getRequisitionStatistics(destination, origin, null, null, null)
+    }
 
+    def getRequisitionStatistics(Location destination, Location origin, User user) {
+        return getRequisitionStatistics(destination, origin, user, null, null)
+    }
+
+    def getRequisitionStatistics(Location destination, Location origin, User user, Date date) {
+        return getRequisitionStatistics(destination, origin, user, date, null)
+    }
+
+    def getRequisitionStatistics(Location destination, Location origin, User user, Date date, List<RequisitionStatus> excludedStatuses) {
+        log.info "destination " + destination
+        log.info "origin " + origin
+        log.info "user " + user
+
+        log.info "Date " + date
+        def statistics = [:]
         def criteria = Requisition.createCriteria()
         def results = criteria.list {
             projections {
@@ -72,6 +88,14 @@ class RequisitionService {
                 //}
             }
             isNotNull("status")
+            if (excludedStatuses) {
+                not {
+                    'in'("status", excludedStatuses)
+                }
+            }
+            if (date) {
+                gt("dateRequested", date)
+            }
         }
 
 
