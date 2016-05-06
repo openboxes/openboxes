@@ -15,6 +15,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.TransactionCode
@@ -1131,5 +1132,24 @@ class ProductService {
 		
 		return similarProducts
 	}
+
+
+	Product addProductComponent(String assemblyProductId, String componentProductId, BigDecimal quantity, String unitOfMeasureId) {
+		def assemblyProduct = Product.get(assemblyProductId)
+		if (assemblyProduct) {
+			def componentProduct = Product.get(componentProductId)
+			if (componentProduct) {
+				def unitOfMeasure = UnitOfMeasure.get(unitOfMeasureId)
+                log.info "Adding " + componentProduct.name + " to " + assemblyProduct.name
+
+				ProductComponent productComponent = new ProductComponent(componentProduct: componentProduct,
+                        quantity: quantity, unitOfMeasure: unitOfMeasure, assemblyProduct: assemblyProduct)
+				assemblyProduct.addToProductComponents(productComponent)
+                assemblyProduct.save(flush:true, failOnError: true)
+			}
+		}
+		return assemblyProduct
+	}
+
 
 }
