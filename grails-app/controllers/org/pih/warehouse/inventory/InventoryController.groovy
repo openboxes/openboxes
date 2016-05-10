@@ -530,7 +530,7 @@ class InventoryController {
     def list = {
         println "List " + params
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
+        def quantityMap = inventoryService.getCurrentInventory(location)
         def statusMap = inventoryService.getInventoryStatus(location)
         println "QuantityMap: " + quantityMap
         [quantityMap:quantityMap,statusMap: statusMap]
@@ -622,6 +622,21 @@ class InventoryController {
         def statusMap = inventoryService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Out of stock  - all - " + location.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
+            return;
+        }
+
+        //[inventoryItems:lowStock, quantityMap:quantityMap]
+        render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
+    }
+
+    def listHealthyStock = {
+        def location = Location.get(session.warehouse.id)
+        def quantityMap = inventoryService.getHealthyStock(location)
+        def statusMap = inventoryService.getInventoryStatus(location)
+        if (params.format == "csv") {
+            def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;

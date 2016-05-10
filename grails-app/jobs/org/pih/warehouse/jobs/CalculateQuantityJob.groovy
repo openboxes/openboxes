@@ -25,45 +25,53 @@ class CalculateQuantityJob {
         def product = Product.get(context.mergedJobDataMap.get('productId'))
         def location = Location.get(context.mergedJobDataMap.get('locationId'))
         def user = User.get(context.mergedJobDataMap.get('userId'))
+        def alltime = context.mergedJobDataMap.get('alltime')?:false
 
-        // System uses yesterday by default if a date is not provided
         if (!date) {
-            log.info "Date is being set to midnight tonight"
-            date = new Date()
-            //date.clearTime()
+            log.info "Date is being set to midnight tonight (tomorrow)"
+            date = new Date() + 1
+            date.clearTime()
         }
 
         log.info "Executing calculate quantity job for date=${date}, user=${user}, location=${location}, product=${product}, mergedJobDataMap=${context.mergedJobDataMap}"
-
-        // Triggered ??
-        if (product && date && location) {
-            println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
-            inventoryService.createOrUpdateInventorySnapshot(date, location, product)
-        }
-        // Triggered by the inventory snapshot tab off the product page
-        else if (product && location) {
-            println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
+        if (alltime) {
             inventoryService.createOrUpdateInventorySnapshot(location, product)
         }
-        // Triggered by the Inventory Snapshot page
-        else if (date && location) {
-            println "Triggered calculate quantity job for all products at ${location} on ${date}"
-            inventoryService.createOrUpdateInventorySnapshot(date, location)
-            inventoryService.createOrUpdateInventoryItemSnapshot(date, location)
-        }
-        // Triggered by the CalculateQuantityJob
-        else if (date) {
-            println "Triggered calculate quantity job for all locations and products on ${date}"
-            inventoryService.createOrUpdateInventorySnapshot(date)
-            inventoryService.createOrUpdateInventoryItemSnapshot(date)
-        }
         else {
-            println "Triggered calculate quantity job for all dates, locations, products"
-            def transactionDates = inventoryService.getTransactionDates()
-            transactionDates.each { transactionDate ->
-                log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
-                inventoryService.createOrUpdateInventorySnapshot(transactionDate)
-                inventoryService.createOrUpdateInventoryItemSnapshot(transactionDate)
+
+            // Triggered by ?
+            if (product && date && location) {
+                println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
+                inventoryService.createOrUpdateInventorySnapshot(date, location, product)
+            }
+            // Triggered by the inventory snapshot tab off the product page
+            else if (product && location) {
+                println "Triggered calculate quantity job for product ${product} at ${location} on ${date}"
+                inventoryService.createOrUpdateInventorySnapshot(location, product)
+            }
+            // Triggered by the Inventory Snapshot page
+            else if (date && location) {
+                println "Triggered calculate quantity job for all products at ${location} on ${date}"
+                inventoryService.createOrUpdateInventorySnapshot(date, location)
+                inventoryService.createOrUpdateInventoryItemSnapshot(date, location)
+            }
+            // Triggered by the CalculateQuantityJob
+            else if (date) {
+                println "Triggered calculate quantity job for all locations and products on ${date}"
+                inventoryService.createOrUpdateInventorySnapshot(date)
+                inventoryService.createOrUpdateInventoryItemSnapshot(date)
+            // FIXME Removed for some reason?
+            //} else if (location) {
+            //    println "Triggered calculate quantity job for all products at location ${location} over all dates"
+            //    inventoryService.createOrUpdateInventorySnapshot(location)
+            } else {
+                println "Triggered calculate quantity job for all dates, locations, products"
+                def transactionDates = inventoryService.getTransactionDates()
+                transactionDates.each { transactionDate ->
+                    log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
+                    inventoryService.createOrUpdateInventorySnapshot(transactionDate)
+                    inventoryService.createOrUpdateInventoryItemSnapshot(transactionDate)
+                }
             }
         }
 

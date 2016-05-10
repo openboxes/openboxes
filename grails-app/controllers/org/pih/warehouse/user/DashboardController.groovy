@@ -20,10 +20,12 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.LocalizationUtil
 
@@ -265,38 +267,38 @@ class DashboardController {
 		//def outgoingOrders = orderService.getOutgoingOrders(location)
 		//def incomingOrders = orderService.getIncomingOrders(location)
 		
-		[ 	//outgoingShipments : recentOutgoingShipments, 
-			//incomingShipments : recentIncomingShipments,
-			//allOutgoingShipments : allOutgoingShipments,
-			//allIncomingShipments : allIncomingShipments,
-			//outgoingOrders : outgoingOrders,
-			//incomingOrders : incomingOrders,
-			//expiredStock : expiredStock,
-			//expiringStockWithin30Days : expiringStockWithin30Days,
-			//expiringStockWithin90Days : expiringStockWithin90Days,
-			//expiringStockWithin180Days : expiringStockWithin180Days,
-			//expiringStockWithin365Days : expiringStockWithin365Days,
-			//lowStock: lowStock,
-			//reorderStock: reorderStock,
-			rootCategory : productService.getRootCategory(),
+		[    //outgoingShipments : recentOutgoingShipments,
+			 //incomingShipments : recentIncomingShipments,
+			 //allOutgoingShipments : allOutgoingShipments,
+			 //allIncomingShipments : allIncomingShipments,
+			 //outgoingOrders : outgoingOrders,
+			 //incomingOrders : incomingOrders,
+			 //expiredStock : expiredStock,
+			 //expiringStockWithin30Days : expiringStockWithin30Days,
+			 //expiringStockWithin90Days : expiringStockWithin90Days,
+			 //expiringStockWithin180Days : expiringStockWithin180Days,
+			 //expiringStockWithin365Days : expiringStockWithin365Days,
+			 //lowStock: lowStock,
+			 //reorderStock: reorderStock,
+			 rootCategory : productService.getRootCategory(),
+             requisitionStatistics: requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine?currentUser:null, null, [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED] as List),
+			requisitions: [],
+			 //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
 
-            requisitionStatistics: requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine?currentUser:null),
-            requisitions: [],
-            //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
-
-            //outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
-			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
+			 //outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
+			 //incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
 			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentIncomingShipments),
 
 			activityList : activityList,
-			activityListTotal : activityListTotal,
-			startIndex: startIndex,
-			endIndex: endIndex,
-			daysToInclude: daysToInclude,
-            tags:productService?.getAllTags()?.sort { it.tag }
+			 activityListTotal : activityListTotal,
+			 startIndex: startIndex,
+			 endIndex: endIndex,
+			 daysToInclude: daysToInclude,
+			 tags:productService?.getPopularTags(50)
 		]
 	}
+
 
 
     def expirationSummary = {
@@ -350,7 +352,7 @@ class DashboardController {
         //def requisitionTemplates = [] //requisitionService.getAllRequisitionTemplates(session.warehouse)
         //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
         //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
-        def requisitionStatistics = requisitionService.getRequisitionStatistics(location,null,user)
+        def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, user, new Date()-30)
 
         def categories = []
 		def category = productService.getRootCategory()		
@@ -367,10 +369,6 @@ class DashboardController {
 			outgoingShipmentsCount: outgoingShipmentsCount,
 			incomingOrders: incomingOrders,
             requisitionStatistics: requisitionStatistics,
-			//incomingRequests: incomingRequests,
-			//outgoingRequests: outgoingRequests,
-            //requisitionTemplates: requisitionTemplates,
-            //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()
 		]
@@ -397,6 +395,7 @@ class DashboardController {
     @CacheFlush(["dashboardCache", "megamenuCache"])
     def flushCache = {
         flash.message = "Cache has been flushed"
+        CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
         redirect(action: "index")
     }
 

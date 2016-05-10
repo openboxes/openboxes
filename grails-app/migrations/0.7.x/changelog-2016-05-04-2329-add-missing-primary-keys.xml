@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1462561958531-disable-foreign-key-checks" runAlways="true" dbms="mysql">
+        <sql>SET FOREIGN_KEY_CHECKS=0</sql>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462561958531-1">
+        <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="product_group"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462561958531-2">
+        <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="product_package"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462561958531-3">
+        <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="unit_of_measure_class"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462561958531-4">
+        <preConditions onFail="MARK_RAN">
+            <not><primaryKeyExists tableName="product_group" primaryKeyName="PRIMARY"/></not>
+        </preConditions>
+        <addPrimaryKey columnNames="id" tableName="product_group"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462561958531-5">
+        <preConditions onFail="MARK_RAN">
+            <not><primaryKeyExists tableName="product_package" primaryKeyName="PRIMARY"/></not>
+        </preConditions>
+        <addPrimaryKey columnNames="id" tableName="product_package"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462561958531-6">
+        <preConditions onFail="MARK_RAN">
+            <not><primaryKeyExists tableName="unit_of_measure_class" primaryKeyName="PRIMARY"/></not>
+        </preConditions>
+        <addPrimaryKey columnNames="id" tableName="unit_of_measure_class"/>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1462561958531-enable-foreign-key-checks" runAlways="true" dbms="mysql">
+        <sql>SET FOREIGN_KEY_CHECKS=1</sql>
+    </changeSet>
+
+
+
+</databaseChangeLog>
