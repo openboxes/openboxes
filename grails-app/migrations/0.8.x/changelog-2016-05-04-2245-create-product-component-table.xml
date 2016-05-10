@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1462507674793-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_component"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_component">
+            <column autoIncrement="false" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="assembly_product_id" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_product_id" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_of_measure_id" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_components_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462507674793-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKB511C5AD20E351EA"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="component_product_id" baseTableName="product_component"
+                                 constraintName="FKB511C5AD20E351EA" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462507674793-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKB511C5AD24DEBC91"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="unit_of_measure_id" baseTableName="product_component"
+                                 constraintName="FKB511C5AD24DEBC91" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="unit_of_measure"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462507674793-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKB511C5ADFB4C199C"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="assembly_product_id" baseTableName="product_component"
+                                 constraintName="FKB511C5ADFB4C199C" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+</databaseChangeLog>
