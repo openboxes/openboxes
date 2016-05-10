@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1462422439127-disable-foreign-key-checks" runAlways="true" dbms="mysql">
+        <sql>SET FOREIGN_KEY_CHECKS=0</sql>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKBD34ABCDAA992CED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="inventory_item_snapshot"
+                                 constraintName="FKBD34ABCDAA992CED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKBD34ABCD8ABEBD5"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="inventory_item_snapshot"
+                                 constraintName="FKBD34ABCD8ABEBD5" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKBD34ABCDDED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="inventory_item_snapshot"
+                                 constraintName="FKBD34ABCDDED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK651874EAF6D8801"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="ordered_by_id" baseTableName="order"
+                                 constraintName="FK651874EAF6D8801" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD3F8383F217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="picklist"
+                                 constraintName="FKD3F8383F217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD3F8383FA3E976BC"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="picker_id" baseTableName="picklist"
+                                 constraintName="FKD3F8383FA3E976BC" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD3F8383F426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="picklist"
+                                 constraintName="FKD3F8383F426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKED8DCCEF217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="product"
+                                 constraintName="FKED8DCCEF217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKED8DCCEFEEB2908D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="default_uom_id" baseTableName="product"
+                                 constraintName="FKED8DCCEFEEB2908D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="unit_of_measure"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKED8DCCEF426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="product"
+                                 constraintName="FKED8DCCEF426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD08A526BC800AA15"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="document_id" baseTableName="product_document"
+                                 constraintName="FKD08A526BC800AA15" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-19">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD08A526BDED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_document"
+                                 constraintName="FKD08A526BDED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-20">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK615A48F6217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="product_package"
+                                 constraintName="FK615A48F6217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-21">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK615A48F6DED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_package"
+                                 constraintName="FK615A48F6DED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-22">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK615A48F63906C4CF"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="uom_id" baseTableName="product_package"
+                                 constraintName="FK615A48F63906C4CF" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="unit_of_measure"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-23">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK615A48F6426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="product_package"
+                                 constraintName="FK615A48F6426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-24">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKAE3064BAB06EC4FB"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="shipment_item_id" baseTableName="receipt_item"
+                                 constraintName="FKAE3064BAB06EC4FB" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-25">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509CD2CB8BBB"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="checked_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509CD2CB8BBB" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-26">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509C217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509C217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-27">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509C4CF042D8"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="delivered_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509C4CF042D8" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-28">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509CD196DBBF"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="issued_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509CD196DBBF" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-29">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509C36C69275"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="received_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509C36C69275" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-30">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509CDFA74E0B"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="reviewed_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509CDFA74E0B" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-31">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509C426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509C426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-32">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509C20E33E1C"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="verified_by_id" baseTableName="requisition"
+                                 constraintName="FK1799509C20E33E1C" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-33">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D6217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D6217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-34">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D614F7BB8E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_group_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D614F7BB8E" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product_group"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-35">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D6DD302242"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requested_by_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D6DD302242" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-36">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D6426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D6426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-37">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKDA3BB298AA992CED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="shipment_item"
+                                 constraintName="FKDA3BB298AA992CED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-38">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1BF9A217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="tag" constraintName="FK1BF9A217F5972"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-39">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1BF9A426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="tag" constraintName="FK1BF9A426DD105"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-40">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="transaction"
+                                 constraintName="FK7FA0D2DE426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-41">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7348B491217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="unit_of_measure"
+                                 constraintName="FK7348B491217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-42">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7348B491426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="unit_of_measure"
+                                 constraintName="FK7348B491426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-43">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5D1B504A6B9DFD"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="base_uom_id" baseTableName="unit_of_measure_class"
+                                 constraintName="FK5D1B504A6B9DFD" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="unit_of_measure"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-44">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5D1B504A217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="unit_of_measure_class"
+                                 constraintName="FK5D1B504A217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-45">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5D1B504A426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="unit_of_measure_class"
+                                 constraintName="FK5D1B504A426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-48">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7348B49197D8303E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="uom_class_id" baseTableName="unit_of_measure"
+                                 constraintName="FK7348B49197D8303E" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="unit_of_measure_class"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-49">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD3F8383F5DE9E374"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id" baseTableName="picklist"
+                                 constraintName="FKD3F8383F5DE9E374" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-50">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK51F3772FEF4C770D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="product_group"
+                                 constraintName="FK51F3772FEF4C770D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-51">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKAE3064BAAA992CED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="receipt_item"
+                                 constraintName="FKAE3064BAAA992CED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-53">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D629B2552E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_package_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D629B2552E" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product_package"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-54">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE5DE9E374"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id" baseTableName="transaction"
+                                 constraintName="FK7FA0D2DE5DE9E374" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-55">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE5F12AFED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="incoming_shipment_id" baseTableName="transaction"
+                                 constraintName="FK7FA0D2DE5F12AFED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-56">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA0D2DEB80B3233"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="outgoing_shipment_id" baseTableName="transaction"
+                                 constraintName="FK7FA0D2DEB80B3233" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-57">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B547AA992CED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="inventory_snapshot"
+                                 constraintName="FK740B547AA992CED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-58">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B5478ABEBD5"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="inventory_snapshot"
+                                 constraintName="FK740B5478ABEBD5" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-59">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B547DED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="inventory_snapshot"
+                                 constraintName="FK740B547DED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-60">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK313A4BDF14F7BB8E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_group_id" baseTableName="product_group_product"
+                                 constraintName="FK313A4BDF14F7BB8E" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product_group"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-61">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK313A4BDFDED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_group_product"
+                                 constraintName="FK313A4BDFDED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-62">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKA71CAC4ADED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_tag"
+                                 constraintName="FKA71CAC4ADED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-63">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKA71CAC4A9740C85F"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="product_tag"
+                                 constraintName="FKA71CAC4A9740C85F" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="tag"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-64">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D6405AC22D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="modification_item_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D6405AC22D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition_item"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-65">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D6F84BDE18"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="parent_requisition_item_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D6F84BDE18" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition_item"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462422439127-66">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D61594028E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="substitution_item_id" baseTableName="requisition_item"
+                                 constraintName="FK5358E4D61594028E" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition_item"/>
+    </changeSet>
+
+
+    <changeSet author="jmiranda" id="1462422439127-enable-foreign-key-checks" runAlways="true" dbms="mysql">
+        <sql>SET FOREIGN_KEY_CHECKS=1</sql>
+    </changeSet>
+
+
+
+</databaseChangeLog>
