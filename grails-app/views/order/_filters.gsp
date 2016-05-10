@@ -2,7 +2,6 @@
     <g:form id="listForm" action="list" method="GET">
         <g:hiddenField name="type" value="${params.type}"/>
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
-
         <div class="box">
             <h2><warehouse:message code="default.filters.label"/></h2>
             <table>
@@ -82,6 +81,7 @@
                 <tr class="prop">
                     <td>
                         <label><warehouse:message code="order.orderedBy.label"/></label>
+
                         <div>
                             <g:select id="orderedById" name="orderedById" class="chzn-select-deselect"
                                       from="${orderedByList}"

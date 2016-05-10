@@ -173,7 +173,7 @@ class ShipmentService {
 		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate, 
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 		
-		log.info "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
+		log.debug "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
 		return shipments
 	}
 	
@@ -201,7 +201,7 @@ class ShipmentService {
 			shipmentMap.put(key, shipmentList)
 		}
 
-        log.info "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return shipmentMap;
 	}
