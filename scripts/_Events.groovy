@@ -36,7 +36,7 @@ eventAllTestsStart = {
     }
 }
 
-private determineGitRevisionNumber = {
+def determineGitRevisionNumber = {
     String revisionNumber = 'dev'
     try {
         revisionNumber = 'git describe --match v* --always'.execute().text.trim()
