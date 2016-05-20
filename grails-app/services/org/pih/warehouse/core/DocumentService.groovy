@@ -9,7 +9,8 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
+import org.groovydev.SimpleImageBuilder
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment;
 
@@ -53,7 +54,6 @@ import org.docx4j.wml.TcPr
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
-import org.groovydev.SimpleImageBuilder
 
 class DocumentService {
 	
@@ -123,9 +123,9 @@ class DocumentService {
 	 */
 	public File findFile(String filePath){
 		def file
-		def appContext = ApplicationHolder.application.parentContext
+		def appContext = Holders.grailsApplication.parentContext
 		def archiveDirectory = filePath
-		if (ApplicationHolder.application.isWarDeployed()){
+		if (Holders.grailsApplication.isWarDeployed()){
 			//archiveDirectory = "${File.separator}WEB-INF${File.separator}grails-app${File.separator}conf${File.separator}${filePath}"			
 			archiveDirectory = "classpath:$filePath";
 			file = appContext.getResource(archiveDirectory)?.getFile()
