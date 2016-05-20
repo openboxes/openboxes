@@ -8,9 +8,10 @@
 * You must not remove this notice, or any other, from this software.
 **/
 
+
+import grails.util.Holders
 import org.slf4j.MDC
 import util.ClickstreamUtil
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 
 class LoggingFilters {
 	def filters = {
@@ -19,7 +20,7 @@ class LoggingFilters {
                 try {
                     def sessionId = session?.id
                     def userId = session?.user?.username
-                    def serverUrl = CH.config.grails.serverURL
+                    def serverUrl = Holders.grailsApplication.config.grails.serverURL
                     def clickStreamUrl = "${serverUrl}/stream/view/${sessionId}"
                     //RequestContextHolder.getRequestAttributes()?.getSessionId()
                     //String clickstreamAsString = ClickstreamUtil.getClickstreamAsString(session.clickstream)
@@ -32,7 +33,7 @@ class LoggingFilters {
                     MDC.put('requestUri', request?.requestURI?.toString()?:"No request URI")
                     MDC.put('requestUrl', request?.requestURL?.toString()?:"No request URL")
                     MDC.put('queryString', request?.queryString?:"No query string")
-                    MDC.put('serverUrl', CH?.config?.grails?.serverURL?:"No server URL")
+                    MDC.put('serverUrl', Holders.grailsApplication?.config?.grails?.serverURL?:"No server URL")
                     MDC.put('clickStreamUrl', sessionId?clickStreamUrl:"No clickstream")
                 } catch (Exception e) {
                     log.warn("Error occurred while adding attributes to Mapped Diagnostic Context: ${e.message}", e)

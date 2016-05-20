@@ -10,7 +10,8 @@
 package org.pih.warehouse.admin
 
 import grails.util.GrailsUtil
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
+
 import org.pih.warehouse.core.MailService
 import org.springframework.web.multipart.MultipartFile
 import util.ClickstreamUtil
@@ -31,7 +32,7 @@ class AdminController {
     def sessionFactory // inject Hibernate sessionFactory
 	MailService mailService;
 	def grailsApplication
-	def config = ConfigurationHolder.config
+	def config = Holders.grailsApplication.config
 
 
 

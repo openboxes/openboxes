@@ -10,9 +10,9 @@
 package org.pih.warehouse.core
 
 import grails.converters.JSON
+import grails.util.Holders
 import org.apache.catalina.util.Base64
 import org.apache.commons.io.FileUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.user.DashboardController
 import util.ClickstreamUtil
 import util.ConfigHelper;
@@ -89,7 +89,7 @@ class ErrorsController {
             def sessionId = session?.id
             def stacktrace = params.remove("stacktrace")
             def clickstream = params.remove("clickstream")
-            def serverUrl = ConfigurationHolder.config.grails.serverURL
+            def serverUrl = Holders.grailsApplication.config.grails.serverURL
             def clickstreamUrl = "${serverUrl}/stream/view/${sessionId}"
             def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
             def body = "${g.render(template:'/email/errorReport', model:[stacktrace:stacktrace, clickstream:clickstream, clickstreamUrl:clickstreamUrl], params:params)}"

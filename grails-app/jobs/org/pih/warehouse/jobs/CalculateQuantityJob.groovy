@@ -1,22 +1,22 @@
 package org.pih.warehouse.jobs
 
-import grails.plugin.mail.MailService
+import grails.util.Holders
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 
 class CalculateQuantityJob {
 
     def inventoryService
     def mailService
+    def grailsApplication
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron name:'cronTrigger', cronExpression: grailsApplication.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
 	def execute(context) {

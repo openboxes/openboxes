@@ -9,10 +9,8 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
-
+import grails.util.Holders
 // import javax.mail.internet.InternetAddress
-
 import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.commons.mail.EmailAttachment;
 // import org.apache.commons.mail.EmailException;
@@ -27,7 +25,7 @@ class MailService {
 	boolean transactional = false
 	def userService
 	def grailsApplication
-	def config = ConfigurationHolder.config
+	def config = Holders.grailsApplication.config
 
     String getDefaultFrom() {
         return config.grails.mail.from

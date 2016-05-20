@@ -7,15 +7,15 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.util;
+package org.pih.warehouse.util
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders;
 
 class FileUtil {
 
 	public static String retrieveFile(String filePath) {
-		if (ApplicationHolder.application.isWarDeployed()) {
-			return ApplicationHolder.application.parentContext.getResource("classpath:$filePath")?.getFile()
+		if (Holders.grailsApplication.isWarDeployed()) {
+			return Holders.grailsApplication.parentContext.getResource("classpath:$filePath")?.getFile()
 		}
 		else {
 			return new File("grails-app/conf/$filePath")
