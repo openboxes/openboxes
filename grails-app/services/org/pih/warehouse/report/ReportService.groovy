@@ -38,7 +38,6 @@ class ReportService implements ApplicationContextAware {
 	def productService
 	def inventoryService
 	def shipmentService
-	def localizationService
 	def grailsApplication
 	
 	ApplicationContext applicationContext
