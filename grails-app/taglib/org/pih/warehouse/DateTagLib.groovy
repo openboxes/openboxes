@@ -12,8 +12,8 @@ package org.pih.warehouse
 // import java.text.SimpleDateFormat;
 // import java.util.Date;
 
-import com.ocpsoft.pretty.time.PrettyTime
-import groovy.time.TimeDuration;
+import groovy.time.TimeDuration
+import org.ocpsoft.prettytime.PrettyTime;
 
 class DateTagLib {
    	
