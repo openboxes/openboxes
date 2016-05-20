@@ -98,12 +98,12 @@ class BootStrap {
 //        }
 //        log.info("Finished running liquibase changelog(s)!")
 //
-//		def enableFixtures = Boolean.parseBoolean(grailsApplication.config.openboxes.fixtures.enabled?:"true");
-//        log.info("Insert test fixtures?  " + enableFixtures)
-//		if (enableFixtures) {
-//            log.info("Inserting test fixtures ...")
-//            insertTestFixture()
-//        }
+		def enableFixtures = Boolean.parseBoolean(grailsApplication.config.openboxes.fixtures.enabled?:"true");
+        log.info("Insert test fixtures?  " + enableFixtures)
+		if (enableFixtures) {
+            log.info("Inserting test fixtures ...")
+            insertTestFixture()
+        }
 
         //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
         //TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
