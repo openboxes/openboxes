@@ -59,51 +59,51 @@ class BootStrap {
         //
         //if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' ||
         //GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
-        log.info("Running liquibase changelog(s) ...")
-        Liquibase liquibase = null
-        try {
-
-            def connection = dataSource.getConnection()
-            if (connection == null) {
-                throw new RuntimeException("Connection could not be created.");
-            }
-            //LiquibaseUtil.class.getClassLoader();
-            def classLoader = getClass().classLoader;
-            def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
-
-            //def fileOpener = new ClassLoaderFileOpener()
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-            log.info("Setting default schema to " + connection.catalog)
-            log.info("Product Version: " + database.databaseProductVersion)
-            log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
-            def ranChangeSets = database.getRanChangeSetList()
-            database.setDefaultSchemaName(connection.catalog)
-
-            //If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!ranChangeSets) {
-                liquibase = new Liquibase("install/install.xml", fileOpener, database);
-                liquibase.update(null)
-            }
-
-            // Run through the updates in the master changelog
-            liquibase = new Liquibase("changelog.xml", fileOpener, database);
-            liquibase.update(null)
-
-
-        }
-        finally {
-            if (liquibase && liquibase.database) {
-                liquibase.database.close()
-            }
-        }
-        log.info("Finished running liquibase changelog(s)!")
-
-		def enableFixtures = Boolean.parseBoolean(grailsApplication.config.openboxes.fixtures.enabled?:"true");
-        log.info("Insert test fixtures?  " + enableFixtures)
-		if (enableFixtures) {
-            log.info("Inserting test fixtures ...")
-            insertTestFixture()
-        }
+//        log.info("Running liquibase changelog(s) ...")
+//        Liquibase liquibase = null
+//        try {
+//
+//            def connection = dataSource.getConnection()
+//            if (connection == null) {
+//                throw new RuntimeException("Connection could not be created.");
+//            }
+//            //LiquibaseUtil.class.getClassLoader();
+//            def classLoader = getClass().classLoader;
+//            def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
+//
+//            //def fileOpener = new ClassLoaderFileOpener()
+//            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+//            log.info("Setting default schema to " + connection.catalog)
+//            log.info("Product Version: " + database.databaseProductVersion)
+//            log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
+//            def ranChangeSets = database.getRanChangeSetList()
+//            database.setDefaultSchemaName(connection.catalog)
+//
+//            //If nothing has been created yet, let's create all new database objects with the install scripts
+//            if (!ranChangeSets) {
+//                liquibase = new Liquibase("install/install.xml", fileOpener, database);
+//                liquibase.update(null)
+//            }
+//
+//            // Run through the updates in the master changelog
+//            liquibase = new Liquibase("changelog.xml", fileOpener, database);
+//            liquibase.update(null)
+//
+//
+//        }
+//        finally {
+//            if (liquibase && liquibase.database) {
+//                liquibase.database.close()
+//            }
+//        }
+//        log.info("Finished running liquibase changelog(s)!")
+//
+//		def enableFixtures = Boolean.parseBoolean(grailsApplication.config.openboxes.fixtures.enabled?:"true");
+//        log.info("Insert test fixtures?  " + enableFixtures)
+//		if (enableFixtures) {
+//            log.info("Inserting test fixtures ...")
+//            insertTestFixture()
+//        }
 
         //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
         //TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
