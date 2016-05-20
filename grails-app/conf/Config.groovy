@@ -15,74 +15,75 @@ import org.apache.log4j.net.SMTPAppender
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 
-// Locations to search for config files that get merged into the main config
-// config files can either be Java properties files or ConfigSlurper scripts
-grails.config.locations = [ 
-	"classpath:${appName}-config.properties",
-	"classpath:${appName}-config.groovy",
-	"file:${userHome}/.grails/${appName}-config.properties",
-	"file:${userHome}/.grails/${appName}-config.groovy"
-]
+// locations to search for config files that get merged into the main config;
+// config files can be ConfigSlurper scripts, Java properties files, or classes
+// in the classpath in ConfigSlurper format
+
+ grails.config.locations = [ "classpath:${appName}-config.properties",
+ 			"classpath:${appName}-config.groovy",
+ 			"file:${userHome}/.grails/${appName}-config.properties",
+ 			"file:${userHome}/.grails/${appName}-config.groovy"]
+
+// if (System.properties["${appName}.config.location"]) {
+//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+// }
+
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
 
-//grails.plugins.reloadConfig.files = []
-//grails.plugins.reloadConfig.includeConfigLocations = true
-//grails.plugins.reloadConfig.interval = 5000
-//grails.plugins.reloadConfig.enabled = true
-//grails.plugins.reloadConfig.notifyPlugins = []
-//grails.plugins.reloadConfig.automerge = true
-//grails.plugins.reloadConfig.notifyWithConfig = true
+grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
-grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
+// The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
+grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
+grails.mime.types = [ // the first one is the default format
+    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
+    atom:          'application/atom+xml',
+    css:           'text/css',
+    csv:           'text/csv',
+    form:          'application/x-www-form-urlencoded',
+    html:          ['text/html','application/xhtml+xml'],
+    js:            'text/javascript',
+    json:          ['application/json', 'text/json'],
+    multipartForm: 'multipart/form-data',
+    rss:           'application/rss+xml',
+    text:          'text/plain',
+    hal:           ['application/hal+json','application/hal+xml'],
+    xml:           ['text/xml', 'application/xml']
+]
+
+// URL Mapping Cache Max Size, defaults to 5000
+//grails.urlmapping.cache.maxsize = 1000
+
+// Legacy setting for codec used to encode data with ${}
+grails.views.default.codec = "none"
+
+// The default scope for controllers. May be prototype, session or singleton.
+// If unspecified, controllers are prototype scoped.
+grails.controllers.defaultScope = 'singleton'
+
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside ${}
+                scriptlet = 'html' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        // filteringCodecForContentType.'text/html' = 'html'
+    }
+}
 
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
-// Default mail settings
-grails {
-	mail { 		
-		// By default we enable email.  You can enable/disable email using environment settings below or in your 
-		// ${user.home}/openboxes-config.properties file 
-		enabled = true			
-		from = "info@openboxes.com"
-		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
-		host = "localhost"
-		port = "25"
-
-        // Authentication disabled by default
-		username = null
-		password = null
-
-        // Disable debug mode by default
-        debug = false
-	}
-}
-
-/* Indicates which activities are required for a location to allow logins */
-openboxes.chooseLocation.requiredActivities = ["MANAGE_INVENTORY"]
-
-/* Grails resources plugin */
-grails.resources.adhoc.includes = []
-grails.resources.adhoc.excludes = ["*"]
-
-grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
-grails.mime.use.accept.header = false
-grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
-		xml: ['text/xml', 'application/xml'],
-		text: 'text/plain',
-		js: 'text/javascript',
-		rss: 'application/rss+xml',
-		atom: 'application/atom+xml',
-		css: 'text/css',
-		csv: 'text/csv',
-		all: '*/*',
-		json: ['application/json','text/json'],
-		form: 'application/x-www-form-urlencoded',
-		multipartForm: 'multipart/form-data']
-
 // The default codec used to encode data with ${}
-grails.views.default.codec="none" // none, html, base64
+grails.views.default.codec="html" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
 //grails.views.gsp.keepgenerateddir="/home/jmiranda/git/openboxes/target/generated"
 grails.converters.encoding="UTF-8"
@@ -91,21 +92,56 @@ grails.views.enable.jsessionid = true
 grails.views.gsp.sitemesh.preprocess = true
 // not sure what this does
 grails.views.javascript.library="jquery"
+
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside ${}
+                scriptlet = 'html' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        // filteringCodecForContentType.'text/html' = 'html'
+    }
+}
+
+grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
+
 // Set to true if BootStrap.groovy is failing to add all sample data 
 grails.gorm.failOnError = false
+
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
 grails.json.legacy.builder = false
 // enabled native2ascii conversion of i18n properties files
 grails.enable.native2ascii = true
-// whether to install the java.util.logging bridge for sl4j. Disable fo AppEngine!
-grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
+// whether to disable processing of multi part requests
+grails.web.disable.multipart=false
+
+// request parameters to mask when logging exceptions
+grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
+
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
+
+// configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
+grails.hibernate.cache.queries = false
+
+// configure passing transaction's read-only attribute to Hibernate session, queries and criterias
+// set "singleSession = false" OSIV mode in hibernate configuration after enabling
+grails.hibernate.pass.readonly = false
+// configure passing read-only to OSIV session by default, requires "singleSession = false" OSIV mode
+grails.hibernate.osiv.readonly = false
 
 grails.validateable.packages = [
 	'org.pih.warehouse.inventory', 
@@ -126,6 +162,7 @@ mail.error.debug = true
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
+	        grails.logging.jul.usebridge = true
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
@@ -142,45 +179,57 @@ environments {
 		grails.mail.enabled = false
 	}
 	production {  
+	        grails.logging.jul.usebridge = false
+		// Should be configured in openboxes-config.properties
 		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
 		grails.mail.enabled = true
-        grails.mail.prefix = "[OpenBoxes]"
-    }
+        	grails.mail.prefix = "[OpenBoxes]"
+    	}
 	staging {  
 		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
 		grails.mail.enabled = true
 	}
-	qa {  
-		grails.serverURL = "http://localhost:8080/${appName}"  
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	client {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	root {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
+}
 
+
+// Default mail settings
+grails {
+	mail { 		
+		// By default we enable email.  You can enable/disable email using environment settings below or in your 
+		// ${user.home}/openboxes-config.properties file 
+		enabled = true			
+		from = "info@openboxes.com"
+		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
+		host = "localhost"
+		port = "25"
+
+        	// Authentication disabled by default
+		username = null
+		password = null
+
+		// Disable debug mode by default
+		debug = false
+	}
 }
 
 
 // log4j configuration
-log4j = {
+log4j.main = {
+    // Example of changing the log pattern for the default console appender:
+    //
+    //appenders {
+    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+    //}
 
 	// Used to debug hibernate/SQL queries
 	//trace 'org.hibernate.type'
 	//debug 'org.hibernate.SQL'
 
-	System.setProperty 'mail.smtp.port', mail.error.port.toString()
-    System.setProperty 'mail.smtp.connectiontimeout', "5000"
-    System.setProperty 'mail.smtp.timeout', "5000"
+/*	System.setProperty 'mail.smtp.port', mail.error.port.toString()
+    	System.setProperty 'mail.smtp.connectiontimeout', "5000"
+    	System.setProperty 'mail.smtp.timeout', "5000"
 
     if (mail.error.starttls)
 		System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
@@ -262,12 +311,9 @@ log4j = {
             asyncAppender.addAppender(smtpAppender)
             appender asyncAppender
         }
-    }
+    }*/
 
-	root {
-		error 'stdout', 'smtp'
-		additivity = false
-	}
+
 
 
 	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter',
@@ -308,9 +354,9 @@ log4j = {
 			'com.mchange',
 			'org.pih.warehouse',
 			'grails.app',
-            'grails.app.controller',
+            'grails.app.controllers',
 			'grails.app.bootstrap',
-			'grails.app.service',
+			'grails.app.services',
 			'grails.app.task',
             'grails.plugin.springcache',
 			'BootStrap',
@@ -334,7 +380,29 @@ log4j = {
    //         'org.hibernate.type'
 
 
+	root {
+		info 'stdout'//, 'smtp'
+		additivity = false
+	}
+
 }
+
+/* Indicates which activities are required for a location to allow logins */
+openboxes.chooseLocation.requiredActivities = ["MANAGE_INVENTORY"]
+
+/* Grails resources plugin */
+grails.resources.adhoc.includes = []
+grails.resources.adhoc.excludes = ["*"]
+
+// Reload Config Plugin
+//grails.plugins.reloadConfig.files = []
+//grails.plugins.reloadConfig.includeConfigLocations = true
+//grails.plugins.reloadConfig.interval = 5000
+//grails.plugins.reloadConfig.enabled = true
+//grails.plugins.reloadConfig.notifyPlugins = []
+//grails.plugins.reloadConfig.automerge = true
+//grails.plugins.reloadConfig.notifyWithConfig = true
+
 
 // Added by the JQuery Validation plugin:
 jqueryValidation.packed = true
@@ -421,7 +489,7 @@ jqueryValidationUi {
 // NOTE: You'll need to enable the plugin and set a DSN using an external config properties file
 // (namely, openboxes-config.properties or openboxes-config.groovy)
 grails.plugins.raven.active = false
-grails.plugins.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
+grails.plugins.raven.dsn = "https://PUBLIC_KEY:SECRET_KEY@app.getsentry.com/PROJECT_ID"
 
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
@@ -500,6 +568,7 @@ grails.doc.copyright = ""
 grails.doc.footer = ""
 
 // Added by the Joda-Time plugin:
+/*
 grails.gorm.default.mapping = {
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTime, class: org.joda.time.DateTime
@@ -514,4 +583,4 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentTimeOfDay, class: org.joda.time.TimeOfDay
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYearMonthDay, class: org.joda.time.YearMonthDay
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYears, class: org.joda.time.Years
-}
+}*/
