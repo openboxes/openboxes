@@ -9,21 +9,27 @@
     <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+    <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
     <!-- Include Main CSS -->
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
-    <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />--%>
+    <link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
+    <%--<link rel="stylesheet" href="${resource(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />--%>
 
     <!-- Include javascript files -->
+    <%--
     <g:javascript library="application"/>
-
     <!-- Include jQuery UI files -->
     <g:javascript library="jquery" plugin="jquery" />
-    <jqui:resources />
-    <link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+    --%>
+    <script src="https://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.8.24/jquery-ui.min.js"></script>
+
+    <%--<jqui:resources />--%>
+    <link href="${resource(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+
+
 
 
     <!-- Include Jquery Validation and Jquery Validation UI plugins -->
@@ -34,7 +40,7 @@
 
 <!-- jquery validation messages -->
     <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
-        <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>
 
     <!-- Grails Layout : write head element for page-->
@@ -42,7 +48,9 @@
 
     <g:render template="/common/customCss"/>
 
+    <%--
     <ga:trackPageview />
+    --%>
     <r:layoutResources/>
 </head>
 <body class="yui-skin-sam">
@@ -131,28 +139,29 @@
 </div>
 
 <!-- Include other plugins -->
-<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.cookie/', file:'jquery.cookie.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.tmpl/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+
+<script src="${resource(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.cookie/', file:'jquery.cookie.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.tmpl/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 <g:if test="${System.getenv().get('headless') != 'false'}" env="test">
     <!--headless driver throw error when using watermark-->
 </g:if>
 <g:else>
-    <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
 </g:else>
-<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
 <!-- JIRA Issue Collector -->
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.jira.issue.collector.enabled)}">
     <script type="text/javascript" src="${grailsApplication.config.openboxes.jira.issue.collector.url}"></script>
@@ -306,7 +315,7 @@
     $(document).ready(function() {
 
         //Feedback({
-        //    h2cPath: "${createLinkTo(dir:'js/html2canvas/', file:'html2canvas.js')}",
+        //    h2cPath: "${resource(dir:'js/html2canvas/', file:'html2canvas.js')}",
         //    url: '${createLink(controller: 'errors', action: 'sendFeedback')}',
         //    label: "Send feedback",
         //    header: "Send us your feedback!",
@@ -418,7 +427,7 @@
 </script>
 
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.scannerDetection.enabled)}">
-    <script src="${createLinkTo(dir:'js/jquery.scannerdetection', file:'jquery.scannerdetection.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.scannerdetection', file:'jquery.scannerdetection.js')}" type="text/javascript" ></script>
     <script>
         $(document).ready(function() {
             var scanner = $("body").scannerDetection();
