@@ -10,7 +10,6 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService

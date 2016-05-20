@@ -11,7 +11,6 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
@@ -581,7 +580,7 @@ class InventoryController {
 
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def listLowStock = {
 
         def startTime = System.currentTimeMillis()
@@ -707,12 +706,12 @@ class InventoryController {
 	}
 
 
-    def getCsvForInventoryMap(map) {
+    private String getCsvForInventoryMap(map) {
         return getCsvForInventoryMap(map, [:])
     }
 
-    def getCsvForInventoryMap(map, statusMap) {
-        def csv = "";
+    private String getCsvForInventoryMap(map, statusMap) {
+        String csv = "";
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
@@ -768,12 +767,12 @@ class InventoryController {
         return csv
     }
 
-    def getCsvForProductMap(map) {
+    private String getCsvForProductMap(map) {
         return getCsvForProductMap(map, [:])
     }
 
-    def getCsvForProductMap(map, statusMap) {
-        def csv = "";
+    private String getCsvForProductMap(map, statusMap) {
+        String csv = "";
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","

@@ -9,9 +9,6 @@
 **/ 
 package org.pih.warehouse
 
-import grails.plugin.springcache.annotations.Cacheable
-
-//import grails.plugin.springcache.annotations.Cacheable
 import java.text.MessageFormat;
 
 import org.pih.warehouse.core.Localization;

@@ -10,10 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -88,8 +85,6 @@ class DashboardController {
 			
 	}
     def throwException = {
-        println "Configuration: " + ConfigurationHolder.config.grails
-        println "Configuration: " + ConfigurationHolder.config.grails.mail
         try {
             throw new RuntimeException("error of some kind")
         } catch (RuntimeException e) {
@@ -239,7 +234,7 @@ class DashboardController {
 			
 			activityList << new DashboardActivityCommand(
 				type: "user",
-				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",				
+				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
@@ -325,7 +320,7 @@ class DashboardController {
 		render results as JSON
 	}
 
-    @Cacheable("megamenuCache")
+    //@Cacheable("megamenuCache")
 	def megamenu = {
 
         def user = User.get(session?.user?.id)
@@ -394,7 +389,7 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-    @CacheFlush(["dashboardCache", "megamenuCache"])
+    //@CacheFlush(["dashboardCache", "megamenuCache"])
     def flushCache = {
         flash.message = "Cache has been flushed"
         redirect(action: "index")

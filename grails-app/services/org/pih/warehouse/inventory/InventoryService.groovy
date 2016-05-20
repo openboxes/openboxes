@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.inventory
 
-import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
