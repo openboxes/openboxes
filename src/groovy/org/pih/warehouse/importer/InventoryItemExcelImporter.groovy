@@ -9,13 +9,15 @@
 **/ 
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.apache.commons.lang.NotImplementedException
+import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 
 // import java.text.ParseException;
 // import java.text.SimpleDateFormat;
 class InventoryItemExcelImporter extends AbstractExcelImporter {
 
+	def grailsApplication
+    def excelImportService
 	def dataService
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
@@ -48,27 +50,27 @@ class InventoryItemExcelImporter extends AbstractExcelImporter {
 	]
 
     static Map propertyMap = [
-            status:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            productCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            productName: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            tags: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            category: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            manufacturer:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            manufacturerCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            vendor:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            vendorCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            binLocation:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            package:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            packageUom:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            packageSize:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            pricePerPackage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            pricePerUnit:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            //pricePerUnitStatic:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            minQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            reorderQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            maxQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            currentQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null])
+            status:([expectedType: StringType, defaultValue:null]),
+            productCode:([expectedType: StringType, defaultValue:null]),
+            productName: ([expectedType: StringType, defaultValue:null]),
+            tags: ([expectedType: StringType, defaultValue:null]),
+            category: ([expectedType: StringType, defaultValue:null]),
+            manufacturer:([expectedType: StringType, defaultValue:null]),
+            manufacturerCode:([expectedType: StringType, defaultValue:null]),
+            vendor:([expectedType: StringType, defaultValue:null]),
+            vendorCode:([expectedType: StringType, defaultValue:null]),
+            binLocation:([expectedType: StringType, defaultValue:null]),
+            unitOfMeasure:([expectedType: StringType, defaultValue:null]),
+            package:([expectedType: StringType, defaultValue:null]),
+            packageUom:([expectedType: StringType, defaultValue:null]),
+            packageSize:([expectedType: IntType, defaultValue:null]),
+            pricePerPackage:([expectedType: IntType, defaultValue:null]),
+            pricePerUnit:([expectedType: IntType, defaultValue:null]),
+            //pricePerUnitStatic:([expectedType: IntType, defaultValue:null]),
+            minQuantity:([expectedType: IntType, defaultValue:null]),
+            reorderQuantity:([expectedType: IntType, defaultValue:null]),
+            maxQuantity:([expectedType: IntType, defaultValue:null]),
+            currentQuantity:([expectedType: IntType, defaultValue:null])
 	]
 
 
@@ -76,12 +78,14 @@ class InventoryItemExcelImporter extends AbstractExcelImporter {
 
 	public InventoryItemExcelImporter(String fileName) {
 		super(fileName)
-		dataService = ApplicationHolder.getApplication().getMainContext().getBean("dataService")
+		dataService = grailsApplication.mainContext.getBean("dataService")
 	}
 
 
 	List<Map> getData() {
-		return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        throw new NotImplementedException("Not supported due to Grails 2.5.4 migration - need to migrate code to use latest version of excel-import plugin")
+
+		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
 	}
 
 

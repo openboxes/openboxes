@@ -9,13 +9,14 @@
 **/ 
 package org.pih.warehouse.importer
 
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 
 // import java.text.ParseException;
 // import java.text.SimpleDateFormat;
+
 class ProductGroupExcelImporter extends AbstractExcelImporter {
 
-	def inventoryService
+	def excelImportService
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
 
@@ -30,9 +31,9 @@ class ProductGroupExcelImporter extends AbstractExcelImporter {
 	]
 
     static Map propertyMap = [
-            productCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            productName: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            genericProduct: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
+            productCode:([expectedType: ExpectedPropertyType.StringType, defaultValue:null]),
+            productName: ([expectedType: ExpectedPropertyType.StringType, defaultValue:null]),
+            genericProduct: ([expectedType: ExpectedPropertyType.StringType, defaultValue:null])
 	]
 
 
@@ -44,7 +45,7 @@ class ProductGroupExcelImporter extends AbstractExcelImporter {
 
 
 	List<Map> getData() {
-		return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
 	}
 
 

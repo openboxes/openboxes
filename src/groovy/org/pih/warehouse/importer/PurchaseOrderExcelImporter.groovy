@@ -9,9 +9,9 @@
 **/ 
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.AbstractExcelImporter
-import org.grails.plugins.excelimport.ExcelImportUtils
+import static org.grails.plugins.excelimport.ExpectedPropertyType.*
+
 
 /**
  * Product code
@@ -39,6 +39,8 @@ import org.grails.plugins.excelimport.ExcelImportUtils
 class PurchaseOrderExcelImporter extends AbstractExcelImporter {
 
 	def productService
+	def grailsApplication
+	def excepImportService
 
     static Map cellMap = [
 		sheet:'Sheet1', startRow: 1, cellMap: []]
@@ -71,26 +73,26 @@ class PurchaseOrderExcelImporter extends AbstractExcelImporter {
 	]
 
 	static Map propertyMap = [
-            productCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            manufacturer: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            manufacturerCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            vendor: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            vendorCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            totalOrderQuantity: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            orderNotes: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            leadTime: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            packageCost: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            unitsPerPackage: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            unitCost: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            quantityUnitsCosted: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            totalCost: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            quoteNotes: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            quantityToExpediteToMiami: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            remaining: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            miamiStatus: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            uhmStatus: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            receptionNotes: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
+            productCode:([expectedType: StringType, defaultValue:null]),
+            product:([expectedType: StringType, defaultValue:null]),
+            manufacturer: ([expectedType: StringType, defaultValue:null]),
+            manufacturerCode: ([expectedType: StringType, defaultValue:null]),
+            vendor: ([expectedType: StringType, defaultValue:null]),
+            vendorCode: ([expectedType: StringType, defaultValue:null]),
+            totalOrderQuantity: ([expectedType: StringType, defaultValue:null]),
+            orderNotes: ([expectedType: StringType, defaultValue:null]),
+            leadTime: ([expectedType: StringType, defaultValue:null]),
+            packageCost: ([expectedType: StringType, defaultValue:null]),
+            unitsPerPackage: ([expectedType: StringType, defaultValue:null]),
+            unitCost: ([expectedType: StringType, defaultValue:null]),
+            quantityUnitsCosted: ([expectedType: StringType, defaultValue:null]),
+            totalCost: ([expectedType: StringType, defaultValue:null]),
+            quoteNotes: ([expectedType: StringType, defaultValue:null]),
+            quantityToExpediteToMiami: ([expectedType: StringType, defaultValue:null]),
+            remaining: ([expectedType: StringType, defaultValue:null]),
+            miamiStatus: ([expectedType: StringType, defaultValue:null]),
+            uhmStatus: ([expectedType: StringType, defaultValue:null]),
+            receptionNotes: ([expectedType: StringType, defaultValue:null])
 	]
 
     public PurchaseOrderExcelImporter(String fileName) {
@@ -100,7 +102,7 @@ class PurchaseOrderExcelImporter extends AbstractExcelImporter {
 
 
     List<Map> getData() {
-		return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+		return excepImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
 	}
 
 

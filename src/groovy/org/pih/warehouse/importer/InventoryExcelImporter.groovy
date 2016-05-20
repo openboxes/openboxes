@@ -9,15 +9,16 @@
 **/ 
 package org.pih.warehouse.importer
 
+import grails.util.Holders
+import org.apache.commons.lang.NotImplementedException
+import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.AbstractExcelImporter
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExcelImportService
 
 // import java.text.ParseException;
 // import java.text.SimpleDateFormat;
 
-import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat
 class InventoryExcelImporter extends AbstractExcelImporter {
 
     def inventoryService
+	def excelImportService
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
 
@@ -49,26 +51,28 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 	]
 
 	static Map propertyMap = [
-            productCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            manufacturer:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            manufacturerCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            binLocation:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
+            productCode:([expectedType: StringType, defaultValue:null]),
+            product:([expectedType: StringType, defaultValue:null]),
+            lotNumber:([expectedType: StringType, defaultValue:null]),
+            expirationDate:([expectedType: StringType, defaultValue:null]),
+            manufacturer:([expectedType: StringType, defaultValue:null]),
+            manufacturerCode:([expectedType: StringType, defaultValue:null]),
+            quantity:([expectedType: StringType, defaultValue:null]),
+            binLocation:([expectedType: StringType, defaultValue:null]),
+            comments:([expectedType: StringType, defaultValue:null])
 	]
 
 
 	public InventoryExcelImporter(String fileName) {
 		super(fileName)
-        inventoryService = ApplicationHolder.getApplication().getMainContext().getBean("inventoryService")
+        inventoryService = Holders.grailsApplication.getMainContext().getBean("inventoryService")
 	}
 
 
 	List<Map> getData() {
-		return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+		throw new NotImplementedException("Not supported due to Grails 2.5.4 migration - need to migrate code to use latest version of excel-import plugin")
+		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+
     }
 
 
