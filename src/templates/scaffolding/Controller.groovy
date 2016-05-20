@@ -6,102 +6,106 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 <%=packageName ? "package ${packageName}\n\n" : ''%>class ${className}Controller {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+import static org.springframework.http.HttpStatus.*
+import grails.transaction.Transactional
 
-    def index = {
-        redirect(action: "list", params: params)
+@Transactional(readOnly = true)
+class ${className}Controller {
+
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond ${className}.list(params), model:[${propertyName}Count: ${className}.count()]
     }
 
-    def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [${propertyName}List: ${className}.list(params), ${propertyName}Total: ${className}.count()]
+    def show(${className} ${propertyName}) {
+        respond ${propertyName}
     }
 
-    def create = {
-        def ${propertyName} = new ${className}()
-        ${propertyName}.properties = params
-        return [${propertyName}: ${propertyName}]
+    def create() {
+        respond new ${className}(params)
     }
 
-    def save = {
-        def ${propertyName} = new ${className}(params)
-        if (${propertyName}.save(flush: true)) {
-            flash.message = "\${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-            redirect(action: "list", id: ${propertyName}.id)
+    @Transactional
+    def save(${className} ${propertyName}) {
+        if (${propertyName} == null) {
+            notFound()
+            return
         }
-        else {
-            render(view: "create", model: [${propertyName}: ${propertyName}])
-        }
-    }
 
-    def show = {
-        def ${propertyName} = ${className}.get(params.id)
-        if (!${propertyName}) {
-            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-            redirect(action: "list")
+        if (${propertyName}.hasErrors()) {
+            respond ${propertyName}.errors, view:'create'
+            return
         }
-        else {
-            [${propertyName}: ${propertyName}]
-        }
-    }
 
-    def edit = {
-        def ${propertyName} = ${className}.get(params.id)
-        if (!${propertyName}) {
-            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [${propertyName}: ${propertyName}]
-        }
-    }
+        ${propertyName}.save flush:true
 
-    def update = {
-        def ${propertyName} = ${className}.get(params.id)
-        if (${propertyName}) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (${propertyName}.version > version) {
-                    <% def lowerCaseName = grails.util.GrailsNameUtils.getPropertyName(className) %>
-                    ${propertyName}.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}')] as Object[], "Another user has updated this ${className} while you were editing")
-                    render(view: "edit", model: [${propertyName}: ${propertyName}])
-                    return
-                }
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])
+                redirect ${propertyName}
             }
-            ${propertyName}.properties = params
-            if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
-                flash.message = "\${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-                redirect(action: "list", id: ${propertyName}.id)
-            }
-            else {
-                render(view: "edit", model: [${propertyName}: ${propertyName}])
-            }
-        }
-        else {
-            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-            redirect(action: "list")
+            '*' { respond ${propertyName}, [status: CREATED] }
         }
     }
 
-    def delete = {
-        def ${propertyName} = ${className}.get(params.id)
-        if (${propertyName}) {
-            try {
-                ${propertyName}.delete(flush: true)
-                flash.message = "\${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "\${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-                redirect(action: "list", id: params.id)
-            }
+    def edit(${className} ${propertyName}) {
+        respond ${propertyName}
+    }
+
+    @Transactional
+    def update(${className} ${propertyName}) {
+        if (${propertyName} == null) {
+            notFound()
+            return
         }
-        else {
-            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-            redirect(action: "list")
+
+        if (${propertyName}.hasErrors()) {
+            respond ${propertyName}.errors, view:'edit'
+            return
+        }
+
+        ${propertyName}.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
+                redirect ${propertyName}
+            }
+            '*'{ respond ${propertyName}, [status: OK] }
+        }
+    }
+
+    @Transactional
+    def delete(${className} ${propertyName}) {
+
+        if (${propertyName} == null) {
+            notFound()
+            return
+        }
+
+        ${propertyName}.delete flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.deleted.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
+                redirect action:"index", method:"GET"
+            }
+            '*'{ render status: NO_CONTENT }
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
         }
     }
 }
