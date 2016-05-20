@@ -1,35 +1,49 @@
+<!DOCTYPE html>
 <html>
-  <head>
-	  <title>General Error</title>
-	  <meta name="layout" content="custom" />	  
-	  <style type="text/css">
-	  		.message {
-	  			border: 1px solid black;
-	  			padding: 5px;
-	  			background-color:#E9E9E9;
-	  		}
-	  		.stack {
-	  			border: 1px solid black;
-	  			padding: 5px;
-	  			overflow:auto;
-	  			height: 300px;
-	  		}
-	  		.snippet {
-	  			padding: 5px;
-	  			background-color:white;
-	  			border:1px solid black;
-	  			margin:3px;
-	  			font-family:courier;
-	  		}
-	  		.dialog { 
-	  			display: none;
-	  		}
-	  </style>
-  </head>
+	<head>
+		<title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
+		<meta name="layout" content="custom">
+        <style type="text/css">
+        .message {
+            border: 1px solid black;
+            padding: 5px;
+            background-color:#E9E9E9;
+        }
+        .stack {
+            border: 1px solid black;
+            padding: 5px;
+            overflow:auto;
+            height: 300px;
+        }
+        .snippet {
+            padding: 5px;
+            background-color:white;
+            border:1px solid black;
+            margin:3px;
+            font-family:courier;
+        }
+        .dialog {
+            display: none;
+        }
+        </style>
+
+		<%--<g:if env="development"><asset:stylesheet src="errors.css"/></g:if>--%>
+	</head>
 
   <body>
-  
-  	<div class="" style="padding: 10px;">
+	<%-- Grails 2.5.4 Error Page --%>
+	
+	<%--
+	<g:if env="development">
+		<g:renderException exception="${exception}" />
+	</g:if>
+	<g:else>
+		<ul class="errors">
+			<li>An error has occurred</li>
+		</ul>
+	</g:else>
+	--%>
+  <div class="" style="padding: 10px;">
 
 
         <button class="open-dialog">
@@ -45,7 +59,7 @@
         </button>
 	</div>
 
-    <h2>Error Details</h2>
+    	<h2>Error Details</h2>
   	<div class="message">
 		<strong>Error ${request?.'javax.servlet.error.status_code'}:</strong>
     		${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
