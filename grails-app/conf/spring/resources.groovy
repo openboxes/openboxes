@@ -8,9 +8,8 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 import com.mchange.v2.c3p0.ComboPooledDataSource
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import grails.util.Holders
 import org.springframework.cache.ehcache.EhCacheFactoryBean
-
 beans = {
 
 	customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
@@ -20,48 +19,48 @@ beans = {
 	//	java.util.Locale.setDefault(defaultLocale)
 	//}
 
-    dashboardCache(EhCacheFactoryBean) { bean ->
-        cacheManager = ref("springcacheCacheManager")
-        cacheName = "dashboardCache"
-        // these are just examples of properties you could set
-        eternal = false
-        diskPersistent = false
-        memoryStoreEvictionPolicy = "LRU"
-        timeToLive = 86400       // 1 day = 60 * 60 * 24
-        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
-    }
-    inventorySnapshotCache(EhCacheFactoryBean) { bean ->
-        cacheManager = ref("springcacheCacheManager")
-        cacheName = "inventorySnapshotCache"
-        // these are just examples of properties you could set
-        eternal = false
-        diskPersistent = false
-        memoryStoreEvictionPolicy = "LRU"
-        timeToLive = 86400       // 1 day = 60 * 60 * 24
-        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
-    }
-
-    quantityOnHandCache(EhCacheFactoryBean) { bean ->
-        cacheManager = ref("springcacheCacheManager")
-        cacheName = "quantityOnHandCache"
-        // these are just examples of properties you could set
-        eternal = false
-        diskPersistent = false
-        memoryStoreEvictionPolicy = "LRU"
-        timeToLive = 86400       // 1 day = 60 * 60 * 24
-        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
-    }
-
-    megamenuCache(EhCacheFactoryBean) { bean ->
-        cacheManager = ref("springcacheCacheManager")
-        cacheName = "megamenuCache"
-        // these are just examples of properties you could set
-        eternal = false
-        diskPersistent = false
-        memoryStoreEvictionPolicy = "LRU"
-        timeToLive = 3600       // 1 hour = 60 * 60 * 1
-        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
-    }
+//    dashboardCache(EhCacheFactoryBean) { bean ->
+//        cacheManager = ref("springcacheCacheManager")
+//        cacheName = "dashboardCache"
+//        // these are just examples of properties you could set
+//        eternal = false
+//        diskPersistent = false
+//        memoryStoreEvictionPolicy = "LRU"
+//        timeToLive = 86400       // 1 day = 60 * 60 * 24
+//        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
+//    }
+//    inventorySnapshotCache(EhCacheFactoryBean) { bean ->
+//        cacheManager = ref("springcacheCacheManager")
+//        cacheName = "inventorySnapshotCache"
+//        // these are just examples of properties you could set
+//        eternal = false
+//        diskPersistent = false
+//        memoryStoreEvictionPolicy = "LRU"
+//        timeToLive = 86400       // 1 day = 60 * 60 * 24
+//        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
+//    }
+//
+//    quantityOnHandCache(EhCacheFactoryBean) { bean ->
+//        cacheManager = ref("springcacheCacheManager")
+//        cacheName = "quantityOnHandCache"
+//        // these are just examples of properties you could set
+//        eternal = false
+//        diskPersistent = false
+//        memoryStoreEvictionPolicy = "LRU"
+//        timeToLive = 86400       // 1 day = 60 * 60 * 24
+//        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
+//    }
+//
+//    megamenuCache(EhCacheFactoryBean) { bean ->
+//        cacheManager = ref("springcacheCacheManager")
+//        cacheName = "megamenuCache"
+//        // these are just examples of properties you could set
+//        eternal = false
+//        diskPersistent = false
+//        memoryStoreEvictionPolicy = "LRU"
+//        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+//        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+//    }
 
 
 	/**
@@ -73,10 +72,10 @@ beans = {
 	dataSource(ComboPooledDataSource) { bean ->
 		bean.destroyMethod = 'close'
 		//use grails' datasource configuration for connection user, password, driver and JDBC url
-		user = CH.config.dataSource.username
-		password = CH.config.dataSource.password
-		driverClass = CH.config.dataSource.driverClassName
-		jdbcUrl = CH.config.dataSource.url 
+		user = Holders.grailsApplication.config.dataSource.username
+		password = Holders.grailsApplication.config.dataSource.password
+		driverClass = Holders.grailsApplication.config.dataSource.driverClassName
+		jdbcUrl = Holders.grailsApplication.config.dataSource.url
 		//connection test settings
 		idleConnectionTestPeriod = 2 * 60 * 60 // 2 hours
 		initialPoolSize = 10
