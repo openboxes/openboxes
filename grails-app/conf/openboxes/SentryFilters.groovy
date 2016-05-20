@@ -9,13 +9,14 @@
  **/
 package openboxes
 
-import grails.plugins.raven.RavenClient
 import grails.util.Environment
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.User
+//import net.kencochrane.raven.Raven
+
 
 class SentryFilters {
-    def ravenClient
+    //Raven ravenClient
 
     def filters = {
         all(uri: '/**') {
@@ -23,7 +24,7 @@ class SentryFilters {
                 if (session.user) {
 
                     try {
-                        def serverUrl = ConfigurationHolder.config.grails.serverURL
+                        def serverUrl = Holders.grailsApplication.config.grails.serverURL
                         def user = User.get(session.user.id)
                         def userData = [
                                 id         : user.id, is_authenticated: true,
@@ -37,12 +38,12 @@ class SentryFilters {
                                 server     : serverUrl ?: "No server URL",
                                 clickstream: session?.id ? "${serverUrl}/stream/view/${session?.id}" : "No clickstream"
                         ]
-                        ravenClient.setUserData(userData)
+                        //ravenClient.setUserData(userData)
                     } catch (Exception e) {
                         log.info("Unable to set the user data for sentry due to the following error " + e.message)
                     }
                 } else {
-                    ravenClient.setUserData([is_authenticated:false])
+                    //ravenClient.setUserData([is_authenticated:false])
                 }
             }
         }
