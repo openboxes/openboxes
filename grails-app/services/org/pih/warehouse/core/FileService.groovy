@@ -9,7 +9,6 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment;
 
@@ -49,13 +48,13 @@ import org.docx4j.wml.TrPr
 
 class FileService {
 	boolean transactional = false
-	
+	def grailsApplication
 	
 	public File findFile(String filePath){
 		def file
-		def appContext = ApplicationHolder.application.parentContext
+		def appContext = grailsApplication.parentContext
 		def archiveDirectory = filePath
-		if (ApplicationHolder.application.isWarDeployed()){
+		if (grailsApplication.isWarDeployed()){
 			//archiveDirectory = "${File.separator}WEB-INF${File.separator}grails-app${File.separator}conf${File.separator}${filePath}"			
 			archiveDirectory = "classpath:$filePath";
 			file = appContext.getResource(archiveDirectory)?.getFile()
