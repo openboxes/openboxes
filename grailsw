@@ -132,7 +132,7 @@ fi
 if [ -z "$STARTER_CONF" ]; then
     STARTER_CONF="$GRAILS_HOME/conf/groovy-starter.conf"
 fi
-STARTER_CLASSPATH="wrapper/grails-wrapper-runtime-2.4.3.jar:wrapper:."
+STARTER_CLASSPATH="wrapper/grails-wrapper-runtime-2.5.4.jar:wrapper:."
 
 # Allow access to Cocoa classes on OS X
 if $darwin; then
@@ -200,7 +200,7 @@ if $mingw ; then
 fi
 
 if [ -z "$GRAILS_AGENT_CACHE_DIR" ]; then
-    GRAILS_AGENT_CACHE_DIR=~/.grails/2.4.3/
+    GRAILS_AGENT_CACHE_DIR=~/.grails/2.5.4/
 fi
 SPRINGLOADED_PARAMS=profile=grails\;cacheDir=$GRAILS_AGENT_CACHE_DIR
 if [ ! -d "$GRAILS_AGENT_CACHE_DIR" ]; then
@@ -208,7 +208,7 @@ if [ ! -d "$GRAILS_AGENT_CACHE_DIR" ]; then
 fi
 
 # Process JVM args
-AGENT_STRING="-javaagent:wrapper/springloaded-1.2.0.RELEASE.jar -noverify -Dspringloaded.synchronize=true -Djdk.reflect.allowGetCallerClass=true -Dspringloaded=$SPRINGLOADED_PARAMS"
+AGENT_STRING="-javaagent:wrapper/springloaded-1.2.4.RELEASE.jar -Xverify:none -Dspringloaded.synchronize=true -Djdk.reflect.allowGetCallerClass=true -Dspringloaded=$SPRINGLOADED_PARAMS"
 CMD_LINE_ARGS=""
 DISABLE_RELOADING=true
 
@@ -306,7 +306,7 @@ if $cygwin; then
     for arg in "$@" ; do
     	CHECK=`echo "$arg"|egrep -c "$OURCYGPATTERN" -`
     	if [ $CHECK -ne 0 ] ; then
-	    	convArg=`cygpath --path --ignore --mixed "$arg"`
+	    	convArg=`cygpath --path --ignore --mixed -- "$arg"`
     	else
 			convArg=$arg
     	fi
