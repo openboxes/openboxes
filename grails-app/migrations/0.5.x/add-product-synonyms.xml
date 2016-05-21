@@ -52,7 +52,7 @@
         </createTable>
     </changeSet>
     -->
-    <changeSet author="jmiranda (generated)" id="1383077886142-3">
+    <changeSet author="jmiranda (generated)" id="1383077886142-3" failOnError="false">
         <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="FK98293BFB217F5972"/>
