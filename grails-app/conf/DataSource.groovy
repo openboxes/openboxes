@@ -55,10 +55,11 @@ environments {
 	test {
 		dataSource {
 			//dbCreate = "update"
-			driverClassName = "org.h2.Driver"
-			username = "sa"
-			password = ""
-			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+//			driverClassName = "org.h2.Driver"
+//			username = "sa"
+//			password = ""
+//			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 
 		}
 	}
