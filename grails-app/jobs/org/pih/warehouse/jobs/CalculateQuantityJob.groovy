@@ -10,13 +10,12 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 class CalculateQuantityJob {
 
-    def inventoryService
     def mailService
-    def grailsApplication
+    def inventoryService
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'cronTrigger', cronExpression: grailsApplication.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron name:'cronTrigger', cronExpression: Holders.grailsApplication.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
 	def execute(context) {
