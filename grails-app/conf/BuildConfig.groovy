@@ -81,6 +81,7 @@ grails.project.dependency.resolution = {
 		compile 'org.apache.commons:commons-email:1.2'
         compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
+		test 'dumbster:dumbster:1.6'
 
 
 //		//compile 'org.apache.httpcomponents:httpcore:4.2.1'
