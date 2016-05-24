@@ -107,6 +107,8 @@ grails.project.dependency.resolution = {
 	plugins {
 
 		build ":tomcat:7.0.55.3" // or ":tomcat:8.0.22"
+        //test ":spock:0.7"
+        test ":build-test-data:2.4.0"
 
 		// plugins for the compile step
 		compile ":scaffolding:2.1.2"
