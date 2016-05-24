@@ -1,30 +1,28 @@
 package org.pih.warehouse
 
-import grails.test.ControllerUnitTestCase
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import org.pih.warehouse.product.*
 import grails.converters.JSON
-//import org.pih.warehouse.requisition.RequisitionService
-import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.core.*
+import org.pih.warehouse.shipping.Shipment
 
 
-
-class JsonControllerTests extends ControllerUnitTestCase {
+@TestFor(JsonController)
+//@Mock([Location, Product, ProductService])
+@Build([Location, Product, Inventory])
+class JsonControllerTests {
 
     void testSearchProductByName() {
-        def bostonInventory = new Inventory(id: "bostonInventory")        
-        def location = new Location(name: "boston", id: "1234", inventory: bostonInventory)
-        mockDomain(Location, [location])
-     //   def group1 = new ProductGroup(id: "group1", description: "painkiller")
-     //   def group2 = new ProductGroup(id: "group2", description: "painLight")
-        def product11 = new Product(id: "product11", name: "sophin 2500mg", productCode: "ab11")
-        def product12 = new Product(id: "product12", name: "boo killer", productCode: "ab12")
-        def product21 = new Product(id: "product21", name: "foo killer", productCode: "ab21")
-        def product22 = new Product(id: "product22", name: "moo", productCode: "ab22")
-        def product3 = new Product(id: "product3", name: "gookiller", productCode: "ab3")
-
-
+        def bostonInventory = Inventory.build(id: "bostonInventory")
+        def location = Location.build(id: "1234", name: "boston", inventory: bostonInventory)
+        def product11 = Product.build(id: "product11", name: "sophin 2500mg", productCode: "ab11")
+        def product12 = Product.build(id: "product12", name: "boo killer", productCode: "ab12")
+        def product21 = Product.build(id: "product21", name: "foo killer", productCode: "ab21")
+        def product22 = Product.build(id: "product22", name: "moo", productCode: "ab22")
+        def product3 = Product.build(id: "product3", name: "gookiller", productCode: "ab3")
 
         def productsSearchResult = [
           [product11.id, product11.name, product11.productCode],
@@ -35,8 +33,8 @@ class JsonControllerTests extends ControllerUnitTestCase {
         def productServiceMock = mockFor(ProductService)
         productServiceMock.demand.searchProductAndProductGroup(1..2){ term -> productsSearchResult}
         productServiceMock.demand.getProducts(1..1){ term -> [ product11, product12, product21, product3 ]}
+        controller.productService = productServiceMock.createMock()
 
-        def inventoryServiceMock = mockFor(InventoryService)
         def quantities = [:]
         quantities[product11.id] = 1100
         quantities[product12.id] = 1200
@@ -44,9 +42,10 @@ class JsonControllerTests extends ControllerUnitTestCase {
         quantities[product22.id] = 2200
         quantities[product3.id] = 3000
 
+        def inventoryServiceMock = mockFor(InventoryService)
         inventoryServiceMock.demand.getQuantityForProducts{inventory, productIds -> quantities}
         controller.inventoryService =  inventoryServiceMock.createMock()
-        controller.productService = productServiceMock.createMock()
+
         controller.session.warehouse = location
         controller.params.term = "killer"
         controller.searchProduct()
@@ -99,11 +98,18 @@ class JsonControllerTests extends ControllerUnitTestCase {
     }
 	
 	// No signature of method: static org.pih.warehouse.core.Person.withCriteria() is applicable for argument types:
-	/*
-	def test_globalSearch() { 
-		def location = new Location(name: "Boston")
+
+	void testGlobalSearch() {
+        def bostonInventory = Inventory.build(id: "bostonInventory")
+		def location = Location.build(name: "Boston", inventory: bostonInventory)
 		mockDomain(Shipment, [new Shipment(name: "Test Shipment")])
-		mockDomain(Product, [new Product(name: "Test Product")])
+		Product.build(name: "Test Product 1")
+//        Product.build(name: "Test Product 2")
+//        Product.build(name: "Test Product 3")
+//        Product.build(name: "Test Product 4")
+//        Product.build(name: "Test Product 5")
+
+
 		def inventoryServiceMock = mockFor(InventoryService)
 		inventoryServiceMock.demand.getProductsByTermsAndCategories{ terms, categories, includeHidden, inventory, max, offset -> 
 			return Product.list() 
@@ -117,7 +123,8 @@ class JsonControllerTests extends ControllerUnitTestCase {
 		def jsonResponse = controller.response.contentAsString
 		println jsonResponse
 		def jsonResult = JSON.parse(jsonResponse)
+        println jsonResult
+        assertNotNull jsonResult
 	}
-	*/
-	
+
 }
