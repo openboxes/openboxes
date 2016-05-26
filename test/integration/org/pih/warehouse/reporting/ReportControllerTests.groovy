@@ -9,8 +9,12 @@ import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.ReportController
 
-@Ignore
 class ReportControllerTests extends ControllerUnitTestCase {
+
+    @Test
+    void testSomething() {
+        assert true
+    }
 
     @Ignore
     void showInventorySamplingReport() {
