@@ -11,7 +11,7 @@ import org.pih.warehouse.reporting.ReportController
 
 class ReportControllerTests extends ControllerUnitTestCase {
 
-    @Test
+    @Ignore
     void showInventorySamplingReport() {
         def location = Location.findByName("Boston Headquarters");
         assert location != null
