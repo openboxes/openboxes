@@ -212,7 +212,7 @@ class InventoryController {
         def startTime = System.currentTimeMillis()
         println "search " + params
 
-        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tag
+        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tags
 
         if (command.validate()) {
 
@@ -261,7 +261,7 @@ class InventoryController {
                 for (date in command?.dates) {
                     println "Get quantity map " + date + " location = " + location
                     def quantityMap = [:]
-                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tag)
+                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tags)
                     def existingQuantityMap = quantityMapByDate[date]
                     if (existingQuantityMap) {
                         quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)
@@ -366,7 +366,7 @@ class InventoryController {
 
         println "search " + params
         println "search " + command.location + " " + command.startDate
-        def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tag)
+        def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tags)
         if (quantityMap) {
             def statusMap = inventoryService.getInventoryStatus(command.location)
             def filename = "Stock report - " +
@@ -1764,6 +1764,7 @@ class QuantityOnHandReportCommand {
     List<Location> locations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List dates = []
     List products = []
+    List tags = []
     Tag tag
     Date startDate = new Date()
     Date endDate
