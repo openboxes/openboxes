@@ -28,10 +28,10 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-
+                        &nbsp;
+                        <img src="${createLinkTo(dir:'images/icons/silk/heart.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
                     <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/heart.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                         <g:link controller="inventory" action="listHealthyStock" target="_blank">
                             <warehouse:message code="inventory.listHealthyStock.label" default="Healthy stock"/>
                         </g:link>
@@ -42,9 +42,10 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
+                        &nbsp;
+                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
                     <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                         <g:link controller="inventory" action="listOverStock" target="_blank">
                             <warehouse:message code="inventory.listOverStock.label" default="Items that are over stocked"/>
                         </g:link>
@@ -55,9 +56,10 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
+                        &nbsp;
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                     </td>
                     <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                         <g:link controller="inventory" action="listReorderStock" target="_blank">
                             <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
                         </g:link>
@@ -68,9 +70,10 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
+                        &nbsp;
+                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                     </td>
                     <td class="indent">
-                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                         <g:link controller="inventory" action="listLowStock" target="_blank">
                             <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
                         </g:link>
@@ -97,9 +100,10 @@
 
                 <tr>
                     <td class="center" style="width: 1%">
+                        &nbsp;
+                        <img src="${createLinkTo(dir:'images/icons/silk/stop.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
                     </td>
                     <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/stop.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
                         <g:link controller="inventory" action="listOutOfStock" target="_blank">
                             <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
                         </g:link>
@@ -109,10 +113,6 @@
 
                     </td>
                 </tr>
-
-
-
-
 				</tbody>
                 <tfoot>
 
