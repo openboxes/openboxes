@@ -28,6 +28,9 @@
                         <li>
                             <a href="#tabs-4" id="system-properties-tab"><warehouse:message code="admin.systemProperties.header"/></a>
                         </li>
+                        <li>
+                            <a href="#tabs-5" id="job-settings-tab"><warehouse:message code="admin.jobSettings.header" default="Job Settings"/></a>
+                        </li>
                     </ul>
                     <div id="tabs-1">
                         <table>
@@ -206,6 +209,45 @@
                                     </td>
                                 </tr>
                             </g:each>
+                        </table>
+                    </div>
+                    <div id="tabs-5">
+                        <table>
+                            <g:each var="externalProperty" in="${externalConfigProperties}" >
+                                <g:each var="property" in="${externalProperty}">
+                                    <g:if test="${property?.key?.contains('jobs')}">
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label>${property.key }</label>
+                                            </td>
+                                            <td class="value">
+                                                <g:if test="${property?.key?.contains('password') && property.value}">
+                                                    ${util.StringUtil.mask(property?.value, "*")}
+                                                </g:if>
+                                                <g:else>
+                                                    ${property.value }
+                                                </g:else>
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                </g:each>
+                            </g:each>
+
+
+                            <tr class="prop">
+                                <td class="name">
+                                    <label>
+                                        <warehouse:message code="admin.calculateHistoricalQuantityJob.status" default="Calculate Historical Quantity Job Status"></warehouse:message>
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <span id="jobStatus">unknown</span>
+                                    <g:remoteLink class="button" controller="json" action="statusCalculateHistoricalQuantityJob" update="jobStatus">Show Status</g:remoteLink>
+                                    <g:remoteLink class="button" controller="json" action="enableCalculateHistoricalQuantityJob">Enable</g:remoteLink>
+                                    <g:remoteLink class="button" controller="json" action="disableCalculateHistoricalQuantityJob">Disable</g:remoteLink>
+
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </div>

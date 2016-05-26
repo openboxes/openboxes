@@ -20,6 +20,8 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
+import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -1480,5 +1482,19 @@ class JsonController {
         render ([id:orderItem.id, product:orderItem.product, order:orderItem.order, quantity:orderItem.quantity, unitPrice:orderItem.unitPrice] as JSON)
     }
 
+
+    def enableCalculateHistoricalQuantityJob = {
+        CalculateHistoricalQuantityJob.enabled = true
+        render([message: "CalculateHistoricalQuantityJob has been ${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"] as JSON)
+    }
+
+    def disableCalculateHistoricalQuantityJob = {
+        CalculateHistoricalQuantityJob.enabled = false
+        render([message: "CalculateHistoricalQuantityJob has been ${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"] as JSON)
+    }
+
+    def statusCalculateHistoricalQuantityJob = {
+        render "${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"
+    }
 
 }

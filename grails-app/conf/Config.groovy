@@ -315,6 +315,8 @@ log4j = {
             'grails.plugin.springcache',
 			'BootStrap',
 			'liquibase',
+            'grails.quartz2',
+            'org.quartz',
 			'com.gargoylesoftware.htmlunit'
 
    debug 	'org.apache.cxf',
@@ -453,8 +455,13 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
 
-// Background jobs
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
+// Calculate current quantity on hand
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+
+// Calculate historical quantity on hand
+openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
+openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 * * * * ?" // every minute
+openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // LDAP configuration
 openboxes.ldap.enabled = false

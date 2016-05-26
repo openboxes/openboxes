@@ -79,7 +79,7 @@ class InventorySnapshotController {
     def triggerCalculateQuantityOnHandJob = {
         println "triggerCalculateQuantityOnHandJob: " + params
 
-        def results = CalculateQuantityJob.triggerNow([productId:params.product.id,locationId:params.location.id,alltime:true])
+        def results = CalculateQuantityJob.triggerNow([productId:params.product.id,locationId:params.location.id,includeAllDates:true])
 
         render ([started:true, results:results] as JSON)
 
