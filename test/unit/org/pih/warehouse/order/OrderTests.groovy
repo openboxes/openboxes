@@ -11,28 +11,22 @@ package org.pih.warehouse.order
 
 import grails.test.*
 import org.pih.warehouse.core.Location
+import grails.test.mixin.Mock
 
-class OrderTests extends GrailsUnitTestCase {
-    protected void setUp() {
-        super.setUp()
-    }
-
-    protected void tearDown() {
-        super.tearDown()
-    }
+@Mock([Order, OrderItem])
+class OrderTests {
 
     void testListOrderItemsWithEmptyOrder() {
         Order order = new Order()
-        mockDomain(Order, [order])
         assertNotNull order.listOrderItems()
     }
 
     void testListOrderItems() {
         Order order = new Order()
-        mockDomain(Order, [order])
-        order.addToOrderItems([id: 1, dateCreated: new Date()-2])
-        order.addToOrderItems([id: 2, dateCreated: new Date()-3])
-        order.addToOrderItems([id: 3, dateCreated: new Date()-1])
+        order.addToOrderItems(new OrderItem([id: 1, dateCreated: new Date()-2]))
+        order.addToOrderItems(new OrderItem([id: 2, dateCreated: new Date()-3]))
+        order.addToOrderItems(new OrderItem([id: 3, dateCreated: new Date()-1]))
+        println order.orderItems
         println order.listOrderItems()
         def orderItems = order.listOrderItems()
         assertNotNull orderItems
@@ -52,7 +46,6 @@ class OrderTests extends GrailsUnitTestCase {
 
     void testTotalPriceWithEmptyOrder() {
         Order order = new Order()
-        mockDomain(Order, [order])
         assertEquals(0, order.totalPrice())
     }
 }

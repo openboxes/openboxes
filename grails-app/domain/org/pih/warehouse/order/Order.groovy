@@ -38,7 +38,9 @@ class Order implements Serializable {
 		events cascade: "all-delete-orphan"
 	}
 	
-	static constraints = { 
+	static constraints = {
+		id(bindable:true)
+		dateCreated(bindable:true)
 		status(nullable:true)
 		description(nullable:false, blank: false, maxSize: 255)
 		orderNumber(nullable:true, maxSize: 255)

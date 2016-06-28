@@ -46,7 +46,9 @@ class OrderItem implements Serializable {
 	static hasMany = [ orderShipments : OrderShipment ]
 
     static constraints = {
-    	description(nullable:true)
+		id(bindable:true)
+        dateCreated(bindable:true)
+		description(nullable:true)
 		category(nullable:true)
 		product(nullable:true)
 		inventoryItem(nullable:true)
