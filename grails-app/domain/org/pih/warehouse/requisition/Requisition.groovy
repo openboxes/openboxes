@@ -135,6 +135,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     static constraints = {
+        id(bindable:true)
         status(nullable: true)
         type(nullable: true)
         name(nullable: true)

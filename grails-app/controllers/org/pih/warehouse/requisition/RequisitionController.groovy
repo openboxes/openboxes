@@ -296,7 +296,7 @@ class RequisitionController {
 
 
     def save = {
-        def jsonResponse = []
+        def jsonResponse
         def requisition = new Requisition()
 		try {
             def jsonRequest = request.JSON

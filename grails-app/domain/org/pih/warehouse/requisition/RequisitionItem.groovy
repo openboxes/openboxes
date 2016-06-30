@@ -94,6 +94,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     static mappedBy = [requisitionItems:'parentRequisitionItem']
 
     static constraints = {
+        id(bindable:true)
         requisitionItemType(nullable:true)
     	description(nullable:true)
         category(nullable:true)
