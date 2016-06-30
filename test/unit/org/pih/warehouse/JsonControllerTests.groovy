@@ -31,8 +31,9 @@ class JsonControllerTests {
           [product3.id, product3.name, product3.productCode] ]
 
         def productServiceMock = mockFor(ProductService)
-        productServiceMock.demand.searchProductAndProductGroup(1..2){ term -> productsSearchResult}
-        productServiceMock.demand.getProducts(1..1){ term -> [ product11, product12, product21, product3 ]}
+        productServiceMock.demand.searchProductAndProductGroup { term -> productsSearchResult}
+        //productServiceMock.demand.searchProductAndProductGroup { term, useWildcard -> productsSearchResult}
+        productServiceMock.demand.getProducts { String[] ids -> [ product11, product12, product21, product3 ]}
         controller.productService = productServiceMock.createMock()
 
         def quantities = [:]
@@ -103,17 +104,27 @@ class JsonControllerTests {
         def bostonInventory = Inventory.build(id: "bostonInventory")
 		def location = Location.build(name: "Boston", inventory: bostonInventory)
 		mockDomain(Shipment, [new Shipment(name: "Test Shipment")])
-		Product.build(name: "Test Product 1")
-//        Product.build(name: "Test Product 2")
-//        Product.build(name: "Test Product 3")
-//        Product.build(name: "Test Product 4")
-//        Product.build(name: "Test Product 5")
+		def product1 = Product.build(name: "Test Product 1")
+        def product2 = Product.build(name: "Test Product 2")
+        def product3 = Product.build(name: "Test Product 3")
+        def product4 = Product.build(name: "Test Product 4")
+        def product5 = Product.build(name: "Test Product 5")
+        def quantityByProductMap = [product1: 1, product2: 2, product3: 3, product4: 4, product5: 5]
 
 
 		def inventoryServiceMock = mockFor(InventoryService)
 		inventoryServiceMock.demand.getProductsByTermsAndCategories{ terms, categories, includeHidden, inventory, max, offset -> 
 			return Product.list() 
 		}
+        inventoryServiceMock.demand.getQuantityByProductMap { inventory, products ->
+            return quantityByProductMap
+        }
+        def stubMessageTagLib = new Expando()
+        stubMessageTagLib.message = { message -> return message }
+        controller.metaClass.warehouse = stubMessageTagLib;
+
+
+
 		//inventoryServiceMock.demand.getQuantityForProducts{inventory, prodcutIds -> quantities}
 		controller.inventoryService =  inventoryServiceMock.createMock()
 		//controller.productService = productServiceMock.createMock()

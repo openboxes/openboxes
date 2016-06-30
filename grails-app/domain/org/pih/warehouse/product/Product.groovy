@@ -227,6 +227,7 @@ class Product implements Comparable, Serializable {
     }
 
     static constraints = {
+        id(bindable:true)
         name(nullable: false, blank: false, maxSize: 255)
         description(nullable: true)
         productCode(nullable: true, maxSize: 255, unique: true)
