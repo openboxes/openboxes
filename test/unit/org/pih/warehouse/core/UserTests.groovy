@@ -23,6 +23,9 @@ class UserTests extends GrailsUnitTestCase {
 
         user.addToLocationRoles(locationRole1)
         user.addToLocationRoles(locationRole2)
+        println "user location pairs: " + user.locationRolePairs()
+        println "user location pairs: " + user.locationRolesDescription()
+
         assert user.locationRolePairs() == [l1: role1.id, l2: role2.id]
         assert user.locationRolesDescription() == "boston: Manager | miami: Browser"
     }

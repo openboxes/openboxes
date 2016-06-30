@@ -18,6 +18,7 @@ class Role implements Serializable, Comparable<Role> {
     String description;
 
     static constraints = {
+        id(bindable:true)
         roleType(nullable: false)
         description(nullable: true, maxSize: 255)
     }

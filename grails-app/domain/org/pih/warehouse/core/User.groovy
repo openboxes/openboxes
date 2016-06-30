@@ -38,6 +38,7 @@ class User extends Person {
     }
     static transients = ["passwordConfirm"]
     static constraints = {
+        id(bindable:true)
         active(nullable: true)
         username(blank: false, unique: true, maxSize: 255)
         password(blank: false, minSize: 6, maxSize: 255, validator: { password, obj ->
@@ -83,6 +84,11 @@ class User extends Person {
     def locationRolesDescription() {
         def roleArray = locationRoles.collect { "${it.location?.name}: ${it.role?.roleType?.name}" }
         roleArray?.join(" | ")
+    }
+
+
+    String toString() {
+        return id
     }
 
 }
