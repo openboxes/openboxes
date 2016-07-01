@@ -12,7 +12,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.BaseUnitTest;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location
-// import org.pih.warehouse.product.Category;
+import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product
 
 
@@ -21,8 +21,15 @@ class InventoryServiceUnitTests extends BaseUnitTest {
 
 	protected void setUp() {
 		super.setUp()
+
+		//def category = new Category(name: "Medicines")
+        //def inventoryItem1 = new InventoryItem()
+
 		mockLogging(InventoryService)
 		mockDomain(Transaction)
+		//mockDomain(Category, [category])
+		//mockDomain(Product, [new Product(name: "Aspirin", category: category), new Product(name: "Tylenol", category: category)])
+        //mockDomain(InventoryItem, [inventoryItem1, inventoryItem2, inventoryItem3])
 	}
 	
 	private void setUp_transactionEntryTests() {

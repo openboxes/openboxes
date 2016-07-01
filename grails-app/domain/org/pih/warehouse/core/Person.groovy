@@ -29,7 +29,8 @@ class Person implements Comparable, Serializable {
 
 	static transients = ["name"]
 	
-	static constraints = { 
+	static constraints = {
+		id(nullable:true)
 		firstName(blank:false, maxSize: 255)
 		lastName(blank:false, maxSize: 255)	
 		phoneNumber(nullable:true, maxSize: 255)

@@ -206,13 +206,15 @@ class RequisitionTests extends GrailsUnitTestCase {
         requestedDeliveryDate: tomorrow,
         name: "test",
         version: 3,
-        lastUpdated: today,
+        //lastUpdated: today,
         status:  RequisitionStatus.CREATED,
         recipientProgram: "prog",
         origin: boston,
         destination: miami,
         requisitionItems: [requisitionItem]
       )
+        requisition.save()
+
       def json = requisition.toJson()
       assert json.id == requisition.id
       assert json.requestedById == peter.id

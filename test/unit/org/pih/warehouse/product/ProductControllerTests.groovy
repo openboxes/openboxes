@@ -36,17 +36,21 @@ class ProductControllerTests extends ControllerUnitTestCase{
 		mockDomain(Product, products)
 		mockDomain(Category, [category])
 
+        // Hack to make sure we have total count
+        products.metaClass.getTotalCount {-> products.size() }
+
 		def productServiceMock = mockFor(ProductService)
 		productServiceMock.demand.getProducts(1..1) { arg1, arg2, arg3, arg4 ->
-			println "Get products from mock service " + products
-			return new PagedResultList(Product.list(), 2);
+			return products
 		}
 		controller.productService = productServiceMock.createMock()
 		def model = controller.list()
-		println "Model " + model.class + " "
+
+        println "Model and view: " + controller.modelAndView
+
+		println "Model " + model
 		println model.productInstanceList
 		println model.productInstanceTotal
-
 
 		assertEquals 2, model.productInstanceTotal
 		assertEquals 2, model.productInstanceList.size()

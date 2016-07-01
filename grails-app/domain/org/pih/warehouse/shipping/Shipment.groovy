@@ -123,6 +123,7 @@ class Shipment implements Comparable, Serializable {
 
 	// Constraints
 	static constraints = {
+		id(bindable:true)
 		name(nullable:false, blank: false, maxSize: 255)
 		shipmentNumber(nullable:true, maxSize: 255)	
 		origin(nullable:false, 

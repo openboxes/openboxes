@@ -34,7 +34,8 @@ class PicklistItem implements Serializable {
 		id generator: 'uuid'
 	}
 		
-    static constraints = {    	
+    static constraints = {
+		id(bindable:true)
 		inventoryItem(nullable:true)
         requisitionItem(nullable:true)
 		quantity(nullable:false)

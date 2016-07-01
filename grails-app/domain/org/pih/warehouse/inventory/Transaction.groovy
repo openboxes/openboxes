@@ -86,6 +86,7 @@ class Transaction implements Comparable, Serializable {
 	
     // Constraints 
     static constraints = {
+		id(bindable:true)
 	    transactionType(nullable:false)
 	    transactionNumber(nullable:true, unique: true)
 		createdBy(nullable:true)

@@ -62,7 +62,8 @@ class Picklist implements Serializable {
 		picklistItems cascade: "all-delete-orphan", sort: "id"
 	}
 	
-	static constraints = { 
+	static constraints = {
+		id(bindable:true)
 		name(nullable:true)
 		description(nullable:true)
 		picker(nullable:true)

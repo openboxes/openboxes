@@ -35,13 +35,15 @@ class InventoryItemTests extends GrailsUnitTestCase {
         mockDomain(InventoryItem, [item])
 
         Map json = item.toJson()
-		
+
+        println "JSON " + json
+
         assert json.inventoryItemId == item.id
         assert json.productId == item.product.id
         assert json.productName == item.product.name
         assert json.lotNumber == item.lotNumber
-		assert json.quantityOnHand == 1
-		assert json.quantityATP == 1
+		assert json.quantityOnHand == 0
+		assert json.quantityATP == 0
         assert json.expirationDate == expirationDate.format("MM/dd/yyyy")
 
 		

@@ -9,11 +9,13 @@
 **/ 
 package org.pih.warehouse.core
 
+import org.junit.Test
 import org.pih.warehouse.util.LocalizationUtil;
 
 
 class LocalizationUtilTest {
 
+	@Test
 	void testGetLocalizedString() {
 	
 		Locale locale = new Locale("en","US")
@@ -32,6 +34,7 @@ class LocalizationUtilTest {
 					
 	}	
 
+	@Test
 	void testGetDefaultString() {		
 		assert LocalizationUtil.getDefaultString("Default Value|fr:French Value|es:Spanish Value") == "Default Value"
 	}

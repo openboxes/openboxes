@@ -35,6 +35,7 @@ class Category implements Comparable, Serializable {
 	}
 	
 	static constraints = {
+		id(bindable:true)
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)

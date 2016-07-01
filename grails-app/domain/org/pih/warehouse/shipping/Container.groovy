@@ -50,7 +50,8 @@ class Container implements Comparable, java.io.Serializable {
 	}
 		
 	// Constraints
-	static constraints = {	 
+	static constraints = {
+		id(bindable:true)
 		name(empty:false, maxSize:255)
 		description(nullable:true, maxSize:255)
 		containerNumber(nullable:true, maxSize:255)

@@ -12,26 +12,23 @@ import grails.test.GrailsUnitTestCase
 class PicklistServiceTests extends GrailsUnitTestCase {
      void testCreateNewPicklist(){
         def requisition = new Requisition(id:"requisition1", name:"myTestRequisition")
-        def picklistItem1 = [id:"", "requisitionItem.id":"ri1", "inventoryItem.id":"ii1", quantity:100]
-        def picklistItem2 = [id:"", "requisitionItem.id":"ri1", "inventoryItem.id":"ii2", quantity:300]
+        def ri1 = new RequisitionItem(id: "ri1", quantity: 400, requisition:requisition)
+        def picklistItem1 = [id:"", requisitionItem: [id:"ri1"], inventoryItem: [id:"ii1"], quantity:100]
+        def picklistItem2 = [id:"", requisitionItem: [id:"ri1"], inventoryItem: [id:"ii2"], quantity:300]
         Person john = new Person(id: "7890")
-        Map data = [id:"", "picker.id": john.id,
-          "requisition.id": requisition.id,
-          picklistItems:[picklistItem1, picklistItem2]]
+        Map data = [id:"", picker:[id: john.id], requisition: [id: requisition.id], picklistItems:[picklistItem1, picklistItem2]]
         mockDomain(Person, [john])
         mockDomain(Requisition, [requisition])
         mockDomain(Picklist, [])
         mockDomain(PicklistItem, [])
-        mockDomain(RequisitionItem, [])
+        mockDomain(RequisitionItem, [ri1])
         mockDomain(InventoryItem, [])
-        
+
         def service = new PicklistService()
 
         def picklist = service.save(data)
 
         def picklistPersisted = Picklist.findByName(requisition.name)
-
-
         assert picklist == picklistPersisted
         def items = picklist.picklistItems.toList()
         assert items.size() == 2       
@@ -49,21 +46,25 @@ class PicklistServiceTests extends GrailsUnitTestCase {
      }
      void testUpdatePicklist(){
         def requisition = new Requisition(id:"requisition1", name:"myTestRequisition")
+        def ri1 = new RequisitionItem(id: "ri1", quantity: 400)
         def picklistInDb = new Picklist(id:"picklist1", requisition: requisition)
         def plItem1 = new PicklistItem(id:"pli1", quantity:10, comment:"good")
         def plItem2 = new PicklistItem(id:"pli2", quantity:20, comment: "better")
+        def ii1 = new InventoryItem(id: "ii1")
+        def ii2 = new InventoryItem(id: "ii2")
+
+        mockDomain(InventoryItem, [ii1, ii2])
+        mockDomain(RequisitionItem, [ri1])
         mockDomain(Picklist, [picklistInDb])
         mockDomain(PicklistItem, [plItem1, plItem2])
 
         picklistInDb.addToPicklistItems(plItem1)
         picklistInDb.addToPicklistItems(plItem2)
         Person john = new Person(id: "7890")
-        def picklistItem1 = [id: plItem1.id, "requisitionItem.id":"ri1", "inventoryItem.id":"ii1", quantity:100]
-        def picklistItem2 = [id:plItem2.id, "requisitionItem.id":"ri1", "inventoryItem.id":"ii2", quantity:300]
+        def picklistItem1 = [id: plItem1.id, requisitionItem:ri1, inventoryItem:ii1, quantity:100]
+        def picklistItem2 = [id:plItem2.id, requisitionItem: ri1, inventoryItem:ii2, quantity:300]
 
-        Map data = [id:picklistInDb.id, "picker.id": john.id,
-          "requisition.id": requisition.id,
-          picklistItems:[picklistItem1, picklistItem2]]
+        Map data = [id:picklistInDb.id, "picker.id": john.id, "requisition.id": requisition.id, picklistItems:[picklistItem1, picklistItem2]]
         mockDomain(Person, [john])
         mockDomain(Requisition, [requisition])
 

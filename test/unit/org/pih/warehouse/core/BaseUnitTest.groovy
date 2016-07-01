@@ -23,8 +23,6 @@ import org.pih.warehouse.product.Product
 class BaseUnitTest extends GrailsUnitTestCase {
 	protected void setUp() {
         super.setUp()
-        
-		
 
           // create some default location types
         def warehouseLocationType = new LocationType(name: "Location", description: "Location")

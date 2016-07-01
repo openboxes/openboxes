@@ -30,6 +30,7 @@ class UserControllerTests extends ControllerUnitTestCase{
 
       assert user.locationRolePairs() == [l1:roleBrowser.id, l2: roleManager.id]
 
+      controller.request.method = "POST"
       controller.params.id = user.id
       controller.params.password = user.password
       controller.params.username = user.username

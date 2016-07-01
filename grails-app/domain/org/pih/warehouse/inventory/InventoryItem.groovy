@@ -54,6 +54,7 @@ class InventoryItem implements Serializable {
 	
 	// Notice the unique constraint on lotNumber/product
     static constraints = {
+        id(bindable:true)
 		product(nullable:false)
 		lotNumber(nullable:true, unique:['product'], maxSize:255)
 		expirationDate(nullable:true)	
