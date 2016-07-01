@@ -31,7 +31,7 @@ class LocationGroup implements Serializable, Comparable<LocationGroup> {
 
 	
 	static constraints = { 
-		name(nullable:true, maxSize: 255)
+		name(nullable:false, maxSize: 255)
 		dateCreated(display:false)
 		lastUpdated(display:false)
 	}

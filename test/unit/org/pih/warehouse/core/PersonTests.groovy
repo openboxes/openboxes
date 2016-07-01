@@ -6,7 +6,7 @@ import org.junit.Test
 class PersonTests extends GrailsUnitTestCase {
 
     @Test
-    void sort_shouldSortByLastNameFirstName() {
+    void test_sort_shouldSortByLastNameFirstName() {
 
         def person1 = new Person(id: 1, firstName: "Rene", lastName: "Merida", email: "rene@openboxes.com")
         def person2 = new Person(id: 2, firstName: "Levi", lastName: "Bermudez", email: "levi@openboxes.com")
@@ -26,7 +26,7 @@ class PersonTests extends GrailsUnitTestCase {
 
 
     @Test
-    void validate_shouldRequireValidEmail() {
+    void test_validate_shouldRequireValidEmail() {
 
         mockDomain(Person)
 

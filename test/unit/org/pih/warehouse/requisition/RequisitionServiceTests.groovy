@@ -47,11 +47,11 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		def today = new Date()
 		def tomorrow = new Date().plus(1)
 		def items = [
-			["product.id":product1.id, quantity: 300, orderIndex: 0],
-			["product.id":product2.id, quantity: 400, orderIndex: 1]
+			[product:[id:product1.id], quantity: 300, orderIndex: 0],
+			[product:[id:product2.id], quantity: 400, orderIndex: 1]
 		]
 		def jsonNull = new org.codehaus.groovy.grails.web.json.JSONObject.Null()
-		Map data = [id: jsonNull, "origin.id": miami.id, "requestedBy.id": john.id,
+		Map data = [id: jsonNull, origin:[id: miami.id], requestedBy:[id: john.id],
 			dateRequested: today, requestedDeliveryDate: tomorrow, commodityClass: CommodityClass.MEDICATION,
 			name: "testRequisition", requisitionItems: items]
 		//def service = new RequisitionService()
@@ -101,10 +101,10 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		def today = new Date()
 		def tomorrow = new Date().plus(1)
 		def items = [
-			[id: oldItem1.id, "product.id":product1.id, quantity: 300, orderIndex: 0],
-			[id: oldItem2.id, "product.id":product2.id, quantity: 400, orderIndex: 1]
+			[id: oldItem1.id, product:[id:product1.id], quantity: 300, orderIndex: 0],
+			[id: oldItem2.id, product:[id:product2.id], quantity: 400, orderIndex: 1]
 		]
-		Map data = [id: oldRequisition.id, "origin.id": miami.id, "requestedBy.id": john.id,
+		Map data = [id: oldRequisition.id, origin:[id: miami.id], requestedBy:[id: john.id],
 			dateRequested: today, requestedDeliveryDate: tomorrow,
 			name: "testRequisition",
 			requisitionItems: items]
@@ -153,9 +153,9 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		def today = new Date()
 		def tomorrow = new Date().plus(1)
 		def items = [
-			[id: oldItem2.id, "product.id":product2.id, quantity: 400, orderIndex: 1]
+			[id: oldItem2.id, product:[id:product2.id], quantity: 400, orderIndex: 1]
 		]
-		Map data = [id: oldRequisition.id, "origin.id": miami.id, "requestedBy.id": john.id,
+		Map data = [id: oldRequisition.id, origin:[id: miami.id], requestedBy:[id: john.id],
 			dateRequested: today, requestedDeliveryDate: tomorrow,
 			name: "testRequisition",
 			requisitionItems: items]

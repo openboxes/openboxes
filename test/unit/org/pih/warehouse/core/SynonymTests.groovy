@@ -41,7 +41,7 @@ class SynonymTests extends GrailsUnitTestCase {
 
 
     @Test
-    void validate_shouldPassValidation() {
+    void test_validate_shouldPassValidation() {
         def synonym = new Synonym(name: "a synonym", product: new Product())
         assertTrue synonym.validate()
         println synonym.errors
@@ -49,7 +49,7 @@ class SynonymTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void validate_shouldFailValidation() {
+    void test_validate_shouldFailValidation() {
         def synonym = new Synonym()
         assertTrue !synonym.validate()
         println synonym.errors
@@ -58,7 +58,7 @@ class SynonymTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void addSynonym() {
+    void test_addSynonym() {
         def product = Product.findByName("new product")
         assertNotNull(product)
         product.addToSynonyms(new Synonym(name: "new synonym"))
@@ -67,7 +67,7 @@ class SynonymTests extends GrailsUnitTestCase {
 
     }
 
-    @Ignore
+    @Ignore // FIXME
     void deleteSynonym() {
         def product = Product.findByName("new product")
         //product.addToSynonyms(new Synonym(name: "new synonym"))
@@ -85,9 +85,10 @@ class SynonymTests extends GrailsUnitTestCase {
         //assertEquals "new synonym", result.name
     }
 
-    @Ignore
+    @Ignore // FIXME
     void deleteProduct_shouldCascadeDeleteSynonyms() {
         def product = Product.findByName("new product")
+
         assertEquals 2, product.synonyms.size()
 
         // Doesn't work for some reason

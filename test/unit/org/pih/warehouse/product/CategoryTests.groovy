@@ -50,7 +50,7 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void getRootCategory_shouldGetRootCategoryWhereParentCategoryIsNull() {
+    void test_getRootCategory_shouldGetRootCategoryWhereParentCategoryIsNull() {
         def rootCategory = Category.findByName("A")
         assertNotNull rootCategory
         assertEquals rootCategory, Category.getRootCategory()
@@ -59,7 +59,7 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void getRootCategory_shouldGetRootCategoryByIsRoot() {
+    void test_getRootCategory_shouldGetRootCategoryByIsRoot() {
         //def rootCategory = Category.getRootCategory()
         // def newRootCategory = new Category(name: "E", parentCategory: null, isRoot: true).save(failOnError: true)
         def rootCategory = Category.getRootCategory()
@@ -69,7 +69,7 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void getParents_shouldGetAllParents() {
+    void test_getParents_shouldGetAllParents() {
         def category = Category.findByName("H")
         println category.getParents()
         def parents = [category1,category3,category4,category5,category6,category7]
@@ -77,7 +77,7 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void getHierarchyAsString_shouldGetHierarchy() {
+    void test_getHierarchyAsString_shouldGetHierarchy() {
         def category = Category.findByName("H")
         println category.getHierarchyAsString(",")
         assertEquals "A,C,D,E,F,G,H", category.getHierarchyAsString(",")
@@ -85,7 +85,7 @@ class CategoryTests extends GrailsUnitTestCase {
 
 
     @Test
-    void getChildren_shouldReturnAllChildren() {
+    void test_getChildren_shouldReturnAllChildren() {
         def category = Category.findByName("A")
         assertEquals 2, category.categories.size()
 
@@ -95,14 +95,14 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void getProducts_shouldReturnAllProducts() {
+    void test_getProducts_shouldReturnAllProducts() {
         def category = Category.findByName("H")
         assertEquals 2, category.products.size()
     }
 
 
     @Test
-    void validate_shouldFailOnNullableError() {
+    void test_validate_shouldFailOnNullableError() {
         def category = new Category()
         assertFalse category.validate()
         assertTrue category.hasErrors()
@@ -111,7 +111,7 @@ class CategoryTests extends GrailsUnitTestCase {
 
 
     @Test
-    void hashCode_shouldReturnID() {
+    void test_hashCode_shouldReturnID() {
         def category = new Category(id: "A", name: "Kid A", parentCategory: null).save()
         assertNotNull category
         assertEquals "A", category.hashCode()
@@ -119,7 +119,7 @@ class CategoryTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void equals_shouldReturnTrueWhenCategoriesAreEqual() {
+    void test_equals_shouldReturnTrueWhenCategoriesAreEqual() {
         def category = Category.getRootCategory();
         def categoryA = Category.findByName("A")
         assertEquals category, categoryA
@@ -127,14 +127,14 @@ class CategoryTests extends GrailsUnitTestCase {
 
 
     @Test
-    void equals_shouldReturnFalseWhenCategoriesAreNotEqual() {
+    void test_equals_shouldReturnFalseWhenCategoriesAreNotEqual() {
         def categoryA = Category.findByName("A")
         def categoryB = Category.findByName("B")
         assertNotSame categoryA, categoryB
     }
 
     @Test
-    void toJson() {
+    void test_toJson() {
         def categoryA = Category.findByName("A")
 
         def json = categoryA.toJson()
@@ -147,15 +147,14 @@ class CategoryTests extends GrailsUnitTestCase {
 
 
     @Test
-    void compareTo_shouldSortCategoriesByName() {
-
+    void test_compareTo_shouldSortCategoriesByName() {
         def categories = Category.findAll()
         categories = categories.sort();
         println categories
     }
 
     @Test
-    void compareTo_shouldSortCategoriesBySortOrder() {
+    void test_compareTo_shouldSortCategoriesBySortOrder() {
         category1.sortOrder = 10
         category2.sortOrder = 20
         category8.sortOrder = 1

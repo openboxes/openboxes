@@ -24,14 +24,14 @@ class LocationGroupTests extends GrailsUnitTestCase {
     }
 
     @Ignore
-    void validate() {
+    void test_validate() {
         def locationGroup = new LocationGroup()
         assertFalse locationGroup.validate()
         assertEquals "nullable", locationGroup.errors["name"]
     }
 
     @Test
-    void compareTo_shouldSortByName() {
+    void test_compareTo_shouldSortByName() {
         def locations = [pap, bos, hum]
         locations = locations.sort()
         assertEquals locations[0].name, "Boston"
