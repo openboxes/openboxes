@@ -224,95 +224,6 @@ log4j.main = {
 	//trace 'org.hibernate.type'
 	//debug 'org.hibernate.SQL'
 
-/*	System.setProperty 'mail.smtp.port', mail.error.port.toString()
-    	System.setProperty 'mail.smtp.connectiontimeout', "5000"
-    	System.setProperty 'mail.smtp.timeout', "5000"
-
-    if (mail.error.starttls)
-		System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
-
-	// Example of changing the log pattern for the default console
-	appenders {
-		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
-		//println "mail.error.server: '${mail.error.server}'"
-		//println "mail.error.username: '${mail.error.username}'"
-		//println "mail.error.password: '${mail.error.password}'"
-
-		// Only enable SMTP appender when mail is enabled
-        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
-	        def smtpAppender
-			def conversionPattern =
-				"Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
-				"Thread: [%t]%n" +
-                "Username: %X{username}%n" +
-                "Location: %X{location}%n" +
-                "Locale: %X{locale}%n" +
-				"IP address: %X{ipAddress} http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
-				"Request URI: %X{requestUri}%n" +
-                "Request URL: %X{requestUrl}%n" +
-				"Query string: %X{queryString}%n" +
-                "Server: %X{serverUrl}%n" +
-                "Clickstream: %X{clickStreamUrl}%n%n" +
-                "Stacktrace: %n%m%n"
-
-			// The 'alternate' appender is the best, but only works on localhost w/o authentication
-			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
-				smtpAppender = new AlternateSMTPAppender(
-					name: 'smtp',
-					to: mail.error.to,
-					from: mail.error.from,
-					subject: mail.error.subject + " %m",
-					threshold: Level.ERROR,
-					//SMTPHost: mail.error.server,
-					layout: pattern(conversionPattern: conversionPattern))
-			}
-			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
-			else if ("dynamic".equals(mail.error.appender)) {
-				smtpAppender = new DynamicSubjectSMTPAppender(
-					name: 'smtp',
-					to: mail.error.to,
-					from: mail.error.from,
-					subject: mail.error.subject + " %m",
-					threshold: Level.ERROR,
-					//SMTPHost: mail.error.server,
-					//SMTPUsername: mail.error.username,
-					//SMTPPassword: mail.error.password,
-					SMTPDebug: mail.error.debug,
-					layout: pattern(conversionPattern: conversionPattern))
-			}
-			// Default SMTP error appender does not allow configurable subject line
-			else {
-				smtpAppender = new SMTPAppender(
-					name: 'smtp',
-					to: mail.error.to,
-					from: mail.error.from,
-					subject: mail.error.subject + " An application error occurred",
-					threshold: Level.ERROR,
-					//SMTPHost: mail.error.server,
-					//SMTPUsername: mail.error.username,
-					SMTPDebug: mail.error.debug,
-					//SMTPPassword: mail.error.password,
-					layout: pattern(conversionPattern: conversionPattern))
-			}
-
-			// These are common attributes for each of the appenders
-			if (mail.error.server) smtpAppender.SMTPHost = mail.error.server
-			if (mail.error.username) smtpAppender.SMTPUsername = mail.error.username
-			if (mail.error.password) smtpAppender.SMTPPassword = mail.error.password
-			//if (mail.error.debug) smtpAppender.SMTPDebug = mail.error.debug
-
-			println "Using " + mail.error.appender + " SMTP appender " + smtpAppender.class.name
-        	appender smtpAppender
-
-            def asyncAppender = new AsyncAppender(name: 'async', bufferSize: 500)
-            asyncAppender.addAppender(smtpAppender)
-            appender asyncAppender
-        }
-    }*/
-
-
-
-
 	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter',
             'org.grails.plugin.resource.ResourceMeta'
 
@@ -365,6 +276,7 @@ log4j.main = {
 		   	'org.apache.commons.mail',
             'grails.plugins.raven',
             'net.kencochrane.raven',
+            'grails.plugin.databasemigration',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
@@ -384,12 +296,19 @@ log4j.main = {
 
 }
 
+/* Database Migration plugin */
+//grails.plugin.databasemigration.dropOnStart = true
+grails.plugin.databasemigration.updateOnStart = true
+//grails.plugin.databasemigration.changelogLocation = "grails-app/migrations"
+grails.plugin.databasemigration.changelogFileName = "changelog.xml"
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.xml']
+
 /* Indicates which activities are required for a location to allow logins */
 openboxes.chooseLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
 /* Grails resources plugin */
-grails.resources.adhoc.includes = []
-grails.resources.adhoc.excludes = ["*"]
+//grails.resources.adhoc.includes = []
+//grails.resources.adhoc.excludes = ["*"]
 
 // Reload Config Plugin
 //grails.plugins.reloadConfig.files = []
