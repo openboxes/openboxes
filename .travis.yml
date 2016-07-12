@@ -1,11 +1,8 @@
 language: groovy
 jdk:
 - openjdk7
-before_install:
-- sudo add-apt-repository -y ppa:groovy-dev/grails
-- sudo apt-get update
-- sudo apt-get install grails-2.5.4
-script: 'grails test-app unit: --non-interactive'
+script: ./grailsw refresh-dependencies
+  && ./grailsw "test-app unit:"
 cache:
   directories:
   - "$HOME/.grails"
