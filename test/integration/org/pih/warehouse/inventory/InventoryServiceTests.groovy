@@ -562,7 +562,10 @@ class InventoryServiceTests extends GroovyTestCase {
 		def terms = ["Ibuprofen"]
 		//def inventoryService = new InventoryService()
 		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
-		assert results.contains(ibuprofenProduct)
+
+        println "Results: " + results
+
+		assert results*.id.contains(ibuprofenProduct?.id)
 	}
 
 	void test_getProductsByTermsAndCategoriesWithDescription() {

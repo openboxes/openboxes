@@ -27,12 +27,12 @@ class UserServiceIntegrationTests extends GroovyTestCase{
 		
 		def allUsers = User.list()
 		def allAdmins = allUsers.findAll { it.roles.contains(roleAdmin) } 
-		assertEquals "Should be 2 users with ROLE_ADMIN", 2, allAdmins.size()
+		assertEquals "Should be 2 users with ROLE_ADMIN", 3, allAdmins.size()
 		
 		// Should return active admins
 		def activeAdmins = userService.getAllAdminUsers()
 		assertFalse "Should not contain inactive users with ROLE_ADMIN", activeAdmins.contains(adminUser)
-		assertEquals 1, activeAdmins.size()
+		assertEquals 2, activeAdmins.size()
 		activeAdmins.each { admin -> 			
 			assertTrue "Should have ROLE_ADMIN", admin.roles.contains(roleAdmin)
 			assertTrue "Should be active", admin.active

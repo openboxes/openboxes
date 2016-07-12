@@ -6,7 +6,7 @@ import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
 import testutils.DbHelper
 
-class ProductIntegrationTests extends GroovyTestCase{
+class ProductIntegrationTests extends GroovyTestCase {
 
 
     @Test

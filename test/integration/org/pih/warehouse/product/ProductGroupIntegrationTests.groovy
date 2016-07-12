@@ -57,7 +57,6 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
     @Test
 	void testProductGroupHasManyProducts() {
 		
-			
 		def productGroup = ProductGroup.findByDescription("Ibuprofen")
 		println productGroup
 		assertNotNull productGroup
@@ -89,7 +88,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 
     // This test doesn't fail any longer.
     @Ignore
-	void test_delete_shouldFail() {
+	void delete_shouldFail() {
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
 		assertNotNull product
 		

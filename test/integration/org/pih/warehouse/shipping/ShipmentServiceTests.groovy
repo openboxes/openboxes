@@ -216,7 +216,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: box1)
 	   shipment1.addToShipmentItems(shipmentItem1)
-	   shipment1.save()
+	   shipment1.save(flush:true)
 	   	   
 	   assertEquals "Box should contain 1 shipment item", 1, box1?.getShipmentItems()?.size()?:0
 	   assertEquals "Pallet's shipment should be shipment 1", shipment1, pallet1.shipment
