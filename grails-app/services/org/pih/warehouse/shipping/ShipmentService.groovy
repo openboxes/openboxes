@@ -826,7 +826,7 @@ class ShipmentService {
                     if (container?.parentContainer) {
                         container?.parentContainer?.removeFromContainers(container)
                     }
-                    container.delete();
+                    container.delete(flush:true);
                 }
             }
 		}

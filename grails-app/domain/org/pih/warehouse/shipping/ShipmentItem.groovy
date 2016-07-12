@@ -58,7 +58,7 @@ class ShipmentItem implements Comparable, Serializable {
 	static constraints = {
 		container(nullable:true)
 		product(nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
-		lotNumber(nullable:true, maxSize: 255)
+		lotNumber(nullable:true)
 		expirationDate(nullable:true)
 		quantity(min:0, range: 0..2147483646)
 		recipient(nullable:true)

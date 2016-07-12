@@ -1044,7 +1044,7 @@ class InventoryService implements ApplicationContextAware {
 			}
 		}
 
-		def products = Product.createCriteria().list() {
+		def products = Product.createCriteria().listDistinct {
 			if (terms) {
 				createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
                 createAlias("inventoryLevels", "inventoryLevels", CriteriaSpecification.LEFT_JOIN)
