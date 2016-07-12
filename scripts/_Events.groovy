@@ -9,32 +9,32 @@
  **/
 import grails.util.Environment
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.test.junit4.JUnit4GrailsTestType
-import org.codehaus.groovy.grails.test.support.GrailsTestMode
+//import org.codehaus.groovy.grails.test.junit4.JUnit4GrailsTestType
+//import org.codehaus.groovy.grails.test.support.GrailsTestMode
 
 Logger log = Logger.getLogger("org.pih.warehouse._Events")
 
 /*loadtest setup*/
-def testTypeName = "loadtest"
-def testDirectory = "loadtest"
-def testMode = new GrailsTestMode(autowire: true, wrapInTransaction: true, wrapInRequestEnvironment: true)
-def loadtestTestType = new JUnit4GrailsTestType(testTypeName, testDirectory, testMode)
- 
-loadtestTests = [loadtestTestType]
- 
-loadtestTestPhasePreparation = {
-       integrationTestPhasePreparation()
-}
-loadtestTestPhaseCleanUp = {
-      integrationTestPhaseCleanUp()
-}
-eventAllTestsStart = {
-    if(System.getProperty("grails.env") == "loadtest"){
-      phasesToRun << "loadtest"
-    }else{
-      println "********* loadtest is ignored for environment ${System.getProperty("grails.env")}."
-    }
-}
+//def testTypeName = "loadtest"
+//def testDirectory = "loadtest"
+//def testMode = new GrailsTestMode(autowire: true, wrapInTransaction: true, wrapInRequestEnvironment: true)
+//def loadtestTestType = new JUnit4GrailsTestType(testTypeName, testDirectory, testMode)
+//
+//loadtestTests = [loadtestTestType]
+//
+//loadtestTestPhasePreparation = {
+//       integrationTestPhasePreparation()
+//}
+//loadtestTestPhaseCleanUp = {
+//      integrationTestPhaseCleanUp()
+//}
+//eventAllTestsStart = {
+//    if(System.getProperty("grails.env") == "loadtest"){
+//      phasesToRun << "loadtest"
+//    }else{
+//      println "********* loadtest is ignored for environment ${System.getProperty("grails.env")}."
+//    }
+//}
 
 def determineGitRevisionNumber = {
     String revisionNumber = 'dev'
