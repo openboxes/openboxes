@@ -82,7 +82,8 @@ grails.project.dependency.resolution = {
         compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
 		test 'dumbster:dumbster:1.6'
-
+		// FIXME Had to add this dependency because of a NoClassDefFoundError
+		runtime 'jline:jline:2.12'
 
 //		//compile 'org.apache.httpcomponents:httpcore:4.2.1'
 //		compile 'commons-lang:commons-lang:2.6'
@@ -107,8 +108,8 @@ grails.project.dependency.resolution = {
 	plugins {
 
 		build ":tomcat:7.0.55.3" // or ":tomcat:8.0.22"
-        //test ":spock:0.7"
-        test ":build-test-data:2.4.0"
+        	//test ":spock:0.7"
+        	test ":build-test-data:2.4.0"
 
 		// plugins for the compile step
 		compile ":scaffolding:2.1.2"
