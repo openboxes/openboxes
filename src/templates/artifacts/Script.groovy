@@ -7,7 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
-includeTargets << grailsScript("Init")
+includeTargets << grailsScript("_GrailsInit")
 
 target(@gant.target.name@: "The description of the script goes here!") {
     // TODO: Implement script here

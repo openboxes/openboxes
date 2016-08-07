@@ -7,7 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
-@artifact.package@class @artifact.name@ {
+@artifact.package@import grails.transaction.Transactional
 
 @Transactional
 class @artifact.name@ {
