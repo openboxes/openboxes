@@ -36,7 +36,7 @@ class RequisitionController {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
         def requisition = new Requisition(params)
@@ -188,7 +188,7 @@ class RequisitionController {
     }
 
 
-	def edit = {
+	def edit() {
 		def requisition = Requisition.get(params.id)
 		if(requisition) {
 
@@ -295,7 +295,7 @@ class RequisitionController {
     }
 
 
-    def save = {
+    def save() {
         def jsonResponse
         def requisition = new Requisition()
 		try {
@@ -489,7 +489,7 @@ class RequisitionController {
 	}
 		
 		
-    def process = {
+    def process() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             def currentInventory = Location.get(session.warehouse.id).inventory
@@ -537,7 +537,7 @@ class RequisitionController {
 		redirect(action: "show", id: params.id)
 	}
 	
-    def cancel = {
+    def cancel() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisitionService.cancelRequisition(requisition)
@@ -568,7 +568,7 @@ class RequisitionController {
 		redirect(action: "list")
 	}
 
-    def show = {
+    def show() {
         def requisition = Requisition.get(params.id)
         //def requisition = Requisition.findById(params.id, [fetch: [requisitionItems: 'join']])
         if (!requisition) {
@@ -580,7 +580,7 @@ class RequisitionController {
         }
     }
 
-    def delete = {
+    def delete() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             try {
@@ -597,7 +597,7 @@ class RequisitionController {
         redirect(action: "list", id:params.id)
     }
 
-    def printDraft = {
+    def printDraft() {
 		println "print draft " + params 
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)

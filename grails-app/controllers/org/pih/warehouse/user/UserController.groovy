@@ -203,7 +203,7 @@ class UserController {
     /**
      * Update a user 
      */
-    def update = {
+    def update() {
         log.info(params)
         def userInstance = User.get(params.id)
         if (userInstance) {

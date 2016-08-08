@@ -155,7 +155,7 @@ class ProductController {
 
 	}
 
-	def list = {
+	def list() {
         log.info "list products " + params
 
 		def productInstanceList = []

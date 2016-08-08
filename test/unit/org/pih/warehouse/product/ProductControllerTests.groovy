@@ -1,20 +1,6 @@
 package org.pih.warehouse.product
 
-import grails.orm.PagedResultList
 import grails.test.ControllerUnitTestCase
-
-// import org.pih.warehouse.MessageTagLib;
-import org.pih.warehouse.inventory.Inventory
-// import org.pih.warehouse.inventory.InventoryItem
-// import org.pih.warehouse.inventory.InventoryService
-// import org.springframework.mock.web.MockHttpServletResponse
-import org.pih.warehouse.core.Location
-//import org.pih.warehouse.core.Person
-import org.pih.warehouse.picklist.*
-// import org.pih.warehouse.product.Product
-// import grails.converters.JSON
-// import groovy.xml.MarkupBuilder;
-
 // import org.pih.warehouse.core.ActivityCode
 import testutils.MockBindDataMixin
 

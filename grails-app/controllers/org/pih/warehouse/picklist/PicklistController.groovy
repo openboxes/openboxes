@@ -21,7 +21,7 @@ class PicklistController {
 	def picklistService
     def pdfRenderingService
 
-	def save = {
+	def save() {
 		def jsonRequest = request.JSON
 		def jsonResponse = []
 		def picklist = picklistService.save(jsonRequest)
@@ -35,14 +35,14 @@ class PicklistController {
 	}
 	
 	
-	def print = {
+	def print() {
 		def requisition = Requisition.get(params.id)
 		def picklist = Picklist.findByRequisition(requisition)
 		def location = Location.get(session.warehouse.id)
 		[requisition:requisition, picklist: picklist, location:location]
     }
 
-    def renderPdf = {
+    def renderPdf() {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
@@ -80,7 +80,7 @@ class PicklistController {
 
     }
 
-    def renderHtml = {
+    def renderHtml() {
 
         def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         def locale = session?.user?.locale ?: session.locale ?: defaultLocale;
