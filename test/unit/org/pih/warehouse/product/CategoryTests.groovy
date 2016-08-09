@@ -88,10 +88,9 @@ class CategoryTests extends GrailsUnitTestCase {
     void test_getChildren_shouldReturnAllChildren() {
         def category = Category.findByName("A")
         assertEquals 2, category.categories.size()
-
         println category.getChildren()
         def expected = [category3,category2,category4,category5,category6,category7,category8].reverse()
-        assertEquals expected, category.getChildren()
+        assertTrue category.getChildren().containsAll(expected)
     }
 
     @Test
