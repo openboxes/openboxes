@@ -51,7 +51,7 @@ grails.mime.types = [ // the first one is the default format
 //grails.urlmapping.cache.maxsize = 1000
 
 // Legacy setting for codec used to encode data with ${}
-grails.views.default.codec = "none"
+grails.views.default.codec = "html" // was "none"
 
 // The default scope for controllers. May be prototype, session or singleton.
 // If unspecified, controllers are prototype scoped.
@@ -232,6 +232,7 @@ log4j.main = {
             'org.hibernate.impl.SessionFactoryObjectFactory',
             'com.gargoylesoftware.htmlunit.DefaultCssErrorHandler',
             'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
+            'org.grails.plugin.resource.ResourceProcessor'
             //'org.jumpmind.symmetric.config.PropertiesFactoryBean'
 
 	warn	'org.mortbay.log',
@@ -268,7 +269,6 @@ log4j.main = {
 			'grails.app.task',
             'grails.plugin.springcache',
 			'BootStrap',
-			'liquibase',
 			'com.gargoylesoftware.htmlunit'
 
    debug 	'org.apache.cxf',
@@ -277,6 +277,7 @@ log4j.main = {
             'grails.plugins.raven',
             'net.kencochrane.raven',
             'grails.plugin.databasemigration',
+		    'liquibase',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',

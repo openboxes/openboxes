@@ -132,7 +132,7 @@ fi
 if [ -z "$STARTER_CONF" ]; then
     STARTER_CONF="$GRAILS_HOME/conf/groovy-starter.conf"
 fi
-STARTER_CLASSPATH="wrapper/grails-wrapper-runtime-2.5.4.jar:wrapper:."
+STARTER_CLASSPATH="wrapper/grails-wrapper-runtime-2.5.5.jar:wrapper:."
 
 # Allow access to Cocoa classes on OS X
 if $darwin; then

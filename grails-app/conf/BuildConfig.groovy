@@ -41,7 +41,7 @@ grails.project.fork = [
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
-	inherits( "global" ) {
+	inherits("global") {
 		// specify dependency exclusions here; for example, uncomment this to disable ehcache:
 		// excludes 'ehcache'
 		excludes "xml-apis"
@@ -69,12 +69,15 @@ grails.project.dependency.resolution = {
 	}
 	
 	dependencies {
+		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
+		runtime 'mysql:mysql-connector-java:5.1.29'
+		runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
+		test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
 //		build ('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2')  { excludes "ant", "javassist" }
 //
 		compile ('org.docx4j:docx4j:2.8.1') { excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'}
 		compile 'c3p0:c3p0:0.9.1.2'
-		compile 'mysql:mysql-connector-java:5.1.26'
 
 		compile 'com.google.zxing:javase:2.0'
 		compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.6') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
@@ -101,13 +104,13 @@ grails.project.dependency.resolution = {
 //		test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 //		test 'dumbster:dumbster:1.6'
 //		//test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
-//		test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+//		
 //        compile 'org.grails:grails-test:2.4.4'
 
 	}
 	plugins {
 
-		build ":tomcat:7.0.55.3" // or ":tomcat:8.0.22"
+		build ":tomcat:7.0.70" // or ":tomcat:8.0.22"
         	//test ":spock:0.7"
         	test ":build-test-data:2.4.0"
 
