@@ -127,12 +127,14 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
         //week formula('WEEK(date_requested)')    //provide the exact column name of the date field
         //month formula('MONTH(date_requested)')
-        monthRequested formula: "date_format(date_requested, '%M %Y')"
+        //monthRequested formula: "date_format(date_requested, '%M %Y')"
         //yearRequested formula: "date_format(date_requested, '%Y')"
         //comments cascade: "all-delete-orphan"
         //documents cascade: "all-delete-orphan"
         //events cascade: "all-delete-orphan"
     }
+
+    static transients = ['monthRequested']
 
     static constraints = {
         id(bindable:true)
@@ -159,7 +161,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
         // FIXME Even though Grails complains that "derived properties may not be constrained", when you remove the constraint there are validation errors on Requisition
         // OB-3180 Derived properties may not be constrained. Property [monthRequested] of domain class org.pih.warehouse.requisition.Requisition will not be checked during validation.
-        monthRequested(nullable: true)
+        //monthRequested(nullable: true)
         //validator: { value ->
         //    def tomorrow = new Date().plus(1)
         //    tomorrow.clearTime()
@@ -189,6 +191,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return Picklist.findByRequisition(this)
     }
     */
+
+    def getMonthRequested() {
+        return dateRequested?.month
+    }
 
 
     def getTransactions() {
