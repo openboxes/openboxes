@@ -29,13 +29,13 @@ grails.project.fork = [
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
     // configure settings for the test-app JVM, uses the daemon by default
-    test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    test: [maxMemory: 2048, minMemory: 2048, debug: false, maxPerm: 1024, daemon:true],
     // configure settings for the run-app JVM
-    run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+    run: [maxMemory: 2048, minMemory: 2048, debug: false, maxPerm: 1024, forkReserve:false],
     // configure settings for the run-war JVM
-    war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+    war: [maxMemory: 2048, minMemory: 2048, debug: false, maxPerm: 1024, forkReserve:false],
     // configure settings for the Console UI JVM
-    console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
+    console: [maxMemory: 2048, minMemory: 2048, debug: false, maxPerm: 1024]
 ]
 
 grails.project.dependency.resolver = "maven" // or ivy
@@ -125,6 +125,7 @@ grails.project.dependency.resolution = {
 		runtime ":database-migration:1.4.1"
 		runtime ":jquery:1.11.1"
 
+        compile ":grails-melody:1.59.0"
 
         compile(":joda-time:1.5")
         compile(':mail:1.0.7') {
@@ -147,6 +148,13 @@ grails.project.dependency.resolution = {
         runtime(":bubbling:2.1.4")
         runtime(":webflow:2.1.0")
         runtime(":resources:1.2.14")
+        runtime(":cache-headers:1.1.7")
+        runtime(":zipped-resources:1.0") { excludes 'resources' }
+        runtime(":cached-resources:1.0") { excludes 'resources', 'cache-headers' }
+
+
+        runtime ":console:1.5.11"
+
 		//runtime(":jquery:1.7.2")
 		//runtime(":jquery-ui:1.8.24") { excludes 'jquery' }
 		runtime( ':jquery-validation:1.9' ) { // 1.7.3
@@ -185,10 +193,6 @@ grails.project.dependency.resolution = {
 		//runtime(':tomcat:1.3.9') 
 		//runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
 //		runtime(':quartz2:2.1.6.2')
-//		runtime(":resources:1.2.14")
-//		runtime(":cache-headers:1.1.5")
-//		runtime(":zipped-resources:1.0") { excludes 'resources' }
-//		runtime(":cached-resources:1.0") { excludes 'resources', 'cache-headers' }
 //		runtime(":jquery:1.7.2")
 //		runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
 
