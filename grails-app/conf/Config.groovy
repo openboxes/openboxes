@@ -269,6 +269,7 @@ log4j.main = {
 			'grails.app.task',
             'grails.plugin.springcache',
 			'BootStrap',
+            'liquibase',
 			'com.gargoylesoftware.htmlunit'
 
    debug 	'org.apache.cxf',
@@ -277,7 +278,6 @@ log4j.main = {
             'grails.plugins.raven',
             'net.kencochrane.raven',
             'grails.plugin.databasemigration',
-		    'liquibase',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
