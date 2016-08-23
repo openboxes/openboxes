@@ -5,7 +5,7 @@ class LinkTagLib extends ApplicationTagLib {
     static namespace = "g"
     def userService
 
-    def link = { attrs, body ->
+    Closure link = { attrs, body ->
 
         def actionName = attrs.action
         def controllerName = attrs.controller ?: ""
