@@ -38,14 +38,19 @@ hibernate {
 environments {
 	development {
 		dataSource {	
-			//dbCreate = "update"
-			url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-			loggingSql = false
-			format_sql = false
-			use_sql_comments = false
 
-//			dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            // MySQL database connection
+            // ?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+            //dbCreate = "update"
+            driverClassName = "com.mysql.jdbc.Driver"
+            dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
+			url = "jdbc:mysql://localhost:3306/openboxes2"
+			username = "openboxes"
+            password = "openboxes"
+
+            // H2 database
 //			driverClassName = "org.h2.Driver"
+//          dialect = ""
 //			username = "sa"
 //			password = ""
 //			url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
@@ -55,11 +60,14 @@ environments {
 	test {
 		dataSource {
 			//dbCreate = "update"
-//			driverClassName = "org.h2.Driver"
-//			username = "sa"
-//			password = ""
-//			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
+			driverClassName = "org.h2.Driver"
+            dialect = ""
+			username = "sa"
+			password = ""
+			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+
+            // Trying to use H2 database for testing and development to improve performance on startup
+            //url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 
 		}
 	}
