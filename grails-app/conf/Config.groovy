@@ -57,6 +57,9 @@ grails.views.default.codec = "html" // was "none"
 // If unspecified, controllers are prototype scoped.
 grails.controllers.defaultScope = 'singleton'
 
+// Default date format for data binding
+grails.databinding.dateFormats = ["MM/dd/yyyy"]
+
 // GSP settings
 grails {
     views {
