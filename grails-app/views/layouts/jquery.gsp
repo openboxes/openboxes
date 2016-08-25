@@ -9,7 +9,7 @@
 	
 	<!-- tab styling -->
 	
-	<link href="${createLinkTo(dir:'css', file:'tabs.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<link href="${resource(dir:'css', file:'tabs.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 		
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
@@ -25,7 +25,7 @@
     <div >
 		<!-- Spinner gets displayed when AJAX is invoked -->
 		<div id="spinner" class="spinner" style="display:none;">
-		    <img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+		    <img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 		</div>
 		<!-- 
 			Header "hd" includes includes logo, global navigation 
@@ -38,7 +38,7 @@
 				    <div id="bannerLeft" class="yui-u first" >
 						<div class="logo">
 						    <a class="home" href="${createLink(uri: '/home/index')}" style="text-decoration: none">						    	
-					    		<img src="${createLinkTo(dir:'images',file:'openboxes_logo3.png')}" alt="Your Boxes. You're Welcome." 
+					    		<img src="${resource(dir:'images',file:'openboxes_logo3.png')}" alt="Your Boxes. You're Welcome."
 					    			style="vertical-align: absmiddle"/>
 						    </a>
 						</div>

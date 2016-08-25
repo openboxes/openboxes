@@ -5,24 +5,24 @@
 	<title><g:layoutTitle default="OpenBoxes" /></title>
 	
 	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css"/>
+	<link rel="stylesheet" href="${resource(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css"/>
 	
 	<!-- Include Favicon -->
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there's a slight distinction between these two ... need to figure out what that distinction is -->
 	<%--<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />--%>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
 	<%-- 
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
 	--%>
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
 
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -30,25 +30,25 @@
 	<!-- Include jQuery UI files -->
 	<g:javascript library="jquery" plugin="jquery" />
 	<jqui:resources />
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<link href="${resource(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<%-- 
 	<jqui:resources />
 	<jqui:resources theme="smoothness" />
 	--%><%--  
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
+	<link href="${resource(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<script src="${resource(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
 	--%>
 	<!-- Include other plugins -->
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
 
 	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
@@ -63,14 +63,14 @@
     </script>
 
 	<%--
-	<link href="${createLinkTo(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.jqGrid/js', file:'jquery.jqGrid.min.js')}" type="text/javascript" ></script>
+	<link href="${resource(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<script src="${resource(dir:'js/jquery.jqGrid/js', file:'jquery.jqGrid.min.js')}" type="text/javascript" ></script>
 	 --%>
 	<%--
-    <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
-    <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
+    <script type="text/javascript" src="${resource(dir:'js/jquery/', file:'fg.menu.js')}"></script>
+    <link type="text/css" href="${resource(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />
 	--%>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${resource(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
 	
 	<!-- Custom styles to be applied to all pages -->
 	<style type="text/css" media="screen"></style>
@@ -107,7 +107,7 @@
    			<h3 class="page-title">
 			    <div>							    
 			    	<g:link controller="dashboard" action="index">
-				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
+				    	<img src="${resource(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
 			    	</g:link>
 				    &nbsp;&rsaquo;&nbsp;								
 					<g:if test="${session?.warehouse}">									

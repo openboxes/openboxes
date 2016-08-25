@@ -99,7 +99,7 @@
 				<table>
 					<tr>
 						<td class="left">
-							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>
+							<img src="${resource(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>
 						</td>
 						<td class="center">
 							<div class="title">			
@@ -115,7 +115,7 @@
 							</div>							
 						</td>			
 						<td class="right">
-							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}" width="34" height="50" />
+							<img src="${resource(dir:'images/icons/logos/',file:'pih_logo.jpg')}" width="34" height="50" />
 						</td>				
 					</tr>
 				</table>

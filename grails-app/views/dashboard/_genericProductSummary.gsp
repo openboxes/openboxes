@@ -9,7 +9,7 @@
     			<tbody>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
+                        <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
                     </td>
 
                     <td>
@@ -18,13 +18,13 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
                     <td>
                         <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT_OBSOLETE']">
@@ -32,13 +32,13 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="STOCK_OUT_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="STOCK_OUT_OBSOLETE" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
 
                     <td>
@@ -47,12 +47,12 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="LOW_STOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="LOW_STOCK" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
 
                     <td>
@@ -61,14 +61,14 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="REORDER" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="REORDER" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
 
 
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
 
                     <td>
@@ -77,12 +77,12 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="OVERSTOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="OVERSTOCK" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
 
                     <td>
@@ -91,13 +91,13 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="IN_STOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="IN_STOCK" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
                     <td>
                         <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK_OBSOLETE']">
@@ -105,7 +105,7 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="IN_STOCK_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="IN_STOCK_OBSOLETE" class="indicator"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
@@ -117,7 +117,7 @@
                 <tfoot>
                     <tr>
                         <th class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle" title='${warehouse.message(code:"default.total.label",default:"Total")}'/>
+                            <img src="${resource(dir:'images/icons/silk/sum.png')}" class="middle" title='${warehouse.message(code:"default.total.label",default:"Total")}'/>
                         </th>
                         <th>
                             <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'ALL']">
@@ -125,7 +125,7 @@
                             </g:link>
                         </th>
                         <th class="right">
-                            <div id="TOTAL"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="TOTAL"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </th>
                     </tr>
 

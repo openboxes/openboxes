@@ -6,9 +6,9 @@
         <meta name="layout" content="custom" />
         <title>Browse inventory</title>
         <%-- 
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.popover',file:'jquery.popover.css')}" type="text/css" media="screen, projection" />    
-		<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-    	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
+		<link rel="stylesheet" href="${resource(dir:'js/jquery.popover',file:'jquery.popover.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+    	<link rel="stylesheet" href="${resource(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     	--%>
     </head>    
     <body>

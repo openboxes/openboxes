@@ -3,7 +3,7 @@
 		<g:if test="${!request.request.requestURL.toString().contains('order/list')}">
 			<div class="action-menu-item">
 				<g:link controller="order" action="list">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
+					<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
 					&nbsp;${warehouse.message(code: 'order.list.label', default: 'List orders')} 
 				</g:link>
 			</div>
@@ -13,7 +13,7 @@
 		</div>
 		<div class="action-menu-item">
 			<g:link controller="order" action="show" id="${orderInstance?.id}">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
+				<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
 				&nbsp;${warehouse.message(code: 'order.viewDetails.label')} 
 			</g:link>		
 		</div>

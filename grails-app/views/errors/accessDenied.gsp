@@ -25,7 +25,7 @@
 				<warehouse:message code="errors.accessDenied.message" default="Apologies, but you are not authorized to view this page."/> 
 			</div>
 			<div style="padding-left: 45px;">
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+				<img src="${resource(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 			

@@ -9,7 +9,7 @@
 		<g:if test="${!request.request.requestURL.toString().contains('requisition/list')}">
 			<div class="action-menu-item">
 				<g:link controller="requisition" action="list">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+					<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
 					&nbsp;${warehouse.message(code: 'requisition.view.label', default: 'View requisitions')}
 				</g:link>
 			</div>
@@ -19,13 +19,13 @@
 		</g:if>
 		<div class="action-menu-item">
 			<g:link controller="requisition" action="show" id="${requisition?.id}">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
+				<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
 				&nbsp;${warehouse.message(code: 'requisition.show.label', default: 'Preview requisition')}
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
 			<g:link controller="requisition" action="edit" id="${requisition?.id}">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+				<img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" />
 				&nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition')}
 			</g:link>		
 		</div>

@@ -63,7 +63,7 @@
 									<td class="value left">								
 										<div>
 											<button type="submit" class="positive"><img
-											src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+											src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 											 /> <warehouse:message code="default.button.delete.label"/></button>
 											
 											&nbsp;

@@ -46,13 +46,13 @@
 												<tr class="even">
 													<th class="center" align="center" colspan="6">
 														<h2>
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
+															<img src="${resource(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
 															<warehouse:message code="order.itemsOrdered.label"/>
 														</h2>
 													</th>
 													<th class="center" align="center" colspan="5" style="border-left: 1px solid lightgrey;">
 														<h2>
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
+															<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
 															<warehouse:message code="order.itemsReceived.label"/>
 														</h2>
 													</th>

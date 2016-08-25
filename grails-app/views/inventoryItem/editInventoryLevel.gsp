@@ -90,7 +90,7 @@
 								<td>
 								
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+										src="${resource(dir:'images/icons/silk',file:'tick.png')}"
 										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;

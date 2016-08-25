@@ -24,7 +24,7 @@
 						<li>
 							<div class="template-image">
 								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'gloves']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'exam-gloves.jpg')}" height="128" width="128"/>
+									<img src="${resource(dir:'images/productTemplates',file:'exam-gloves.jpg')}" height="128" width="128"/>
 								</g:link>
 							</div>		
 							<div class="template-name">Gloves</div>						
@@ -33,7 +33,7 @@
 						<li>
 							<div class="template-image">
 								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'masks']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'masks.jpg')}" height="128" width="128"/>
+									<img src="${resource(dir:'images/productTemplates',file:'masks.jpg')}" height="128" width="128"/>
 								</g:link>
 							</div>		
 							<div class="template-name">Masks</div>						
@@ -41,7 +41,7 @@
 						<li>
 							<div class="template-image">
 								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'medicine']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'pills.png')}" height="128" width="128"/>
+									<img src="${resource(dir:'images/productTemplates',file:'pills.png')}" height="128" width="128"/>
 								</g:link>
 							</div>		
 							<div class="template-name">Medicine</div>						
@@ -51,7 +51,7 @@
 						<li>
 							<div class="template-image">
 								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'new']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'new.png')}" height="128" width="128"/>
+									<img src="${resource(dir:'images/productTemplates',file:'new.png')}" height="128" width="128"/>
 								</g:link>
 							</div>		
 							<div class="template-name">New template</div>						

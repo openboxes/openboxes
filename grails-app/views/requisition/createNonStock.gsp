@@ -31,18 +31,18 @@
                     <g:if test="${requisition?.id }">
                         <div class="box">
                             <a class="toggle" href="javascript:void(0);">
-                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
                             </a>
                             <h2 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h2>
                             <g:if test="${requisition?.id }">
                                 <g:if test="${!params.editHeader }">
                                     <g:link controller="requisition" action="editHeader" id="${requisition?.id }">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
                                     </g:link>
                                 </g:if>
                                 <g:else>
                                     <g:link controller="requisition" action="edit" id="${requisition?.id }">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
                                     </g:link>
                                 </g:else>
                             </g:if>

@@ -130,7 +130,7 @@
                                             <%--
                                             <td align="center">
                                                 <span title="${productInstance?.description }">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'information.png')}" class="middle" alt="Information" />
+                                                    <img src="${resource(dir:'images/icons/silk',file:'information.png')}" class="middle" alt="Information" />
                                                 </span>
                                             </td>
                                             --%>

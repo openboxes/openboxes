@@ -12,8 +12,8 @@
 	        <title><warehouse:message code="product.add.label" /></title>	
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
-		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${resource(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
         <style>
         #category_id_chosen {
             width: 100% !important;
@@ -824,7 +824,7 @@
                                                     <td>
                                                         <%--
                                                         <g:link controller="inventoryLevel" action="edit" id="${inventoryLevelInstance?.id}">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/></g:link>
+                                                            <img src="${resource(dir:'images/icons/silk', file: 'pencil.png')}"/></g:link>
                                                         --%>
                                                         <div class="button-group">
 
@@ -970,14 +970,14 @@
                                                                 <td>
                                                                     <%--
                                                                     <g:link controller="document" action="edit" id="${document?.id}" params="['product.id':productInstance?.id]">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+                                                                        <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
                                                                     </g:link>
                                                                     --%>
                                                                     <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Download" />
+                                                                        <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="Download" />
                                                                     </g:link>
                                                                     <g:link controller="product" action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" />
+                                                                        <img src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" />
                                                                     </g:link>
 
                                                                 </td>

@@ -47,7 +47,7 @@
 					</table>
 				</div>
 
-                <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+                <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
                 <script>
                     $(document).ready(function() {
                         $('.nailthumb-container').nailthumb({ width: 24, height: 24 });

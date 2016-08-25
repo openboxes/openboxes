@@ -150,7 +150,7 @@
 													</g:else>
 												</td>
 												<td class="center">
-													<img class="delete middle button" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>													
+													<img class="delete middle button" src="${resource(dir:'images/icons/silk',file:'delete.png')}"/>
 												</td>
 											</tr>
 										</g:if>

@@ -76,7 +76,7 @@
 									<div class="buttons">
 													<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 										<button type="submit" class="positive"><img
-											src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+											src="${resource(dir:'images/icons/silk',file:'tick.png')}"
 														alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
 														
 										&nbsp;

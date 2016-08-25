@@ -180,14 +180,14 @@
 										</td>
 										<td>
 											<button type="submit" class="positive"><img
-												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+												src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 												alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 											</button>
 											&nbsp;
 											<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 											<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
 											<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-									                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+									                <button type="button" class="negative"><img src="${resource(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
 											</g:if>
 											&nbsp;
 											<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
@@ -230,7 +230,7 @@
 												<tr>
 													<td>
 														<g:link action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-															<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+															<img src="${resource(dir:'images/icons',file:'trash.png')}" alt="Delete" />
 														</g:link>												
 													</td>
 													<td>
@@ -264,7 +264,7 @@
 									&nbsp;
 									<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+										src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 													alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
 								</td>
 							</tr>						

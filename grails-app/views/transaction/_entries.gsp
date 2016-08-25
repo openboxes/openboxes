@@ -23,7 +23,7 @@
                     <tr class="${status%2?'odd':'even' } ${selected?'selected':''}">
                         <td>
                             <g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id}">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
                             </g:link>
 
                         </td>
@@ -31,13 +31,13 @@
                             <%--
                             <g:if test="${params?.showAll || !params.product }">
                                 <g:link controller="inventory" action="showTransaction" id="${transactionInstance.id}" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
+                                    <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
                                 </g:link>
                             </g:if>
                             <g:else>
                                 <g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
                                     <a href="?showAll=true">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'transaction.showAllProducts.label') }" style="vertical-align: middle"/>
+                                        <img src="${resource(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'transaction.showAllProducts.label') }" style="vertical-align: middle"/>
                                     </a>
                                 </g:if>
                             </g:else>

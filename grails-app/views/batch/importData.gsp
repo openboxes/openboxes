@@ -170,7 +170,7 @@
             </g:if>
 
 		</div>
-        <script src="${createLinkTo(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
         <script type="text/javascript">
             $(document).ready(function(){

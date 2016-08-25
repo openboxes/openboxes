@@ -112,7 +112,7 @@
 													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
 														value="${transactionEntry?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 													
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'cancel.label') }"/>
+													<img class="undo middle" src="${resource(dir:'images/icons/silk',file:'decline.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'cancel.label') }"/>
 												</span>	
 												
 												<span class="lotNumberReadonly" style="${!displayLotNumberReadonly?'display:none;':'' }">
@@ -135,15 +135,15 @@
 															</span>
 														</g:if>
 													</g:else>
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'undo.label') }"/>
+													<img class="undo middle" src="${resource(dir:'images/icons/silk',file:'pencil.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'undo.label') }"/>
 												</span>	
 											</td>
 											<td>
 												<g:textField name="transactionEntries[${i }].quantity" size="5" class="text medium" autocomplete="off" value="${transactionEntry?.quantity }"/>
 											</td>
 											<td>
-												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
-												<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+												<img class="add middle" src="${resource(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
+												<img class="delete middle" src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>
 											</td>
 											<td>
 									            <g:hasErrors bean="${transactionEntry}">
@@ -199,7 +199,7 @@
 													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
 														value="${command?.transactionEntries[i]?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 																										
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>
+													<img class="undo middle" src="${resource(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>
 												</span>	
 												
 												<span class="lotNumberReadonly" style="${!displayLotNumberReadonly?'display:none;':'' }">
@@ -212,15 +212,15 @@
 																<format:date obj="${command?.transactionEntries[i]?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>)
 														</span>
 													</g:if>
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="${warehouse.message(code: 'undo.label') }"/>
+													<img class="undo middle" src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="${warehouse.message(code: 'undo.label') }"/>
 												</span>	
 											</td>
 											<td>
 												<g:textField name="transactionEntries[${i }].quantity" size="5" class="text medium" autocomplete="off" value="${command?.transactionEntries[i]?.quantity }"/>
 											</td>
 											<td>
-												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
-												<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+												<img class="add middle" src="${resource(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
+												<img class="delete middle" src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>
 											</td>
 										</tr>
 									</g:each>

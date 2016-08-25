@@ -99,7 +99,7 @@
                                                     </g:else>
 												</td>
 												<td>
-													<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+													<img class="delete middle" src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>
 												</td>
 											</tr>
 											<g:set var="status" value="${status+1 }"/>										

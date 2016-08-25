@@ -6,7 +6,7 @@
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
         <title><warehouse:message code="transaction.dailyTransactions.label"/></title>    
-        <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'scrolltable.css')}" type="text/css" media="screen, projection" />
+        <link rel="stylesheet" href="${resource(dir:'css',file:'scrolltable.css')}" type="text/css" media="screen, projection" />
     </head>    
 
 	<body>

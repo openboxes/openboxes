@@ -38,7 +38,7 @@
 						<div class="actions">
 							<div class="action-menu-item">
 								<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'shipping.returnToInventoryBrowser.label') }" style="vertical-align: middle" />	
+									<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'shipping.returnToInventoryBrowser.label') }" style="vertical-align: middle" />
 									&nbsp; <warehouse:message code="shipping.returnToInventoryBrowser.label"/>
 								</g:link>
 							</div>

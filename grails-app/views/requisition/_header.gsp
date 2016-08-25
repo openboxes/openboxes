@@ -3,7 +3,7 @@
 
             <%--
             <a class="toggle" href="javascript:void(0);">
-                <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                <img id="toggle-icon" src="${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
             </a>
             <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
             &nbsp;
@@ -163,7 +163,7 @@
 
                     <%--
                     <a class="toggle" href="javascript:void(0);">
-                        <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                        <img id="toggle-icon" src="${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
                     </a>
                     <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
                     &nbsp;
@@ -310,12 +310,12 @@
             // hides children divs if shown, shows if hidden
             $details = $("#requisition-header").slideUp();
             var icon = $("#toggle-icon");
-            icon.attr('src', "${createLinkTo(dir: 'images/icons/silk', file: 'section_expanded.png')}");
+            icon.attr('src', "${resource(dir: 'images/icons/silk', file: 'section_expanded.png')}");
             console.log(icon);
         }, function() {
             $details = $("#requisition-header").slideDown();
             var icon = $("#toggle-icon");
-            icon.attr('src', "${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}");
+            icon.attr('src', "${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}");
             console.log(icon);
         });
     });

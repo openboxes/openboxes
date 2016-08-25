@@ -8,8 +8,8 @@
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
-		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${resource(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
     </head>
     <body>
         <div class="body">
@@ -32,7 +32,7 @@
                     <div style="width: 49%; margin: 5px; float: left;">
                         <fieldset>
                             <legend>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_detail.png')}" class="middle"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'application_view_detail.png')}" class="middle"/>
                                 <warehouse:message code="location.details.label" default="Details"/>
                             </legend>
                             <table>
@@ -143,7 +143,7 @@
 
                         <fieldset>
                             <legend>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" class="middle"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'flag_red.png')}" class="middle"/>
                                 <warehouse:message code="default.status.label" default="Status"/>
                             </legend>
                             <table>
@@ -184,7 +184,7 @@
                     <div style="width: 49%;margin: 5px; float: left;">
                         <fieldset>
                             <legend>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                                 <warehouse:message code="address.label" default="Address"/>
                             </legend>
                             <table>

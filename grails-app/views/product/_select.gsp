@@ -21,7 +21,7 @@
 		</tbody>
 	</table>
 </div>
-<script src="${createLinkTo(dir:'js/jquery.tableFilter/', file:'picnet.table.filter.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.tableFilter/', file:'picnet.table.filter.min.js')}" type="text/javascript" ></script>
 <script>
 	//filter results based on query
 	function filter(selector, query, andOr) {

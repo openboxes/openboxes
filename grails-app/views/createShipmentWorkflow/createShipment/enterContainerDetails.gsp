@@ -388,7 +388,7 @@
 												</div>
 												<%--
                                                 <span id="${shipmentItem?.id }" class="draggable">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" class="middle"/>
+                                                    <img src="${resource(dir:'images/icons/silk',file:'package_go.png')}" class="middle"/>
                                                 </span>
                                                 --%>
 											</td>

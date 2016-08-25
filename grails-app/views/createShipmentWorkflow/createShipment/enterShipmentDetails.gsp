@@ -64,7 +64,7 @@
 									<td valign="top" class="name">
                                         <label><warehouse:message code="default.origin.label" /></label>
                                         <g:link action="createShipment" event="addLocation" params="[target:'origin']" tabIndex="-1">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>
+                                            <img src="${resource(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>
                                         </g:link>
 
                                     </td>
@@ -82,7 +82,7 @@
 									<td valign="top" class="name">
                                         <label><warehouse:message code="default.destination.label" /></label>
                                         <g:link action="createShipment" event="addLocation" params="[target:'origin']" tabIndex="-1">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle" />
+                                            <img src="${resource(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle" />
                                         </g:link>
                                     </td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">

@@ -7,7 +7,7 @@
 	<title><warehouse:message code="notFound.label" default="Page Not Found"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="title"><warehouse:message code="notFound.label" default="Page Not Found"/></content>
-    <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 	
 	
 </head>
@@ -26,7 +26,7 @@
 				 
 			</div>
 			<div style="padding-left: 45px;" >
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+				<img src="${resource(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 	</div>

@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="print" />
-	    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
+	    <link rel="stylesheet" href="${resource(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
         <title><warehouse:message code="report.showShippingReport.label" /></title>    
         
     </head>    
@@ -28,7 +28,7 @@
 				<table>
 					<tr>
 						<td rowspan="3" class="middle left">
-							<img src="${createLinkTo(dir:'images/',file:'hands.jpg')}"  width="65" height="65"/>
+							<img src="${resource(dir:'images/',file:'hands.jpg')}"  width="65" height="65"/>
 						</td>
 						<td class="center">
 							<div class="title">			
@@ -44,7 +44,7 @@
 							</div>							
 						</td>			
 						<td rowspan="3" class="middle right">
-							<img src="${createLinkTo(dir:'images/',file:'hands.jpg')}" width="65" height="65" />
+							<img src="${resource(dir:'images/',file:'hands.jpg')}" width="65" height="65" />
 						</td>				
 					</tr>
 				</table>

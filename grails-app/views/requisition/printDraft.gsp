@@ -3,16 +3,16 @@
 <html>
 <head>
     <meta name="layout" content="print" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
     <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
-	<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-   	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
+	<script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+   	<link rel="stylesheet" href="${resource(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
 
 </head>
 <body>
 	<h2 id="print-header">
-		<img id="logo" src="${createLinkTo(dir:'images/', file:'hands.jpg')}" />
+		<img id="logo" src="${resource(dir:'images/', file:'hands.jpg')}" />
 		${requisition?.name}
 		<span style="float: right;">
 		    <button type="button" id="print-button" onclick="window.print()">

@@ -378,7 +378,7 @@
                                                                    </g:if>
                                                                    <g:elseif test="${inventoryItem?.supported && showQuantity }">
                                                                    <%-- <g:formatNumber number="${inventoryItem?.quantityToReceive?:0}"/>--%>
-                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                                                                    </g:elseif>
                                                                    <g:else>
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
@@ -390,7 +390,7 @@
                                                                    </g:if>
                                                                    <g:elseif test="${inventoryItem?.supported && showQuantity}">
                                                                    <%-- <g:formatNumber number="${inventoryItem?.quantityToShip?:0}"/>--%>
-                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                                                                    </g:elseif>
                                                                    <g:else>
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
@@ -406,7 +406,7 @@
                                                                    <g:elseif test="${inventoryItem?.supported && showQuantity}">
                                                                        <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
                                                                        <%-- <g:formatNumber number="${inventoryItem?.quantityOnHand?:0}"/>--%>
-                                                                           <div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                                                           <div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                                                                        </g:link>
                                                                    </g:elseif>
                                                                    <g:else>
@@ -470,8 +470,8 @@
 				</div>    	
 			</div>
 		</div>
-        <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-        <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 		<script>
 			$(document).ready(function() {
 				$(".checkable a").click(function(event) {

@@ -28,7 +28,7 @@
 								
 					<div id="loginBox" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
+							<img src="${resource(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
 						</h2>
 						<table>
 							<tbody>

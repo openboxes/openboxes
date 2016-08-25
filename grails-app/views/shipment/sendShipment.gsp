@@ -74,20 +74,20 @@
 									</p>
 									<ul class="prop">
 										<li>
-											<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
+											<img src="${resource(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
 											&nbsp;
 											<warehouse:message code="shipping.shipmentWillBeMarkedAsShipped.message" 
 											args="[shipmentInstance?.name]"/>
 										</li>
 										<g:if test="${shipmentInstance?.origin.isWarehouse()}">
 											<li>
-												<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+												<img src="${resource(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 												&nbsp;
 												<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
 											</li>
 										</g:if>
 										<li>
-											<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+											<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 											&nbsp;
 											<warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/>
 										</li>
@@ -107,19 +107,19 @@
 										<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.CREATED}"/>
 									</span>
 									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+									<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 									&nbsp;
 									<span class="fade">
 										<format:metadata obj="${shipmentInstance?.status?.code}"/>
 									</span>
 									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+									<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 									&nbsp;
 									<span>
 										<b><format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}"/></b>
 									</span>
 									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+									<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 									&nbsp;
 									<span class="fade">
 										<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}"/>
@@ -154,7 +154,7 @@
 												<g:each var="item" in="${shipmentInstance?.shipmentItems }" status="status">
 													<tr class="${status % 2 ? 'even' : 'odd' }">
 														<td>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+															<img src="${resource(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 														</td>
 														<td>
 															${item?.container?.name }
@@ -197,7 +197,7 @@
 											<tr class="prop odd">
 												<td style="valign:center">
 													<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.carrier?.id}"/>
-													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+													<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 												</td>
 												<td>
 													<warehouse:message code="shipping.traveler.label"/>
@@ -213,7 +213,7 @@
 											<tr class="prop even">
 												<td>
 													<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.recipient?.id}"/>
-													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+													<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 												</td>
 												<td>
 													<warehouse:message code="shipping.recipient.label"/>
@@ -231,7 +231,7 @@
 													<tr class="prop odd">
 														<td>
 															<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+															<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 														</td>
 														<td>
 															<warehouse:message code="shipping.recipient.label"/>
@@ -254,7 +254,7 @@
 								<td valign="top" class="value">
 									
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+										src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 										alt="save" /> <warehouse:message code="shipping.sendShipment.label"/></button>
 									&nbsp;
 									<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">

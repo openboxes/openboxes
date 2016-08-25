@@ -8,7 +8,7 @@
 
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiredStock">
@@ -17,14 +17,14 @@
                         </td>
                         <td class="right">
                             <div id="expiredStockCount">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </div>
                         </td>
                     </tr>
 
 					<tr>
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
+							<img src="${resource(dir:'images/icons/silk/error.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:30]">
@@ -33,12 +33,12 @@
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="expiringIn30DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+							<div id="expiringIn30DaysStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 						</td>
 					</tr>
 					<tr>
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
+							<img src="${resource(dir:'images/icons/silk/error.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:90]">
@@ -46,13 +46,13 @@
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="expiringIn90DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+							<div id="expiringIn90DaysStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 						
 						</td>
 					</tr>
 					<tr>
 						<td class="center" style="width: 1%">
-							<img src="${createLinkTo(dir:'images/icons/silk', file: 'error.png')}" class="middle"/>
+							<img src="${resource(dir:'images/icons/silk', file: 'error.png')}" class="middle"/>
 						</td>
 						<td>
 							<g:link controller="inventory" action="listExpiringStock" params="[threshold:180]">
@@ -60,13 +60,13 @@
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="expiringIn180DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+							<div id="expiringIn180DaysStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 							
 						</td>
 					</tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'accept.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/', file: 'accept.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[threshold:365]">
@@ -74,7 +74,7 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="expiringIn365DaysStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="expiringIn365DaysStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
                 </tbody>

@@ -94,7 +94,7 @@
         <table>
             <tr>
                 <td>
-                    <img class="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
+                    <img class="logo" src="${resource(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
                 </td>
                 <td>
                     ${requisition.requestNumber}

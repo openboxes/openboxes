@@ -1,5 +1,5 @@
 <link rel="stylesheet"
-	href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}"
+	href="${resource(dir:'js/chosen',file:'chosen.css')}"
 	type="text/css" media="screen, projection" />
 
 	<g:selectCategoryWithChosen		

@@ -100,7 +100,7 @@
                             <tr>
                                 <td>
                                     <div style="padding-left: 25px;">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;
+                                        <img src="${resource(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;
                                         <g:if test="${!category.parentCategory }"><b><format:category category="${category}"/></b></g:if>
                                         <g:else><format:category category="${category}"/></g:else>
                                         <g:link class="new" action="create" params="['parentCategory.id':category.id]"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
@@ -113,7 +113,7 @@
                                 <tr>
                                     <td>
                                         <div style="padding-left: 50px;">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;
+                                            <img src="${resource(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;
 
                                             <g:if test="${!childCategory.parentCategory }">
                                                 <b><format:category category="${childCategory}"/></b>

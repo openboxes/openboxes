@@ -59,7 +59,7 @@
 					</td>
 					--%>
 					<td class="center middle"><img
-						src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
+						src="${resource(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
 						style="vertical-align: middle; width: 24px; height: 24px;" />
 					</td>

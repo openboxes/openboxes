@@ -55,7 +55,7 @@
 										<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''}">
 											<g:if test="${newContainer }">
 												<td class="container top left" rowspan="${rowspan }">
-													<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
+													<%-- <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 													<label>
 														<g:if test="${shipmentItem?.container?.parentContainer}">${shipmentItem?.container?.parentContainer?.name } &rsaquo;</g:if>
 														<g:if test="${shipmentItem?.container?.name }">${shipmentItem?.container?.name }</g:if>

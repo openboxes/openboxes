@@ -5,15 +5,15 @@
     <meta name="layout" content="" />
     <title>OpenBoxes Analytics</title>
 
-    <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/bootstrap/css',file:'bootstrap.css')}" type="text/css" media="all" />--%>
+    <%--<link rel="stylesheet" href="${resource(dir:'js/bootstrap/css',file:'bootstrap.css')}" type="text/css" media="all" />--%>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
-    <link rel="stylesheet" href="${createLinkTo(dir:'css/',file:'dashboard.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css/',file:'dashboard.css')}" type="text/css" media="all" />
 
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/pivottable/',file:'pivot.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/pivottable/',file:'pivot.css')}" type="text/css" media="all" />
 
 
 </head>
@@ -85,9 +85,9 @@
 <script src="http://nicolas.kruchten.com/pivottable/examples/ext/jquery-1.8.3.min.js"></script>
 <script src="http://nicolas.kruchten.com/pivottable/examples/ext/jquery-ui-1.9.2.custom.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-<script src="${createLinkTo(dir:'js/', file:'angular.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/pivottable', file:'pivot.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/', file:'pivot.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'angular.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/pivottable', file:'pivot.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'pivot.js')}" type="text/javascript" ></script>
 <script src="https://rawgithub.com/eligrey/FileSaver.js/master/FileSaver.js" type="text/javascript"></script>
 <script src="https://rawgithub.com/bouil/angular-google-chart/gh-pages/ng-google-chart.js" type="text/javascript"></script>
 <script type="text/javascript">

@@ -29,7 +29,7 @@
 
                 <div class="box">
                     <h2>
-                        <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"/>
+                        <img src="${resource(dir:'images/icons',file:'handtruck.png')}"/>
                         <label><warehouse:message code="receiving.label"/></label>
                     </h2>
 

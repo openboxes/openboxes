@@ -27,7 +27,7 @@
 						<label><warehouse:message code="person.search.label"/></label>            
 						<g:textField name="q" size="45" value="${params.q }"/>					
 						<button type="submit"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+							src="${resource(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
 							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
 						</button>		          
 					</g:form>

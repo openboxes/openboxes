@@ -74,14 +74,14 @@
 		                                    	<td>
 				                                    <g:textField name="option" value="${option}" size="60" class="text medium"/>
 		                                    		<a href="#">
-		                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png') }" style="vertical-align: middle;"/>
+		                                    			<img src="${resource(dir: 'images/icons/silk', file: 'cross.png') }" style="vertical-align: middle;"/>
 		                                    		</a>
 		                                    	</td>
 		                                    </tr>
 	                                    </table>
 	                                    <div>
 	                                    	<a href="#" onClick="javascript:addOption('');">
-		                                    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png') }" style="vertical-align: middle;"/>
+		                                    	<img src="${resource(dir: 'images/icons/silk', file: 'add.png') }" style="vertical-align: middle;"/>
 		                                    	<warehouse:message code="default.add.option" />
 		                                   	</a>
 	                                    </div>

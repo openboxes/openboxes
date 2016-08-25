@@ -24,7 +24,7 @@
             <div class="actions left">
                 <div class="action-menu-item">
                     <g:link controller="inventory" action="show" params="['format':'csv']"><img
-                            src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}"
+                            src="${resource(dir:'images/icons/silk',file:'disk_download.png')}"
                     /> &nbsp;<warehouse:message code="default.export.label" args="['CSV']"/>
                     </g:link>
                 </div>

@@ -13,8 +13,8 @@
 	--%>
 	<td class="middle">
 		<%-- 
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="" class="middle"/>
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_toggle_minus.png')}" alt="" class="middle"/>
+		<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="" class="middle"/>
+		<img src="${resource(dir:'images/icons/silk',file:'bullet_toggle_minus.png')}" alt="" class="middle"/>
 		--%>
 		<span class="action-menu">
 			<button class="action-btn">
@@ -26,7 +26,7 @@
 				<div class="action-menu-item">
 					<div class="action-menu-item">
 						<g:link controller="productGroup" action="edit" id="${inventoryItem?.productGroup?.id }"> 
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="${warehouse.message(code: 'default.edit.label') }" class="middle"/> 
+							<img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="${warehouse.message(code: 'default.edit.label') }" class="middle"/>
 							&nbsp;<warehouse:message code="productGroup.edit.label" />
 						</g:link>
 					</div>					
@@ -46,7 +46,7 @@
 		<span id="${inventoryItem?.productGroup?.id }" class="expandable">
 			${inventoryItem?.productGroup?.description } (${inventoryItem?.productGroup?.products?.size() } ${warehouse.message(code:'products.label') })		
 		</span>
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" 
+		<img src="${resource(dir:'images/icons/silk',file:'bullet_arrow_down.png')}"
 			id="${inventoryItem?.productGroup?.id }" class="expandable" alt="" class="middle"/>
 		
 		

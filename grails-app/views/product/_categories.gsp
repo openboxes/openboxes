@@ -60,6 +60,6 @@
     </g:each>
 </div>
 <div style="padding: 5px;">
-	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
+	<img src="${resource(dir:'images/icons/silk',file:'add.png')}" />
 	<a href="#" onclick="addCategory();" class="middle"><warehouse:message code="product.addAnotherCategory.label"/></a>
 </div>

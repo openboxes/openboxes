@@ -7,9 +7,9 @@
 		<title>
 			<warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/>
 		</title>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+		<link rel="stylesheet" href="${resource(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
         <link rel="stylesheet" type="text/css" href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
+		<script src="${resource(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
         <script type="text/javascript" charset="utf8" src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
 	</head>
 	<body>
@@ -272,7 +272,7 @@
                                         <td class="value">
                                             <g:hiddenField name="importNow" value="${true }"/>
                                             <button type="submit" class="button">
-                                            <%-- <img src="${createLinkTo(dir:'images/skin',file:'database_save.png')}" alt="upload" />--%>
+                                            <%-- <img src="${resource(dir:'images/skin',file:'database_save.png')}" alt="upload" />--%>
                                                 ${warehouse.message(code: 'default.button.import.label', default: 'Import')}</button>
                                             &nbsp;
                                             <a href="${createLink(controller: "product", action: "importAsCsv")}" >

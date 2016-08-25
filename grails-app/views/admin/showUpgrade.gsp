@@ -36,7 +36,7 @@
 								<td class="value">						
 									<g:textField name="remoteWebArchiveUrl" value="${command?.remoteWebArchiveUrl }" size="80"/>
 									<button type="submit" class="positive" name="_action_download">	
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" class="middle"/>&nbsp;						
+										<img src="${resource(dir:'images/icons/silk',file:'accept.png')}" class="middle"/>&nbsp;
 										<g:message code="upgrade.download.label"/> &nbsp;
 									</button>												
 									<br/>
@@ -122,13 +122,13 @@
 									<g:if test="${command?.localWebArchive?.absolutePath }">
 										<g:if test="${session?.command?.future?.done}">
 											<button type="submit" class="positive" name="_action_deploy">	
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_start.png')}" class="middle"/>						
+												<img src="${resource(dir:'images/icons/silk',file:'bullet_start.png')}" class="middle"/>
 												<g:message code="upgrade.deploy.label"/> &nbsp;
 											</button>							
 										</g:if>			
 										<g:else>
 											<button type="submit" class="" name="_action_deploy" disabled="disabled">	
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_stop.png')}" class="middle"/>						
+												<img src="${resource(dir:'images/icons/silk',file:'bullet_stop.png')}" class="middle"/>
 												<g:message code="upgrade.deploy.label"/> &nbsp;
 											</button>											
 											(Please wait for download to complete)

@@ -17,7 +17,7 @@
 						${command?.importFile?.originalFilename }
 						<input name="importFile" type="file"/>
 						
-						<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
+						<button type="submit" class="positive"><img src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="upload" />
 							${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}</button>
 
 							<a href="${createLink(controller: "product", action: "importAsCsv")}" class="negative">

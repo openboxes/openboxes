@@ -5,13 +5,13 @@
     <meta name="layout" content="" />
     <title>OpenBoxes Analytics</title>
 
-    <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/bootstrap/css',file:'bootstrap.css')}" type="text/css" media="all" />--%>
+    <%--<link rel="stylesheet" href="${resource(dir:'js/bootstrap/css',file:'bootstrap.css')}" type="text/css" media="all" />--%>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
-    <link rel="stylesheet" href="${createLinkTo(dir:'css/',file:'dashboard.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css/',file:'dashboard.css')}" type="text/css" media="all" />
 
 </head>
 
@@ -169,9 +169,9 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-route.min.js"></script>
-    <script src="${createLinkTo(dir:'js/angular-translate.min.js', file:'angular-translate.min.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'analytics/app.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'analytics/controllers.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/angular-translate.min.js', file:'angular-translate.min.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/', file:'analytics/app.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/', file:'analytics/controllers.js')}" type="text/javascript" ></script>
     <script src="//rawgithub.com/eligrey/FileSaver.js/master/FileSaver.js" type="text/javascript"></script>
     <script src="//rawgithub.com/bouil/angular-google-chart/gh-pages/ng-google-chart.js" type="text/javascript"></script>
 </body>

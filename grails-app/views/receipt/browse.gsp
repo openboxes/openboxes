@@ -48,7 +48,7 @@
 												</td>
 												<td>
 													<span class="buttons">
-														<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
+														<button type="submit" class="positive"><img src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" />
 															${warehouse.message(code: 'default.button.filter.label', default: 'Filter')}</button>
 													</span>											
 												</td>
@@ -96,13 +96,13 @@
 														<td style="text-align: left">										
 															<%--<g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link> --%>
 															<g:if test="${productInstance.class.simpleName == 'DrugProduct'}">															
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'pill.png')}"/>
+																<img src="${resource(dir:'images/icons/silk',file: 'pill.png')}"/>
 															</g:if>
 															<g:elseif test="${productInstance.class.simpleName == 'DurableProduct' }">
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'computer.png')}"/>
+																<img src="${resource(dir:'images/icons/silk',file: 'computer.png')}"/>
 															</g:elseif>
 															<g:else>
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'page_white.png')}"/>
+																<img src="${resource(dir:'images/icons/silk',file: 'page_white.png')}"/>
 															</g:else>
 															&nbsp;
 															<g:link action="show" id="${productInstance.id}">

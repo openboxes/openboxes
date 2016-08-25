@@ -3,15 +3,15 @@
 <html>
 <head>
     <meta name="layout" content="print"/>
-    <link rel="stylesheet" href="${createLinkTo(dir: 'css', file: 'print.css')}" type="text/css"
+    <link rel="stylesheet" href="${resource(dir: 'css', file: 'print.css')}" type="text/css"
           media="print, screen, projection"/>
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}"/>
     <title><warehouse:message code="default.show.label" args="[entityName]"/></title>
-    <script src="${createLinkTo(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.js')}"
+    <script src="${resource(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.js')}"
             type="text/javascript"></script>
-    <link rel="stylesheet" href="${createLinkTo(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.css')}"
+    <link rel="stylesheet" href="${resource(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.css')}"
           type="text/css" media="all"/>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 
     <style>
     .cf-header {
@@ -44,7 +44,7 @@
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                 <div class="print-logo nailthumb-container" style="float: left;">
-                    <img src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
+                    <img src="${resource(dir: 'images/', file: 'hands.jpg')}"/>
                 </div>
             </div>
         </td>
@@ -217,7 +217,7 @@
             <td width="1%">
                 <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                     <div class="print-logo nailthumb-container" style="float: left;">
-                        <img src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
+                        <img src="${resource(dir: 'images/', file: 'hands.jpg')}"/>
                     </div>
                 </div>
             </td>

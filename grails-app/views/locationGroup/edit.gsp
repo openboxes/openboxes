@@ -8,8 +8,8 @@
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
-		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${resource(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
     </head>
     <body>
         <div class="body">

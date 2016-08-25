@@ -200,11 +200,11 @@
 		                                    			
 		                                    			<%-- 
 		                                    			<g:link controller="transactionEntry" action="show" id="${transactionEntry?.id }">
-		                                    				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" /></g:link>
+		                                    				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" /></g:link>
 														&nbsp;
 														--%>
 		                                    			<g:link controller="transactionEntry" action="delete" id="${transactionEntry?.id }" onclick="return confirm('Are you sure?');">
-			                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png')}" />
+			                                    			<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
 			                                    		</g:link>
 			                                    	</td>
 			                                    </tr>											
@@ -246,10 +246,10 @@
 		                                    	<td class="center"><g:textField class="quantityField" name="quantity" value="" size="6"/></td>
 		                                    	<td class="actionsCell center">
 	                                    			<g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id }">
-	                                    				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" class="rowEditButton" />
+	                                    				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" class="rowEditButton" />
 	                                    			</g:link>
 	
-	                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" class="rowDeleteButton" />
+	                                    			<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="rowDeleteButton" />
 		                                    	</td>
 		                                    </tr>
 		                                    --%>

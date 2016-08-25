@@ -28,10 +28,10 @@
 						<div class="">
 							<span style="border: 1px solid lightgrey; background-color: #f7f7f7; padding: 5px; margin: 5px; width: 100px;">
 								<a id="hideParameters" class="toggleParameters" href="javascript:void(0);">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'section_expanded.png')}" class="middle"/>
+									<img src="${resource(dir:'images/icons/silk',file:'section_expanded.png')}" class="middle"/>
 								</a>
 								<a id="showParameters" class="toggleParameters" href="javascript:void(0);">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'section_collapsed.png')}" class="middle"/>
+									<img src="${resource(dir:'images/icons/silk',file:'section_collapsed.png')}" class="middle"/>
 								</a>
 							</span>
 						</div>
@@ -410,7 +410,7 @@
 												    		</g:link>											    		
 												    		
 															<g:link controller="report" action="generateTransactionReport" params="['product.id':product?.id,'category.id':category?.id,'location.id':command?.location?.id,startDate:params.startDate,endDate:params.endDate,includeChildren:command?.includeChildren,pageBreak:params.pageBreak]">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
+																<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
 															</g:link>
 
 											    		</g:if>
@@ -428,7 +428,7 @@
 												    		${entry?.quantityTransferredIn ?: 0}
 												    	</span>
 												    	<g:if test="${command.showTransferBreakdown && !params.print }">														
-												    		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
+												    		<img src="${resource(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
 												    		<div class="hidden details">
 												    			<g:if test="${entry.quantityTransferredInByLocation }">
 												    				<h2>
@@ -438,7 +438,7 @@
 												    								<format:product product="${product }"/>
 													    						</td>
 													    						<td class="right middle">
-															    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>										    						
+															    					<img src="${resource(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>
 													    						</td>
 													    					</tr>
 													    				</table>
@@ -505,7 +505,7 @@
 													<td class="right nowrap">	    	
 														<span class="${(entry?.quantityTransferredOut>0)?'debit':'credit'}">${entry?.quantityTransferredOut?:0}</span>
 												    	<g:if test="${command.showTransferBreakdown && !params.print }">														
-												    		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
+												    		<img src="${resource(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
 												    		<div class="hidden details">
 												    			<g:if test="${entry.quantityTransferredOutByLocation }">
 												    				<h2>
@@ -517,7 +517,7 @@
 														    						</label>
 													    						</td>
 													    						<td class="right middle">
-															    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>										    						
+															    					<img src="${resource(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>
 													    						</td>
 													    					</tr>
 													    				</table>

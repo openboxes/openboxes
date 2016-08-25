@@ -9,7 +9,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryAdjustedBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'book_edit.png')}"
+					src="${resource(dir:'images/icons/silk',file:'book_edit.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.inventoryAdjusted.label" />
@@ -18,7 +18,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="incomingTransferBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'package_in.png')}"
+					src="${resource(dir:'images/icons/silk',file:'package_in.png')}"
 					alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.incomingTransfer.label" />
@@ -27,7 +27,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="outgoingTransferBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}"
+					src="${resource(dir:'images/icons/silk',file:'package_go.png')}"
 					alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.outgoingTransfer.label" />
@@ -47,7 +47,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="addToProductGroupBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'link_add.png')}"
+					src="${resource(dir:'images/icons/silk',file:'link_add.png')}"
 					alt="${warehouse.message(code: 'productGroup.addProducts.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="productGroup.addProducts.label" />
@@ -59,7 +59,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryConsumedBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}"
+					src="${resource(dir:'images/icons/silk',file:'package_white.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.inventoryConsumed.label" />
@@ -68,7 +68,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryDamagedBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'exclamation.png')}"
+					src="${resource(dir:'images/icons/silk',file:'exclamation.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryDamaged.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.inventoryDamaged.label" />
@@ -77,7 +77,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryExpiredBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'clock_red.png')}"
+					src="${resource(dir:'images/icons/silk',file:'clock_red.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.inventoryExpired.label" />
@@ -89,7 +89,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="markAsSupported"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+					src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 					alt="${warehouse.message(code: 'inventory.markAsSupported.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.markAsSupported.label" />
@@ -99,7 +99,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="markAsNonInventoried"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}"
+					src="${resource(dir:'images/icons/silk',file:'flag_orange.png')}"
 					alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.markAsNonInventoried.label" />
@@ -109,7 +109,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="markAsNotSupported"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
+					src="${resource(dir:'images/icons/silk',file:'decline.png')}"
 					alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="inventory.markAsNotSupported.label" />
@@ -121,7 +121,7 @@
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="exportProductsBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'table_save.png')}"
+					src="${resource(dir:'images/icons/silk',file:'table_save.png')}"
 					alt="${warehouse.message(code: 'product.exportAsCsv.label') }"
 					style="vertical-align: middle" /> &nbsp;<warehouse:message
 						code="product.exportAsCsv.label" />
@@ -130,7 +130,7 @@
             <div class="action-menu-item">
                 <a href="javascript:void(0);" class="actionButton"
                    id="deleteProductsBtn"> <img
-                        src="${createLinkTo(dir:'images/icons/silk',file:'table_delete.png')}"
+                        src="${resource(dir:'images/icons/silk',file:'table_delete.png')}"
                         alt="${warehouse.message(code: 'products.delete.label', default: 'Delete selected products') }"
                         style="vertical-align: middle" /> &nbsp;<warehouse:message code="products.button.delete.label" default="Delete selected products" />
                 </a>
@@ -145,7 +145,7 @@
 				<g:hiddenField name="location.id" value="${session?.warehouse?.id}"/>
 															
 				<a href="javascript:void(0);" class="actionButton" id="transactionReportBtn">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" alt="${warehouse.message(code: 'report.showTransactionReport.label') }" style="vertical-align: middle"/>
+					<img src="${resource(dir:'images/icons/silk',file:'report.png')}" alt="${warehouse.message(code: 'report.showTransactionReport.label') }" style="vertical-align: middle"/>
 					&nbsp;<warehouse:message code="report.showTransactionReport.label"/>
 				</a>
 			</div>		
@@ -153,7 +153,7 @@
 		<div class="action-menu-item">
 			<g:link controller="inventory" action="listAllTransactions">
 				<img
-					src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"
+					src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}"
 					alt="${warehouse.message(code: 'inventory.listTransactions.label') }"
 					style="vertical-align: middle" />
 				&nbsp;<warehouse:message code="inventory.listTransactions.label" />

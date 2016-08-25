@@ -19,7 +19,7 @@
             <div class="actions">
                 <div class="action-menu-item">
                     <g:link controller="dashboard" action="downloadFastMoversAsCsv">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
                         <warehouse:message code="dashboard.downloadFastMoversAsCsv.label" default="Download fast movers as CSV"/>
                     </g:link>
 
@@ -37,7 +37,7 @@
             <div class="actions">
                 <div class="action-menu-item">
                     <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
                         Show all requisitions
                     </g:link>
                 </div>

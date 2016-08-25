@@ -4,9 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <script
-	src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}"
+	src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}"
 	type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'requisition.js')}"
+<script src="${resource(dir:'js/', file:'requisition.js')}"
 	type="text/javascript"></script>
 <g:set var="entityName"
 	value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />

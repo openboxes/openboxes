@@ -42,7 +42,7 @@
 					
 					<div class="dialog box">
                         <h2>
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"/>
+                            <img src="${resource(dir:'images/icons/silk',file:'lorry.png')}"/>
                             <warehouse:message code="shipping.sendShipment.label"/>
                         </h2>
 
@@ -59,7 +59,7 @@
 										<table>
 											<tr>
 												<td>
-													<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
+													<img src="${resource(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
 													&nbsp;
 													<warehouse:message code="shipping.shipmentWillBeMarkedAsShipped.message" 
 													args="[shipmentInstance?.name]"/>
@@ -68,7 +68,7 @@
 											<g:if test="${shipmentInstance?.origin.isWarehouse()}">
 												<tr>
 													<td>
-														<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+														<img src="${resource(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 														&nbsp;
 														<span id="itemsInShipmentWillBeDebited">
 															<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
@@ -82,7 +82,7 @@
 											<g:if test="${includeNotifications }">
 												<tr>
 													<td>
-														<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+														<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 														&nbsp;
 														<span id="notificationEmailsWillBeSentOut">
 															<warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/>
@@ -93,7 +93,7 @@
 											<g:else>
 												<tr>
 													<td>
-														<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+														<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 														&nbsp;
 														<span id="notificationEmailsWillNotBeSentOut">
 															<warehouse:message code="shipping.notificationEmailsWillNotBeSentOut.message"/>
@@ -142,19 +142,19 @@
 											<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.CREATED}"/>
 										</span>
 										&nbsp;
-										<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+										<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 										&nbsp;
 										<span class="fade">
 											<format:metadata obj="${shipmentInstance?.status?.code}"/>
 										</span>
 										&nbsp;
-										<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+										<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 										&nbsp;
 										<span>
 											<b><format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}"/></b>
 										</span>
 										&nbsp;
-										<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+										<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 										&nbsp;
 										<span class="fade">
 											<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}"/>
@@ -274,7 +274,7 @@
 													<tr class="prop odd">
 														<td style="valign:center">
 															<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.carrier?.id}"/>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+															<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 														</td>
 														<td>
 															<warehouse:message code="shipping.traveler.label"/>
@@ -290,7 +290,7 @@
 													<tr class="prop even">
 														<td>
 															<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.recipient?.id}"/>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+															<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 														</td>
 														<td>
 															<warehouse:message code="shipping.recipient.label"/>
@@ -310,7 +310,7 @@
 														<tr class="prop odd">
 															<td>
 																<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+																<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 															</td>
 															<td>
 																<warehouse:message code="shipping.recipient.label"/>

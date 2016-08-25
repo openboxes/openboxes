@@ -8,8 +8,8 @@
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
-		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${resource(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
     </head>
     <body>
         <div class="body">
@@ -268,10 +268,10 @@
 													<tr class="${status%2?'even':'odd' }">
 														<td>
 															<g:if test="${locationInstance?.supports(activity) }">
-																<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
+																<img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
 							                            	</g:if>
 							                            	<g:else>
-																<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>               	
+																<img class="middle" src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
 							                            	</g:else>
 							                            	&nbsp;
 															${format.metadata(obj:activity)}
@@ -354,7 +354,7 @@
 		                            	<td class="value">
 											<div class="buttons left">
 							                   <button type="submit">								
-													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
+													<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
 													<warehouse:message code="default.button.save.label"/>
 												</button>
 												&nbsp;

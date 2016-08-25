@@ -16,14 +16,14 @@
             <div class="actions">
                 <div class="action-menu-item">
                     <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
                         Show all requisitions
                     </g:link>
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="dashboard" action="index" class="${params.onlyShowMine.equals('true')?'selected':''}"
                             params="['onlyShowMine':true]">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="View requests" style="vertical-align: middle" />
+                        <img src="${resource(dir:'images/icons/silk',file:'user.png')}" alt="View requests" style="vertical-align: middle" />
                         Show my requisitions
                     </g:link>
                 </div>
@@ -48,7 +48,7 @@
                             <g:if test="${requisitionCount}">
                                 <tr class="${i%2?'odd':'even'}">
                                     <td class="center" style="width: 1%">
-                                        <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
+                                        <img src="${resource(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
 
                                     </td>
                                     <td>
@@ -71,7 +71,7 @@
                         <g:if test="${requisitionStatistics['MINE']}">
                             <tr class="${i%2?'odd':'even'}">
                                 <td class="center" style="width: 1%">
-                                    <img src="${createLinkTo(dir:'images/icons/silk', file: 'user.png')}"/>
+                                    <img src="${resource(dir:'images/icons/silk', file: 'user.png')}"/>
 
                                 </td>
                                 <td>

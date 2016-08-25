@@ -88,7 +88,7 @@
 											<img src="${product.images[0] }" height="100" width="100"/>
 										</g:if>
 										<g:else>
-											<img src="${createLinkTo(dir:'images',file:'default_product.png')}" class="middle" width="100" height="100"/>
+											<img src="${resource(dir:'images',file:'default_product.png')}" class="middle" width="100" height="100"/>
 										</g:else>
 										<%-- 										
 										<g:each var="document" in="${productInstance?.images}" status="i">
@@ -137,7 +137,7 @@
 									<img src="${product.images[0] }" height="100" width="100" class="left top"/>
 								</g:if>
 								<g:else>
-									<img src="${createLinkTo(dir:'images',file:'default_product.png')}" class="left top" width="100" height="100"/>
+									<img src="${resource(dir:'images',file:'default_product.png')}" class="left top" width="100" height="100"/>
 								</g:else>									
 							</td>
 							<td>

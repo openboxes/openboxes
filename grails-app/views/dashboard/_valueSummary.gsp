@@ -8,40 +8,40 @@
                 <tbody>
                     <tr>
                         <td>
-                            <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/sum.png')}" class="middle"/>
                         </td>
                         <td>
                             <div># of products with pricing information</div>
                         </td>
                         <td>
                             <div id="progressSummary" class="right">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <img src="${createLinkTo(dir:'images/icons/silk/chart_pie.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/chart_pie.png')}" class="middle"/>
                         </td>
                         <td>
                             <div>Percentage of products with pricing information</div>
                         </td>
                         <td>
                             <div id="progressPercentage" class="right">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/money.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/money.png')}" class="middle"/>
                         </td>
                         <td>
                             <warehouse:message code="inventory.totalStockValue.label" default="Total value of inventory"/>
                         </td>
                         <td class="right">
                             <div id="totalStockValue">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </div>
                         </td>
                     </tr>

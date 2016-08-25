@@ -47,11 +47,11 @@
 
 
 
-<%--<script src="${createLinkTo(dir:'js/flot/', file:'jquery.js')}" type="text/javascript" ></script>--%>
-<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.categories.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.canvas.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.resize.js')}" type="text/javascript" ></script>
+<%--<script src="${resource(dir:'js/flot/', file:'jquery.js')}" type="text/javascript" ></script>--%>
+<script src="${resource(dir:'js/flot/', file:'jquery.flot.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/flot/', file:'jquery.flot.categories.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/flot/', file:'jquery.flot.canvas.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/flot/', file:'jquery.flot.resize.js')}" type="text/javascript" ></script>
 
 <script type="text/javascript">
 

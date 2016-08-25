@@ -33,7 +33,7 @@
 
 					<div id="details" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="Details" style="vertical-align: middle"/>
+							<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="Details" style="vertical-align: middle"/>
 							<label><warehouse:message code="shipping.details.label"/></label>
 						</h2>
 						<table>
@@ -147,7 +147,7 @@
 							<g:if test="${!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier}">
 								<tr class="prop">
 									<td valign="top" class="name">
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="carrier" style="vertical-align: middle"/>
+										<img src="${resource(dir:'images/icons/silk',file:'user.png')}" alt="carrier" style="vertical-align: middle"/>
 										<label><warehouse:message code="shipping.traveler.label" /></label></td>
 									<td valign="top" class="value">
 										<g:if test="${shipmentInstance?.carrier}">
@@ -276,7 +276,7 @@
 
                     <div id="events" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'date.png')}" alt="event" style="vertical-align: middle"/>
+							<img src="${resource(dir:'images/icons/silk',file:'date.png')}" alt="event" style="vertical-align: middle"/>
 							<label><warehouse:message code="shipping.tracking.label"/></label>
 						</h2>
 						<g:set var="i" value="${0 }"/>
@@ -335,10 +335,10 @@
 											</g:if>
 											<%--
 											<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
+												<img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
 											</g:link>
 											<g:link action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" style="vertical-align: middle"/>
+												<img src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" style="vertical-align: middle"/>
 											</g:link>
 											--%>
 										</td>
@@ -401,7 +401,7 @@
                     <g:if test="${shipmentInstance?.outgoingTransactions || shipmentInstance?.incomingTransactions }">
                         <div id="transactions" class="box">
                             <h2>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_switch_bluegreen.png')}" style="vertical-align: middle"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch_bluegreen.png')}" style="vertical-align: middle"/>
                                 <label><warehouse:message code="shipping.transactions.label"/></label>
                             </h2>
                             <table>
@@ -465,7 +465,7 @@
 
 					<div id="documents" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
+							<img src="${resource(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
 							<label><warehouse:message code="document.documents.label"/></label>
 						</h2>
 						<table>
@@ -481,22 +481,22 @@
 										<td style="width:1%" class="middle">
 											<g:set var="f" value="${document?.filename?.toLowerCase()}"/>
 											<g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
+												<img src="${resource(dir:'images/icons/silk',file:'picture.png')}"/>
 											</g:if>
 											<g:elseif test="${f.endsWith('.pdf') }">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_acrobat.png')}"/>
+												<img src="${resource(dir:'images/icons/silk',file:'page_white_acrobat.png')}"/>
 											</g:elseif>
 											<g:elseif test="${f.endsWith('.doc')||f.endsWith('.docx') }">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"/>
+												<img src="${resource(dir:'images/icons/silk',file:'page_white_word.png')}"/>
 											</g:elseif>
 											<g:elseif test="${f.endsWith('.xls')||f.endsWith('.xlsx')||f.endsWith('.csv') }">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"/>
+												<img src="${resource(dir:'images/icons/silk',file:'page_white_excel.png')}"/>
 											</g:elseif>
 											<g:elseif test="${f.endsWith('.gz')||f.endsWith('.jar')||f.endsWith('.zip')||f.endsWith('.tar') }">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_compressed.png')}"/>
+												<img src="${resource(dir:'images/icons/silk',file:'page_white_compressed.png')}"/>
 											</g:elseif>
 											<g:else>
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white.png')}"/> 
+												<img src="${resource(dir:'images/icons/silk',file:'page_white.png')}"/>
 											</g:else>
 										</td>
 										<td>
@@ -549,7 +549,7 @@
 								</g:each>
 								<tr class=" ">
 									<td>
-										<img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" class="middle"/>
+										<img src="${resource(dir:'images/icons',file:'pdf.png')}" class="middle"/>
 									</td>																				
 									<td>
 										<div>
@@ -566,7 +566,7 @@
 							   	</tr>									   		
 								<tr class=" ">
 									<td>
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>										
+										<img src="${resource(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>
 									</td>
 									<td>
 										<div>
@@ -584,7 +584,7 @@
 							   	</tr>									   		
 								<tr class=" ">
 									<td>
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>											
+										<img src="${resource(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>
 									</td>
 									<td>
 										<div>
@@ -603,7 +603,7 @@
 							   	</tr>									   		
 								<tr class="">
 									<td>
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>
+										<img src="${resource(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>
 									</td>
 									<td>
 										<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
@@ -663,7 +663,7 @@
 					<g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
 					<div id="items" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
+							<img src="${resource(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
 							<label><warehouse:message code="shipping.contents.label"/></label>
 						</h2>
 						<table>
@@ -777,7 +777,7 @@
 					</div>
 					<div id="comments" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="note" style="vertical-align: middle"/>
+							<img src="${resource(dir:'images/icons/silk',file:'comment.png')}" alt="note" style="vertical-align: middle"/>
 							<label>${warehouse.message(code: 'comments.label') }</label>
 						</h2>
 
@@ -828,12 +828,12 @@
 										<p class="fade right">
 											<%--
 											<g:link class="fade" action="editComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
+												<img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
 											</g:link>
 											--%>
 											<%--
 											<g:link class="fade" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteNote.message')}')">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" style="vertical-align: middle"/>
+												<img src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" style="vertical-align: middle"/>
 											</g:link>
 											--%>
 										</p>

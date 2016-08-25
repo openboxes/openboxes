@@ -3,8 +3,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Smart Wizard 2 - Basic Example  - a javascript jQuery wizard control plugin</title>
 
-<link href="${createLinkTo(dir:'js/jquery.smartWizard/styles', file:'smart_wizard.css')}" rel="stylesheet" type="text/css">
-<script src="${createLinkTo(dir:'js/jquery.smartWizard/', file:'jquery.smartWizard-2.0.min.js')}" type="text/javascript" ></script>
+<link href="${resource(dir:'js/jquery.smartWizard/styles', file:'smart_wizard.css')}" rel="stylesheet" type="text/css">
+<script src="${resource(dir:'js/jquery.smartWizard/', file:'jquery.smartWizard-2.0.min.js')}" type="text/javascript" ></script>
 
 <script type="text/javascript">
     $(document).ready(function(){

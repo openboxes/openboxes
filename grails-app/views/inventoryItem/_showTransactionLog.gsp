@@ -37,7 +37,7 @@
 								noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
 						
 							<button  class="" name="filter">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
 								&nbsp;<warehouse:message code="default.button.filter.label"/>
 							</button>
 						</td>
