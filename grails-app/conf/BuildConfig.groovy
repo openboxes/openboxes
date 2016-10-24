@@ -40,6 +40,8 @@ grails.project.dependency.resolution = {
 
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
         mavenRepo "http://repo.grails.org/grails/plugins/"
+        mavenRepo "http://repo1.maven.org/maven2/"
+        mavenRepo "https://mvnrepository.com/artifact"
 	}
 	
 	dependencies {
@@ -75,6 +77,8 @@ grails.project.dependency.resolution = {
 		test 'dumbster:dumbster:1.6'
         test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
 
+        compile ('io.keen:keen-client-api-java:5.0.1')
+        //compile ('io.keen:keen-client-api-query:5.0.0')
 
 	}
 	plugins {

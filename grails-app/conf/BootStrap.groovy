@@ -34,11 +34,15 @@ import liquibase.database.DatabaseFactory
 
 class BootStrap {
 
+    def keenService
     def identifierService
     def grailsApplication
     DataSource dataSource;
 
     def init = { servletContext ->
+
+        // Initialize the Keen IO client
+        keenService.initialize()
 
         // ================================    Static Data    ============================================
         //

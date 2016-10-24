@@ -319,6 +319,7 @@ log4j = {
    debug 	'org.apache.cxf',
             'grails.plugin.rendering',
 		   	'org.apache.commons.mail',
+		    'io.keen',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',

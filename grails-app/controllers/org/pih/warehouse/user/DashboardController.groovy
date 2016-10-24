@@ -12,6 +12,8 @@ package org.pih.warehouse.user
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import io.keen.client.java.JavaKeenClientBuilder
+import io.keen.client.java.KeenClient
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
@@ -37,7 +39,7 @@ class DashboardController {
 	def productService
     def requisitionService
 	def sessionFactory
-	
+
 	def showCacheStatistics = {
 		def statistics = sessionFactory.statistics
 		log.info(statistics)

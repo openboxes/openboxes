@@ -29,6 +29,7 @@
 						<td width="33%">
                             <g:render template="activitySummary"/>
                             <g:render template="tagSummary" model="[tags:tags]"/>
+                            <g:render template="keenSummary"/>
 						</td>
 					
 					</tr>
