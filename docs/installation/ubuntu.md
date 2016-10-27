@@ -1,3 +1,9 @@
+## Installing OpenBoxes on Ubuntu 14.04
+
+### -1. Watch the Video
+.. raw:: html
+        <iframe src="//www.youtube.com/embed/TGC16JvbxiY?rel=0" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+
 ### 0. Choose a cloud provider
 Here are a few options for cheapish cloud hosting providers.
 
