@@ -140,7 +140,7 @@ $ sudo cp openboxes.war /var/lib/tomcat7/webapps/ROOT.war
 $ sudo service tomcat7 start
 ```
 
-### Watch the Tomcat logs during startup
+#### Watch for errors in the Tomcat logs during startup
 The log file should look something like this:
 ```
 Using Java at: /usr/lib/jvm/java-6-openjdk-amd64
