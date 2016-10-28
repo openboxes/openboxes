@@ -1,7 +1,6 @@
 ## Installing OpenBoxes on Ubuntu 14.04
 
 ### -1. Watch the Video
-.. raw:: html
         <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;"><iframe src="//www.youtube.com/embed/TGC16JvbxiY?rel=0" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
         
         
@@ -38,7 +37,7 @@ mysql -u root -p -e 'grant all on openboxes.* to 'openboxes'@'localhost' identif
 NOTE: For security reasons, you will want to set a decent password.  These values should be used in the `dataSource.username` and `dataSource.password` configuration properties in `openboxes-config.properties`.
 
 ### 3. Configure application properties
-Download the sample external configuration properties file ([openboxes-config.properties](https://github.com/openboxes/openboxes/blob/master/deploy/openboxes-config.properties)) and save it under `$HOME/.grails/openboxes-config.properties` where $HOME is the Tomcat users home directory.
+Download the sample external configuration properties file ([openboxes-config.properties](https://github.com/openboxes/openboxes/blob/master/deploy/openboxes-config.properties)) and save it under `/usr/share/tomcat7/.grails/openboxes-config.properties`.
 
 **REMINDER:** Change `dataSource.password` to the password you set in the `grant all` command above.
 
@@ -124,6 +123,7 @@ $ sudo service tomcat7 stop
 ```
 
 **Download latest release**
+
 * Go to the the [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub.
 * Download the WAR file (`openboxes.war`) associated with the latest release.
 
@@ -148,6 +148,7 @@ $ sudo service tomcat7 start
 ```
 
 **Tail Tomcat logs**
+
 Keep an eye out for any errors/exceptions that pop up in the `catalina.out` log file.
 ```
 $ tail -f /var/log/tomcat7/catalina.out
