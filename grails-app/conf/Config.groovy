@@ -46,7 +46,7 @@ grails {
 		// ${user.home}/openboxes-config.properties file 
 		enabled = true			
 		from = "info@openboxes.com"
-		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
+		prefix = "[OpenBoxes " + GrailsUtil.environment+"]"
 		host = "localhost"
 		port = "25"
 
@@ -116,7 +116,7 @@ mail.error.server = 'localhost'
 mail.error.port = 25
 mail.error.from = 'justin@openboxes.com'
 mail.error.to = 'errors@openboxes.com'
-mail.error.subject = '[OpenBoxes]['+GrailsUtil.environment+']'
+mail.error.subject = '[OpenBoxes '+GrailsUtil.environment+']'
 mail.error.debug = true
 
 // set per-environment serverURL stem for creating absolute links
