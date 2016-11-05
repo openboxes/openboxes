@@ -14,9 +14,9 @@ import org.pih.warehouse.core.User
 
 class SecurityFilters {
 	
-  static ArrayList controllersWithAuthUserNotRequired = ['test']
-  static ArrayList actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
-  static ArrayList actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+  static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
+  static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
+  static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
 	def authService 
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
@@ -54,6 +54,12 @@ class SecurityFilters {
 				//	log.info ("Location: " + session.location)
 				//	return true;
 				//}
+
+
+				// This allows requests for the health monitoring endpoint to pass through without a user
+				if (controllerName.equals("api") && actionName.equals("status")) {
+					return true
+				}
 				
 				// This allows the megamenu to be g:include'd in the page (allowing for dynamic content to be added) 
 				if(controllerName.equals("dashboard") && actionName.equals("megamenu")) { 
