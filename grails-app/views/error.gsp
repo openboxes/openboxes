@@ -94,10 +94,10 @@
                         <td class="value">
                             <g:set var="recipients" value="${util.ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients)}"/>
                             <g:if test="${recipients}">
-                                Support <a href="mailto:${recipients.join(";")}" target="_blank">${recipients.join(";")}</a>
+                                ${recipients.join(";")}
                             </g:if>
                             <g:else>
-                                OpenBoxes Support <a href="mailto:errors@openboxes.com" target="_blank">errors@openboxes.com</a>
+                                errors@openboxes.com
                             </g:else>
                         </td>
                     </tr>
@@ -106,8 +106,19 @@
                             <label><warehouse:message code="error.reportedBy.label"/></label>
                         </td>
                         <td class="value">
-                            ${session?.user?.name }
-                            <a href="mailto:${session?.user?.email }" target="_blank">${session?.user?.email }</a>
+                            <g:if test="${session.user}">
+                                ${session?.user?.name }
+                                <a href="mailto:${session?.user?.email }" target="_blank">${session?.user?.email }</a>
+
+                                <g:if test="${session.user}">
+                                    <g:checkBox name="ccMe" value="${true }" />&nbsp;
+                                    <warehouse:message code="default.reportCcMe.label" />
+                                </g:if>
+
+                            </g:if>
+                            <g:else>
+                                ${grailsApplication.config.grails.mail.from}
+                            </g:else>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -129,15 +140,8 @@
                                 placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>
                         </td>
                     </tr>
-                    <tr class="prop">
-                        <td class="name">
 
-                        </td>
-                        <td class="value">
-                            <g:checkBox name="ccMe" value="${true }" />&nbsp;
-                            <warehouse:message code="default.reportCcMe.label" />
-                        </td>
-                    </tr>
+
                     <g:hiddenField name="clickstream" value="${util.ClickstreamUtil.getClickstreamAsString(session.clickstream)}"/>
                     <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>
 

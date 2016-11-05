@@ -14,12 +14,23 @@ import org.pih.warehouse.product.Product
 
 class ApiController {
 
+    def dataSource
 
+	def status = {
+        boolean databaseStatus = true
+        String databaseStatusMessage = "Database is available"
+
+        try {
+            Product.count()
+        } catch (Exception e) {
+            databaseStatus = false
+            databaseStatusMessage = "Error: " + e.message
+        }
+		render ([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage?:""] ] as JSON)
+	}
 	
 	def products = { 
-		def products = new ArrayList();
-		
-		products = Product.getAll();
+		def products = Product.getAll();
 		def jsonProducts = [products:products]		
 		
 		
