@@ -22,6 +22,7 @@ import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
+import org.pih.warehouse.inventory.InventoryItemSummary
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
@@ -46,6 +47,7 @@ class DataService {
 
     def productService
     def sessionFactory
+    def dataSource
 
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
@@ -850,5 +852,36 @@ class DataService {
         }
         return localFile
     }
+
+    /**
+     * Rebuilds the inventory item summary table used by the dashboard.
+     *
+     * @return
+     */
+    boolean rebuildInventoryItemSummaryTable() {
+        try {
+            long startTime = System.currentTimeMillis()
+            InputStream inputStream = this.class.classLoader.getResourceAsStream('data/build-inventory-item-summary-table.sql')
+            String text = inputStream.text
+            Sql sql = new Sql(dataSource)
+            sql.execute(text)
+            def count = InventoryItemSummary.count()
+            long responseTime = System.currentTimeMillis() - startTime
+            log.info "Finsihed rebuilding inventory item summary table ${count} rows: ${responseTime} ms"
+            return true
+        }
+        catch(Exception e) {
+            log.error("Unable to rebuild inventory item summary table due to error: " + e.message, e)
+            return false
+        }
+    }
+
+    boolean rebuildShipmentSummaryTable() {
+
+
+    }
+
+
+
 
 }
