@@ -9,17 +9,18 @@ class BuildSummaryTablesJob {
 
     def mailService
     def dataService
+    def grailsApplication
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-        simple startDelay: 60000, repeatInterval: 300000 // run every five minutes
-		//cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
 	def execute(context) {
-
-        dataService.rebuildInventoryItemSummaryTable()
+        boolean force = context.mergedJobDataMap.get('force')
+        if(grailsApplication.config.openboxes.jobs.buildSummaryTablesJob.enabled || force) {
+            dataService.rebuildInventoryItemSummaryTable()
+        }
     }
-
 
 }
