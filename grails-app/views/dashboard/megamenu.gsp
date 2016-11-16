@@ -164,7 +164,7 @@
                             <%--(${requisitionStatistics["ALL"]?:0})--%>
                         </g:link>
                     </div>
-                    <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
+                    <g:each var="requisitionStatus" in="${RequisitionStatus.listValid()}">
                         <div class="megaButton">
                             <g:link controller="requisition" action="list" params="[status:requisitionStatus]">
                                 <format:metadata obj="${requisitionStatus}"/>
