@@ -3900,13 +3900,15 @@ class InventoryService implements ApplicationContextAware {
         def batchEnded = System.currentTimeMillis()
         def milliseconds = (batchEnded-lastBatchStarted)
         //def total = (batchEnded-startTime)/1000
-        log.info "Flushed last batch ${index} ... took ${milliseconds} ms"
+        log.debug "Flushed last batch ${index} ... took ${milliseconds} ms"
         lastBatchStarted = batchEnded
     }
 
-
-
-
+    /**
+     * @deprecated This method does not factor in INVENTORY transactions.
+     * @param location
+     * @return
+     */
     def getQuantityMap(Location location) {
         def quantityMap = [:]
         def products = Product.list()
@@ -3921,7 +3923,11 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-
+    /**
+     * @deprecated This method does not factor in INVENTORY transactions.
+     * @param location
+     * @return
+     */
     def calculateQuantityOnHand(Product product, Location location) {
 		long startTime = System.currentTimeMillis()
 
@@ -4180,69 +4186,7 @@ class InventoryService implements ApplicationContextAware {
         return statusMessage
     }
 
-    /**
-     * Get fast moving items based on requisition data.
-     *
-     * @param location
-     * @param date
-     * @param max
-     * @return
-     */
-    def getFastMovers(location, date, max) {
-        def startTime = System.currentTimeMillis()
-        def data = [:]
-        try {
-            data.location = location.id
-            data.startDate = date-30
-            data.endDate = date
 
-            def criteria = RequisitionItem.createCriteria()
-            def results = criteria.list {
-                requisition {
-                    eq("destination", location)
-                    between("dateRequested", date-30, date)
-                }
-                projections {
-                    //product {
-                    //    groupProperty('id')
-                    //    groupProperty('name')
-                    //    groupProperty('productCode')
-                    //}
-                    groupProperty("product")
-                    countDistinct('id', "occurrences")
-                    sum("quantity", "quantity")
-                }
-                order('occurrences','desc')
-                order('quantity','desc')
-                if (max) { maxResults(max) }
-            }
-
-            def quantityMap = getQuantityByProductMap(location.inventory)
-            //println "quantityMap: " + quantityMap
-
-            def count = 1;
-            data.results = results.collect {
-                [
-                        rank: count++,
-                        id: it[0].id,
-                        productCode: it[0].productCode,
-                        name: it[0].name,
-                        //genericProduct: it[0]?.genericProduct?.name?:"",
-                        category: it[0]?.category?.name?:"",
-                        requisitionCount: it[1],
-                        quantityRequested: it[2],
-                        quantityOnHand: (quantityMap[Product.get(it[0].id)]?:0),
-                ]
-            }
-            data.responseTime = (System.currentTimeMillis() - startTime) + " ms"
-
-
-        } catch (Exception e) {
-            log.error("Error occurred while getting requisition items " + e.message, e)
-            data = e.message
-        }
-        return data
-    }
 
 }
 

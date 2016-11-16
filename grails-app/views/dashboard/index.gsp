@@ -19,11 +19,12 @@
                             <g:render template="receiptSummary"/>
                             <g:render template="shipmentSummary"/>
                             <g:render template="indicatorSummary"/>
-						</td>
+                        </td>
                         <td width="33%">
-                            <g:render template="valueSummary"/>
+
+                            <%--<g:render template="valueSummary"/>--%>
                             <g:render template="productSummary"/>
-                            <g:render template="genericProductSummary"/>
+                            <%--<g:render template="genericProductSummary"/>--%>
                             <g:render template="expiringSummary"/>
                         </td>
 						<td width="33%">
@@ -35,7 +36,7 @@
 				</table>
 	    	</div>
 		</div>
-
+        <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
         <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
         <script type="text/javascript">
 

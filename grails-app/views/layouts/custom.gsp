@@ -96,8 +96,8 @@
             <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
                 Loading...
             </div>
-
         </div>
+
         <div id="breadcrumb">
             <g:render template="/common/breadcrumb"/>
         </div>

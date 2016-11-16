@@ -1,4 +1,4 @@
-<%@page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.core.ActivityCode"%>
+<%@page import="org.pih.warehouse.shipping.ShipmentStatus; org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.core.ActivityCode"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
     <li>
@@ -161,18 +161,16 @@
                     <div class="megaButton">
                         <g:link controller="requisition" action="list" class="list">
                             <warehouse:message code="default.all.label" default="All" />
-                            (${requisitionStatistics["ALL"]?:0})
+                            <%--(${requisitionStatistics["ALL"]?:0})--%>
                         </g:link>
                     </div>
                     <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
-                        <g:if test="${requisitionStatistics[requisitionStatus]>0}">
-                            <div class="megaButton">
-                                <g:link controller="requisition" action="list" params="[status:requisitionStatus]">
-                                    <format:metadata obj="${requisitionStatus}"/>
-                                    (${requisitionStatistics[requisitionStatus]?:0 })
-                                </g:link>
-                            </div>
-                        </g:if>
+                        <div class="megaButton">
+                            <g:link controller="requisition" action="list" params="[status:requisitionStatus]">
+                                <format:metadata obj="${requisitionStatus}"/>
+                                <%--(${requisitionStatistics[requisitionStatus]?:0 })--%>
+                            </g:link>
+                        </div>
                     </g:each>
 
                 <%--
@@ -217,18 +215,13 @@
                 <hr/>
                 <div class="megaButton">
    					<g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                            <warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/>
+                            <warehouse:message code="shipping.listOutgoing.label"  default="All outbound shipments"/>
                     </g:link>
 				</div>
-                <div class="megaButton">
-                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                        All (${outgoingShipmentsCount})
-                    </g:link>
-                </div>
-				<g:each in="${outgoingShipments}" var="statusRow">
+				<g:each in="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}" var="statusRow">
 					<div class="megaButton">
-						<g:link controller="shipment" action="list" params="[status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+						<g:link controller="shipment" action="list" params="[status:statusRow]" class="shipment-status-${statusRow }">
+							<format:metadata obj="${statusRow}"/>
 						</g:link>
 					</div>
 				</g:each>
@@ -255,13 +248,13 @@
 
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                        All (${incomingShipmentsCount})
+                        All
                     </g:link>
                 </div>
-				<g:each in="${incomingShipments}" var="statusRow">
+				<g:each in="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}" var="statusRow">
 					<div class="megaButton">
-						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow]" class="shipment-status-${statusRow }">
+							<format:metadata obj="${statusRow}"/>
 						</g:link>
 					</div>
 				</g:each>					

@@ -12,6 +12,7 @@ package org.pih.warehouse.user
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
@@ -20,11 +21,13 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.jobs.BuildSummaryTablesJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatus
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.SimpleDateFormat
@@ -36,7 +39,8 @@ class DashboardController {
 	def inventoryService
 	def productService
     def requisitionService
-	def sessionFactory
+	def dashboardService
+    def sessionFactory
 	
 	def showCacheStatistics = {
 		def statistics = sessionFactory.statistics
@@ -108,7 +112,7 @@ class DashboardController {
 		}
 		
 	    def currentUser = User.get(session?.user?.id)
-		
+
 		def location = Location.get(session?.warehouse?.id);
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
@@ -124,187 +128,99 @@ class DashboardController {
 		//def reorderStock = inventoryService.getReorderStock(location)
 
         // Days to include for activity list
-        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
-        def activityList = []
+        int daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
 
-        // Find recent requisition activity
-        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
-                ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination': location])
-        requisitions.each {
-            def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
-            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
-            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-            activityType = "${warehouse.message(code: activityType)}"
-            activityList << new DashboardActivityCommand(
-                    type: "basket",
-                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType, username])}",
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    requisition: it)
-        }
-				
-        // Add recent shipments
-		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
-		shipments.each { 
-			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			activityType = "${warehouse.message(code: activityType)}"	
-			activityList << new DashboardActivityCommand(
-				type: "lorry",
-				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}", 
-				url: link,
-				dateCreated: it.dateCreated, 
-				lastUpdated: it.lastUpdated, 
-				shipment: it)
-		}
-		//order by e.createdDate desc
-		//[max:params.max.toInteger(), offset:params.offset.toInteger ()]
-		def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude])
-		shippedShipments.each {
-			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-			def activityType = "dashboard.activity.shipped.label"
-			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
-			activityList << new DashboardActivityCommand(
-				type: "lorry_go",
-				label: activityType,
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				shipment: it)
-		}
-		def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude])
-		receivedShipment.each {
-			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-			def activityType = "dashboard.activity.received.label"
-			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
-			activityList << new DashboardActivityCommand(
-				type: "lorry_stop",
-				label: activityType,
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				shipment: it)
-		}
+        def requisitionStatistics =
+                requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine?currentUser:null)
 
-		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
-		products.each { 
-			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
-			def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			activityType = "${warehouse.message(code: activityType)}"
-			def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-			activityList << new DashboardActivityCommand(
-				type: "package",
-				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType, username])}",
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				product: it)
-		}
-		
-		// If the current location has an inventory, add recent transactions associated with that location to the activity list
-		if (location?.inventory) { 
-			def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
-			
-			transactions.each { 
-				def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
-				def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
-				def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-				activityType = "${warehouse.message(code: activityType)}"
-				def label = LocalizationUtil.getLocalizedString(it)
-				def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-				activityList << new DashboardActivityCommand(
-					type: "arrow_switch_bluegreen",
-					label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
-					url: link,
-					dateCreated: it.dateCreated,
-					lastUpdated: it.lastUpdated,
-					transaction: it)
-			}
-		}
-				
-		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
-		users.each { 
-			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			if (it.lastUpdated == it.lastLoginDate) { 
-				activityType = "dashboard.activity.loggedIn.label"
-			}
-			activityType = "${warehouse.message(code: activityType)}"
-
-			
-			activityList << new DashboardActivityCommand(
-				type: "user",
-				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",				
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				user: it)
-		}
-		
-		//activityList = activityList.groupBy { it.lastUpdated }
-        def activityListTotal = 0
-		def startIndex = 0
-        def endIndex = 0
-        if (activityList) {
-            activityList = activityList.sort { it.lastUpdated }.reverse()
-            activityListTotal = activityList.size()
-            startIndex = params.offset?Integer.valueOf(params.offset):0
-            endIndex = (startIndex + (params.max?Integer.valueOf(params.max):10))
-            if (endIndex > activityListTotal) endIndex = activityListTotal
-            endIndex -= 1
-    		activityList = activityList[startIndex..endIndex]
-        }
-
+        def outgoingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentOutgoingShipments)
+        def incomingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentIncomingShipments)
 
         log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 		//def outgoingOrders = orderService.getOutgoingOrders(location)
 		//def incomingOrders = orderService.getIncomingOrders(location)
-		
-		[ 	//outgoingShipments : recentOutgoingShipments, 
-			//incomingShipments : recentIncomingShipments,
-			//allOutgoingShipments : allOutgoingShipments,
-			//allIncomingShipments : allIncomingShipments,
-			//outgoingOrders : outgoingOrders,
-			//incomingOrders : incomingOrders,
-			//expiredStock : expiredStock,
-			//expiringStockWithin30Days : expiringStockWithin30Days,
-			//expiringStockWithin90Days : expiringStockWithin90Days,
-			//expiringStockWithin180Days : expiringStockWithin180Days,
-			//expiringStockWithin365Days : expiringStockWithin365Days,
-			//lowStock: lowStock,
-			//reorderStock: reorderStock,
+		[
 			rootCategory : productService.getRootCategory(),
-
-            requisitionStatistics: requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine?currentUser:null),
+            requisitionStatistics: requisitionStatistics,
             requisitions: [],
             //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
 
             //outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
-			//incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
-			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentOutgoingShipments),
-			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(recentIncomingShipments),
-
-			activityList : activityList,
-			activityListTotal : activityListTotal,
-			startIndex: startIndex,
-			endIndex: endIndex,
+            //incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
+            outgoingShipmentsByStatus : outgoingShipmentsByStatus,
+            incomingShipmentsByStatus : incomingShipmentsByStatus,
 			daysToInclude: daysToInclude,
             tags:productService?.getAllTags()?.sort { it.tag }
 		]
 	}
 
 
-    def expirationSummary = {
+    def recentActivities = {
+        def errorMessage, message
         def location = Location.get(session.warehouse.id)
-        def results = inventoryService.getExpirationSummary(location)
+        int daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):7
+        def recentActivities = dashboardService.getRecentActivities(location, daysToInclude)
+        if (!recentActivities) {
+            errorMessage = "${g.message(code:'dashboard.noActivityFound.message')}"
+        }
 
+        int recentActivitiesTotal = 0, startIndex = 0, endIndex = 0
+        if (recentActivities) {
+            recentActivitiesTotal = recentActivities.size()
+//            startIndex = params.offset ? Integer.valueOf(params.offset):0
+//            endIndex = (startIndex + (params.max?Integer.valueOf(params.max):10))
+//            if (endIndex > recentActivitiesTotal) endIndex = recentActivitiesTotal
+//            endIndex -= 1
+//            recentActivities = recentActivities[startIndex..endIndex]
+        }
+
+        recentActivities.eachWithIndex { activity, index ->
+            activity.styleClass = index % 2 ? "even" : "odd"
+        }
+
+        message = "${g.message(code:'dashboard.showing.message', args: [recentActivitiesTotal,daysToInclude])}"
+
+        render ([recentActivities:recentActivities, errorMessage:errorMessage, message:message] as JSON)
+    }
+
+
+    def rebuildSummaryTables = {
+        BuildSummaryTablesJob.triggerNow([force:true])
+        flash.message = "Rebuilding summary tables. This might take a minute or two ..."
+        redirect(action: "index")
+    }
+
+    def productSummary = {
+        def results = [:]
+        try {
+            def location = Location.get(session.warehouse.id)
+            results = dashboardService.getProductSummary(location)
+        } catch (Exception e) {
+            results.error = true
+            results.message = e.message
+        }
+        render(results as JSON)
+    }
+
+
+    def expirationSummary = {
+        def results = [:]
+        try {
+            def location = Location.get(session.warehouse.id)
+            results = dashboardService.getExpirationSummary(location)
+        } catch (Exception e) {
+            results.error = true
+            results.message = e.message
+        }
         render results as JSON
     }
+
+    def expirationDetails = {
+        def location = Location.get(session.warehouse.id)
+        def results = dashboardService.getExpirationDetails(location)
+        render results as JSON
+    }
+
 
     def hideTag = {
         Tag tag = Tag.get(params.id)
@@ -331,51 +247,19 @@ class DashboardController {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
-      //   def startTime = System.currentTimeMillis()
-
-        // Shipments
-		def incomingShipments = Shipment.findAllByDestination(location).groupBy{it.status.code}.sort()
-        def incomingShipmentsCount = Shipment.countByDestination(location)
-
-		def outgoingShipments = Shipment.findAllByOrigin(location).groupBy{it.status.code}.sort();
-        def outgoingShipmentsCount = Shipment.countByOrigin(location)
-        // Orders
-		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
-
-        // Requisitions
-        //def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-		//def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-        //def incomingRequests = [:] //requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
-        //def outgoingRequests = []
-        //def requisitionTemplates = [] //requisitionService.getAllRequisitionTemplates(session.warehouse)
-        //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
-        //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
-        def requisitionStatistics = requisitionService.getRequisitionStatistics(location,null,user)
+        def requisitionStatistics = [:] //requisitionService.getRequisitionStatistics(location,null,user)
 
         def categories = []
 		def category = productService.getRootCategory()		
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
 
-        //println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
-
 		[
 			categories: categories,
-			incomingShipments: incomingShipments,
-            incomingShipmentsCount: incomingShipmentsCount,
-            outgoingShipments: outgoingShipments,
-			outgoingShipmentsCount: outgoingShipmentsCount,
-			incomingOrders: incomingOrders,
-            requisitionStatistics: requisitionStatistics,
-			//incomingRequests: incomingRequests,
-			//outgoingRequests: outgoingRequests,
-            //requisitionTemplates: requisitionTemplates,
-            //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
+            requisitionStatistics:requisitionStatistics,
 			tags:productService.getAllTags()
 		]
-
-		
 	}
 	
 	
@@ -490,6 +374,26 @@ class DashboardController {
         return;
     }
 
+    /**
+     * Dashboard > Fast movers
+     */
+
+    def fastMovers = {
+        log.info "fastMovers: " + params
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        def date = new Date()
+        if (params.date) {
+            date = dateFormat.parse(params.date)
+            date.clearTime()
+        }
+        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+        log.info "fast movers: " + location
+        def data = dashboardService.getFastMovers(location, date, params.max as int)
+
+        render ([aaData: data?.results?:[], message: data.message] as JSON)
+    }
+
+
     def downloadFastMoversAsCsv = {
         println "exportFastMoversAsCsv: " + params
         def location = Location.get(params?.location?.id?:session?.warehouse?.id)
@@ -501,7 +405,7 @@ class DashboardController {
             date.clearTime()
         }
 
-        def data = inventoryService.getFastMovers(location, date, params.max)
+        def data = dashboardService.getFastMovers(location, date, params.max)
         def sw = new StringWriter()
         if (data?.results) {
             // Write column headers
@@ -532,7 +436,17 @@ class DashboardController {
         render(contentType: "text/csv", text:sw.toString())
         return;
     }
-    
+
+
+    def getQuantityByLocation = {
+
+        def location = Location.get(session?.warehouse?.id)
+        def results = dashboardService.getQuantityByLocation(location)
+
+        render ([results:results] as JSON)
+
+    }
+
 }
 
 
