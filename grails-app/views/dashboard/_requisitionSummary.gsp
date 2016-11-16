@@ -42,7 +42,7 @@
                 <table>
                     <tbody>
                         <g:set var="i" value="${0}"/>
-                        <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list()}">
+                        <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.listValid()}">
                             <g:set var="requisitionCount" value="${requisitionStatistics[status]?:0}"/>
                             <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
                             <g:if test="${requisitionCount}">

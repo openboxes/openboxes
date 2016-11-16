@@ -31,11 +31,11 @@
                                 </div>
                             </td>
                             <td class="right">
-                                <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
-                                    <warehouse:message code="requisition.button.export.label" default="Export requisitions"/>
+                                <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button">
+                                    <warehouse:message code="requisition.button.download.label" default="Download requisitions"/>
                                 </g:link>
-                                <g:link controller="requisition" action="exportRequisitionItems" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
-                                    <warehouse:message code="requisition.button.export.label" default="Export requisition items"/>
+                                <g:link controller="requisition" action="exportRequisitionItems" params="${pageParams.findAll {it.value != 'null' }}" class="button">
+                                    <warehouse:message code="requisitionItem.button.download.label" default="Download requisition items"/>
                                 </g:link>
                             </td>
                         </tr>
@@ -55,14 +55,12 @@
                         <warehouse:message code="default.all.label"/>
                         (${requisitionStatistics["ALL"]})
                     </g:link>
-                    <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
-                        <g:if test="${requisitionStatistics[requisitionStatus]>0}">
+                    <g:each var="requisitionStatus" in="${RequisitionStatus.listValid()}">
                             <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
                             <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
                                 <format:metadata obj="${requisitionStatus}"/>
                                 (${requisitionStatistics[requisitionStatus]?:0 })
                             </g:link>
-                        </g:if>
                     </g:each>
                 </div>
                 <%--
