@@ -842,8 +842,7 @@ class ProductService {
 	 * @return	all tags
 	 */
 	def getAllTags() { 
-		def tags = Tag.findAllByIsActive(true);
-        return tags;
+		return Tag.findAllByIsActive(true, [max: 100]);
 	}
 	
 	/**
