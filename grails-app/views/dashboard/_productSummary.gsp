@@ -1,123 +1,29 @@
+<style>
+    tr.data td { font-color: lightgrey; font-weight: normal; }
+    tr.subtotal td { font-color: lightgrey; border-top: 0px solid black; font-weight: bold; }
+    tr.total td { background-color: #f5f5f5; border-top: 1px solid black; font-weight: bold; }
+    tr.a_normal td { background-color: #dff0d8; }
+    tr.b_warning td { background-color: #fcf8e3; }
+    tr.c_danger td  { background-color: #f2dede; }
+</style>
+
 <div class="box">
-    <h2><warehouse:message code="inventory.productSummary.label" default="Inventory status by product"/></h2>
+    <h2>
+        <warehouse:message code="inventory.productSummary.label" default="Product Summary"/>
+        <img id="product-summary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+    </h2>
 	<div class="widget-content" style="padding:0; margin:0">
-		<div id="alertSummary" class="list">
-
-    		<table class="zebra">
-    			<tbody>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listOutOfStock" target="_blank">
-                            <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="outOfStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listLowStock" target="_blank">
-                            <warehouse:message code="inventory.listLowStock.label" default="Items that are below minimum level"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="lowStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listReorderStock" target="_blank">
-                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="reorderStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
-
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listOverStock" target="_blank">
-                            <warehouse:message code="inventory.listOverStock.label" default="Items that are over stocked"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="overStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listTotalStock" target="_blank">
-                            <warehouse:message code="inventory.listTotalStock.label" default="Items that have ever been stocked"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="totalStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listInStock" target="_blank">
-                            <warehouse:message code="inventory.listInStock.label" default="Items that are currently stocked"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="inStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/information.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="inventory" action="listQuantityOnHandZero" target="_blank">
-                            <warehouse:message code="inventory.listQuantityOnHandZero.label" default="Items that have QoH equal to zero"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="onHandQuantityZeroCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-
+		<div id="product-summary-details">
+    		<table id="product-summary-table" class="table table-striped">
+                <thead>
                     <tr>
-                        <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/information.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
-                        </td>
-                        <td>
-                            <g:link controller="inventory" action="listReconditionedStock" target="_blank">
-                                <warehouse:message code="inventory.listReconditionedStock.label" default="Items that need to be reconditioned"/>
-                            </g:link>
-                        </td>
-                        <td class="right">
-                            <div id="reconditionedStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                        </td>
+                        <th></th>
+                        <th>Status</th>
+                        <th class="right" width="10%">Count</th>
+                        <th class="right" width="20%">Amount (USD)</th>
                     </tr>
+                </thead>
+    			<tbody>
 
 				</tbody>
 			</table>
@@ -126,56 +32,91 @@
 </div>
 
 <script>
-    $(window).load(function(){
 
+
+    $(document).ready(function(){
         $.ajax({
             dataType: "json",
-            timeout: 120000,
-            url: "${request.contextPath}/json/getDashboardAlerts?location.id=${session.warehouse.id}",
+            url: "${request.contextPath}/dashboard/productSummary?location.id=${session.warehouse.id}",
             //data: data,
             success: function (data) {
                 console.log(data);
-                var outOfStockCount = data.outOfStock?data.outOfStock:0;
-                var lowStockCount = data.lowStock?data.lowStock:0;
-                var reorderStockCount = data.reorderStock?data.reorderStock:0;
-                var inStockCount = data.inStock?data.inStock:0;
-                var overStockCount = data.overStock?data.overStock:0;
-
-                var totalStockCount = data.totalStock?data.totalStock:0;
-                var onHandQuantityZeroCount = data.onHandQuantityZero?data.onHandQuantityZero:0;
-                var reconditionedStockCount = data.reconditionedStock?data.reconditionedStock:0;
-
-
-                $("#outOfStockCount").html("<a href='${request.contextPath}/inventory/listOutOfStock' target='_blank'>" + outOfStockCount + "</a>");
-                $('#outOfStockCount').html("<a href='${request.contextPath}/inventory/listOutOfStock' target='_blank'>" + outOfStockCount + "</a>");
-                $('#lowStockCount').html("<a href='${request.contextPath}/inventory/listLowStock' target='_blank'>" + lowStockCount + "</a>");
-                $('#reorderStockCount').html("<a href='${request.contextPath}/inventory/listReorderStock' target='_blank'>" + reorderStockCount + "</a>");
-                $('#inStockCount').html("<a href='${request.contextPath}/inventory/listInStock' target='_blank'>" + inStockCount + "</a>");
-                $('#overStockCount').html("<a href='${request.contextPath}/inventory/listOverStock' target='_blank'>" + overStockCount + "</a>");
-
-                $('#totalStockCount').html("<a href='${request.contextPath}/inventory/listTotalStock' target='_blank'>" + totalStockCount + "</a>");
-                $('#onHandQuantityZeroCount').html("<a href='${request.contextPath}/inventory/listQuantityOnHandZero' target='_blank'>" + onHandQuantityZeroCount + "</a>");
-                $('#reconditionedStockCount').html("<a href='${request.contextPath}/inventory/listReconditionedStock' target='_blank'>" + reconditionedStockCount + "</a>");
-                //$('#outOfStockCountClassA').html(data.outOfStockClassA?data.outOfStockClassA:0);
-                //$('#outOfStockCountClassB').html(data.outOfStockClassB?data.outOfStockClassB:0);
-                //$('#outOfStockCountClassC').html(data.outOfStockClassC?data.outOfStockClassC:0);
-                //$('#outOfStockCountClassNone').html(data.outOfStockClassNone?data.outOfStockClassNone:0);
+                if (!data.error) {
+                    renderProductSummary(data);
+                }
+                else {
+                    renderProductSummaryError(data);
+                }
 
             },
             error: function(xhr, status, error) {
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
-                $('#outOfStockCount').html("ERROR " + error);
-                $('#reorderStockCount').html("ERROR " + error);
-                $('#lowStockCount').html("ERROR " + error);
-                $('#overStockCount').html("ERROR " + error);
-                $('#inStockCount').html("ERROR " + error);
-                $('#reconditionedStockCount').html("ERROR " + error);
-                $('#onHandQuantityZeroCount').html("ERROR " + error);
-                $('#totalStockCount').html("ERROR " + error);
-
+                var data = { message: message };
+                renderProductSummaryError(data);
             }
         });
     });
+
+    function renderProductSummary(data) {
+        console.log(data);
+        if (data.length == 0) {
+            //showNoActivity();
+        }
+        else {
+            //$("#product-summary-spinner").show();
+
+            $.each(data, function () {
+                var productSummary = {
+                    label: $(this).attr("label"),
+                    code: $(this).attr("code"),
+                    status: $(this).attr("status"),
+                    subStatus: $(this).attr("subStatus"),
+                    count: $(this).attr("count"),
+                    cost: $(this).attr("cost"),
+                    styleClass: $(this).attr("styleClass"),
+                    url: $(this).attr("url")
+                };
+                addProductSummary(productSummary);
+            });
+            $("#product-summary-spinner").hide();
+        }
+    }
+
+
+    function renderProductSummaryError(error) {
+        $("#product-summary-error-template").tmpl(error).appendTo('#product-summary-table tbody');
+        $("#product-summary-spinner").hide();
+    }
+
+    function addProductSummary(productSummary) {
+        console.log($("#product-summary-table"))
+
+        $("#product-summary-template").tmpl(productSummary).appendTo('#product-summary-table tbody');
+    }
+
+
+</script>
+
+<script id="product-summary-template" type="x-jquery-tmpl">
+    <tr class="prop {{= styleClass}} {{= code}} {{= status}}">
+        <td class="center" style="width: 1%">
+            <img src="{{= imgUrl}}" class="middle" title=""{{= title}}" />
+        </td>
+        <td>
+            <a href="{{= url}}">{{= label}}</a>
+        </td>
+        <td class="right">
+            <a href="{{= url}}">{{= count}}</a>
+        </td>
+        <td class="right">
+            <a href="{{= url}}">{{= cost}}</a>
+        </td>
+    </tr>
+</script>
+
+<script id="product-summary-error-template" type="x-jquery-tmpl">
+    <tr class="prop error">
+        <td colspan="4">
+            {{= message}}
+        </td>
+    </tr>
 </script>

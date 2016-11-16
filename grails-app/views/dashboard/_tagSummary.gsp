@@ -32,8 +32,8 @@
         <warehouse:message code="tags.label" default="Tags"/>
     </h2>
 
-	<div class="widget-content">
-        <div id="tag-summary">
+	<div class="widget-content" style="padding:0px; margin:0">
+        <div id="tag-summary" style="max-height:250px;overflow:auto;">
             <g:if test="${params.editTags}">
                 <g:isUserAdmin>
                     <table>
@@ -69,7 +69,7 @@
             </g:if>
             <g:else>
                 <g:if test="${tags}">
-                    <div id="tagcloud">
+                    <div id="tagcloud" style="margin: 10px">
                         <g:each in="${tags }" var="tag">
                             <g:if test="${tag?.products?.size() > 1}">
                                 <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">

@@ -12,14 +12,20 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryItemSummary
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -39,11 +45,15 @@ class JsonController {
 
 	def inventoryService
 	def productService
+    def dashboardService
 	def localizationService	
 	def shipmentService
     def reportService
 	def messageSource
     def consoleService
+    def sessionFactory
+    def dataSource
+
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
@@ -989,7 +999,8 @@ class JsonController {
 		render json as JSON
 	}
 
-  
+
+
 	def globalSearch = {
 		def items = []
         def quantityMap = [:]
@@ -1001,15 +1012,15 @@ class JsonController {
 
             // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
             if (products) {
-                quantityMap = getQuantityByProductMapCached(location, products);
+                quantityMap = dashboardService.getQuantityByLocation(location)
                 log.info "Quantity map: " + quantityMap?.size()
             }
             items.addAll(products)
 		}
-		
+
 		items.unique{ it.id }
 		def json = items.collect{
-            def quantity = quantityMap[it]?:0
+            def quantity = quantityMap[it.id]?:0
             def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
 
 			def type = it.class.simpleName.toLowerCase()
@@ -1363,26 +1374,6 @@ class JsonController {
 
 
         render ([label: "${product?.name}", location: "${location.name}", data:newData] as JSON);
-    }
-
-
-
-    /**
-     * Dashboard > Fast movers
-     */
-    def getFastMovers = {
-        log.info "getRequisitionItems: " + params
-        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-        def date = new Date()
-        if (params.date) {
-            date = dateFormat.parse(params.date)
-            date.clearTime()
-        }
-        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-
-        def data = inventoryService.getFastMovers(location, date, params.max as int)
-
-        render ([aaData: data?.results?:[]] as JSON)
     }
 
 

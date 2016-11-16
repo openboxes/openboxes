@@ -104,6 +104,13 @@
                                                 ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
                                             </g:link>
                                         </li>
+                                        <li class="action-menu-item">
+                                            <g:link controller="dashboard" action="rebuildSummaryTables" style="color: #666">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'brick.png')}"/>
+                                                ${warehouse.message(code:'dashboard.rebuildSummaryTables.label', default: 'Rebuild summary tables')}
+                                            </g:link>
+                                        </li>
+
 
                                         <g:if test="${session?.warehouse}">
                                             <%--

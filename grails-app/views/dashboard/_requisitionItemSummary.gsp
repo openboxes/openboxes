@@ -64,7 +64,7 @@
 	</div>
     <br/><br/>
 </div>
-<script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
+
 <script>
     $(window).load(function(){
 
@@ -77,7 +77,7 @@
             "bJQueryUI": false,
             "bAutoWidth": true,
             "sPaginationType": "two_button",
-            "sAjaxSource": "${request.contextPath}/json/getFastMovers",
+            "sAjaxSource": "${request.contextPath}/dashboard/fastMovers",
             "fnServerParams": function ( data ) {
                 //console.log("server data " + data);
                 //var locationId = $("#locationId").val();

@@ -860,6 +860,7 @@ class DataService {
      */
     boolean rebuildInventoryItemSummaryTable() {
         try {
+            log.info "Started rebuilding inventory item summary table"
             long startTime = System.currentTimeMillis()
             InputStream inputStream = this.class.classLoader.getResourceAsStream('data/build-inventory-item-summary-table.sql')
             String text = inputStream.text

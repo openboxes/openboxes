@@ -13,6 +13,7 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.ListUtils
@@ -40,6 +41,7 @@ class InventoryController {
     def productService
 	def inventoryService
     def requisitionService
+    def dashboardService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"];
 
@@ -525,15 +527,65 @@ class InventoryController {
 		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
 	}
 
-
-
+    /**
+     * @deprecated Use productSummary OR inventoryItemSummary
+     */
     def list = {
         println "List " + params
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
+        def quantityMap = inventoryService.getCurrentInventory(location)
         def statusMap = inventoryService.getInventoryStatus(location)
         println "QuantityMap: " + quantityMap
         [quantityMap:quantityMap,statusMap: statusMap]
+    }
+
+
+    def productSummary = {
+        println "List " + params
+        def status = params.id
+        def location = Location.get(session.warehouse.id)
+        def productList = dashboardService.getProductDetails(location, status)
+
+        def totalValue = productList.sum { it.totalCost?:0  }
+
+        def productSummary = dashboardService.getProductSummary(location)
+
+
+        if (params.format == "csv") {
+            def filename = "product-summary-report-${status?:'all'}.csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text:getCsvForProductList(productList))
+            return;
+        }
+        //render productList as JSON
+
+        [ productList: productList, totalValue: totalValue, productSummary: productSummary ]
+
+    }
+
+
+    def inventoryItemSummary = {
+
+        def status = params.id
+        def location = Location.get(session.warehouse.id)
+        def inventoryItemList = dashboardService.getExpirationDetails(location, status)
+
+        def totalValue = inventoryItemList.sum { it.totalCost?:0  }
+
+        def expirationSummary = dashboardService.getExpirationSummary(location)
+
+        if (params.format == "csv") {
+
+            def filename = "inventory-item-summary-report-${status?:'all'}.csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text:getCsvForInventoryItemList(inventoryItemList))
+            return;
+        }
+        //render inventoryItemList as JSON
+
+
+        [ inventoryItemList: inventoryItemList, totalValue: totalValue, expirationSummary: expirationSummary ]
+
     }
 
 
@@ -824,6 +876,104 @@ class InventoryController {
         }
         return csv
     }
+
+
+    def getCsvForInventoryItemList(List inventoryItemList) {
+        def csv = "";
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
+        //csv += '"' + "${warehouse.message(code: 'product.genericProduct.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryItem.lotNumber.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryItem.expirationDate.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
+        //csv += '"' + "${warehouse.message(code: 'product.tags.label', default:'Tags')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturerCode.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
+        csv += "\n"
+
+        inventoryItemList.each { inventoryItem ->
+            csv += '"' + (inventoryItem.status?:"")  + '"' + ","
+            csv += '"' + (inventoryItem.productCode?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(inventoryItem?.productName?:"") + ","
+            //csv += StringEscapeUtils.escapeCsv(inventoryItem?.genericProduct:"") + ","
+            csv += '"' + (inventoryItem?.lotNumber?:"")  + '"' + ","
+            csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy')  + '"' + ","
+            csv += '"' + (inventoryItem?.categoryName?:"")  + '"' + ","
+            //csv += '"' + (inventoryItem?.tagsToString()?:"")  + '"' + ","
+            csv += '"' + (inventoryItem?.manufacturer?:"")  + '"' + ","
+            csv += '"' + (inventoryItem?.manufacturerCode?:"")  + '"' + ","
+            csv += '"' + (inventoryItem?.vendor?:"") + '"' + ","
+            csv += '"' + (inventoryItem?.vendorCode?:"") + '"' + ","
+            csv += '"' + (inventoryItem?.binLocation?:"") + '"' + ","
+            csv += '"' + (inventoryItem?.unitOfMeasure?:"") + '"' + ","
+            csv += (inventoryItem?.pricePerUnit?:"") + ","
+            csv += (inventoryItem?.minQuantity?:"") + ","
+            csv += (inventoryItem?.reorderQuantity?:"") + ","
+            csv += (inventoryItem?.maxQuantity?:"")+ ","
+            csv += '' + (inventoryItem?.quantity?:"0")  + '' + ","
+            csv += "\n"
+        }
+        return csv
+    }
+
+
+    def getCsvForProductList(List productList) {
+        def csv = "";
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productCode.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.genericProduct.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
+        //csv += '"' + "${warehouse.message(code: 'product.tags.label', default:'Tags')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.manufacturerCode.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
+        csv += "\n"
+
+        productList.each { product ->
+
+            csv += '"' + (product?.status?:"")  + '"' + ","
+            csv += '"' + (product.productCode?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product?.productName) + ","
+            csv += '"' + (product?.genericProduct?:"")  + '"' + ","
+            csv += '"' + (product?.categoryName?:"")  + '"' + ","
+            //csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
+            csv += '"' + (product?.manufacturer?:"")  + '"' + ","
+            csv += '"' + (product?.manufacturerCode?:"")  + '"' + ","
+            csv += '"' + (product?.vendor?:"") + '"' + ","
+            csv += '"' + (product?.vendorCode?:"") + '"' + ","
+            csv += '"' + (product?.binLocation?:"")  + '"' + ","
+            csv += '"' + (product?.abcClass?:"")  + '"' + ","
+            csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
+            csv += (product?.pricePerUnit?:"") + ","
+            csv += (product?.minQuantity?:"") + ","
+            csv += (product?.reorderQuantity?:"") + ","
+            csv += (product?.maxQuantity?:"") + ","
+            csv += (product?.quantity?:"0") + ","
+            csv += "\n"
+        }
+        return csv
+    }
+
 
 
     def exportLatestInventoryDate = {
