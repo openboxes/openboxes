@@ -234,23 +234,7 @@ ON DUPLICATE KEY UPDATE debits = quantity + values(quantity);
 #SET lst.quantity = lst.quantity - ld.quantity;
 # ---------------------------------------------------------------------------------------------
 # step 6 populate inventory item summary
-DROP TABLE IF EXISTS inventory_item_summary;
-CREATE TABLE `inventory_item_summary` (
-  `id` varchar(255) NOT NULL,
-  `version` bigint(20) NOT NULL,
-  `location_id` char(38) NOT NULL,
-  `inventory_item_id` char(38) NOT NULL,
-  `product_id` char(38) NOT NULL,
-  `quantity0` double NULL,
-  `adjustments` double NULL,
-  `credits` double NULL,
-  `debits` double NULL,
-  `quantity` double NULL,
-  `date_created` datetime NOT NULL,
-  `last_updated` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `inventory_item_id` (`inventory_item_id`,`location_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#DROP TABLE IF EXISTS inventory_item_summary;
 
 ALTER TABLE inventory_item_summary ADD UNIQUE INDEX (location_id, inventory_item_id);
 
@@ -260,7 +244,6 @@ LOCK TABLES
 	latest_adjustments READ, 
     latest_credits READ, 
     latest_debits READ;
-
 
 TRUNCATE inventory_item_summary;
 
