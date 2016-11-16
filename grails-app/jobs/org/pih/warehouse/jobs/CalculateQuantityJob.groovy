@@ -11,8 +11,9 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 
 class CalculateQuantityJob {
 
-    def inventoryService
     def mailService
+    def inventoryService
+    def grailsApplication
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
@@ -20,6 +21,12 @@ class CalculateQuantityJob {
     }
 
 	def execute(context) {
+
+        // Allow admins to disable the job
+        if(!grailsApplication.config.openboxes.jobs.calculateQuantityJob.enabled) {
+            return
+        }
+
         def startTime = System.currentTimeMillis()
         def date = context.mergedJobDataMap.get('date')
         def product = Product.get(context.mergedJobDataMap.get('productId'))

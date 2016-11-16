@@ -444,8 +444,14 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
 
-// Background jobs
+// Job that calculates quantity on hand every day. Occurs at midnight every day.
+// NOTE: This job should only run once a day for now (that is fixed in the development branch).
+openboxes.jobs.calculateQuantityJob.enabled = true
 openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
+
+// Job that builds summary table (i.e. QoH, consumption, shipping). Occurs every ten minutes
+openboxes.jobs.buildSummaryTablesJob.enabled = false
+openboxes.jobs.buildSummaryTablesJob.cronExpression = "0 0/5 * 1/1 * ? *"  // every ten minutes
 
 // LDAP configuration
 openboxes.ldap.enabled = false
