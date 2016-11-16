@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.user
 
+import grails.plugin.springcache.annotations.CacheFlush
 import grails.util.GrailsUtil
 import org.apache.commons.mail.EmailException
 import org.pih.warehouse.core.MailService
@@ -125,6 +126,7 @@ class AuthController {
 	/**
 	 * Allows user to log out of the system
 	 */
+	@CacheFlush(["dashboardCache", "megamenuCache"])
 	def logout = { 
 		session.targetUri = null    	
 		session.user = null;
