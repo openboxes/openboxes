@@ -23,6 +23,8 @@
 </div>
 <script>
     $(document).ready(function(){
+
+        $("#expiration-summary-spinner").show();
         $.ajax({
             dataType: "json",
             url: "${request.contextPath}/dashboard/expirationSummary?location.id=${session.warehouse.id}",
@@ -46,15 +48,16 @@
                 // Expiration
             }
         });
+
     });
 
     function renderExpirationSummary(data) {
         console.log(data);
         if (data.length == 0) {
             //showNoActivity();
+            renderExpirationSummaryError({ message: "There's no data in the inventory item summary table." });
         }
         else {
-            $("#expiration-summary-spinner").show();
 
             $.each(data, function () {
                 var expirationSummary = {
@@ -70,20 +73,23 @@
                 addExpirationSummary(expirationSummary);
             });
 
-            $("#expiration-summary-spinner").hide();
-        }
-    }
 
-    function renderExpirationSummaryError(data) {
-        $("#expiration-summary-error-template").tmpl(data).appendTo('#expiration-summary-table tbody');
+        }
         $("#expiration-summary-spinner").hide();
     }
+
+
 
     function addExpirationSummary(data) {
         console.log($("#expiration-summary-table"))
         $("#expiration-summary-template").tmpl(data).appendTo('#expiration-summary-table tbody');
     }
 
+
+    function renderExpirationSummaryError(data) {
+        $("#expiration-summary-error-template").tmpl(data).appendTo('#expiration-summary-table tbody');
+        $("#expiration-summary-spinner").hide();
+    }
 
 </script>
 

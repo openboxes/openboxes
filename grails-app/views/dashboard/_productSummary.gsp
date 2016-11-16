@@ -59,7 +59,7 @@
     function renderProductSummary(data) {
         console.log(data);
         if (data.length == 0) {
-            //showNoActivity();
+            renderProductSummaryError({ message: "There's no data in the inventory item summary table." });
         }
         else {
             //$("#product-summary-spinner").show();
@@ -77,8 +77,8 @@
                 };
                 addProductSummary(productSummary);
             });
-            $("#product-summary-spinner").hide();
         }
+        $("#product-summary-spinner").hide();
     }
 
 
