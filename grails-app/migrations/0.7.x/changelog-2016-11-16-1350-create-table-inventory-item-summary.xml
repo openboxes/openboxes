@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="jmiranda (generated)" id="1479325848163-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="inventory_item_summary"/>
+            </not>
+        </preConditions>
+		<createTable tableName="inventory_item_summary">
+			<column name="id" type="CHAR(38)" />
+			<column name="version" type="INT" />
+			<column name="product_id" type="CHAR(38)" />
+			<column name="product_group_id" type="CHAR(38)" />
+			<column name="location_id" type="CHAR(38)" />
+			<column name="inventory_item_id" type="CHAR(38)" />
+			<column name="quantity" type="DOUBLE" />
+			<column name="quantity_allocated" type="DOUBLE" />
+			<column name="quantity_available" type="DOUBLE" />
+			<column name="quantity_inbound" type="DOUBLE" />
+			<column name="quantity_outbound" type="DOUBLE" />
+			<!-- debugging -->
+			<column name="quantity0" type="DOUBLE" />
+			<column name="adjustments" type="DOUBLE" />
+			<column name="credits" type="DOUBLE" />
+			<column name="debits" type="DOUBLE" />
+			<!-- auditing -->
+			<column name="last_updated" type="DATETIME" />
+			<column name="date_created" type="DATETIME" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

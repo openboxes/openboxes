@@ -11,16 +11,22 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductGroup
 
 class InventoryItemSummary {
 
     String id
     Date date
     Product product
+    ProductGroup productGroup
     InventoryItem inventoryItem
     Location location
 
-    double quantity
+    double quantity = 0
+    double quantityAvailable = 0
+    double quantityAllocated = 0
+    double quantityInbound = 0
+    double quantityOutbound = 0
 
     Date dateCreated
     Date lastUpdated
@@ -30,6 +36,10 @@ class InventoryItemSummary {
         location(nullable:false)
         inventoryItem(nullable:false)
         quantity(nullable:false)
+        quantityAvailable(nullable:true)
+        quantityAllocated(nullable:true)
+        quantityInbound(nullable:true)
+        quantityOutbound(nullable:true)
     }
 
     static mapping = {
