@@ -34,6 +34,7 @@ class ConsumptionController {
     def consoleService
     ProductService productService
     InventoryService inventoryService
+    def dashboardService
 
     def show = { ShowConsumptionCommand command ->
         log.info "Show consumption " + params
@@ -196,7 +197,7 @@ class ConsumptionController {
             products = command.rows.keySet().asList()
 
             command.fromLocations.each { location ->
-                def onHandQuantityMap = inventoryService.getQuantityByProductMap(location.inventory, products)
+                def onHandQuantityMap = dashboardService.getQuantityByLocation(location)//inventoryService.getQuantityByProductMap(location.inventory, products)
 
                 //println "onHandQuantityMap: " + onHandQuantityMap
                 // For each product, add to the onhand quantity map
