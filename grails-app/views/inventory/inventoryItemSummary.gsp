@@ -23,9 +23,7 @@
 			</g:if>
 
             <div class="yui-gf" style="margin: 0; padding: 0">
-                <div class="yui-u first" style="background-color: #f5f5f5; border-right: 1px solid lightgrey; height: 100%;">
-
-
+                <div class="yui-u first filters">
                     <div>
                         <div style="margin: 20px;">
                             <h1><warehouse:message code="inventory.status.label" default="Status"/></h1>

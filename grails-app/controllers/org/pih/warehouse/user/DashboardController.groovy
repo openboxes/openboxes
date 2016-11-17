@@ -245,11 +245,9 @@ class DashboardController {
 
         def requisitionStatistics = [:] //requisitionService.getRequisitionStatistics(location,null,user)
 
-        def categories = []
-		def category = productService.getRootCategory()		
-		categories = category.categories
+		def category = productService.getRootCategory()
+		def categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
-
 		[
 			categories: categories,
 			quickCategories:productService.getQuickCategories(),

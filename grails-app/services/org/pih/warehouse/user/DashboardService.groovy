@@ -463,12 +463,11 @@ class DashboardService {
             }
         }
 
+        // Transform result set to map of quantities indexed by product ID
         def map = results.inject([:]) { map, entry ->
             map[entry.productId] = entry.quantity
             return map
         }
-        log.info "Results: " + results
-
 
         return map
     }

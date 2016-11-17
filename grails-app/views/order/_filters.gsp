@@ -94,7 +94,7 @@
                 <tr class="prop">
                     <td>
                         <label>${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}</label>
-                        <a href="javascript:void(0);" id="clearStartDate">clear</a>
+                        <a href="javascript:void(0);" id="clearDates">${warehouse.message(code: 'default.clearDates.label', default: 'Clear dates')}</a>
                         <table>
                             <tr>
                                 <td>
