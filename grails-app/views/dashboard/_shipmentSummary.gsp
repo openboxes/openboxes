@@ -2,7 +2,12 @@
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode"%>
 
 <div class="box">
-    <h2><warehouse:message code="shipping.label"/></h2>
+    <h2>
+		<warehouse:message code="shipping.summary.label"/>
+		<g:set var="startDate" value="${g.formatDate(date:start, format:'MMM dd')}"/>
+		<g:set var="endDate" value="${g.formatDate(date:end, format:'MMM dd')}"/>
+		<small>${warehouse.message(code: 'dashboard.outbound.label', args: [session.warehouse.name, startDate, endDate]) }</small>
+	</h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">
 			<g:if test="${!outgoingShipmentsByStatus}">
@@ -19,68 +24,56 @@
 				<g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[shipped] }"/>		
 				<g:set var="shipmentsReceived" value="${outgoingShipmentsByStatus[received] }"/>		
 				<g:set var="outgoingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsShipped.objectList.size + shipmentsReceived.objectList.size }"/>	
-
-					
-	    		<table class="zebra">
-                    <thead>
-                        <tr class="prop odd">
-                            <td colspan="3" class="left">
-                                <g:set var="startDate" value="${g.formatDate(date:new Date()-7, format:'MMMMM dd')}"/>
-                                <g:set var="endDate" value="${g.formatDate(date:new Date()+7, format:'MMMMM dd')}"/>
-                                <div class="fade">${warehouse.message(code: 'dashboard.outgoing.label', args: [session.warehouse.name, startDate, endDate]) }</div>
-
-                            </td>
-                        </tr>
-                    </thead>
+                <g:set var="dateCreatedFrom" value="${start.format('MM/dd/yyyy')}"/>
+                <g:set var="dateCreatedTo" value="${end.format('MM/dd/yyyy')}"/>
+	    		<table class="table">
                     <tbody>
 						<tr>
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>
+							<td style="padding: 10px; margin: 10px">
+                                <p class="center title">
+                                    <g:link controller="shipment" action="list"
+                                            params="['type':'outgoing','status':pending, 'dateCreatedFrom':dateCreatedFrom, 'dateCreatedTo':dateCreatedTo]">
+                                        ${shipmentsPending.objectList.size}
+                                    </g:link>
+                                </p>
+                                <p class="center">
+                                    <g:link controller="shipment" action="list"
+                                            params="['type':'outgoing','status':pending, 'dateCreatedFrom':dateCreatedFrom, 'dateCreatedTo':dateCreatedTo]">
+                                        ${warehouse.message(code: 'dashboard.outbound.pending.label', args: [session.warehouse.name]) }</g:link>
+                                </p>
 							</td>
-							<td>
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
-									${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }							
-								</g:link>
+
+							<td style="padding: 10px; margin: 10px">
+                                <p class="center title">
+                                    <g:link controller="shipment" action="list"
+                                            params="['type':'outgoing','status':shipped, 'dateCreatedFrom':dateCreatedFrom, 'dateCreatedTo':dateCreatedTo]">
+                                        ${shipmentsShipped.objectList.size}
+                                    </g:link>
+                                </p>
+                                <p class="center">
+                                    <g:link controller="shipment" action="list"
+                                            params="['type':'outgoing','status':shipped, 'dateCreatedFrom':dateCreatedFrom, 'dateCreatedTo':dateCreatedTo]">
+                                        ${warehouse.message(code: 'dashboard.outbound.shipped.label', args: [session.warehouse.name]) }
+                                    </g:link>
+                                </p>
+
 							</td>
-							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
-									${shipmentsPending.objectList.size}
-								</g:link>
-							</td>
-						</tr>	
-						<tr>
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>
-							</td>
-						
-							<td>
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
-									${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }							
-								</g:link>
-							</td>
-							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
-									${shipmentsShipped.objectList.size}
-								</g:link>
+
+							<td style="padding: 10px; margin: 10px">
+                                <p class="center title">
+                                    <g:link controller="shipment" action="list"
+                                            params="['type':'outgoing','status':received, 'dateCreatedFrom':dateCreatedFrom, 'dateCreatedTo':dateCreatedTo]">
+                                        ${shipmentsReceived.objectList.size}
+                                    </g:link>
+                                </p>
+                                <p class="center">
+                                    <g:link controller="shipment" action="list"
+                                            params="['type':'outgoing', 'status':received, 'dateCreatedFrom':dateCreatedFrom, 'dateCreatedTo':dateCreatedTo]">
+                                        ${warehouse.message(code: 'dashboard.outbound.received.label', args: [session.warehouse.name]) }
+                                    </g:link>
+                                </p>
 							</td>
 						</tr>
-							
-						<tr>
-							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>
-							</td>
-						
-							<td>
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':received]">
-									${warehouse.message(code: 'dashboard.outgoing.received.label', args: [session.warehouse.name]) }							
-								</g:link>
-							</td>
-							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':received]">
-									${shipmentsReceived.objectList.size}
-								</g:link>
-							</td>
-						</tr>								
 			    	</tbody>			    	
 			    	<tfoot>
 						<tr class="odd">

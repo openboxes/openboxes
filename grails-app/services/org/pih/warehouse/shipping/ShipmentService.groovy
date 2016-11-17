@@ -127,20 +127,19 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentOutgoingShipments(String locationId, int daysBefore, int daysAfter) { 		
+	List<Shipment> getRecentOutgoingShipments(String locationId, Date start, Date end) {
 		Location location = Location.get(locationId);
 		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
 		//	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
 		
 		def criteria = Shipment.createCriteria()
-		def now = new Date()
 		def upcomingShipments = criteria.list {
 			and { 
 				eq("origin", location)
 				or {
 					//between("expectedShippingDate",null,null)
-					between("expectedShippingDate",now-daysBefore,now+daysAfter)
-					isNull("expectedShippingDate")
+					between("dateCreated", start, end)
+					//isNull("expectedShippingDate")
 				}
 			}
 		}
@@ -164,13 +163,11 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentIncomingShipments(String locationId, int daysBefore, int daysAfter) { 		
+	List<Shipment> getRecentIncomingShipments(String locationId, Date start, Date end) {
 		def startTime = System.currentTimeMillis()
 		Location location = Location.get(locationId);
-		Date fromDate = new Date() - daysBefore
-		Date toDate = new Date() + daysAfter
-		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
-		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate, 
+		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
+		def shipments = Shipment.findAllByDestinationAndDateCreatedBetween(location, start, end,
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 		
 		log.info "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
@@ -405,9 +402,11 @@ class ShipmentService {
 	 * @param statusEndDate
 	 * @return
 	 */
-	List<Shipment> getShipments(String terms, ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate, Date lastUpdatedStart, Date lastUpdatedEnd) {
+	List<Shipment> getShipments(String terms, ShipmentType shipmentType, Location origin, Location destination,
+								ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate,
+								Date lastUpdatedFrom, Date lastUpdatedTo, Date dateCreatedFrom, Date dateCreatedTo) {
 
-        log.info "Get shipments: " + terms + " " + shipmentType + " " + origin + " " + destination + " " + lastUpdatedStart + " " + lastUpdatedEnd
+        log.info "Get shipments: " + terms + " " + shipmentType + " " + origin + " " + destination + " " + lastUpdatedFrom + " " + lastUpdatedTo
 
         def shipments = Shipment.withCriteria {
             and {
@@ -418,10 +417,18 @@ class ShipmentService {
                     }
                 }
                 if (shipmentType) { eq("shipmentType", shipmentType) }
+
                 if (origin) { eq("origin", origin) }
+
                 if (destination) { eq("destination", destination) }
-                if (lastUpdatedStart) { ge("lastUpdated", lastUpdatedStart)}
-                if (lastUpdatedEnd) { le("lastUpdated", lastUpdatedEnd)}
+
+				if (lastUpdatedFrom || lastUpdatedTo) {
+					between("lastUpdated", lastUpdatedFrom?:new Date(), lastUpdatedTo?:new Date())
+				}
+
+				if (dateCreatedFrom || dateCreatedTo) {
+					between("dateCreated", dateCreatedFrom?:new Date(), dateCreatedTo?:new Date())
+				}
             }
 
         }

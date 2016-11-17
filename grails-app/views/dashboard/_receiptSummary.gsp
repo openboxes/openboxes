@@ -3,7 +3,13 @@
 
 
 <div class="box">
-    <h2><warehouse:message code="receiving.label"/></h2>
+    <h2>
+		<warehouse:message code="receiving.summary.label"/>
+		<g:set var="startDate" value="${g.formatDate(date:start, format:'MMM dd')}"/>
+		<g:set var="endDate" value="${g.formatDate(date:end, format:'MMM dd')}"/>
+		<small>${warehouse.message(code: 'dashboard.inbound.label', args: [session.warehouse.name, startDate, endDate]) }</small>
+
+	</h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">
 			<g:if test="${!outgoingShipmentsByStatus}">
@@ -21,65 +27,56 @@
 				<g:set var="shipmentsPending" value="${incomingShipmentsByStatus[pending] }"/>			
 				<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>			
   				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
-				<g:set var="incomingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
+				<g:set var="incomingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>
+                <g:set var="dateCreatedFrom" value="${start.format('MM/dd/yyyy')}"/>
+                <g:set var="dateCreatedTo" value="${end.format('MM/dd/yyyy')}"/>
 
 					
-	    		<table class="zebra">
-	    			<thead>
-                        <tr class="prop odd">
-                            <td colspan="3" class="left">
-                                <g:set var="startDate" value="${g.formatDate(date:new Date()-7, format:'MMMMM dd')}"/>
-                                <g:set var="endDate" value="${g.formatDate(date:new Date()+7, format:'MMMMM dd')}"/>
-                                <div class="fade">${warehouse.message(code: 'dashboard.incoming.label', args: [session.warehouse.name, startDate, endDate]) }</div>
-                            </td>
-                        </tr>
-
-	    			</thead>
+	    		<table class="table">
 	    			<tbody>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>						
+								<p class="title">
+									<g:link controller="shipment" action="list"
+                                            params="[type:'incoming', status:pending, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+										${shipmentsPending.objectList.size}
+									</g:link>
+
+								</p>
+                                <g:link controller="shipment" action="list"
+                                        params="['type':'incoming','status':pending, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+                                    ${warehouse.message(code: 'dashboard.inbound.pending.label', args: [session.warehouse.name]) }
+                                </g:link>
+
 							</td>
-							<td>
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':pending]">
-									${warehouse.message(code: 'dashboard.incoming.pending.label', args: [session.warehouse.name]) }							
-								</g:link>
-							</td>
-							<td class="right">
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':pending]">
-									${shipmentsPending.objectList.size}
-								</g:link>
-							</td>
-						</tr>				
-						<tr>
+
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>						
-							</td>
-							<td>
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':shipped]">
-									${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }							
+								<p class="title">
+									<g:link controller="shipment" action="list"
+                                            params="['type':'incoming','status':shipped, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+										${shipmentsEnroute.objectList.size}
+									</g:link>
+								</p>
+								<g:link controller="shipment" action="list"
+                                        params="['type':'incoming','status':shipped, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+									${warehouse.message(code: 'dashboard.inbound.shipped.label', args: [session.warehouse.name]) }
 								</g:link>
+
 							</td>
-							<td class="right">
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':shipped]">
-									${shipmentsEnroute.objectList.size}
-								</g:link>
-							</td>
-						</tr>				
-						<tr>
+
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>						
-							</td>
-						
-							<td>
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':received]">
-									${warehouse.message(code: 'dashboard.incoming.received.label', args: [session.warehouse.name]) }
-								</g:link>
-							</td>
-							<td class="right">
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':received]">
-									${shipmentsReceived.objectList.size}
-								</g:link>
+								<p class="title">
+									<g:link controller="shipment" action="list"
+                                            params="['type':'incoming','status':received, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+										${shipmentsReceived.objectList.size}
+									</g:link>
+                                </p>
+
+                                <g:link controller="shipment" action="list"
+                                        params="['type':'incoming','status':received, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+                                    ${warehouse.message(code: 'dashboard.inbound.received.label', args: [session.warehouse.name]) }
+                                </g:link>
+
 							</td>
 						</tr>							
 			    	</tbody>

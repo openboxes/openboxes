@@ -14,10 +14,10 @@
 	    		<table>
 					<tr>
 						<td width="33%">
-                            <g:render template="requisitionItemSummary"/>
                             <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
                             <g:render template="receiptSummary"/>
                             <g:render template="shipmentSummary"/>
+                            <g:render template="requisitionItemSummary"/>
                             <g:render template="indicatorSummary"/>
                         </td>
                         <td width="33%">

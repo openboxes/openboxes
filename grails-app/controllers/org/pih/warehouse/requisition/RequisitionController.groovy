@@ -43,8 +43,12 @@ class RequisitionController {
         requisition.destination = Location.get(session?.warehouse?.id)
         //def startTime = System.currentTimeMillis()
 
+        def dateCreatedFrom = params.dateCreatedFrom ? Date.parse("MM/dd/yyyy", params.dateCreatedFrom) : null
+        def dateCreatedTo = params.dateCreatedTo ? Date.parse("MM/dd/yyyy", params.dateCreatedTo) : null
+
+
         // Requisitions to display in the table
-        def requisitions = requisitionService.getRequisitions(requisition, params)
+        def requisitions = requisitionService.getRequisitions(requisition, dateCreatedFrom, dateCreatedTo, params)
         def requisitionStatistics = requisitionService.getRequisitionStatistics(requisition.destination, null, user)
 
         render(view:"list", model:[requisitions: requisitions, requisitionStatistics:requisitionStatistics])

@@ -23,32 +23,27 @@
 			</g:if>
 
             <div class="yui-gf" style="margin: 0; padding: 0">
-                <div class="yui-u first" style="background-color: #f5f5f5; border-right: 1px solid lightgrey; height: 100%;">
+                <div class="yui-u first" class="filters">
+                    <div style="margin: 10px;">
+                        <h1><warehouse:message code="inventory.status.label" default="Status"/></h1>
 
+                        <table>
 
-                    <div>
-                        <div style="margin: 20px;">
-                            <h1><warehouse:message code="inventory.status.label" default="Status"/></h1>
+                            <g:each in="${productSummary}" var="status">
+                                <%-- exclude subtotal rows --%>
+                                <g:if test="${status.label}">
+                                    <tr class="prop ${status.styleClass} ${status.code} ${status.status}">
+                                        <td>
+                                            <a href="${status.url}">${status.label}</a>
+                                        </td>
+                                        <td class="right">
+                                            <a href="${status.url}">${status.count}</a>
+                                        </td>
+                                    </tr>
+                                </g:if>
 
-                            <table>
-
-                                <g:each in="${productSummary}" var="status">
-                                    <%-- exclude subtotal rows --%>
-                                    <g:if test="${status.label}">
-                                        <tr class="prop ${status.styleClass} ${status.code} ${status.status}">
-                                            <td>
-                                                <a href="${status.url}">${status.label}</a>
-                                            </td>
-                                            <td class="right">
-                                                <a href="${status.url}">${status.count}</a>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-
-                                </g:each>
-                            </table>
-                        </div>
-                        <hr/>
+                            </g:each>
+                        </table>
                     </div>
 
                 </div>

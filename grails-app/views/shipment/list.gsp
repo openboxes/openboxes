@@ -10,8 +10,8 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            <div class="yui-gf">
-                <div class="yui-u first">
+            <div class="yui-gf" style="margin: 0; padding: 0">
+                <div class="yui-u first filters">
                     <g:render template="filters" model="[]"/>
 
                 </div>
@@ -37,7 +37,7 @@
                                 </ul>
                                 <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
                                     <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
-
+                                        <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode], statusCode:shipmentStatusCode]"/>
 
                                         <g:if test="${shipmentStatusCode== org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
                                             <div class="button-group">
@@ -45,7 +45,7 @@
                                                     <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
                                                 </button>
                                                 <button id="bulkMarkAsReceived" type="submit" class="button icon tag">
-                                                    <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
+                                                    <warehouse:message code="bulk.markAsReceived.label" default="Mark as Received"/>
                                                 </button>
                                             </div>
                                         </g:if>
@@ -57,7 +57,6 @@
                                             </div>
                                         </g:if>
 
-                                        <g:render template="list" model="[incoming:incoming, shipments:shipmentMap[shipmentStatusCode], statusCode:shipmentStatusCode]"/>
                                     </div>
                                 </g:each>
                             </div>
