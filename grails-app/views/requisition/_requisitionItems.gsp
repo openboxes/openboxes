@@ -1,5 +1,5 @@
 <div id="requisitionItems">
-<table class="zebra">
+<table class="table">
 <thead>
 <tr class="odd">
     <th>

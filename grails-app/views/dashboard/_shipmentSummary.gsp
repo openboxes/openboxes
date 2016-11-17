@@ -4,9 +4,7 @@
 <div class="box">
     <h2>
 		<warehouse:message code="shipping.summary.label"/>
-		<g:set var="startDate" value="${g.formatDate(date:start, format:'MMM dd')}"/>
-		<g:set var="endDate" value="${g.formatDate(date:end, format:'MMM dd')}"/>
-		<small>${warehouse.message(code: 'dashboard.outbound.label', args: [session.warehouse.name, startDate, endDate]) }</small>
+		<small>${warehouse.message(code: 'dashboard.outbound.label', args: [session.warehouse.name, (end-start)]) }</small>
 	</h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">
