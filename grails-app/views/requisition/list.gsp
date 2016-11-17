@@ -168,10 +168,8 @@
                             <table>
                                 <tbody>
                                 <tr>
-                                    <td class="middle">
-                                        <warehouse:message code="default.showing.message" args="${[requisitions.totalCount]}" />
-                                    </td>
-                                    <td class="right">
+                                    <td>
+                                        <label><warehouse:message code="default.showing.message" args="${[requisitions.totalCount]}" /></label>
                                         <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button">
                                             <warehouse:message code="requisition.button.download.label" default="Download requisitions"/>
                                         </g:link>

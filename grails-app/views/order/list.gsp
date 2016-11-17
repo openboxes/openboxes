@@ -13,8 +13,8 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 
-			<div class="yui-gf">
-				<div class="yui-u first">
+			<div class="yui-gf" style="padding: 0; margin: 0">
+				<div class="yui-u first filters">
 					<g:render template="filters" model="[]"/>
 
 				</div>

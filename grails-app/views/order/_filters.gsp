@@ -2,8 +2,8 @@
     <g:form id="listForm" action="list" method="GET">
         <g:hiddenField name="type" value="${params.type}"/>
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
-        <div class="box">
-            <h2><warehouse:message code="default.filters.label"/></h2>
+        <div style="margin: 10px;">
+            <h1><warehouse:message code="default.filters.label"/></h1>
             <table>
                 <%--
                 <tr>
@@ -42,7 +42,7 @@
                 </tr>
                 --%>
 
-                <tr class="prop">
+                <tr>
                     <td>
                         <label class="block">${warehouse.message(code: 'order.status.label')}</label>
                         <div>
@@ -93,26 +93,26 @@
 
                 <tr class="prop">
                     <td>
-
-                        <label class="block">${warehouse.message(code: 'default.lastUpdateAfter.label', default: 'Last updated after')}</label>
-                        <div>
-                            <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
-                                                size="40" numberOfMonths="2" changeMonthAndYear="false"
-                                                value="${statusStartDate}" format="MM/dd/yyyy"/>
-                        </div>
+                        <label>${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}</label>
                         <a href="javascript:void(0);" id="clearStartDate">clear</a>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td>
-                        <label class="block">${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
-                        <div>
-                            <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="40"
+                        <table>
+                            <tr>
+                                <td>
+                                    <label>${warehouse.message(code: 'default.from.label', default: 'From')}</label>
+                                    <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
+                                                        size="10" numberOfMonths="2" changeMonthAndYear="false"
+                                                        value="${statusStartDate}" format="MM/dd/yyyy"/>
+                                    <br/>
+                                </td>
+                                <td>
+                                    <label>${warehouse.message(code: 'default.to.label', default: 'To')}</label>
+                                    <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="10"
                                                 numberOfMonths="2" changeMonthAndYear="true"
                                                 value="${statusEndDate}" format="MM/dd/yyyy"/>
-                        </div>
-                        <a href="javascript:void(0);" id="clearEndDate">clear</a>
-
+                                    <br/>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
 
