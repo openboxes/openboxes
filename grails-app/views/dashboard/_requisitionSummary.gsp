@@ -36,7 +36,7 @@
                                                     </g:link>
                                                 </p>
                                                 <p class="center">
-                                                    <g:link controller="requisition" action="list" params="[status:status,dateCreatedFrom:start,dateCreatedTo:end]" fragment="${statusMessage}">
+                                                    <g:link controller="requisition" action="list" params="[status:status,dateCreatedFrom:dateCreatedFrom,dateCreatedTo:dateCreatedTo]" fragment="${statusMessage}">
                                                         ${format.metadata(obj: status)}
                                                     </g:link>
                                                 </p>

@@ -129,6 +129,11 @@
 					$("#status").val('').trigger("chosen:updated");
 				});
 
+                $("#clearDates").click(function() {
+                    $('#statusStartDate-datepicker').datepicker('setDate', null);
+                    $('#statusEndDate-datepicker').datepicker('setDate', null);
+                });
+
                 $("#clearStartDate").click(function() {
                     $('#statusStartDate-datepicker').datepicker('setDate', null);
                 });

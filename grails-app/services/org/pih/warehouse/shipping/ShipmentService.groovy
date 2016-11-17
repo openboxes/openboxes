@@ -128,34 +128,17 @@ class ShipmentService {
 	 * @return
 	 */
 	List<Shipment> getRecentOutgoingShipments(String locationId, Date start, Date end) {
+        def startTime = System.currentTimeMillis()
 		Location location = Location.get(locationId);
-		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
-		//	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
-		
 		def criteria = Shipment.createCriteria()
-		def upcomingShipments = criteria.list {
+		def results = criteria.list {
 			and { 
 				eq("origin", location)
-				or {
-					//between("expectedShippingDate",null,null)
-					between("dateCreated", start, end)
-					//isNull("expectedShippingDate")
-				}
+                between("dateCreated", start, end)
 			}
 		}
-		
-		def shipments = new ArrayList<Shipment>();		
-		for (shipment in upcomingShipments) { 
-			shipments.add(shipment);
-		}
-						
-		/*
-		def unknownShipments = Shipment.findAllByOriginAndExpectedShippingDateIsNull(location);		
-		for (shipment in unknownShipments) { 
-			shipments.add(shipment);
-		}*/
-		
-		return shipments;
+        log.info "Get recent outbound shipments " + (System.currentTimeMillis() - startTime) + " ms"
+		return results;
 	}
 	
 	/**
@@ -163,15 +146,19 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentIncomingShipments(String locationId, Date start, Date end) {
+	def getRecentIncomingShipments(String locationId, Date start, Date end) {
 		def startTime = System.currentTimeMillis()
 		Location location = Location.get(locationId);
-		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
-		def shipments = Shipment.findAllByDestinationAndDateCreatedBetween(location, start, end,
-			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
-		
-		log.info "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
-		return shipments
+
+        def criteria = Shipment.createCriteria()
+        def results = criteria.list {
+            and {
+                eq("destination", location)
+                between("dateCreated", start, end)
+            }
+        }
+		log.info "Get recent inbound shipments " + (System.currentTimeMillis() - startTime) + " ms"
+		return results
 	}
 	
 
