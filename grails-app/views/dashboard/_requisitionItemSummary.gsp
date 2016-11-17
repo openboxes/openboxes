@@ -27,8 +27,8 @@
             </div>
         </div>
 
-        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast moving items (last 30 days)"/>
-        <span class="beta">Beta</span>
+        <warehouse:message code="dashboard.fastMovers.title.label" default="Fast Movers (within last 30 days)"/>
+        <small><warehouse:message code="dashboard.fastMovers.subtitle.label" default="Within last 30 days" args="[(end-start)]"/></small>
         <%--
         <span class="action-menu">
             <button class="action-btn">

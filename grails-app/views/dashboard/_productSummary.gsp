@@ -75,7 +75,11 @@
                     styleClass: $(this).attr("styleClass"),
                     url: $(this).attr("url")
                 };
-                addProductSummary(productSummary);
+
+                console.log(productSummary);
+                if (productSummary.styleClass != "subtotal") {
+                    addProductSummary(productSummary);
+                }
             });
         }
         $("#product-summary-spinner").hide();
