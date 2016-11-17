@@ -8,9 +8,12 @@
 		<content tag="menuTitle"><warehouse:message code="default.controllers.label" default="Controllers" /></content>		
     </head>
     <body>        
-		<div id="settings" role="main" class="yui-gb">
+		<div id="settings" role="main" class="yui-gf">
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
+
+			</div>
+			<div class="yui-u">
 				<table class="box">
 					<tr>
 						<g:set var="status" value="${1 }"/>
@@ -19,7 +22,7 @@
 								<g:set var="controllerName"><%= c.getName().toLowerCase() %></g:set>
 								<span class="linkButton">						
 									<li class="controller">
-										<a class="${c.name}" href="${createLink(uri: '/' + c.logicalPropertyName)}"">${c.fullName}</a>
+										<a class="${c.name}" href="${createLink(uri: '/' + c.logicalPropertyName)}">${c.fullName}</a>
 									</li>
 								</span>
 

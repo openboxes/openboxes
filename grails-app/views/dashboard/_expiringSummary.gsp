@@ -70,7 +70,10 @@
                     styleClass: $(this).attr("styleClass"),
                     url: $(this).attr("url")
                 };
-                addExpirationSummary(expirationSummary);
+
+                if (expirationSummary.styleClass != "subtotal") {
+                    addExpirationSummary(expirationSummary);
+                }
             });
 
 
