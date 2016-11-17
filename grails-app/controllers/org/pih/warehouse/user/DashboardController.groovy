@@ -113,44 +113,40 @@ class DashboardController {
 		
 	    def currentUser = User.get(session?.user?.id)
 
+        def start = new Date() - 30, end = new Date()
+
 		def location = Location.get(session?.warehouse?.id);
-		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
-		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
-		//def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
-		//def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
-		
-		//def expiredStock = inventoryService.getExpiredStock(null, location)
-		//def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
-		//def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
-		//def expiringStockWithin180Days = inventoryService.getExpiringStock(null, location, 180)
-		//def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
-		//def lowStock = inventoryService.getLowStock(location)
-		//def reorderStock = inventoryService.getReorderStock(location)
+		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, start, end)
+		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, start, end)
+        def outgoingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentOutgoingShipments)
+        def incomingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentIncomingShipments)
 
         // Days to include for activity list
         int daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
 
+        def user = params.onlyShowMine?currentUser:null
         def requisitionStatistics =
-                requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine?currentUser:null)
+                requisitionService.getRequisitionStatistics(location, null, user, start, end)
 
-        def outgoingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentOutgoingShipments)
-        def incomingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentIncomingShipments)
+        def tags = productService?.getAllTags()?.sort { it.tag }
+        def rootCategory = productService.getRootCategory()
 
         log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 		//def outgoingOrders = orderService.getOutgoingOrders(location)
 		//def incomingOrders = orderService.getIncomingOrders(location)
 		[
-			rootCategory : productService.getRootCategory(),
+            start: start,
+            end: end,
+			rootCategory : rootCategory,
             requisitionStatistics: requisitionStatistics,
             requisitions: [],
             //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
-
             //outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
             //incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
             outgoingShipmentsByStatus : outgoingShipmentsByStatus,
             incomingShipmentsByStatus : incomingShipmentsByStatus,
 			daysToInclude: daysToInclude,
-            tags:productService?.getAllTags()?.sort { it.tag }
+            tags:tags
 		]
 	}
 

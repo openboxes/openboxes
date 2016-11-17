@@ -65,12 +65,13 @@ class ShipmentController {
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
         def lastUpdatedFrom = params.lastUpdatedFrom ? Date.parse("MM/dd/yyyy", params.lastUpdatedFrom) : null
         def lastUpdatedTo = params.lastUpdatedTo ? Date.parse("MM/dd/yyyy", params.lastUpdatedTo) : null
-
+		def dateCreatedFrom = params.dateCreatedFrom ? Date.parse("MM/dd/yyyy", params.dateCreatedFrom) : null
+		def dateCreatedTo = params.dateCreatedTo ? Date.parse("MM/dd/yyyy", params.dateCreatedTo) : null
 
         println "lastUpdatedFrom = " + lastUpdatedFrom + " lastUpdatedTo = " + lastUpdatedTo
 
 		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination,
-                statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo)
+                statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo, dateCreatedFrom, dateCreatedTo)
 		
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b ->
@@ -88,6 +89,8 @@ class ShipmentController {
 			status:statusCode?.name,
             lastUpdatedFrom:lastUpdatedFrom,
             lastUpdatedTo:lastUpdatedTo,
+			dateCreatedFrom:dateCreatedFrom,
+			dateCreatedTo:dateCreatedTo,
 			incoming: incoming
 		]
 	}

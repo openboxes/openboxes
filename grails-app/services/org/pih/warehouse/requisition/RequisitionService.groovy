@@ -40,10 +40,14 @@ class RequisitionService {
     */
 
     def getRequisitionStatistics(destination, origin) {
-        return getRequisitionStatistics(destination, origin, null)
+        return getRequisitionStatistics(destination, origin, null, null, null)
     }
 
     def getRequisitionStatistics(destination, origin, user) {
+        return getRequisitionStatistics(destination, origin, user, null, null)
+    }
+
+    def getRequisitionStatistics(destination, origin, user, start, end) {
         def statistics = [:]
 
         def criteria = Requisition.createCriteria()
@@ -62,6 +66,10 @@ class RequisitionService {
 
                     if (destination) eq("destination", destination)
                     if (origin) eq("origin", origin)
+                }
+
+                if (start || end) {
+                    between("dateCreated", start, end)
                 }
                 //if (user) {
                 //    or {
@@ -167,6 +175,11 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Requisition requisition, Map params) {
+        return getRequisitions(requisition, null, null, params)
+    }
+
+
+    def getRequisitions(Requisition requisition, Date dateCreatedFrom, Date dateCreatedTo, Map params) {
         println "Get requisitions: " + params
 
         //def getRequisitions(Location destination, Location origin, User createdBy, RequisitionType requisitionType, RequisitionStatus status, CommodityClass commodityClass, String query, Map params) {
@@ -194,7 +207,9 @@ class RequisitionService {
                 if (params.commodityClassIsNull) {
                     isNull("commodityClass")
                 }
-
+                if (dateCreatedFrom && dateCreatedTo) {
+                    between("dateCreated", dateCreatedFrom, dateCreatedTo)
+                }
                 if (requisition.destination) {
                     eq("destination", requisition.destination)
                 }

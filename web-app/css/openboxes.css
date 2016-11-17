@@ -2969,6 +2969,12 @@ select {
    Filter list
    ========================================================================== */
 
+.filters {
+    background-color: #f5f5f5;
+    border-right: 1px solid lightgrey;
+    height: 100%;
+    margin: 5px;
+}
 
 ul.filter-list {
     list-style: none;

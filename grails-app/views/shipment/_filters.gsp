@@ -1,8 +1,8 @@
-<div>
+<div style="margin: 10px;">
 	<g:form method="GET" controller="shipment" action="list">
         <g:hiddenField name="type" value="${params.type}"/>
-		<div class="box">
-            <h2><warehouse:message code="default.filters.label"/></h2>
+		<div>
+            <h3><warehouse:message code="default.filters.label"/></h3>
 			<table>
 				<tr>
 					<td>
@@ -113,18 +113,42 @@
 
                 <tr class="prop">
                     <td class="left">
-                        <label>${warehouse.message(code: 'default.updatedBetween.label', default: 'Last updated between')}</label>
-                        <div class="clearfix">
+                        <label>${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}</label>
+                        <table style="width: auto;">
+                            <tr>
+                                <td>
+                                    <label>${warehouse.message(code: 'default.from.label', default: 'From')}</label>
+                                    <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                                        value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="10"/>
+                                </td>
+                                <td>
+                                    <label>${warehouse.message(code: 'default.to.label', default: 'To')}</label>
+                                    <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                                        value="${lastUpdatedTo}" format="MM/dd/yyyy" size="10"/>
+                                </td>
+                            </tr>
+                        </table>
 
-                            <div class="left">
-                                <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
-                                                    value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="15"/>
-                            </div>
-                            <div class="right">
-                                <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
-                                                    value="${lastUpdatedTo}" format="MM/dd/yyyy" size="15"/>
-                            </div>
-                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="left">
+                        <label>${warehouse.message(code: 'default.dateCreated.label', default: 'Date created')}</label>
+                        <table style="width: auto;">
+                            <tr>
+                                <td>
+                                    <label>${warehouse.message(code: 'default.from.label', default: 'From')}</label>
+                                    <g:jqueryDatePicker id="dateCreatedFrom" name="dateCreatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                                        value="${dateCreatedFrom}" format="MM/dd/yyyy" size="10"/>
+                                </td>
+                                <td>
+                                    <label>${warehouse.message(code: 'default.to.label', default: 'To')}</label>
+                                    <g:jqueryDatePicker id="dateCreatedTo" name="dateCreatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                                        value="${dateCreatedTo}" format="MM/dd/yyyy" size="10"/>
+                                </td>
+
+                            </tr>
+                        </table>
 
                     </td>
                 </tr>

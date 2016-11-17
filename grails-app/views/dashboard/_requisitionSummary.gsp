@@ -1,35 +1,14 @@
 <!--  Show recent shipments/receipts -->
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode"%>
 
+<g:set var="dateCreatedFrom" value="${start.format('MM/dd/yyyy')}"/>
+<g:set var="dateCreatedTo" value="${end.format('MM/dd/yyyy')}"/>
 
 <div class="box">
     <h2>
-        <warehouse:message code="requisitions.label"/>
+        <warehouse:message code="requisition.summary.label" default="Requisition Summary"/>
+        <small>Requisitions created in the last ${end - start} days</small>
     </h2>
-
-
-        <%--
-        <span class="action-menu">
-            <button class="action-btn">
-                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-            </button>
-            <div class="actions">
-                <div class="action-menu-item">
-                    <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                        Show all requisitions
-                    </g:link>
-                </div>
-                <div class="action-menu-item">
-                    <g:link controller="dashboard" action="index" class="${params.onlyShowMine.equals('true')?'selected':''}"
-                            params="['onlyShowMine':true]">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="View requests" style="vertical-align: middle" />
-                        Show my requisitions
-                    </g:link>
-                </div>
-            </div>
-        </span>
-        --%>
 
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
@@ -41,56 +20,37 @@
 			<g:else>
                 <table>
                     <tbody>
-                        <g:set var="i" value="${0}"/>
-                        <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.listValid()}">
-                            <g:set var="requisitionCount" value="${requisitionStatistics[status]?:0}"/>
-                            <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
-                            <g:if test="${requisitionCount}">
-                                <tr class="${i%2?'odd':'even'}">
-                                    <td class="center" style="width: 1%">
-                                        <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
-
-                                    </td>
-                                    <td>
-                                        <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                            <%--<warehouse:message code="requisitions.label"/>--%>
-                                            ${format.metadata(obj: status)}
-                                        </g:link>
-                                    </td>
-                                    <td class="right">
-                                        <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                            ${requisitionStatistics[status]?:0}
-                                        </g:link>
-                                    </td>
-                                </tr>
-                                <g:set var="i" value="${i+1}"/>
-                            </g:if>
-
-                        </g:each>
-                        <%--
-                        <g:if test="${requisitionStatistics['MINE']}">
-                            <tr class="${i%2?'odd':'even'}">
-                                <td class="center" style="width: 1%">
-                                    <img src="${createLinkTo(dir:'images/icons/silk', file: 'user.png')}"/>
-
-                                </td>
+                        <tr>
+                            <g:set var="i" value="${0}"/>
+                            <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.listValid()}">
+                                <g:set var="requisitionCount" value="${requisitionStatistics[status]?:0}"/>
+                                <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
                                 <td>
-                                    <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                        <warehouse:message code="requisitions.mine.label" default="My requisitions"/>
-                                    </g:link>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <p class="center">
+                                                    <g:link controller="requisition" action="list"
+                                                            params="[status:status,dateCreatedFrom:dateCreatedFrom,dateCreatedTo:dateCreatedTo]" fragment="${statusMessage}" class="title">
+                                                        ${requisitionStatistics[status]?:0}
+                                                    </g:link>
+                                                </p>
+                                                <p class="center">
+                                                    <g:link controller="requisition" action="list" params="[status:status,dateCreatedFrom:start,dateCreatedTo:end]" fragment="${statusMessage}">
+                                                        ${format.metadata(obj: status)}
+                                                    </g:link>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
-                                <td class="right">
-                                    <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                        ${requisitionStatistics["MINE"]?:0}
-                                    </g:link>
-                                </td>
-                            </tr>
-                        </g:if>
-                        --%>
+                                <g:set var="i" value="${i+1}"/>
+                            </g:each>
+                        </tr>
                     </tbody>
                     <tfoot>
                         <tr class="odd">
-                            <th colspan="2">
+                            <th colspan="${org.pih.warehouse.requisition.RequisitionStatus.listValid().size()-1}">
                                 <label>${warehouse.message(code:'default.total.label')}</label>
                             </th>
                             <th class="right">
