@@ -1467,6 +1467,7 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Get a map of quantities (indexed by product) for a particular inventory.
 	 *
+	 * @deprecated use dashboard service
 	 * @param inventoryInstance
 	 * @return
 	 */
