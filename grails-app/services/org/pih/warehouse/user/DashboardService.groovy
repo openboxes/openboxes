@@ -209,7 +209,7 @@ class DashboardService {
                 product.price_per_unit as price_per_unit,
                 product.unit_of_measure as unit_of_measure,
                 location.name as location_name,
-                greatest(sum(quantity), 0) as quantity,
+                sum(quantity) as quantity,
                 ifnull(inventory_level.min_quantity, 0) as min_quantity,
                 ifnull(inventory_level.reorder_quantity, 0) as reorder_quantity,
                 ifnull(inventory_level.max_quantity, 0) as max_quantity
@@ -218,7 +218,19 @@ class DashboardService {
             JOIN category on product.category_id = category.id 
             JOIN location on inventory_item_summary.location_id = location.id
             JOIN inventory on inventory.id = location.inventory_id
-            LEFT OUTER JOIN inventory_level on inventory_level.product_id = product.id AND inventory_level.inventory_id = inventory.id
+            LEFT OUTER JOIN (
+                SELECT 
+                    product_id, 
+                    inventory_id, 
+                    max(min_quantity) as min_quantity, 
+                    max(max_quantity) as max_quantity, 
+                    max(reorder_quantity) as reorder_quantity,
+                    max(date_created) as date_created
+                FROM inventory_level
+                WHERE inventory_level.status IS NULL OR inventory_level.status NOT IN ('INACTIVE', 'NOT_SUPPORTED')
+                GROUP BY product_id, inventory_id
+                ORDER BY date_created 
+            ) as inventory_level ON inventory_level.product_id = product.id AND inventory_level.inventory_id = inventory.id
             WHERE location.id = :locationId
             GROUP BY product.id, location.id
         """
@@ -276,6 +288,7 @@ class DashboardService {
         if (status) {
             query += " having status = :status"
         }
+
         def results = sql.rows(query, [locationId:location.id, status: status]);
 
         def productDetailsList = results.collect { [
@@ -323,7 +336,7 @@ class DashboardService {
             product.unit_of_measure as unit_of_measure,
             location.id as location_id,
             location.name as location_name,
-            greatest(sum(quantity), 0) as quantity,            
+            sum(quantity) as quantity,            
             ifnull(inventory_level.min_quantity, 0) as min_quantity,
             ifnull(inventory_level.reorder_quantity, 0) as reorder_quantity,
             ifnull(inventory_level.max_quantity, 0) as max_quantity
@@ -471,6 +484,36 @@ class DashboardService {
 
         return map
     }
+
+
+    /**
+     * Returns a list of
+     * @param currentLocation
+     * @return
+     */
+    def getItemQuantityByLocation(Location currentLocation) {
+
+        def results = InventoryItemSummary.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                sum('quantity', 'quantity')
+                groupProperty('inventoryItem.id', 'inventoryItemId')
+            }
+
+            location {
+                eq 'id', currentLocation.id
+            }
+        }
+
+        // Transform result set to map of quantities indexed by product ID
+        def map = results.inject([:]) { map, entry ->
+            map[entry.inventoryItemId] = entry.quantity
+            return map
+        }
+
+        return map
+    }
+
 
 
     /**

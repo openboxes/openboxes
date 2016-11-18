@@ -17,7 +17,7 @@ CREATE TABLE stock_take AS
 		product.id as product_id,
 		product.product_code as product_code,
 		product.name as product_name,        
-		ifnull(quantity, 0) as quantity
+		sum(quantity) as quantity
 	from transaction
 	join transaction_entry on transaction.id = transaction_entry.transaction_id
 	join transaction_type on transaction.transaction_type_id = transaction_type.id
@@ -57,7 +57,7 @@ ALTER TABLE latest_stock_take MODIFY COLUMN transaction_date DATETIME;
 #ALTER TABLE latest_stock_take ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE latest_stock_take ADD INDEX (transaction_date);
 ALTER TABLE latest_stock_take ADD INDEX (product_code);
-ALTER TABLE latest_stock_take ADD INDEX (lot_number);
+#ALTER TABLE latest_stock_take ADD INDEX (lot_number);
 #ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, product_id, inventory_item_id);
 ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, inventory_item_id);
 # ---------------------------------------------------------------------------------------------
@@ -70,16 +70,17 @@ INSERT INTO latest_stock_take
 		product_code,
 		stock_take.inventory_item_id,
 		lot_number,
-		sum(quantity) as quantity
+    # this needs to be sum because some stock count transactions have multiple line items per inventory item
+		sum(quantity) as quantity		
 	from stock_take
 	inner join (
 		SELECT max(transaction_date) as transaction_date, location_id, product_id
 		FROM stock_take
 		GROUP BY location_id, product_id
-	) as latest_stock_take 
-    ON (stock_take.product_id = latest_stock_take.product_id
-	AND stock_take.location_id = latest_stock_take.location_id
-	AND stock_take.transaction_date = latest_stock_take.transaction_date)
+	) as latest_stock_take ON (
+		stock_take.product_id = latest_stock_take.product_id
+		AND stock_take.location_id = latest_stock_take.location_id
+		AND stock_take.transaction_date = latest_stock_take.transaction_date)
 	GROUP BY stock_take.location_id, stock_take.inventory_item_id
 ON DUPLICATE KEY UPDATE quantity = values(quantity), transaction_date = values(transaction_date);
 # ---------------------------------------------------------------------------------------------
@@ -92,9 +93,9 @@ JOIN (
 SET t1.transaction_date = t2.transaction_date;
 # ---------------------------------------------------------------------------------------------
 create table latest_adjustments AS
-select
-	max(transaction.transaction_date) as transaction_date,
-	transaction_type.transaction_code,
+SELECT 
+	transaction.transaction_date as transaction_date,
+	transaction_type.transaction_code as transaction_code,
 	location.id as location_id,
 	location.name as location_name,
 	inventory_item.id as inventory_item_id,
@@ -102,20 +103,42 @@ select
 	product.id as product_id,
 	product.product_code as product_code,
 	product.name as product_name,
-	ifnull(transaction_entry.quantity, 0) as quantity
-from transaction
-join transaction_entry on transaction.id = transaction_entry.transaction_id
-join transaction_type on transaction.transaction_type_id = transaction_type.id
-join inventory on inventory.id = transaction.inventory_id
-join location on location.inventory_id = inventory.id
+	transaction_entry.quantity
+FROM transaction 
+JOIN transaction_type ON transaction.transaction_type_id = transaction_type.id
+JOIN transaction_entry ON transaction.id = transaction_entry.transaction_id
 join inventory_item on transaction_entry.inventory_item_id = inventory_item.id
+join inventory on transaction.inventory_id = inventory.id
+join location on location.inventory_id = inventory.id
 join product on inventory_item.product_id = product.id
-left join latest_stock_take on (latest_stock_take.inventory_item_id = inventory_item.id 
-	AND latest_stock_take.location_id = location.id)
-where transaction_type.transaction_code = 'INVENTORY'
-and (transaction.transaction_date > latest_stock_take.transaction_date OR latest_stock_take.transaction_date is null)
-group by location.id, inventory_item.id;
-#order by transaction.transaction_date desc;
+join (
+	SELECT 
+		location.id as location_id,
+		transaction_entry.inventory_item_id as inventory_item_id,
+		transaction_type.transaction_code as transaction_code,
+		max(transaction.transaction_date) as transaction_date
+	FROM transaction
+	JOIN transaction_type ON transaction.transaction_type_id = transaction_type.id
+	JOIN transaction_entry ON transaction.id = transaction_entry.transaction_id
+	join inventory on transaction.inventory_id = inventory.id
+	join location on location.inventory_id = inventory.id
+	left outer join latest_stock_take on (
+		latest_stock_take.inventory_item_id = transaction_entry.inventory_item_id 
+		AND latest_stock_take.location_id = location.id
+	)
+	WHERE transaction_type.transaction_code = "INVENTORY"
+	AND (
+		transaction.transaction_date >= latest_stock_take.transaction_date 
+		OR latest_stock_take.transaction_date is null
+	)
+	GROUP BY location.id, transaction_entry.inventory_item_id
+) as latest_adjustments on (
+	latest_adjustments.inventory_item_id = inventory_item.id
+	AND latest_adjustments.location_id = location.id
+	AND latest_adjustments.transaction_date = transaction.transaction_date
+	AND latest_adjustments.transaction_code = transaction_type.transaction_code
+)
+GROUP BY location.id, inventory_item.id;
 #ALTER TABLE latest_stock_take_partial ADD FOREIGN KEY (location_id) REFERENCES location(id);
 #ALTER TABLE latest_stock_take_partial ADD FOREIGN KEY (inventory_item_id) REFERENCES inventory_item(id);
 #ALTER TABLE latest_stock_take_partial ADD FOREIGN KEY (product_id) REFERENCES product(id);
@@ -129,6 +152,7 @@ JOIN (
 	SELECT inventory_item_id, location_id, quantity, max(transaction_date) as transaction_date
     FROM latest_adjustments 
 	GROUP BY inventory_item_id, location_id
+    ORDER BY transaction_date DESC
 ) as t2 ON t1.inventory_item_id = t2.inventory_item_id AND t1.location_id = t2.location_id 
 SET t1.quantity = t2.quantity, t1.transaction_date = t2.transaction_date;
 #  ---------------------------------------------------------------------------------------------
@@ -155,7 +179,7 @@ join product on inventory_item.product_id = product.id
 join latest_stock_take on (latest_stock_take.inventory_item_id = inventory_item.id 
 	AND latest_stock_take.location_id = location.id)
 where transaction_type.transaction_code = 'CREDIT'
-and (transaction.transaction_date > latest_stock_take.transaction_date 
+and (transaction.transaction_date >= latest_stock_take.transaction_date 
 	OR latest_stock_take.transaction_date is null)
 group by location.id, inventory_item.id;
 #ALTER TABLE latest_credits ADD FOREIGN KEY (location_id) REFERENCES location(id);
@@ -189,7 +213,7 @@ join product on inventory_item.product_id = product.id
 join latest_stock_take on (latest_stock_take.inventory_item_id = inventory_item.id 
 	AND latest_stock_take.location_id = location.id)    
 where transaction_type.transaction_code = 'DEBIT'
-and (transaction.transaction_date > latest_stock_take.transaction_date
+and (transaction.transaction_date >= latest_stock_take.transaction_date
 	OR latest_stock_take.transaction_date is null)
 group by location.id, inventory_item.id;
 #ALTER TABLE latest_debits ADD FOREIGN KEY (location_id) REFERENCES location(id);
