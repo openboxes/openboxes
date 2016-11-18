@@ -13,7 +13,7 @@ class BuildSummaryTablesJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.buildSummaryTablesJob.cronExpression
     }
 
 	def execute(context) {
