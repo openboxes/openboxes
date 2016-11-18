@@ -76,87 +76,85 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
                                 --%>
-                                <th class="center border-right" colspan="2"><warehouse:message code="inventory.quantity.label" default="Quantity"/></th>
+                                <th class="center"><warehouse:message code="inventory.qoh.label" default="QoH"/></th>
+                                <th class="center border-right"><warehouse:message code="product.uom.label" default="UoM"/></th>
                                 <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
                                 <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
                             </tr>
                             <tbody>
-                                    <g:each var="entry" in="${productList}" status="i">
-                                        <tr class="prop ${i%2?'odd':'even'} ${entry.statusCode}">
-                                            <td>
-                                                <g:message code="dashboard.${entry.status}.label"/>
-                                            </td>
-                                            <td>
-                                                ${entry.productCode}
-                                            </td>
-                                            <td>
-                                                <g:link controller="inventoryItem" action="showStockCard" id="${entry.id}">
-                                                    ${entry?.productName}
-                                                </g:link>
-                                            </td>
-                                            <%--
-                                            <td>
-                                                ${entry?.genericProductName?:""}
-                                            </td>
-                                            --%>
-                                            <td>
-                                                ${entry?.categoryName}
+                                <g:each var="entry" in="${productList}" status="i">
+                                    <tr class="prop ${i%2?'odd':'even'} ${entry.statusCode}">
+                                        <td>
+                                            <g:message code="dashboard.${entry.status}.label"/>
+                                        </td>
+                                        <td>
+                                            ${entry.productCode}
+                                        </td>
+                                        <td>
+                                            <g:link controller="inventoryItem" action="showStockCard" id="${entry.id}">
+                                                ${entry?.productName}
+                                            </g:link>
+                                        </td>
+                                        <td>
+                                            ${entry?.genericProductName?:""}
+                                        </td>
+                                        <td>
+                                            ${entry?.categoryName}
 
-                                            </td>
-                                            <%--
-                                            <td>
-                                                ${entry.manufacturer}
+                                        </td>
+                                        <%--
+                                        <td>
+                                            ${entry.manufacturer}
 
-                                            </td>
-                                            <td>
-                                                ${entry.vendor}
-                                            </td>
-                                            <td class="left">
-                                                ${entry?.binLocation?:""}
-                                            </td>
-                                            <td class="center">
-                                                ${entry?.abcClass?:""}
-                                            </td>
-                                            --%>
+                                        </td>
+                                        <td>
+                                            ${entry.vendor}
+                                        </td>
+                                        <td class="left">
+                                            ${entry?.binLocation?:""}
+                                        </td>
+                                        <td class="center">
+                                            ${entry?.abcClass?:""}
+                                        </td>
+                                        --%>
 
-                                    <%--
-                                    <td class="center">
-                                        ${entry?.minQuantity?:"--"}
-                                    </td>
-                                    <td class="center">
-                                        ${entry?.reorderQuantity?:"--"}
-                                    </td>
-                                    <td class="center">
-                                        ${entry?.maxQuantity?:"--"}
-                                    </td>
-                                    --%>
-                                            <td class="center">
-                                                ${entry.quantity}
-                                            </td>
-                                            <td class="center border-right">
-                                                ${entry?.unitOfMeasure}
-                                            </td>
-                                    <td class="center">
-                                        <g:if test="${entry?.pricePerUnit}">
-                                            <g:formatNumber number="${entry.pricePerUnit}" minFractionDigits="2"/>
-                                        </g:if>
-                                        <g:else>
-                                            --
-                                        </g:else>
-                                    </td>
-                                    <td class="center">
-                                        <g:if test="${entry.totalCost}">
-                                            <g:formatNumber number="${entry.totalCost}" minFractionDigits="2"/>
-                                        </g:if>
-                                        <g:else>
-                                            --
-                                        </g:else>
-                                    </td>
-                                </tr>
+                                        <%--
+                                        <td class="center">
+                                            ${entry?.minQuantity?:"--"}
+                                        </td>
+                                        <td class="center">
+                                            ${entry?.reorderQuantity?:"--"}
+                                        </td>
+                                        <td class="center">
+                                            ${entry?.maxQuantity?:"--"}
+                                        </td>
+                                        --%>
+                                        <td class="center">
+                                            ${entry.quantity}
+                                        </td>
+                                        <td class="center border-right">
+                                            ${entry?.unitOfMeasure}
+                                        </td>
+                                        <td class="center">
+                                            <g:if test="${entry?.pricePerUnit}">
+                                                <g:formatNumber number="${entry.pricePerUnit}" minFractionDigits="2"/>
+                                            </g:if>
+                                            <g:else>
+                                                --
+                                            </g:else>
+                                        </td>
+                                        <td class="center">
+                                            <g:if test="${entry.totalCost}">
+                                                <g:formatNumber number="${entry.totalCost}" minFractionDigits="2"/>
+                                            </g:if>
+                                            <g:else>
+                                                --
+                                            </g:else>
+                                        </td>
+                                    </tr>
                                 </g:each>
                             </tbody>
-
-                            <g:unless test="${quantityMap}">
+                            <g:unless test="${!quantityMap}">
                                 <tr>
                                     <td colspan="12" class="center">
                                         <div class="empty fade">
