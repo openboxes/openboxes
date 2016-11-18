@@ -175,7 +175,7 @@
                                 </g:each>
                             </tbody>
 
-                            <g:unless test="${quantityMap}">
+                            <g:unless test="${!quantityMap}">
                                 <tr>
                                     <td colspan="12" class="center">
                                         <div class="empty fade">
