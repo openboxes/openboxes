@@ -59,7 +59,7 @@
 
         			</div>
         		</td>
-				<td class="right" width="1%">
+				<td class="right" width="5%">
         			<div id="product-status" class="title">
 
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
@@ -80,10 +80,10 @@
 							</g:else>
 						</g:if>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-							<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
+							<span class="tag tag-danger"><warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/></span>
 						</g:elseif>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-							<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
+							<span class="tag tag-danger"><warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/></span>
 						</g:elseif>
 						<g:else>
 							none
