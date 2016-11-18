@@ -893,12 +893,12 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.uom.label', default: 'UoM')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventory.qoh.label', default: 'QoH')}"  + '"' + ","
         csv += "\n"
 
         inventoryItemList.each { inventoryItem ->
@@ -941,12 +941,12 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.uom.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventory.qoh.label', default: 'QoH')}"  + '"' + ","
         csv += "\n"
 
         productList.each { product ->
@@ -1793,18 +1793,18 @@ class InventoryController {
 	def editTransaction = {
         def startTime = System.currentTimeMillis()
 		log.info "edit transaction: " + params
-		def transactionInstance = Transaction.get(params?.id)
-		def warehouseInstance = Location.get(session?.warehouse?.id);
-		def products = Product.list();
+		def transaction = Transaction.get(params?.id)
+		def location = Location.get(session?.warehouse?.id);
+        def products = transaction.transactionEntries.collect { it.inventoryItem.product }
 		def inventoryItems = InventoryItem.findAllByProductInList(products)
-		def model = [ 
+        def quantityMap = dashboardService.getItemQuantityByLocation(location)
+		def model = [
 			inventoryItemsMap: inventoryItems.groupBy { it.product } ,
-			transactionInstance: transactionInstance?:new Transaction(),
-			productInstanceMap: Product.list().groupBy { it?.category },
+			transactionInstance: transaction?:new Transaction(),
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.list(),
-			quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
-			warehouseInstance: warehouseInstance
+			quantityMap: quantityMap,
+			warehouseInstance: location
         ]
 
         println "Edit transaction " + (System.currentTimeMillis() - startTime) + " ms"
