@@ -451,7 +451,7 @@ openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
 
 // Job that builds summary table (i.e. QoH, consumption, shipping). Occurs every ten minutes
 openboxes.jobs.buildSummaryTablesJob.enabled = true
-openboxes.jobs.buildSummaryTablesJob.cronExpression = "0 0/5 * 1/1 * ? *"  // every ten minutes
+openboxes.jobs.buildSummaryTablesJob.cronExpression = "0 0/5 * * * ?"  // every five minutes
 
 // LDAP configuration
 openboxes.ldap.enabled = false
