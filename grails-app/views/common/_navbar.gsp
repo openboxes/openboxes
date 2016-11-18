@@ -67,15 +67,15 @@
                             </g:else>
                             <g:if test="${session.useDebugLocale }">
                                 <li>
-                                    <g:link controller="user" action="disableDebugMode">
-                                        ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}
+                                    <g:link controller="user" action="disableTranslationMode">
+                                        ${warehouse.message(code:'dashboard.disableTranslationMode.label', default: 'Disable translation mode')}
                                     </g:link>
                                 </li>
                             </g:if>
                             <g:else>
                                 <li>
-                                    <g:link controller="user" action="enableDebugMode">
-                                        ${warehouse.message(code:'debug.enable.label', default: 'Enable debug mode')}
+                                    <g:link controller="user" action="enableTranslationMode">
+                                        ${warehouse.message(code:'dashboard.enabledTranslationMode.label', default: 'Enable transaction mode')}
                                     </g:link>
                                 </li>
                             </g:else>

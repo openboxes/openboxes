@@ -84,17 +84,17 @@
                                         </g:else>
                                         <g:if test="${session.useDebugLocale }">
                                             <li class="action-menu-item">
-                                                <g:link controller="user" action="disableDebugMode" style="color: #666;">
+                                                <g:link controller="user" action="disableTranslationMode" style="color: #666;">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'bug_delete.png')}"/>
-                                                    ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}
+                                                    ${warehouse.message(code:'debug.disable.label', default: 'Disable tranlation mode')}
                                                 </g:link>
                                             </li>
                                         </g:if>
                                         <g:else>
                                             <li class="action-menu-item">
-                                                <g:link controller="user" action="enableDebugMode" style="color: #666;">
+                                                <g:link controller="user" action="enableTranslationMode" style="color: #666;">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'bug_add.png')}"/>
-                                                    ${warehouse.message(code:'debug.enable.label', default: 'Enable debug mode')}
+                                                    ${warehouse.message(code:'debug.enable.label', default: 'Enable translation mode')}
                                                 </g:link>
                                             </li>
                                         </g:else>

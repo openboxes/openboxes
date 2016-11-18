@@ -64,12 +64,15 @@
     <g:if test="${session.useDebugLocale}">
 
         <div id="debug-header" class="notice box" style="margin-bottom: 0px;">
-            You are in DEBUG mode.
-            <g:link controller="localization" action="list" class="button icon log">Show all localizations</g:link>
-            <g:link controller="localization" action="create" class="button icon add">Create new localization</g:link>
+
+            ${warehouse.message(code: 'dashboard.translationMode.label', default: 'You are in TRANSLATION mode.')}
+
+            <g:link controller="localization" action="list" class="button">Show all localizations</g:link>
+            <g:link controller="localization" action="create" class="button">Create new localization</g:link>
             <div class="right">
-                <g:link controller="user" action="disableDebugMode">
+                <g:link controller="user" action="disableTranslationMode" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
+                    ${warehouse.message(code: 'dashboard.disableTranslationMode.label', default: 'Disable translation mode')}
                 </g:link>
             </div>
             <div id="localizations">
