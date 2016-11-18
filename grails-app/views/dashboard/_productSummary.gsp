@@ -119,7 +119,7 @@
 
 <script id="product-summary-error-template" type="x-jquery-tmpl">
     <tr class="prop error">
-        <td colspan="4">
+        <td colspan="4" class="center">
             {{= message}}
         </td>
     </tr>

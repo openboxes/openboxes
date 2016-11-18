@@ -6,7 +6,6 @@
     <h2>
 		<warehouse:message code="receiving.summary.label"/>
 		<small>${warehouse.message(code: 'dashboard.inbound.label', args: [session.warehouse.name, (end-start)]) }</small>
-
 	</h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">
@@ -17,7 +16,7 @@
 				
 			</g:if>	    		
 			<g:else>	
-			
+
   				<g:set var="pending" value="${ShipmentStatusCode.PENDING}"/>
   				<g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
   				<g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
