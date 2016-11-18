@@ -280,14 +280,14 @@ class UserController {
    }
    
    
-   def disableDebugMode = { 
+   def disableTranslationMode = {
 	   log.info ("params " + params)
 	   
 	   session.useDebugLocale = false
 	   redirect(controller: "dashboard", action: "index")	   
    }
 
-   def enableDebugMode = { 
+   def enableTranslationMode = {
 	   log.info ("params " + params)
 	   session.useDebugLocale = true
 	   redirect(controller: "dashboard", action: "index")
