@@ -24,7 +24,7 @@
 
 
 
-        <div class="yui-u first">
+            <div class="yui-u first filters">
                 <g:render template="filters" model="[command:command]"/>
             </div>
             <div class="yui-u">
@@ -192,6 +192,7 @@
 
                                 <tr>
                                     <th></th>
+                                    <th><warehouse:message code="product.productCode.label"/></th>
                                     <th class="border-right"><warehouse:message code="product.label"/></th>
 
                                     <%--
@@ -218,7 +219,7 @@
                                     <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
                                     <th class="center border-right"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
 
-                                    <th class="center"><warehouse:message code="consumption.onHand.label" default="On hand"/></th>
+                                    <th class="center"><warehouse:message code="inventory.qoh.label" default="QoH"/></th>
                                     <th class="center border-right"><warehouse:message code="consumption.monthsLeft.label" default="Months left"/></th>
                                     <%--
                                     <g:each var="property" in="${command.selectedProperties}">
@@ -244,9 +245,13 @@
                                             ${(numberOfMonthsLeft<3&&numberOfMonthsLeft>0)?'error':} ${(numberOfMonthsLeft<0)?'notice':''}"
                                         --%>
                                         <td>${i+1}</td>
+                                        <td>
+                                            ${product?.productCode}
+                                        </td>
+
                                         <td class="border-right">
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
-                                                ${product?.productCode} ${product?.name}
+                                                ${product?.name}
                                             </g:link>
 
                                             &nbsp;
