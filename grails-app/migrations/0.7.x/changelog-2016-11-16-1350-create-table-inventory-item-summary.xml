@@ -30,4 +30,16 @@
 			<column name="date_created" type="DATETIME" />
 		</createTable>
 	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1479325848163-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists indexName="inventory_item_summary_idx"/>
+			</not>
+		</preConditions>
+		<createIndex indexName="inventory_item_summary_idx" tableName="inventory_item_summary" unique="true">
+			<column name="location_id"/>
+			<column name="inventory_item_id"/>
+		</createIndex>
+	</changeSet>
+
 </databaseChangeLog>

@@ -260,8 +260,6 @@ ON DUPLICATE KEY UPDATE debits = quantity + values(quantity);
 # step 6 populate inventory item summary
 #DROP TABLE IF EXISTS inventory_item_summary;
 
-ALTER TABLE inventory_item_summary ADD UNIQUE INDEX (location_id, inventory_item_id);
-
 LOCK TABLES 
 	inventory_item_summary WRITE, 
     latest_stock_take READ, 
