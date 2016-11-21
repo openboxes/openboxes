@@ -1,4 +1,3 @@
-<%@ page import="java.util.Locale" %>
 <?xml version="1.0" encoding="UTF-8"?>
 <html lang="en">
 <head>
