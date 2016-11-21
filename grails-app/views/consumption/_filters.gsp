@@ -8,10 +8,10 @@
     max-height: 200px;
 }
 </style>
-<div class="filters">
+<div>
 	<g:form method="POST" controller="consumption" action="show">
 
-    <div class="box">
+    <div>
         <h2><warehouse:message code="consumption.filters.label" default="Report parameters"/></h2>
         <table>
             <tr>
@@ -27,8 +27,7 @@
             <tr>
                 <td class="middle">
                     <label><warehouse:message code="consumption.afterDate.label" default="Consumed on or after"/></label>
-                </td>
-                <td>
+
                     <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy" size="18"/>
                 </td>
             </tr>
@@ -37,8 +36,7 @@
                     <label>
                         <warehouse:message code="consumption.beforeDate.label" default="Consumed on or before"/>
                     </label>
-                </td>
-                <td>
+
                     <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" size="18"/>
                 </td>
             </tr>

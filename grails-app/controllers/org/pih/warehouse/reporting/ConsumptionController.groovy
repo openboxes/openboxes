@@ -93,7 +93,7 @@ class ConsumptionController {
         command.debits = inventoryService.getDebitsBetweenDates(fromLocations, selectedLocations, command.fromDate, command.toDate)
         command.credits = inventoryService.getCreditsBetweenDates(selectedLocations, fromLocations, command.fromDate, command.toDate)
 
-        println command.credits
+        //println command.credits
 
         def transactions = []
         transactions.addAll(command.debits)
@@ -197,11 +197,13 @@ class ConsumptionController {
             products = command.rows.keySet().asList()
 
             command.fromLocations.each { location ->
-                def onHandQuantityMap = dashboardService.getQuantityByLocation(location)//inventoryService.getQuantityByProductMap(location.inventory, products)
+                def onHandQuantityMap = inventoryService.getProductQuantityByLocation(location)
+                //inventoryService.getQuantityByProductMap(location.inventory, products)
 
-                //println "onHandQuantityMap: " + onHandQuantityMap
                 // For each product, add to the onhand quantity map
-                products.each { product ->
+                products.each { entry ->
+                    def product = Product.load(entry.id)
+
                     def onHandQuantity = onHandQuantityMap[product];
                     //println "onHandQuantity: " + onHandQuantity
                     if(onHandQuantity) {
@@ -302,7 +304,7 @@ class ConsumptionController {
             return
         }
         else {
-            println "Render as HTML " + params
+
 
             [command:command]
         }
