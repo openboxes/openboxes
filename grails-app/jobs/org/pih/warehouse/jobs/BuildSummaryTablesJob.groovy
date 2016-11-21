@@ -13,12 +13,13 @@ class BuildSummaryTablesJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.buildSummaryTablesJob.cronExpression
+		cron name:'buildSummaryTablesTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.buildSummaryTablesJob.cronExpression
     }
 
 	def execute(context) {
+        boolean enabled = grailsApplication.config.openboxes.jobs.buildSummaryTablesJob.enabled
         boolean force = context.mergedJobDataMap.get('force')
-        if(grailsApplication.config.openboxes.jobs.buildSummaryTablesJob.enabled || force) {
+        if(enabled || force) {
             dataService.rebuildInventoryItemSummaryTable()
         }
     }
