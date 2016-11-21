@@ -43,7 +43,7 @@ class InventoryItemSummary {
     }
 
     static mapping = {
-        cache true
+        cache usage: 'read-only'
         id generator: 'uuid'
     }
 
