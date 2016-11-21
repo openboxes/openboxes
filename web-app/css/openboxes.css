@@ -610,7 +610,7 @@ th.desc a {
 -------------------------------------------------------------- */
 
 
-label       { font-weight: normal; white-space: nowrap; }
+label       { font-weight: normal; }
 fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
 legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
