@@ -1,7 +1,6 @@
 # ---------------------------------------------------------------------------------------------
 drop table if exists stock_take;
 drop table if exists latest_stock_take;
-drop table if exists latest_stock_take2;
 drop table if exists latest_adjustments;
 drop table if exists latest_credits;
 drop table if exists latest_debits;
