@@ -132,7 +132,7 @@
                     <g:set var="isCanceled" value="${requisitionItem?.isCanceled()}"/>
                     <g:set var="isChanged" value="${requisitionItem?.isChanged()}"/>
                     <g:set var="hasSubstitution" value="${requisitionItem?.hasSubstitution()}"/>
-                    <g:set var="quantityOnHand" value="${quantityOnHand.toInteger()}"/>
+                    <g:set var="quantityOnHand" value="${quantityOnHand}"/>
                     <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
                     <g:set var="isAvailableForSubstitution" value="${hasSubstitution && (quantityOnHandForSubstitution > 0) && (quantityOnHandForSubstitution >= requisitionItem?.substitution?.totalQuantity()) }"/>
                     <g:set var="rowClass" value="${count%2?'odd':'even'}"/>
