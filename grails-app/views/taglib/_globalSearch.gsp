@@ -16,7 +16,7 @@
 		$(document).ready(function() {
 	      	$("#${attrs.id}").autocomplete( {
                 minLength: 1,
-                delay: 200,
+                delay: 300,
 	      		source: function(req, resp) {
 			  		$.getJSON('${attrs.jsonUrl}', req, function(data) {
 						var suggestions = [];
