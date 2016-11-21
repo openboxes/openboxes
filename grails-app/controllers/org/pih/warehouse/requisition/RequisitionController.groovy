@@ -279,10 +279,12 @@ class RequisitionController {
             def products = requisition.requisitionItems.collect { it.product }
             //def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
 
-            def quantityProductMap = dashboardService.getQuantityByLocation(location)
+            def quantityProductMap = inventoryService.getProductQuantityByLocation(location)
 
             requisition?.requisitionItems?.each { requisitionItem ->
-                quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
+
+                def product = Product.load(requisitionItem?.product?.id)
+                quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[product]?:0
                     //inventoryService.getQuantityOnHand(location, requisitionItem?.product)
                 //quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
                     //inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
@@ -772,12 +774,13 @@ class RequisitionController {
         // But we only want to show the original requisition items
         def requisitionItems = requisition?.originalRequisitionItems
         //def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
-        def quantityProductMap = dashboardService.getQuantityByLocation(location)
+        def quantityProductMap = inventoryService.getProductQuantityByLocation(location)
         def quantityOnHandMap = [:]
         def quantityAvailableToPromiseMap = [:]
 
         requisitionItems?.each { requisitionItem ->
-            quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
+            def product = Product.load(requisitionItem?.product?.id)
+            quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[product]?:0
             //inventoryService.getQuantityOnHand(location, requisitionItem?.product)
             //quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
             //inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)

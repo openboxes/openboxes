@@ -607,9 +607,7 @@ class InventoryService implements ApplicationContextAware {
 		Map inventoryItemQuantity = [:]
 		Set inventoryItems = getInventoryItemsByProductAndInventory(product, inventory);
 		Map<InventoryItem, Integer> quantityMap = getQuantityForInventory(inventory)
-		
-		//log.debug "getQuantityByInventoryAndProduct: " + quantityMap
-		
+
 		inventoryItems.each {
 			def quantity = quantityMap[it]
 			if (quantity) { 
@@ -1438,18 +1436,28 @@ class InventoryService implements ApplicationContextAware {
         return getQuantityByProductMap(location.inventory)
     }
 
-
+    /**
+     *
+     * @param inventory
+     * @return
+     */
 	Map<Product, Integer> getQuantityByProductMap(Inventory inventory) {
         def startTime = System.currentTimeMillis()
-		def transactionEntries = getTransactionEntriesByInventory(inventory);
-		def quantityMap = getQuantityByProductMap(transactionEntries)
-
+		//def transactionEntries = getTransactionEntriesByInventory(inventory);
+		//def quantityMap = getQuantityByProductMap(transactionEntries)
+        def location = Location.findByInventory(inventory)
+        def quantityMap = getProductQuantityByLocation(location)
         log.info "getQuantityByProductMap(inventory): " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return quantityMap
 	}
 
-
+    /**
+     * Get all products that have an inventory level at the given location.
+     *
+     * @param inventory
+     * @return
+     */
     List<Product> getProductsByInventory(Inventory inventory) {
         InventoryLevel.executeQuery("select il.product from InventoryLevel as il where il.inventory = :inventory", [inventory:inventory])
     }
@@ -1674,8 +1682,10 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	Map<InventoryItem, Integer> getQuantityForInventory(Inventory inventory) {
-		def transactionEntries = getTransactionEntriesByInventory(inventory);
-		return getQuantityByInventoryItemMap(transactionEntries);
+		//def transactionEntries = getTransactionEntriesByInventory(inventory);
+		//return getQuantityByInventoryItemMap(transactionEntries);
+        Location location = Location.findByInventory(inventory)
+        return getItemQuantityByLocation(location)
 	}
 
     /**
@@ -1686,9 +1696,82 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     Map<InventoryItem, Integer> getQuantityForInventory(Inventory inventory, List<Product> products) {
-        def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products)
-        return getQuantityByInventoryItemMap(transactionEntries);
+        //def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products)
+        //return getQuantityByInventoryItemMap(transactionEntries);
+
+        Location location = Location.findByInventory(inventory)
+        return getItemQuantityByLocation(location, products)
+
     }
+
+
+    /**
+     * Returns a list of
+     * @param currentLocation
+     * @return
+     */
+    def getItemQuantityByLocation(Location location) {
+        return getItemQuantityByLocation(location, [] as List)
+    }
+
+    /**
+     * Returns a list of
+     * @param currentLocation
+     * @return
+     */
+    def getItemQuantityByLocation(Location currentLocation, List<Product> products) {
+        def productIds = products.collect { it.id }
+        def results = InventoryItemSummary.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                sum('quantity', 'quantity')
+                groupProperty('inventoryItem', 'inventoryItem')
+            }
+
+            location {
+                eq 'id', currentLocation.id
+            }
+
+            if (productIds) {
+                product {
+                    'in'('id', productIds)
+                }
+            }
+        }
+
+        // Transform result set to map of quantities indexed by product ID
+        def map = results.inject([:]) { map, entry ->
+            map[entry.inventoryItem] = entry.quantity
+            return map
+        }
+
+        return map
+    }
+
+
+    def getProductQuantityByLocation(Location currentLocation) {
+
+        def results = InventoryItemSummary.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                sum('quantity', 'quantity')
+                groupProperty('product', 'product')
+            }
+
+            location {
+                eq 'id', currentLocation.id
+            }
+        }
+
+        // Transform result set to map of quantities indexed by product ID
+        def map = results.inject([:]) { map, entry ->
+            map[entry.product] = entry.quantity
+            return map
+        }
+
+        return map
+    }
+
 
 
     Map<InventoryItem, Integer> getMostRecentInventoryItemSnapshot(Location location) {
@@ -2126,6 +2209,7 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Get all transaction entries over all products/inventory items.
 	 *
+     * @deprecated
 	 * @param inventoryInstance
 	 * @return
 	 */
@@ -2775,6 +2859,7 @@ class InventoryService implements ApplicationContextAware {
 
 	/**
 	 *
+     * @deprecated
 	 * @param location
 	 * @param category
 	 * @param startDate
@@ -2789,6 +2874,14 @@ class InventoryService implements ApplicationContextAware {
 
 	}
 
+    /**
+     * @deprecated
+     * @param location
+     * @param categories
+     * @param startDate
+     * @param endDate
+     * @return
+     */
 	def getTransactionEntries(Location location, List categories, Date startDate, Date endDate) {
 		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = criteria.list {

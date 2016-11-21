@@ -431,16 +431,6 @@ class DashboardController {
         return;
     }
 
-
-    def getQuantityByLocation = {
-
-        def location = Location.get(session?.warehouse?.id)
-        def results = dashboardService.getQuantityByLocation(location)
-
-        render ([results:results] as JSON)
-
-    }
-
 }
 
 
