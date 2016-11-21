@@ -27,6 +27,7 @@ class DashboardService {
 
     def dataSource
     def grailsApplication
+    def inventoryService
 
     boolean transactional = false
 
@@ -460,7 +461,6 @@ class DashboardService {
      * Returns a list of
      * @param currentLocation
      * @return
-     */
     def getQuantityByLocation(Location currentLocation) {
 
         def results = InventoryItemSummary.createCriteria().list {
@@ -484,35 +484,7 @@ class DashboardService {
 
         return map
     }
-
-
-    /**
-     * Returns a list of
-     * @param currentLocation
-     * @return
      */
-    def getItemQuantityByLocation(Location currentLocation) {
-
-        def results = InventoryItemSummary.createCriteria().list {
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            projections {
-                sum('quantity', 'quantity')
-                groupProperty('inventoryItem.id', 'inventoryItemId')
-            }
-
-            location {
-                eq 'id', currentLocation.id
-            }
-        }
-
-        // Transform result set to map of quantities indexed by product ID
-        def map = results.inject([:]) { map, entry ->
-            map[entry.inventoryItemId] = entry.quantity
-            return map
-        }
-
-        return map
-    }
 
 
 
@@ -552,7 +524,7 @@ class DashboardService {
 
             //log.info "Results: " + results
 
-            def quantityMap = getQuantityByLocation(location)
+            def quantityMap = inventoryService.getProductQuantityByLocation(location)
 
             def count = 1;
             data.results = results.collect {[
@@ -563,7 +535,7 @@ class DashboardService {
                     category: it[0]?.category?.name?:"",
                     requisitionCount: it[1],
                     quantityRequested: it[2],
-                    quantityOnHand: (quantityMap[it[0].id]?:0),
+                    quantityOnHand: (quantityMap[it[0]]?:0),
                 ]
             }
             data.responseTime = (System.currentTimeMillis() - startTime) + " ms"

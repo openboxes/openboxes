@@ -637,7 +637,7 @@ class JsonController {
 	}
 
 	def findLotsByName = { 
-		log.info params
+		log.info "findLotsByName: " + params
 		// Constrain by product id if the productId param is passed in		
 		def items = new TreeSet();
 		if (params.term) {
@@ -655,7 +655,7 @@ class JsonController {
 			}
 			
 			def warehouse = Location.get(session.warehouse.id);
-			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
+			def quantitiesByInventoryItem = dashboardService.getItemQuantityByLocation(warehouse)
 			
 			if (items) {
 				items = items.collect() { item ->
@@ -1012,23 +1012,25 @@ class JsonController {
 
             // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
             if (products) {
-                quantityMap = dashboardService.getQuantityByLocation(location)
-                log.info "Quantity map: " + quantityMap?.size()
+                quantityMap = inventoryService.getProductQuantityByLocation(location)
             }
             items.addAll(products)
 		}
 
 		items.unique{ it.id }
 		def json = items.collect{
-            def quantity = quantityMap[it.id]?:0
-            def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
+            def quantity = quantityMap[it]?:0
+            def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}"
+            if (it.manufacturerCode) {
+                manufuacturerInfo += " #" + it.manufacturerCode?:""
+            }
 
 			def type = it.class.simpleName.toLowerCase()
 			[   id: it.id,
                 type: it.class,
                 url: request.contextPath + "/" + type  + "/redirect/" + it.id,
 				value: it.name,
-                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + it.unitOfMeasure ]
+                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + it.unitOfMeasure?:"EA" ]
 		}
 		render json as JSON
 	}
@@ -1381,6 +1383,20 @@ class JsonController {
         def orderItem = OrderItem.get(params.id)
         render ([id:orderItem.id, product:orderItem.product, order:orderItem.order, quantity:orderItem.quantity, unitPrice:orderItem.unitPrice] as JSON)
     }
+
+
+    def getProductQuantityByLocation = {
+        Location location = Location.get(session.warehouse.id)
+        def results = inventoryService.getProductQuantityByLocation(location)
+        render ([results:results] as JSON)
+    }
+
+    def getItemQuantityByLocation = {
+        def location = Location.get(session?.warehouse?.id)
+        def results = inventoryService.getItemQuantityByLocation(location)
+        render ([results:results] as JSON)
+    }
+
 
 
 }
