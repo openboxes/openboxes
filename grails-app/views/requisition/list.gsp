@@ -273,11 +273,15 @@
                                                 ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
                                                 --%>
                                             </td>
-                                            <td class="middle center">
-                                                <label class="status"><format:metadata obj="${requisition?.status}"/></label>
+                                            <td class="middle">
+                                                <g:link controller="requisition" action="show" id="${requisition.id}">
+                                                    <format:metadata obj="${requisition?.status}"/>
+                                                </g:link>
                                             </td>
-                                            <td class="middle center">
-                                                ${requisition.requestNumber }
+                                            <td class="middle">
+                                                <g:link controller="requisition" action="show" id="${requisition.id}">
+                                                    ${requisition.requestNumber }
+                                                </g:link>
                                             </td>
                                             <td class="middle left">
                                                 <format:metadata obj="${requisition?.type}"/>
