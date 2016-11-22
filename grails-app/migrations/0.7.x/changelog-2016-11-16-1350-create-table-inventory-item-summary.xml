@@ -9,7 +9,9 @@
             </not>
         </preConditions>
 		<createTable tableName="inventory_item_summary">
-			<column name="id" type="CHAR(38)" />
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
 			<column name="version" type="INT" />
 			<column name="product_id" type="CHAR(38)" />
 			<column name="product_group_id" type="CHAR(38)" />
