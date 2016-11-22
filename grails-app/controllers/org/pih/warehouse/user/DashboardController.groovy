@@ -113,7 +113,7 @@ class DashboardController {
 		
 	    def currentUser = User.get(session?.user?.id)
 
-        def start = new Date() - 30, end = new Date()
+        def start = new Date() - 7, end = new Date()
 
 		def location = Location.get(session?.warehouse?.id);
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, start, end)
@@ -150,7 +150,7 @@ class DashboardController {
 		]
 	}
 
-
+    @Cacheable("dashboardCache")
     def recentActivities = {
         def errorMessage, message
         def location = Location.get(session.warehouse.id)
@@ -186,6 +186,7 @@ class DashboardController {
         redirect(action: "index")
     }
 
+    @Cacheable("dashboardCache")
     def productSummary = {
         def results = [:]
         try {
@@ -199,6 +200,7 @@ class DashboardController {
     }
 
 
+    @Cacheable("dashboardCache")
     def expirationSummary = {
         def results = [:]
         try {
@@ -211,6 +213,7 @@ class DashboardController {
         render results as JSON
     }
 
+    @Cacheable("dashboardCache")
     def expirationDetails = {
         def location = Location.get(session.warehouse.id)
         def results = dashboardService.getExpirationDetails(location)
@@ -286,7 +289,7 @@ class DashboardController {
 	}
 	
 	def chooseLocation = {
-		log.info params
+		log.info "Choose location: " + params
 		def warehouse = null;
 			
 		// If the user has selected a new location from the topnav bar, we need 
@@ -332,8 +335,8 @@ class DashboardController {
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
-			List warehouses = Location.findAllWhere("active":true)
-			render(view: "chooseLocation", model: [warehouses: warehouses])
+			//List warehouses = Location.findAllWhere("active":true)
+			render(view: "chooseLocation")
 		}
 		
 	}
@@ -372,6 +375,7 @@ class DashboardController {
      * Dashboard > Fast movers
      */
 
+    @Cacheable("dashboardCache")
     def fastMovers = {
         log.info "fastMovers: " + params
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
