@@ -25,7 +25,7 @@ CREATE TABLE stock_take AS
 	join inventory_item on transaction_entry.inventory_item_id = inventory_item.id
 	join product on inventory_item.product_id = product.id
 	where transaction_type.transaction_code = 'PRODUCT_INVENTORY'
-	group by date_created, location.id, inventory_item.id;
+	group by transaction.date_created, location.id, inventory_item.id;
 #ALTER TABLE stock_take ADD FOREIGN KEY (location_id) REFERENCES location(id);
 #ALTER TABLE stock_take ADD FOREIGN KEY (inventory_item_id) REFERENCES inventory_item(id);
 #ALTER TABLE stock_take ADD FOREIGN KEY (product_id) REFERENCES product(id);
