@@ -29,6 +29,7 @@ CREATE TABLE stock_take AS
 #ALTER TABLE stock_take ADD FOREIGN KEY (location_id) REFERENCES location(id);
 #ALTER TABLE stock_take ADD FOREIGN KEY (inventory_item_id) REFERENCES inventory_item(id);
 #ALTER TABLE stock_take ADD FOREIGN KEY (product_id) REFERENCES product(id);
+ALTER TABLE stock_take ADD INDEX (date_created);
 ALTER TABLE stock_take ADD INDEX (transaction_date);
 ALTER TABLE stock_take ADD INDEX (lot_number);
 ALTER TABLE stock_take ADD INDEX (product_code);
@@ -56,9 +57,10 @@ ALTER TABLE latest_stock_take MODIFY COLUMN transaction_date DATETIME;
 #ALTER TABLE latest_stock_take ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE latest_stock_take ADD INDEX (transaction_date);
 ALTER TABLE latest_stock_take ADD INDEX (product_code);
+#ALTER TABLE latest_stock_take ADD INDEX (product_id);
 #ALTER TABLE latest_stock_take ADD INDEX (lot_number);
 #ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, product_id, inventory_item_id);
-ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, inventory_item_id);
+ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, product_id, inventory_item_id);
 # ---------------------------------------------------------------------------------------------
 INSERT INTO latest_stock_take 
 (transaction_date, location_id, product_id, product_code, inventory_item_id, lot_number, quantity)
@@ -77,8 +79,8 @@ INSERT INTO latest_stock_take
 		FROM stock_take
 		GROUP BY location_id, product_id
 	) as latest_stock_take ON (
-		stock_take.product_id = latest_stock_take.product_id
-		AND stock_take.location_id = latest_stock_take.location_id
+		stock_take.location_id = latest_stock_take.location_id
+		AND stock_take.product_id = latest_stock_take.product_id
 		AND stock_take.transaction_date = latest_stock_take.transaction_date)
 	GROUP BY stock_take.location_id, stock_take.inventory_item_id
 ON DUPLICATE KEY UPDATE quantity = values(quantity), transaction_date = values(transaction_date);
@@ -132,8 +134,8 @@ join (
 	)
 	GROUP BY location.id, transaction_entry.inventory_item_id
 ) as latest_adjustments on (
-	latest_adjustments.inventory_item_id = inventory_item.id
-	AND latest_adjustments.location_id = location.id
+	latest_adjustments.location_id = location.id
+	AND	latest_adjustments.inventory_item_id = inventory_item.id
 	AND latest_adjustments.transaction_date = transaction.transaction_date
 	AND latest_adjustments.transaction_code = transaction_type.transaction_code
 )
@@ -175,8 +177,8 @@ join inventory on inventory.id = transaction.inventory_id
 join location on location.inventory_id = inventory.id
 join inventory_item on transaction_entry.inventory_item_id = inventory_item.id
 join product on inventory_item.product_id = product.id
-join latest_stock_take on (latest_stock_take.inventory_item_id = inventory_item.id 
-	AND latest_stock_take.location_id = location.id)
+join latest_stock_take on (latest_stock_take.location_id = location.id
+	AND latest_stock_take.inventory_item_id = inventory_item.id )
 where transaction_type.transaction_code = 'CREDIT'
 and (transaction.transaction_date >= latest_stock_take.transaction_date 
 	OR latest_stock_take.transaction_date is null)
@@ -268,10 +270,9 @@ LOCK TABLES
 
 TRUNCATE inventory_item_summary;
 
-INSERT INTO inventory_item_summary (id, version, location_id, inventory_item_id, product_id,
+INSERT INTO inventory_item_summary (version, location_id, inventory_item_id, product_id,
 	quantity0, adjustments, credits, debits, quantity, date_created, last_updated)
 select
-	uuid(),
 	0,
 	latest_stock_take.location_id as location_id,
 	latest_stock_take.inventory_item_id as inventory_item_id, 
@@ -286,15 +287,14 @@ select
     now()    
 from latest_stock_take
 left outer join latest_adjustments on (
-	latest_adjustments.inventory_item_id = latest_stock_take.inventory_item_id 
-	and latest_adjustments.location_id = latest_stock_take.location_id)
+		latest_adjustments.location_id = latest_stock_take.location_id
+		and latest_adjustments.inventory_item_id = latest_stock_take.inventory_item_id)
 left outer join latest_debits on (
-	latest_debits.inventory_item_id = latest_stock_take.inventory_item_id 
-    and latest_debits.location_id = latest_stock_take.location_id)
+		latest_debits.location_id = latest_stock_take.location_id
+    and latest_debits.inventory_item_id = latest_stock_take.inventory_item_id )
 left outer join latest_credits on (
-	latest_credits.inventory_item_id = latest_stock_take.inventory_item_id 
-    and latest_credits.location_id = latest_stock_take.location_id)
+		latest_credits.location_id = latest_stock_take.location_id
+    and latest_credits.inventory_item_id = latest_stock_take.inventory_item_id)
 GROUP BY location_id, inventory_item_id;
-
 
 UNLOCK TABLES;

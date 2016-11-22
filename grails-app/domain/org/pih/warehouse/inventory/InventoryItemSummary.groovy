@@ -15,7 +15,6 @@ import org.pih.warehouse.product.ProductGroup
 
 class InventoryItemSummary {
 
-    String id
     Date date
     Product product
     ProductGroup productGroup
@@ -44,7 +43,6 @@ class InventoryItemSummary {
 
     static mapping = {
         cache usage: 'read-only'
-        id generator: 'uuid'
     }
 
 }
