@@ -45,7 +45,7 @@ public enum RequisitionStatus {
     }
 
 	static listValid() {
-		[ CREATED, EDITING, VERIFYING, PICKING, CHECKING, ISSUED, RECEIVED, CANCELED ]
+		[ CREATED, EDITING, VERIFYING, PICKING, CHECKING, ISSUED, CANCELED ]
 	}
 
 	String toString() { return name() }
