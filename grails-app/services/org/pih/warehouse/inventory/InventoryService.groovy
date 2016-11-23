@@ -3324,7 +3324,6 @@ class InventoryService implements ApplicationContextAware {
         def transactionEntries = []
         if (date) {
             def products = Tag.get(tag?.id)?.products
-            log.info "Products: " + products
             transactionEntries = criteria.list {
                 if (products) {
                     inventoryItem {
@@ -3770,29 +3769,31 @@ class InventoryService implements ApplicationContextAware {
     def createOrUpdateInventorySnapshot(Date date) {
         def startTime = System.currentTimeMillis()
         date.clearTime()
-        def locations = getDepotLocations()
-        locations.each { location ->
 
-            def count = InventorySnapshot.countByDateAndLocation(date, location)
-            if (count == 0) {
-                log.info "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
-                createOrUpdateInventorySnapshot(date, location)
-            }
-            else {
-                log.warn "Skipping inventory snapshot for date ${date}, location ${location.name} as ${count} inventory snapshots already exist"
-            }
+
+        def count = InventorySnapshot.countByDate(date)
+        if (count != 0) {
+            InventorySnapshot.executeUpdate("delete from InventorySnapshot as inventorySnapshot where inventorySnapshot.date = :date", [date:date])
         }
 
-        println "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+        def locations = getDepotLocations()
+        locations.each { location ->
+            log.info ("-".multiply(80))
+            log.info "Updating product snapshot for location = ${location.name}, date = ${date}  ..."
+            createOrUpdateInventorySnapshot(date, location)
+        }
+
+        println "Created product snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info ("-".multiply(80))
     }
 
 
     def createOrUpdateInventorySnapshot(Date date, Location location) {
         try {
             def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
-            log.info "Date ${date}, location ${location}: " + inventorySnapshots
+            log.info "Count by date ${date}, location ${location}: " + inventorySnapshots
             //if (inventorySnapshots == 0) {
-                log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
+                log.info "Update product snapshot for location ${location.name} on date ${date}"
                 //Location.withSession {
                     if (!location.isAttached()) {
                         location.attach()
@@ -3806,7 +3807,7 @@ class InventoryService implements ApplicationContextAware {
                         products.eachWithIndex { product, index ->
                             def onHandQuantity = quantityMap[product]
                             updateInventorySnapshot(date, product, location, onHandQuantity)
-                            if (index % 50 == 0) {
+                            if (index % 500 == 0) {
                                 cleanUpGorm(index)
                             }
                         }
@@ -3879,19 +3880,22 @@ class InventoryService implements ApplicationContextAware {
 	def createOrUpdateInventoryItemSnapshot(Date date) {
 		def startTime = System.currentTimeMillis()
 		date.clearTime()
-		def locations = getDepotLocations()
-		locations.each { location ->
 
-			def count = InventoryItemSnapshot.countByDateAndLocation(date, location)
-			if (count == 0) {
-				log.info "Creating or updating inventory item snapshot for date ${date} and location ${location.name} ..."
-				createOrUpdateInventoryItemSnapshot(date, location)
-			}
-			else {
-				log.warn "Skipping inventory item snapshot for date ${date} and location ${location.name} as ${count} inventory item snapshots already exist"
-			}
+
+        def count = InventoryItemSnapshot.countByDate(date)
+        if (count != 0) {
+            InventoryItemSnapshot.executeUpdate("delete from InventoryItemSnapshot as inventoryItemSnapshot where inventoryItemSnapshot.date = :date", [date:date])
+        }
+
+        def locations = getDepotLocations()
+		locations.each { location ->
+            log.info ("-".multiply(80))
+
+            log.info "Updating inventory item snapshot for date ${date} and location ${location.name} ..."
+            createOrUpdateInventoryItemSnapshot(date, location)
 		}
-		println "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+		println "Created inventory item snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info ("-".multiply(80))
 	}
 
     def createOrUpdateInventoryItemSnapshot(Date date, Location location) {
@@ -3913,7 +3917,7 @@ class InventoryService implements ApplicationContextAware {
                 inventoryItems.eachWithIndex { inventoryItem, index ->
                     def onHandQuantity = onHandQuantityMap[inventoryItem]
                     updateInventoryItemSnapshot(date, inventoryItem, location, onHandQuantity)
-                    if (index % 50 == 0) {
+                    if (index % 500 == 0) {
                         cleanUpGorm(index)
                     }
                 }
@@ -3923,6 +3927,27 @@ class InventoryService implements ApplicationContextAware {
             log.error("Unable to complete inventory snapshot process", e)
         }
     }
+
+    def updateInventoryItemSnapshot(Date date, InventoryItem inventoryItem, Location location, Double quantityOnHand) {
+        //log.info "Updating inventory snapshot for product " + product.name + " @ " + location.name
+        try {
+            def inventoryItemSnapshot = InventoryItemSnapshot.findWhere(date: date, location: location, product:inventoryItem?.product, inventoryItem: inventoryItem)
+            if (!inventoryItemSnapshot) {
+                inventoryItemSnapshot = new InventoryItemSnapshot(date: date, location: location, product: inventoryItem?.product, inventoryItem: inventoryItem)
+            }
+            //def pendingQuantity = calculatePendingQuantity(product, location)
+            inventoryItemSnapshot.quantityOnHand = quantityOnHand.toInteger()?:0
+            //inventorySnapshot.quantityInbound = pendingQuantity[0]?:0
+            //inventorySnapshot.quantityOutbound = pendingQuantity[1]?:0
+            //inventorySnapshot.lastUpdated = new Date()
+            inventoryItemSnapshot.save()
+        }
+        catch (Exception e) {
+            log.error("Error saving inventory snapshot for inventory item " + inventoryItem + " and location " + location.name, e)
+            throw e;
+        }
+    }
+
 
 	def updateInventoryItemSnapshot(Date date, InventoryItem inventoryItem, Location location, Integer quantityOnHand) {
 		//log.info "Updating inventory snapshot for product " + product.name + " @ " + location.name
