@@ -22,6 +22,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.BuildSummaryTablesJob
+import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
@@ -182,6 +183,8 @@ class DashboardController {
 
     def rebuildSummaryTables = {
         BuildSummaryTablesJob.triggerNow([force:true])
+        CalculateQuantityJob.triggerNow()
+
         flash.message = "Rebuilding summary tables. This might take a minute or two ..."
         redirect(action: "index")
     }
