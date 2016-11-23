@@ -10,12 +10,8 @@ CREATE TABLE stock_take AS
 		transaction_date as transaction_date,
 		transaction.date_created as date_created,
 		location.id as location_id,
-		location.name as location_name,
 		inventory_item.id as inventory_item_id,
-		inventory_item.lot_number as lot_number,
 		product.id as product_id,
-		product.product_code as product_code,
-		product.name as product_name,        
 		sum(quantity) as quantity
 	from transaction
 	join transaction_entry on transaction.id = transaction_entry.transaction_id
@@ -31,17 +27,13 @@ CREATE TABLE stock_take AS
 #ALTER TABLE stock_take ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE stock_take ADD INDEX (date_created);
 ALTER TABLE stock_take ADD INDEX (transaction_date);
-ALTER TABLE stock_take ADD INDEX (lot_number);
-ALTER TABLE stock_take ADD INDEX (product_code);
 # ---------------------------------------------------------------------------------------------
 create table latest_stock_take AS (
 	SELECT 
 		null as transaction_date,
 		location.id as location_id, 
 		product.id as product_id, 
-		product.product_code as product_code,
 		inventory_item.id as inventory_item_id,
-		inventory_item.lot_number,
 		0 as quantity
 	from transaction
 	join transaction_entry on transaction.id = transaction_entry.transaction_id
@@ -56,21 +48,17 @@ ALTER TABLE latest_stock_take MODIFY COLUMN transaction_date DATETIME;
 #ALTER TABLE latest_stock_take ADD FOREIGN KEY (inventory_item_id) REFERENCES inventory_item(id);
 #ALTER TABLE latest_stock_take ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE latest_stock_take ADD INDEX (transaction_date);
-ALTER TABLE latest_stock_take ADD INDEX (product_code);
 #ALTER TABLE latest_stock_take ADD INDEX (product_id);
-#ALTER TABLE latest_stock_take ADD INDEX (lot_number);
 #ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, product_id, inventory_item_id);
-ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, product_id, inventory_item_id);
+ALTER TABLE latest_stock_take ADD UNIQUE INDEX (location_id, inventory_item_id);
 # ---------------------------------------------------------------------------------------------
 INSERT INTO latest_stock_take 
-(transaction_date, location_id, product_id, product_code, inventory_item_id, lot_number, quantity)
+(transaction_date, location_id, product_id, inventory_item_id, quantity)
     select
 		latest_stock_take.transaction_date,
 		stock_take.location_id,
 		stock_take.product_id,
-		product_code,
 		stock_take.inventory_item_id,
-		lot_number,
     # this needs to be sum because some stock count transactions have multiple line items per inventory item
 		sum(quantity) as quantity		
 	from stock_take
@@ -96,14 +84,9 @@ SET t1.transaction_date = t2.transaction_date;
 create table latest_adjustments AS
 SELECT 
 	transaction.transaction_date as transaction_date,
-	transaction_type.transaction_code as transaction_code,
 	location.id as location_id,
-	location.name as location_name,
 	inventory_item.id as inventory_item_id,
-	inventory_item.lot_number as lot_number,
 	product.id as product_id,
-	product.product_code as product_code,
-	product.name as product_name,
 	transaction_entry.quantity
 FROM transaction 
 JOIN transaction_type ON transaction.transaction_type_id = transaction_type.id
@@ -145,8 +128,6 @@ GROUP BY location.id, inventory_item.id;
 #ALTER TABLE latest_stock_take_partial ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE latest_adjustments ADD UNIQUE INDEX (location_id, inventory_item_id);
 ALTER TABLE latest_adjustments ADD INDEX (transaction_date);
-ALTER TABLE latest_adjustments ADD INDEX (product_code);
-ALTER TABLE latest_adjustments ADD INDEX (lot_number);
 #  ---------------------------------------------------------------------------------------------
 UPDATE latest_stock_take t1
 JOIN (
@@ -163,12 +144,8 @@ select
 	max(transaction.transaction_date) as transaction_date,
 	transaction_type.transaction_code,
 	location.id as location_id,
-	location.name as location_name,
 	inventory_item.id as inventory_item_id,
-	inventory_item.lot_number as lot_number,
 	product.id as product_id,
-	product.product_code as product_code,
-	product.name as product_name,
 	sum(transaction_entry.quantity) as quantity
 from transaction
 join transaction_entry on transaction.id = transaction_entry.transaction_id
@@ -183,13 +160,8 @@ where transaction_type.transaction_code = 'CREDIT'
 and (transaction.transaction_date >= latest_stock_take.transaction_date 
 	OR latest_stock_take.transaction_date is null)
 group by location.id, inventory_item.id;
-#ALTER TABLE latest_credits ADD FOREIGN KEY (location_id) REFERENCES location(id);
-#ALTER TABLE latest_credits ADD FOREIGN KEY (inventory_item_id) REFERENCES inventory_item(id);
-#ALTER TABLE latest_credits ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE latest_credits ADD INDEX (location_id, inventory_item_id);
 ALTER TABLE latest_credits ADD INDEX (transaction_date);
-ALTER TABLE latest_credits ADD INDEX (product_code);
-ALTER TABLE latest_credits ADD INDEX (lot_number);
 # ---------------------------------------------------------------------------------------------
 # step 4b create latest debits
 create table latest_debits AS
@@ -197,12 +169,8 @@ select
 	max(transaction.transaction_date) as transaction_date,
 	transaction_type.transaction_code,
 	location.id as location_id,
-	location.name as location_name,
 	inventory_item.id as inventory_item_id,
-	inventory_item.lot_number as lot_number,
 	product.id as product_id,
-	product.product_code as product_code,
-	product.name as product_name,
 	sum(transaction_entry.quantity) as quantity
 from transaction
 join transaction_entry on transaction.id = transaction_entry.transaction_id
@@ -222,45 +190,8 @@ group by location.id, inventory_item.id;
 #ALTER TABLE latest_debits ADD FOREIGN KEY (product_id) REFERENCES product(id);
 ALTER TABLE latest_debits ADD INDEX (location_id, inventory_item_id);
 ALTER TABLE latest_debits ADD INDEX (transaction_date);
-ALTER TABLE latest_debits ADD INDEX (product_code);
-ALTER TABLE latest_debits ADD INDEX (lot_number);
-# ---------------------------------------------------------------------------------------------
-# step 5a update latest stock take with latest credits
-/*
-INSERT INTO latest_stock_take 
-(transaction_date, location_id, product_id, product_code, inventory_item_id, lot_number, quantity)
-SELECT max(transaction_date), location_id, product_id, product_code, inventory_item_id, lot_number, sum(quantity)
-FROM latest_credits
-GROUP BY location_id, product_id, inventory_item_id
-ON DUPLICATE KEY UPDATE credits = quantity + values(quantity);
-#UPDATE latest_stock_take 
-#LEFT OUTER JOIN latest_credits on latest_stock_take.inventory_item_id = latest_credits.inventory_item_id 
-#	and latest_stock_take.location_id = latest_credits.location_id
-#SET latest_stock_take.quantity = latest_stock_take.quantity + latest_credits.quantity;
-# ---------------------------------------------------------------------------------------------
-# step 5b update latest stock take with latest debits
-INSERT INTO latest_stock_take (transaction_date, location_id, product_id, product_code, inventory_item_id, lot_number, 
-	quantity, quantity_partial, debits, credits)
-SELECT 
-	max(transaction_date), 
-	location_id, 
-	product_id, 
-	product_code,
-	inventory_item_id, 
-	lot_number, 
-    
-	0 - sum(quantity)
-FROM latest_debits
-GROUP BY location_id, inventory_item_id
-ON DUPLICATE KEY UPDATE debits = quantity + values(quantity);
-*/
-#UPDATE latest_stock_take lst
-#JOIN latest_debits ld on lst.inventory_item_id = ld.inventory_item_id and lst.location_id = ld.location_id
-#SET lst.quantity = lst.quantity - ld.quantity;
 # ---------------------------------------------------------------------------------------------
 # step 6 populate inventory item summary
-#DROP TABLE IF EXISTS inventory_item_summary;
-
 LOCK TABLES 
 	inventory_item_summary WRITE, 
     latest_stock_take READ, 
