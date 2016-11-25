@@ -11,11 +11,11 @@ package org.pih.warehouse.inventory
 
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
-import org.hibernate.annotations.Cache
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.auth.AuthService
@@ -30,11 +30,12 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.reporting.Consumption
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
 import util.InventoryUtil
 
@@ -47,15 +48,11 @@ import java.text.SimpleDateFormat
 class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
-    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-    def startTime = System.currentTimeMillis()
-    def lastBatchStarted = startTime
-
 
     def dataService
 	def productService
 	def identifierService
-	//def authService
+    def dataSource
 
 	ApplicationContext applicationContext
 
@@ -3571,7 +3568,7 @@ class InventoryService implements ApplicationContextAware {
 
         def calendar = Calendar.getInstance()
         command.data.eachWithIndex { row, index ->
-            println "${index}: ${row}"
+            log.info "${index}: ${row}"
             def transactionEntry = new TransactionEntry()
             transactionEntry.quantity = row.quantity.toInteger()
             transactionEntry.comments = row.comments
@@ -3581,7 +3578,7 @@ class InventoryService implements ApplicationContextAware {
             assert product
 
             // Check the Levenshtein distance between the given name and stored product name (make sure they're close)
-            println "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
+            log.info "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
             //assert product.name == row.product
 
             // Handler for the lot number
@@ -3589,7 +3586,7 @@ class InventoryService implements ApplicationContextAware {
             if (lotNumber instanceof Double) {
                 lotNumber = lotNumber.toInteger().toString()
             }
-            println "Lot Number: " + lotNumber
+            log.info "Lot Number: " + lotNumber
 
             // Expiration date should be the last day of the month
             def expirationDate = null
@@ -3610,14 +3607,14 @@ class InventoryService implements ApplicationContextAware {
 
             // Find or create an inventory item
             def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
-            println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
+            log.info "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
             transactionEntry.inventoryItem = inventoryItem
 
             transaction.addToTransactionEntries(transactionEntry)
         }
         transaction.save(flush:true, failOnError: true);
-        println "Transaction ${transaction?.transactionNumber} saved successfully! "
-        println "Added ${transaction?.transactionEntries?.size()} transaction entries"
+        log.info "Transaction ${transaction?.transactionNumber} saved successfully! "
+        log.info "Added ${transaction?.transactionEntries?.size()} transaction entries"
         return data
     }
 
@@ -3664,7 +3661,7 @@ class InventoryService implements ApplicationContextAware {
         }
         */
 
-        println "transactionDates: " + transactionDates
+        log.info "transactionDates: " + transactionDates
         /*
         def criteria = TransactionEntry.createCriteria()
         def results = criteria.list {
@@ -3783,11 +3780,12 @@ class InventoryService implements ApplicationContextAware {
             createOrUpdateInventorySnapshot(date, location)
         }
 
-        println "Created product snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "Created product snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
         log.info ("-".multiply(80))
     }
 
 
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     def createOrUpdateInventorySnapshot(Date date, Location location) {
         try {
             def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
@@ -3800,23 +3798,47 @@ class InventoryService implements ApplicationContextAware {
                     }
                     // Only process locations with inventory
                     if (location?.inventory) {
+                        def startTime = System.currentTimeMillis()
                         //def productQuantityMap = getQuantityByProductMap(location.inventory)
                         def quantityMap = getQuantityOnHandAsOfDate(location, date)
-                        def products = quantityMap.keySet();
-                        log.info "Saving inventory snapshot for ${products?.size()} products"
-                        products.eachWithIndex { product, index ->
-                            def onHandQuantity = quantityMap[product]
-                            updateInventorySnapshot(date, product, location, onHandQuantity)
-                            if (index % 500 == 0) {
-                                cleanUpGorm(index)
+                        log.info "Time to calculate quantity for ${location.name}: " + (System.currentTimeMillis()-startTime) + " ms"
+
+                        String dateFormat = "yyyy-MM-dd HH:mm:ss"
+                        String now = "${new Date().format(dateFormat)}"
+                        def products = quantityMap.keySet()
+
+                        startTime = System.currentTimeMillis()
+
+                        Sql sql = new Sql(dataSource)
+                        sql.withBatch(500) { preparedStatement ->
+                            quantityMap.eachWithIndex { product, quantityOnHand, index ->
+                                def insertStatement =
+                                        "insert into inventory_snapshot " +
+                                                "(id, version, date, date_created, inventory_item_id, last_updated, location_id, product_id, quantity_on_hand) " +
+                                                "values (uuid(), 0, '${date.format(dateFormat)}', '${now}', null, '${now}', '${location.id}', '${product.id}', ${quantityOnHand?:0}) " +
+                                                "on duplicate key update quantity_on_hand = ${quantityOnHand?:0}"
+
+                                //def values = [0, date, now, null, now, location.id, product.id, quantityOnHand]
+                                preparedStatement.addBatch(insertStatement)
                             }
                         }
+
+//                        log.info "Saving product snapshot for ${products?.size()} products"
+//                        products.eachWithIndex { product, index ->
+//                            def onHandQuantity = quantityMap[product]
+//                            updateInventorySnapshot(date, product, location, onHandQuantity)
+//                            if (index % 100 == 0) {
+//                                cleanUpGorm(index)
+//                            }
+//                        }
+                        log.info "Time to save ${products?.size()} product snapshots for ${location.name}: " + (System.currentTimeMillis()-startTime) + " ms"
                     }
                 //}
             //}
-            log.info "Saved inventory snapshot for products=ALL, location=${location}, date=${date}"
+            log.info "Finished saving inventory snapshot for all products at '${location}' on date '${date}'"
         } catch (Exception e) {
             log.error("Unable to complete inventory snapshot process", e)
+            throw e;
         }
     }
 
@@ -3843,7 +3865,7 @@ class InventoryService implements ApplicationContextAware {
     def createOrUpdateInventorySnapshot(Date date, Location location, Product product) {
         try {
             def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
-            println "Date ${date}, location ${location}: " + inventorySnapshots
+            log.info "Date ${date}, location ${location}: " + inventorySnapshots
             if (inventorySnapshots == 0) {
                 log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
                 def quantity = getQuantity(product, location, date)
@@ -3871,7 +3893,7 @@ class InventoryService implements ApplicationContextAware {
             inventorySnapshot.save()
         }
         catch (Exception e) {
-            log.error("Error saving inventory snapshot for product " + product.name + " and location " + location.name, e)
+            log.error("Error saving product snapshot for " + product.name + " at location " + location.name, e)
             throw e;
         }
     }
@@ -3891,38 +3913,53 @@ class InventoryService implements ApplicationContextAware {
 		locations.each { location ->
             log.info ("-".multiply(80))
 
-            log.info "Updating inventory item snapshot for date ${date} and location ${location.name} ..."
+            log.info "Location: ${location.name}, Date: ${date} ..."
             createOrUpdateInventoryItemSnapshot(date, location)
 		}
-		println "Created inventory item snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+		log.info "Created inventory item snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
         log.info ("-".multiply(80))
 	}
 
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     def createOrUpdateInventoryItemSnapshot(Date date, Location location) {
         try {
             if (!location.isAttached()) {
                 location.attach()
             }
             def inventoryItemSnapshots = InventoryItemSnapshot.countByDateAndLocation(date, location)
-            log.info "Date ${date}, location ${location}: " + inventoryItemSnapshots
+            log.info "Found ${inventoryItemSnapshots} inventory item snapshots"
             log.info "Create or update inventory snapshot for location ${location.name} on date ${date}"
             // Only process locations with inventory
             if (location.inventory) {
+                def startTime = System.currentTimeMillis()
+                def quantityMap = getQuantityForInventory(location.inventory)
+                log.info "Time to calculate quantity for ${location.name}: " + (System.currentTimeMillis()-startTime) + " ms"
 
-                def onHandQuantityMap = getQuantityForInventory(location.inventory)
-                def inventoryItems = onHandQuantityMap.keySet();
 
+                startTime = System.currentTimeMillis()
+                def inventoryItems = quantityMap.keySet();
                 log.info "Saving inventory snapshot for ${inventoryItems?.size()} inventory items"
 
-                inventoryItems.eachWithIndex { inventoryItem, index ->
-                    def onHandQuantity = onHandQuantityMap[inventoryItem]
-                    updateInventoryItemSnapshot(date, inventoryItem, location, onHandQuantity)
-                    if (index % 500 == 0) {
-                        cleanUpGorm(index)
+                String dateFormat = "yyyy-MM-dd HH:mm:ss"
+                String now = "${new Date().format(dateFormat)}"
+
+                startTime = System.currentTimeMillis()
+
+                Sql sql = new Sql(dataSource)
+                sql.withBatch(500) { preparedStatement ->
+                    quantityMap.eachWithIndex { inventoryItem, quantityOnHand, index ->
+                        def insertStatement =
+                                "insert into inventory_item_snapshot " +
+                                        "(id, version, date, date_created, inventory_item_id, last_updated, location_id, product_id, quantity_on_hand) " +
+                                        "values (uuid(), 0, '${date.format(dateFormat)}', '${now}', '${inventoryItem.id}', '${now}', '${location.id}', '${inventoryItem?.product?.id}', ${quantityOnHand?:0}) " +
+                                        "on duplicate key update quantity_on_hand = ${quantityOnHand?:0}"
+                        preparedStatement.addBatch(insertStatement)
                     }
                 }
+
+                log.info "Time to save ${inventoryItems?.size()} inventory item snapshots for ${location.name}: " + (System.currentTimeMillis()-startTime) + " ms"
             }
-            log.info "Saved inventory snapshot for all products at location=${location.name} on date=${date}"
+            log.info "Finished saving inventory item snapshot for all products at location=${location.name} on date=${date}"
         } catch (Exception e) {
             log.error("Unable to complete inventory snapshot process", e)
         }
@@ -4012,7 +4049,7 @@ class InventoryService implements ApplicationContextAware {
         session.flush()
         session.clear()
         propertyInstanceMap.get().clear()
-        printStatus(index)
+        //printStatus(index)
     }
 
     def printStatus(index) {
@@ -4058,14 +4095,14 @@ class InventoryService implements ApplicationContextAware {
             quantityOnHand = mostRecentStockCount[0][1]
         }
 
-        println "stockCountDate: " + stockCountDate
-        println "quantityOnHand: " + quantityOnHand
+        log.info "stockCountDate: " + stockCountDate
+        log.info "quantityOnHand: " + quantityOnHand
 
         def quantityDebit = getQuantityChangeSince(product, location, TransactionCode.DEBIT, stockCountDate)[0]?:0
         def quantityCredit = getQuantityChangeSince(product, location, TransactionCode.CREDIT, stockCountDate)[0]?:0
 
-        println "quantityDebit: " + quantityDebit
-        println "quantityCredit: " + quantityCredit
+        log.info "quantityDebit: " + quantityDebit
+        log.info "quantityCredit: " + quantityCredit
 
 		log.info ("Time to calculate quantity on hand: " + (System.currentTimeMillis() - startTime) + " ms")
         return quantityOnHand - quantityDebit + quantityCredit
