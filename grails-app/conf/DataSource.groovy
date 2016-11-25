@@ -22,9 +22,10 @@ dataSource {
 // Hibernate caching properties
 hibernate {
     generate_statistics=false
-    cache.use_second_level_cache=true
+    cache.use_second_level_cache=false
     cache.use_query_cache=false
     cache.provider_class='org.hibernate.cache.EhCacheProvider'
+	jdbc.batch_size=50
     //default_batch_fetch_size = 16
     //max_fetch_depth = 5
 }
