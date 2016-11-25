@@ -18,8 +18,11 @@ grails.project.test.reports.dir	= "target/test-reports"
 grails.plugin.location.spock='spock/'
 grails.plugin.location.liquibase='liquibase/'
 
-// Development configuration property used to enable xrebel features
+// Development configuration property used to enable xrebel and newrelic agents
+// Unfortunately, these do not work so I had to explicitly export a variable before running grails run-app
+//      export GRAILS_OPTS="$GRAILS_OPTS -javaagent:/home/jmiranda/Desktop/newrelic/newrelic.jar"
 //grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
+//grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/newrelic/newrelic.jar"]
 
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
