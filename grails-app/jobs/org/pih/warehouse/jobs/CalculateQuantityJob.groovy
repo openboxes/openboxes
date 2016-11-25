@@ -21,9 +21,13 @@ class CalculateQuantityJob {
     }
 
 	def execute(context) {
+        log.info "Executing with context = ${context.mergedJobDataMap}"
 
-        // Allow admins to disable the job
-        if(!grailsApplication.config.openboxes.jobs.calculateQuantityJob.enabled) {
+        // Allow admins to disable the recurring job, but allow an admin to force it to run once
+        boolean force = context.mergedJobDataMap.get('force')
+        boolean enabled = grailsApplication.config.openboxes.jobs.calculateQuantityJob.enabled
+        if(!enabled && !force) {
+            log.info "Job is disabled"
             return
         }
 
@@ -40,7 +44,7 @@ class CalculateQuantityJob {
             date.clearTime()
         }
 
-        log.info "Executing calculate quantity job for date=${date}, user=${user}, location=${location}, product=${product}, mergedJobDataMap=${context.mergedJobDataMap}"
+        log.info "Executing calculate quantity job for date=${date}, user=${user}, location=${location}, product=${product}"
 
 
         if (product && date && location) {
