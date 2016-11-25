@@ -486,8 +486,6 @@ class DashboardService {
     }
      */
 
-
-
     /**
      * Get fast moving items based on requisition data.
      *
@@ -517,8 +515,8 @@ class DashboardService {
                     countDistinct('id', "occurrences")
                     sum("quantity", "quantity")
                 }
-                order('occurrences','desc')
                 order('quantity','desc')
+                order('occurrences','desc')
                 if (max) { maxResults(max) }
             }
 

@@ -50,12 +50,12 @@
 	<div class="widget-content" style="padding:0px;; margin:0">
         <table id="dataTable">
             <thead>
-                <th>Rank</th>
-                <th>Code</th>
-                <th>Product</th>
-                <th># Requisitions</th>
-                <th>Quantity Requested</th>
-                <th>Quantity On Hand</th>
+                <th><warehouse:message code="fastMovers.rank.label" default="Rank"/></th>
+                <th><warehouse:message code="product.productCode.label" default="Code"/></th>
+                <th><warehouse:message code="product.label" default="Product"/></th>
+                <th><warehouse:message code="fastMovers.count.label" default="Count"/></th>
+                <th><warehouse:message code="fastMovers.qty.label" default="Qty"/></th>
+                <th><warehouse:message code="fastMovers.qoh.label" default="QoH"/></th>
             </thead>
             <tbody>
 
@@ -79,11 +79,7 @@
             "sPaginationType": "two_button",
             "sAjaxSource": "${request.contextPath}/dashboard/fastMovers",
             "fnServerParams": function ( data ) {
-                //console.log("server data " + data);
-                //var locationId = $("#locationId").val();
-                //var date = $("#date").val();
-                //data.push({ name: "location.id", value: locationId });
-                //data.push({ name: "date", value: date })
+                data.push({ name: "locationId", value: $("#currentLocationId").val() });
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
