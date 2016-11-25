@@ -64,7 +64,7 @@ class InventorySnapshotController {
             date = dateFormat.parse(params.date)
             date.clearTime()
 
-            def results = CalculateQuantityJob.triggerNow([locationId: params.location.id, date: date])
+            def results = CalculateQuantityJob.triggerNow([locationId: params.location.id, date: date, force: true])
             render([results: results] as JSON)
 
         }
@@ -79,7 +79,7 @@ class InventorySnapshotController {
     def triggerCalculateQuantityOnHandJob = {
         println "triggerCalculateQuantityOnHandJob: " + params
 
-        def results = CalculateQuantityJob.triggerNow([productId:params.product.id,locationId:params.location.id])
+        def results = CalculateQuantityJob.triggerNow([productId:params.product.id,locationId:params.location.id, force: true])
         //def location = Location.get(params.location.id)
         //def product = Product.get(params.product.id)
         //def results = inventoryService.getTransactionDates(location, product)
@@ -112,8 +112,7 @@ class InventorySnapshotController {
         try {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
-
-            CalculateQuantityJob.triggerNow([date:date,productId:params.product?.id,locationId:location?.id,userId:user?.id])
+            CalculateQuantityJob.triggerNow([date:date, productId:params.product?.id, locationId:location?.id, userId:user?.id, force: true])
         } catch (Exception e) {
             log.error("An error occurred " + e.message, e);
             render([message: "An error occurred: " + e.message] as JSON)
