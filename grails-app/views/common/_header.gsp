@@ -99,19 +99,23 @@
                                             </li>
                                         </g:else>
                                         <li class="action-menu-item">
-                                            <g:link controller="dashboard" action="flushCache" style="color: #666">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
-                                                ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
-                                            </g:link>
-                                        </li>
-                                        <li class="action-menu-item">
                                             <g:link controller="dashboard" action="rebuildSummaryTables" style="color: #666">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'brick.png')}"/>
                                                 ${warehouse.message(code:'dashboard.rebuildSummaryTables.label', default: 'Rebuild summary tables')}
                                             </g:link>
                                         </li>
-
-
+                                        <li class="action-menu-item">
+                                            <g:link controller="dashboard" action="rebuildSnapshotTables" style="color: #666">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'brick.png')}"/>
+                                                ${warehouse.message(code:'dashboard.rebuildSnapshotTables.label', default: 'Rebuild snapshot tables')}
+                                            </g:link>
+                                        </li>
+                                        <li class="action-menu-item">
+                                            <g:link controller="dashboard" action="flushCache" style="color: #666">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
+                                                ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
+                                            </g:link>
+                                        </li>
                                         <g:if test="${session?.warehouse}">
                                             <%--
                                             <li class="action-menu-item">

@@ -42,7 +42,7 @@ class DashboardController {
     def requisitionService
 	def dashboardService
     def sessionFactory
-	
+
 	def showCacheStatistics = {
 		def statistics = sessionFactory.statistics
 		log.info(statistics)
@@ -183,9 +183,13 @@ class DashboardController {
 
     def rebuildSummaryTables = {
         BuildSummaryTablesJob.triggerNow([force:true])
-        CalculateQuantityJob.triggerNow()
-
         flash.message = "Rebuilding summary tables. This might take a minute or two ..."
+        redirect(action: "index")
+    }
+
+    def rebuildSnapshotTables = {
+        CalculateQuantityJob.triggerNow([force:true])
+        flash.message = "Rebuilding snapshot tables. This might take a minute or two ..."
         redirect(action: "index")
     }
 
@@ -387,7 +391,7 @@ class DashboardController {
             date = dateFormat.parse(params.date)
             date.clearTime()
         }
-        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+        def location = Location.get(params?.locationId?:session?.warehouse?.id)
         log.info "fast movers: " + location
         def data = dashboardService.getFastMovers(location, date, params.max as int)
 
