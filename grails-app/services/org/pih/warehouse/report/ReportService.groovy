@@ -360,7 +360,7 @@ class ReportService implements ApplicationContextAware {
             println product.name + " = " + status
 
             //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-            def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
+            def imageUrl = (product.thumbnail)?'${request.contextPath}/product/renderImage/${product?.thumbnail?.id}':''
             items << [
                     id:product.id,
                     name: product.name,

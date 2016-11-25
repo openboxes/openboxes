@@ -150,12 +150,12 @@
                         break;
                 }
                 if (aData["id"]) {
-                    $('td:eq(1)', nRow).html('<a href="/openboxes/productGroup/edit/' + aData['id'] + '" target="_blank">' + aData['name'] + '</a>');
+                    $('td:eq(1)', nRow).html('<a href="${request.contextPath}/productGroup/edit/' + aData['id'] + '" target="_blank">' + aData['name'] + '</a>');
                 }
                 if (aData["inventoryLevelId"]) {
-                    $('td:eq(5)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['minQuantity'] + '</a>');
-                    $('td:eq(6)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['reorderQuantity'] + '</a>');
-                    $('td:eq(7)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['maxQuantity'] + '</a>');
+                    $('td:eq(5)', nRow).html('<a href="${request.contextPath}/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['minQuantity'] + '</a>');
+                    $('td:eq(6)', nRow).html('<a href="${request.contextPath}/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['reorderQuantity'] + '</a>');
+                    $('td:eq(7)', nRow).html('<a href="${request.contextPath}/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['maxQuantity'] + '</a>');
                 }
                 return nRow;
             }

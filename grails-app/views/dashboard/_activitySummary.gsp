@@ -22,7 +22,7 @@
 </div>
 <script>
     $(window).load(function(){
-        $.get("/openboxes/dashboard/recentActivities", function(data) {
+        $.get("${request.contextPath}/dashboard/recentActivities", function(data) {
             console.log(data);
             renderRecentActivities(data);
         });
