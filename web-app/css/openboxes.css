@@ -914,11 +914,6 @@ button.action-btn, button.previous, button.next {
     height: 2em;
 }
 
-/*
-.edit {
-    background-image: url('/openboxes/images/icons/silk/pencil.png') no-repeat right center;
-}
-*/
 .box {
     border: 1px solid lightgrey;
     margin: 5px;
