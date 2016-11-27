@@ -24,7 +24,7 @@
                 <th>
                     <warehouse:message code="default.expires.label"/>
                 </th>
-                <th class="center middle" >
+                <th class="right middle" >
                     <warehouse:message code="default.qty.label"/>
                 </th>
             </tr>
@@ -67,7 +67,7 @@
                                 <span class="fade"><warehouse:message code="default.never.label"/></span>
                             </g:else>
                         </td>
-                        <td class="middle center">
+                        <td class="middle right">
                             <g:set var="styleClass" value=""/>
                             <g:if test="${itemQuantity<0}">
                                 <g:set var="styleClass" value="color: red;"/>
@@ -81,22 +81,8 @@
                                     ${warehouse.message(code:'default.each.label') }
                                 </g:else>
                             </span>
-
-
                         </td>
-                        <%--
-                        <g:hasErrors bean="${flash.itemInstance}">
-                            <td>
-                                <g:if test="${selected }">
-                                    <div class="errors dialog">
-                                        <g:eachError bean="${flash.itemInstance}">
-                                            <warehouse:message error="${it}"/>
-                                        </g:eachError>
-                                    </div>
-                                </g:if>
-                            </td>
-                        </g:hasErrors>
-                        --%>
+
                     </tr>
                 </g:if>
             </g:each>
@@ -114,8 +100,9 @@
         <tfoot>
             <tr class="odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
                 <td colspan="3" class="left">
+                    <label><warehouse:message code="default.total.label"/></label>
                 </td>
-                <td class="center">
+                <td class="right">
                     <span style="font-size: 1em;">
                         <g:set var="styleClass" value="color: black;"/>
                         <g:if test="${commandInstance.totalQuantity < 0}">
