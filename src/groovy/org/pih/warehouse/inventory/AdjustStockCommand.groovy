@@ -38,7 +38,7 @@ class AdjustStockCommand {
         reasonCode(blank:false)
         comments(nullable:true)
         newQuantity blank: false, validator: { newQuantity, object ->
-            if(!newQuantity) {
+            if(newQuantity == null) {
                 return 'adjustment.newQuantity.required'
             }
             else if (object.oldQuantity == newQuantity) {
