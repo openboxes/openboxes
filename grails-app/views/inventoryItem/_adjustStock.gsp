@@ -75,7 +75,7 @@
             <tr class="prop">
                 <td valign="top" class="name"><label><warehouse:message code="adjustment.comment.label" /></label></td>
                 <td valign="top" class="value">
-                    <g:textArea name="comment" value="${command?.comment}" cols="60" rows="3" class="middle text"/>
+                    <g:textArea name="comments" value="${command?.comments}" cols="60" rows="3" class="middle text"/>
 
                 </td>
             </tr>
