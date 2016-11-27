@@ -59,6 +59,9 @@ class Transaction implements Comparable, Serializable {
 	Requisition requisition				// associated requisition
 	String transactionNumber
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
+
+    // Reason code is mainly used for adjustments, but can be used for other purposes as well
+	String reasonCode
 	String comment
 	
 	// Auditing fields
