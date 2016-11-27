@@ -25,12 +25,6 @@
 			</g:link>
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': productInstance?.id, 'disableFilter':true]">
-				<img src="${resource(dir: 'images/icons/silk', file: 'calendar.png')}"/>&nbsp;
-				<warehouse:message code="inventory.showTransactionLog.label"/>
-			</g:link>
-		</div>
-		<div class="action-menu-item">
 			<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]">
 				<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
 				<warehouse:message code="inventory.showLotNumbers.label"/>
@@ -46,15 +40,6 @@
 			</g:link>
 		</div>
 		<g:isUserManager>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="inventoryAdjustedBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'book_edit.png')}"
-					alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
-						code="inventory.inventoryAdjusted.label" />
-				</a>
-			</div>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="incomingTransferBtn"> <img
@@ -93,16 +78,6 @@
 						code="productGroup.addProducts.label" />
 				</a>
 			</div>
-			<%-- 
-			<div class="action-menu-item"> 
-			
-				<a href="#" id="linkProductToProductGroup" class="open-dialog">
-					Link to product group
-				</a>
-				
-			
-			</div>
-			--%>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryConsumedBtn"> <img
@@ -231,10 +206,7 @@
 		$("#outgoingTransferBtn").click(function(event) { 
 			$("#inventoryActionForm").append($("<input>", {type: "hidden", name: "transactionType.id", "value": "9"})).submit();
 		});
-		$("#inventoryAdjustedBtn").click(function(event) { 
-			$("#inventoryActionForm").append($("<input>", {type: "hidden", name: "transactionType.id", "value": "7"})).submit();
-		});
-		$("#inventoryDamagedBtn").click(function(event) { 
+		$("#inventoryDamagedBtn").click(function(event) {
 			$("#inventoryActionForm").append($("<input>", {type: "hidden", name: "transactionType.id", "value": "5"})).submit();
 		});
 		$("#inventoryExpiredBtn").click(function(event) { 

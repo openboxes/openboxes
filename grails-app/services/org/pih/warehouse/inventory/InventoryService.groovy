@@ -2827,14 +2827,20 @@ class InventoryService implements ApplicationContextAware {
 
 	}
 
-	public void validateData(ImportDataCommand command) {
+	void validateData(ImportDataCommand command) {
 		processData(command);
 	}
 
 
-	public void processData(ImportDataCommand command) {
-		Date today = new Date()
+	void processData(ImportDataCommand command) {
+
+        throw new UnsupportedOperationException("This feature has not been implemented yet")
+
+
+
+        Date today = new Date()
 		//today.clearTime()
+
 		def transactionInstance = new Transaction(transactionDate: today,
 		transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
 		inventory: command?.location?.inventory)

@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -363,78 +364,7 @@ class InventoryItemController {
 			transactionEntryList: transactionEntryList,
 			transactionEntryMap: transactionEntryList.groupBy { it.transaction } ]
 	}
-	
-			
-	def createInventoryItem = {
-		
-		flash.message = "${warehouse.message(code: 'inventoryItem.temporaryCreateInventoryItem.message')}"
-		
-		def productInstance = Product.get(params?.product?.id)
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
-		def itemInstance = new InventoryItem(product: productInstance)
-		def inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)
-		def inventoryItems = inventoryService.getInventoryItemsByProduct(productInstance);
-		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]
-	}
 
-	def saveInventoryItem = {
-		log.info "save inventory item " + params
-		def productInstance = Product.get(params.product.id)
-		def inventoryInstance = Inventory.get(params.inventory.id)
-		def inventoryItem = new InventoryItem(params)
-		def inventoryItems = inventoryService.getInventoryItemsByProduct(inventoryItem.product);
-		inventoryInstance.properties = params;		
-
-		def transactionInstance = new Transaction(params);
-		def transactionEntry = new TransactionEntry(params);
-		if (!transactionEntry.quantity) {
-			transactionEntry.errors.rejectValue("quantity", 'transactionEntry.quantity.invalid')
-		}
-		
-		if (transactionEntry.hasErrors()) { 
-			inventoryItem.errors = transactionEntry.errors
-		}
-		if (transactionInstance.hasErrors()) {
-			inventoryItem.errors = transactionInstance.errors
-		}
-		
-		
-				
-		// TODO Move all of this logic into the service layer in order to take advantage of Hibernate/Spring transactions
-		if (!inventoryItem.hasErrors() && inventoryItem.save()) { 
-			//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
-			//redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem.product.id);
-
-			// Need to create a transaction if we want the inventory item 
-			// to show up in the stock card			
-			transactionInstance.transactionDate = new Date();
-			//transactionInstance.transactionDate.clearTime(); // we only want to store the date component
-			transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
-			def warehouseInstance = Location.get(session.warehouse.id);
-			transactionInstance.source = warehouseInstance;
-			transactionInstance.inventory = warehouseInstance.inventory;
-			
-			transactionEntry.inventoryItem = inventoryItem;
-			//transactionEntry.quantity = params.quantity;
-			transactionInstance.addToTransactionEntries(transactionEntry);
-			
-			transactionInstance.save()
-			flash.message = "${warehouse.message(code: 'inventoryItem.savedItemWithinNewTransaction.message', args: [inventoryItem.id ,  transactionInstance.id])}"
-	
-		} else { 	
-			render(view: "createInventoryItem", model: [itemInstance: inventoryItem, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems])
-			return;
-		}
-		
-		 
-		// If all else fails, return to the show stock card page
-		redirect(action: 'showStockCard', id: productInstance?.id)
-	}
-	
-
-
-	
-	
 	def edit = {
 		def itemInstance = InventoryItem.get(params.id)
 	//	def inventoryInstance = Inventory.get(params?.inventory?.id)
@@ -811,27 +741,6 @@ class InventoryItemController {
 		}
 
 		redirect(action: 'showLotNumbers', params: ['product.id':inventoryItem?.product?.id])
-	}
-
-	def deleteInventoryItem = {
-		def inventoryItem = InventoryItem.get(params.id);
-		def productInstance = inventoryItem?.product;
-		def inventoryInstance = Inventory.get(inventoryItem?.inventory?.id);
-		
-		if (inventoryItem && inventoryInstance) {
-			inventoryInstance.removeFromInventoryItems(inventoryItem).save();
-			inventoryItem.delete();
-		}		
-		else {
-			inventoryItem.errors.reject("inventoryItem.error", "Could not delete inventory item")
-			params.put("product.id", productInstance?.id);
-			params.put("inventory.id", inventoryInstance?.id);
-			log.info "Params " + params;
-			chain(action: "createInventoryItem", model: [inventoryItem: inventoryItem], params: params)
-			return;
-		}
-		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
-		
 	}
 	
 	

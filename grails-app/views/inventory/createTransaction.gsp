@@ -31,9 +31,6 @@
 					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID}">
 						<g:render template="incomingTransfer"></g:render>
 					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryAdjustment"></g:render>
-					</g:elseif>
 					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID}">
 						<g:render template="inventoryExpired"></g:render>
 					</g:elseif>
