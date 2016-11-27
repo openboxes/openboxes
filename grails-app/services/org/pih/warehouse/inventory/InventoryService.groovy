@@ -2223,6 +2223,7 @@ class InventoryService implements ApplicationContextAware {
                 }
 
                 transaction.addToTransactionEntries(transactionEntry);
+                transaction.transactionNumber = identifierService.generateTransactionIdentifier()
 
 
                 transaction.save()
