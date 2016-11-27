@@ -41,5 +41,55 @@
             <g:render template="returnStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
             <g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
         </div>
+
     </g:isUserManager>
 </div>
+<script type="text/javascript">
+
+    function clearMessage(dialogId) {
+        $(dialogId + " .errorMessage").livequery(function() {
+            $(this).html("").removeClass("errors");
+        });
+    }
+
+    function renderMessage(dialogId, html, styleClass) {
+        console.log("renderMessage", dialogId, html)
+        $(dialogId + " .errorMessage").livequery(function() {
+            $(this).html(html).addClass(styleClass);
+        });
+    }
+
+    function onFailure(dialogId, XMLHttpRequest,textStatus,errorThrown) {
+        console.log("failure: ");
+        console.log(XMLHttpRequest);
+        console.log(textStatus);
+        console.log(errorThrown);
+        var errors = JSON.parse(XMLHttpRequest.responseText);
+        console.log("errors", errors);
+
+        var ul = $('<ul/>');
+        $.each(errors, function( index, value ) {
+            ul.append('<li>' + value.message + '</li>');
+        });
+        renderMessage(dialogId, ul, "errors");
+
+    }
+
+    function onSuccess(dialogId, data) {
+        //clearMessage(dialogId);
+        renderMessage(dialogId, data.message, "message");
+        $(dialogId).dialog('close');
+        if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        }
+    }
+
+    function showLoading() {
+        $('#loader').show();
+    }
+
+    function hideLoading() {
+        $('#loader').hide();
+    }
+
+</script>

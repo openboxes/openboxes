@@ -22,6 +22,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
@@ -2187,45 +2188,55 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param params
 	 */
-	boolean adjustStock(InventoryItem itemInstance, Map params) {
+	boolean adjustStock(AdjustStockCommand command, Location location, User user) {
+        log.info "Adjust stock: " + command
+        log.info "${command.oldQuantity} == ${command.newQuantity}: " + (command.oldQuantity == command.newQuantity)
 
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
-
-		if (itemInstance && inventoryInstance) {
-			def transactionEntry = new TransactionEntry(params);
-			def quantity = 0;
-			try {
-				quantity = Integer.valueOf(params?.newQuantity);
-			} catch (Exception e) {
-				itemInstance.errors.reject("inventoryItem.quantity.invalid")
-			}
-
-			def transactionInstance = new Transaction(params);
-			if (transactionEntry.hasErrors() || transactionInstance.hasErrors()) {
-				itemInstance.errors = transactionEntry.errors
-				itemInstance.errors = transactionInstance.errors
-			}
-
-			if (!itemInstance.hasErrors() && itemInstance.save()) {
-				// Need to create a transaction if we want the inventory item
-				// to show up in the stock card
-				transactionInstance.transactionDate = new Date();
-				//transactionInstance.transactionDate.clearTime();
-				transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
-				transactionInstance.inventory = inventoryInstance;
-
-				// Add transaction entry to transaction
-				transactionEntry.inventoryItem = itemInstance;
-				transactionEntry.quantity = quantity
-				transactionInstance.addToTransactionEntries(transactionEntry);
-				if (!transactionInstance.hasErrors() && transactionInstance.save()) {
-
-				}
-				else {
-					transactionInstance?.errors.allErrors.each { itemInstance.errors << it; }
-				}
-			}
+        // If there are validation errors we'll deal with those straight away
+		if (!command.validate()) {
+            log.info "Command validated and has errors: " + command.errors
+            return false
 		}
+        else {
+
+            try {
+
+                Transaction transaction = new Transaction()
+                transaction.transactionDate = new Date()
+                transaction.inventory = location.inventory
+                transaction.reasonCode = command.reasonCode
+                transaction.createdBy = user
+                transaction.updatedBy = user
+
+                TransactionEntry transactionEntry = new TransactionEntry()
+                transactionEntry.inventoryItem = command.inventoryItem
+                transactionEntry.comments = command.comments
+                transactionEntry.quantity = command.newQuantity - command.oldQuantity
+
+                if (transactionEntry.quantity > 0) {
+                    transaction.transactionType = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID);
+                } else if (transactionEntry.quantity < 0) {
+                    transaction.transactionType = TransactionType.get(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID);
+                } else {
+                    command.errors.rejectValue("newQuantity", "adjustment.newQuantity.notEqual")
+                    return false
+                }
+
+                transaction.addToTransactionEntries(transactionEntry);
+
+
+                transaction.save()
+                return true
+
+            } catch (Exception e) {
+                log.error("Unable to process adjust stock request " + e.message, e)
+                command.errors.reject("adjustment.exception.message", [e.message] as Object[], "Unable to process adjust stock request " + e.message)
+                return false
+            }
+        }
+
+        //command.errors.reject("adjustment.exception.message", [e.message] as Object[], "Unable to process adjust stock request " + e.message)
+        return false
 	}
 	
 	

@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
@@ -16,6 +16,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Container
@@ -83,9 +84,7 @@ class InventoryItemController {
 
             def quantityMap = inventoryService.getQuantityOnHand(commandInstance.warehouseInstance, commandInstance?.productInstance)
 
-            //log.info "get quantity on hand: " + (System.currentTimeMillis() - startTime) + " ms"
-            //startTime = System.currentTimeMillis()
-
+            log.info "Show stock card: " + (System.currentTimeMillis() - startTime) + " ms"
 
             [ commandInstance: commandInstance, quantityMap: quantityMap ]
         } catch (ProductException e) {
@@ -526,13 +525,41 @@ class InventoryItemController {
     /**
 	 * Handles form submission from Show Stock Card > Adjust Stock dialog.	
 	 */
-	def adjustStock = {
-		log.info "Params " + params;
-		def itemInstance = InventoryItem.get(params.id)
-	//	def inventoryInstance = Inventory.get(params?.inventory?.id)
-		if (itemInstance) {
-			boolean hasErrors = inventoryService.adjustStock(itemInstance, params);
-			if (!itemInstance.hasErrors() && !hasErrors) {
+	def adjustStock = { AdjustStockCommand command ->
+        log.info "Params " + params;
+
+        User user = User.get(session.user.id)
+        Location location = Location.get(session.warehouse.id)
+        InventoryItem inventoryItem = command.inventoryItem
+
+        boolean success = inventoryService.adjustStock(command, location, user);
+
+        log.info "Adjust stock returned " + success
+        if (!success) {
+            def errors = command.errors.allErrors.collect { error -> [error:error, message:g.message(error: error)] }
+            response.status = 500
+            render errors as JSON
+        }
+        else {
+            def message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item'), inventoryItem.id])}"
+            def redirectUrl = "${g.createLink(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id], absolute: true)}"
+
+            render ([message:message, redirectUrl: redirectUrl] as JSON)
+
+        }
+		/*
+        if (itemInstance) {
+
+            int oldQuantity = params.int("oldQuantity")
+            def newQuantity = params.int("newQuantity")
+
+            if (oldQuantity == newQuantity || newQuantity < 0) {
+                itemInstance.errors.reject("inventoryItem.quantity.invalid")
+            }
+
+
+
+            if (!itemInstance.hasErrors() && !hasErrors) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
 			}
 			else {
@@ -540,7 +567,10 @@ class InventoryItemController {
 				flash.itemInstance = itemInstance;
 			}
 		}
-		redirect(controller: "inventoryItem", action: "showStockCard", id: itemInstance?.product?.id, params: ['inventoryItem.id':itemInstance?.id])
+		*/
+
+
+		//redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id])
 	}
 
 	def transferStock = {
@@ -869,4 +899,3 @@ class InventoryItemController {
 	}
 
 }
-

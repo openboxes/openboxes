@@ -24,15 +24,30 @@ class ErrorsController {
     def grailsApplication
 
 	def handleException = {
-		render(view: "/error")
+        if (request.xhr) {
+            render "${warehouse.message(code: 'errors.exception.message', args: [request?.exception?.message])}"
+        }
+        else {
+            render(view: "/error")
+        }
 	}
 	
-	def handleNotFound = { 
-		render(view:"/errors/notFound")
+	def handleNotFound = {
+        if (request.xhr) {
+            render "${warehouse.message(code: 'errors.notFound.message', args: [request?.exception?.message])}"
+        }
+        else {
+            render(view: "/errors/notFound")
+        }
 	}
 	
-	def handleUnauthorized = { 
-		render(view:"/errors/accessDenied")
+	def handleUnauthorized = {
+        if (request.xhr) {
+            render "${warehouse.message(code: 'errors.unauthorized.message', args: [request?.exception?.message])}"
+        }
+        else {
+            render(view: "/errors/accessDenied")
+        }
 	}
 
     def handleInvalidDataAccess = {
@@ -40,7 +55,12 @@ class ErrorsController {
     }
 
     def handleMethodNotAllowed = {
-        render(view:"/errors/methodNotAllowed")
+        if (request.xhr) {
+            render "${warehouse.message(code: 'errors.methodNotAllowed.message', args: [request?.exception?.message])}"
+        }
+        else {
+            render(view:"/errors/methodNotAllowed")
+        }
     }
 
     def sendFeedback = {

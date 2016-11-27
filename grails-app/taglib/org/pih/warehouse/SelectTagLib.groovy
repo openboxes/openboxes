@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse
 
+import org.pih.warehouse.core.AdjustmentReasonCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -74,6 +75,11 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectAdjustmentReasonCode = { attrs, body ->
+        attrs.from = AdjustmentReasonCode.list()
+        attrs.optionValue = { format.metadata(obj: it) }
+        out << g.select(attrs)
+    }
 
     def selectTag = { attrs, body ->
         def tags = Tag.list(sort:"tag").collect { [ id: it.id, name: it.tag, productCount: it?.products?.size() ]}
