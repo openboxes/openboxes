@@ -152,7 +152,7 @@
                             <g:if test="${productPackage?.uom?.code != 'EA' }">
                                 <div>
                                     <span class="fade">
-                                        <g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
+                                        <g:set var="quantityPerPackage" value="${totalQuantity?:0 / productPackage?.quantity }"/>
                                         ${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
                                         ${productPackage?.uom?.code }/${productPackage.quantity }
                                     </span>
