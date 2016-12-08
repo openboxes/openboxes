@@ -31,7 +31,7 @@ if (configLocation) {
 }
 
 // Allow admin to override the config location using environment variable
-configLocation = System.env["${appName.toUpperCase()}_CONFIG_LOCATION"]
+configLocation = System.env["${appName.toString().toUpperCase()}_CONFIG_LOCATION"]
 if (configLocation) {
     grails.config.locations << "file:" + configLocation
 }
