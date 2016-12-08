@@ -23,6 +23,20 @@ grails.config.locations = [
 	"file:${userHome}/.grails/${appName}-config.properties",
 	"file:${userHome}/.grails/${appName}-config.groovy"
 ]
+
+// Allow admin to override the config location using command line argument
+configLocation = System.properties["${appName}.config.location"]
+if (configLocation) {
+	grails.config.locations << "file:" + configLocation
+}
+
+// Allow admin to override the config location using environment variable
+configLocation = System.env["${appName.toUpperCase()}_CONFIG_LOCATION"]
+if (configLocation) {
+    grails.config.locations << "file:" + configLocation
+}
+
+
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
 
 //grails.plugins.reloadConfig.files = []
