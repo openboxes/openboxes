@@ -30,7 +30,6 @@ import java.text.SimpleDateFormat
 class InventoryExcelImporter extends AbstractExcelImporter {
 
     def inventoryService
-	def excelImportService
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
 
@@ -57,26 +56,27 @@ class InventoryExcelImporter extends AbstractExcelImporter {
             expirationDate:([expectedType: StringType, defaultValue:null]),
             manufacturer:([expectedType: StringType, defaultValue:null]),
             manufacturerCode:([expectedType: StringType, defaultValue:null]),
-            quantity:([expectedType: StringType, defaultValue:null]),
+            quantity:([expectedType: IntType, defaultValue:null]),
             binLocation:([expectedType: StringType, defaultValue:null]),
             comments:([expectedType: StringType, defaultValue:null])
 	]
 
+	def getExcelImportService() {
+		ExcelImportService.getService()
+	}
 
-	public InventoryExcelImporter(String fileName) {
+	InventoryExcelImporter(String fileName) {
 		super(fileName)
         inventoryService = Holders.grailsApplication.getMainContext().getBean("inventoryService")
 	}
 
 
 	List<Map> getData() {
-		throw new NotImplementedException("Not supported due to Grails 2.5.4 migration - need to migrate code to use latest version of excel-import plugin")
-		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
-
+		return excelImportService.columns(workbook, columnMap, null, propertyMap)
     }
 
 
-    public void validateData(ImportDataCommand command) {
+    void validateData(ImportDataCommand command) {
         inventoryService.validateInventoryData(command)
     }
 
@@ -88,7 +88,7 @@ class InventoryExcelImporter extends AbstractExcelImporter {
      * @param inventoryMapList
      * @param errors
      */
-    public void importData(ImportDataCommand command) {
+    void importData(ImportDataCommand command) {
         inventoryService.importInventoryData(command)
 
     }
