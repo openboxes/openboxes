@@ -2,7 +2,6 @@
 .settings
 *.iml
 *.iws
-*.sql
 *Db.properties
 *Db.script
 /plugins
@@ -26,3 +25,4 @@ tags
 /uploads
 site/
 .asscache
+.slcache
