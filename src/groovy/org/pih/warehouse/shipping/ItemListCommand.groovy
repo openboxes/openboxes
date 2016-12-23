@@ -9,11 +9,13 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 
 // import java.io.Serializable
 
+@Validateable
 class ItemListCommand implements Serializable {
 	
 	def items =

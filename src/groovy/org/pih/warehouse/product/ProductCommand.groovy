@@ -9,6 +9,9 @@
 **/ 
 package org.pih.warehouse.product
 
+import grails.validation.Validateable
+
+@Validateable
 class ProductCommand {
 	String id
 	String ean

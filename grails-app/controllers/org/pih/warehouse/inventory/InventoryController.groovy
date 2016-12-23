@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.validation.Validateable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
@@ -1732,6 +1733,7 @@ class InventoryController {
 
 }
 
+@Validateable
 class ConsumptionCommand {
 		String groupBy
 		Date startDate
@@ -1742,6 +1744,7 @@ class ConsumptionCommand {
 		}
 	}
 
+@Validateable
 class QuantityOnHandReportCommand {
     //Location location
     //def locations = ListUtils.lazyList([], FactoryUtils.instantiateFactory(Location))

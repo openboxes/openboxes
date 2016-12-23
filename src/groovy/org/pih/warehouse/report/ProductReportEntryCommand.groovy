@@ -9,8 +9,10 @@
 **/ 
 package org.pih.warehouse.report
 
+import grails.validation.Validateable
 import org.pih.warehouse.inventory.TransactionEntry
 
+@Validateable
 class ProductReportEntryCommand {
 
 	TransactionEntry transactionEntry;

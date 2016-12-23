@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.order.Order
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 /**
  * Command object 
  */
+@Validateable
 class DocumentCommand {
    String name
    String typeId

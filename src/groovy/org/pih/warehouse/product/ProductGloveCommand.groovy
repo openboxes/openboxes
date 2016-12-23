@@ -7,9 +7,12 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.product;
+package org.pih.warehouse.product
+
+import grails.validation.Validateable;
 // import java.io.Serializable;
 
+@Validateable
 class ProductGloveCommand implements Serializable {
 	
 	String name

@@ -9,8 +9,11 @@
 **/ 
 package org.pih.warehouse.core
 
+import grails.validation.Validateable
+
 // import java.util.List;
 
+@Validateable
 class ListCommand {
 	String category;
 	List objectList;

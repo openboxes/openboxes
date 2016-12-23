@@ -9,9 +9,11 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.Validateable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 
+@Validateable
 class ItemCommand implements Serializable {
 	
 	Product product

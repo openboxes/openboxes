@@ -9,12 +9,15 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.Validateable
+
 // import java.io.Serializable;
 // import java.util.Date;
 
 import org.pih.warehouse.inventory.Transaction;
 
-class SendShipmentCommand implements Serializable { 
+@Validateable
+class SendShipmentCommand implements Serializable {
 	
 	String comments	
 	Shipment shipment 

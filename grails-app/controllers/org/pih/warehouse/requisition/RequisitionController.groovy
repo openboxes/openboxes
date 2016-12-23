@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.converters.JSON
+import grails.validation.Validateable
 import grails.validation.ValidationException
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
@@ -1094,7 +1095,7 @@ class RequisitionController {
 
 }
 
-
+@Validateable
 class AddToPicklistItemsCommand {
     Requisition requisition
     RequisitionItem requisitionItem

@@ -9,11 +9,13 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
+@Validateable
 class FulfillmentCommand implements Serializable {
 
 	Requisition request					// original request

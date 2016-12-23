@@ -10,6 +10,7 @@
 package org.pih.warehouse.batch
 
 import grails.converters.JSON
+import grails.validation.Validateable
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
@@ -209,7 +210,7 @@ class BatchController {
 
 
 
-
+@Validateable
 class ImportProductsCommand {
 	def filename
 	def importFile
@@ -221,6 +222,7 @@ class ImportProductsCommand {
 	
 }
 
+@Validateable
 class ImportInventoryCommand {
 	
 	def filename

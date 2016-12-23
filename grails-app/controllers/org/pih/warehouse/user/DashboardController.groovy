@@ -10,6 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.converters.JSON
+import grails.validation.Validateable
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
@@ -530,7 +531,7 @@ class DashboardController {
     
 }
 
-
+@Validateable
 class DashboardCommand { 
 	
 	List<DashboardActivityCommand> activityList;
@@ -539,7 +540,8 @@ class DashboardCommand {
 }
 
 
-class DashboardActivityCommand { 
+@Validateable
+class DashboardActivityCommand {
 
 	String label
 	String type	

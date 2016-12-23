@@ -9,9 +9,11 @@
 **/ 
 package org.pih.warehouse.product
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 
+@Validateable
 class BatchEditCommand {
 	
 	//Location location

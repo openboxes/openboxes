@@ -9,6 +9,9 @@
 **/ 
 package org.pih.warehouse.inventory
 
+import grails.validation.Validateable
+
+@Validateable
 class InventoryCommand {
 
     def shipment

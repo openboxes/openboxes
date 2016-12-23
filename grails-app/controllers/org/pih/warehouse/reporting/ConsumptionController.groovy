@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.reporting
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
@@ -309,7 +310,7 @@ class ConsumptionController {
 
 }
 
-
+@Validateable
 class ShowConsumptionCommand {
 
     // Map of product to ShowConsumptionRowCommand
@@ -372,6 +373,7 @@ class ShowConsumptionCommand {
 
 }
 
+@Validateable
 class ShowConsumptionRowCommand {
 
     Product product

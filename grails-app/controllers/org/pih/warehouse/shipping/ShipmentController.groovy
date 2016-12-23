@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.Validateable
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.pih.warehouse.core.*
@@ -1113,6 +1114,7 @@ class ShipmentController {
 
 }
 
+@Validateable
 class ReceiveShipmentCommand implements Serializable {
 	
 	String comments

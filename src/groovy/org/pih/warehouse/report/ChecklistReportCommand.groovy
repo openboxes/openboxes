@@ -9,11 +9,13 @@
 **/ 
 package org.pih.warehouse.report
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
+@Validateable
 class ChecklistReportCommand {
 
 	Shipment shipment;

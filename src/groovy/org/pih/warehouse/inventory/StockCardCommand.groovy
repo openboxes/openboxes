@@ -9,10 +9,12 @@
 **/ 
 package org.pih.warehouse.inventory
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment;
 
+@Validateable
 class StockCardCommand {
 	
 	// Used when adding a new inventory item (not implemented yet)

@@ -9,10 +9,12 @@
 **/ 
 package org.pih.warehouse.report
 
+import grails.validation.Validateable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
+@Validateable
 class ChecklistReportEntryCommand {
 
 	Product product;
