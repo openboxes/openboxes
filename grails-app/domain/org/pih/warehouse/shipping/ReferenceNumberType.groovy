@@ -34,7 +34,7 @@ class ReferenceNumberType implements Serializable {
 	}	
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		sort "sortOrder"
 	}
 

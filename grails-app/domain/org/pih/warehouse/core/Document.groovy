@@ -36,7 +36,7 @@ class Document implements Serializable {
 	// Shipment (and other entities) should create a join table for documents.	
 	//static belongsTo = [ shipment : Shipment ];
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		cache true
 	}
 	

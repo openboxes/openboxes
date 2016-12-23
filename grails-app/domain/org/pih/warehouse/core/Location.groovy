@@ -67,7 +67,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	}
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		// Needs to be eagerly fetched because of Location.supportsActivity() method
 		supportedActivities lazy: false
 		locationType lazy: false

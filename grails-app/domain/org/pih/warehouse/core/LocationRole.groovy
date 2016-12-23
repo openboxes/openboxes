@@ -14,7 +14,7 @@ class LocationRole implements Serializable {
     Location location
     Role role
     static mapping = {
-        id generator: 'uuid'
+        id generator: 'uuid', sqlType: "char(38)"
     }
     static belongsTo = [user: User]
     static constraints = {

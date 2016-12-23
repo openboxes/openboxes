@@ -45,7 +45,7 @@ class Synonym implements Serializable {
 	static belongsTo = [product:Product]
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
         // Using a join tale because we want multiple one-to-many associations, not many-to-many
         // product-synonyms, shipment-synonyms, etc
 		//products joinTable: [name:'product_synonym', column: 'product_id', key: 'synonym_id']

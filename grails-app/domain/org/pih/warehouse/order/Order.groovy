@@ -30,7 +30,7 @@ class Order implements Serializable {
 	
 	static hasMany = [ orderItems : OrderItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		table "`order`"
 		orderItems cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"

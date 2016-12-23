@@ -29,7 +29,7 @@ class Address implements Serializable {
     static belongsTo = [ location : Location ]
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 	
@@ -37,6 +37,7 @@ class Address implements Serializable {
 		address(nullable: false, maxSize: 255)
 		address2(nullable:true, maxSize: 255)
 		city(nullable: true, maxSize: 255)
+		country(nullable: true)
 		stateOrProvince(nullable: true, maxSize: 255)
 		postalCode(nullable:true, maxSize: 255)
 		stateOrProvince(nullable:true, maxSize: 255)

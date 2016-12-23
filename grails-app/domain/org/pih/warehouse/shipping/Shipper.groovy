@@ -24,7 +24,7 @@ class Shipper implements java.io.Serializable {
 
 	static hasMany = [ shipperServices : ShipperService ];
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		shipperServices joinTable: [name:'shipper_service', column: 'shipper_service_id', key: 'shipper_id']
 	}
 	

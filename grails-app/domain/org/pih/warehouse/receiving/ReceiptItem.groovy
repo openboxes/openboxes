@@ -41,7 +41,7 @@ class ReceiptItem implements Comparable, Serializable {
 	Date lastUpdated;
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 	static belongsTo = [ receipt : Receipt ]

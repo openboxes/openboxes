@@ -31,7 +31,7 @@ class ProductGroup implements Comparable, Serializable {
 	static belongsTo = Product
 	static hasMany = [ products : Product ]
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		products joinTable: [name:'product_group_product', column: 'product_id', key: 'product_group_id']
 	}
 		

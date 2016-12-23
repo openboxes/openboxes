@@ -31,7 +31,7 @@ class Localization implements Serializable {
     static transients = ['translation', 'translations']
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
         cache true
 	}
 	

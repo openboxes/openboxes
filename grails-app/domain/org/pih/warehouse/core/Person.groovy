@@ -24,7 +24,7 @@ class Person implements Comparable, Serializable {
 	static mapping = { 
 		tablePerHierarchy false
 		table 'person' 
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 
 	static transients = ["name"]

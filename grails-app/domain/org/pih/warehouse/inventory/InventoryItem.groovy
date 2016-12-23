@@ -48,7 +48,7 @@ class InventoryItem implements Serializable {
 	static belongsTo = [ product : Product ]
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		cache true
 	}
 	

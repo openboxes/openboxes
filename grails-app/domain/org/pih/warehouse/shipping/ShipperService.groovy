@@ -20,7 +20,7 @@ class ShipperService {
 	static belongsTo = [ shipper : Shipper ]
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 
 	static constraints = {

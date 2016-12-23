@@ -32,7 +32,7 @@ class Event implements Comparable, Serializable {
 	
 	//static belongsTo = [ shipment : Shipment ]
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 

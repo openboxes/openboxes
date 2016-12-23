@@ -24,7 +24,7 @@ class Role implements Serializable, Comparable<Role> {
     }
 
     static mapping = {
-        id generator: 'uuid'
+        id generator: 'uuid', sqlType: "char(38)"
     }
 
     String toString() { return "${roleType.name}"; }

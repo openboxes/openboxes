@@ -27,7 +27,7 @@ class Comment implements Serializable {
 	//static belongsTo = [ shipment : Shipment ];
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 	static constraints = {

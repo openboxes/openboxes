@@ -122,7 +122,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem]
     static mapping = {
-        id generator: 'uuid'
+        id generator: 'uuid', sqlType: "char(38)"
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
         //week formula('WEEK(date_requested)')    //provide the exact column name of the date field

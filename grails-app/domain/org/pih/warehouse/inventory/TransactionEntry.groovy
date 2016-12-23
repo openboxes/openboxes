@@ -19,7 +19,7 @@ class TransactionEntry implements Comparable, Serializable {
     static belongsTo = [ transaction : Transaction ]
 
 	static mapping = { 
-		id generator: 'uuid'		
+		id generator: 'uuid', sqlType: "char(38)"
 	}
     static constraints = {		
 		inventoryItem(nullable:false)		

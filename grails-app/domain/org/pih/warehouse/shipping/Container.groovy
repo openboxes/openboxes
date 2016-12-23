@@ -45,7 +45,7 @@ class Container implements Comparable, java.io.Serializable {
 
 	static transients = [ "optionValue", "shipmentItems" ]
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		//containers cascade: "all-delete-orphan"
 	}
 		

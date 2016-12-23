@@ -53,7 +53,7 @@ class LocalTransfer {
     }
     
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		sourceTransaction cascade: "all-delete-orphan"
 		destinationTransaction cascade: "all-delete-orphan"
 	}	

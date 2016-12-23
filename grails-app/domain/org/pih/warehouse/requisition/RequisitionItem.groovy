@@ -86,7 +86,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
         picklistItems cascade: "all-delete-orphan", sort: "id"
 		requisitionItems cascade: "all-delete-orphan", sort: "id", batchSize: 100
 	}

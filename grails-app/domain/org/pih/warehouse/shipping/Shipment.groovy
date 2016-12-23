@@ -103,7 +103,7 @@ class Shipment implements Comparable, Serializable {
 	// use a SortedSet for events and have the Event class implement Comparable. 
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		cache true
 		additionalInformation type: "text"
 		events cascade: "all-delete-orphan"

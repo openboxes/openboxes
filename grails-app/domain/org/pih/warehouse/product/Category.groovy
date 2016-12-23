@@ -28,7 +28,7 @@ class Category implements Comparable, Serializable {
 	static belongsTo = [ parentCategory : Category ];
 	static transients = [ "parents", "children", "deleted", "products" ]
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		sort name:"desc"
 		categories sort:"name", cascade: "all-delete-orphan"
 		cache true

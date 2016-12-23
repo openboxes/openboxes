@@ -24,7 +24,7 @@ class LocationGroup implements Serializable, Comparable<LocationGroup> {
 	Date lastUpdated;
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 	static hasMany = [ locations : Location ]

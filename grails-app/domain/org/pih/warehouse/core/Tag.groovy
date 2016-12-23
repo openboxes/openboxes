@@ -45,7 +45,7 @@ class Tag implements Serializable {
 	static belongsTo = Product
 	
 	static mapping = {
-		id generator: 'uuid'		
+		id generator: 'uuid', sqlType: "char(38)"
 		products joinTable: [name:'product_tag', column: 'product_id', key: 'tag_id']
 	}
 	

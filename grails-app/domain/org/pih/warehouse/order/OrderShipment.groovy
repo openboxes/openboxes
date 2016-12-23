@@ -18,7 +18,7 @@ class OrderShipment implements Serializable {
 	String id
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 
 	//OrderItem orderItem

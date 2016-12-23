@@ -34,7 +34,7 @@ class User extends Person {
         table "`user`"
         roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id'], cascade: "save-update"
         locationRoles cascade: "all-delete-orphan"
-        id generator: 'uuid'
+        id generator: 'uuid', sqlType: "char(38)"
     }
     static transients = ["passwordConfirm"]
     static constraints = {

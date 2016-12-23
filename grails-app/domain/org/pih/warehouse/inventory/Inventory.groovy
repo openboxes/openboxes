@@ -32,7 +32,7 @@ class Inventory implements java.io.Serializable {
     String toString() { return "${warehouse.name}"; }
 
 	static mapping = { 
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		cache true
 	}
 	

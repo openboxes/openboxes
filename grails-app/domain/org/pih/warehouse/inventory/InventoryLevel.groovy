@@ -34,7 +34,7 @@ class InventoryLevel {
 	Date lastUpdated;
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 		product index: 'inventory_level_prod_inv_idx'
 		inventory index: 'inventory_level_prod_inv_idx'
 		cache true
