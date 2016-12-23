@@ -122,7 +122,7 @@ grails.project.dependency.resolution = {
 
 		// plugins needed at runtime but not for compilation
 		runtime ":hibernate:3.6.10.19" //":hibernate4:4.3.10" // or ":hibernate:3.6.10.18"
-		runtime ":database-migration:1.4.1"
+		compile ":database-migration:1.4.2-SNAPSHOT"
 		runtime ":jquery:1.11.1"
 
         compile ":grails-melody:1.59.0"
@@ -131,7 +131,7 @@ grails.project.dependency.resolution = {
         compile(':mail:1.0.7') {
             //excludes 'mail', 'spring-test'
         }
-		compile(':excel-import:1.1.0.BUILD-SNAPSHOT') {
+		compile(':excel-import:2.0.0.BUILD-SNAPSHOT') {
             //excludes 'poi-contrib', 'poi-scratchpad'
         }
         compile(":pretty-time:2.1.3.Final-1.0.1")
@@ -147,7 +147,7 @@ grails.project.dependency.resolution = {
         runtime(":yui:2.8.2.1")
         runtime(":bubbling:2.1.4")
         runtime(":webflow:2.1.0")
-        runtime(":resources:1.2.14")
+        runtime(":resources:1.2.15-SNAPSHOT")
         runtime(":cache-headers:1.1.7")
         runtime(":zipped-resources:1.0") { excludes 'resources' }
         runtime(":cached-resources:1.0") { excludes 'resources', 'cache-headers' }

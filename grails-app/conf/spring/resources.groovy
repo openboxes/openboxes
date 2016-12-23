@@ -13,6 +13,8 @@ import org.springframework.cache.ehcache.EhCacheFactoryBean
 beans = {
 
 	customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
+	migrationCallbacks(org.pih.warehouse.migration.MigrationCallbacks)
+
 
 	//localeResolver(org.springframework.web.servlet.i18n.SessionLocaleResolver) {
 	//	defaultLocale = new Locale("de","DE")

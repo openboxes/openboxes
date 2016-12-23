@@ -60,13 +60,17 @@ environments {
 	test {
 		dataSource {
 			//dbCreate = "update"
-			driverClassName = "org.h2.Driver"
-            dialect = ""
-			username = "sa"
-			password = ""
-			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+//			driverClassName = "org.h2.Driver"
+//            dialect = ""
+//			username = "sa"
+//			password = ""
+//			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
 
-            // Trying to use H2 database for testing and development to improve performance on startup
+			driverClassName = "com.mysql.jdbc.Driver"
+			dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
+
+
+			// Trying to use H2 database for testing and development to improve performance on startup
             //url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 
 		}

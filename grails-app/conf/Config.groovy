@@ -18,8 +18,7 @@ import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
-
- grails.config.locations = ["file:${userHome}/.grails/${appName}-config.properties", "file:${userHome}/.grails/${appName}-config.groovy" ]
+grails.config.locations = ["file:${userHome}/.grails/${appName}-config.properties", "file:${userHome}/.grails/${appName}-config.groovy" ]
 
 if (System.properties["${appName}.config.location"]) {
     grails.config.locations << "file:" + System.properties["${appName}.config.location"]
@@ -247,6 +246,7 @@ log4j.main = {
 			'org.codehaus.groovy.grails.commons', 			// core / classloading
 			'org.codehaus.groovy.grails.plugins',			// plugins
 			//'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
+            'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner',
 			'org.docx4j',
 			'org.apache.http.headers',
 			'org.apache.ddlutils',
@@ -258,8 +258,7 @@ log4j.main = {
             'org.hibernate.cache',
             'org.apache.ddlutils'
 
-	info    'org.liquibase',
-            'com.opensymphony.clickstream',
+	info    'com.opensymphony.clickstream',
             'org.codehaus.groovy.grails.web.pages',		// GSP			'com.mchange',
             'org.springframework',
 			'org.hibernate',
@@ -273,6 +272,8 @@ log4j.main = {
             'grails.plugin.springcache',
 			'BootStrap',
             'liquibase',
+			'org.liquibase',
+            'grails.plugin.databasemigration',
 			'com.gargoylesoftware.htmlunit'
 
    debug 	'org.apache.cxf',
@@ -280,7 +281,6 @@ log4j.main = {
 		   	'org.apache.commons.mail',
             'grails.plugins.raven',
             'net.kencochrane.raven',
-            'grails.plugin.databasemigration',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
@@ -301,11 +301,10 @@ log4j.main = {
 }
 
 /* Database Migration plugin */
-//grails.plugin.databasemigration.dropOnStart = true
 grails.plugin.databasemigration.updateOnStart = true
-//grails.plugin.databasemigration.changelogLocation = "grails-app/migrations"
-grails.plugin.databasemigration.changelogFileName = "changelog.xml"
-grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.xml']
+grails.plugin.databasemigration.changelogLocation = "grails-app/migrations"
+grails.plugin.databasemigration.updateOnStartFileNames = ['install/install.xml','changelog.xml']
+grails.plugin.databasemigration.ignoredObjects = ["click_stream", "click_stream_request"]
 
 /* Indicates which activities are required for a location to allow logins */
 openboxes.chooseLocation.requiredActivities = ["MANAGE_INVENTORY"]
