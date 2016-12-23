@@ -26,7 +26,7 @@ class OrderItem implements Serializable {
 	Product product
 	InventoryItem inventoryItem
 	Integer quantity
-	Float unitPrice
+	BigDecimal unitPrice
 	
 	User requestedBy	// the person who actually requested the item
 	
@@ -36,7 +36,7 @@ class OrderItem implements Serializable {
 	Date lastUpdated
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 	static transients = [ "orderItemType" ]

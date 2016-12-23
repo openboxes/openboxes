@@ -40,7 +40,7 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
 	String description		// Description of the package
 	String gtin				// Global trade identification number
 	Integer quantity		// Number of units (each) in the box
-    Float price
+    BigDecimal price
 	UnitOfMeasure uom		// Unit of measure of the package (e.g. box, case, etc)
 	
 	// Auditing
@@ -52,7 +52,7 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
 	static belongsTo = [product : Product]
 
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
     static constraints = {

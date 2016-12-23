@@ -11,7 +11,7 @@ package org.pih.warehouse.admin
 
 import grails.util.GrailsUtil
 import grails.util.Holders
-
+import grails.validation.Validateable
 import org.pih.warehouse.core.MailService
 import org.springframework.web.multipart.MultipartFile
 import util.ClickstreamUtil
@@ -355,6 +355,7 @@ class AdminController {
 
 }
 
+@Validateable
 class UpgradeCommand {
 	
 	FutureTask future	

@@ -71,7 +71,7 @@ class Product implements Comparable, Serializable {
     String productCode
 
     // Price per unit (global for the entire system)
-    Float pricePerUnit
+    BigDecimal pricePerUnit
 
     // Controlled Substances
     // http://en.wikipedia.org/wiki/Controlled_Substances_Act
@@ -216,7 +216,7 @@ class Product implements Comparable, Serializable {
     ]
 
     static mapping = {
-        id generator: 'uuid'
+        id generator: 'uuid', sqlType: "char(38)"
         cache true
         tags joinTable: [name: 'product_tag', column: 'tag_id', key: 'product_id']
         categories joinTable: [name: 'product_category', column: 'category_id', key: 'product_id']
