@@ -16,13 +16,8 @@ class ApiController {
 
 
 	
-	def products = { 
-		def products = new ArrayList();
-		
-		products = Product.getAll();
-		def jsonProducts = [products:products]		
-		
-		
-		render jsonProducts as JSON 		
+	def products() {
+		def products = Product.getAll();
+		render ([products:products] as JSON)
 	}
 }
