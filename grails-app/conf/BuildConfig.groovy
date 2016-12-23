@@ -125,7 +125,7 @@ grails.project.dependency.resolution = {
 		compile ":database-migration:1.4.2-SNAPSHOT"
 		runtime ":jquery:1.11.1"
 
-        compile ":grails-melody:1.59.0"
+        //compile ":grails-melody:1.59.0"
 
         compile(":joda-time:1.5")
         compile(':mail:1.0.7') {
