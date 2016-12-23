@@ -87,7 +87,7 @@ class MailService {
 
 		
 	/**
-	 * @return
+	 * @return true if mail is enabled, false otherwise
 	 */
 	def isMailEnabled() {  
 		log.info "grailsApplication.config.grails.mail.enabled '" + grailsApplication.config.grails.mail.enabled + "'"
@@ -95,34 +95,27 @@ class MailService {
 		log.info (isMailEnabled ? "Mail is enabled" : "Mail is disabled") 
 		return isMailEnabled
 	}
-	
-	/**
-	 * @param subject
-	 * @param msg
-	 * @param to
-	 * @return
-	 */
+
+    /**
+     * Send non-HTML email.
+     *
+     * @param subject
+     * @param msg
+     * @param to
+     * @return
+     */
 	def sendMail(String subject, String msg, String to) {
-		sendMail(subject, msg, [to], null)
+		sendMail(subject, msg, [to], null, null, false)
 	}
 	
-	/**
-	 * @param subject
-	 * @param msg
-	 * @param to
-	 * @return
-	 */
-	def sendMail(String subject, String msg, Collection to, Integer port) {
-		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
-		if (isMailEnabled()) { 			
+	def sendMail(String subject, String msg, Collection to, String hostname, Integer port, boolean override) {
+		if (isMailEnabled() || override) {
 			log.info "Sending text email '" + subject + "' to " + to; 
 			try { 
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
 				email.setCharset("UTF-8");
-				email.setHostName(defaultHost)
-				
-				// override port
+				email.setHostName(hostname?:defaultHost)
 				email.setSmtpPort(port?:defaultPort)
 
 				to.each { 
@@ -160,59 +153,46 @@ class MailService {
 	 * @param to
 	 * @return
 	 */	
-	def sendHtmlMail(String subject, String htmlMessage, String [] to) { 
-		log.debug "Sending email to array " + to
-		sendHtmlMail(subject, htmlMessage, to, null)
-		
+	def sendHtmlMail(String subject, String htmlMessage, String [] toArray) {
+		sendHtmlMail(subject, htmlMessage, toArray, null, null, false)
 	}
-	
-	
-	/**
-	 * 
-	 * @param subject
-	 * @param htmlMessage
-	 * @param to
-	 * @return
-	 */
+
 	def sendHtmlMail(String subject, String htmlMessage, String to) {
-		sendHtmlMail(subject, htmlMessage, [to], null, false)
+		sendHtmlMail(subject, htmlMessage, [to], null, null, false)
 	}
 	
 	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) { 
-		sendHtmlMail(subject, htmlMessage, [to], port, false)
+		sendHtmlMail(subject, htmlMessage, [to], null, port, false)
 	}
 
 	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port, Boolean override) {
-		sendHtmlMail(subject, htmlMessage, [to], port, override)
+		sendHtmlMail(subject, htmlMessage, [to], null, port, override)
 	}
 
-	
-	def sendHtmlMail(String subject, String body, Collection to) {
-		sendHtmlMail(subject, body, to, null, false)
+    def sendHtmlMail(String subject, String htmlMessage, String to, String hostname, Integer port, Boolean override) {
+        sendHtmlMail(subject, htmlMessage, [to], hostname, port, override)
+    }
+
+    def sendHtmlMail(String subject, String body, Collection to) {
+		sendHtmlMail(subject, body, to, null, null, false)
 	}
 	
-	/**
-	 * @param subject
-	 * @param body
-	 * @param to
-	 * @return
-	 */
-	def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) { 	
+	def sendHtmlMail(String subject, String body, Collection to, String hostname, Integer port, Boolean override) {
 		log.debug "Sending email to " + to
-		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
-		if (isMailEnabled() || override) { 		
-			log.info "Sending html email '" + subject + "' to " + to; 
+		if (isMailEnabled() || override) {
+			log.info "Sending html email '" + subject + "' to " + to + " using port " + port
 			try { 			
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setCharset("UTF-8");
-				email.setHostName(defaultHost)
+				email.setHostName(hostname?:defaultHost)
 				to.each { 
 					email.addTo(it) 
 				}
 				
 				//addBccAddresses(email)
 				email.setFrom(defaultFrom)
+				log.info "Setting port to ${port?:defaultPort}"
 				email.setSmtpPort(port?:defaultPort)
 				email.setSubject("${prefix} " + subject)
 				email.setHtmlMsg(body);
