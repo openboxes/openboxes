@@ -35,7 +35,7 @@ class ApiControllerSpec extends Specification {
 
     void "list all products"() {
         given:
-        controller.list()
+        controller.products()
         log.info "model: " + model
         println "model: " + model
         println response
