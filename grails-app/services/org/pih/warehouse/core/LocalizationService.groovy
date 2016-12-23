@@ -54,4 +54,41 @@ class LocalizationService {
 		// fetch the locale of the current user; if there isn't one, use the default locale
 		return (RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))
 	}
+
+	/**
+	 * Gets a translation for the given text.
+	 *
+	 * @param text
+	 * @param source
+	 * @param destination
+	 * @return
+	 */
+	def getTranslation(String text, String source, String destination) {
+		def translation = ""
+		def email = grailsApplication.config.openboxes.frengly.email
+		def password = grailsApplication.config.openboxes.frengly.password
+		String urlString = "http://frengly.com?src=${source}&dest=${destination}&text=${text}&email=${email}&password=${password}"
+        //grailsApplication.config.openboxes.frengly.url
+		try {
+			log.info "Before " + urlString
+			def url = new URL(urlString)
+			def connection = url.openConnection()
+			log.info "content type; " + connection.contentType
+			if(connection.responseCode == 200){
+				def xml = connection.content.text
+				log.info "XML: " + xml
+				def root = new XmlParser(false, true).parseText(xml)
+				translation = root.translation.text()
+			}
+			else {
+				log.info "connection " + connection.responseCode
+
+			}
+		} catch (Exception e) {
+			log.error("Error trying to translate using syslang API ", e);
+			throw new ApiException(message: "Unable to query syslang API: " + e.message)
+		}
+		return translation
+	}
+
 }

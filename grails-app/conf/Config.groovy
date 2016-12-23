@@ -478,6 +478,11 @@ openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
 
+
+// Frengly Translation API
+openboxes.frengly.email = "<username>"
+openboxes.frengly.password = "<password>"
+
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""
