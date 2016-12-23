@@ -16,7 +16,6 @@ import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 	def dataService
-	def excelImportService
 	def grailsApplication
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
@@ -76,28 +75,29 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 	]
 
 
+	def getExcelImportService() {
+		ExcelImportService.getService()
+	}
 
 
-	public InventoryLevelExcelImporter(String fileName) {
+	InventoryLevelExcelImporter(String fileName) {
 		super(fileName)
 		dataService = grailsApplication.mainContext.getBean("dataService")
 	}
 
 
 	List<Map> getData() {
-		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+		return excelImportService.columns(workbook, columnMap, null, propertyMap)
 	}
 
 
 
-	public void validateData(ImportDataCommand command) { 
-		//inventoryService.validateData(command)
+	void validateData(ImportDataCommand command) {
         dataService.validateInventoryLevels(command)
 
     }
 
-	public void importData(ImportDataCommand command) { 
-		//inventoryService.importData(command)
+	void importData(ImportDataCommand command) {
         dataService.importInventoryLevels(command)
 	}
 

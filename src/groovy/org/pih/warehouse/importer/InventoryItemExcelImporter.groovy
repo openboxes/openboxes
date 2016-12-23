@@ -10,6 +10,8 @@
 package org.pih.warehouse.importer
 
 import org.apache.commons.lang.NotImplementedException
+import org.grails.plugins.excelimport.ExcelImportService
+
 import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 
 // import java.text.ParseException;
@@ -73,28 +75,24 @@ class InventoryItemExcelImporter extends AbstractExcelImporter {
             currentQuantity:([expectedType: IntType, defaultValue:null])
 	]
 
+	def getExcelImportService() {
+		ExcelImportService.getService()
+	}
 
-
-
-	public InventoryItemExcelImporter(String fileName) {
+	InventoryItemExcelImporter(String fileName) {
 		super(fileName)
 		dataService = grailsApplication.mainContext.getBean("dataService")
 	}
 
-
 	List<Map> getData() {
-        throw new NotImplementedException("Not supported due to Grails 2.5.4 migration - need to migrate code to use latest version of excel-import plugin")
-
-		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+		return excelImportService.columns(workbook, columnMap, null, propertyMap)
 	}
 
-
-
-	public void validateData(ImportDataCommand command) { 
+	void validateData(ImportDataCommand command) {
 		dataService.validateInventoryLevels(command)
 	}
 
-	public void importData(ImportDataCommand command) { 
+	void importData(ImportDataCommand command) {
 		dataService.importInventoryLevels(command)
 	}
 

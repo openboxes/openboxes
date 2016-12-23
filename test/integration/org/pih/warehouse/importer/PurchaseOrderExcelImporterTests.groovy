@@ -1,19 +1,22 @@
 package org.pih.warehouse.importer
 
+import grails.test.mixin.integration.Integration
 import org.apache.commons.lang.StringUtils
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 
-class PurchaseOrderExcelImporterTests extends GroovyTestCase {
-    protected void setUp() {
-        super.setUp()
-    }
+@Integration
+class PurchaseOrderExcelImporterTests {
 
-    protected void tearDown() {
-        super.tearDown()
-    }
+    @Before
+    void setUp() { }
+
+    @After
+    void tearDown() { }
 
     @Test
     void testSomething() {

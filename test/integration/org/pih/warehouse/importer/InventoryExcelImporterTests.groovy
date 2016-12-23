@@ -1,6 +1,9 @@
 package org.pih.warehouse.importer
 
+import grails.test.mixin.integration.Integration
 import org.apache.commons.lang.StringUtils
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -14,15 +17,14 @@ import org.springframework.core.io.Resource
 
 import java.text.SimpleDateFormat
 
-class InventoryExcelImporterTests extends GroovyTestCase {
+@Integration
+class InventoryExcelImporterTests {
 
-    protected void setUp() {
-        super.setUp()
-    }
+    @Before
+    void setUp() { }
 
-    protected void tearDown() {
-        super.tearDown()
-    }
+    @After
+    void tearDown() { }
 
     @Test
     void testSomething() {

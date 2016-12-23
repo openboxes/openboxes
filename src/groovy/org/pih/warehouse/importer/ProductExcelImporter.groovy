@@ -10,7 +10,9 @@
 package org.pih.warehouse.importer
 
 
-import org.grails.plugins.excelimport.AbstractExcelImporter;
+import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExcelImportService;
+
 import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 
 
@@ -54,20 +56,22 @@ class ProductExcelImporter extends AbstractExcelImporter {
 		code:([expectedType: StringType, defaultValue:null])
 	]
 
+	def getExcelImportService() {
+		ExcelImportService.getService()
+	}
 
-
-	public ProductExcelImporter(String fileName) {
+	ProductExcelImporter(String fileName) {
 		super(fileName)
 		productService = grailsApplication.getMainContext().getBean("productService")
 	}
 
 
 	List<Map> getData() {
-		return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+		return excelImportService.columns(workbook, columnMap, null, propertyMap)
 	}
 
 
-	public void validateData(ImportDataCommand command) {
+	void validateData(ImportDataCommand command) {
 		productService.validateData(command)
 	}
 	
@@ -79,7 +83,7 @@ class ProductExcelImporter extends AbstractExcelImporter {
 	 * @param inventoryMapList
 	 * @param errors
 	 */
-	public void importData(ImportDataCommand command) {
+	void importData(ImportDataCommand command) {
 		productService.importData(command)
 
 	}
