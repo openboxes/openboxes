@@ -685,6 +685,9 @@ class ProductService {
             log.info "Import product " + productProperties.productCode + " " + productProperties.name
             // Update existing
             def product = Product.findByIdOrProductCode(productProperties.id, productProperties.productCode)
+
+            def productSpecificTags = productProperties.remove("tags")
+
             if (product) {
                 product.properties = productProperties
             }
@@ -696,7 +699,7 @@ class ProductService {
             log.info "Old tags " + product.tags
             log.info "New tags: " + tags + ", " + productProperties.tags
             addTagsToProduct(product, tags)
-            addTagsToProduct(product, productProperties.tags)
+            addTagsToProduct(product, productSpecificTags)
 
             // Create a new generic product
 //            log.info "Old productGroups: " + product.productGroups
@@ -862,7 +865,7 @@ class ProductService {
 		def list = sqlQuery.list()
 		list.each { 
 			Tag tag = Tag.get(it[0])
-			popularTags[tag] = it[1]	
+			popularTags[tag] = it[1] as int
 		}
 		return popularTags		
 	}
@@ -925,11 +928,6 @@ class ProductService {
             }
             log.info "Product " + product.properties
             product.addToTags(tag)
-            if (product.id) {
-                log.info "Before merge " + product.properties
-                product = product.merge()
-                log.info "After merge " + product.properties
-            }
             product.save(flush:true)
         }
         else {
@@ -948,7 +946,7 @@ class ProductService {
 	 */
 	def deleteTag(product, tag) { 
 		product.removeFromTags(tag)
-		tag.delete();
+		tag.delete(flush:true);
 	}
 
     /**
