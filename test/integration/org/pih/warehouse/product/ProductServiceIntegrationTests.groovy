@@ -1,9 +1,12 @@
 package org.pih.warehouse.product
 
+import grails.test.mixin.integration.Integration
+import org.junit.Before
 import org.junit.Ignore
 
 // import org.apache.commons.lang.StringUtils
 import org.junit.Test;
+import static org.junit.Assert.*
 import org.pih.warehouse.core.Constants
 // import org.pih.warehouse.core.Location
 // import org.pih.warehouse.core.LocationType
@@ -13,8 +16,8 @@ import org.pih.warehouse.core.Tag;
 import testutils.DbHelper
 
 
-
-class ProductServiceIntegrationTests extends GroovyTestCase {
+@Integration
+class ProductServiceIntegrationTests {
 	
 	
 	def productService
@@ -30,7 +33,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     /**
      *
      */
-	protected void setUp(){
+	@Before
+	void setUp(){
 		product1 = DbHelper.createProductWithGroups("boo floweree 250mg",["Hoo moodiccina", "Boo floweree"])
 		product2 = DbHelper.createProductWithGroups("boo pill",["Boo floweree"])
 		product3 = DbHelper.createProductWithGroups("foo",["Hoo moodiccina"])
@@ -149,10 +153,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         products[0].lastUpdated = new Date()
 
         productService.importProducts(products)
-		def product = Product.findByName("product 1235")
-		assertNotNull product
-		category = Category.findByName("category 123")
-		assertNotNull category
+
+		assertNotNull Product.findByName("product 1235")
+		assertNotNull Category.findByName("category 123")
 	}
 
     @Test
@@ -182,6 +185,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 
         def products = productService.validateProducts(csv)
+
+        println products
         productService.importProducts(products)
 		
 		def productAfter = Product.get(productBefore.id)
@@ -358,10 +363,14 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void findOrCreateCategory_shouldCreateNewCategory() {
 		def categoryName = "Nonexistent Category"
 		def nonexistentCategory = Category.findByName(categoryName)
-		assertNull nonexistentCategory
+
+        assertNull nonexistentCategory
+
 		def category = productService.findOrCreateCategory(categoryName)
-		def existingCategory = Category.findByName(categoryName)
-		assertEquals existingCategory, category
+
+        assertNotNull category
+        assertNotNull category.id
+		assertEquals categoryName, category.name
 	}
 
     @Test
@@ -510,12 +519,21 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	}
 
     @Test
+    void addTagToProduct_shouldAddTagToProduct() {
+        def product = Product.findByName("Ibuprofen 200mg tablet")
+        productService.addTagToProduct(product, "new tag")
+        assertEquals 4, product.tags.size()
+        assertEquals product.tagsToString(), "favorite,new tag,nsaid,pain"
+    }
+
+
+    @Test
 	void addTagsToProduct_shouldAddTagToProduct() {
 		def product = Product.findByName("Ibuprofen 200mg tablet")
 		assertNotNull product		
 		productService.addTagsToProduct(product, ["awesome", "super"])
 		println product.tags*.tag		
-		assertEquals product.tagsToString(), "awesome,favorite,nsaid,pain,super"		
+		assertEquals product.tagsToString(), "awesome,favorite,nsaid,pain,super"
 	}
 
     @Test

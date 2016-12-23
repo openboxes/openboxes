@@ -81,7 +81,7 @@ class DbHelper {
             inventoryLevel.minQuantity = min
             inventoryLevel.reorderQuantity = reorder
             inventoryLevel.maxQuantity = max
-            inventoryLevel.save(failOnError: true)
+            inventoryLevel.save(flush:true, failOnError: true)
         }
         return inventoryLevel
 

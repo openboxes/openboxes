@@ -1,12 +1,15 @@
 package org.pih.warehouse.core
 
+import grails.test.mixin.integration.Integration
+
 // import groovy.util.GroovyTestCase;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test
-// import com.dumbster.smtp.SimpleSmtpServer
+import static org.junit.Assert.*
 
-class IdentifierServiceTests extends GroovyTestCase{
+@Integration
+class IdentifierServiceTests {
   
 	def identifierService
 		

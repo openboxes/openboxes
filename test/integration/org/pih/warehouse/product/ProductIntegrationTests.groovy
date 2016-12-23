@@ -1,13 +1,15 @@
 package org.pih.warehouse.product
 
+import grails.test.mixin.integration.Integration
 import org.junit.Ignore
 import org.junit.Test
+import static org.junit.Assert.*
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
 import testutils.DbHelper
 
-class ProductIntegrationTests extends GroovyTestCase {
-
+@Integration
+class ProductIntegrationTests {
 
     @Test
     void getInventoryLevels_shouldNotFailOnNonPersistedProduct() {
@@ -25,7 +27,6 @@ class ProductIntegrationTests extends GroovyTestCase {
         product.getInventoryLevel(bostonLocation.id)
     }
 
-
     @Test
     void testSaveProductProductGroup(){
         def suppliers = Category.findByName("Supplies")
@@ -40,8 +41,6 @@ class ProductIntegrationTests extends GroovyTestCase {
         assert group.save(flush:true, failOnError:true)
         assert product.productGroups.contains(group)
         assert group.products.contains(product)
-
-
     }
 
 
@@ -115,7 +114,7 @@ class ProductIntegrationTests extends GroovyTestCase {
 
 
     @Test
-    void deleteSynonym_shouldCascadeOnDelete() {
+    void deleteSynonym_shouldNotCascadeOnDelete() {
         def category = new Category(name: "new category").save(flush: true)
         def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
 
@@ -131,12 +130,11 @@ class ProductIntegrationTests extends GroovyTestCase {
 
         // Remove the synonym from product synonyms, which should not cause a cascade delete on synonym
         product1.removeFromSynonyms(synonym)
+        product1.save(flush:true)
         println "Synonyms: " + Synonym.list().size()
 
         assertEquals 0, product1.synonyms.size()
         assertNull Synonym.findByName("new synonym")
-
-
     }
 
     @Test
@@ -153,7 +151,7 @@ class ProductIntegrationTests extends GroovyTestCase {
 
         assertEquals 1, product1.synonyms.size()
 
-        product1.delete()
+        product1.delete(flush:true)
 
         assertNull Synonym.findByName("new synonym")
 

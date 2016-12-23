@@ -1,5 +1,6 @@
 package org.pih.warehouse.requisition
 
+import grails.test.mixin.integration.Integration
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -7,11 +8,13 @@ import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.Category
+import static org.junit.Assert.*
 
-class RequisitionIntegrationTests extends GroovyTestCase {
+@Integration
+class RequisitionIntegrationTests {
 
     def sessionFactory
-
 
     @Before
     void setUp() {
@@ -42,8 +45,10 @@ class RequisitionIntegrationTests extends GroovyTestCase {
     @Test
     void save_shouldSaveRequisition() {
         def location = Location.list().first()
-        def product1 = Product.findByName("Advil 200mg")
-        def product2 = Product.findByName("Tylenol 325mg")
+        def category = Category.findOrCreateWhere(name: "Medicines").save(flush:true)
+        def product1 = Product.findOrCreateWhere(name: "Advil 200mg", category: category).save(flush:true)
+        def product2 = Product.findOrCreateWhere(name: "Tylenol 325mg", category: category).save(flush:true)
+
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()
@@ -63,7 +68,11 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         requisition.validate()
         requisition.errors.each{ println(it)}
 
-        assert requisition.save(flush:true)
+        requisition.save(flush:true)
+
+        assertNotNull requisition
+        assertNotNull requisition.id
+
 
 
     }
@@ -88,7 +97,10 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 		def item = new RequisitionItem(product: product, quantity: 10)
 		requisition.addToRequisitionItems(item);
 		
-		assert requisition.save(flush:true)
+		requisition.save(flush:true)
+
+        assertNotNull requisition
+        assertNotNull requisition.id
 		assertEquals 1, requisition.requisitionItems.size()
 
     }

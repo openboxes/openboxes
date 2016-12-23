@@ -7,10 +7,13 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
+
+import grails.test.mixin.integration.Integration
+import org.junit.Before
+import org.junit.Test;
 
 import static org.junit.Assert.*
-import grails.test.*
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -18,7 +21,8 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-class ShipmentItemTests extends GroovyTestCase {
+@Integration
+class ShipmentItemTests {
 	
 	def shipmentItem1
 	def shipmentItem2
@@ -26,10 +30,9 @@ class ShipmentItemTests extends GroovyTestCase {
 	def shipmentItem4
 	def shipmentItem5
 	def shipmentItem6
-	
-	protected void setUp() {
-		super.setUp()
-		
+
+    @Before
+	void setUp() {
 		new Category(name: "Medicines").save(flush:true);
 		new Product(name: "Ibuprofen", category: Category.findByName("Medicines")).save(flush:true);
 		new Product(name: "Tylenol", category: Category.findByName("Medicines")).save(flush:true);
@@ -95,12 +98,14 @@ class ShipmentItemTests extends GroovyTestCase {
 	}
 
 
+    @Test
 	void test_compareTo_shouldShipmentItem1BeforeShipmentItem2() { 
 		def expectedValue = -1
 		def actualValue = shipmentItem1.compareTo(shipmentItem2)
 		assertEquals expectedValue, actualValue
 	}
-	
+
+    @Test
 	void test_sort_shouldSortProperly() { 
 		//def expectedValue = [shipmentItem6, shipmentItem1, shipmentItem5, shipmentItem2, shipmentItem3, shipmentItem4]
 		def expectedValue = [shipmentItem5, shipmentItem1, shipmentItem4, shipmentItem6, shipmentItem3, shipmentItem2]

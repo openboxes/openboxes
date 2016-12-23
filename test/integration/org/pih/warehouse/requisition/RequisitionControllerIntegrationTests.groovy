@@ -1,5 +1,6 @@
 package org.pih.warehouse.requisition
 
+import grails.test.mixin.integration.Integration
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -7,9 +8,11 @@ import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-class RequisitionControllerIntegrationTests extends GroovyTestCase {
+@Integration
+class RequisitionControllerIntegrationTests {
 
     def sessionFactory
     def dataService
@@ -17,23 +20,13 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
     def requisitionService
     def productService
 
-    @Before
-    void setUp() {
-        assertNotNull sessionFactory
-        println sessionFactory.getStatistics()
-    }
-
-    @After
-    void tearDown() {
-        assertNotNull sessionFactory
-        println sessionFactory.getStatistics()
-    }
 
     @Test
     void list_shouldListRequisitions() {
-        def location = Location.findByName("Boston Headquarters")
-        def product1 = Product.findByName("Advil 200mg")
-        def product2 = Product.findByName("Tylenol 325mg")
+        def location = Location.findOrCreateByName("Boston Headquarters").save(flush:true)
+        def category = Category.findOrCreateByName("Medicine").save(flush:true)
+        def product1 = Product.findOrCreateWhere(name: "Advil 200mg", category: category).save(flush:true)
+        def product2 = Product.findOrCreateWhere(name: "Tylenol 325mg", category: category).save(flush:true)
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()
@@ -56,8 +49,8 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
         controller.session.user = User.list().first()
         controller.list()
 
-        assertTrue controller.modelAndView.viewName.contains("list")
-        assertEquals 1, controller.modelAndView.model.requisitions.size()
+        assert controller.modelAndView.viewName.contains("list")
+        assert 1 == controller.modelAndView.model.requisitions.size()
 
     }
 

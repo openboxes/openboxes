@@ -7,7 +7,9 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
+
+import grails.test.mixin.integration.Integration;
 
 import static org.junit.Assert.*;
 
@@ -26,13 +28,14 @@ import org.pih.warehouse.product.Product;
 
 import testutils.DbHelper;
 
-class ShipmentServiceTests extends GroovyTestCase {
+@Integration
+class ShipmentServiceTests {
 
 	def shipmentService;
-	
-	protected void setUp() {
-		super.setUp()
-		
+
+	@Before
+	void setUp() {
+
 		new Category(name: "Category").save(flush:true);
 		new Product(name: "Product", category: Category.findByName("Category")).save(flush:true);
 		new ShipmentType(name: "Ground").save(flush:true)
@@ -68,7 +71,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	}
 
 
-
+    @Test
 	void test_saveShipment_shouldSaveShipment() {	
 		def shipment3 = new Shipment();
 		shipment3.name = "New Shipment 3"
@@ -88,7 +91,8 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	 * Add a container to a shipment.
 	 */
-	void test_addToContainers_shouldAddContainerToShipment() { 	
+    @Test
+	void test_addToContainers_shouldAddContainerToShipment() {
 		def shipment = Shipment.findByName("New Shipment 1")
 		assertNotNull shipment
 
@@ -103,6 +107,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	 * Add a shipment item to a shipment.
 	 */
+    @Test
 	void test_addShipmentItems_shouldAddShipmentItemToShipment() {
 		def shipment = Shipment.findByName("New Shipment 1")
 
@@ -122,6 +127,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	 * Move a container to another shipment.
 	 */
+    @Test
 	void test_moveContainer_shouldMoveContainerToShipment() {
 		def shipment1 = Shipment.findByName("New Shipment 1")
 		def shipment2 = Shipment.findByName("New Shipment 2")
@@ -162,8 +168,9 @@ class ShipmentServiceTests extends GroovyTestCase {
 		assertEquals "Pallet shipment should equal Shipment 2", shipment2, Container.findByName("Pallet 1").shipment
 	}
 
-	
-	void test_moveContainer_shouldMoveContainerWithShipmentItemsToShipment() { 
+
+    @Test
+	void test_moveContainer_shouldMoveContainerWithShipmentItemsToShipment() {
 		def shipment1 = Shipment.findByName("New Shipment 1")
 		def shipment2 = Shipment.findByName("New Shipment 2")
 		def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
@@ -201,6 +208,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	* Move a container to another shipment.
 	*/
+    @Test
    void test_moveContainer_shouldMoveChildContainersToShipment() {
 	   def shipment1 = Shipment.findByName("New Shipment 1")
 	   def shipment2 = Shipment.findByName("New Shipment 2")	   
@@ -234,7 +242,8 @@ class ShipmentServiceTests extends GroovyTestCase {
    /**
     * 
     */
-   void test_deleteShipment_shouldCascadeDeleteContainers() {
+    @Test
+    void test_deleteShipment_shouldCascadeDeleteContainers() {
 	   def shipment1 = Shipment.findByName("New Shipment 1")	   
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))	   
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
@@ -261,8 +270,9 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   assertEquals "Should be equal to # of containers before delete minus 1", numberOfContainersBeforeDelete-1, Container.count()
 	   
    }
-   
-   void test_deleteShipment_shouldCascadeDeleteShipmentItems() {
+
+    @Test
+    void test_deleteShipment_shouldCascadeDeleteShipmentItems() {
 	   def shipment1 = Shipment.findByName("New Shipment 1")
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
@@ -288,7 +298,8 @@ class ShipmentServiceTests extends GroovyTestCase {
    /**
     * @TODO Should be moved to  
     */
-   void test_deleteContainer_shouldDeleteContainerButNotShipmentItems() {
+    @Test
+    void test_deleteContainer_shouldDeleteContainerButNotShipmentItems() {
 	   def shipment1 = Shipment.findByName("New Shipment 1")
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
@@ -312,6 +323,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   
    }
 
+    @Test
    void test_deleteShipmentItem_shouldDeleteShipmentItemFromShipment() {
 	   def shipment = Shipment.findByName("New Shipment 1")
 	   //def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
@@ -321,8 +333,9 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   shipmentService.deleteShipmentItem(shipmentItem1)	   
 	   assertEquals "Should be equal to 0", 0, shipment?.shipmentItems?.size()?:0
    }
-   
-   
+
+
+    @Test
    void test_deleteShipmentItem_shouldDeleteShipmentItemWithContainerFromShipment() {
 	   def shipment = Shipment.findByName("New Shipment 1")
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))

@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.data
 
+import grails.test.mixin.integration.Integration
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.junit.Ignore
 import org.junit.Test
@@ -18,8 +19,8 @@ import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 
-class DataServiceTests extends GroovyTestCase {
-
+@Integration
+class DataServiceTests {
 
     def dataService
 
@@ -36,47 +37,47 @@ class DataServiceTests extends GroovyTestCase {
     @Test
     void findOrCreateCategory() {
         def category = dataService.findOrCreateCategory("New Category")
-        assertNotNull category
-        assertEquals "New Category", category.name
+        assert category != null
+        assert "New Category" == category.name
     }
 
     @Test
-    void findOrCreateProduct() {
+    void test_findOrCreateProduct() {
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
-        assertNotNull product
-        assertEquals "AB12", product.productCode
-        assertEquals "New product", product.name
-        assertEquals "Mfg", product.manufacturer
-        assertEquals "Mfgcode", product.manufacturerCode
-        assertEquals "Vendor", product.vendor
-        assertEquals "Vendor code", product.vendorCode
-        assertEquals "each", product.unitOfMeasure
+        assert product != null
+        assert "AB12" == product.productCode
+        assert "New product" == product.name
+        assert "Mfg" == product.manufacturer
+        assert "Mfgcode" == product.manufacturerCode
+        assert "Vendor" == product.vendor
+        assert "Vendor code" == product.vendorCode
+        assert "each" == product.unitOfMeasure
     }
 
     @Test
-    void findOrCreateUnitOfMeasure() {
+    void test_indOrCreateUnitOfMeasure() {
         def unitOfMeasure = dataService.findOrCreateUnitOfMeasure("EA")
-        assertNotNull unitOfMeasure
-        assertEquals "EA", unitOfMeasure.code
+        assert unitOfMeasure != null
+        assert "EA" == unitOfMeasure.code
     }
 
     @Test
-    void findOrCreateProductPackage() {
+    void test_findOrCreateProductPackage() {
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         def productPackage = dataService.findOrCreateProductPackage(product, "EA", 1, 1.50)
-        assertNotNull productPackage
-        assertEquals "EA/1", productPackage.name
-        assertEquals "EA/1", productPackage.description
-        assertEquals 1.50, productPackage.price
-        assertEquals "EA", productPackage.uom.code
-        assertEquals "EA", productPackage.uom.name
-        assertEquals "EA", productPackage.uom.description
+        assert productPackage != null
+        assert "EA/1" == productPackage.name
+        assert "EA/1" == productPackage.description
+        assert 1.50 == productPackage.price
+        assert "EA" == productPackage.uom.code
+        assert "EA" == productPackage.uom.name
+        assert "EA" == productPackage.uom.description
     }
 
     @Test
-    void findOrCreateInventoryLevel() {
+    void test_findOrCreateInventoryLevel() {
         def location = Location.findByName("Boston Headquarters");
-        assertNotNull location
+        assert location != null
         if (!location.inventory) {
             location.inventory = new Inventory();
             location.save(flush: true, failOnError: true)
@@ -85,21 +86,21 @@ class DataServiceTests extends GroovyTestCase {
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, "AB-12-12", 0, 10, 100, true)
 
-        assertNotNull inventoryLevel
+        assert inventoryLevel != null
         //assertEquals "AB-12-12", inventoryLevel.binLocation
-        assertEquals 0, inventoryLevel.minQuantity
-        assertEquals 10, inventoryLevel.reorderQuantity
-        assertEquals 100, inventoryLevel.maxQuantity
-        assertEquals "Boston Headquarters", inventoryLevel.inventory.warehouse.name
-        assertEquals "AB12", inventoryLevel.product.productCode
-        assertEquals "New product", inventoryLevel.product.name
-        assertTrue inventoryLevel.preferred
+        assert 0 == inventoryLevel.minQuantity
+        assert 10 == inventoryLevel.reorderQuantity
+        assert 100 == inventoryLevel.maxQuantity
+        assert "Boston Headquarters" == inventoryLevel.inventory.warehouse.name
+        assert "AB12" == inventoryLevel.product.productCode
+        assert "New product" == inventoryLevel.product.name
+        assert inventoryLevel.preferred
     }
 
 
 
     @Ignore
-    void importInventoryLevels() {
+    void test_importInventoryLevels() {
         def startTime = System.currentTimeMillis()
 
         // Get the
@@ -203,7 +204,7 @@ class DataServiceTests extends GroovyTestCase {
      }
 
     @Ignore
-    void importProductGroups() {
+    void test_importProductGroups() {
         def startTime = System.currentTimeMillis()
 
         // Get the

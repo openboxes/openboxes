@@ -10,7 +10,10 @@
 package org.pih.warehouse.product
 
 import grails.test.*
+import grails.test.mixin.integration.Integration
 import groovy.sql.Sql
+import org.junit.After
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test;
 
@@ -19,13 +22,14 @@ import org.junit.Test;
 // import org.pih.warehouse.inventory.InventoryItem
 // import org.springframework.dao.InvalidDataAccessApiUsageException;
 
-class ProductGroupIntegrationTests extends GroovyTestCase {
+@Integration
+class ProductGroupIntegrationTests {
 	
 	def dataSource
-	
-	protected void setUp() {
-		super.setUp()
-		
+
+    @Before
+	void setUp() {
+
 		def category = new Category(name: "Medicines")
 		category.save(flush:true)
 		
@@ -49,8 +53,9 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 
 	}
 
-	protected void tearDown() {
-		super.tearDown()
+    @After
+	void tearDown() {
+
 	}
 
 
@@ -59,9 +64,9 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		
 		def productGroup = ProductGroup.findByDescription("Ibuprofen")
 		println productGroup
-		assertNotNull productGroup
-		assertNotNull productGroup.products
-		assertEquals 1, productGroup.products.size()		
+		assert productGroup
+		assert productGroup.products
+		assert 1 == productGroup.products.size()
 	}
 
 
@@ -70,20 +75,20 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
 		println product
-		assertNotNull product
+		assert product
 		
 		def productGroup = ProductGroup.findByDescription("Ibuprofen")
 		println productGroup
-		assertNotNull productGroup
+        assert productGroup
 
-		
-		assertEquals "Ibuprofen, 200 mg, tablet", product.name
-		assertNotNull product.productGroups
-		assertTrue product.productGroups.contains(productGroup)
-		
-		assertEquals "Ibuprofen", productGroup.description
-		assertNotNull productGroup.products
-		assertTrue productGroup.products.contains(product)
+
+        assert "Ibuprofen, 200 mg, tablet" == product.name
+        assert product.productGroups
+        assert product.productGroups.contains(productGroup)
+
+        assert "Ibuprofen" == productGroup.description
+        assert productGroup.products
+        assert productGroup.products.contains(product)
 	}
 
     // This test doesn't fail any longer.
@@ -111,31 +116,32 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 	void test_delete_shouldDeleteProductGroupAndProductAssociation() {
 		
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
-		assertNotNull product
+        assert product
         println product.category
         println product.category.categories
 
 		def productGroup = ProductGroup.findByDescription("Ibuprofen")
-		assertNotNull productGroup
+        assert productGroup
 
 		product.removeFromProductGroups(productGroup)		
 		productGroup.delete()
 		
-		product = Product.findByName("Ibuprofen, 200 mg, tablet")		
-		assertEquals 0, product.productGroups.size()
-		assertEquals 0, productGroup.products.size()
+		product = Product.findByName("Ibuprofen, 200 mg, tablet")
+        assert 0 == product.productGroups.size()
+        assert 0 == productGroup.products.size()
 	}
-	
+
+    @Test
 	void test_productGroup_shouldNotPersistNonOwningAssociation() { 
 		printAllProducts()
 		def product = Product.findByName("Tylenol, 325 mg, tablet")
-		assertNotNull product
+		assert product
 				
 		def productGroup = ProductGroup.findByDescription("Tylenol")
-		assertNotNull productGroup
-		assertNotNull productGroup.products
-		assertEquals 1, productGroup.products.size()
-		assertTrue productGroup.products.contains(product)
+        assert productGroup
+        assert productGroup.products
+        assert 1 == productGroup.products.size()
+        assert productGroup.products.contains(product)
 	}
 	
 	void printAllProducts() { 
