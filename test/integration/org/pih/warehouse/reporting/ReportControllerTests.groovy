@@ -1,28 +1,16 @@
 package org.pih.warehouse.reporting
 
-import grails.buildtestdata.mixin.Build
-import grails.converters.JSON
-import grails.test.ControllerUnitTestCase
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import org.junit.Test
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.reporting.ReportController
 
-@TestFor(ReportController)
-@Mock(Location)
-@TestMixin(GrailsUnitTestMixin)
-@Build(Location)
-class ReportControllerTests {
+class ReportControllerTests extends GroovyTestCase {
 
     @Test
-    void showInventorySamplingReport() {
+    void testShowInventorySamplingReport() {
         def location = Location.findOrCreateWhere(name: "Boston Headquarters");
         assert location != null
 
-
+        def controller = new ReportController()
         controller.session.warehouse = location
         controller.params.n = 4
         controller.showInventorySamplingReport()
@@ -32,10 +20,11 @@ class ReportControllerTests {
     }
 
     @Test
-    void showInventorySamplingReport_shouldHandleErrorCase() {
+    void testShowInventorySamplingReport_shouldHandleErrorCase() {
         def location = Location.findOrCreateWhere(name: "Boston Headquarters");
         assert location != null
 
+        def controller = new ReportController()
         controller.session.warehouse = location
         controller.showInventorySamplingReport()
 
