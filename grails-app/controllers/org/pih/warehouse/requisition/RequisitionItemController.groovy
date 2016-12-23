@@ -26,11 +26,11 @@ class RequisitionItemController {
 	
     //static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         println "List requisition items " + params
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)
         //[requisitionItemInstanceList: RequisitionItem.list(params), requisitionItemInstanceTotal: RequisitionItem.count()]
@@ -47,7 +47,7 @@ class RequisitionItemController {
 
     }
 
-    def listCanceled = {
+    def listCanceled() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         params.offset = params.offset?:0
         def location = Location.get(session.warehouse.id)
@@ -56,7 +56,7 @@ class RequisitionItemController {
         render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.totalCount])
     }
 
-    def listPending = {
+    def listPending() {
         def location = Location.get(session.warehouse.id)
         def requisitionItemInstanceList = requisitionService.getPendingRequisitionItems(location)
 
@@ -64,13 +64,13 @@ class RequisitionItemController {
     }
 
 
-    def create = {
+    def create() {
         def requisitionItemInstance = new RequisitionItem()
         requisitionItemInstance.properties = params
         return [requisitionItemInstance: requisitionItemInstance]
     }
 
-    def save = {
+    def save() {
         def requisitionItemInstance = new RequisitionItem(params)
         if (requisitionItemInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), requisitionItemInstance.id])}"
@@ -81,7 +81,7 @@ class RequisitionItemController {
         }
     }
 
-    def show = {
+    def show() {
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (!requisitionItemInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
@@ -92,7 +92,7 @@ class RequisitionItemController {
         }
     }
 
-    def edit = {
+    def edit() {
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (!requisitionItemInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
@@ -103,7 +103,7 @@ class RequisitionItemController {
         }
     }
 
-    def change = {
+    def change() {
         def location = Location.get(session.warehouse.id)
         def requisitionItemInstance = RequisitionItem.get(params.id)
         def quantityOnHand = inventoryService.getQuantityOnHand(location, requisitionItemInstance?.product)?:0
@@ -119,7 +119,7 @@ class RequisitionItemController {
         }
     }
 
-    def update = {
+    def update() {
         def requisitionItemInstance = RequisitionItem.get(params.id)
         if (requisitionItemInstance) {
             if (params.version) {
@@ -148,7 +148,7 @@ class RequisitionItemController {
         }
     }
 
-    def delete = {
+    def delete() {
 		
 		println "Delete requisition item " + params
         def requisitionItemId = 0
@@ -186,7 +186,7 @@ class RequisitionItemController {
 
 
 
-    def changeQuantity = {
+    def changeQuantity() {
         log.info "change quantity " + params
       //  def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
@@ -212,7 +212,7 @@ class RequisitionItemController {
     /**
      *  Allow user to cancel the given requisition item.
      */
-    def cancelQuantity = {
+    def cancelQuantity() {
         log.info "cancel quantity = " + params
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
@@ -244,7 +244,7 @@ class RequisitionItemController {
     /**
      *  Allow user to approve the given requisition item.
      */
-    def approveQuantity = {
+    def approveQuantity() {
         log.info "approve quantity = " + params
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
@@ -261,7 +261,7 @@ class RequisitionItemController {
     /**
      * Allow user to undo changes made during the review process.
      */
-    def undoChanges = {
+    def undoChanges() {
         log.info "cancel quantity = " + params
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
@@ -281,7 +281,7 @@ class RequisitionItemController {
     /**
      * Allow user to choose substitute during the review process.
      */
-    def chooseSubstitute = {
+    def chooseSubstitute() {
         log.info "choose substitute " + params
         def redirectAction = params?.redirectAction ?: "review"
         def requisitionItem = RequisitionItem.get(params.id)
@@ -321,7 +321,7 @@ class RequisitionItemController {
     /**
      *
      */
-	def cancelPicking = {
+	def cancelPicking() {
 		log.info "Cancel requisition item " + params
 		
 		def requisitionItem = RequisitionItem.get(params.id)
@@ -340,7 +340,7 @@ class RequisitionItemController {
     }
 
 
-    def undoCancelPicking = {
+    def undoCancelPicking() {
         println params
 		def requisitionItem = RequisitionItem.get(params.id)
 		if (requisitionItem) {
@@ -357,7 +357,7 @@ class RequisitionItemController {
 		}
 	}
 
-    def undoCancelReviewing = {
+    def undoCancelReviewing() {
         println "Undo changes: " + params
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
@@ -374,7 +374,7 @@ class RequisitionItemController {
         }
     }
 
-    def addAddition = {
+    def addAddition() {
         log.info "add addition " + params
         /*
 		def requisition = Requisition.get(params.id)
@@ -392,7 +392,7 @@ class RequisitionItemController {
         redirect(controller: "requisition", action: "review", id: requisition?.id)
     }
 
-    def addSubstitution = {
+    def addSubstitution() {
         log.info "add substitution " + params
         /*
 		def requisition = Requisition.get(params.id)
@@ -414,7 +414,7 @@ class RequisitionItemController {
 
 
 
-    def undoChangeQuantity = {
+    def undoChangeQuantity() {
        // def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
 
@@ -434,7 +434,7 @@ class RequisitionItemController {
 
     }
 
-    def substitute = {
+    def substitute() {
         println "substitute " + params
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         def requisition = Requisition.get(params.id)
@@ -457,7 +457,7 @@ class RequisitionItemController {
     }
 
 
-    def export = {
+    def export() {
         def date = new Date();
         def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
         def requisitionItems = []

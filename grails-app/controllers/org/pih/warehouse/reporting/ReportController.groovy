@@ -57,7 +57,7 @@ class ReportController {
     }
 
 
-    def exportInventoryReport = {
+    def exportInventoryReport() {
         println "Export inventory report " + params
         def map = []
         def location = Location.get(session.warehouse.id)
@@ -76,13 +76,13 @@ class ReportController {
         return;
     }
 
-	def showInventoryReport = {
+	def showInventoryReport() {
 
 
 	}
 
 
-    def showInventorySamplingReport = {
+    def showInventorySamplingReport() {
 
         def sw = new StringWriter()
         def count = (params.n?:10).toInteger()
@@ -133,7 +133,7 @@ class ReportController {
 
 
 
-    def showConsumptionReport = {
+    def showConsumptionReport() {
 
         def transactions = Transaction.findAllByTransactionDateBetween(new Date()-10, new Date())
 
@@ -141,7 +141,7 @@ class ReportController {
     }
 
 
-	def showProductReport = { ProductReportCommand command -> 	
+	def showProductReport(ProductReportCommand command) {
 		
 		//if (!command?.product) { 
 		//	throw new Exception("Unable to locate product " + params?.product?.id)
@@ -157,7 +157,7 @@ class ReportController {
 	}
 	
 	
-	def showTransactionReport = { 
+	def showTransactionReport() {
 		
 		InventoryReportCommand command = new InventoryReportCommand();
 		command.rootCategory = productService.getRootCategory();
@@ -167,7 +167,7 @@ class ReportController {
 	}
 	
 	
-	def generateTransactionReport = { InventoryReportCommand command -> 
+	def generateTransactionReport(InventoryReportCommand command) {
 		// We always need to initialize the root category 
 		command.rootCategory = productService.getRootCategory();
 		if (!command?.hasErrors()) { 			
@@ -176,7 +176,7 @@ class ReportController {
 		render(view: 'showTransactionReport', model: [command : command])
 	}
 	
-	def showShippingReport = { ChecklistReportCommand command ->
+	def showShippingReport(ChecklistReportCommand command) {
 		command.rootCategory = productService.getRootCategory();
 		if (!command?.hasErrors()) {
 			reportService.generateShippingReport(command);
@@ -184,7 +184,7 @@ class ReportController {
 		[command : command]
 	}
 	
-	def showPaginatedPackingListReport = { ChecklistReportCommand command ->
+	def showPaginatedPackingListReport(ChecklistReportCommand command) {
 		command.rootCategory = productService.getRootCategory();
 		if (!command?.hasErrors()) {
 			reportService.generateShippingReport(command);
@@ -192,7 +192,7 @@ class ReportController {
 		[command : command]
 	}	
 	
-	def printShippingReport = { ChecklistReportCommand command ->
+	def printShippingReport(ChecklistReportCommand command) {
 		command.rootCategory = productService.getRootCategory();
 		if (!command?.hasErrors()) {
 			reportService.generateShippingReport(command);
@@ -200,7 +200,7 @@ class ReportController {
 		[command : command]
 	}
 	
-	def printPaginatedPackingListReport = { ChecklistReportCommand command ->
+	def printPaginatedPackingListReport(ChecklistReportCommand command) {
 		try {
 			command.rootCategory = productService.getRootCategory();
 			if (!command?.hasErrors()) {
@@ -214,7 +214,7 @@ class ReportController {
 	}
 	
 
-	def downloadTransactionReport = {		
+	def downloadTransactionReport() {
 		def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
 
 		// JSESSIONID is required because otherwise the login page is rendered
@@ -241,7 +241,7 @@ class ReportController {
 		reportService.generatePdf(url, response.getOutputStream())
 	}
 	
-	def downloadShippingReport = {		
+	def downloadShippingReport() {
 		if (params.format == 'docx') { 
 			def tempFile = documentService.generateChecklistAsDocx()
 	//		def filename = "shipment-checklist.docx"

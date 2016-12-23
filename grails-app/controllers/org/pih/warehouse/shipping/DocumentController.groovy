@@ -40,7 +40,7 @@ class DocumentController {
     /**
      * Show index page - just a redirect to the list page.
      */
-	def index = {    	
+	def index() {
 		log.info "document controller index";
 		redirect(action: "list", params:params)
 	}
@@ -49,7 +49,7 @@ class DocumentController {
 	 * Saves changes to document metadata (or, more specifically, saves changes to metadata--type,name,documentNumber--associated with
 	 * a document without modifying the document itself--the upload method handles this)
 	 */
-	def save = { DocumentCommand command ->
+	def save(DocumentCommand command) {
 		// fetch the existing document
 		Document documentInstance = Document.get(params.documentId)
 		if (!documentInstance) {
@@ -87,7 +87,7 @@ class DocumentController {
 	/**
 	* Upload a document to the server
 	*/
-   def upload = { DocumentCommand command ->
+   def upload(DocumentCommand command) {
 	   log.info "Uploading document: " + params	  	   
 	   def file = command.fileContents;	   
 	   def shipmentInstance = Shipment.get(command.shipmentId);	   
@@ -191,7 +191,7 @@ class DocumentController {
 	/**
 	 * Allow user to download the file associated with the given id.
 	 */
-	def download = { 
+	def download() {
 		log.debug "Download file with id = ${params.id}";
 
 		def document = Document.get(params.id)

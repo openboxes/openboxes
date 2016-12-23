@@ -21,7 +21,7 @@ class Doc4jController {
 	def documentService
 	def shipmentService 
 		
-	def downloadLetter = { 
+	def downloadLetter() {
 		def shipmentInstance = Shipment.get(params.id);
 		
 		if (!shipmentInstance) { 
@@ -35,7 +35,7 @@ class Doc4jController {
 		response.outputStream << tempFile.readBytes()
 	}
 
-	def downloadLetterAsPdf = { 	
+	def downloadLetterAsPdf() {
 		
 		def shipmentInstance = Shipment.get(params.id);
 		
@@ -56,7 +56,7 @@ class Doc4jController {
 	/**
 	 * 
 	 */
-	def downloadPackingList = { 
+	def downloadPackingList() {
 		log.info params
 		def shipmentInstance = Shipment.get(params.id);
 		

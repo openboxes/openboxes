@@ -14,7 +14,7 @@ class ReceiptController {
 	
 	
 	
-	def process = { 
+	def process() {
 		def receiptInstance = Receipt.get(params.id);
 				
 	}

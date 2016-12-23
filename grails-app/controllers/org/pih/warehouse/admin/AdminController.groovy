@@ -36,10 +36,10 @@ class AdminController {
 
 
 
-	def index = { }
+	def index() { }
 
 
-    def controllerActions = {
+    def controllerActions() {
 			
 		List actionNames = []
 		grailsApplication.controllerClasses.sort { it.logicalPropertyName }.each { controller ->
@@ -58,10 +58,10 @@ class AdminController {
 		[actionNames:actionNames]
 	}
 
-    def cache = {
+    def cache() {
         [cacheStatistics: sessionFactory.getStatistics()]
     }
-    def clickstream = {
+    def clickstream() {
         if (params.format == "csv") {
             def filename = "Clickstream - ${session.user.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
@@ -70,12 +70,12 @@ class AdminController {
         }
     }
 
-    def plugins = { } 
-    def status = { } 
+    def plugins() { }
+    def status() { }
     
 	def static LOCAL_TEMP_WEBARCHIVE_PATH = "warehouse.war"
 	
-	def showUpgrade = { UpgradeCommand command ->
+	def showUpgrade(UpgradeCommand command) {
 		log.info "show upgrade " + params
 		
 		[
@@ -85,7 +85,7 @@ class AdminController {
 		]				
 	}
 
-    def evictDomainCache = {
+    def evictDomainCache() {
         def domainClass = grailsApplication.getDomainClass(params.name)
         if (domainClass) {
             sessionFactory.evict(domainClass.clazz)
@@ -97,7 +97,7 @@ class AdminController {
         redirect(action: "showSettings")
     }
 
-    def evictQueryCache = {
+    def evictQueryCache() {
         if (params.name) {
             sessionFactory.evictQueries(params.name)
             flash.message = "Query cache '${params.name}' was invalidated"
@@ -110,7 +110,7 @@ class AdminController {
     }
 
 
-	def sendMail = {
+	def sendMail() {
 
         println "sendMail: " + params
 
@@ -159,7 +159,7 @@ class AdminController {
     }
 
 	
-	def download = { UpgradeCommand command ->
+	def download(UpgradeCommand command) {
 		log.info "download " + params
 		if (command?.remoteWebArchiveUrl) {
 			session.command = command
@@ -181,7 +181,7 @@ class AdminController {
 	}
 	
 	
-	def deploy = { UpgradeCommand command -> 
+	def deploy(UpgradeCommand command) {
 		log.info "deploy " + params
 		
 		session.command.localWebArchivePath = command.localWebArchivePath
@@ -200,7 +200,7 @@ class AdminController {
 		//redirect (view: "showUpgrade", model: [command: command])
 	}
 	
-	def showSettings = { 		
+	def showSettings() {
 		def externalConfigProperties = []
 		grailsApplication.config.grails.config.locations.each { filename ->			
 			try { 
@@ -228,7 +228,7 @@ class AdminController {
 	}
 		
 	
-	def downloadWar = { 
+	def downloadWar() {
 		log.info params
 		log.info("Updating war file " + params)
 		// def url = "http://ci.pih-emr.org/downloads/openboxes.war"
@@ -241,7 +241,7 @@ class AdminController {
 		redirect(action: "showSettings")
 	}
 	
-	def cancelUpdateWar = { 
+	def cancelUpdateWar() {
 		log.info params
 		if (session.future) { 
 			session.future.cancel(true)
@@ -250,7 +250,7 @@ class AdminController {
 		redirect(action: "showSettings")
 	}
 		
-	def deployWar = { UpgradeCommand -> 
+	def deployWar(UpgradeCommand command) {
 		log.info params
 		def source = session.command.localWebArchive
 		
@@ -285,7 +285,7 @@ class AdminController {
 	
 	
 	/*
-	def reloadWar = {
+	def reloadWar() {
 		log.info("Reloading war file")
 		def future = callAsync {
 			log.info "Within call async"

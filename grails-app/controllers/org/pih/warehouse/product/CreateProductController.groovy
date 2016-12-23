@@ -28,7 +28,7 @@ class CreateProductController {
 	}
 	
 	
-    def createFlow = {    	
+    def createFlow() {
     	start {
     		action {
     			//Product flow.product = new Product()

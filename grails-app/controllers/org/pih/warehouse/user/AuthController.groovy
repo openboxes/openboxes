@@ -29,7 +29,7 @@ class AuthController {
     /**
      * Show index page - just a redirect to the list page.
      */
-	def index = {    	
+	def index() {
 		log.info "auth controller index";
 		redirect(action: "login", params:params)
 	}
@@ -37,7 +37,7 @@ class AuthController {
 	/**
 	 * Checks whether there is an authenticated user in the session.
 	 */
-	def authorized = { 
+	def authorized() {
 		if (session.user == null) { 
         	flash.message = "${warehouse.message(code: 'auth.notAuthorized.message')}"
     		redirect(controller: 'auth', action: 'login');
@@ -47,7 +47,7 @@ class AuthController {
     /**
      * Allows user to log into the system.
      */
-    def login = {
+    def login() {
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
@@ -59,7 +59,7 @@ class AuthController {
     /** 
      * Performs the authentication logic.
      */
-	def handleLogin = {
+	def handleLogin() {
 		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
 		if (userInstance) {
 
@@ -132,7 +132,7 @@ class AuthController {
 	/**
 	 * Allows user to log out of the system
 	 */
-	def logout = { 
+	def logout() {
 		session.targetUri = null    	
 		session.user = null;
         session.userName = null
@@ -146,12 +146,12 @@ class AuthController {
 	/**
 	 * Allow user to register a new account
 	 */
-	def signup = { }
+	def signup() { }
 	
 	/**
 	 * Handle account registration.
 	 */
-	def handleSignup = {
+	def handleSignup() {
 
 		def userInstance = new User();
 		if ("POST".equalsIgnoreCase(request.getMethod())) { 			
@@ -238,12 +238,12 @@ class AuthController {
 	}
 
 
-    def renderAccountCreatedEmail = {
+    def renderAccountCreatedEmail() {
         def userInstance = User.get(params.id)
         render(template:"/email/userAccountCreated", model:[userInstance:userInstance])
     }
 
-    def renderAccountConfirmedEmail = {
+    def renderAccountConfirmedEmail() {
         def userInstance = User.get(params.id)
         render(template:"/email/userAccountConfirmed", model:[userInstance:userInstance])
     }

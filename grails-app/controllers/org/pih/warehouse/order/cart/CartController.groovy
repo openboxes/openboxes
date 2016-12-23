@@ -15,11 +15,11 @@ import org.pih.warehouse.product.Product
 
 class CartController {
 
-	def index = { 
+	def index() {
 		redirect(action: 'list')
 	}
 	
-	def list = { 	
+	def list() {
 		def map = [:]	
 		if (!session.cart) { 
 			session.cart = new Cart();		
@@ -32,7 +32,7 @@ class CartController {
 		[ productInstanceMap : map ]
 	}
 	
-	def addToCart = { 
+	def addToCart() {
 		log.info params
 		def inventoryInstance = Inventory.get(params?.inventory?.id);
 		def productInstance = Product.get(params?.product?.id);		;
@@ -63,7 +63,7 @@ class CartController {
 		
 	}
 
-	def removeFromCart = {
+	def removeFromCart() {
 		def productInstance = Product.get(params?.product?.id);
 		if (productInstance) {
 			if (!session?.cart) {

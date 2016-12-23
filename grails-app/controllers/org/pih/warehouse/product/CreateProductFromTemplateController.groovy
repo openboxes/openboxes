@@ -25,7 +25,7 @@ class CreateProductFromTemplateController {
 	}
 	
 	
-    def createFlow = {    	
+    def createFlow() {
     	start {
     		action {
     			flow.product = new ProductGloveCommand()

@@ -20,7 +20,7 @@ class IndicatorController {
 
     // Proof of concept to see if we could evalute a string of code
     // Could be used to create dynamic indicators for the dashboard
-    def evaluate = {
+    def evaluate() {
 
         String code = """
             import org.pih.warehouse.product.Product;

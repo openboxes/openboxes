@@ -18,16 +18,16 @@ class RxNormController {
 
 	def productService
 	
-	def index = { 
+	def index() {
 		redirect(action: "list")
 	}
 	
-	def lookupDisplayNames = { 
+	def lookupDisplayNames() {
 		//[terms:productService.findRxNormDisplayNames()]
 	}
 	
 	
-	def lookupProducts = { ProductSearchCommand search ->
+	def lookupProducts(ProductSearchCommand search) {
 		println "lookupProducts: " + params 
 		if (search.searchTerms) { 
 			try {
@@ -45,7 +45,7 @@ class RxNormController {
 		[search:search]
 	}
 	
-	def createProduct = { 
+	def createProduct() {
 		def results = productService.getNdcProduct(params.id)
 		if (!results) { 
 			def search = new ProductSearchCommand();
@@ -58,7 +58,7 @@ class RxNormController {
 		}		
 	}
 	
-	def saveProduct = { 
+	def saveProduct() {
 		println "save product: " + params
 		
 		def product = new Product(params)
@@ -75,14 +75,14 @@ class RxNormController {
 	}
 	
 	
-	def getCode = { ProductSearchCommand search ->		
+	def getCode(ProductSearchCommand search) {
 		println "getCode: " +  params
 		search.results = productService.getNdcProduct(params.id)
 		search.searchTerms = params.id
 		render (view: "lookupProducts", model:[search:search])
 	}
 	
-	def test2 = { 
+	def test2() {
 		def client = new RESTClient("http://rxnav.nlm.nih.gov/REST/")
 	//	def data = "";
 		

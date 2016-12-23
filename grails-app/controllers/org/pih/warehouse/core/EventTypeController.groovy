@@ -13,22 +13,22 @@ class EventTypeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [eventTypeInstanceList: EventType.list(params), eventTypeInstanceTotal: EventType.count()]
     }
 
-    def create = {
+    def create() {
         def eventTypeInstance = new EventType()
         eventTypeInstance.properties = params
         return [eventTypeInstance: eventTypeInstance]
     }
 
-    def save = {
+    def save() {
         def eventTypeInstance = new EventType(params)
         if (eventTypeInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), eventTypeInstance.id])}"
@@ -39,7 +39,7 @@ class EventTypeController {
         }
     }
 
-    def show = {
+    def show() {
         def eventTypeInstance = EventType.get(params.id)
         if (!eventTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), params.id])}"
@@ -50,7 +50,7 @@ class EventTypeController {
         }
     }
 
-    def edit = {
+    def edit() {
         def eventTypeInstance = EventType.get(params.id)
         if (!eventTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), params.id])}"
@@ -61,7 +61,7 @@ class EventTypeController {
         }
     }
 
-    def update = {
+    def update() {
         def eventTypeInstance = EventType.get(params.id)
         if (eventTypeInstance) {
             if (params.version) {
@@ -88,7 +88,7 @@ class EventTypeController {
         }
     }
 
-    def delete = {
+    def delete() {
         def eventTypeInstance = EventType.get(params.id)
         if (eventTypeInstance) {
             try {

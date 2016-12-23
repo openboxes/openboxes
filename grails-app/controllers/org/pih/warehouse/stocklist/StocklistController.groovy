@@ -18,7 +18,7 @@ import org.pih.warehouse.requisition.*
 
 class StocklistController {
 
-	def show = { 
+	def show() {
 		println "stocklist " + params
 		def location = Location.get(params.id)
 		//def inventory = Inventory.findByLocation(location)

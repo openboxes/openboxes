@@ -47,11 +47,11 @@ class ProductController {
 	static allowedMethods = [save: "POST", update: "POST"];
 
 
-	def index = {
+	def index() {
 		redirect(action: "list", params: params)
 	}
 
-	def redirect = {
+	def redirectById() {
         log.info("Redirecting to product " + params.id)
 		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
 	}
@@ -59,7 +59,7 @@ class ProductController {
 	/** 
 	 * Perform a bulk update of 
 	 */
-	def batchEdit = { BatchEditCommand cmd ->
+	def batchEdit(BatchEditCommand cmd) {
 		def startTime = System.currentTimeMillis()
 	//	def location = Location.get(session.warehouse.id)
         def category = Category.get(params.categoryId)
@@ -85,7 +85,7 @@ class ProductController {
 		[ commandInstance : cmd, products: cmd.productInstanceList?:[], categoryInstance: category ]
 	}
 
-    def batchEditProperties = {
+    def batchEditProperties() {
         def startTime = System.currentTimeMillis()
      //   def location = Location.get(session.warehouse.id)
      //   def category = Category.get(params.categoryId)
@@ -99,7 +99,7 @@ class ProductController {
     }
 
 
-	def batchSave = { BatchEditCommand cmd ->
+	def batchSave(BatchEditCommand cmd) {
 
         println "Batch save " + cmd
 
@@ -191,7 +191,7 @@ class ProductController {
 	}
 
 
-	def create = {
+	def create() {
         def startTime = System.currentTimeMillis()
 		def productInstance = new Product(params)
         def rootCategory = productService.getRootCategory()
@@ -202,7 +202,7 @@ class ProductController {
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
 	}
 
-	def save = {
+	def save() {
 		println "Save product: " + params
 
 
@@ -276,7 +276,7 @@ class ProductController {
 	}
 
 
-	def show = {
+	def show() {
 		//def productInstance = Product.get(params.id)
 		//if (!productInstance) {
 		//	flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
@@ -288,7 +288,7 @@ class ProductController {
 	}
 
 
-	def edit = {
+	def edit() {
 
         def startTime = System.currentTimeMillis()
 		def productInstance = Product.get(params.id)
@@ -311,7 +311,7 @@ class ProductController {
 		}
 	}
 
-	def update = {
+	def update() {
 		log.info "Update called with params " + params
 		def productInstance = Product.get(params.id)
 
@@ -448,7 +448,7 @@ class ProductController {
     }
 
 
-	def delete = {
+	def delete() {
 		def productInstance = Product.get(params.id)
 		if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
 			try {
@@ -476,7 +476,7 @@ class ProductController {
 	}
 
 
-    def deleteProducts = {
+    def deleteProducts() {
         println "Delete products: " + params
         //def productIds = params.list('product.id')
         def productIds = request.getParameterValues("product.id")
@@ -491,7 +491,7 @@ class ProductController {
     }
 
 
-	def removePackage = {
+	def removePackage() {
 		def packageInstance = ProductPackage.get(params.id)
 		def productInstance = packageInstance.product
 		log.info "" + packageInstance.product
@@ -502,7 +502,7 @@ class ProductController {
 		redirect(action: "edit", id: productInstance.id)
 	}
 
-	def savePackage = {
+	def savePackage() {
 
 		println "savePackage: " + params
 		def productInstance = Product.get(params.product.id)
@@ -535,7 +535,7 @@ class ProductController {
 	/**
 	 * 
 	 */
-	def importDependencies = {
+	def importDependencies() {
 		/*
 		 if (session.dosageForms) {
 		 session.dosageForms.unique().each() {
@@ -571,7 +571,7 @@ class ProductController {
 
 
 
-	def search = {
+	def search() {
 		log.info "search " + params
 		if (params.q) {
 			def products = productService.findProducts(URLEncoder.encode(params.q))
@@ -579,7 +579,7 @@ class ProductController {
 		}
 	}
 
-	def barcode = {
+	def barcode() {
 		BarcodeFormat format = BarcodeFormat.valueOf(params.format)
 		File file = File.createTempFile("barcode-", ".png")
 		barcodeService.renderImageToFile(file, params.data, (params.width?:125) as int, (params.height?:50) as int, format)
@@ -592,7 +592,7 @@ class ProductController {
 	/**
 	 * Upload a document to a product.
 	 */
-	def upload = { DocumentCommand command ->
+	def upload(DocumentCommand command) {
 		log.info "Uploading document: " + params
 		
 		// HACK - for some reason the Product in document command is not getting bound
@@ -704,7 +704,7 @@ class ProductController {
 	}
 
 
-	def deleteDocument = {
+	def deleteDocument() {
 		def productInstance = Product.get(params.product.id)
 		if (!productInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.product.id])}"
@@ -731,7 +731,7 @@ class ProductController {
 	}
 
 
-	def upnDatabase = {
+	def upnDatabase() {
 
 		def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
 	//	def count=0, MAXSIZE=100000
@@ -781,7 +781,7 @@ class ProductController {
 	}
 
 	
-	def renderImage = { 
+	def renderImage() {
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {		
 			response.outputStream << documentInstance.fileContents
@@ -791,7 +791,7 @@ class ProductController {
 		}
 	}
 
-    def downloadDocument = {
+    def downloadDocument() {
         log.info "viewImage: " + params
         def documentInstance = Document.get(params.id);
         if (documentInstance) {
@@ -805,7 +805,7 @@ class ProductController {
 	/**
 	 * View document
 	 */
-	def viewImage = {
+	def viewImage() {
         log.info "viewImage: " + params
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {
@@ -838,7 +838,7 @@ class ProductController {
 	}
 
 
-	def viewThumbnail = {
+	def viewThumbnail() {
         log.info "viewThumbnail: " + params
 		def documentInstance = Document.get(params.id);
 		if (documentInstance) {
@@ -877,7 +877,7 @@ class ProductController {
      *
      * @params product.id
      */
-	def exportProducts = { 
+	def exportProducts() {
 		println "export products: " + params
 		def productIds = params.list('product.id')
 		println "Product IDs: " + productIds
@@ -902,7 +902,7 @@ class ProductController {
     /**
      * Export all products as CSV
      */
-	def exportAsCsv = {
+	def exportAsCsv() {
         log.info "Export as CSV: " + params
 
 		//def products = session.productIds ? Product.getAll(session.productIds) : Product.list()
@@ -927,14 +927,14 @@ class ProductController {
     /**
      * Renders form to begin the import process
      */
-	def importAsCsv = { 
+	def importAsCsv() {
 		// renders the initial form
 	}
 
     /**
      * Upload CSV file
      */
-	def uploadCsv = { ImportDataCommand command ->
+	def uploadCsv(ImportDataCommand command) {
 		
 		log.info "uploadCsv " + params
 			
@@ -1013,7 +1013,7 @@ class ProductController {
     /**
      * Perform import of CSV
      */
-	def importCsv = { ImportDataCommand command ->
+	def importCsv(ImportDataCommand command) {
 		
 		log.info "import " + params
 		
@@ -1060,7 +1060,7 @@ class ProductController {
      *
      * @return
      */
-    def addProductGroupToProduct = {
+    def addProductGroupToProduct() {
         println "addProductGroupToProduct() " + params
         def product = Product.get(params.id)
         if (product) {
@@ -1077,7 +1077,7 @@ class ProductController {
     /**
      * Delete product group from database
      */
-    def removeFromProductGroups = {
+    def removeFromProductGroups() {
         println "removeFromProductGroup() " + params
 
         def product = Product.get(params.productId)
@@ -1096,7 +1096,7 @@ class ProductController {
     /**
      * Delete product group from database
      */
-    def deleteProductGroup = {
+    def deleteProductGroup() {
         println "deleteProductGroup() " + params
 
         def product = Product.get(params.productId)
@@ -1122,7 +1122,7 @@ class ProductController {
      *
      * @return
      */
-    def addSynonymToProduct = {
+    def addSynonymToProduct() {
         println "addSynonymToProduct() " + params
         def product = Product.get(params.id)
         if (product) {
@@ -1135,7 +1135,7 @@ class ProductController {
     /**
      * Delete synonym from database
      */
-    def deleteSynonym = {
+    def deleteSynonym() {
         println "deleteSynonym() " + params
 
         def product = Product.get(params.productId)
@@ -1152,7 +1152,7 @@ class ProductController {
     }
 
 
-    def renderCreatedEmail = {
+    def renderCreatedEmail() {
         def productInstance = Product.get(params.id)
         def userInstance = User.get(session.user.id)
         render(template:"/email/productCreated", model:[productInstance:productInstance, userInstance:userInstance])

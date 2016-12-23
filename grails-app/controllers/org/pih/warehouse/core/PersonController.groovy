@@ -13,13 +13,13 @@ class PersonController {
 	def userService
 
 	def scaffold = Person;
-	
-	def redirect = { 
+
+	def redirectById() {
 		redirect(action: "show", id: params.id)
 	}
+
 	
-	
-	def list = {
+	def list() {
 		def personInstanceList = []
 		def personInstanceTotal = 0;
 		
@@ -41,12 +41,12 @@ class PersonController {
 		[personInstanceList: personInstanceList, personInstanceTotal: personInstanceTotal]
 	}
 		
-	def convertPersonToUser = { 	
+	def convertPersonToUser() {
 		userService.convertPersonToUser(params.id)
 		redirect(controller: "user", action: "edit", id: params.id)	
 	}
 
-	def convertUserToPerson = {
+	def convertUserToPerson() {
 		userService.convertUserToPerson(params.id)
 		redirect(controller: "person", action: "show", id: params.id)
 	}

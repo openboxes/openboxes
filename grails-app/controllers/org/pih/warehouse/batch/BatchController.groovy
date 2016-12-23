@@ -29,10 +29,10 @@ class BatchController {
 	def inventoryService
 	def importService
 
-	def index = { }
+	def index() { }
 
 
-    def uploadData = { ImportDataCommand command ->
+    def uploadData(ImportDataCommand command) {
 
         if (request instanceof DefaultMultipartHttpServletRequest) {
             def uploadFile = request.getFile('xlsFile');
@@ -53,7 +53,7 @@ class BatchController {
     }
 
 
-    def downloadTemplate = {
+    def downloadTemplate() {
         println "Download XLS template " + params
         def filename = params.template
         try {
@@ -68,7 +68,7 @@ class BatchController {
         }
     }
 
-    def downloadCsvTemplate = {
+    def downloadCsvTemplate() {
         println "Download csv template " + params
         def filename = params.template
         try {
@@ -84,7 +84,7 @@ class BatchController {
     }
 
 
-    def importData = { ImportDataCommand command ->
+    def importData(ImportDataCommand command) {
 		
 		log.info params 
 		log.info command.location

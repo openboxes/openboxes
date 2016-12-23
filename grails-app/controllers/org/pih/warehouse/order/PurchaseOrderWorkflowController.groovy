@@ -18,8 +18,8 @@ class PurchaseOrderWorkflowController {
 
 	def orderService;
 	
-	def index = { redirect(action:"purchaseOrder") }
-	def purchaseOrderFlow = {		
+	def index() { redirect(action:"purchaseOrder") }
+	def purchaseOrderFlow() {
 		
 		start {
 			action {

@@ -23,27 +23,27 @@ class ErrorsController {
 	def userService
     def grailsApplication
 
-	def handleException = {
+	def handleException() {
 		render(view: "/error")
 	}
 	
-	def handleNotFound = { 
+	def handleNotFound() {
 		render(view:"/errors/notFound")
 	}
 	
-	def handleUnauthorized = { 
+	def handleUnauthorized() {
 		render(view:"/errors/accessDenied")
 	}
 
-    def handleInvalidDataAccess = {
+    def handleInvalidDataAccess() {
         render(view:"/errors/dataAccess")
     }
 
-    def handleMethodNotAllowed = {
+    def handleMethodNotAllowed() {
         render(view:"/errors/methodNotAllowed")
     }
 
-    def sendFeedback = {
+    def sendFeedback() {
         def enabled = Boolean.parseBoolean(grailsApplication.config.openboxes.mail.feedback.enabled?:"true");
 
         if (enabled) {
@@ -71,7 +71,7 @@ class ErrorsController {
     }
 
 
-	def processError = {
+	def processError() {
 
         //def enabled = Boolean.valueOf(grailsApplication.config.openboxes.mail.errors.enabled)
         //def enabled = Boolean.parseBoolean(grailsApplication.config.openboxes.mail.errors.enabled?:"true");

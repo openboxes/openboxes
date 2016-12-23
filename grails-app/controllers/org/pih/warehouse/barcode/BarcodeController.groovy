@@ -13,7 +13,7 @@ import org.krysalis.barcode4j.impl.code39.Code39Bean
 // import org.krysalis.barcode4j.impl.code128.Code128Bean
 
 class BarcodeController {
-	def barcode = {
+	def barcode() {
 		// Create and configure the generator
 		//def generator = new Code39Bean()
 		//generator.height = 12

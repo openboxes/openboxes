@@ -16,8 +16,8 @@ import org.pih.warehouse.product.Product
 
 class OrderWorkflowController {
 
-	def index = { redirect(action:"order") }
-	def orderFlow = {
+	def index() { redirect(action:"order") }
+	def orderFlow() {
 		getProducts {
 			action {
 				//params.max = Math.min(params.max ? params.int('max') : 10, 100)

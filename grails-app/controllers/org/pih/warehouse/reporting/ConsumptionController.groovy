@@ -36,7 +36,7 @@ class ConsumptionController {
     ProductService productService
     InventoryService inventoryService
 
-    def show = { ShowConsumptionCommand command ->
+    def show(ShowConsumptionCommand command) {
         log.info "Show consumption " + params
         println "Bind errors: " + command.errors
         if (command.hasErrors()) {

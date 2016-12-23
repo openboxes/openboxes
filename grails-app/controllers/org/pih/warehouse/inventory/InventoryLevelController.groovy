@@ -17,22 +17,22 @@ class InventoryLevelController {
 
     static allowedMethods = [save: "POST", update: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [inventoryLevelInstanceList: InventoryLevel.list(params), inventoryLevelInstanceTotal: InventoryLevel.count()]
     }
 
-    def create = {
+    def create() {
         def inventoryLevelInstance = new InventoryLevel()
         inventoryLevelInstance.properties = params
         return [inventoryLevelInstance: inventoryLevelInstance]
     }
 
-    def save = {
+    def save() {
         def inventoryLevelInstance = new InventoryLevel(params)
         if (inventoryLevelInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
@@ -44,7 +44,7 @@ class InventoryLevelController {
         }
     }
 
-    def show = {
+    def show() {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
@@ -55,7 +55,7 @@ class InventoryLevelController {
         }
     }
 
-    def edit = {
+    def edit() {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
 
         if (!inventoryLevelInstance) {
@@ -73,7 +73,7 @@ class InventoryLevelController {
         }
     }
 
-    def clone = {
+    def clone() {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
@@ -98,7 +98,7 @@ class InventoryLevelController {
         }
     }
 
-    def update = {
+    def update() {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (inventoryLevelInstance) {
             if (params.version) {
@@ -126,7 +126,7 @@ class InventoryLevelController {
         }
     }
 
-    def delete = {
+    def delete() {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (inventoryLevelInstance) {
             def productId = inventoryLevelInstance?.product?.id
@@ -148,7 +148,7 @@ class InventoryLevelController {
     }
 	
 	
-	def markAsSupported = { 
+	def markAsSupported() {
 		log.info "Mark as supported " + params	
 		def productIds = params.product.id
 		def location = Location.get(session.warehouse.id)
@@ -160,7 +160,7 @@ class InventoryLevelController {
 		redirect(controller: "inventory", action: "browse")
 	}
 
-	def markAsNotSupported = {
+	def markAsNotSupported() {
 		log.info "Mark as not supported " + params
 		def productIds = params.product.id
 		def location = Location.get(session.warehouse.id)
@@ -172,7 +172,7 @@ class InventoryLevelController {
 		redirect(controller: "inventory", action: "browse")
 	}
 
-	def markAsNonInventoried = {
+	def markAsNonInventoried() {
 		log.info "Mark as non-inventoried " + params
 		def productIds = params.product.id
 		def location = Location.get(session.warehouse.id)
@@ -200,7 +200,7 @@ class InventoryLevelController {
 		}
 	}
 
-    def export = {
+    def export() {
         def date = new Date();
         def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
         def inventoryLevels = []

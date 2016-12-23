@@ -43,12 +43,12 @@ class InventoryController {
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"];
 
-    def index = {
+    def index() {
 		redirect(action: "browse");
 	}
 
     /*
-    def calculateQuantityOnHand = {
+    def calculateQuantityOnHand() {
         def product = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.calculateQuantityOnHand(product, location)
@@ -57,11 +57,11 @@ class InventoryController {
     */
 
 
-    def analyze = {
+    def analyze() {
         /* single page app using */
     }
 
-    def pivot = {
+    def pivot() {
         /* single page app using angularjs */
     }
 
@@ -70,7 +70,7 @@ class InventoryController {
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
     //@Cacheable("inventoryControllerCache")
-	def browse = { InventoryCommand cmd ->
+	def browse(InventoryCommand cmd) {
         if(!params.max) params.max = 10
         if(!params.offset) params.offset = 0
 
@@ -147,7 +147,7 @@ class InventoryController {
 	/**
 	 * 
 	 */
-	def create = {
+	def create() {
 		def warehouseInstance = Location.get(params?.warehouse?.id)
 		if (!warehouseInstance) { 
 			warehouseInstance = Location.get(session?.warehouse?.id);
@@ -159,7 +159,7 @@ class InventoryController {
 	/**
 	 * 
 	 */
-	def save = {		
+	def save() {
 		def warehouseInstance = Location.get(params.warehouse?.id)
 		if (!warehouseInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
@@ -180,7 +180,7 @@ class InventoryController {
 	/**
 	 * 
 	 */
-	def show = {
+	def show() {
         def quantityMap = [:]
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
@@ -207,7 +207,7 @@ class InventoryController {
 
 	}
 
-	def search = { QuantityOnHandReportCommand command ->
+	def search(QuantityOnHandReportCommand command) {
         def quantityMapByDate = [:]
         def startTime = System.currentTimeMillis()
         println "search " + params
@@ -362,7 +362,7 @@ class InventoryController {
     }
 
 
-    def download = { QuantityOnHandReportCommand command ->
+    def download(QuantityOnHandReportCommand command) {
 
         println "search " + params
         println "search " + command.location + " " + command.startDate
@@ -384,7 +384,7 @@ class InventoryController {
 
 	
 	
-	def addToInventory = {
+	def addToInventory() {
 		def inventoryInstance = Inventory.get( params.id )
 		def productInstance = Product.get( params.product.id )
 
@@ -407,7 +407,7 @@ class InventoryController {
 	}
 	
 	
-	def edit = {
+	def edit() {
 		def inventoryInstance = Inventory.get(params.id)
 		if (!inventoryInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
@@ -420,7 +420,7 @@ class InventoryController {
 		}
 	}
 	
-	def update = {
+	def update() {
 		def inventoryInstance = Inventory.get(params.id)
 		if (inventoryInstance) {
 			if (params.version) {
@@ -447,7 +447,7 @@ class InventoryController {
 		}
 	}
 	
-	def delete = {
+	def delete() {
 		def inventoryInstance = Inventory.get(params.id)
 		if (inventoryInstance) {
 			try {
@@ -466,7 +466,7 @@ class InventoryController {
 		}
 	}
 	
-	def addItem = {
+	def addItem() {
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		def productInstance = Product.get(params?.product?.id);
 		def itemInstance = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber)
@@ -489,7 +489,7 @@ class InventoryController {
 		}
 	}
 	
-	def deleteItem = {
+	def deleteItem() {
 		def itemInstance = InventoryItem.get(params.id)
 		if (itemInstance) {
 			try {
@@ -510,11 +510,11 @@ class InventoryController {
 				
 	}
 	
-	def listTransactions = { 
+	def listTransactions() {
 		redirect(action: listAllTransactions)
 	}
 	
-	def listDailyTransactions = { 
+	def listDailyTransactions() {
 		def dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		def dateSelected = (params.date) ? dateFormat.parse(params.date) : new Date();
 		
@@ -527,7 +527,7 @@ class InventoryController {
 
 
 
-    def list = {
+    def list() {
         println "List " + params
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
@@ -537,7 +537,7 @@ class InventoryController {
     }
 
 
-    def listReconditionedStock = {
+    def listReconditionedStock() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getReconditionedStock(location)
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -551,7 +551,7 @@ class InventoryController {
     }
 
 
-    def listTotalStock = {
+    def listTotalStock() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getTotalStock(location);
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -566,7 +566,7 @@ class InventoryController {
 
     }
 
-    def listInStock = {
+    def listInStock() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getInStock(location);
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -582,7 +582,7 @@ class InventoryController {
     }
 
     //@Cacheable("dashboardCache")
-    def listLowStock = {
+    def listLowStock() {
 
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
@@ -601,7 +601,7 @@ class InventoryController {
         render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
-    def listReorderStock = {
+    def listReorderStock() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getReorderStock(location);
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -616,7 +616,7 @@ class InventoryController {
     }
 
 
-    def listQuantityOnHandZero = {
+    def listQuantityOnHandZero() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getQuantityOnHandZero(location);
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -632,7 +632,7 @@ class InventoryController {
     }
 
 
-    def listOverStock = {
+    def listOverStock() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getOverStock(location)
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -647,7 +647,7 @@ class InventoryController {
         render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
-    def listOutOfStock = {
+    def listOutOfStock() {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getOutOfStock(location, params.abcClass);
         def statusMap = inventoryService.getInventoryStatus(location)
@@ -662,7 +662,7 @@ class InventoryController {
 
 
 
-	def listExpiredStock = { 
+	def listExpiredStock() {
 		def location = Location.get(session.warehouse.id)
 		def categorySelected = (params.category) ? Category.get(params.category) : null;		
 		def inventoryItems = inventoryService.getExpiredStock(categorySelected, location);
@@ -683,7 +683,7 @@ class InventoryController {
 	}
 	
 	
-	def listExpiringStock = { 
+	def listExpiringStock() {
 		def threshold = (params.threshold) ? params.threshold as int : 0;
 		def category = (params.category) ? Category.get(params.category) : null;
 		def location = Location.get(session.warehouse.id)		
@@ -826,7 +826,7 @@ class InventoryController {
     }
 
 
-    def exportLatestInventoryDate = {
+    def exportLatestInventoryDate() {
         println params
         def location = Location.get(session.warehouse.id)
 
@@ -846,7 +846,7 @@ class InventoryController {
 
 
     /*
-	def listLowStock = {
+	def listLowStock() {
 		def warehouse = Location.get(session.warehouse.id)
 		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
 		
@@ -874,7 +874,7 @@ class InventoryController {
 	}
     */
     /*
-	def listReorderStock = {
+	def listReorderStock() {
 
 		def warehouse = Location.get(session.warehouse.id)
 		
@@ -905,7 +905,7 @@ class InventoryController {
 	}
 	*/
 	
-	def searchRecall = {
+	def searchRecall() {
 		
 		log.info "searchRecall " + params
 		
@@ -914,7 +914,7 @@ class InventoryController {
 	}
 
 	
-	def showConsumption = { ConsumptionCommand command ->
+	def showConsumption(ConsumptionCommand command) {
 		
 		def consumptions = inventoryService.getConsumptionTransactionsBetween(command?.startDate, command?.endDate)
 		def consumptionMap = consumptions.groupBy { it.product };
@@ -1023,7 +1023,7 @@ class InventoryController {
 			dateKeys: dateKeys]
 	}
 
-	def refreshConsumptionData = { 
+	def refreshConsumptionData() {
 		def consumptionType = TransactionType.get(2)		
 		def transactions = Transaction.findAllByTransactionType(consumptionType)
 
@@ -1061,7 +1061,7 @@ class InventoryController {
 	 * Used to create default inventory items.
 	 * @return
 	 */
-	def createDefaultInventoryItems = { 
+	def createDefaultInventoryItems() {
 		def products = inventoryService.findProductsWithoutEmptyLotNumber();
 		products.each { product -> 
 			def inventoryItem = new InventoryItem()
@@ -1074,14 +1074,14 @@ class InventoryController {
 	}
 	
 		
-	def showProducts = { 
+	def showProducts() {
 		def products = inventoryService.findProductsWithoutEmptyLotNumber()
 		[ products : products ]
 		
 	}
 	
 	
-	def listAllTransactions = {		
+	def listAllTransactions() {
 		
 		// FIXME Using the dynamic finder Inventory.findByLocation() does not work for some reason
 		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
@@ -1109,18 +1109,18 @@ class InventoryController {
 	}
 
 		
-	def listPendingTransactions = { 
+	def listPendingTransactions() {
 		def transactions = Transaction.findAllByConfirmedOrConfirmedIsNull(Boolean.FALSE)
 		render(view: "listTransactions", model: [transactionInstanceList: transactions])
 	}
 	
-	def listConfirmedTransactions = { 		
+	def listConfirmedTransactions() {
 		def transactions = Transaction.findAllByConfirmed(Boolean.TRUE)
 		render(view: "listTransactions", model: [transactionInstanceList: transactions])
 	}
 	
 	
-	def deleteTransaction = { 
+	def deleteTransaction() {
 		def transactionInstance = Transaction.get(params.id);
 		
 		if (transactionInstance) {
@@ -1146,7 +1146,7 @@ class InventoryController {
 	}
 	
 	
-	def saveTransaction = {	
+	def saveTransaction() {
 		log.debug "save transaction: " + params
 		def transactionInstance = Transaction.get(params.id);
 		// def inventoryInstance = Inventory.get(params.inventory.id);
@@ -1195,7 +1195,7 @@ class InventoryController {
 	/**
 	 * Show the transaction.
 	 */
-	def showTransaction = {
+	def showTransaction() {
 		def transactionInstance = Transaction.get(params.id);
 		if (!transactionInstance) {
 			flash.message = "${warehouse.message(code: 'inventory.noTransactionWithId.message', args: [params.id])}"
@@ -1219,7 +1219,7 @@ class InventoryController {
 	/**
 	* Show the transaction.
 	*/
-   def showTransactionDialog = {
+   def showTransactionDialog() {
 	   def transactionInstance = Transaction.get(params.id);
 	   if (!transactionInstance) {
 		 	flash.message = "${warehouse.message(code: 'inventory.noTransactionWithId.message', args: [params.id])}"
@@ -1239,7 +1239,7 @@ class InventoryController {
    }
    
    	
-	def confirmTransaction = { 
+	def confirmTransaction() {
 		def transactionInstance = Transaction.get(params?.id)
 		if (transactionInstance?.confirmed) { 
 			transactionInstance?.confirmed = Boolean.FALSE;
@@ -1257,7 +1257,7 @@ class InventoryController {
 	}
 	
 	
-	def createTransaction = { 
+	def createTransaction() {
 		log.info("createTransaction params " + params)
 		def command = new TransactionCommand();
 		def warehouseInstance = Location.get(session?.warehouse?.id);
@@ -1311,7 +1311,7 @@ class InventoryController {
 	/**
 	 * Save a transaction that sets the current inventory level for stock.
 	 */
-	def saveInventoryTransaction = { TransactionCommand command ->
+	def saveInventoryTransaction(TransactionCommand command) {
 		log.debug ("Saving inventory adjustment " + params)
 
 		def transaction = command?.transactionInstance;
@@ -1388,7 +1388,7 @@ class InventoryController {
 	 * 
 	 * TRANSFER_OUT, CONSUMED, DAMAGED, EXPIRED
 	 */
-	def saveDebitTransaction = { TransactionCommand command ->
+	def saveDebitTransaction(TransactionCommand command) {
 		log.debug ("Saving debit transactions " + params)
 		
 		log.debug("size: " + command?.transactionEntries?.size());
@@ -1465,7 +1465,7 @@ class InventoryController {
 	 * 
 	 * TRANSFER_IN
 	 */
-	def saveCreditTransaction = { TransactionCommand command ->
+	def saveCreditTransaction(TransactionCommand command) {
 
 		log.debug("Saving credit transaction: " + params)
 		def transactionInstance = command?.transactionInstance
@@ -1564,7 +1564,7 @@ class InventoryController {
 	 * 
 	 * Not used at the moment.  
 	 */
-	def saveOutgoingTransfer = { Transaction transaction, TransactionCommand command ->
+	def saveOutgoingTransfer(Transaction transaction, TransactionCommand command) {
 		log.debug ("Saving stock transfer " + params)
 
 		def warehouseInstance = Location.get(session?.warehouse?.id);
@@ -1640,7 +1640,7 @@ class InventoryController {
 		}			
 	}
 
-	def editTransaction = {
+	def editTransaction() {
         def startTime = System.currentTimeMillis()
 		log.info "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
@@ -1668,39 +1668,39 @@ class InventoryController {
 	* TODO These are the same methods used in the inventory browser.  Need to figure out a better
 	* way to handle this (e.g. through a generic ajax call or taglib).
 	*/
-	def removeCategoryFilter = {
+	def removeCategoryFilter() {
 		def category = Category.get(params?.categoryId)
 		if (category)
 			session.inventoryCategoryFilters.remove(category?.id);
 		redirect(action: browse);
 	}
 	
-	def clearAllFilters = {
+	def clearAllFilters() {
 		session.inventoryCategoryFilters = [];
 		session.inventorySearchTerms = [];
 		redirect(action: browse);
 	}
-	def addCategoryFilter = {
+	def addCategoryFilter() {
 		def category = Category.get(params?.categoryId);
 		if (category && !session.inventoryCategoryFilters.contains(category?.id))
 			session.inventoryCategoryFilters << category?.id;	
 		redirect(action: browse);
 	}
-	def narrowCategoryFilter = {
+	def narrowCategoryFilter() {
 		def category = Category.get(params?.categoryId);
 		session.inventoryCategoryFilters = []
 		if (category && !session.inventoryCategoryFilters.contains(category?.id))
 			   session.inventoryCategoryFilters << category?.id;
 		redirect(action: browse);
 	}
-	def removeSearchTerm = {
+	def removeSearchTerm() {
 		if (params.searchTerm)
 			session.inventorySearchTerms.remove(params.searchTerm);
 		redirect(action: browse);
 	}
 
 
-    def upload = {
+    def upload() {
         def inventoryList = [:]
         if (request.method == "POST") {
             File localFile = null;

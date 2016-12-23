@@ -43,7 +43,7 @@ class JsonController {
 	def messageSource
     def consoleService
 
-    def evaluateIndicator = {
+    def evaluateIndicator() {
         def indicator = Indicator.get(params.id)
         if (indicator) {
             def results = consoleService.eval(indicator.expression, true, request)
@@ -54,7 +54,7 @@ class JsonController {
         }
     }
 
-    def addToRequisitionItems = {
+    def addToRequisitionItems() {
 
         def requisition = Requisition.get(params.requisitionId)
         def product = Product.get(params.productId);
@@ -80,41 +80,15 @@ class JsonController {
         render json as JSON
     }
 
-    def getTranslation = {
-        def translation = getTranslation(params.text, params.src, params.dest)
+    def getTranslation() {
+        def translation = localizationService.getTranslation(params.text, params.src, params.dest)
         def json = [translation]
         render json as JSON
     }
 
-    def getTranslation(String text, String source, String destination) {
-        def translation = ""
-        text = text.encodeAsURL()
-        def email = "openboxes@pih.org"
-        def password = "0p3nb0x3s"
-        String urlString = "http://www.syslang.com/frengly/controller?action=translateREST&src=${source.encodeAsHTML()}&dest=${destination}&text=${text.encodeAsHTML()}&email=${email}&password=${password}"
-        try {
-            log.info "Before " + urlString
-            def url = new URL(urlString)
-            def connection = url.openConnection()
-            log.info "content type; " + connection.contentType
-            if(connection.responseCode == 200){
-                def xml = connection.content.text
-                log.info "XML: " + xml
-                def root = new XmlParser(false, true).parseText(xml)
-                translation = root.translation.text()
-            }
-            else {
-                log.info "connection " + connection.responseCode
 
-            }
-        } catch (Exception e) {
-            log.error("Error trying to translate using syslang API ", e);
-            throw new ApiException(message: "Unable to query syslang API: " + e.message)
-        }
-        return translation
-    }
 
-	def getLocalization = { 
+	def getLocalization() {
 		log.info "get localization " + params
 		def localization = Localization.get(params.id)
 		// Get the localization from the database
@@ -150,7 +124,7 @@ class JsonController {
 		render localization.toJson() as JSON;
 	}
 
-	def saveLocalization = { 
+	def saveLocalization() {
 		log.info "Save localization " + params
 		def data = request.JSON
 		log.info "Data " + data
@@ -191,7 +165,7 @@ class JsonController {
 		return true
 	}
 
-    def deleteLocalization = {
+    def deleteLocalization() {
         log.info "get localization " + params
         // Get the localization from the database
         def jsonResponse = []
@@ -207,7 +181,7 @@ class JsonController {
         render jsonResponse as JSON
     }
 
-	def getQuantityToReceive = {
+	def getQuantityToReceive() {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityToReceive = inventoryService.getQuantityToReceive(location, product)
@@ -215,7 +189,7 @@ class JsonController {
 		render (quantityToReceive?:"0")
 	}
 
-	def getQuantityToShip = {
+	def getQuantityToShip() {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityToShip = inventoryService.getQuantityToShip(location, product)
@@ -223,7 +197,7 @@ class JsonController {
 		render (quantityToShip?:"0")
 	}
 
-	def getQuantityOnHand = {
+	def getQuantityOnHand() {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
 		def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
@@ -234,7 +208,7 @@ class JsonController {
 
 
     //@Cacheable("dashboardCache")
-    def getGenericProductSummary = {
+    def getGenericProductSummary() {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session?.warehouse?.id)
         def genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
@@ -248,7 +222,7 @@ class JsonController {
 
 
     //@Cacheable("dashboardCache")
-    def getDashboardAlerts = {
+    def getDashboardAlerts() {
         def location = Location.get(session?.warehouse?.id)
         def dashboardAlerts = inventoryService.getDashboardAlerts(location)
 
@@ -268,14 +242,14 @@ class JsonController {
     }
 
     //@Cacheable("dashboardCache")
-    def getDashboardExpiryAlerts = {
+    def getDashboardExpiryAlerts() {
         def location = Location.get(session?.warehouse?.id)
         def map = inventoryService.getExpirationSummary(location)
         render map as JSON
     }
 
     //@Cacheable("dashboardCache")
-    def getTotalStockValue = {
+    def getTotalStockValue() {
         def location = Location.get(session?.warehouse?.id)
         def result = inventoryService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
@@ -285,21 +259,21 @@ class JsonController {
     }
 
     //@Cacheable("dashboardCache")
-    def getReconditionedStockCount = {
+    def getReconditionedStockCount() {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getReconditionedStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     //@Cacheable("dashboardCache")
-    def getTotalStockCount = {
+    def getTotalStockCount() {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getTotalStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     //@Cacheable("dashboardCache")
-    def getInStockCount = {
+    def getInStockCount() {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getInStock(location)
         //println "in stock: " + results
@@ -307,21 +281,21 @@ class JsonController {
     }
 
     //@Cacheable("dashboardCache")
-    def getOutOfStockCount = {
+    def getOutOfStockCount() {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getOutOfStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     //@Cacheable("dashboardCache")
-    def getOverStockCount = {
+    def getOverStockCount() {
         def location = Location.get(params?.location?.id)
         def results = inventoryService.getOverStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     //@Cacheable("dashboardCache")
-    def getLowStockCount = {
+    def getLowStockCount() {
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getLowStock(location)
         //println "low: " + results
@@ -329,7 +303,7 @@ class JsonController {
 	}
 
     //@Cacheable("dashboardCache")
-	def getReorderStockCount = {
+	def getReorderStockCount() {
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getReorderStock(location)
         //println "reorder: " + results
@@ -337,7 +311,7 @@ class JsonController {
 	}
 
     //@Cacheable("dashboardCache")
-	def getExpiringStockCount = {
+	def getExpiringStockCount() {
 		def daysUntilExpiry = Integer.valueOf(params.daysUntilExpiry)
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiringStock(null, location, daysUntilExpiry)
@@ -345,7 +319,7 @@ class JsonController {
 	}
 
     //@Cacheable("dashboardCache")
-	def getExpiredStockCount = {
+	def getExpiredStockCount() {
 		//println "expired stock count " + params
 		def location = Location.get(params?.location?.id)
 		def results = inventoryService.getExpiredStock(null, location)
@@ -353,7 +327,7 @@ class JsonController {
 	}
 
 
-    def getQuantityOnHandMap = {
+    def getQuantityOnHandMap() {
         def startTime = System.currentTimeMillis()
         //def location = Location.get(session?.warehouse?.id)
         //def results = inventoryService.getQuantityByProductMap(location.inventory)
@@ -364,12 +338,7 @@ class JsonController {
     }
 
 
-    Map<Product,Integer> getQuantityOnHand(Inventory inventory) {
-        return inventoryService.getQuantityByProductMap(inventory)
-    }
-
-
-    def findProductCodes = {
+    def findProductCodes() {
         def searchTerm = params.term + "%";
         def c = Product.createCriteria()
         def products = c.list {
@@ -382,7 +351,7 @@ class JsonController {
     }
 
 
-	def findTags = {
+	def findTags() {
 		def searchTerm = "%" + params.term + "%";
 		def c = Tag.createCriteria()
 		def tags = c.list {
@@ -394,7 +363,7 @@ class JsonController {
 		render results as JSON;
 	}
 
-	def autoSuggest = {
+	def autoSuggest() {
         log.info "autoSuggest: " + params
 		def searchTerm = "%" + params.term + "%";
 		def c = Product.createCriteria()
@@ -408,7 +377,7 @@ class JsonController {
 		render results as JSON;
 	}
 
-    def autoSuggestProductGroups = {
+    def autoSuggestProductGroups() {
         log.info "autoSuggest: " + params
         def searchTerms = params.term.split(" ")
         //def searchTerm = "%" + params.term + "%";
@@ -428,7 +397,7 @@ class JsonController {
     }
 
 
-	def findProductNames = {
+	def findProductNames() {
 		def searchTerm = "%" + params.term + "%";
 		def c = Product.createCriteria()
 		def productNames = c.list {
@@ -442,7 +411,7 @@ class JsonController {
 		render results as JSON;
 	}
 	
-	def findPrograms = {
+	def findPrograms() {
         log.info "find programs " + params
 		def searchTerm = params.term + "%";
 		def c = Requisition.createCriteria()
@@ -474,7 +443,7 @@ class JsonController {
 		render results as JSON;
 	}
 	
-	def findRxNormDisplayNames = {
+	def findRxNormDisplayNames() {
         log.info "findRxNormDisplayNames: " + params
 		def results = []
 		try {
@@ -506,11 +475,11 @@ class JsonController {
 	}
 	
 	
-	def getInventoryItem = { 
+	def getInventoryItem() {
 		render InventoryItem.get(params.id).toJson() as JSON;
 	}
 	
-	def getQuantity = {
+	def getQuantity() {
 		log.info params
 		def quantity = 0
 		def location = Location.get(session.warehouse.id);
@@ -525,7 +494,7 @@ class JsonController {
 		render quantity ?: "N/A";
 	}
 
-	def sortContainers = {
+	def sortContainers() {
 		def container
 		params.get("container[]").eachWithIndex { id, index ->
 			container = Container.get(id)
@@ -539,7 +508,7 @@ class JsonController {
 		render(text: "", contentType: "text/plain")
 	}
 
-    def sortRequisitionItems = {
+    def sortRequisitionItems() {
         log.info "sort requisition items " + params
 
         def requisitionItem
@@ -556,7 +525,7 @@ class JsonController {
 	/**
 	 * Ajax method for the Record Inventory page.
 	 */
-	def getInventoryItems = {
+	def getInventoryItems() {
 		log.info params
 		def productInstance = Product.get(params?.product?.id);
 		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
@@ -567,7 +536,7 @@ class JsonController {
 	/**
 	 * Returns inventory items for the given location, lot number, and product.
 	 */
-	def findInventoryItems = {
+	def findInventoryItems() {
 		log.info params
 		def inventoryItems = []
 		def location = Location.get(session.warehouse.id);
@@ -624,7 +593,7 @@ class JsonController {
 		render inventoryItems as JSON;
 	}
 
-	def findLotsByName = { 
+	def findLotsByName() {
 		log.info params
 		// Constrain by product id if the productId param is passed in		
 		def items = new TreeSet();
@@ -666,7 +635,7 @@ class JsonController {
 		render items as JSON;
 	}
 
-	def findPersonByName = {
+	def findPersonByName() {
 		log.info "findPersonByName: " + params
 		def items = new TreeSet();
 		try {
@@ -724,7 +693,7 @@ class JsonController {
 
 	}
 
-	def findProductByName = {
+	def findProductByName() {
 		
 		log.info("find products by name " + params)
 		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
@@ -819,7 +788,7 @@ class JsonController {
 		render products as JSON;
 	}
 
-	def findRequestItems = {
+	def findRequestItems() {
 		
 		log.info("find request items by name " + params)
 		
@@ -873,7 +842,7 @@ class JsonController {
 
 
 
-    def searchProductPackages = {
+    def searchProductPackages() {
 
         log.info "Search product packages " + params
         def location = Location.get(session.warehouse.id);
@@ -921,7 +890,7 @@ class JsonController {
 
 
 
-    def searchProduct = {
+    def searchProduct() {
         def location = Location.get(session.warehouse.id);
         def results = productService.searchProductAndProductGroup(params.term)
         if (!results) {
@@ -967,7 +936,7 @@ class JsonController {
     }
 
 
-	def searchPersonByName = {
+	def searchPersonByName() {
 		def items = []
 		def terms = params.term?.split(" ")
 		terms?.each{ term ->
@@ -988,7 +957,7 @@ class JsonController {
 	}
 
   
-	def globalSearch = {
+	def globalSearch() {
 		def items = []
         def quantityMap = [:]
 		def terms = params.term?.split(" ")
@@ -1013,7 +982,7 @@ class JsonController {
 			def type = it.class.simpleName.toLowerCase()
 			[   id: it.id,
                 type: it.class,
-                url: request.contextPath + "/" + type  + "/redirect/" + it.id,
+                url: request.contextPath + "/" + type  + "/redirectById/" + it.id,
 				value: it.name,
                 label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + it.unitOfMeasure ]
 		}
@@ -1034,7 +1003,7 @@ class JsonController {
 
 
     /*
-    def calculateQuantityOnHandByProduct2 = {
+    def calculateQuantityOnHandByProduct2() {
         def items = []
 
         def startTime = System.currentTimeMillis()
@@ -1087,12 +1056,12 @@ class JsonController {
     */
 
     //@CacheFlush("quantityOnHandCache")
-    def flushQuantityOnHandCache = {
+    def flushQuantityOnHandCache() {
         redirect(controller:"inventory", action: "analyze")
     }
 
     //@Cacheable("quantityOnHandCache")
-    def calculateQuantityOnHandByProduct = {
+    def calculateQuantityOnHandByProduct() {
 
         log.info "Calculating quantity on hand by product ..." + params
 
@@ -1149,7 +1118,7 @@ class JsonController {
     /**
      * Analytics > Inventory Browser > Data Table
      */
-    def getQuantityOnHandByProductGroup = {
+    def getQuantityOnHandByProductGroup() {
         def startTime = System.currentTimeMillis()
         log.info "getQuantityOnHandByProductGroup " + params
         def aaData = new HashSet() //data.productGroupDetails.ALL.values()
@@ -1182,7 +1151,7 @@ class JsonController {
                 totalValue:totalValue,totalValueFormatted:totalValueFormatted] as JSON)
     }
 
-    def getSummaryByProductGroup = {
+    def getSummaryByProductGroup() {
         log.info "getSummaryByProductGroup " + params
         def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
 
@@ -1190,21 +1159,21 @@ class JsonController {
         render (data.productGroupSummary as JSON)
     }
 
-    def mostRecentQuantityOnHand = {
+    def mostRecentQuantityOnHand() {
         def product = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
         def object = inventoryService.getMostRecentQuantityOnHand(product, location)
         render ([mostRecentQuantityOnHand:object] as JSON)
     }
 
-    def quantityMap = {
+    def quantityMap() {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityMap(location)
         render ([quantityMap:quantityMap] as JSON)
     }
 
 
-    def scanBarcode = {
+    def scanBarcode() {
         log.info "Scan barcode: " + params
 
         def url
@@ -1243,7 +1212,7 @@ class JsonController {
     /**
      * Stock Card > Snapshot graph
      */
-    def getQuantityOnHandByMonth = {
+    def getQuantityOnHandByMonth() {
         log.info params;
         def dates = []
         def format = "MMM-yy"
@@ -1368,7 +1337,7 @@ class JsonController {
     /**
      * Dashboard > Fast movers
      */
-    def getFastMovers = {
+    def getFastMovers() {
         log.info "getRequisitionItems: " + params
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         def date = new Date()
@@ -1384,7 +1353,7 @@ class JsonController {
     }
 
 
-    def getOrderItem = {
+    def getOrderItem() {
         def orderItem = OrderItem.get(params.id)
         render ([id:orderItem.id, product:orderItem.product, order:orderItem.order, quantity:orderItem.quantity, unitPrice:orderItem.unitPrice] as JSON)
     }

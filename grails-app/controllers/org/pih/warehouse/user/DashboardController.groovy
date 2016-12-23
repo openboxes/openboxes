@@ -36,27 +36,26 @@ class DashboardController {
     def requisitionService
 	def sessionFactory
 	
-	def showCacheStatistics = {
+	def showCacheStatistics() {
 		def statistics = sessionFactory.statistics
-		log.info(statistics)
-		render statistics
+		render statistics as JSON
 	}
 
-    def showRequisitionStatistics = {
+    def showRequisitionStatistics() {
         def user = User.get(session.user.id)
         def location = Location.get(session?.warehouse?.id);
         def statistics = requisitionService.getRequisitionStatistics(location,null,user)
         render statistics as JSON
     }
 
-    def showRequisitionMadeStatistics = {
+    def showRequisitionMadeStatistics() {
         def user = User.get(session.user.id)
         def location = Location.get(session?.warehouse?.id);
         def statistics = requisitionService.getRequisitionStatistics(null,location,user)
         render statistics as JSON
     }
 
-    def globalSearch = {
+    def globalSearch() {
 		
 		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
 		if (transaction) { 
@@ -85,7 +84,7 @@ class DashboardController {
 		redirect(controller: "inventory", action: "browse", params:params)
 			
 	}
-    def throwException = {
+    def throwException() {
         try {
             throw new RuntimeException("error of some kind")
         } catch (RuntimeException e) {
@@ -95,7 +94,7 @@ class DashboardController {
     }
 
     //@Cacheable("dashboardControllerCache")
-	def index = {
+	def index() {
 
         def startTime = System.currentTimeMillis()
 		if (!session.warehouse) {
@@ -295,21 +294,21 @@ class DashboardController {
 	}
 
 
-    def expirationSummary = {
+    def expirationSummary() {
         def location = Location.get(session.warehouse.id)
         def results = inventoryService.getExpirationSummary(location)
 
         render results as JSON
     }
 
-    def hideTag = {
+    def hideTag() {
         Tag tag = Tag.get(params.id)
         tag.isActive = false
         tag.save(flush:true)
         redirect(controller: "dashboard", action: "index", params: [editTags:true])
     }
 	
-	def status = { 
+	def status() {
 		def admin = User.get(1)
 		def comments = Comment.findAllBySenderAndRecipient(admin, admin) 
 		
@@ -322,7 +321,7 @@ class DashboardController {
 	}
 
     //@Cacheable("megamenuCache")
-	def megamenu = {
+	def megamenu() {
 
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
@@ -375,7 +374,7 @@ class DashboardController {
 	}
 	
 	
-	def menu = { 
+	def menu() {
 		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()
 		def outgoingShipments = Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort();
 		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
@@ -391,19 +390,19 @@ class DashboardController {
 	}
 
     //@CacheFlush(["dashboardCache", "megamenuCache"])
-    def flushCache = {
+    def flushCache() {
         flash.message = "Cache has been flushed"
         redirect(action: "index")
     }
 
-	def chooseLayout = {
+	def chooseLayout() {
 		if (params.layout) { 
 			session.layout = params.layout
 		}
 		redirect(controller:'dashboard', action:'index')
 	}
 	
-	def chooseLocation = {
+	def chooseLocation() {
 		log.info params
 		def warehouse = null;
 			
@@ -456,7 +455,7 @@ class DashboardController {
 		
 	}
 
-    def downloadGenericProductSummaryAsCsv = {
+    def downloadGenericProductSummaryAsCsv() {
         def location = Location.get(session?.warehouse?.id)
         def genericProductSummary = inventoryService.getGenericProductSummary(location)
         def data = (params.status == "ALL") ? genericProductSummary.values().flatten() : genericProductSummary[params.status]
@@ -486,7 +485,7 @@ class DashboardController {
         return;
     }
 
-    def downloadFastMoversAsCsv = {
+    def downloadFastMoversAsCsv() {
         println "exportFastMoversAsCsv: " + params
         def location = Location.get(params?.location?.id?:session?.warehouse?.id)
 
