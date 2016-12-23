@@ -1,63 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-	<changeSet author="jmiranda (generated)" id="1359439555236-1">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="active" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="active" type="BIT" />
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1359439555236-2">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="controlled_substance" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="controlled_substance" type="BIT" />
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1359439555236-3">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="essential" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="essential" type="BIT" />
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1359439555236-4">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="hazardous_material" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="hazardous_material" type="BIT" />
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1359439555236-5">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="lot_control" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="lot_control" type="BIT" />
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1359439555236-6">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="serialized" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="serialized" type="BIT" />
-		</addColumn>
-	</changeSet>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="jmiranda (generated)" id="1359439555236-1">
+        <validCheckSum>3:ca8e426ac3814638df62c057aa7e910c</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="active" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1359439555236-2">
+        <validCheckSum>3:2b9a4bdf2ef0a23beea7f0a086b32037</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="controlled_substance"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="controlled_substance" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1359439555236-3">
+        <validCheckSum>3:6a0da91edf03df6fc29a7dc20b89d622</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="essential"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="essential" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1359439555236-4">
+        <validCheckSum>3:1780ae4b92949f4fb276edcb51c83e1e</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="hazardous_material"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="hazardous_material" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1359439555236-5">
+        <validCheckSum>3:130101d3c0dd7f0860be956ec2703ecd</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="lot_control"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="lot_control" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1359439555236-6">
+        <validCheckSum>3:a90dea611d42c8890075dccd1a7e96fd</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="serialized"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="serialized" type="BIT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

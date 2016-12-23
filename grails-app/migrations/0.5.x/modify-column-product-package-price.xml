@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
 	<changeSet author="jmiranda (generated)" id="1383796948707-1">
+		<validCheckSum>3:8a3653ee1fc16a0cf9668cbd810c39ec</validCheckSum>
 		<preConditions onFail="MARK_RAN">
             <columnExists tableName="product_package" columnName="price" />
 		</preConditions>
-		<modifyColumn tableName="product_package">
-			<column name="price" type="DECIMAL(19,4)">
-		        <constraints nullable="true"/>
-	    	</column>
-		</modifyColumn>
+		<modifyDataType tableName="product_package" columnName="price" newDataType="DECIMAL(19,4)"/>
 	</changeSet>
 
 </databaseChangeLog>

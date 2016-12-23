@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="adminuser (generated)" id="1351524646228-1">
+        <validCheckSum>3:3ddcb79112d877364666997dbf7deabd</validCheckSum>
         <addColumn tableName="requisition">
             <column name="requested_delivery_date" type="DATETIME">
                 <constraints nullable="false"/>
@@ -10,6 +12,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351524646228-2">
+        <validCheckSum>3:5198da8947b1df3be5c8f3251b07e146</validCheckSum>
         <addNotNullConstraint columnDataType="DATETIME" columnName="date_requested" defaultNullValue=""
                               tableName="requisition"/>
     </changeSet>

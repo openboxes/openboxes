@@ -1,43 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
     <changeSet author="Stephen (generated)" id="1352830406838-1">
+        <validCheckSum>3:8726bacdfbfa32ac1719a77fcc254373</validCheckSum>
         <addColumn tableName="picklist_item">
             <column name="picklist_item_idx" type="INT"/>
         </addColumn>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-1">
+        <validCheckSum>3:8b1ba479df6da9a10a1d721769213fc5</validCheckSum>
         <addColumn tableName="picklist_item">
             <column name="requisition_item_id" type="CHAR(38)"/>
         </addColumn>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-2">
+        <validCheckSum>3:be68a616a25affaa2dad4d79c3940fbf</validCheckSum>
         <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="picklist"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-3">
+        <validCheckSum>3:a41717fb1c5d9b93313078acc10d8bb7</validCheckSum>
         <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="picklist_item"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-4">
+        <validCheckSum>3:7f40e6998c577e3ea17bd5c7c0fa7118</validCheckSum>
         <addPrimaryKey columnNames="id" tableName="picklist"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-5">
+        <validCheckSum>3:319364bcc414989d2ea2d03adfd4ec6e</validCheckSum>
         <addPrimaryKey columnNames="id" tableName="picklist_item"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-6">
-        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_3" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+        <validCheckSum>3:d37c29828817a10d2008b9c862f03108</validCheckSum>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="picklist_item"
+                                 constraintName="picklist_item_ibfk_3" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-7">
-        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_5" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+        <validCheckSum>3:8c4dbf25b7c30778a0ddb6fbf82f490e</validCheckSum>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="picklist_item"
+                                 constraintName="picklist_item_ibfk_5" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-8">
-        <addForeignKeyConstraint baseColumnNames="picklist_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_2" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="picklist"/>
+        <validCheckSum>3:d136a17b6a396cb0119c8f6defc15e3b</validCheckSum>
+        <addForeignKeyConstraint baseColumnNames="picklist_id" baseTableName="picklist_item"
+                                 constraintName="picklist_item_ibfk_2" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="picklist"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-9">
-        <addForeignKeyConstraint baseColumnNames="requisition_item_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="requisition_item"/>
+        <validCheckSum>3:91714a60419cf0b418337398b66fac50</validCheckSum>
+        <addForeignKeyConstraint baseColumnNames="requisition_item_id" baseTableName="picklist_item"
+                                 constraintName="picklist_item_ibfk_1" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition_item"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-10">
-        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+        <validCheckSum>3:9fd8bbb2ab71bf3b4ace53af98c16c69</validCheckSum>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="picklist_item"
+                                 constraintName="picklist_item_ibfk_4" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
     <changeSet author="Stephen (generated)" id="1352832480258-11">
+        <validCheckSum>3:231c55b3dfecb89b119745aba14c36a3</validCheckSum>
         <dropColumn columnName="request_item_id" tableName="picklist_item"/>
     </changeSet>
 </databaseChangeLog>

@@ -1,91 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-	<changeSet author="jmiranda (generated)" id="1358133447150-1">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="brand_name" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="brand_name" type="VARCHAR(255)">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1358133447150-2">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="vendor" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="vendor" type="VARCHAR(255)">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1358133447150-3">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="vendor_code" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="vendor_code" type="VARCHAR(255)">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1358133447150-4">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="package_size" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="package_size" type="INT">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1358133447150-5">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="model_number" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="model_number" type="VARCHAR(255)">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1358133447150-6">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="manufacturer_name" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="manufacturer_name" type="VARCHAR(255)">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
-	<changeSet author="jmiranda (generated)" id="1358133447150-7">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="product" columnName="vendor_name" />
-			</not>
-		</preConditions>
-		<addColumn tableName="product">
-			<column name="vendor_name" type="VARCHAR(255)">
-				<constraints nullable="true" />
-			</column>
-		</addColumn>
-	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-1">
+        <validCheckSum>3:37f25ceab116484f55e395702eff259b</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="brand_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="brand_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-2">
+        <validCheckSum>3:f984cb8ac9946a90c8fed892b5a7ccc3</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="vendor"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="vendor" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-3">
+        <validCheckSum>3:33f3bc604eb33be1ec4135f63fa2a815</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="vendor_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="vendor_code" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-4">
+        <validCheckSum>3:71bbb01862557f86af926a079509b73a</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="package_size"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="package_size" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-5">
+        <validCheckSum>3:3eedfbd418eed982aa152df32b56eae2</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="model_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="model_number" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-6">
+        <validCheckSum>3:158ace33927fcf060b8692ff68702e33</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="manufacturer_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="manufacturer_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1358133447150-7">
+        <validCheckSum>3:6864d1c4233af36a5e8c91e5ab2d02a5</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="vendor_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="vendor_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

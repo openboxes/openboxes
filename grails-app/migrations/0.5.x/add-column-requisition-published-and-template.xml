@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
     <changeSet author="jmiranda (generated)" id="1361916937666-1">
+        <validCheckSum>3:536af5ff640941a81a61cb136f7881aa</validCheckSum>
     	<preConditions onFail="MARK_RAN">
     		<not>
     			<columnExists tableName="requisition" columnName="is_template"/>
@@ -11,6 +16,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1361916937666-2">
+        <validCheckSum>3:0073ef6c89f1587a1c6b235e0d745ad2</validCheckSum>
     	<preConditions onFail="MARK_RAN">
     		<not>
     			<columnExists tableName="requisition" columnName="is_published"/>
@@ -21,6 +27,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1361916937666-3">
+        <validCheckSum>3:80d0ef7b3dd72fbfd7bb98329f8756d8</validCheckSum>
     	<preConditions onFail="MARK_RAN">
     		<not>
     			<columnExists tableName="requisition" columnName="date_published"/>

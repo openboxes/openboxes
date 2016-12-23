@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="jmiranda (generated)" id="1380854972536-1">
+        <validCheckSum>3:7cadc6e7905f1abb24a986faef9faab6</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="requisition_item" columnName="substitution_item_id"/>
@@ -15,6 +16,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1380854972536-2">
+        <validCheckSum>3:955510d6402083d08ec0d7d8586a6f0e</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="requisition_item" columnName="modification_item_id"/>

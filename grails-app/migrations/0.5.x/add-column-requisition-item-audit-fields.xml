@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="jmiranda (generated)" id="1366998651167-1">
+        <validCheckSum>3:680732b30c45e8cd42e885bb5a59f78a</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition_item" columnName="created_by_id" />
+                <columnExists tableName="requisition_item" columnName="created_by_id"/>
             </not>
         </preConditions>
         <addColumn tableName="requisition_item">
             <column name="created_by_id" type="CHAR(38)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1366998651167-2">
+        <validCheckSum>3:577955c595962abaa32843b4a3db8672</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition_item" columnName="updated_by_id" />
+                <columnExists tableName="requisition_item" columnName="updated_by_id"/>
             </not>
         </preConditions>
         <addColumn tableName="requisition_item">
             <column name="updated_by_id" type="CHAR(38)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>

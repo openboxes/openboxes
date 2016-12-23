@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="jmiranda (generated)" id="1368104110878-1">
+        <validCheckSum>3:bdc49db7f88fd4f5d63199dee554aed4</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="requisition" columnName="received_by_id" />
@@ -13,6 +14,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1368104110878-2">
+        <validCheckSum>3:a6f7d54ef42f6e4c5e16e563f4e622ac</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="requisition" columnName="date_received" />

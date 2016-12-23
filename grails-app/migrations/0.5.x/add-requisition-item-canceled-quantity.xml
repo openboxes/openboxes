@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 	<changeSet author="jmiranda (generated)" id="1359787826281-1">
+		<validCheckSum>3:209d869848f0f3503c79af4655e36e1e</validCheckSum>
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="requisition_item" columnName="quantity_canceled" />
@@ -11,6 +12,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="jmiranda (generated)" id="1359787826281-2">
+        <validCheckSum>3:00a85efa32a475787c7554583ad4d39a</validCheckSum>
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="requisition_item" columnName="cancel_reason_code" />
@@ -21,6 +23,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="jmiranda (generated)" id="1359787826281-3">
+        <validCheckSum>3:42b02def88a1a533ad9c414fa83abea2</validCheckSum>
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="requisition_item" columnName="cancel_comments" />

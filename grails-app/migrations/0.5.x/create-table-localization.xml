@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
 	<changeSet author="jmiranda (generated)" id="1361238137701-1">
 		<validCheckSum>7031408cf1a2de502029e04463308a70</validCheckSum>
+		<validCheckSum>3:01663dddfa55d7dc2efc085177541fb3</validCheckSum>
 		<preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="localization"/>
@@ -35,6 +38,7 @@
 	</changeSet>
 	<changeSet author="jmiranda (generated)" id="1361238338554-2">
 		<validCheckSum>fb4822ae86726cad4921b995d258456</validCheckSum>
+		<validCheckSum>3:822d598758dc384070eaf5a64eac72d1</validCheckSum>
 		<preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="localization_code_locale_idx"/>

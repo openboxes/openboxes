@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="adminuser (generated)" id="1351628122698-1">
+        <validCheckSum>3:8ffc185b8a57fdcdd31535072c96e0b8</validCheckSum>
         <addColumn tableName="requisition_item">
             <column name="comment" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351628122698-2">
+        <validCheckSum>3:c996d25e508022797ddbf87b00c69d5c</validCheckSum>
         <addColumn tableName="requisition_item">
             <column name="recipient_id" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351628122698-3">
+        <validCheckSum>3:aeef5f49f6b7070abd55f6ffe947e7e9</validCheckSum>
         <addColumn tableName="requisition_item">
             <column name="substitutable" type="BIT">
                 <constraints nullable="false"/>
@@ -20,10 +24,12 @@
         </addColumn>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351628122698-4">
+        <validCheckSum>3:1164da7458f139fcd2fe8b5f6ca093cc</validCheckSum>
         <addNotNullConstraint columnDataType="CHAR(38)" columnName="product_id" defaultNullValue=""
                               tableName="requisition_item"/>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351628122698-5">
+        <validCheckSum>3:7058608b29ec984be7af5d34aff70540</validCheckSum>
         <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="requisition_item"
                                  constraintName="requisition_item_ibfk_1" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="person"/>

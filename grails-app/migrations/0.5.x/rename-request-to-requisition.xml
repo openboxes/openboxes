@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="PZ DM" id="1295640983194-01">
+        <validCheckSum>3:6cca9a1593288afdf315979d24fc06c3</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="request_event"/>
         </preConditions>
         <dropTable tableName="request_event"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-02">
+        <validCheckSum>3:7e4ace10e52b382dc6df455ead387161</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="request_comment"/>
         </preConditions>
         <dropTable tableName="request_comment"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-03">
+        <validCheckSum>3:b49df242d756baa5add43dedc1e6e5e5</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="request_document"/>
         </preConditions>
         <dropTable tableName="request_document"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-04">
+        <validCheckSum>3:07aa61462a8e17be7171b53ceea3f67b</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="request_shipment"/>
         </preConditions>
@@ -29,6 +30,7 @@
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-04b">
         <validCheckSum>8c2aedd41a27c9626174e0f6f7dac793</validCheckSum>
+        <validCheckSum>3:43184415eb3b11befd29d35ec56fac13</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <foreignKeyConstraintExists
                     foreignKeyName="FKEDC55CD447EBE106"/>
@@ -37,19 +39,25 @@
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-04c">
         <validCheckSum>5e566ff3c1677aa55127e206c8b112</validCheckSum>
+        <validCheckSum>3:6c8985fe5e2cb5beedf74114a0c71fa2</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <indexExists indexName="FKEDC55CD447EBE106"/>
         </preConditions>
         <dropIndex indexName="FKEDC55CD447EBE106" tableName="fulfillment_item"/>
     </changeSet>
 
+
+
+
     <changeSet author="PZ DM" id="1295640983194-05">
+        <validCheckSum>3:d5ef8d97e331bd9e8a7516e5eea0c6ef</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="request_item"/>
         </preConditions>
         <dropTable tableName="request_item"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-06">
+        <validCheckSum>3:3aa4971f75d8317c5fadb3b6ae1c3872</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="request"/>
         </preConditions>
@@ -57,6 +65,7 @@
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-07">
         <validCheckSum>da93143b848014974bdd11821be753c1</validCheckSum>
+        <validCheckSum>3:0003b3ce0c80c48c658cc59ade79cfc8</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="requisition"/>
@@ -89,9 +98,9 @@
         </createTable>
     </changeSet>
 
-
     <changeSet author="PZ DM" id="1295640983194-08">
         <validCheckSum>21daa6d83b862c149264c3c6aa92b0aa</validCheckSum>
+        <validCheckSum>3:6a1f98dd2ecb256a09ebce34af649f52</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="requisition_item"/>
@@ -126,6 +135,7 @@
     
     <changeSet author="PZ DM" id="1295640983194-09">
         <validCheckSum>f31e24b92574a8d3878374cc97c86</validCheckSum>
+        <validCheckSum>3:8bf3212a36f14ce7024b6486ec1e9492</validCheckSum>
         <preConditions onFail="MARK_RAN">
         	<columnExists tableName="fulfillment_item" columnName="request_item_id"/>
         </preConditions>
@@ -134,6 +144,7 @@
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-10">
         <validCheckSum>56a770ee8f7e38d45ff7b4581138ecb4</validCheckSum>
+        <validCheckSum>3:96d95b1ce2d89658089bcf4802a9ffee</validCheckSum>
         <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FKEDC55CD447EBE106"/>
@@ -145,6 +156,7 @@
                                  referencedColumnNames="id" referencedTableName="requisition_item"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-11">
+        <validCheckSum>3:16bbd3500a0b85048ae26001cfb4fb83</validCheckSum>
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK414EF28F1E2B3CDC"/>
@@ -154,7 +166,8 @@
                                  constraintName="FK414EF28F1E2B3CDC" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="location"/>    </changeSet>
     <changeSet author="PZ DM" id="1295640983194-12">
-         <preConditions onFail="MARK_RAN">
+         <validCheckSum>3:809998f88350399af0dbdc1814de4ced</validCheckSum>
+        <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK414EF28F94567276"/>
             </not>
@@ -164,7 +177,8 @@
                                  referencedColumnNames="id" referencedTableName="fulfillment"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-13">
-         <preConditions onFail="MARK_RAN">
+        <validCheckSum>3:a66913248ab2c170b1860d18cb7cc192</validCheckSum>
+        <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK414EF28FDBDEDAC4"/>
             </not>
@@ -174,7 +188,8 @@
                                  referencedColumnNames="id" referencedTableName="location"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-14">
-         <preConditions onFail="MARK_RAN">
+         <validCheckSum>3:fe6ece8a8125cdeca7389942f4ddc32f</validCheckSum>
+        <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK414EF28F44979D51"/>
             </not>
@@ -184,7 +199,8 @@
                                  referencedColumnNames="id" referencedTableName="person"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-15">
-         <preConditions onFail="MARK_RAN">
+        <validCheckSum>3:7898f92d0a02172bc26af3a240a30e25</validCheckSum>
+        <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK414EF28FDD302242"/>
             </not>
@@ -194,6 +210,7 @@
                                  referencedColumnNames="id" referencedTableName="person"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-16">
+        <validCheckSum>3:70631236674f8e692b37dcab438653a6</validCheckSum>
          <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3EF4C770D"/>
@@ -204,8 +221,9 @@
                                  referencedColumnNames="id" referencedTableName="category"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-17">
-         <preConditions onFail="MARK_RAN">
-             <not>
+        <validCheckSum>3:84312b674f99e049ea99e176d3fd41ac</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3AA992CED"/>
             </not>
         </preConditions>
@@ -214,6 +232,7 @@
                                  referencedColumnNames="id" referencedTableName="inventory_item"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-18">
+        <validCheckSum>3:c07e4e82a205b2f9f07b7a40a13528fd</validCheckSum>
          <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3DED5FAE7"/>
@@ -224,6 +243,7 @@
                                  referencedColumnNames="id" referencedTableName="product"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-19">
+        <validCheckSum>3:6f461280addff8c98a462a6c46490c24</validCheckSum>
          <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3911E7578"/>
@@ -234,6 +254,7 @@
                                  referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-20">
+        <validCheckSum>3:bb534c2817e1e17290d36d4d150ea8ca</validCheckSum>
          <preConditions onFail="MARK_RAN">
              <not>
                 <foreignKeyConstraintExists  foreignKeyName="FK4DA982C35DE21C87"/>
