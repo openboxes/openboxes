@@ -303,7 +303,7 @@ log4j.main = {
 /* Database Migration plugin */
 grails.plugin.databasemigration.updateOnStart = true
 grails.plugin.databasemigration.changelogLocation = "grails-app/migrations"
-grails.plugin.databasemigration.updateOnStartFileNames = ['install/install.xml','changelog.xml']
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.xml']
 grails.plugin.databasemigration.ignoredObjects = ["click_stream", "click_stream_request"]
 
 /* Indicates which activities are required for a location to allow logins */
