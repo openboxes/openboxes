@@ -1,6 +1,8 @@
 language: groovy
 jdk:
+  - openjdk8
   - openjdk7
+#  - oraclejdk8
   - oraclejdk7
 
 #before_install:
