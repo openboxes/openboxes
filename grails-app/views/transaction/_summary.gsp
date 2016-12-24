@@ -22,7 +22,7 @@
 		</td>
 		<td class="right" style="width: 1%">	
 			<g:if test="${transactionInstance?.transactionNumber }">
-				<img src="${createLink(controller:'product',action:'barcode',params:[data:transactionInstance?.transactionNumber,format:'CODE_128',height: 20]) }"/>
+				<img src="${createLink(controller:'product',action:'barcode',params:[data:transactionInstance?.transactionNumber,barcodeFormat:'CODE_128',height: 20]) }"/>
 			</g:if>
 			<div class="transactionNumber center">${transactionInstance?.transactionNumber }</div>
 		</td>

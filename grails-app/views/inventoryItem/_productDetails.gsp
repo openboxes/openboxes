@@ -75,7 +75,7 @@
 			<tr>
 				<td class="value" colspan="2">
 					<div class="center">					
-						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,format:'CODE_39',width:200,height:20]) }" class="top"/>
+						<img src="${createLink(controller:'product',action:'barcode',params:[data:productInstance?.productCode,barcodeFormat:'CODE_39',width:200,height:20]) }" class="top"/>
 						<div class="productCode">${productInstance?.productCode }</div>
 					</div>		
 				</td>

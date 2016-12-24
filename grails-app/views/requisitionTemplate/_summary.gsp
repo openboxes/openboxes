@@ -11,7 +11,7 @@
                     <td class="center">
                         <g:if test="${requisition?.requestNumber }">
                             <div>
-                                <img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
+                                <img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,barcodeFormat:'CODE_128']) }"/>
     						</div>
                             <div class="requisition-number">
                                 ${requisition?.requestNumber }

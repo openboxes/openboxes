@@ -10,7 +10,7 @@
                     <td class="center" width="1%">
 						<div class="box-barcode">
 							<g:if test="${requisition?.requestNumber }">
-								<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,format:'CODE_128']) }"/>
+								<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:100,height:30,barcodeFormat:'CODE_128']) }"/>
                                 <div class="barcode">${requisition.requestNumber}</div>
 							</g:if>
 						</div>

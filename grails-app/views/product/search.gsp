@@ -54,7 +54,7 @@
 	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">       
 	                        	<td class="center">
 	                        		<g:if test="${product.upc }">
-										<img src="${createLink(controller:'product',action:'barcode',params:[data:product.upc,width:100,height:10,format:'CODE_128']) }"/>
+										<img src="${createLink(controller:'product',action:'barcode',params:[data:product.upc,width:100,height:10,barcodeFormat:'CODE_128']) }"/>
 									</g:if>
 									<%-- 
 										Example URL

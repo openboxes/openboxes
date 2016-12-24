@@ -59,7 +59,7 @@
 
             <div class="header">
                 <g:if test="${requisition.requestNumber}">
-                    <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
+                    <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, barcodeFormat: 'CODE_128'])}"/>
                 </g:if>
             </div>
         </td>
@@ -235,7 +235,7 @@
                 --%>
                 <div class="header">
                     <g:if test="${requisition.requestNumber}">
-                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
+                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, barcodeFormat: 'CODE_128'])}"/>
                     </g:if>
                 </div>
             </td>

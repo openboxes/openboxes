@@ -38,7 +38,7 @@
     </div>
     <div class="requisition-number" style="float: right; text-align: center; margin: 5px;" >
     	<g:if test="${requisition.requestNumber }">
-	    	<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:200,height:60,format:'CODE_128']) }"/>
+	    	<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:200,height:60,barcodeFormat:'CODE_128']) }"/>
 	    	<br/>
 	    	
 	    	${requisition?.requestNumber }
@@ -95,7 +95,7 @@
 	                <tr class="prop">
                         <td class="center">${i+1}</td>
                         <td>
-	                        <img src="${createLink(controller:'product',action:'barcode',params:[data:requisitionItem?.product?.productCode,width:100,height:60,format:'CODE_128']) }"/>
+	                        <img src="${createLink(controller:'product',action:'barcode',params:[data:requisitionItem?.product?.productCode,width:100,height:60,barcodeFormat:'CODE_128']) }"/>
                         </td>
                         <td>
 							<g:if test="${requisitionItem?.product?.images }">
