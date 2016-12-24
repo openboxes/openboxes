@@ -2468,7 +2468,7 @@ class InventoryService implements ApplicationContextAware {
 
 		// first save the base transaction
 		if (!baseTransaction.save(flush: true)) {
-			throw new RuntimeException("Unable to save base transaction " + baseTransaction?.id)
+			throw new RuntimeException("Unable to save base transaction due to validation errors: " + baseTransaction?.errors)
 		}
 
 		// try to fetch any existing local transfer

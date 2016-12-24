@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.inventory
 
+import grails.test.mixin.integration.Integration
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.core.Constants
@@ -18,10 +19,11 @@ import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.core.User
 import org.springframework.core.io.ClassPathResource;
 import testutils.DbHelper
-
 import org.junit.Test
+import static org.junit.Assert.*
 
-class InventoryServiceTests extends GroovyTestCase {
+@Integration
+class InventoryServiceTests {
 	
 	def inventoryService
 	
@@ -238,6 +240,7 @@ class InventoryServiceTests extends GroovyTestCase {
         level6.save(flush:true)
     }
 
+    @Test
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsNoInventoryLevelsAtCurrentInventory() {
         inventoryLevelTestFixture()
         //def inventoryService = new InventoryService()
@@ -250,6 +253,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert result.contains(advilProduct)
     }
 
+    @Test
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsNotSupported() {
         inventoryLevelTestFixture()
         //def inventoryService = new InventoryService()
@@ -262,6 +266,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert !result.contains(ibuprofenProduct)
     }
 
+    @Test
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsSupported() {
         inventoryLevelTestFixture()
         //def inventoryService = new InventoryService()
@@ -332,6 +337,7 @@ class InventoryServiceTests extends GroovyTestCase {
 		
 	}
 
+    @Test
     void test_getQuantityByProductMap() {
 
         transactionEntryTestFixture()
@@ -381,7 +387,7 @@ class InventoryServiceTests extends GroovyTestCase {
 	}
 
 	
-	
+    @Test
     void test_getQuantityByInventoryItemMap() {
 
         transactionEntryTestFixture()
@@ -397,6 +403,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void test_getInventoryItemsWithQuantity() {
 
         transactionEntryTestFixture()
@@ -419,6 +426,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void test_isValidForLocalTransfer_shouldCheckIfTransactionSupportsLocalTransfer() {
         localTransferTestFixture()
 
@@ -436,6 +444,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert inventoryService.isValidForLocalTransfer(transaction5) == true
     }
 
+    @Test
     void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
         localTransferTestFixture()
 
@@ -478,6 +487,7 @@ class InventoryServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
         localTransferTestFixture()
 
@@ -506,7 +516,7 @@ class InventoryServiceTests extends GroovyTestCase {
     }
 
 
-
+    @Test
     void test_getProductsByTags() {
         productTagTestFixture()
         //def inventoryService = new InventoryService()
@@ -519,6 +529,7 @@ class InventoryServiceTests extends GroovyTestCase {
     }
 
 
+    @Test
     void test_getProductsByTag() {
         productTagTestFixture()
         def tags = Tag.list()
@@ -540,6 +551,7 @@ class InventoryServiceTests extends GroovyTestCase {
     }
 
 
+    @Test
     void test_getProductsByTermsAndCategoriesAndLotNumberWithProductSearchTerm() {
         basicTestFixture()
         def terms = ["Asp", "rin"]
@@ -548,7 +560,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert results.contains(aspirinProduct)
     }
 
-
+    @Test
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
         basicTestFixture()
         def terms = ["lot9383"]
@@ -557,6 +569,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert results.contains(tylenolProduct)
     }
 
+    @Test
 	void test_getProductsByTermsAndCategoriesWithProductName() {
 		basicTestFixture()
 		def terms = ["Ibuprofen"]
@@ -568,6 +581,7 @@ class InventoryServiceTests extends GroovyTestCase {
 		assert results*.id.contains(ibuprofenProduct?.id)
 	}
 
+    @Test
 	void test_getProductsByTermsAndCategoriesWithDescription() {
 		basicTestFixture()
 		def terms = ["NSAID"]

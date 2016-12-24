@@ -1,18 +1,10 @@
 package org.pih.warehouse.core
 
+import grails.test.mixin.integration.Integration
 import org.junit.Test
 
-class RoleIntegrationTests extends GroovyTestCase {
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
+@Integration
+class RoleIntegrationTests {
 
     @Test
     void test_getAdmin() {

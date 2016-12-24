@@ -7,18 +7,22 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
+package org.pih.warehouse.report
 
+import grails.test.mixin.integration.Integration
+import org.junit.Test;
 
-
-package org.pih.warehouse.report;
-
-
-class ReportServiceTests extends GroovyTestCase {
+@Integration
+class ReportServiceTests {
 
     //def reportService;
 
-  void testSomething(){
-  }
+    @Test
+    void testSomething() {
+
+
+        assert true
+    }
 //spring cannot build the service , commented out the test so far by Peter
 
 //	void testGenerateTransactionReport() {

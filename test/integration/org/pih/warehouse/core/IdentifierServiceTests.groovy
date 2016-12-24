@@ -1,9 +1,6 @@
 package org.pih.warehouse.core
 
 import grails.test.mixin.integration.Integration
-
-// import groovy.util.GroovyTestCase;
-
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test
 import static org.junit.Assert.*
