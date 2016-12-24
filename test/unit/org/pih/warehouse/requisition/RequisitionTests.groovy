@@ -46,13 +46,12 @@ class RequisitionTests extends GrailsUnitTestCase {
     }
 
 
-
     @Test
     void newInstance_shouldCopyRequisitionAndRequisitionItems() {
         def origin = new Location(name: "HUM")
         def destination = new Location(name: "Boston")
         def requestedBy = new User(username: "jmiranda")
-        def requisition = new Requisition(id:  "1", origin: origin, destination: destination, requestedBy: requestedBy,
+        def requisition = new Requisition(id: "1", origin: origin, destination: destination, requestedBy: requestedBy,
                 type: RequisitionType.DEPOT_TO_DEPOT, commodityClass: CommodityClass.MEDICATION,
                 dateRequested: new Date(), requestedDeliveryDate: new Date())
 
@@ -89,20 +88,20 @@ class RequisitionTests extends GrailsUnitTestCase {
     }
 
 
-    void testDefaultValues(){
-       def requisition = new Requisition()
-       assert requisition.dateRequested <= new Date()
-       //def tomorrow = new Date().plus(1)
-       //tomorrow.clearTime()
-       def today = new Date()
-	   today.clearTime()
-	   
-	   assert requisition.requestedDeliveryDate >= today
+    void testDefaultValues() {
+        def requisition = new Requisition()
+        assert requisition.dateRequested <= new Date()
+        //def tomorrow = new Date().plus(1)
+        //tomorrow.clearTime()
+        def today = new Date()
+        today.clearTime()
+
+        assert requisition.requestedDeliveryDate >= today
     }
 
     void testNotNullableConstraints() {
         mockForConstraintsTests(Requisition)
-        def requisition = new Requisition(dateRequested:null,requestedDeliveryDate:null)
+        def requisition = new Requisition(dateRequested: null, requestedDeliveryDate: null)
         assertFalse requisition.validate()
         assertEquals "nullable", requisition.errors["origin"]
         assertEquals "nullable", requisition.errors["destination"]
@@ -111,7 +110,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         assertEquals "nullable", requisition.errors["requestedDeliveryDate"]
     }
 
-	/*
+    /*
     void testDateRequestedCannotBeGreaterThanToday() {
         mockForConstraintsTests(Requisition)
         def requisition = new Requisition(dateRequested:new Date().plus(1))
@@ -120,16 +119,16 @@ class RequisitionTests extends GrailsUnitTestCase {
     }
     */
 
-     void testDateRequestedCanNeToday() {
+    void testDateRequestedCanNeToday() {
         mockForConstraintsTests(Requisition)
-        def requisition = new Requisition(dateRequested:new Date())
+        def requisition = new Requisition(dateRequested: new Date())
         requisition.validate()
         assertNull requisition.errors["dateRequested"]
     }
 
-     void testDateRequestedCanBeLessThanToday() {
+    void testDateRequestedCanBeLessThanToday() {
         mockForConstraintsTests(Requisition)
-        def requisition = new Requisition(dateRequested:new Date().minus(6))
+        def requisition = new Requisition(dateRequested: new Date().minus(6))
         requisition.validate()
         assertNull requisition.errors["dateRequested"]
     }
@@ -143,7 +142,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         assertNull requisition.errors["requestedDeliveryDate"]
     }
 
-	/*
+    /*
     void testRequestedDeliveryDateCannotBeToday() {
         mockForConstraintsTests(Requisition)
         def requisition = new Requisition(requestedDeliveryDate:new Date())
@@ -155,8 +154,8 @@ class RequisitionTests extends GrailsUnitTestCase {
     @Test
     void compareTo_shouldSortByOriginTypeCommodityClassDateCreated() {
         // def justin = new Person(id:"1", firstName:"Justin", lastName:"Miranda")
-        def boston = new Location(id: "bos", name:"Boston")
-        def miami = new Location(id: "mia", name:"Miami")
+        def boston = new Location(id: "bos", name: "Boston")
+        def miami = new Location(id: "mia", name: "Miami")
         def today = new Date()
         def tomorrow = new Date().plus(1)
         def yesterday = new Date().minus(1)
@@ -175,7 +174,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         def requisition10 = new Requisition(id: "10", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
 
         def requisition11 = new Requisition(id: "11", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: tomorrow)
-        def requisition12 = new Requisition(id: "12", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK,dateCreated: yesterday)
+        def requisition12 = new Requisition(id: "12", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: yesterday)
         def requisition13 = new Requisition(id: "13", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: today)
 
         // def equal1 = 0,
@@ -185,53 +184,55 @@ class RequisitionTests extends GrailsUnitTestCase {
         assertEquals firstWins, requisition3 <=> requisition4
 
 
-        assertEquals([requisition7,requisition5,requisition6], [requisition5,requisition6,requisition7].sort())
-        assertEquals([requisition9,requisition8,requisition10], [requisition8,requisition9,requisition10].sort())
-        assertEquals([requisition11,requisition13,requisition12], [requisition11,requisition12,requisition13].sort())
+        assertEquals([requisition7, requisition5, requisition6], [requisition5, requisition6, requisition7].sort())
+        assertEquals([requisition9, requisition8, requisition10], [requisition8, requisition9, requisition10].sort())
+        assertEquals([requisition11, requisition13, requisition12], [requisition11, requisition12, requisition13].sort())
 
     }
 
+    @Test
+    void testToJson() {
+        def peter = new Person(id: "person1", firstName: "peter", lastName: "zhao")
+        def boston = new Location(id: "l1", name: "boston")
+        def miami = new Location(id: "l2", name: "miami")
+        def today = new Date()
+        def tomorrow = new Date().plus(1)
+        def requisitionItem = new RequisitionItem(id: "item1")
+        def requisition = new Requisition(
+                id: "1234",
+                requestedBy: peter,
+                dateRequested: today,
+                requestedDeliveryDate: tomorrow,
+                name: "test",
+                version: 3,
+                //lastUpdated: today,
+                status: RequisitionStatus.CREATED,
+                recipientProgram: "prog",
+                origin: boston,
+                destination: miami,
+                requisitionItems: [requisitionItem]
+        )
+        requisition.save(flush:true)
 
-    void testToJson(){
-      def peter = new Person(id:"person1", firstName:"peter", lastName:"zhao")
-      def boston = new Location(id: "l1", name:"boston")
-      def miami = new Location(id: "l2", name:"miami")
-      def today = new Date()
-      def tomorrow = new Date().plus(1)
-      def requisitionItem = new RequisitionItem(id:"item1")
-      def requisition = new Requisition(
-        id: "1234",
-        requestedBy: peter,
-        dateRequested: today,
-        requestedDeliveryDate: tomorrow,
-        name: "test",
-        version: 3,
-        //lastUpdated: today,
-        status:  RequisitionStatus.CREATED,
-        recipientProgram: "prog",
-        origin: boston,
-        destination: miami,
-        requisitionItems: [requisitionItem]
-      )
-        requisition.save()
+        def json = requisition.toJson()
 
-      def json = requisition.toJson()
-      assert json.id == requisition.id
-      assert json.requestedById == peter.id
-      assert json.requestedByName == peter.getName()
-      assert json.dateRequested == today.format("MM/dd/yyyy")
-      assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yyyy")
-      assert json.name == requisition.name
-      assert json.version == requisition.version
-      assert json.lastUpdated == requisition.lastUpdated.format("dd/MMM/yyyy hh:mm a")
-      assert json.status == "CREATED"
-      assert json.recipientProgram == requisition.recipientProgram
-      assert json.originId == requisition.origin.id
-      assert json.originName == requisition.origin.name
-      assert json.destinationId == requisition.destination.id
-      assert json.destinationName == requisition.destination.name
-      assert json.requisitionItems.size() == 1
-      assert json.requisitionItems[0].id == requisitionItem.id
+        println "json: " + json
+        assert json.id == requisition.id
+        assert json.requestedById == peter.id
+        assert json.requestedByName == peter.getName()
+        assert json.dateRequested == today.format("MM/dd/yyyy")
+        assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yyyy")
+        assert json.name == requisition.name
+        assert json.version == requisition.version
+        assert json.lastUpdated == requisition.lastUpdated?.format("dd/MMM/yyyy hh:mm a")
+        assert json.status == "CREATED"
+        assert json.recipientProgram == requisition.recipientProgram
+        assert json.originId == requisition.origin.id
+        assert json.originName == requisition.origin.name
+        assert json.destinationId == requisition.destination.id
+        assert json.destinationName == requisition.destination.name
+        assert json.requisitionItems.size() == 1
+        assert json.requisitionItems[0].id == requisitionItem.id
 
     }
 
