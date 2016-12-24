@@ -1,15 +1,15 @@
 language: groovy
 jdk:
-  - openjdk8
   - openjdk7
-#  - oraclejdk8
   - oraclejdk7
+  - oraclejdk8
 
-#before_install:
-#  - cat /etc/hosts # optionally check the content *before*
-#  - sudo hostname "$(hostname | cut -c1-63)"
-#  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
-#  - cat /etc/hosts # optionally check the content *after
+before_install:
+  - cat /etc/hosts # optionally check the content *before*
+  - sudo hostname "$(hostname | cut -c1-63)"
+  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts > /tmp/hosts
+  - sudo mv /tmp/hosts /etc/hosts
+  - cat /etc/hosts # optionally check the content *after*
 
 script: ./grailsw refresh-dependencies
   && ./grailsw "test-app unit:"
@@ -30,5 +30,5 @@ notifications:
 #   - https://github.com/mockito/mockito/blob/master/.travis.yml
 addons:
   hosts:
-    - openboxes-travis
-  hostname: openboxes-travis
+    - travis.openboxes.com
+  hostname: travis.openboxes.com
