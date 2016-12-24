@@ -16,7 +16,9 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 
@@ -1129,5 +1131,22 @@ class ProductService {
 		
 		return similarProducts
 	}
+
+
+    def markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) {
+        def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
+        // Add a new inventory level
+        if (!inventoryLevel) {
+            inventoryLevel = new InventoryLevel(product: product, status: inventoryStatus)
+            inventory.addToConfiguredProducts(inventoryLevel)
+            inventory.save()
+        }
+        // update existing inventory level
+        else {
+            inventoryLevel.status = inventoryStatus
+            inventoryLevel.save()
+        }
+    }
+
 
 }

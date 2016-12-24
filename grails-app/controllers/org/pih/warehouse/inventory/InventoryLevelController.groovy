@@ -15,6 +15,8 @@ import org.pih.warehouse.product.Product
 
 class InventoryLevelController {
 
+    def productService
+
     static allowedMethods = [save: "POST", update: "POST"]
 
     def index() {
@@ -154,7 +156,7 @@ class InventoryLevelController {
 		def location = Location.get(session.warehouse.id)
 		productIds.each {
 			def product = Product.get(it)
-			markAs(product, location.inventory, InventoryStatus.SUPPORTED)
+			productService.markAs(product, location.inventory, InventoryStatus.SUPPORTED)
 		}		
 		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"		
 		redirect(controller: "inventory", action: "browse")
@@ -166,7 +168,7 @@ class InventoryLevelController {
 		def location = Location.get(session.warehouse.id)
 		productIds.each {
 			def product = Product.get(it)
-			markAs(product, location.inventory, InventoryStatus.NOT_SUPPORTED)
+            productService.markAs(product, location.inventory, InventoryStatus.NOT_SUPPORTED)
 		}
 		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
 		redirect(controller: "inventory", action: "browse")
@@ -178,26 +180,10 @@ class InventoryLevelController {
 		def location = Location.get(session.warehouse.id)
 		productIds.each {
 			def product = Product.get(it)
-			markAs(product, location.inventory, InventoryStatus.SUPPORTED_NON_INVENTORY)
+            productService.markAs(product, location.inventory, InventoryStatus.SUPPORTED_NON_INVENTORY)
 		}
 		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
 		redirect(controller: "inventory", action: "browse")
-	}
-
-	
-	def markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) { 		
-		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
-		// Add a new inventory level
-		if (!inventoryLevel) {
-			inventoryLevel = new InventoryLevel(product: product, status: inventoryStatus)
-			inventory.addToConfiguredProducts(inventoryLevel)
-			inventory.save()
-		}
-		// update existing inventory level
-		else {
-			inventoryLevel.status = inventoryStatus
-			inventoryLevel.save()
-		}
 	}
 
     def export() {
