@@ -2,17 +2,31 @@ language: groovy
 jdk:
   - openjdk7
   - oraclejdk7
-before_install:
-  - cat /etc/hosts # optionally check the content *before*
-  - sudo hostname "$(hostname | cut -c1-63)"
-  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
-  - cat /etc/hosts # optionally check the content *after
+
+#before_install:
+#  - cat /etc/hosts # optionally check the content *before*
+#  - sudo hostname "$(hostname | cut -c1-63)"
+#  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
+#  - cat /etc/hosts # optionally check the content *after
+
 script: ./grailsw refresh-dependencies
   && ./grailsw "test-app unit:"
+
 cache:
   directories:
   - "$HOME/.grails"
   - "$HOME/.ivy2"
+
 notifications:
   slack:
     secure: NJ2bhtLK2Xn0vPfq/lAxehuwLshp50Uep1mHMTbiQ7WK/YxNhLbrjgIbh9ZcM/UxZ4AhYX3Wv4VUI9iyEa06XUNTtxaM3ia8Eqao1wTVMl9N0RvU+VgHINORmyZZlf4MNBOZItwsmZT2b094gAfPIg7r8VuCo1wVqGjubVfTeUQ=
+
+# To solve BufferOverflow on OpenJDK7 we setup short hostname (<64characters)
+# See:
+#   - ISSUE-5227: https://github.com/travis-ci/travis-ci/issues/5227
+#   - https://docs.travis-ci.com/user/hostname
+#   - https://github.com/mockito/mockito/blob/master/.travis.yml
+addons:
+  hosts:
+    - openboxes-travis
+  hostname: openboxes-travis
