@@ -50,7 +50,7 @@ class FileService {
 	boolean transactional = false
 	def grailsApplication
 	
-	public File findFile(String filePath){
+	File findFile(String filePath){
 		def file
 		def appContext = grailsApplication.parentContext
 		def archiveDirectory = filePath
@@ -65,8 +65,7 @@ class FileService {
 		}
 		return file
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param shipmentInstance
@@ -215,7 +214,7 @@ class FileService {
 	 * @param cellWidthTwips
 	 * @return
 	 */
-	public Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
+	Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();		
 		// w:tblPr
@@ -296,7 +295,7 @@ class FileService {
 	 * @param cellWidthTwips
 	 * @return
 	 */
-	public Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
+	Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();
 		// w:tblPr
@@ -418,7 +417,22 @@ class FileService {
 		//return outputStream;
 	}
 
-	
-	
-   
+
+    Integer downloadWar(String remoteUrl, File localFile) {
+        try {
+            log.info("Downloading war file " + remoteUrl + " .... ")
+            def outputStream = new BufferedOutputStream(new FileOutputStream(localFile))
+            def url = new URL(remoteUrl)
+            outputStream << url.openStream()
+            outputStream.close();
+            log.info("... done downloading remote file " + remoteUrl + " to " + localFile.absolutePath)
+            //return file.absolutePath
+            return 0
+        } catch (Exception e) {
+            log.error e
+            throw e;
+        }
+    }
+
+
 }

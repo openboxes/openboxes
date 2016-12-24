@@ -968,7 +968,7 @@ class JsonController {
 
             // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
             if (products) {
-                quantityMap = getQuantityByProductMapCached(location, products);
+                quantityMap = inventoryService.getQuantityByProductMap(location.inventory, products)
                 log.info "Quantity map: " + quantityMap?.size()
             }
             items.addAll(products)
@@ -988,19 +988,6 @@ class JsonController {
 		}
 		render json as JSON
 	}
-
-    /**
-     * Caches the quantity on hand values indexed by product.
-     *
-     * @param location
-     * @param products
-     * @return
-     */
-    //@Cacheable("dashboardCache")
-    Map<Product, Integer> getQuantityByProductMapCached(Location location, List<Product> products) {
-        return inventoryService.getQuantityByProductMap(location.inventory, products)
-    }
-
 
     /*
     def calculateQuantityOnHandByProduct2() {

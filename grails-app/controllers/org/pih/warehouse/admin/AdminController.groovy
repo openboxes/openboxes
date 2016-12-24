@@ -29,12 +29,12 @@ import sun.misc.BASE64Encoder;
 
 class AdminController {
 
-    def sessionFactory // inject Hibernate sessionFactory
+	def fileService
 	MailService mailService;
+
 	def grailsApplication
 	def config = Holders.grailsApplication.config
-
-
+	def sessionFactory // inject Hibernate sessionFactory
 
 	def index() { }
 
@@ -168,7 +168,7 @@ class AdminController {
 			flash.message = "Attempting to download '" + command?.remoteWebArchiveUrl + "' to '" + command?.localWebArchive?.absolutePath + "'"
 			// Requires executor plugin
 			//session.command.future = callAsync {			
-			//	return doDownloadWar(command?.remoteWebArchiveUrl, command?.localWebArchive)
+			//	return fileService.doDownloadWar(command?.remoteWebArchiveUrl, command?.localWebArchive)
 			//}
 		}
 		else {
@@ -265,24 +265,6 @@ class AdminController {
 		
 		redirect(action: "showSettings")
 	}
-
-	Integer doDownloadWar(String remoteUrl, File localFile) { 
-		try { 
-			log.info("Downloading war file " + remoteUrl + " .... ")
-			def outputStream = new BufferedOutputStream(new FileOutputStream(localFile))		
-			def url = new URL(remoteUrl)
-			outputStream << url.openStream()
-			outputStream.close();
-			log.info("... done downloading remote file " + remoteUrl + " to " + localFile.absolutePath)
-			//return file.absolutePath
-			return 0
-		} catch (Exception e) { 
-			log.error e
-			throw e;
-		}
-	}
-	
-	
 	
 	/*
 	def reloadWar() {
