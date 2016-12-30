@@ -27,14 +27,12 @@
             <g:form method="post" action="update">
                 <g:hiddenField name="id" value="${locationInstance?.id}" />
                 <g:hiddenField name="version" value="${locationInstance?.version}" />
-                <div class="box dialog">
-                    <h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
                     <div style="width: 49%; margin: 5px; float: left;">
-                        <fieldset>
-                            <legend>
+                        <div class="box">
+                            <h2>
                                 <img src="${resource(dir:'images/icons/silk',file:'application_view_detail.png')}" class="middle"/>
                                 <warehouse:message code="location.details.label" default="Details"/>
-                            </legend>
+                            </h2>
                             <table>
                                 <tbody>
                                     <tr class="prop">
@@ -139,13 +137,13 @@
 
                                 </tbody>
                             </table>
-                        </fieldset>
+                        </div>
 
-                        <fieldset>
-                            <legend>
+                        <div class="box">
+                            <h2>
                                 <img src="${resource(dir:'images/icons/silk',file:'flag_red.png')}" class="middle"/>
                                 <warehouse:message code="default.status.label" default="Status"/>
-                            </legend>
+                            </h2>
                             <table>
                                 <tbody>
                                 <tr class="prop">
@@ -179,14 +177,14 @@
                                 </tr>
                                 </tbody>
                             </table>
-                        </fieldset>
+                        </div>
                     </div>
                     <div style="width: 49%;margin: 5px; float: left;">
-                        <fieldset>
-                            <legend>
+                        <div class="box">
+                            <h2>
                                 <img src="${resource(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                                 <warehouse:message code="address.label" default="Address"/>
-                            </legend>
+                            </h2>
                             <table>
                                 <tbody>
                                     <tr class="prop">
@@ -248,7 +246,7 @@
                                 </tr>
                                 </tbody>
                             </table>
-                        </fieldset>
+                        </div>
 
 
                     </div>
