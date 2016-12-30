@@ -9,10 +9,19 @@
  **/
 package org.pih.warehouse.core
 
+import java.beans.PropertyEditor
 import java.beans.PropertyEditorSupport
 
-class LocationEditor  extends PropertyEditorSupport {
+class LocationEditor extends PropertyEditorSupport implements PropertyEditor {
+
+    @Override
     void setAsText(String text) {
-        value = Location.get(text)
+        setValue(Location.get(text))
     }
+
+    @Override
+    String getAsText() {
+        return getValue()
+    }
+
 }
