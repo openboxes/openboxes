@@ -1,17 +1,24 @@
 package org.pih.warehouse.order
 
 import grails.test.mixin.TestFor
+import grails.test.mixin.integration.Integration
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.User;
 
 import testutils.DbHelper;
+import static org.junit.Assert.*
 
-class OrderServiceTests extends GroovyTestCase {
+
+@Integration
+class OrderServiceTests {
 
 	def orderService
-	protected void setUp() {
+
+	@Before
+	void setUp() {
 		def locationType = new LocationType(name: "Depot").save(flush:true)
 		new Location(name: "Origin", locationType: locationType).save(flush:true)
 		new Location(name: "Destination", locationType: locationType).save(flush:true)

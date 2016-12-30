@@ -7,7 +7,6 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
 
-// import groovy.util.GroovyTestCase;
 import org.junit.Test
 import com.dumbster.smtp.SimpleSmtpServer
 

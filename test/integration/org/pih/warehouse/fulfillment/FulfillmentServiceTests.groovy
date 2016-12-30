@@ -10,16 +10,13 @@
 package org.pih.warehouse.fulfillment
 
 import grails.test.*
+import grails.test.mixin.integration.Integration
+import org.junit.Test
 
-class FulfillmentServiceTests extends GroovyTestCase {
-    protected void setUp() {
-        super.setUp()
-    }
+@Integration
+class FulfillmentServiceTests {
 
-    protected void tearDown() {
-        super.tearDown()
-    }
-
+    @Test
     void testSomething() {
 
     }

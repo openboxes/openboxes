@@ -1,9 +1,11 @@
 package org.pih.warehouse.reporting
 
+import grails.test.mixin.integration.Integration
 import org.junit.Test
 import org.pih.warehouse.core.Location
 
-class ReportControllerTests extends GroovyTestCase {
+@Integration
+class ReportControllerTests {
 
     @Test
     void testShowInventorySamplingReport() {
