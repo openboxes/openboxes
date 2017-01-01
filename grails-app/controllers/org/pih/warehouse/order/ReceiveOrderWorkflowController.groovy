@@ -19,7 +19,7 @@ class ReceiveOrderWorkflowController {
 	def orderService;
 	
 	def index() { redirect(action:"receiveOrder") }
-	def receiveOrderFlow() {
+	def receiveOrderFlow = {
 		start {
 			action {
 				log.info("Starting order workflow " + params)
