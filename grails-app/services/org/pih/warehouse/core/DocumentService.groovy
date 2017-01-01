@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
+import org.docx4j.Docx4J
 import org.groovydev.SimpleImageBuilder
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment;
@@ -31,8 +32,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 //import org.apache.poi.hssf.util.CellReference
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
-import org.docx4j.convert.out.pdf.PdfConversion
-import org.docx4j.convert.out.pdf.viaXSLFO.Conversion
 import org.docx4j.jaxb.Context
 import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
@@ -71,7 +70,7 @@ class DocumentService {
 	}
 
 	
-	public File writeImage(org.pih.warehouse.core.Document document) {
+	File writeImage(org.pih.warehouse.core.Document document) {
 		File file
 		try {
 			file = new File(document.filename)
@@ -86,7 +85,7 @@ class DocumentService {
 	}
 	
 	
-	public void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
+	void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
 
         log.info("Scale image " + document.filename + " width=" + width + " height=" + height + " contentType=" + document.contentType)
 		File file
@@ -121,7 +120,7 @@ class DocumentService {
 	 * @param filePath
 	 * @return
 	 */
-	public File findFile(String filePath){
+	File findFile(String filePath){
 		def file
 		def appContext = Holders.grailsApplication.parentContext
 		def archiveDirectory = filePath
@@ -178,7 +177,7 @@ class DocumentService {
 		// 2. Fetch the document part
 		MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
 
-		Document wmlDocumentEl = (Document) documentPart.getJaxbElement();
+		Document wmlDocumentEl = (Document) documentPart.getContents();
 
 		//xml --> string
 		def xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
@@ -271,7 +270,7 @@ class DocumentService {
 		// 2. Fetch the document part
 		MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
 
-		Document wmlDocumentEl = (Document) documentPart.getJaxbElement();
+		Document wmlDocumentEl = (Document) documentPart.getContents();
 
 		//xml --> string
 		def xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
@@ -332,9 +331,8 @@ class DocumentService {
 	 * @param wordMLPackage
 	 * @param filePath
 	 */
-	void savePackageToFile(WordprocessingMLPackage wordMLPackage, String filePath) { 		
-		SaveToZipFile saver = new SaveToZipFile(wordMLPackage);
-		saver.save(filePath);
+	void savePackageToFile(WordprocessingMLPackage wmlPackage, String filePath) {
+        Docx4J.save(wmlPackage, new File(filePath))
 		log.info( "Saved output to:" + filePath );
 	}
 	
@@ -347,9 +345,9 @@ class DocumentService {
 	 * @throws Exception
 	 */
 	void insertTableAfter(WordprocessingMLPackage pkg, String afterText, Tbl table) throws Exception {
-		Body b = pkg.getMainDocumentPart().getJaxbElement().getBody();
+		Body b = pkg.getMainDocumentPart().getContents().getBody();
 		int addPoint = -1, count = 0;
-		for (Object o : b.getEGBlockLevelElts()) {
+		for (Object o : b.getContent()) {
 			if (o instanceof P && getElementText(o).startsWith(afterText)) {
 				addPoint = count + 1;
 				break;
@@ -357,7 +355,7 @@ class DocumentService {
 			count++;
 		}
 		if (addPoint != -1)
-			b.getEGBlockLevelElts().add(addPoint, table);
+			b.getContent().add(addPoint, table);
 		else {
 			// didn't find paragraph to insert after...
 		}
@@ -377,7 +375,7 @@ class DocumentService {
 	 * @param cellWidthTwips
 	 * @return
 	 */
-	public Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
+	Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();		
 		// w:tblPr
@@ -427,7 +425,7 @@ class DocumentService {
 	void createPackingListCell(Tr tr, int cellWidthTwips) { 
 		
 		Tc tc = Context.getWmlObjectFactory().createTc();
-		tr.getEGContentCellContent().add(tc);
+		tr.getContent().add(tc);
 		
 		TcPr tcPr = Context.getWmlObjectFactory().createTcPr();
 		tc.setTcPr(tcPr);
@@ -445,7 +443,7 @@ class DocumentService {
 		//text.setValue("testing");
 		//run.getRunContent().add(text)
 		//paragraph.getParagraphContent().add(run);
-		tc.getEGBlockLevelElts().add(paragraph);
+		tc.getContent().add(paragraph);
 
 	} 
 	
@@ -458,7 +456,7 @@ class DocumentService {
 	 * @param cellWidthTwips
 	 * @return
 	 */
-	public Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
+	Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();
 		// w:tblPr
@@ -489,7 +487,7 @@ class DocumentService {
 
 		// Create a repeating header
 		Tr trHeader = Context.getWmlObjectFactory().createTr();
-		tbl.getEGContentRowContent().add(trHeader);
+		tbl.getContent().add(trHeader);
 		BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue();
 		
 		TrPr trPr = Context.getWmlObjectFactory().createTrPr();
@@ -510,7 +508,7 @@ class DocumentService {
 			
 			log.info "previous: " + previousContainer + ", current: " + itemInstance?.container + ", same: " + (itemInstance?.container == previousContainer)
 			Tr tr = Context.getWmlObjectFactory().createTr();
-			tbl.getEGContentRowContent().add(tr);
+			tbl.getContent().add(tr);
 			if (itemInstance?.container != previousContainer) { 
 				addTc(wmlPackage, tr, itemInstance?.container?.name, false);
 			}
@@ -535,8 +533,8 @@ class DocumentService {
 	void addTc(WordprocessingMLPackage wmlPackage, Tr tr, String text, boolean applyBold) {
 		Tc tc = Context.getWmlObjectFactory().createTc();
 		// wmlPackage.getMainDocumentPart().createParagraphOfText(text)		
-		tc.getEGBlockLevelElts().add( createParagraphOfText(text, applyBold) );
-		tr.getEGContentCellContent().add( tc );
+		tc.getContent().add( createParagraphOfText(text, applyBold) );
+		tr.getContent().add( tc );
 	}
 	
 	/**
@@ -552,7 +550,7 @@ class DocumentService {
 		t.setValue(simpleText);
 		// Create the run
 		R run = Context.getWmlObjectFactory().createR();
-		run.getRunContent().add(t);
+		run.getContent().add(t);
 		//run.getRPr().setB(true);
 		// Set bold property 
 		if (applyBold) {
@@ -561,7 +559,7 @@ class DocumentService {
 			rpr.setB(bdt)
 			run.setRPr(rpr);
 		}		
-		para.getParagraphContent().add(run);
+		para.getContent().add(run);
 		
 		return para;
 	}
@@ -572,11 +570,8 @@ class DocumentService {
 	 * @return
 	 */
 	OutputStream convertToPdf(WordprocessingMLPackage wordMLPackage) {
-		PdfConversion conversion = new Conversion(wordMLPackage);
-		
-		((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
-		OutputStream outputStream = new FileOutputStream(inputfilepath + ".pdf");
-		conversion.output(outputStream);
+        OutputStream outputStream = new ByteArrayOutputStream()
+        Docx4J.toPDF(wordMLPackage, outputStream);
 		return outputStream;
 	}
 
@@ -740,33 +735,25 @@ class DocumentService {
 	}
 
 	
-	
-	void generatePackingList(OutputStream outputStream, Shipment shipmentInstance) { 
+	void generatePackingList(OutputStream outputStream, Shipment shipmentInstance) {
 		// TODO Move to PoiService
-		
 		try {
 			Workbook workbook = new HSSFWorkbook();
 			CreationHelper createHelper = workbook.getCreationHelper();
 			Sheet sheet = workbook.createSheet();
-			//sheet.autoSizeColumn(0);
-			//sheet.autoSizeColumn(1);
-			//sheet.autoSizeColumn(2);
-			//sheet.autoSizeColumn(3);
-			//sheet.autoSizeColumn(4);
-			//sheet.autoSizeColumn(5);
-			sheet.setColumnWidth((short)0, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)1, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)2, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)3, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)4, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)5, (short) ((50 * 8) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)6, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)7, (short) ((50 * 3) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)8, (short) ((50 * 2) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)9, (short) ((50 * 2) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)10, (short) ((50 * 5) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short)11, (short) ((50 * 5) / ((double) 1 / 20)))
-            //sheet.setColumnWidth((short)12, (short) ((50 * 10) / ((double) 1 / 20)))
+			sheet.setColumnWidth(0, (short) ((50 * 5) / ((double) 1 / 20)))
+			sheet.setColumnWidth(1, (short) ((50 * 3) / ((double) 1 / 20)))
+            sheet.setColumnWidth(2, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth(3, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth(4, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth(5, (short) ((50 * 8) / ((double) 1 / 20)))
+			sheet.setColumnWidth(6, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth(7, (short) ((50 * 3) / ((double) 1 / 20)))
+			sheet.setColumnWidth(8, (short) ((50 * 2) / ((double) 1 / 20)))
+            sheet.setColumnWidth(9, (short) ((50 * 2) / ((double) 1 / 20)))
+            sheet.setColumnWidth(10, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth(11, (short) ((50 * 5) / ((double) 1 / 20)))
+            //sheet.setColumnWidth(12,  ((50 * 10) / ((double) 1 / 20)))
 
 			// Bold font
 			Font boldFont = workbook.createFont();
@@ -860,27 +847,27 @@ class DocumentService {
 
 			// SHIPMENT NAME
 			int counter = 0;
-			Row row = sheet.createRow((short)counter++);
+			Row row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.name.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.name);
 
 
 			// SHIPMENT TYPE
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentType.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue("" + getFormatTagLib().metadata(obj: shipmentInstance?.shipmentType));
 
 			
 			/*
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.todaysDate.label'));
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(new Date());
 			row.getCell(1).setCellStyle(dateStyle);
 			
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'));
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.id?.toUpperCase());
@@ -894,7 +881,7 @@ class DocumentService {
 					def referenceNumber = shipmentInstance.getReferenceNumber(it?.name)
 					log.info ("reference #: " + it?.name + " " + referenceNumber)
 					if (referenceNumber) {
-						row = sheet.createRow((short)counter++);
+						row = sheet.createRow(counter++);
 						row.createCell(0).setCellValue(referenceNumber?.referenceNumberType?.name);
 						row.createCell(1).setCellValue(referenceNumber?.identifier);
 					}
@@ -904,41 +891,41 @@ class DocumentService {
 			
 			// REFERENCE NUMBERS
 			shipmentInstance.referenceNumbers.each {
-				row = sheet.createRow((short)counter++);
+				row = sheet.createRow(counter++);
 				row.createCell(0).setCellValue("" + getFormatTagLib().metadata(obj: it?.referenceNumberType));
-				row.getCell(0).setCellStyle(labelStyle);
+				//row.getCell(0).setCellStyle(labelStyle);
 				row.createCell(1).setCellValue(it?.identifier);
 			}
 
 			// EMPTY ROW
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 
 			// FROM
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0, Cell.CELL_TYPE_STRING).setCellValue("" + getMessageTagLib().message(code:'shipping.origin.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.origin?.name);
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.destination.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.destination?.name);
 
 			// EMPTY ROW
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			
 			// EXPECTED SHIPMENT DATE
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.expectedShippingDate.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			Cell expectedShipmentDateCell = row.createCell(1);
 			expectedShipmentDateCell.setCellValue(shipmentInstance?.expectedShippingDate);
 			expectedShipmentDateCell.setCellStyle(dateStyle);
 			
 			// ACTUAL SHIPMENT DATE
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.actualShippingDate.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			Cell actualShipmentDateCell = row.createCell(1);
 			if (shipmentInstance?.actualShippingDate) {
 				actualShipmentDateCell.setCellValue(shipmentInstance?.actualShippingDate);
@@ -949,39 +936,39 @@ class DocumentService {
 			}
 			
 			// EXPECTED ARRIVAL DATE
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.expectedDeliveryDate.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			Cell expectedArrivalDateCell = row.createCell(1);
 			expectedArrivalDateCell.setCellValue(shipmentInstance?.expectedDeliveryDate);
-			expectedArrivalDateCell.setCellStyle(dateStyle);
+			//expectedArrivalDateCell.setCellStyle(dateStyle);
 
 			// ACTUAL ARRIVAL DATE
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.actualDeliveryDate.label'));
 			row.getCell(0).setCellStyle(labelStyle);
 			Cell actualArrivalDateCell = row.createCell(1);
 			if (shipmentInstance?.actualDeliveryDate) {
 				actualArrivalDateCell.setCellValue(shipmentInstance?.actualDeliveryDate);
-				actualArrivalDateCell.setCellStyle(dateStyle);
+				//actualArrivalDateCell.setCellStyle(dateStyle);
 			}
 			else {
 				actualArrivalDateCell.setCellValue("" + getMessageTagLib().message(code:'default.notAvailable.label'));
 			}
 			
 			// EMPTY ROW
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 
 			// COMMENTS
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.comments.label'));
-			row.getCell(0).setCellStyle(labelStyle);
+			//row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.additionalInformation);
-			row.getCell(1).setCellStyle(wrapTextCellStyle);
+			//row.getCell(1).setCellStyle(wrapTextCellStyle);
 
 			// TWO EMPTY ROWS
-			row = sheet.createRow((short)counter++);
-            row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
+            row = sheet.createRow(counter++);
 
             // Merge cells
             //first row (0-based)
@@ -1006,7 +993,7 @@ class DocumentService {
             int CELL_INDEX = 0;
 
 			// ITEM TABLE HEADER
-			row = sheet.createRow((short)counter++);
+			row = sheet.createRow(counter++);
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'container.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
@@ -1048,7 +1035,7 @@ class DocumentService {
 
                 CELL_INDEX = 0
 				log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
-				row = sheet.createRow((short)counter++);
+				row = sheet.createRow(counter++);
 				
 				if (previousContainer != itemInstance?.container?.name) { 
 					row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.name?:getMessageTagLib().message(code:'shipping.unpacked.label').toString());

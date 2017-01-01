@@ -75,13 +75,24 @@ grails.project.dependency.resolution = {
 		test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
 //		build ('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2')  { excludes "ant", "javassist" }
-//
-		compile ('org.docx4j:docx4j:2.8.1') { excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'}
-		compile 'c3p0:c3p0:0.9.1.2'
 
+        // Docx4j 3.3.2
+		compile ('org.docx4j:docx4j:3.3.2') {
+            excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'
+        }
+
+        // Connection pool
+        compile 'c3p0:c3p0:0.9.1.2'
+
+        // Barcoding
 		compile 'com.google.zxing:javase:2.0'
-		compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.6') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
-		compile 'org.apache.commons:commons-email:1.2'
+
+        // HTTP client
+		compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
+            excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec"
+        }
+
+        compile 'org.apache.commons:commons-email:1.2'
         compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
 		test 'dumbster:dumbster:1.6'

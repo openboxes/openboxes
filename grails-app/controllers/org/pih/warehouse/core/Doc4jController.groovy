@@ -9,11 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-//import org.apache.poi.hssf.usermodel.HSSFFont
 import org.pih.warehouse.shipping.Shipment;
-
-// import java.io.File;
-// import java.io.FileOutputStream
 
 class Doc4jController {
 
@@ -64,17 +60,19 @@ class Doc4jController {
 			throw new Exception("Unable to locate shipment with ID ${params.id}")
 		}
 
-		// For some reason, this needs to be here or we get a File Not Found error (ERR_FILE_NOT_FOUND)
-		render ""
-		
-		def filename = "Packing List - " + shipmentInstance?.name?.trim() + ".xls"
-		log.info ("filename " + filename )
-		response.setHeader("Content-disposition", "attachment; filename='" + filename + "'");
-		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-		documentService.generatePackingList(response.outputStream, shipmentInstance)
-		//response.outputStream << tempFile.readBytes()
-		return;
+        try {
+            def filename = "Packing List - " + shipmentInstance?.name?.trim() + ".xls"
+            response.setHeader("Content-disposition", "attachment;filename='"+filename+"'");
+            response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            documentService.generatePackingList(response.outputStream, shipmentInstance)
+            response.outputStream.flush()
 
+        } catch (Exception e) {
+            log.error("Unable to generate packing list XLS: " + e.message, e)
+            flash.message = e.message
+            redirect(controller: "shipment", action: "showDetails", id: params.id)
+
+        }
 	}
 	
 }
