@@ -22,8 +22,8 @@ import org.springframework.beans.propertyeditors.CustomDateEditor
 // import java.util.Date
 import java.text.SimpleDateFormat
 
-public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
-	public void registerCustomEditors(PropertyEditorRegistry registry) {
+class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
+	void registerCustomEditors(PropertyEditorRegistry registry) {
 		registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true));
         registry.registerCustomEditor(Location.class, new LocationEditor())
         registry.registerCustomEditor(Category.class, new CategoryEditor())
