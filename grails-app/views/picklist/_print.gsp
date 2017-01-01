@@ -94,7 +94,7 @@
         <table>
             <tr>
                 <td>
-                    <img class="logo" src="${resource(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
+                    <g:displayLogo location="${session?.warehouse?.id}"/>
                 </td>
                 <td>
                     ${requisition.requestNumber}

@@ -12,7 +12,8 @@
 </head>
 <body>
 	<h2 id="print-header">
-		<img id="logo" src="${resource(dir:'images/', file:'hands.jpg')}" />
+        <g:displayLogo location="${session?.warehouse?.id}"/>
+
 		${requisition?.name}
 		<span style="float: right;">
 		    <button type="button" id="print-button" onclick="window.print()">

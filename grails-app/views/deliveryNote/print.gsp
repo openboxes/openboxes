@@ -43,8 +43,8 @@
     <tr>
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
-                <div class="print-logo nailthumb-container" style="float: left;">
-                    <img src="${resource(dir: 'images/', file: 'hands.jpg')}"/>
+                <div class="logo print-logo nailthumb-container" style="float: left;">
+                    <g:displayLogo location="${session?.warehouse?.id}"/>
                 </div>
             </div>
         </td>
@@ -217,7 +217,7 @@
             <td width="1%">
                 <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                     <div class="print-logo nailthumb-container" style="float: left;">
-                        <img src="${resource(dir: 'images/', file: 'hands.jpg')}"/>
+                        <g:displayLogo location="${session?.warehouse?.id}"/>
                     </div>
                 </div>
             </td>

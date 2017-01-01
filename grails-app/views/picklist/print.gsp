@@ -17,7 +17,9 @@
 
 <body>
 <div id="print-header" style="line-height: 40px;">
-    <%--<img id="logo" src="${resource(dir: 'images/', file: 'hands.jpg')}"/>--%>
+    <span class="logo">
+        <g:displayLogo location="${session?.warehouse?.id}"/>
+    </span>
     <span class="title"><warehouse:message code="picklist.print.label"/></span>
     <div class="right button-group" style="margin:10px;">
         <a href="javascript:window.print()" type="button" id="print-button" onclick="window.print();"  class="button">
@@ -42,7 +44,7 @@
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                 <div class="print-logo nailthumb-container-100 center">
-                    <img src="${resource(dir: 'images/', file: 'hands.jpg')}"/>
+                    <g:displayLogo location="${session?.warehouse?.id}"/>
                 </div>
             </div>
         </td>

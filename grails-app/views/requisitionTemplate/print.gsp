@@ -75,7 +75,7 @@
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                 <div class="print-logo nailthumb-container-100">
-                    <img src="${resource(dir: 'images/', file: 'hands.jpg')}"/>
+                    <g:displayLogo location="${session?.warehouse?.id}"/>
                 </div>
             </div>
         </td>
