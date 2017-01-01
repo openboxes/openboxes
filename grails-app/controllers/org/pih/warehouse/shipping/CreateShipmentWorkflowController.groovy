@@ -9,11 +9,6 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import org.apache.poi.hssf.usermodel.HSSFSheet
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Row
-import org.hibernate.StaleObjectStateException
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -35,7 +30,7 @@ class CreateShipmentWorkflowController {
     	redirect(action:'createShipment')
     }
     
-    def createShipmentFlow() {
+    def createShipmentFlow = {
     	
     	start {
     		action {
