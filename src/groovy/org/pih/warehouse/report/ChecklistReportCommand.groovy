@@ -36,6 +36,9 @@ class ChecklistReportCommand {
 		startDate(nullable:true)
 		endDate(nullable:true)
 		category(nullable:true)
+		date(nullable:true)
+		shipments(nullable:true)
+		rootCategory(nullable:true)
 	}
 	
 }

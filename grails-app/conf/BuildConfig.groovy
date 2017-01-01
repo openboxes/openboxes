@@ -85,8 +85,15 @@ grails.project.dependency.resolution = {
         compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
 		test 'dumbster:dumbster:1.6'
+
 		// FIXME Had to add this dependency because of a NoClassDefFoundError
 		runtime 'jline:jline:2.12'
+
+        // FIXME Added as a workaround for GPC rendering plugin issue (see http://stackoverflow.com/questions/29694796/null-pointer-exception-with-grails-rendering-plugin)
+        runtime "org.springframework:spring-test:4.1.8.RELEASE"
+
+        // Determine mime type for uploads (see https://mvnrepository.com/artifact/net.sf.jmimemagic/jmimemagic)
+        compile "net.sf.jmimemagic:jmimemagic:0.1.4"
 
 //		//compile 'org.apache.httpcomponents:httpcore:4.2.1'
 //		compile 'commons-lang:commons-lang:2.6'
@@ -146,7 +153,7 @@ grails.project.dependency.resolution = {
 
         runtime(":yui:2.8.2.1")
         runtime(":bubbling:2.1.4")
-        runtime(":webflow:2.1.0")
+        compile(":webflow:2.1.0")
         runtime(":resources:1.2.15-SNAPSHOT")
         runtime(":cache-headers:1.1.7")
         runtime(":zipped-resources:1.0") { excludes 'resources' }
@@ -171,7 +178,7 @@ grails.project.dependency.resolution = {
 		//compile ":handlebars-asset-pipeline:1.3.0.3"
 
 		// Existing plugins
-//		compile ":rendering:1.0.0"
+		compile ":rendering:1.0.0"
 //		compile ":raven:6.0.0.4"
 //
 //		runtime( ':constraints:0.6.0' )

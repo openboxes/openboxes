@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.core
 
+import net.sf.jmimemagic.Magic
+import net.sf.jmimemagic.MagicMatch
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
@@ -138,4 +140,14 @@ class Location implements Comparable<Location>, java.io.Serializable {
     static AllDepotWardAndPharmacy(){
       Location.list().findAll{ it.isDepotWardOrPharmacy()}.sort{it.name}
     }
+
+	Map getLogoWithMimeType() {
+		if (logo) {
+			MagicMatch match = Magic.getMagicMatch(logo);
+			def mimeType = match.getMimeType();
+            return [bytes:logo, mimeType:mimeType]
+		}
+        return null
+	}
+
 }

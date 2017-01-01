@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.reporting
 
+import net.sf.jmimemagic.Magic
+import net.sf.jmimemagic.MagicMatch
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
@@ -22,7 +24,8 @@ class ReportController {
 	def inventoryService
 	def productService
 	def reportService
-
+	def pdfRenderingService
+    def grailsApplication
 
     def getCsv(list) {
         println list
@@ -241,28 +244,31 @@ class ReportController {
 		reportService.generatePdf(url, response.getOutputStream())
 	}
 	
-	def downloadShippingReport() {
-		if (params.format == 'docx') { 
+	def downloadShippingReport(ChecklistReportCommand command) {
+        log.info "Download shipping report: " + command.properties
+        def logo = session?.warehouse?.getLogoWithMimeType()
+        command.rootCategory = productService.getRootCategory();
+        if (!command?.hasErrors()) {
+            reportService.generateShippingReport(command);
+        }
+        command.location = session.warehouse
+
+        if (params.downloadFormat == 'docx') {
 			def tempFile = documentService.generateChecklistAsDocx()
-	//		def filename = "shipment-checklist.docx"
-			//response.setHeader("Content-disposition", "attachment; filename=" + filename);
+			def filename = "shipment-checklist.docx"
+			response.setHeader("Content-disposition", "attachment; filename=" + filename);
 			response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 			response.outputStream << tempFile.readBytes()
 		} 
-		else if (params.format == 'pdf') { 
-			def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
-			def url = baseUri + params.url + ";jsessionid=" + session.getId()
-			url += "?print=true&orientation=portrait"
-			url += "&shipment.id=" + params.shipment.id
-			url += "&includeEntities=true" 
-			log.info "Fetching url $url"	
-			response.setContentType("application/pdf")
-			//response.setHeader("Content-disposition", "attachment;") // removed filename=	
-			reportService.generatePdf(url, response.getOutputStream())
+		else if (params.downloadFormat == 'pdf') {
+
+			pdfRenderingService.render(template:"/report/shippingReport", model:[command:command, logo: logo], response)
 		}
-		else { 
-			throw new UnsupportedOperationException("Format '${params.format}' not supported")
-		}
+        else {
+            // render as HTML by default
+            render (template: "/report/shippingReport", model: [command:command, logo: logo])
+        }
+
 	}
 
 }

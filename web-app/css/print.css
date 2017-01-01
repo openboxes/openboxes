@@ -16,6 +16,9 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
     margin: 10px;
 }
 
+th { background-color: #f0f0f0; }
+tr.underline td { border-bottom: 1px black dotted; }
+
 .canceled {
     color: lightgrey;
     text-decoration: line-through;
@@ -38,7 +41,7 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 }
 
 #signature-table {
-    width: 60%;
+    width: 100%;
     margin: auto;
     margin-bottom: 20px;
     margin-top: 20px;
@@ -46,7 +49,7 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 #signature-table tr { border-bottom: 1px solid lightgrey;  }
 
 .signature-table {
-    width: 90%;
+    width: 100%;
     margin: auto;
     margin-bottom: 20px;
     margin-top: 20px;
@@ -55,7 +58,7 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 
 
 #details-table{
-    width: 60%;
+    width: 100%;
     margin: auto;
     margin-bottom: 20px;
 }
@@ -82,7 +85,7 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 }
 
 #packinglist-items tbody tr {
-    border-bottom: 1px lightgrey solid;
+    border: 1px lightgrey solid;
 }
 
 #comment-box{

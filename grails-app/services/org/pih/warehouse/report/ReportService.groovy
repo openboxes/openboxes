@@ -44,14 +44,14 @@ class ReportService implements ApplicationContextAware {
 	
 	boolean transactional = true
 
-	public void generateShippingReport(ChecklistReportCommand command) {		
+	void generateShippingReport(ChecklistReportCommand command) {
 		def shipmentItems = command?.shipment?.shipmentItems?.sort()
 		shipmentItems.each { shipmentItem -> 
 			command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
 		}
 	}
 
-	public void generateProductReport(ProductReportCommand command) { 
+	void generateProductReport(ProductReportCommand command) {
 		
 		command.inventoryItems = InventoryItem.findAllByProduct(command?.product)
 		command.quantityInitial = inventoryService.getInitialQuantity(command?.product, command?.location, command?.startDate)
@@ -111,7 +111,7 @@ class ReportService implements ApplicationContextAware {
 	 * 
 	 * @param command
 	 */
-	public void generateTransactionReport(InventoryReportCommand command) { 
+	void generateTransactionReport(InventoryReportCommand command) {
 		
 		def products = 
 			//inventoryService.getProductsByNestedCategory(command.category)
@@ -293,20 +293,19 @@ class ReportService implements ApplicationContextAware {
 
 		} catch (Exception e) { 
 			log.error("Cannot generate pdf due to error: " + e.message, e);
-            log.error "Error caused by: " + html
 
 		} finally {
             if (outputStream != null) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
-                // ignore
+                	// ignore
                 }
             }
         }
 	}
 
-    public static Document loadXMLFromString(String xml) throws Exception {
+    static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource is = new InputSource(new StringReader(xml));

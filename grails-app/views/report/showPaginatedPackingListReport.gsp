@@ -65,16 +65,14 @@
 				    		<td>
 								<label><warehouse:message code="report.exportAs.label"/></label>
 								<g:if test="${command?.shipment }">
-						   			<g:link target="_blank" controller="report" action="showShippingReport" params="[print:'true','shipment.id':command?.shipment?.id]">
+						   			<g:link target="_blank" class="button" controller="report" action="showShippingReport" params="[print:'true','shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.html.label"/>
 						   			</g:link> 
-						   			|
-						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
+						   			<g:link target="_blank" class="button" controller="report" action="downloadShippingReport" params="[downloadFormat:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.pdf.label"/>
 						   			</g:link>
-						   			<%-- 
-						   			|
-						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
+                                    <%--
+						   			<g:link target="_blank" class="button" controller="report" action="downloadShippingReport" params="[downloadFormat:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.docx.label"/>
 						   			</g:link>
 						   			--%>
@@ -98,7 +96,9 @@
 				<table border="0">
 					<tr>
 						<td class="left">
-							<img src="${resource(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>
+							<div class="logo">
+								<img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:command?.location?.id)}" class="middle" />
+							</div>
 						</td>
 						<td class="center">
 							<div class="title">			
@@ -113,9 +113,6 @@
 								<warehouse:message code="report.shippingReport.title"/>	
 							</div>
 						</td>			
-						<td class="right">
-							<img src="${resource(dir:'images/icons/logos/',file:'pih_logo.jpg')}" width="34" height="50" />
-						</td>				
 					</tr>
 				</table>
 				

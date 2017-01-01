@@ -4,15 +4,16 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="print" />
 	    <link rel="stylesheet" href="${resource(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
-        <title><warehouse:message code="report.showShippingReport.label" /></title>    
-        
+        <title><warehouse:message code="report.showShippingReport.label" /></title>
     </head>    
     <body>
 
 		<button type="button" id="print-button" onclick="window.print()">
 	        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
 	        ${warehouse.message(code:"default.print.label")}
-	    </button>    
+	    </button>
+
+        <hr/>
     
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
@@ -24,65 +25,55 @@
 		</g:hasErrors>
 
 		<g:if test="${command?.shipment }">
-			<div>
-				<table>
+            <div class="center">
+                <table id="summary-table" style="width: auto;">
 					<tr>
-						<td rowspan="3" class="middle left">
-							<img src="${resource(dir:'images/',file:'hands.jpg')}"  width="65" height="65"/>
+						<td class="top left">
+                            <div class="logo">
+                                <g:displayLogo location="${session?.warehouse?.id}"/>
+                            </div>
 						</td>
-						<td class="center">
-							<div class="title">			
-								<warehouse:message code="report.shippingReport.heading"/>	
-							</div>								
+						<td class="middle left">
+                            <div class="title">
+                                <warehouse:message code="report.shippingReport.heading"/>
+                            </div>
 							<div class="subtitle">
 								<div style="line-height: 24px">
 									${session?.warehouse?.name }
 								</div>
-								<div style="line-height: 24px">
-									<warehouse:message code="report.shippingReport.title"/>	
-								</div>
-							</div>							
-						</td>			
-						<td rowspan="3" class="middle right">
-							<img src="${resource(dir:'images/',file:'hands.jpg')}" width="65" height="65" />
-						</td>				
+							</div>
+						</td>
 					</tr>
 				</table>
 				
 				
 				<table id="details-table">
 					<tr>				
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.containerNumber.label"/></label>
-						</td>
+						</th>
 						<td class="value underline">
 							<span class="value">
 								${command?.shipment?.name }
 							</span>
 						</td>
-						<td class="spacer">
-						
-						</td>
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.plate.label"/></label>
-						</td>
+						</th>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>						
 						</td>
 					</tr>
 					<tr>
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.origin.label"/></label>
-						</td>
+						</th>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.origin?.name }</span>							
 						</td>
-						<td class="spacer">
-						
-						</td>
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.destination.label"/></label>
-						</td>
+						</th>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.destination?.name }</span>
 						</td>
@@ -115,12 +106,12 @@
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.expirationDate.label"/><!-- Exp, Expiration date -->
 					    					</th>
-					    					<td colspan="2" class="center bottom">
+					    					<th colspan="2" class="center bottom">
 												<label><warehouse:message code="report.quantityDelivered.label"/><!-- Livré, Delivered --></label>
-											</td>
-					    					<td colspan="2" class="center bottom">
+											</th>
+					    					<th colspan="2" class="center bottom">
 						    					<label><warehouse:message code="report.quantityReceived.label"/><!-- Reçu, Received --></label>
-					    					</td>
+					    					</th>
 					    				</tr>
 					    				<tr>
 					    					<th class="center">
@@ -167,22 +158,19 @@
 													<format:expirationDate obj="${checklistEntry?.shipmentItem?.inventoryItem?.expirationDate }"/>
 													
 												</td>	
-												<%-- 						
-												<td>
-
-												</td>
-												--%>
 												<td>
 
 												</td>
 												<td class="center">
 													${checklistEntry?.shipmentItem?.quantity }
+                                                    ${checklistEntry?.shipmentItem?.product?.unitOfMeasure?:"EA" }
 												</td>
 												<td>
 
 												</td>
 												<td class="center">
 													${checklistEntry?.shipmentItem?.quantity }
+                                                    ${checklistEntry?.shipmentItem?.product?.unitOfMeasure?:"EA" }
 												</td>
 											</tr>
 								    		<g:set var="previousContainer" value="${checklistEntry?.shipmentItem?.container}"/>
@@ -196,50 +184,41 @@
 				
 				<table id="signature-table">
 					<tr>
-						<td class="label">
+						<th width="15%">
 							<label><warehouse:message code="report.preparedBy.label"/></label><!--  Préparé par, Prepared by -->
-						</td>
+						</th>
 						<td class="value underline">
 						
 						</td>
-						<td class="spacer">
-						
-						</td>						
-						<td class="label">
+						<th width="15%">
 							<label><warehouse:message code="report.receivedBy.label"/></label><!-- Reçu par, Received by -->
-						</td>
+						</th>
 						<td class="value underline">
 						
 						</td>
 					</tr>
 					<tr>
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.deliveredBy.label"/></label><!-- Livré par, Delivered/supplied by -->
-						</td>
+						</th>
 						<td class="value underline">
 						
 						</td>
-						<td class="spacer">
-						
-						</td>						
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.receivedOn.label"/></label><!-- Reçu le, Received on -->
-						</td>
+						</th>
 						<td class="value underline">
 						
 						</td>
 					</tr>
 					<tr>
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.deliveredOn.label"/></label><!-- Livré le, Delivered/supplied on -->
 						</td>
 						<td class="value underline">
 						
 						</td>
-						<td class="spacer">
-						
-						</td>						
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.verifiedOn.label"/></label><!-- Vérifié le, Verified on -->
 						</td>
 						<td class="value underline">
@@ -247,18 +226,15 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.transportedBy.label"/></label><!-- Transporté, Carrier -->
-						</td>
+						</th>
 						<td class="value underline">
 						
 						</td>
-						<td class="spacer">
-						
-						</td>						
-						<td class="label">
+						<th>
 							<label><warehouse:message code="report.verifiedBy.label"/></label><!-- Vérifié par, Verified by -->
-						</td>
+						</th>
 						<td class="value underline">
 						
 						</td>

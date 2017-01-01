@@ -11,7 +11,8 @@
 </g:if>
 <html>
 <head>
-	<link rel="stylesheet" href="${resource(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css" media="print, screen, projection"/>
+	<!-- YUI -->
+	<yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'menu.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'form.css')}" type="text/css" media="print, screen, projection" />
@@ -19,6 +20,7 @@
 	<link rel="stylesheet" href="${resource(dir:'css',file:'wizard.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'custom.css')}" type="text/css" media="print, screen, projection" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
 	<g:javascript library="jquery" plugin="jquery" />
 	<g:layoutHead />
 	<g:render template="/common/customCss"/>
@@ -35,11 +37,13 @@
 			.report { page-break-after: always; }
 		</g:if>
 	</style>
+    <r:layoutResources/>
 
 </head>
 <body >
     <div class="${params.orientation?:'landscape'}" >
 		<g:layoutBody />
 	</div>
+    <r:layoutResources/>
 </body>
 </html>
