@@ -13,6 +13,7 @@ import net.sf.jmimemagic.Magic
 import net.sf.jmimemagic.MagicMatch
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.StockCardCommand
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
@@ -270,5 +271,27 @@ class ReportController {
         }
 
 	}
+
+    def downloadStockHistory(StockCardCommand command) {
+        log.info "Download stock histpry report: " + command
+        def startTime = System.currentTimeMillis()
+
+        command.warehouseInstance = Location.get(session?.warehouse?.id)
+
+        // now populate the rest of the commmand object
+        def commandInstance = inventoryService.getStockCardCommand(command, params)
+        def logo = session?.warehouse?.getLogoWithMimeType()
+
+        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        if (params.downloadFormat == 'pdf') {
+            pdfRenderingService.render(template: "/report/stockHistory", model: [commandInstance: commandInstance, logo: logo], params:params, response)
+        }
+        else {
+            render(template: "/report/stockHistory", model: [commandInstance:commandInstance, logo:logo], params:params)
+        }
+
+    }
+
 
 }

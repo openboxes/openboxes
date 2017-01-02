@@ -1,13 +1,18 @@
+<!DOCTYPE html>
+
 <%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<%--
-<div class="left smpad">
-	Showing ${commandInstance?.allTransactionLogMap?.keySet()?.size() } of ${commandInstance?.allTransactionLogMap?.keySet()?.size() } transaction(s)
-</div>				
---%>
 
 <div class="box">
-    <h2><warehouse:message code="inventory.stockHistory.label"/></h2>
+    <h2><warehouse:message code="inventory.stockHistory.label"/>
+        <small>Showing ${commandInstance?.allTransactionLogMap?.keySet()?.size() } of ${commandInstance?.allTransactionLogMap?.keySet()?.size() } transaction(s)</small>
+        <div class="right">
+            <label>Download as:</label>
+            <g:link target="_blank" controller="report" action="downloadStockHistory" id="${commandInstance?.productInstance?.id}" params="[downloadFormat:'html']" class="button">HTML</g:link>
+            <g:link target="_blank" controller="report" action="downloadStockHistory" id="${commandInstance?.productInstance?.id}" params="[downloadFormat:'pdf']" class="button">PDF</g:link>
+        </div>
+
+    </h2>
     <g:form method="GET" action="showTransactionLog">
         <g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
             <table>
@@ -182,15 +187,11 @@
                                                         ${requisition?.name }
                                                     </g:link>
                                                 </g:elseif>
-
                                                 <g:else>
                                                     <%--
                                                     <span class="fade">${warehouse.message(code:'default.none.label') }</span>
                                                     --%>
                                                 </g:else>
-
-
-
                                             </div>
                                         </td>
                                     </g:if>
@@ -233,75 +234,6 @@
                                 </tr>
                                 <g:set var="previousTransaction" value="${transaction}"/>
                             </g:each>
-
-                            <%--
-                            <tr class="transaction ${(status%2==0)?'even':'odd' } prop border-top">
-                                <td nowrap="nowrap">
-                                    <format:date obj="${transaction?.transactionDate}" format="dd/MMM/yyyy"/>
-                                </td>
-                                <td>
-                                    <format:date obj="${transaction?.transactionDate}" format="hh:mma"/>
-                                </td>
-                                <td>
-                                    <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
-                                        ${transaction?.transactionNumber }
-                                    </g:link>
-                                </td>
-                                <td>
-                                    <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
-                                        <format:metadata obj="${transaction?.transactionType}"/>
-                                        <g:if test="${transaction?.source }">
-                                            ${warehouse.message(code:'default.from.label')}
-                                            ${transaction?.source?.name }
-                                        </g:if>
-                                        <g:elseif test="${transaction?.destination }">
-                                            ${warehouse.message(code:'default.to.label')}
-                                            ${transaction?.destination?.name }
-                                        </g:elseif>
-                                    </g:link>
-
-                                </td>
-                                <td class="border-right">
-                                    <div>
-                                        <g:if test="${transaction?.incomingShipment }">
-                                            <g:link controller="shipment" action="showDetails" id="${transaction?.incomingShipment?.id }">
-                                                ${transaction.incomingShipment?.shipmentNumber } |
-                                                ${transaction.incomingShipment?.name }
-                                            </g:link>
-                                        </g:if>
-                                        <g:elseif test="${transaction?.outgoingShipment }">
-                                            <g:link controller="shipment" action="showDetails" id="${transaction?.outgoingShipment?.id }">
-                                                ${transaction.outgoingShipment?.shipmentNumber } |
-                                                ${transaction.outgoingShipment?.name }
-                                            </g:link>
-                                        </g:elseif>
-                                        <g:elseif test="${transaction?.requisition }">
-                                            <g:link controller="requisition" action="show" id="${transaction?.requisition?.id }">
-                                                ${transaction?.requisition?.requestNumber } |
-                                                ${transaction?.requisition?.name }
-                                            </g:link>
-                                        </g:elseif>
-                                        <g:else>
-                                            <span class="fade">${warehouse.message(code:'default.none.label') }</span>
-                                        </g:else>
-                                    </div>
-                                </td>
-                                <td class="border-right center">
-                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
-                                        ${quantityChange }
-                                    </g:if>
-                                </td>
-                                <td  class="border-right center">
-                                    <g:if test="${transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
-                                        (${quantityChange })
-                                    </g:if>
-                                </td>
-                                <td class="border-right center">
-                                    ${balance}
-                                </td>
-                            </tr>
-                            <g:set var="previousMonth" value="${transaction?.transactionDate?.month}"/>
-                            --%>
                         </g:each>
                         <%--
                         <!-- Commented out because it's a little confusing -->

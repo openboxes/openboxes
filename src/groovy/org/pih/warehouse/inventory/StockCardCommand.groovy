@@ -49,8 +49,23 @@ class StockCardCommand {
 		startDate(nullable:true)
 		endDate(nullable:true)
 		transactionType(nullable:true)
+		totalQuantity(nullable:true)
+		transactionEntriesByTransactionMap(nullable:true)
+		pendingShipmentList(nullable:true)
+		inventoryLevelInstance(nullable:true)
+		warehouseInstance(nullable:true)
+		allTransactionLogMap(nullable:true)
+		transactionEntriesByInventoryItemMap(nullable:true)
+		lotNumberList(nullable:true)
+		inventoryItem(nullable:true)
+		transactionEntryList(nullable:true)
+		inventoryItemList(nullable:true)
+		productInstance(nullable:true)
+		quantityByInventoryItemMap(nullable:true)
+		transactionLogMap(nullable:true)
+		inventoryInstance(nullable:true)
 	}
-	
+
 	/**
 	 * Return the total quantity for all inventory items.
 	 *
@@ -61,7 +76,7 @@ class StockCardCommand {
 	//}
 	
 	Map getAllTransactionLogMap() { 
-		return transactionEntryList.groupBy { it.transaction }
+		return transactionEntryList?.groupBy { it.transaction }
 	}
 	
 	/**
