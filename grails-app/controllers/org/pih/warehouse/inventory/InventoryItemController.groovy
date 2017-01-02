@@ -125,7 +125,7 @@ class InventoryItemController {
 
     def showStockHistory(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
+
         // add the current warehouse to the command object
         cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 

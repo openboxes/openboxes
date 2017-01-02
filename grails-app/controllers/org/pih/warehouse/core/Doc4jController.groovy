@@ -44,7 +44,6 @@ class Doc4jController {
 	
 		response.setHeader("Content-disposition", "attachment; filename='" + filename + "'");
 		response.setContentType("application/pdf")
-		//response.outputStream = outputStream;
 		return;
 	}
 
