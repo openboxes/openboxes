@@ -511,7 +511,7 @@ class InventoryController {
 	}
 	
 	def listTransactions() {
-		redirect(action: listAllTransactions)
+		redirect(action: "listAllTransactions")
 	}
 	
 	def listDailyTransactions() {

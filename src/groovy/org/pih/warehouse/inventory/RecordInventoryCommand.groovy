@@ -29,6 +29,7 @@ class RecordInventoryCommand {
 		// new ListUtils.lazyList(new ArrayList(),{new RecordInventoryRowCommand()} as Factory)
 	
 	static constraints = {
+		recordInventoryRow(nullable:true)
 		productInstance(nullable:false)
 		inventoryInstance(nullable:true) 
 		inventoryLevelInstance(nullable:true)
