@@ -9,19 +9,24 @@
  */
 package org.pih.warehouse.picklist
 
+import org.springframework.transaction.annotation.Transactional
+
 class PicklistItemController {
 
     def scaffold = PicklistItem
 
 	def picklistService
 
+	@Transactional
 	def delete() {
 		def picklistItem = PicklistItem.get(params.id)
 		if (picklistItem) {
 			
 			try {
-				//picklistItem.picklist.removeFromPicklistItems(picklistItem)
-				picklistItem.delete()
+				def picklist = picklistItem.picklist
+				//picklist.removeFromPicklistItems(picklistItem)
+				picklistItem.delete(flush:true)
+				//picklist.save()
 				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
