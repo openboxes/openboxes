@@ -16,7 +16,7 @@ import grails.validation.Validateable
 
 import org.pih.warehouse.inventory.Transaction;
 
-@Validateable
+@Validateable(nullable = true)
 class SendShipmentCommand implements Serializable {
 	
 	String comments	
@@ -24,8 +24,8 @@ class SendShipmentCommand implements Serializable {
 	Transaction transaction
 	ShipmentWorkflow shipmentWorkflow
 	Boolean debitStockOnSend = true
-	Date actualShippingDate	
-	
+	Date actualShippingDate
+
 	static constraints = { 
 		comments(nullable:true)
 		transaction(nullable:true)
@@ -33,6 +33,6 @@ class SendShipmentCommand implements Serializable {
 		shipmentWorkflow(nullable:true)
 		debitStockOnSend(nullable:false)
 		actualShippingDate(nullable:false) //validator: { value, obj-> value > new Date()}
-	}	
+	}
 	
 }

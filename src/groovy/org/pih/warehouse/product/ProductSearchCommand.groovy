@@ -14,7 +14,7 @@ import grails.validation.Validateable;
 // import java.io.Serializable;
 // import java.util.Map;
 
-@Validateable
+@Validateable(nullable = true)
 class ProductSearchCommand implements Serializable {
 	String searchTerms
 	Integer startIndex = 1

@@ -11,9 +11,9 @@ package org.pih.warehouse.order
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 
-@Validateable
+@Validateable(nullable = true)
 class OrderItemListCommand implements Serializable {
 		
 	// Not the actual order items, but rather all the line items on the receive order page.  

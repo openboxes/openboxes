@@ -1114,7 +1114,7 @@ class ShipmentController {
 
 }
 
-@Validateable
+@Validateable(nullable = true)
 class ReceiveShipmentCommand implements Serializable {
 	
 	String comments

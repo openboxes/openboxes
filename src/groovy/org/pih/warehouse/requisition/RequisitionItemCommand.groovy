@@ -9,13 +9,13 @@
 **/ 
 package org.pih.warehouse.requisition
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-@Validateable
+@Validateable(nullable = true)
 class RequisitionItemCommand implements Serializable {
 
 	Boolean primary

@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 /**
  * Command object 
  */
-@Validateable
+@Validateable(nullable = true)
 class DocumentCommand {
    String name
    String typeId

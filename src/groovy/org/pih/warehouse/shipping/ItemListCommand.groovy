@@ -15,7 +15,7 @@ import org.apache.commons.collections.list.LazyList
 
 // import java.io.Serializable
 
-@Validateable
+@Validateable(nullable = true)
 class ItemListCommand implements Serializable {
 	
 	def items =

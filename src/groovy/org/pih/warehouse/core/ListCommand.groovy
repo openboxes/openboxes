@@ -13,7 +13,7 @@ import grails.validation.Validateable
 
 // import java.util.List;
 
-@Validateable
+@Validateable(nullable = true)
 class ListCommand {
 	String category;
 	List objectList;

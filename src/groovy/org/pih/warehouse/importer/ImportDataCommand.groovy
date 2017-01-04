@@ -12,7 +12,7 @@ package org.pih.warehouse.importer
 import grails.validation.Validateable
 import org.pih.warehouse.core.Location;
 
-@Validateable
+@Validateable(nullable = true)
 class ImportDataCommand {
 	def filename
 	def importFile

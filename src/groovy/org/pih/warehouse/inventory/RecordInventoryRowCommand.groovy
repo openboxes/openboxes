@@ -9,9 +9,9 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.codehaus.groovy.grails.validation.Validateable;
+import grails.validation.Validateable;
 
-@Validateable
+@Validateable(nullable = true)
 class RecordInventoryRowCommand {
 	String id
 	String lotNumber

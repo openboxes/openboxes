@@ -13,7 +13,7 @@ import grails.validation.Validateable;
 
 // import java.io.Serializable;
 
-@Validateable
+@Validateable(nullable = true)
 class ProductNameCommand implements Serializable {
 	String name
 	String description

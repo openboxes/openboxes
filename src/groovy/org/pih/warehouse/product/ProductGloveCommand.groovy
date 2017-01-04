@@ -12,7 +12,7 @@ package org.pih.warehouse.product
 import grails.validation.Validateable;
 // import java.io.Serializable;
 
-@Validateable
+@Validateable(nullable = true)
 class ProductGloveCommand implements Serializable {
 	
 	String name

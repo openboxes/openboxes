@@ -13,7 +13,7 @@ import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 
-@Validateable
+@Validateable(nullable = true)
 class BatchEditCommand {
 	
 	//Location location

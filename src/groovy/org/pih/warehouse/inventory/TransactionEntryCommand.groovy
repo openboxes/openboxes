@@ -9,10 +9,10 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.product.Product
 
-@Validateable
+@Validateable(nullable = true)
 class TransactionEntryCommand {
 	
 	boolean deleted

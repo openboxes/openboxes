@@ -337,7 +337,7 @@ class AdminController {
 
 }
 
-@Validateable
+@Validateable(nullable = true)
 class UpgradeCommand {
 	
 	FutureTask future	

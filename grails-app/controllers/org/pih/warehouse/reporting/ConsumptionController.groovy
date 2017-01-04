@@ -310,7 +310,7 @@ class ConsumptionController {
 
 }
 
-@Validateable
+@Validateable(nullable = true)
 class ShowConsumptionCommand {
 
     // Map of product to ShowConsumptionRowCommand
@@ -373,7 +373,7 @@ class ShowConsumptionCommand {
 
 }
 
-@Validateable
+@Validateable(nullable = true)
 class ShowConsumptionRowCommand {
 
     Product product

@@ -11,7 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.validation.Validateable
 
-@Validateable
+@Validateable(nullable = true)
 class InventoryCommand {
 
     def shipment
@@ -41,6 +41,7 @@ class InventoryCommand {
 	List tag
 	
 	static constraints = {
+		tag(nullable:true)
         shipment(nullable:true)
 		warehouseInstance(nullable:true)
 		searchTerms(nullable:true)

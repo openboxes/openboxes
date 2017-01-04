@@ -16,7 +16,7 @@ import org.pih.warehouse.product.Product
 
 // import java.util.HashSet;
 
-@Validateable
+@Validateable(nullable = true)
 class InventoryReportCommand {
 
 	Product product

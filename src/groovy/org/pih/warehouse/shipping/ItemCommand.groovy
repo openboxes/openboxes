@@ -13,7 +13,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 
-@Validateable
+@Validateable(nullable = true)
 class ItemCommand implements Serializable {
 	
 	Product product

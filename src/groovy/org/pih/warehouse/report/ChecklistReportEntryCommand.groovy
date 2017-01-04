@@ -14,7 +14,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
-@Validateable
+@Validateable(nullable = true)
 class ChecklistReportEntryCommand {
 
 	Product product;

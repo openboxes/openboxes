@@ -12,7 +12,7 @@ package org.pih.warehouse.shipping
 import grails.validation.Validateable;
 import org.pih.warehouse.core.Document;
 
-@Validateable
+@Validateable(nullable = true)
 class DocumentUploadCommand {
    String shipmentId
    Document document   

@@ -210,7 +210,7 @@ class BatchController {
 
 
 
-@Validateable
+@Validateable(nullable = true)
 class ImportProductsCommand {
 	def filename
 	def importFile
@@ -222,7 +222,7 @@ class ImportProductsCommand {
 	
 }
 
-@Validateable
+@Validateable(nullable = true)
 class ImportInventoryCommand {
 	
 	def filename

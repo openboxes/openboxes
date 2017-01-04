@@ -1733,7 +1733,7 @@ class InventoryController {
 
 }
 
-@Validateable
+@Validateable(nullable = true)
 class ConsumptionCommand {
 		String groupBy
 		Date startDate
@@ -1744,7 +1744,7 @@ class ConsumptionCommand {
 		}
 	}
 
-@Validateable
+@Validateable(nullable = true)
 class QuantityOnHandReportCommand {
     //Location location
     //def locations = ListUtils.lazyList([], FactoryUtils.instantiateFactory(Location))

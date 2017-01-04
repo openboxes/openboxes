@@ -11,7 +11,7 @@ package org.pih.warehouse.product
 
 import grails.validation.Validateable
 
-@Validateable
+@Validateable(nullable = true)
 class ProductCommand {
 	String id
 	String ean

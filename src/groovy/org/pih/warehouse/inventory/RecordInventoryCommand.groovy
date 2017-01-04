@@ -14,7 +14,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.product.Product
 
-@Validateable
+@Validateable(nullable = true)
 class RecordInventoryCommand {
 	
 	Product productInstance;

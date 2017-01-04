@@ -15,7 +15,7 @@ import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
-@Validateable
+@Validateable(nullable = true)
 class FulfillmentCommand implements Serializable {
 
 	Requisition request					// original request

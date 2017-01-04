@@ -14,7 +14,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 
-@Validateable
+@Validateable(nullable = true)
 class InventoryItemCommand {
 	
 	String description

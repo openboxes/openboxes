@@ -13,7 +13,7 @@ import grails.validation.Validateable;
 
 // import java.io.Serializable;
 
-@Validateable
+@Validateable(nullable = true)
 class ProductImageCommand implements Serializable {
 
 	String link

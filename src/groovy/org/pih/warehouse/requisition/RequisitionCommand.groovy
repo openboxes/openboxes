@@ -18,7 +18,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
-@Validateable
+@Validateable(nullable = true)
 class RequisitionCommand implements Serializable {
 
 	Requisition requisition

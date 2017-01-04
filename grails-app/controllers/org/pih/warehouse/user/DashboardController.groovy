@@ -35,7 +35,7 @@ class DashboardController {
 	def productService
     def requisitionService
 	def sessionFactory
-	
+
 	def showCacheStatistics() {
 		def statistics = sessionFactory.statistics
 		render statistics as JSON
@@ -527,10 +527,10 @@ class DashboardController {
         render(contentType: "text/csv", text:sw.toString())
         return;
     }
-    
+
 }
 
-@Validateable
+@Validateable(nullable = true)
 class DashboardCommand { 
 	
 	List<DashboardActivityCommand> activityList;
@@ -539,7 +539,7 @@ class DashboardCommand {
 }
 
 
-@Validateable
+@Validateable(nullable = true)
 class DashboardActivityCommand {
 
 	String label
