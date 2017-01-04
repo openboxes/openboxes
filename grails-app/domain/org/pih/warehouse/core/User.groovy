@@ -88,7 +88,7 @@ class User extends Person {
 
 
     String toString() {
-        return id
+        return "${name}"
     }
 
 }
