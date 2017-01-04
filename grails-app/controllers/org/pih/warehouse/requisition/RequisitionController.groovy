@@ -199,7 +199,9 @@ class RequisitionController {
                 requisition.save(flush:true)
             }
 
-            return [requisition: requisition, requisitionJson:requisition.toJson() as JSON];
+            String requisitionJson =requisition.toJson() as JSON
+
+            return [requisition: requisition, requisitionJson:requisitionJson];
 
 
 
