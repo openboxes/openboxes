@@ -73,7 +73,7 @@
         <div class="box">
             <h2>
                 ${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}
-                <div class="button-group right">
+                <div class="button-group right" style="margin: 5px;">
                     <g:link controller="requisitionTemplate" action="changeSortOrderAlpha" class="button" id="${requisition.id}">
                         <warehouse:message code="requisitionTemplate.button.sortAlphabetically.label" default="Sort alphabetically"/>
                     </g:link>
@@ -127,6 +127,7 @@
                                     ${requisitionItem?.product?.productCode}
                                 </td>
                                 <td>
+                                    <g:hiddenField name="requisitionItems[${i}].id" value="${requisitionItem?.id}"/>
                                     <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
                                     <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
                                         ${requisitionItem?.product?.name}
@@ -192,6 +193,7 @@
                                 <td colspan="7">
                                     <div class="buttons">
                                         <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+
                                         <g:link controller="requisitionTemplate" action="list" class="button">
                                             <warehouse:message code="default.button.done.label" default="Done"/>
                                         </g:link>

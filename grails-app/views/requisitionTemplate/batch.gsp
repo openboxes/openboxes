@@ -83,12 +83,12 @@
                             <tr >
                                 <td></td>
                                 <td class="left" colspan="4">
-                                    <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}" class="button icon arrowleft">
-                                        ${warehouse.message(code:'default.button.back.label')}
-                                    </g:link>
                                     <button class="button icon approve">
                                         ${warehouse.message(code:'requisitionTemplate.save.label', default: 'Save')}
                                     </button>
+                                    <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}" class="button icon remove">
+                                        ${warehouse.message(code:'default.button.cancel.label')}
+                                    </g:link>
                                 </td>
                             </tr>
                         </tfoot>
@@ -132,12 +132,12 @@
                             <tr>
                                 <td></td>
                                 <td class="left" colspan="4">
-                                    <g:link controller="requisitionTemplate" action="edit" id="${requisition.id}" class="button icon arrowleft">
-                                        ${warehouse.message(code:'default.button.back.label')}
-                                    </g:link>
                                     <button class="button icon add">
                                         ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Import')}
                                     </button>
+                                    <g:link controller="requisitionTemplate" action="edit" id="${requisition.id}" class="button icon remove">
+                                        ${warehouse.message(code:'default.button.cancel.label')}
+                                    </g:link>
                                 </td>
                             </tr>
                         </tfoot>
