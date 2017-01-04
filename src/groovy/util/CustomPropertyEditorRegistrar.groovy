@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat
 
 class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	void registerCustomEditors(PropertyEditorRegistry registry) {
-		registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true));
+		//registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true));
         registry.registerCustomEditor(Location.class, new LocationEditor())
         registry.registerCustomEditor(Category.class, new CategoryEditor())
         registry.registerCustomEditor(Tag.class, new TagEditor())
