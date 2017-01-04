@@ -23,6 +23,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.springframework.orm.hibernate3.HibernateSystemException
+import org.springframework.transaction.annotation.Transactional
 
 class RequisitionController {
 
@@ -198,10 +199,7 @@ class RequisitionController {
                 requisition.save(flush:true)
             }
 
-
-            println "Requisition json: " + requisition.toJson()
-
-            return [requisition: requisition];
+            return [requisition: requisition, requisitionJson:requisition.toJson() as JSON];
 
 
 
@@ -301,7 +299,7 @@ class RequisitionController {
         def requisition = new Requisition()
 		try {
             def jsonRequest = request.JSON
-            println "Save requisition: " + jsonRequest
+            log.info "Save requisition: " + jsonRequest
             requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
             if (!requisition.hasErrors()) {
                 jsonResponse = [success: true, data: requisition.toJson()]
@@ -609,10 +607,10 @@ class RequisitionController {
 
 
 	def addToPicklistItems(AddToPicklistItemsCommand command) {
-		println "Add to picklist items " + params
+		log.info "Add to picklist items " + params
 		def requisition = Requisition.get(params.id)
 	//	def requisitionItem = Requisition.get(params.requisitionItem.id)
-        println "Requisition " + command?.requisition
+        log.info "Requisition " + command?.requisition
 		def picklist = Picklist.findByRequisition(command.requisition)
         if (!picklist) {
             picklist = new Picklist();
@@ -621,15 +619,16 @@ class RequisitionController {
                 throw new ValidationException("Unable to create new picklist", picklist.errors)
             }
         }
-        command?.picklistItems.each { picklistItem ->
-            def existingPicklistItem  = PicklistItem.get(picklistItem.id)
-            if (picklistItem.quantity > 0) {
+        command?.picklistItems.each { picklistItemCommand ->
+            def existingPicklistItem  = PicklistItem.get(picklistItemCommand.id)
+            if (picklistItemCommand.quantity > 0) {
                 if (existingPicklistItem) {
-                    existingPicklistItem.quantity = picklistItem.quantity
+                    existingPicklistItem.quantity = picklistItemCommand.quantity
                     existingPicklistItem.save(flush:true)
                 }
                 else {
-                    println "Adding new item to picklist " + picklistItem?.id + " inventoryItem.id=" + picklistItem?.inventoryItem?.id + " qty=" + picklistItem?.quantity
+                    println "Adding new item to picklist " + picklistItemCommand?.id + " inventoryItem.id=" + picklistItemCommand?.inventoryItem?.id + " qty=" + picklistItemCommand?.quantity
+                    PicklistItem picklistItem = new PicklistItem(picklistItemCommand.properties)
                     picklist.addToPicklistItems(picklistItem)
                     //picklistItem.save(flush:true)
                     picklist.save(flush:true)
@@ -853,7 +852,6 @@ class RequisitionController {
     }
 
 
-
     def saveRequisitionItem() {
         println "Save requisition item" + params
         def location = Location.get(session.warehouse.id)
@@ -917,6 +915,7 @@ class RequisitionController {
     }
 
 
+    @Transactional
     def approveQuantity() {
         log.info "approve quantity = " + params
         def quantityOnHandMap = [:]
@@ -927,11 +926,10 @@ class RequisitionController {
             def products = getRelatedProducts(requisitionItem)
             quantityOnHandMap = getQuantityOnHandMap(location, products)
             requisitionItem.approveQuantity()
-            //requisitionItem.save()
+            requisitionItem.save()
+            requisition.save(flush:true)
         }
-        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
         render(template:'editRequisitionItem',  model: [requisition:requisition,requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
-        //redirect(action:"nextRequisitionItem", id: requisition.id, params:['requisitionItem.id':requisitionItem.id])
     }
 
     def undoChangesFromList() {
@@ -1095,18 +1093,31 @@ class RequisitionController {
 
 }
 
-@Validateable
+@Validateable(nullable = true)
 class AddToPicklistItemsCommand {
     Requisition requisition
     RequisitionItem requisitionItem
-    def picklistItems = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(PicklistItem.class));
+    List<PicklistItemCommand> picklistItems = [].withLazyDefault { new PicklistItemCommand() }
 
     static constraints = {
         requisition(nullable:false)
         requisitionItem(nullable:false)
         picklistItems(nullable:true)
-
     }
+}
 
+@Validateable(nullable = true)
+class PicklistItemCommand {
+    String id
+    Integer quantity
+    RequisitionItem requisitionItem
+    InventoryItem inventoryItem
+
+    static constraints = {
+        id(nullable:false)
+        requisitionItem(nullable:false)
+        inventoryItem(nullable:false)
+        quantity(nullable:false)
+    }
 
 }

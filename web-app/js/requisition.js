@@ -320,8 +320,8 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
     function getJsonDataFromRequisition() {
         var data = ko.toJS(self.requisition);
         console.log(data);
-        data["origin.id"] = data.originId;
-        data["requestedBy.id"] = data.requestedById;
+        data["origin"] = { "id": data.originId };
+        data["requestedBy"] = { "id": data.requestedById };
         delete data.version;
         delete data.status;
         delete data.lastUpdated;
@@ -330,8 +330,8 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
         }
         _.each(data.requisitionItems, function (item) {
             // Convert to variable names that will automatically bind on the server
-            item["product.id"] = item.productId;
-            item["productPackage.id"] = item.productPackageId;
+            item["product"] = { "id": item.productId };
+            item["productPackage"] = { "id": item.productPackageId };
 
             for (var attr in item) {
                 if (item[attr] == null) delete item[attr];

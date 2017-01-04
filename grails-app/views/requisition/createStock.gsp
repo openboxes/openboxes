@@ -251,7 +251,7 @@
                     <g:link controller="requisition" action="chooseTemplate" class="button icon arrowleft">
                         ${warehouse.message(code:'default.button.back.label', default: 'Back')}
                     </g:link>
-                    <button class="button icon approve" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
+                    <button class="button icon arrowright" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
 
                     <%--
                     <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>

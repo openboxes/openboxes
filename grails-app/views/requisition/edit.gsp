@@ -159,7 +159,7 @@
 		requisitionTypes['DEPOT_NON_STOCK'] = 'Depot'; 
 		requisitionTypes['DEPOT_TO_DEPOT'] = 'Depot'; 
 
-		var requisitionFromServer = ${requisition.toJson() as JSON};
+		var requisitionFromServer = ${raw(requisitionJson)};
 		var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
 		var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
 		var viewModel = new openboxes.requisition.EditRequisitionViewModel(requisitionData);
