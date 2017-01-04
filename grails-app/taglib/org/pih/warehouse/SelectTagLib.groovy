@@ -115,6 +115,7 @@ class SelectTagLib {
         }
         else {
             attrs.noSelection = ["null":"EA/1"]
+            attrs.from = product?.packages?.sort()
             out << g.select(attrs)
             //out << product.unitOfMeasure?:"EA/1"
 

@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.requisition
 
+import grails.transaction.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
@@ -21,6 +22,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product;
 
+@Transactional
 class RequisitionTemplateController {
 
     def requisitionService
@@ -77,7 +79,7 @@ class RequisitionTemplateController {
 	def save() {
         def requisition = new Requisition(params)
 
-        if (!requisition.hasErrors() && requisition.save()) {
+        if (!requisition.hasErrors() && requisition.save(flush:true)) {
             flash.message = "Requisition template has been created"
         }
         else {
