@@ -56,7 +56,7 @@ grails.views.default.codec = "html" // was "none"
 // If unspecified, controllers are prototype scoped.
 grails.controllers.defaultScope = 'singleton'
 
-// Default date format for data binding
+// Default date format for data binding ("yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ss.S'Z'")
 grails.databinding.dateFormats = ["MM/dd/yyyy"]
 
 // GSP settings
@@ -148,6 +148,7 @@ grails.validateable.packages = [
 	'org.pih.warehouse.order', 
 	'org.pih.warehouse.request',
 	'org.pih.warehouse.shipment',
+	'org.pih.warehouse.shipping',
 ]
 
 /* Default settings for emails sent through the SMTP appender  */
