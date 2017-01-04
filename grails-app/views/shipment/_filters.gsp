@@ -93,17 +93,22 @@
 
                 <tr class="prop">
                     <td class="left">
-                        <label>${warehouse.message(code: 'default.updatedBetween.label', default: 'Last updated between')}</label>
-                        <div class="clearfix">
+                        <label>${warehouse.message(code: 'shipping.lastUpdatedFrom.label', default: 'Last updated after')}</label>
+                        <div>
+                            <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                                value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="60" cssClass="center text large"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
 
-                            <div class="left">
-                                <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
-                                                    value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="15"/>
-                            </div>
-                            <div class="right">
-                                <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
-                                                    value="${lastUpdatedTo}" format="MM/dd/yyyy" size="15"/>
-                            </div>
+                    <td class="left">
+                        <label>${warehouse.message(code: 'shipping.lastUpdatedTo.label', default: 'Last updated before')}</label>
+
+                        <div>
+                            <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                                value="${lastUpdatedTo}" format="MM/dd/yyyy" size="60" cssClass="center text large"/>
+
                         </div>
 
                     </td>
