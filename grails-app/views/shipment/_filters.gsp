@@ -93,24 +93,32 @@
 
                 <tr class="prop">
                     <td class="left">
-                        <label>${warehouse.message(code: 'shipping.lastUpdatedFrom.label', default: 'Last updated after')}</label>
+
+                        <table>
+                            <tr>
+                                <td>
+                                    <label>${warehouse.message(code: 'shipping.lastUpdatedFrom.label', default: 'Last updated after')}</label>
+
+                                </td>
+                                <td>
+                                    <label>${warehouse.message(code: 'shipping.lastUpdatedTo.label', default: 'Last updated before')}</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                                        value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="20" />
+
+                                </td>
+                                <td>
+                                    <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                                        value="${lastUpdatedTo}" format="MM/dd/yyyy" size="20" />
+
+                                </td>
+                            </tr>
+                        </table>
                         <div>
-                            <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
-                                                value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="60" cssClass="center text large"/>
                         </div>
-                    </td>
-                </tr>
-                <tr class="prop">
-
-                    <td class="left">
-                        <label>${warehouse.message(code: 'shipping.lastUpdatedTo.label', default: 'Last updated before')}</label>
-
-                        <div>
-                            <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
-                                                value="${lastUpdatedTo}" format="MM/dd/yyyy" size="60" cssClass="center text large"/>
-
-                        </div>
-
                     </td>
                 </tr>
                 <%--
