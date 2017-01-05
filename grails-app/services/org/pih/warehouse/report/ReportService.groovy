@@ -14,7 +14,6 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
-import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
@@ -26,6 +25,7 @@ import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.w3c.dom.Document
+import org.xhtmlrenderer.pdf.ITextRenderer
 import org.xml.sax.InputSource
 import util.InventoryUtil
 
@@ -274,7 +274,7 @@ class ReportService implements ApplicationContextAware {
 		log.info "Generate PDF for URL " + url
 		try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            //builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             //Document document = loadXMLFromString(html)
             //Document document = builder.parse(new StringBufferInputStream(html));

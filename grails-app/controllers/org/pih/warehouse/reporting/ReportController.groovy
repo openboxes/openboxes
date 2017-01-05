@@ -219,30 +219,43 @@ class ReportController {
 	
 
 	def downloadTransactionReport() {
-		def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
 
-		// JSESSIONID is required because otherwise the login page is rendered
-		def url = baseUri + params.url + ";jsessionid=" + session.getId()		
-		url += "?print=true" 
-		url += "&location.id=" + params.location.id
-		url += "&category.id=" + params.category.id
-		url += "&startDate=" + params.startDate
-		url += "&endDate=" + params.endDate
-		url += "&showTransferBreakdown=" + params.showTransferBreakdown
-		url += "&hideInactiveProducts=" + params.hideInactiveProducts
-		url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
-		url += "&includeChildren=" + params.includeChildren
-		url += "&includeEntities=true" 
+        try {
+            def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
 
-		// Let the browser know what content type to expect
-		//response.setHeader("Content-disposition", "attachment;") // removed filename=
-		response.setContentType("application/pdf")
+            // JSESSIONID is required because otherwise the login page is rendered
+            def url = baseUri + params.url + ";jsessionid=" + session.getId()
+            url += "?print=true"
+            url += "&location.id=" + params.location.id
+            url += "&category.id=" + params.category.id
+            url += "&startDate=" + params.startDate
+            url += "&endDate=" + params.endDate
+            url += "&showTransferBreakdown=" + params.showTransferBreakdown
+            url += "&hideInactiveProducts=" + params.hideInactiveProducts
+            url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
+            url += "&includeChildren=" + params.includeChildren
+            url += "&includeEntities=true"
 
-		// Render pdf to the response output stream
-		log.info "BaseUri is $baseUri"	
-		log.info("Session ID: " + session.id)
-		log.info "Fetching url $url"
-		reportService.generatePdf(url, response.getOutputStream())
+            // Let the browser know what content type to expect
+            //response.setHeader("Content-disposition", "attachment;") // removed filename=
+            response.setContentType("application/pdf")
+
+            // Render pdf to the response output stream
+            log.info "BaseUri is $baseUri"
+            log.info("Session ID: " + session.id)
+            log.info "Fetching url $url"
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream()
+            reportService.generatePdf(url, baos)
+
+            response.outputStream << baos
+            response.outputStream.flush()
+        }
+        catch (Exception e) {
+            flash.message = e.message
+            redirect(controller: "errors", action: "handleException")
+        }
+
 	}
 	
 	def downloadShippingReport(ChecklistReportCommand command) {
