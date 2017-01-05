@@ -8,15 +8,13 @@
         <title><warehouse:message code="clickstream.title" default="Clickstream" /></title>
     </head>
     <body>        
-		<div id="settings" role="main" class="yui-ga">
+		<div id="settings" role="main" class="yui-gf">
 
             <g:if test="${flash.message}">
                 <div class="message">${flash.message}</div>
             </g:if>
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
-
-
                 <div class="box">
                     <h2><warehouse:message code="clickstream.label" default="Clickstream"/></h2>
                     <table>
@@ -94,62 +92,77 @@
                         <tr class="prop">
                             <td class="name">
                                 <label>
-                                    Actions
+                                    <g:message code="default.limit.label" default="Limit"/>
                                 </label>
                             </td>
                             <td class="value">
-                                <g:link controller="admin" action="clickstream" params="[format:'csv']" class="button icon log">
-                                    <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
-                                </g:link>
-                            </td>
-                        </tr>
-
-
-
-                        <tr class="prop">
-                            <td class="name">
-                                <label>
-                                    <warehouse:message code="clickstream.label" default="Clickstream"/>
-                                </label>
-                            </td>
-                            <td class="value">
-
-
-
-                                <div class="box" style="padding: 10px;">
-                                    <label>Limit</label>
-                                    <a href="?">All</a> |
-                                    <a href="?limit=10">10</a> |
-                                    <a href="?limit=25">25</a> |
-                                    <a href="?limit=50">50</a> |
-                                    <a href="?limit=100">100</a> |
-                                    <a href="?limit=250">250</a> |
-                                    <a href="?limit=500">500</a> |
-                                    <a href="?limit=1000">1000</a>
-                                </div>
-
-                                <g:set var="clickstream" value="${session?.clickstream?.stream?.reverse()}"/>
-                                <g:if test="${params.limit}">
-                                    <g:set var="endIndex" value="${params.int('limit')?:10}"/>
-                                    <g:set var="clickstream" value="${clickstream[0..endIndex-1]}"/>
-                                </g:if>
-                                <ul>
-                                    <g:each var="entry" in="${clickstream}" status="i">
-                                        <li>
-                                            ${++i}
-                                            ${entry.timestamp}
-                                            <a href="http://${entry.toString()}">
-                                                ${entry.toString()}
-                                            </a>
-                                        </li>
-                                    </g:each>
-                                </ul>
+                                <a href="?">All</a> |
+                                <a href="?limit=10">10</a> |
+                                <a href="?limit=25">25</a> |
+                                <a href="?limit=50">50</a> |
+                                <a href="?limit=100">100</a> |
+                                <a href="?limit=250">250</a> |
+                                <a href="?limit=500">500</a> |
+                                <a href="?limit=1000">1000</a>
                             </td>
                         </tr>
                     </table>
                 </div>
+            </div>
+
+            <div class="yui-u">
+
+                <div class="buttonBar">
+                    <g:link controller="admin" action="clickstream" params="[downloadFormat:'csv']" class="button icon log">
+                        <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
+                    </g:link>
+                </div>
 
 
+                <div class="box">
+                    <h2><warehouse:message code="clickstream.label" default="Clickstream"/>
+
+                    </h2>
+                    <g:set var="clickstream" value="${session?.clickstream?.stream}"/>
+                    <g:if test="${params.limit}">
+                        <g:set var="endIndex" value="${params.int('limit')?:10}"/>
+                        <g:if test="${endIndex > clickstream.size()}">
+                            <g:set var="endIndex" value="${clickstream.size()}"/>
+                        </g:if>
+                        <g:set var="clickstream" value="${clickstream[0..endIndex-1]}"/>
+                    </g:if>
+                    <table class="dataTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th><g:message code="default.date.label"/></th>
+                                <th><g:message code="default.time.label"/></th>
+                                <th><g:message code="default.link.label" default="Link"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <g:each var="entry" in="${clickstream}" status="i">
+                            <tr class="prop">
+                                <td>
+                                    ${i+1}
+                                </td>
+                                <td>
+                                    <g:formatDate date="${entry.timestamp}" format="MMM dd, yyyy"/>
+                                </td>
+                                <td>
+                                    <g:formatDate date="${entry.timestamp}" format="hh:mm:ss.S a"/>
+                                </td>
+                                <td class="dont-break-out" width="75%">
+                                    <a href="//${entry.toString()}">
+                                        ${entry.toString()}
+                                    </a>
+                                </td>
+                            </tr>
+                            </g:each>
+                        </tbody>
+                    </table>
+
+                </div>
             </div>
 		</div>
     </body>

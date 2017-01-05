@@ -47,7 +47,7 @@ class ClickstreamUtil {
         csv += '"' + "Request" + '"'
         csv += "\n"
 
-        clickstream?.stream?.reverse()?.each { entry ->
+        clickstream?.stream?.each { entry ->
             csv += '"' + (entry?.timestamp?:"")  + '"' + ","
             csv += '"' + (entry?.serverName?:"")  + '"' + ","
             csv += '"' + (entry?.serverPort?:"")  + '"' + ","

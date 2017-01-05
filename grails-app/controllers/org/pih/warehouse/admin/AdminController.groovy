@@ -62,7 +62,7 @@ class AdminController {
         [cacheStatistics: sessionFactory.getStatistics()]
     }
     def clickstream() {
-        if (params.format == "csv") {
+        if (params.downloadFormat == "csv") {
             def filename = "Clickstream - ${session.user.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text: ClickstreamUtil.getClickstreamAsCsv(session.clickstream))
