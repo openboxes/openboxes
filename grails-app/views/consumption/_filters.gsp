@@ -75,23 +75,23 @@
                 </td>
             </tr>
 
-            <g:if test="${command?.toLocations}">
-                <tr class="prop">
-                    <td colspan="2">
-                        <h3>
-                            <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
+            <tr class="prop">
+                <td colspan="2">
+                    <h3>
+                        <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
 
-                            <g:unless test="${!command.toLocations}">
-                                <div class="right">
-                                    <a id="selectAllLocations">Select All</a>&nbsp;|&nbsp;
-                                    <a id="selectNoLocations">Select None</a>
-                                </div>
-                            </g:unless>
-                        </h3>
-                    </td>
-                </tr>
-                <tr class="">
-                    <td colspan="2">
+                        <g:if test="${command.toLocations}">
+                            <div class="right">
+                                <a id="selectAllLocations">Select All</a>&nbsp;|&nbsp;
+                                <a id="selectNoLocations">Select None</a>
+                            </div>
+                        </g:if>
+                    </h3>
+                </td>
+            </tr>
+            <tr class="">
+                <td colspan="2">
+                    <g:if test="${command?.toLocations}">
                         <div> <!-- style="max-height: 300px; overflow: auto; border: 1px lightgrey solid"-->
                             <div id="toLocation-accordion">
                                 <g:set var="count" value="${0}"/>
@@ -141,14 +141,15 @@
                                 --%>
                             </div>
                         </div>
-                        <g:unless test="${command.toLocations}">
-                            <div class="center">
-                                <warehouse:message code="consumption.destinations.message" default=""/>
-                            </div>
-                        </g:unless>
-                    </td>
-                </tr>
-            </g:if>
+                    </g:if>
+                    <g:else>
+                        <div class="left fade">
+                            <warehouse:message code="consumption.destinations.message"
+                                               default="Destination filter will be displayed once you propulate required fields (Date Range, Products, Sources) and click the Run Report button."/>
+                        </div>
+                    </g:else>
+                </td>
+            </tr>
             <tr class="prop">
                 <td colspan="2">
                     <h3>
@@ -164,10 +165,10 @@
                 </td>
                 <td>
                     <span class="middle">
-                        <g:radio name="format" value="html" checked="${params.format=='html'||!params.format}"/> HTML
+                        <g:radio name="downloadFormat" value="html" checked="${params.downloadFormat=='html'||!params.downloadFormat}"/> HTML
                     </span>
                     <span class="middle">
-                        <g:radio name="format" value="csv" checked="${false}" /> CSV
+                        <g:radio name="downloadFormat" value="csv" checked="${false}" /> CSV
                     </span>
                 </td>
             </tr>
@@ -217,14 +218,14 @@
                     --%>
                 </td>
             </tr>
-            <tr>
+            <tr class="prop">
                 <td class="center" colspan="2">
                     <div>
-                        <button class="button icon search">
-                            <warehouse:message code="default.button.getData.label" default="Get data"/>
+                        <button class="button icon settings">
+                            <g:message code="default.button.runReport.label" default="Run Report"/>
                         </button>
                         &nbsp;
-                        <g:link controller="consumption" action="show">${warehouse.message(code:'default.button.reset.label', default: 'Reset')}</g:link>
+                        <g:link controller="consumption" action="show" class="button icon reload">${g.message(code:'default.button.reset.label', default: 'Reset')}</g:link>
                         <%--
                         <a href="#" id="parameters-toggle" class="button icon settings">
                             <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>

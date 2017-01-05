@@ -229,7 +229,7 @@ class ConsumptionController {
         }
 
         // Export as CSV
-        if (params.format == "csv") {
+        if (params.downloadFormat == "csv") {
 
             /*
             def csvWriter = new CSVWriter(sw, {

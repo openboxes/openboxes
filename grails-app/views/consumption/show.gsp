@@ -183,7 +183,8 @@
 
                 <div class="box">
                     <h2>
-                        Returned ${command.rows?.keySet()?.size()} results
+                        <g:message code="consumption.label"/>
+                        <small class="fade">${command.rows?.keySet()?.size()} results</small>
                     </h2>
 
                     <div>
@@ -212,7 +213,7 @@
                                     <%--
                                     <th class="center border-right" colspan="2"><warehouse:message code="consumption.returns.label" default="Returns"/></th>
                                     --%>
-                                    <th class="center border-right"><warehouse:message code="consumption.balance.label" default="Balance"/></th>
+                                    <th class="center border-right"><warehouse:message code="consumption.total.label" default="Total"/></th>
 
                                     <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
                                     <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
@@ -245,12 +246,9 @@
                                         --%>
                                         <td>${i+1}</td>
                                         <td class="border-right">
-                                            <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
+                                            <a href="javascript:void(-1);" data-id="${product.id}" class="product-details-toggle-btn">
                                                 ${product?.productCode} ${product?.name}
-                                            </g:link>
-
-                                            &nbsp;
-                                            <a href="javascript:void(-1);" data-id="${product.id}" class="product-details-toggle-btn">more info</a>
+                                            </a>
                                             <div id="product-details-box-${product?.id}" class="box product-details-box" style="display:none">
                                                 <table >
                                                     <tr>
