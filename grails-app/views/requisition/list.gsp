@@ -270,7 +270,7 @@
                                                 --%>
                                             </td>
                                             <td class="middle center">
-                                                <label class="status"><format:metadata obj="${requisition?.status}"/></label>
+                                                <format:metadata obj="${requisition?.status}"/>
                                             </td>
                                             <td class="middle center">
                                                 ${requisition.requestNumber }

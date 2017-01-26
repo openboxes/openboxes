@@ -200,7 +200,7 @@
         </g:else>
 
 	</div>
-	
+
 	<script>
         function checkFormSubmission() {
             var comments = $("#comments").val();
@@ -211,7 +211,7 @@
             }
             return true;
         }
-		$(".go-back").click(function() { 
+		$(".go-back").click(function() {
 			parent.history.back();
 	        return false;
 		});
@@ -219,20 +219,20 @@
 			var dom = document.getElementsByTagName('html')[0].innerHTML;
 			dom = "<html>" + dom + "</html>"
 			$("#dom").val(dom);
-			
-			$("#error-dialog").dialog({ 
-				autoOpen: true, 
-				modal: true, 
+
+			$("#error-dialog").dialog({
+				autoOpen: true,
+				modal: true,
 				width: '1000px'
 			});
 
 			$("#comments").focus();
 
-			
+
 		});
 		$(".close-dialog").click(function(event) {
-			event.preventDefault(); 
-			$("#error-dialog").dialog("close"); 
+			event.preventDefault();
+			$("#error-dialog").dialog("close");
 		});
 
 	</script>
