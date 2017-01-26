@@ -4,7 +4,7 @@
         <table id="prodEntryTable">
             <thead>
             <tr class="odd">
-                <th></th>
+                <th><g:message code="default.actions.label"/></th>
                 <th><warehouse:message code="product.label"/></th>
                 <th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
                 <th style="text-align: center"><warehouse:message code="product.expirationDate.label"/></th>
@@ -22,10 +22,9 @@
                     <g:set var="transactionCount" value="${transactionCount+1 }"/>
                     <tr class="${status%2?'odd':'even' } ${selected?'selected':''}">
                         <td>
-                            <g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id}">
-                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
+                            <g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id}" class="button">
+                                <g:message code="default.button.edit.label"/>
                             </g:link>
-
                         </td>
                         <td style="text-align: left;">
                             <%--

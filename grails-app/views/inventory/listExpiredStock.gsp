@@ -13,11 +13,13 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
             
-           
-            <h3><warehouse:message code="inventory.expiredStock.label"/></h3>
-            
+
             
             <div class="yui-gf">
+				<div class="summary">
+					<h1><warehouse:message code="inventory.expiredStock.label"/></h1>
+
+				</div>
 				<div class="yui-u first">
 				
 			
@@ -173,8 +175,19 @@
 				
 				$("#toggleCheckbox").click(function(event) {
 					$(".checkbox").attr("checked", $(this).attr("checked"));
-				});	
-			});	
+				});
+
+                $("#inventoryActionForm").submit(function(event){
+                    console.log("submit");
+                    var checked = $("form input:checkbox:checked")
+                    if (checked.length <= 0) {
+                        alert("Please choose at least one");
+                        event.preventDefault();
+                    }
+
+                });
+
+			});
 		</script>	
 	</body>
 </html>

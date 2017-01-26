@@ -136,4 +136,8 @@ class Transaction implements Comparable, Serializable {
 		}
 		return compare
 	}
+
+	String toString() {
+		return "${transactionNumber?:id}"
+	}
 }

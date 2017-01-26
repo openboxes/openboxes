@@ -16,18 +16,23 @@ import org.pih.warehouse.core.Location
 
 @Validateable(nullable = true)
 class TransactionCommand {
-	
+
+	String id
 	Date transactionDate
 	TransactionType transactionType
-	
+	Inventory inventory
+	Location location
+	Location destination
+	Location source
+	String comment
+
 	Map productInventoryItems
 	Map quantityMap
 	List transactionTypeList 
 	List locationList
 	
-	Transaction transactionInstance
-	Location warehouseInstance
-	
+	Transaction transaction
+
 	List<TransactionEntryCommand> transactionEntries =
 		LazyList.decorate(new ArrayList(),FactoryUtils.instantiateFactory(TransactionEntryCommand.class));
 		

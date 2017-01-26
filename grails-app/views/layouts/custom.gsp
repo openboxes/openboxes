@@ -29,9 +29,6 @@
     <%--<jqui:resources />--%>
     <link href="${resource(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 
-
-
-
     <!-- Include Jquery Validation and Jquery Validation UI plugins -->
     <jqval:resources />
     <jqvalui:resources />

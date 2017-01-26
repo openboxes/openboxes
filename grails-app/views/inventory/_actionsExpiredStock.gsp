@@ -1,37 +1,36 @@
-<div class="action-menu" style="padding: 1px;">
-	<button class="action-btn">
-		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/> <warehouse:message code="default.actions.label" default="Actions"/>
-	</button>
-	<div class="actions">
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryExpiredBtn">
-				<img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryConsumedBtn">
-				<img src="${resource(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">
-			<hr/>
-		</div>
-		<div class="action-menu-item">														
-			<g:link controller="inventory" action="browse">
-				<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.browse.label"/>
-			</g:link>
-		</div>		
-		
+<button class="action-btn button middle">
+    <img src="${resource(dir:'images/icons/silk',file:'cog.png')}" alt="${warehouse.message(code: 'default.actions.label') }" style="vertical-align: middle"/>
+	&nbsp;<warehouse:message code="default.actions.label" default="Actions"/>
+</button>
+<div class="actions">
+	<div class="action-menu-item">
+		<a href="javascript:void(0);" class="actionButton" id="inventoryExpiredBtn">
+			<img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
+			&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
+		</a>
 	</div>
+	<div class="action-menu-item">
+		<a href="javascript:void(0);" class="actionButton" id="inventoryConsumedBtn">
+			<img src="${resource(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
+			&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
+		</a>
+	</div>
+	<div class="action-menu-item">
+		<a href="javascript:void(0);" class="actionButton" id="outgoingTransferBtn">
+			<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
+			&nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
+		</a>
+	</div>
+
 </div>
 
 <script>
 	$(document).ready(function() {
 
-		$("#inventoryExpiredBtn").click(function(event) { 
+        $("#outgoingTransferBtn").click(function(event) {
+            $("#inventoryActionForm").append($("<input>", {type: "hidden", name: "transactionType.id", "value": "9"})).submit();
+        });
+        $("#inventoryExpiredBtn").click(function(event) {
 			$("#inventoryActionForm").append($("<input>", {type: "hidden", name: "transactionType.id", "value": "4"})).submit();
 		});
 		$("#inventoryConsumedBtn").click(function(event) { 

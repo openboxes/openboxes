@@ -13,10 +13,12 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			
-			<h3><warehouse:message code="inventory.expiringStock.label"/></h3>
-			
+
+
 			<div class="yui-gf">
+                <div class="summary">
+                    <h1 class="title"><warehouse:message code="inventory.expiringStock.label"/></h1>
+                </div>
 				<div class="yui-u first">
 		            <g:form action="listExpiringStock" method="get">
 						<div class="dialog box">
@@ -85,7 +87,7 @@
                             <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
                                 <table>
                                     <thead>
-                                        <tr class="odd" style="height:50px;">
+                                        <tr class="odd">
                                             <th class="center middle">
                                                 <input type="checkbox" id="toggleCheckbox" class="middle"/>
                                             </th>
@@ -194,7 +196,17 @@
 					//$(".checkbox").attr("checked", $(this).attr("checked"));
                     var checked = ($(this).attr("checked") == 'checked');
                     $(".checkbox").attr("checked", checked);
-				});	
+				});
+
+                $("#inventoryActionForm").submit(function(event){
+                    console.log("submit");
+                    var checked = $("form input:checkbox:checked")
+                    if (checked.length <= 0) {
+                        alert("Please choose at least one");
+                        event.preventDefault();
+                    }
+
+                });
 			});	
 		</script>	
 		

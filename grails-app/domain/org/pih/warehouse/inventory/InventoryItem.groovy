@@ -74,7 +74,7 @@ class InventoryItem implements Serializable {
     }
 
 	@Override
-	String toString() { return "${lotNumber}:${expirationDate}"; }
+	String toString() { return "${product?.productCode}:${lotNumber}:${expirationDate}"; }
 	
 	@Override
 	int hashCode() {

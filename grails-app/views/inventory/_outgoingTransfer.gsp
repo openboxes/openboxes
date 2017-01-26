@@ -1,19 +1,16 @@
 <div class="box">
-    <h2><warehouse:message code="inventory.outgoingTransfer.label"/></h2>
-
+    <h2><g:message code="inventory.outgoingTransfer.label"/> <g:message code="transaction.new.label"/></h2>
     <g:form action="saveDebitTransaction">
-		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
-		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
-		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>							
+		<g:hiddenField name="id" value="${command?.id}"/>
+		<g:hiddenField name="inventory.id" value="${command?.inventory?.id}"/>
+		<g:hiddenField name="transactionType.id" value="${command?.transactionType?.id }"/>
 		<table>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.type.label"/></label>
 				</td>
 				<td class="value">
-					<span>
-						${command?.transactionInstance?.transactionType?.name }
-					</span>								
+					${format.metadata(obj: command?.transactionType)}
 				</td>
 			</tr>	
 			<tr class="prop">
@@ -21,13 +18,7 @@
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
-                    <%--
-					<span>
-						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
-								value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>
-				    --%>
-                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
+                    <g:datePicker name="transactionDate" value="${command?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	
 			<tr class="prop">
@@ -35,9 +26,7 @@
 					<label><warehouse:message code="transaction.source.label"/></label>
 				</td>
 				<td class="value">
-					<span>
-						${command?.warehouseInstance?.name}
-					</span>								
+					${command?.location?.name}
 				</td>
 			</tr>	
 			
@@ -47,8 +36,8 @@
 				</td>
 				<td class="value">
 					<span>
-						<g:selectTransactionDestination name="transactionInstance.destination.id" class="chzn-select-deselect"
-							value="${command?.transactionInstance?.destination?.id}" noSelection="['null': '']"/>
+						<g:selectTransactionDestination name="destination.id" class="chzn-select-deselect"
+							value="${command?.destination?.id}" noSelection="['null': '']"/>
 
 					</span>
 				</td>
@@ -59,8 +48,8 @@
 				</td>
 				<td class="value">
 					<span class="value">
-						<g:textArea cols="120" rows="5" name="transactionInstance.comment"
-							value="${command?.transactionInstance?.comment }"></g:textArea>
+						<g:textArea cols="120" rows="5" name="comment"
+							value="${command?.comment }"></g:textArea>
 
 					</span>								
 				</td>
@@ -79,7 +68,6 @@
 									<th><warehouse:message code="product.label"/></th>
 									<th><warehouse:message code="product.lotNumber.label"/></th>
 									<th><warehouse:message code="default.expires.label"/></th>
-									<th><warehouse:message code="default.unitOfMeasure.label"/></th>
 									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
 									<th><warehouse:message code="default.qty.label"/></th>
 									<th><warehouse:message code="default.actions.label"/></th>
@@ -122,28 +110,27 @@
 													</span>
 												</td>
 												<td>
-													<span>
-														${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
-													</span>
-												</td>
-												<td>
 													<span class="${onHandQuantity >0? '':'fade'}">
 														${onHandQuantity }
+                                                        ${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
 													</span>
 												</td>
 												<td>
 													<g:if test="${onHandQuantity > 0 }">
 														<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>									
-														<g:if test="${command?.transactionInstance?.transactionEntries }">
+														<g:if test="${command?.transactionEntries }">
 															<g:textField name="transactionEntries[${status }].quantity"
-																value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="10" autocomplete="off"  class="text" />
-														</g:if>
+																value="${command?.transactionEntries[status]?.quantity }" size="10" autocomplete="off"  class="text" />
+                                                            ${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+
+                                                        </g:if>
 														<g:else>
-															<g:textField name="transactionEntries[${status }].quantity" class="text medium"
+															<g:textField name="transactionEntries[${status}].quantity" class="text medium"
 																value="" size="10" autocomplete="off" />
-														</g:else>
-														<g:set var="status" value="${status+1 }"/>										
-														
+                                                            ${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+
+                                                        </g:else>
+														<g:set var="status" value="${status+1}"/>
 													</g:if>
 													<g:else>
 														<input type="text" class="fade" disabled="disabled" value="N/A" size="1"/>

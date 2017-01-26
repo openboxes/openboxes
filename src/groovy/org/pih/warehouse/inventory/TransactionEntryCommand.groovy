@@ -27,4 +27,9 @@ class TransactionEntryCommand {
 	static constraints = {
 
 	}
+
+
+	String toString() {
+		return "inventoryItem: ${inventoryItem}, quantity: ${quantity}"
+	}
 }
