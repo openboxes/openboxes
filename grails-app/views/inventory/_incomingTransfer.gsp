@@ -2,47 +2,56 @@
     <h2><warehouse:message code="inventory.incomingTransfer.label"/></h2>
 
 	<g:form action="saveCreditTransaction">
-		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
-		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
-		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
+		<g:hiddenField name="id" value="${command?.id}"/>
+		<g:hiddenField name="inventory.id" value="${command?.inventory?.id}"/>
+		<g:hiddenField name="transactionType.id" value="${command?.transactionType?.id }"/>
 
 
 		<table>
 			<tr class="prop">
 				<td class="name">
+					<label><warehouse:message code="transaction.type.label"/></label>
+				</td>
+				<td class="value">
+					${format.metadata(obj: command?.transactionType)}
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
-
-                    <%--
-					<span class="transactionDate">
-						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
-							value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>
-				    --%>
-                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
+                    <g:datePicker name="transactionDate" value="${command?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	
 			<tr class="prop">
 				<td class="name">
-					<label><warehouse:message code="default.from.label"/></label>
+					<label><warehouse:message code="transaction.source.label"/></label>
 				</td>
 				<td class="value">			
-
-					<g:selectTransactionSource name="transactionInstance.source.id"
+					<g:selectTransactionSource name="source.id"
                         class="chzn-select-deselect"
-						optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
-							
+						optionKey="id" optionValue="name" value="${command?.source?.id}" noSelection="['null': '']" />
 				</td>
 			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label><warehouse:message code="transaction.destination.label"/></label>
+				</td>
+				<td class="value">
+					${command?.location?.name}
+				</td>
+			</tr>
+
+
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.comment.label"/></label>
 				</td>
 				<td class="value">
 					<span class="comment">
-						<g:textArea cols="120" rows="5" name="transactionInstance.comment"
-							value="${command?.transactionInstance?.comment }"></g:textArea>
+						<g:textArea cols="120" rows="5" name="comment"
+							value="${command?.comment }"></g:textArea>
 
 					</span>								
 				</td>

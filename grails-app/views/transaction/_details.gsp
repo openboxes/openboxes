@@ -21,22 +21,41 @@
 		
 		
 		<tr class="prop">
-			<td class=""><label><warehouse:message
-						code="transaction.type.label" /></label>
+			<td class="">
+                <label><warehouse:message code="transaction.type.label" /></label>
             </td>
             <td>
                 <div class="transaction-type-${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-					<format:metadata obj="${transactionInstance?.transactionType}" /> <g:if
-						test="${transactionInstance?.source }">
-						<warehouse:message code="default.from.label" />
-						${transactionInstance?.source?.name }
-					</g:if> <g:if test="${transactionInstance?.destination }">
-						<warehouse:message code="default.to.label" />
-						${transactionInstance?.destination?.name }
-					</g:if>
+					<format:metadata obj="${transactionInstance?.transactionType}" />
                 </div>
 			</td>
 		</tr>
+
+
+        <g:if test="${transactionInstance?.source }">
+            <tr class="prop">
+                <td class="">
+                    <label><warehouse:message code="transaction.source.label" /></label>
+                </td>
+                <td>
+                    ${transactionInstance?.source?.name }
+                </td>
+            </tr>
+        </g:if>
+
+
+        <g:if test="${transactionInstance?.destination }">
+            <tr class="prop">
+                <td class="">
+                    <label><warehouse:message code="transaction.destination.label" /></label>
+                </td>
+                <td>
+                    ${transactionInstance?.destination?.name }
+                </td>
+            </tr>
+        </g:if>
+
+
         <tr id="inventory" class="prop">
             <td class=""><label><warehouse:message
                     code="inventory.label" /></label>

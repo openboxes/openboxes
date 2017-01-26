@@ -44,7 +44,7 @@
                                         </label>
                                     </td>
                                     <td>
-                                        <select id="transactionTypeSelect" name="transactionType.id">
+                                        <select id="transactionTypeSelect" name="transactionType.id" class="chzn-select-deselect">
                                             <option value="">
                                                 <warehouse:message code="transactionType.all.label"/>
                                             </option>
@@ -81,7 +81,7 @@
                                 </tr>
                                 --%>
                                 <tr>
-                                    <td colspan="2" class="right">
+                                    <td colspan="2" class="center">
 
                                         <g:submitButton name="search" value="Search" class="button"></g:submitButton>
                                     </td>
@@ -224,7 +224,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="paginateButtons">
+                    <div class="pagination">
                         <g:paginate total="${transactionCount}" params="['transactionType.id':transactionTypeSelected?.id]"/>
                     </div>
 

@@ -72,19 +72,7 @@
 
                                         </td>
                                     </tr>
-                                    <tr class="prop">
-                                        <td valign="top" class="name">
-                                            <label for="unitOfMeasure"><warehouse:message
-                                                    code="product.unitOfMeasure.label"
-                                                    default="Unit of measure"/></label>
-                                        </td>
-                                        <td valign="top" class="value">
-                                            <span id="unitOfMeasure">
-                                                ${transactionEntryInstance?.inventoryItem?.product?.unitOfMeasure}
-                                            </span>
 
-                                        </td>
-                                    </tr>
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                             <label for="inventoryItem.id"><warehouse:message
@@ -93,7 +81,7 @@
                                         </td>
                                         <td valign="top"
                                             class="value ${hasErrors(bean: transactionEntryInstance, field: 'inventoryItem', 'errors')}">
-                                            <g:select name="inventoryItem.id"
+                                            <g:select name="inventoryItem.id" class="chzn-select-deselect"
                                                       from="${org.pih.warehouse.inventory.InventoryItem.findAllByProduct(transactionEntryInstance?.inventoryItem?.product)}"
                                                       optionKey="${{ it.id }}" optionValue="${{ it.lotNumber }}"
                                                       value="${transactionEntryInstance?.inventoryItem?.id}"/>
@@ -109,6 +97,7 @@
                                             class="value ${hasErrors(bean: transactionEntryInstance, field: 'quantity', 'errors')}">
                                             <g:textField name="quantity" value="${transactionEntryInstance?.quantity}"
                                                          size="10" class="text"/>
+                                            ${transactionEntryInstance?.inventoryItem?.product?.unitOfMeasure?:"EA"}
                                         </td>
                                     </tr>
 

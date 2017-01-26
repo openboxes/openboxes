@@ -4,10 +4,9 @@
 			<g:render template="../transaction/actions"/>
 		</td>
 		<td class="top">
-			<div class="title"> 
-				<span class="transactionNumber">${transactionInstance?.transactionNumber }</span>
+			<div class="transactionNumber">${transactionInstance?.transactionNumber }</div>
+			<div class="title">
 				<g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
-
                     <format:metadata obj="${transactionInstance?.transactionType}" /> <g:if
                         test="${transactionInstance?.source }">
                     <warehouse:message code="default.from.label" />

@@ -54,7 +54,7 @@
 										<tr class="prop">
 											<td class="name">
 												<label><warehouse:message code="transaction.status.label"/></label>
-											</td>												
+											</td>
 											<td class="value">
 												<g:if test="${transactionInstance?.id }">
 													<warehouse:message code="enum.TransactionStatus.COMPLETE"/>
@@ -77,44 +77,49 @@
                                                               value="${transactionInstance?.transactionDate}"
                                                                 precision="minute"/>
 											</td>
-										</tr>											
+										</tr>
 										<tr class="prop">
 											<td class="name">
 												<label><warehouse:message code="transaction.type.label"/></label>
 											</td>
 											<td class="value">
 												<span class="value">
-													<g:select id="transactionTypeSelector" name="transactionType.id" from="${transactionTypeList}" 
+													<g:select id="transactionTypeSelector" name="transactionType.id" from="${transactionTypeList}" class="chzn-select-deselect"
 							                       		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${transactionInstance.transactionType?.id}" noSelection="['': '']" />
 						                       	</span>
 											</td>
 										</tr>
-										<tr class="prop">
-											<td class="name">							                  
-												<label><warehouse:message code="transaction.source.label"/></label>
-											</td>
-											<td class="value">
-												<g:select id="sourceId" name="source.id" from="${locationInstanceList}" 
-						                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
-				                       		</td>
-				                       	</tr>
-				                       	<tr class="prop">
-				                       		<td class="name">
-												<label><warehouse:message code="transaction.destination.label"/></label>
-											</td>
-											<td class="value">
-												<g:select id="destinationId" name="destination.id" from="${locationInstanceList}" 
-						                       		optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
-											</td>
-										</tr>
+                                        <g:if test="${transactionInstance?.source}">
+                                            <tr class="prop">
+                                                <td class="name">
+                                                    <label><warehouse:message code="transaction.source.label"/></label>
+                                                </td>
+                                                <td class="value">
+                                                    <g:select id="sourceId" name="source.id" from="${locationInstanceList}" class="chzn-select-deselect"
+                                                        optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
+                                                </td>
+                                            </tr>
+                                        </g:if>
+
 				                       	<tr class="prop">
 				                       		<td class="name">
 												<label><warehouse:message code="transaction.inventory.label"/></label>
 											</td>
 											<td class="value">
-                                                <g:selectInventory name="inventory.id" value="${transactionInstance?.inventory?.id}" noSelection="['null': '']" />
+                                                <g:selectInventory name="inventory.id" value="${transactionInstance?.inventory?.id}" noSelection="['null': '']" class="chzn-select-deselect"/>
 											</td>
 										</tr>
+                                        <g:if test="${transactionInstance?.destination}">
+                                            <tr class="prop">
+                                                <td class="name">
+                                                    <label><warehouse:message code="transaction.destination.label"/></label>
+                                                </td>
+                                                <td class="value">
+                                                    <g:select id="destinationId" name="destination.id" from="${locationInstanceList}" class="chzn-select-deselect"
+                                                              optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
+                                                </td>
+                                            </tr>
+                                        </g:if>
 										<tr class="prop">
 											<td class="name">
 												<label><warehouse:message code="transaction.comment.label"/></label>
@@ -124,7 +129,7 @@
 											</td>
 										</tr>
 									</tbody>
-									<tfoot>									
+									<tfoot>
 										<tr>
 											<td class="center" colspan="2">
 												<button type="submit" name="save" class="button">
@@ -134,29 +139,29 @@
 												<g:if test="${params?.product?.id }">
 													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
 														${warehouse.message(code: 'default.button.cancel.label')}
-													</g:link>		
+													</g:link>
 												</g:if>
 												<g:else>
 													<g:link controller="inventory" action="browse">
 														${warehouse.message(code: 'default.button.cancel.label')}
 													</g:link>
-												</g:else>			
-												
+												</g:else>
+
 											</td>
 										</tr>
-									</tfoot>									
-													
+									</tfoot>
+
 								</table>
 							</g:form>
 						</div>
 					</div>
-					<div class="yui-u">									
+					<div class="yui-u">
 						<div class="box">
                             <h2>${warehouse.message(code: 'transaction.transactionEntries.label')}</h2>
 							<g:form action="saveTransaction">
 								<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 								<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
-							
+
 								<div style="">
 									<table id="transaction-entries-table" border="0" style="margin: 0; padding: 0; border: 0px solid lightgrey; background-color: white;">
 										<thead>
@@ -171,15 +176,15 @@
 										</thead>
 										<tbody>
 											<g:each var="transactionEntry" in="${transactionInstance?.transactionEntries }" status="i">
-											
+
 			                                    <tr class="${i % 2 ? 'odd' : 'even' }">
 			                                    	<td>
 														<format:product product="${transactionEntry?.inventoryItem?.product }"/>
 			                                    	</td>
 			                                    	<td class="center">
-			                                    		<g:select name="transactionEntries[${i }].inventoryItem.id" value="${transactionEntry?.inventoryItem?.id }" 
+			                                    		<g:select name="transactionEntries[${i }].inventoryItem.id" value="${transactionEntry?.inventoryItem?.id }"
 			                                    			from="${inventoryItemsMap[transactionEntry?.inventoryItem?.product]}" noSelection="['null':'']"
-			                                    			optionKey="id" optionValue="lotNumber" /> 
+			                                    			optionKey="id" optionValue="lotNumber" />
 			                                    	</td>
 			                                    	<td class="center">
 			                                    		<g:if test="${transactionEntry?.inventoryItem?.expirationDate }">
@@ -197,8 +202,8 @@
                                                             value="${transactionEntry?.quantity }" size="6"/>
 			                                    	</td>
 			                                    	<td class="center">
-		                                    			
-		                                    			<%-- 
+
+		                                    			<%--
 		                                    			<g:link controller="transactionEntry" action="show" id="${transactionEntry?.id }">
 		                                    				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" /></g:link>
 														&nbsp;
@@ -207,16 +212,16 @@
 			                                    			<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
 			                                    		</g:link>
 			                                    	</td>
-			                                    </tr>											
+			                                    </tr>
 											</g:each>
 											<g:unless test="${transactionInstance?.transactionEntries }">
 												<tr class="empty">
 													<td colspan="7" style="text-align: center; display:none;" id="noItemsRow">
 														<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
 													</td>
-												</tr>											
+												</tr>
 											</g:unless>
-											<%-- 
+											<%--
 											<tr class="empty">
 												<td colspan="7" style="text-align: center; display:none;" id="noItemsRow">
 													<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
@@ -227,7 +232,7 @@
 		                                    		 <g:hiddenField class="entryIdField" name="transactionEntryId" value=""/>
 		                                    		 <g:hiddenField class="entryDeleteField" name="deleteEntry" value="false"/>
 		                                    		 <g:hiddenField class="productIdField" name="productId" value=""/>
-		                                    		 <g:hiddenField class="inventoryItemIdField" name="inventoryItemId" value=""/> 
+		                                    		 <g:hiddenField class="inventoryItemIdField" name="inventoryItemId" value=""/>
 		                                    		 <span class="productNameLabel"></span>
 		                                    	</td>
 		                                    	<td class="center">
@@ -248,7 +253,7 @@
 	                                    			<g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id }">
 	                                    				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" class="rowEditButton" />
 	                                    			</g:link>
-	
+
 	                                    			<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="rowDeleteButton" />
 		                                    	</td>
 		                                    </tr>
@@ -265,19 +270,19 @@
 														<g:if test="${params?.product?.id }">
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
 																${warehouse.message(code: 'default.button.cancel.label')}
-															</g:link>		
+															</g:link>
 														</g:if>
 														<g:else>
 															<g:link controller="inventory" action="browse">
 																${warehouse.message(code: 'default.button.cancel.label')}
 															</g:link>
-														</g:else>			
+														</g:else>
 													</div>
 												</td>
 											</tr>
 										</tfoot>
 									</table>
-								</div>	
+								</div>
 							</g:form>
 						</div>
 					</div>

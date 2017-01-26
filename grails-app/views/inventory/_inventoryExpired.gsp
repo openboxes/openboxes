@@ -46,9 +46,6 @@
 
 				</td>
 				<td style="padding: 0px;">
-                    <%--
-                    <label><warehouse:message code="transaction.transactionEntries.label"/></label>
-					--%>
 					<div>
 						<table id="inventoryTable">
 							<thead>

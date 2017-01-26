@@ -27,32 +27,19 @@
 			</div>
 		</g:hasErrors>
 
-		<div class="dialog" >			
+		<div class="box">
+
+			<h2><warehouse:message code="shipping.addToShipments.label"/></h2>
 			<g:form action="addToShipmentPost">
-				
-					<%-- 
-					<div class="action-menu" style="padding: 10px;">
-						<button class="action-btn">
-							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-						</button>
-						<div class="actions">
-							<div class="action-menu-item">
-								<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">
-									<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'shipping.returnToInventoryBrowser.label') }" style="vertical-align: middle" />
-									&nbsp; <warehouse:message code="shipping.returnToInventoryBrowser.label"/>
-								</g:link>
-							</div>
-						</div>
-					</div>					
-					--%>
-					<table class="box">
+
+					<table>
 					
 						<tr class="prop">
 							<td class="name">
 								<label>${warehouse.message(code:'container.label') }</label>
 							</td>
 							<td class="value">
-								<g:selectContainer name="shipmentContainerKey"
+								<g:selectContainer name="shipmentContainerKey" class="chzn-select-deselect"
 									noSelection="${['null':warehouse.message(code:'shipping.selectContainer.label')]}" 
 									from="${shipments}"
 									optionKey="id" optionValue="name" groupBy="shipment"/>	
@@ -107,15 +94,15 @@
 															</g:else>
 														</td>
 														<td class="center">
-															${item?.quantityShipping?:"<span class='fade'>0</span>"}
+															${item?.quantityShipping?:0}
 															<g:hiddenField name="items[${listStatus }].quantityShipping" value="${item?.quantityShipping }"/>
 														</td>
 														<td class="center">
-															${item?.quantityReceiving?:"<span class='fade'>0</span>"}
+															${item?.quantityReceiving?:0}
 															<g:hiddenField name="items[${listStatus }].quantityReceiving" value="${item?.quantityReceiving }"/>
 														</td>
 														<td class="center">
-															${item?.quantityOnHand?:"<span class='fade'>0</span>"}
+															${item?.quantityOnHand?:0}
 															<g:hiddenField name="items[${listStatus }].quantityOnHand" value="${item?.quantityOnHand }"/>
 														</td>
 														<td class="center middle" style="border-left: 1px solid lightgrey; padding: 0">

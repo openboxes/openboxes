@@ -1,5 +1,5 @@
 <div class="box">
-    <h2><g:message code="inventory.outgoingTransfer.label"/> <g:message code="transaction.new.label"/></h2>
+    <h2><g:message code="inventory.outgoingTransfer.label"/></h2>
     <g:form action="saveDebitTransaction">
 		<g:hiddenField name="id" value="${command?.id}"/>
 		<g:hiddenField name="inventory.id" value="${command?.inventory?.id}"/>
@@ -35,11 +35,8 @@
 					<label><warehouse:message code="transaction.destination.label"/></label>
 				</td>
 				<td class="value">
-					<span>
-						<g:selectTransactionDestination name="destination.id" class="chzn-select-deselect"
-							value="${command?.destination?.id}" noSelection="['null': '']"/>
-
-					</span>
+					<g:selectTransactionDestination name="destination.id" class="chzn-select-deselect"
+						value="${command?.destination?.id}" noSelection="['null': '']"/>
 				</td>
 			</tr>
 			<tr class="prop">

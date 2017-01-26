@@ -1,5 +1,5 @@
 <div class="box">
-    <h2><warehouse:message code="inventory.consumption.label"/> <g:message code="transaction.new.label"/></h2>
+    <h2><warehouse:message code="inventory.consumption.label"/></h2>
 	<g:form action="saveDebitTransaction">
 		<g:hiddenField name="id" value="${command?.id}"/>
 		<g:hiddenField name="inventory.id" value="${command?.inventory?.id}"/>

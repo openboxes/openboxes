@@ -23,18 +23,9 @@
             
 			<div class="dialog">
                 <div id="inventory-summary" class="summary">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td class="top">
-                                    <div class="title">
-                                        <warehouse:message code="inventory.browse.label" default="Browse inventory"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
+                    <p class="title">
+                        <warehouse:message code="inventory.browse.label" default="Browse inventory"/>
+                    </p>
                 </div>
 
 				<!-- Inventory Browser -->
@@ -451,11 +442,11 @@
                                 <g:set var="pageParams"
                                        value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
-
                                 <g:paginate total="${numProducts}"
                                             action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
-                                <div >
+
+                                <div class="page-size">
                                     <warehouse:message code="inventory.browseResultsPerPage.label"/>:
                                     <g:if test="${params.max != '10'}"><g:link action="browse" params="${[max:10, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
                                     <g:if test="${params.max != '25'}"><g:link action="browse" params="${[max:25, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
@@ -463,6 +454,8 @@
                                     <g:if test="${params.max != '100'}"><g:link action="browse" params="${[max:100, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
                                     <g:if test="${params.max != '-1'}"><g:link action="browse" params="${[max:-1, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
                                 </div>
+
+                                <div class="clearfix"></div>
                             </div>
 						</div>
 					</div>
