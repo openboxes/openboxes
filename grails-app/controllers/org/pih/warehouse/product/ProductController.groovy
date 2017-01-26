@@ -878,10 +878,8 @@ class ProductController {
      * @params product.id
      */
 	def exportProducts() {
-		println "export products: " + params
-		def productIds = params.list('product.id')
-		println "Product IDs: " + productIds
-		def products = productService.getProducts(productIds.toArray())
+		String [] productIds = params.list('product.id').toArray()
+		def products = productService.getProducts(productIds)
 		if (products) { 
 			def date = new Date();
 			response.setHeader("Content-disposition",
