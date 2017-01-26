@@ -61,25 +61,6 @@
                                         </select>
                                     </td>
                                 </tr>
-
-                                <%--
-                                <tr>
-                                    <td>
-                                        <label>
-                                            <warehouse:message code="transaction.transactionDate.label"/>
-
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <g:jqueryDatePicker id="transactionDateFrom" name="transactionDateFrom"
-                                                                value="${params.transactionDateFrom}" format="MM/dd/yyyy"/>
-                                            <g:jqueryDatePicker id="transactionDateTo" name="transactionDateTo"
-                                                                value="${params.transactionDateTo}" format="MM/dd/yyyy"/>
-                                        </div>
-                                    </td>
-                                </tr>
-                                --%>
                                 <tr>
                                     <td colspan="2" class="center">
 
@@ -138,11 +119,19 @@
                                                     </button>
                                                     <div class="actions">
                                                         <div class="action-menu-item">
-                                                            <g:link action="showTransaction" id="${transactionInstance?.id }">
+                                                            <g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
                                                                 <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" style="vertical-align: middle;"/>&nbsp;<warehouse:message code="transaction.view.label"/>
                                                             </g:link>
-                                                            <g:link action="editTransaction" id="${transactionInstance?.id }">
+                                                        </div>
+                                                        <div class="action-menu-item">
+                                                            <g:link controller="inventory" action="editTransaction" id="${transactionInstance?.id }">
                                                                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: middle;"/>&nbsp;<warehouse:message code="transaction.edit.label"/>
+                                                            </g:link>
+                                                        </div>
+                                                        <div class="action-menu-item">
+                                                            <g:link controller="inventory" action="deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                                <img src="${resource(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+                                                                &nbsp;${warehouse.message(code: 'transaction.delete.label')}&nbsp;
                                                             </g:link>
                                                         </div>
                                                     </div>
