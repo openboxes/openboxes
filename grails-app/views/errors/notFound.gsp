@@ -19,13 +19,14 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<h1><warehouse:message code="notFound.label" default="Page Not Found"/></h1>
+		<div class="summary">
+			<h1><warehouse:message code="notFound.label" default="Page Not Found"/></h1>
+		</div>
 		<div style="width: 25%;">
 			<div class="triangle-isosceles">
-				<warehouse:message code="errors.accessDenied.message" default="Apologies, but I can't find that page."/>
-				 
+				<warehouse:message code="errors.accessDenied.message" default="Apologies, but we can't find that page."/>
 			</div>
-			<div style="padding-left: 45px;" >
+			<div style="padding-left: 45px;" class="img-rounded" >
 				<img src="${resource(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
