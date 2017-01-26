@@ -9,19 +9,34 @@
  **/
 package org.pih.warehouse.inventory
 
-
-
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.*
+import org.junit.Before
 import spock.lang.*
 
 @TestFor(TransactionEntryController)
 @Mock(TransactionEntry)
+@Build([InventoryItem, Transaction])
 class TransactionEntryControllerSpec extends Specification {
 
+    void setup() {
+        println "setup data"
+        Transaction.build(id: "1")
+        InventoryItem.build(id: "1", lotNumber: "lot123", expirationDate: new Date()+365)
+        InventoryItem.build(id: "2", lotNumber: "lot456", expirationDate: new Date()+100)
+    }
+
+
     def populateValidParams(params) {
+
+        println Transaction.all
+        println InventoryItem.all
+
         assert params != null
-        // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
+        params["transaction.id"] = Transaction.get("1").id
+        params["inventoryItem.id"] = InventoryItem.findByLotNumber("lot456").id
+        params["quantity"] = '10'
+        params["comments"] = 'no comment'
     }
 
     void "Test the index action returns the correct model"() {
