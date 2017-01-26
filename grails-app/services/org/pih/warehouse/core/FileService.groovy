@@ -20,8 +20,6 @@ import javax.xml.bind.JAXBException
 
 import org.docx4j.TextUtils;
 import org.docx4j.XmlUtils;
-import org.docx4j.convert.out.pdf.PdfConversion;
-import org.docx4j.convert.out.pdf.viaXSLFO.Conversion;
 import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.jaxb.Context;
 //import org.docx4j.model.table.TblFactory;
@@ -409,12 +407,13 @@ class FileService {
 	 * @return
 	 */
 	void convertToPdf(WordprocessingMLPackage wordMLPackage, OutputStream outputStream) {
-		wordMLPackage.setFontMapper(new IdentityPlusMapper());
-		PdfConversion conversion = new Conversion(wordMLPackage);
+		//wordMLPackage.setFontMapper(new IdentityPlusMapper());
+		//PdfConversion conversion = new Conversion(wordMLPackage);
 		//((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
 		//OutputStream outputStream = new FileOutputStream(inputfilepath + ".pdf");
-		conversion.output(outputStream);
+		//conversion.output(outputStream);
 		//return outputStream;
+		throw new UnsupportedOperationException("PDF conversion is not currently supported")
 	}
 
 
