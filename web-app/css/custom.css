@@ -258,7 +258,7 @@ button.action-btn, button.previous, button.next {
 .middle { vertical-align: middle; }
 
 /* temporarily hide the nav bar until we figure out whether we want to keep it or not */
-.nav { display: none; } 
+/*.nav { display: none; } */
 
 li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 { 

@@ -1,300 +1,447 @@
+/* FONT STACK */
+body,
+input, select, textarea {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.1;
+}
+
+/* BASE LAYOUT */
+
+html {
+    background-color: #ddd;
+    background-image: -moz-linear-gradient(center top, #aaa, #ddd);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #aaa), color-stop(1, #ddd));
+    background-image: linear-gradient(top, #aaa, #ddd);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#aaaaaa', EndColorStr = '#dddddd');
+    background-repeat: no-repeat;
+    height: 100%;
+    /* change the box model to exclude the padding from the calculation of 100% height (IE8+) */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+html.no-cssgradients {
+    background-color: #aaa;
+}
+
+.ie6 html {
+    height: 100%;
+}
+
 html * {
     margin: 0;
-    /*padding: 0; SELECT NOT DISPLAYED CORRECTLY IN FIREFOX */
 }
 
-/* GENERAL */
-/*
-.spinner {
-    padding: 5px;
-    position: absolute;
-    right: 0;
-}
-*/
 
-body {
-    background: #fff;
-    color: #333;
-    /*font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;*/
+
+/* replace with .no-boxshadow body if you have modernizr available */
+.ie6 body,
+.ie7 body,
+.ie8 body {
+    border-color: #255b17;
+    border-style: solid;
+    border-width: 0 1px;
 }
-#grailsLogo {
-    padding-left: 0px;
-    margin:0;
-}
-#grailsAppName {
-    font-size: 4em;
-    font-weight: bold;
-    font-family: 'verdana';
-    letter-spacing: -1px;
-    padding-left: 0px;
-    vertical-align: middle;
+
+.ie6 body {
+    height: 100%;
 }
 
 a:link, a:visited, a:hover {
-    color: blue;
-    /*font-weight: bold;*/
-    /*font-size: 0.9em;*/ /* removed because it's distracting */
-    /*text-decoration: underline;*/
-   	text-decoration: none;	/* removed because we want to see underline */
+    color: #48802c;
+}
+
+a:hover, a:active {
+    outline: none; /* prevents outline in webkit on active links but retains it for tab focus */
 }
 
 h1 {
+    color: #48802c;
     font-weight: normal;
-    font-size: 16px;
-    /*margin: .8em 0 .3em 0;*/
+    font-size: 1.25em;
+    margin: 0.8em 0 0.3em 0;
 }
 
-/*
 ul {
-    padding-left: 5px;
-}*/
-
-input, select, textarea, button {
-    /*
-    background-color: #fcfcfc;
-    border: 1px solid #ccc;
-    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
-    */
-    margin: 2px 0;
-    padding: 2px 4px;
-}
-select {
-   padding: 2px 2px 2px 0;
-}
-textarea {
-	/*
-	width: 250px;
-	height: 150px;*/
-	vertical-align: top;
+    padding: 0;
 }
 
-input:focus, select:focus, textarea:focus {
-    /*border: 1px solid #b2d1ff;*/
-    /* Causing buttons to change background color ?? when in focus  */
+img {
+    border: 0;
 }
 
-.body {
-    /*float: left;*/
-    margin: 0px 5px 0px 0px;
+/* GENERAL */
+
+#grailsLogo a {
+    display: inline-block;
+    margin: 1em;
+}
+
+.content {
+}
+
+.content h1 {
+    border-bottom: 1px solid #CCCCCC;
+    margin: 0.8em 1em 0.3em;
+    padding: 0 0.25em;
+}
+
+.scaffold-list h1 {
+    border: none;
+}
+
+.footer {
+    background: #abbf78;
+    color: #000;
+    clear: both;
+    font-size: 0.8em;
+    margin-top: 1.5em;
+    padding: 1em;
+    min-height: 1em;
+}
+
+.footer a {
+    color: #255b17;
+}
+
+.spinner {
+    background: url(../images/spinner.gif) 50% 50% no-repeat transparent;
+    height: 16px;
+    width: 16px;
+    padding: 0.5em;
+    position: absolute;
+    right: 0;
+    top: 0;
+    text-indent: -9999px;
 }
 
 /* NAVIGATION MENU */
 
-.nav {
-    /*background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;*/
-    background-color: #eee;
-    border: 1px solid #ccc;
-    border-style: solid none solid none;
-    margin-top: 5px;
-    padding: 7px 12px;
+
+.nav ul {
+    overflow: hidden;
+    padding-left: 0;
+    zoom: 1;
 }
 
-
-.linkButton {
-    color: #333;
-	padding: 10px 5px;
-}
-.linkButton a {
-    padding: 2px 3px;
-    padding-left: 20px;
+.nav li {
+    display: block;
+    float: left;
+    list-style-type: none;
+    margin-right: 0.5em;
+    padding: 0;
 }
 
-
-.linkButton a.home {
-    background: url(../images/skin/house.png) center left no-repeat;
-}
-.linkButton a.list {
-    background: url(../images/icons/silk/table.png) center left no-repeat;
-}
-.linkButton a.create {
-    background: url(../images/icons/silk/add.png) center left no-repeat;
-}
-.linkButton a.new {
-    background: url(../images/skin/new.png) center left no-repeat;
+.nav a {
+    color: #666666;
+    display: block;
+    padding: 0.25em 0.7em;
+    text-decoration: none;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
 }
 
-.linkButton a.ALL {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.NEW {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.OPEN {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.FULFILLED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.CANCELED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+.nav a:active, .nav a:visited {
+    color: #666666;
 }
 
-.linkButton a.order-status-PENDING {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.order-status-PLACED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.order-status-RECEIVED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+.nav a:focus, .nav a:hover {
+    background-color: #999999;
+    color: #ffffff;
+    outline: none;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 
-.linkButton a.request-status-NEW {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-REQUESTED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-PENDING {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-PICKED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-OPEN {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-FULFILLED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-CANCELED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-PLACED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-RECEIVED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.request-status-SHIPPED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.shipment-status-PENDING {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.shipment-status-SHIPPED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.shipment-status-RECEIVED {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+.no-borderradius .nav a:focus, .no-borderradius .nav a:hover {
+    background-color: transparent;
+    color: #444444;
+    text-decoration: underline;
 }
 
-
-.linkButton a.report_low {
-    background: url(../images/icons/silk/chart_bar.png) center left no-repeat;
-}
-.linkButton a.report_reorder {
-    background: url(../images/icons/silk/arrow_refresh.png) center left no-repeat;
-}
-.linkButton a.report_expiring {
-    background: url(../images/icons/silk/clock.png) center left no-repeat;
-}
-.linkButton a.report_expired {
-    background: url(../images/icons/silk/clock_red.png) center left no-repeat;
-}
-.linkButton a.report_consumption {
-    background: url(../images/icons/silk/package_white.png) center left no-repeat;
-}
-.linkButton a.report_transactions {
-    background: url(../images/icons/silk/calendar_view_day.png) center left no-repeat;
-}
-.linkButton a.report_shipping {
-    background: url(../images/icons/silk/lorry.png) center left no-repeat;
-}
-.linkButton a.report_inventory {
-    background: url(../images/icons/silk/package.png) center left no-repeat;
-}
-.linkButton a.settings {
-    background: url(../images/icons/silk/cog.png) center left no-repeat;
-}
-.linkButton a.supported {
-    background: url(../images/icons/silk/accept.png) center left no-repeat;
-}
-.linkButton a.formulary {
-    background: url(../images/icons/silk/pill.png) center left no-repeat;
-}
-.linkButton a.stocked {
-    background: url(../images/icons/silk/tick.png) center left no-repeat;
-}
-.linkButton a.notSupported {
-    background: url(../images/icons/silk/decline.png) center left no-repeat;
+.nav a.home, .nav a.list, .nav a.create {
+    background-position: 0.7em center;
+    background-repeat: no-repeat;
+    text-indent: 25px;
 }
 
+.nav a.home {
+    background-image: url(../images/skin/house.png);
+}
+
+.nav a.list {
+    background-image: url(../images/skin/database_table.png);
+}
+
+.nav a.create {
+    background-image: url(../images/skin/database_add.png);
+}
+
+/* CREATE/EDIT FORMS AND SHOW PAGES */
+
+fieldset,
+.property-list {
+    margin: 0.6em 1.25em 0 1.25em;
+    padding: 0.3em 1.8em 1.25em;
+    position: relative;
+    zoom: 1;
+    border: none;
+}
+
+.property-list .fieldcontain {
+    list-style: none;
+    overflow: hidden;
+    zoom: 1;
+}
+
+.fieldcontain {
+    margin-top: 1em;
+}
+
+.fieldcontain label,
+.fieldcontain .property-label {
+    color: #666666;
+    text-align: right;
+    width: 25%;
+}
+
+.fieldcontain .property-label {
+    float: left;
+}
+
+.fieldcontain .property-value {
+    display: block;
+    margin-left: 27%;
+}
+
+label {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 0.25em 0 0;
+}
+
+input, select, textarea {
+    background-color: #fcfcfc;
+    border: 1px solid #cccccc;
+    font-size: 1em;
+    padding: 0.2em 0.4em;
+}
+
+select {
+    padding: 0.2em 0.2em 0.2em 0;
+}
+
+select[multiple] {
+    vertical-align: top;
+}
+
+textarea {
+    width: 250px;
+    height: 150px;
+    overflow: auto; /* IE always renders vertical scrollbar without this */
+    vertical-align: top;
+}
+
+input[type=checkbox], input[type=radio] {
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+}
+
+input:focus, select:focus, textarea:focus {
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    outline: 0;
+    -moz-box-shadow: 0 0 0.5em #ffffff;
+    -webkit-box-shadow: 0 0 0.5em #ffffff;
+    box-shadow: 0 0 0.5em #ffffff;
+}
+
+.required-indicator {
+    color: #48802C;
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 0.3em;
+    position: relative;
+    top: 0.1em;
+}
+
+ul.one-to-many {
+    display: inline-block;
+    list-style-position: inside;
+    vertical-align: top;
+}
+
+.ie6 ul.one-to-many, .ie7 ul.one-to-many {
+    display: inline;
+    zoom: 1;
+}
+
+ul.one-to-many li.add {
+    list-style-type: none;
+}
+
+/* EMBEDDED PROPERTIES */
+
+fieldset.embedded {
+    background-color: transparent;
+    border: 1px solid #CCCCCC;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+fieldset.embedded legend {
+    margin: 0 1em;
+}
 
 /* MESSAGES AND ERRORS */
 
+.errors,
 .message {
-    background: #f3f8fc url(../images/skin/information.png) 8px 50% no-repeat;
+    font-size: 0.8em;
+    line-height: 2;
+    margin: 1em 2em;
+    padding: 0.25em;
+}
+
+.message {
+    background: #f3f3ff;
     border: 1px solid #b2d1ff;
     color: #006dba;
-    margin: 5px 0 5px 0;
-    padding: 5px 5px 5px 30px
+    -moz-box-shadow: 0 0 0.25em #b2d1ff;
+    -webkit-box-shadow: 0 0 0.25em #b2d1ff;
+    box-shadow: 0 0 0.25em #b2d1ff;
 }
 
-div.errors {
+.errors {
     background: #fff3f3;
-    border: 1px solid red;
+    border: 1px solid #ffaaaa;
     color: #cc0000;
-    margin: 10px 0 5px 0;
-    padding: 5px 0 5px 0;
+    -moz-box-shadow: 0 0 0.25em #ff8888;
+    -webkit-box-shadow: 0 0 0.25em #ff8888;
+    box-shadow: 0 0 0.25em #ff8888;
 }
 
-div.errors ul {
-    list-style: none;
+.errors ul,
+.message {
     padding: 0;
 }
-div.errors li {
-	background: url(../images/skin/exclamation.png) 8px 0% no-repeat;
-    line-height: 16px;
-    padding-left: 30px;
+
+.errors li {
+    list-style: none;
+    background: transparent url(../images/skin/exclamation.png) 0.5em 50% no-repeat;
+    text-indent: 2.2em;
 }
 
-td.errors select {
-    border: 1px solid red;
+.message {
+    background: transparent url(../images/skin/information.png) 0.5em 50% no-repeat;
+    text-indent: 2.2em;
 }
-td.errors input {
-    border: 1px solid red;
+
+/* form fields with errors */
+
+.error input, .error select, .error textarea {
+    background: #fff3f3;
+    border-color: #ffaaaa;
+    color: #cc0000;
+}
+
+.error input:focus, .error select:focus, .error textarea:focus {
+    -moz-box-shadow: 0 0 0.5em #ffaaaa;
+    -webkit-box-shadow: 0 0 0.5em #ffaaaa;
+    box-shadow: 0 0 0.5em #ffaaaa;
+}
+
+/* same effects for browsers that support HTML5 client-side validation (these have to be specified separately or IE will ignore the entire rule) */
+
+input:invalid, select:invalid, textarea:invalid {
+    background: #fff3f3;
+    border-color: #ffaaaa;
+    color: #cc0000;
+}
+
+input:invalid:focus, select:invalid:focus, textarea:invalid:focus {
+    -moz-box-shadow: 0 0 0.5em #ffaaaa;
+    -webkit-box-shadow: 0 0 0.5em #ffaaaa;
+    box-shadow: 0 0 0.5em #ffaaaa;
 }
 
 /* TABLES */
 
 table {
-    /*border: 1px solid #ccc;*/		/* jmiranda: removed because it's annoying to have to disable the border */
+    border-top: 1px solid #DFDFDF;
+    border-collapse: collapse;
     width: 100%;
+    margin-bottom: 1em;
 }
+
 tr {
     border: 0;
 }
+
+tr>td:first-child, tr>th:first-child {
+    padding-left: 1.25em;
+}
+
+tr>td:last-child, tr>th:last-child {
+    padding-right: 1.25em;
+}
+
 td, th {
-    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
-    line-height: 12px;
-    padding: 6px 6px;
+    line-height: 1.5em;
+    padding: 0.5em 0.6em;
     text-align: left;
     vertical-align: top;
 }
+
 th {
-    /*background: #fff url(../images/skin/shadow.jpg);*/
-    color: #666;
-    font-size: 11px;
+    background-color: #efefef;
+    background-image: -moz-linear-gradient(top, #ffffff, #eaeaea);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ffffff), color-stop(1, #eaeaea));
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#ffffff', EndColorStr = '#eaeaea');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#eaeaea')";
+    color: #666666;
     font-weight: bold;
-    line-height: 17px;
-    padding: 2px 6px;
-    border-top: 1px solid #f2f2f2;
+    line-height: 1.7em;
+    padding: 0.2em 0.6em;
 }
-th a:link, th a:visited, th a:hover {
-    color: #333;
+
+thead th {
+    white-space: nowrap;
+}
+
+th a {
     display: block;
-    font-size: 10px;
     text-decoration: none;
-    width: 100%;
 }
-th.asc a, th.desc a {
+
+th a:link, th a:visited {
+    color: #666666;
+}
+
+th a:hover, th a:focus {
+    color: #333333;
+}
+
+th.sortable a {
     background-position: right;
     background-repeat: no-repeat;
+    padding-right: 1.1em;
 }
+
 th.asc a {
     background-image: url(../images/skin/sorted_asc.gif);
 }
+
 th.desc a {
     background-image: url(../images/skin/sorted_desc.gif);
 }
@@ -302,278 +449,132 @@ th.desc a {
 .odd {
     background: #f7f7f7;
 }
+
 .even {
-	background: #fff;
+    background: #ffffff;
 }
 
-/* LIST */
-
-.list table {
-    border-collapse: collapse;
+th:hover, tr:hover {
+    background: #E1F2B6;
 }
-.list th, .list td {
-    /*border-left: 1px solid #ddd;*/
-}
-.list tbody tr:hover {
-    background: #b2d1ff; 
-}
-
-.list tbody tr.none:hover { 
-	background: none;
-}
-.list tbody tr.unhighlight:hover { 
-	background: none;
-}
-
-
 
 /* PAGINATION */
 
-.paginateButtons {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
+.pagination {
     border-top: 0;
-    color: #666;
-    font-size: 10px;
-    overflow: hidden;
-    padding: 10px 3px;
-}
-.paginateButtons a {
-    background: #fff;
-    border: 1px solid #ccc;
-    border-color: #ccc #aaa #aaa #ccc;
-    color: #666;
-    margin: 0 3px;
-    padding: 2px 6px;
-}
-.paginateButtons span {
-    padding: 2px 3px;
+    margin: 0;
+    padding: 0.3em 0.2em;
+    text-align: center;
+    -moz-box-shadow: 0 0 3px 1px #AAAAAA;
+    -webkit-box-shadow: 0 0 3px 1px #AAAAAA;
+    box-shadow: 0 0 3px 1px #AAAAAA;
+    background-color: #EFEFEF;
 }
 
-/* DIALOG */
-
-.dialog table {
-    padding: 5px 0;
+.pagination a,
+.pagination .currentStep {
+    color: #666666;
+    display: inline-block;
+    margin: 0 0.1em;
+    padding: 0.25em 0.7em;
+    text-decoration: none;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
 }
 
-.prop {
-    padding: 5px;
-}
-.prop .name {
-    text-align: left;
-    width: 10%;
-    white-space: nowrap;
-}
-.prop .value {
-    text-align: left;
-    width: 90%;
-}
-/* allows table to be flush with its parent table cell */
-.prop .table { 
-	padding: 0px;
+.pagination a:hover, .pagination a:focus,
+.pagination .currentStep {
+    background-color: #999999;
+    color: #ffffff;
+    outline: none;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 
-/* ACTION BUTTONS 
+.no-borderradius .pagination a:hover, .no-borderradius .pagination a:focus,
+.no-borderradius .pagination .currentStep {
+    background-color: transparent;
+    color: #444444;
+    text-decoration: underline;
+}
+
+/* ACTION BUTTONS */
 
 .buttons {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    color: #666;
-    font-size: 10px;
-    margin-top: 0px;
+    background-color: #efefef;
     overflow: hidden;
-    padding: 0;
+    padding: 0.3em;
+    -moz-box-shadow: 0 0 3px 1px #aaaaaa;
+    -webkit-box-shadow: 0 0 3px 1px #aaaaaa;
+    box-shadow: 0 0 3px 1px #aaaaaa;
+    margin: 0.1em 0 0 0;
+    border: none;
 }
 
-.buttons input {
-    background: #fff;
+.buttons input,
+.buttons a {
+    background-color: transparent;
     border: 0;
-    color: #333;
+    color: #666666;
     cursor: pointer;
-    font-size: 10px;
-    font-weight: bold;
-    margin-left: 3px;
+    display: inline-block;
+    margin: 0 0.25em 0;
     overflow: visible;
-    padding: 2px 6px;
-}
-.buttons input.delete {
-    background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
-    padding-left: 28px;
-}
-.buttons input.edit {
-    background: transparent url(../images/skin/database_edit.png) 5px 50% no-repeat;
-    padding-left: 28px;
-}
-.buttons input.save {
-    background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
-    padding-left: 28px;
-}
-*/
+    padding: 0.25em 0.7em;
+    text-decoration: none;
 
-/* more menu button icons */
-.menuButton { 
-	padding-left: 0px;
-}
-.menuButton a { 
-	padding-left: 15px;
-}
-.linkButton a.alert {
-    background: url(../images/icons/silk/alert.png) center left no-repeat;
-}
-.linkButton a.error {
-    background: url(../images/icons/silk/error.png) center left no-repeat;
-}
-.linkButton a.email {
-    background: url(../images/icons/silk/email.png) center left no-repeat;
-}
-.linkButton a.settings {
-    background: url(../images/icons/settings.png) center left no-repeat;
-}
-.linkButton a.shipment {
-    background: url(../images/icons/truck.png) center left no-repeat;
-}
-.linkButton a.drugRoute {
-    background: url(../images/icons/silk/pill_go.png) center left no-repeat;
-}
-.linkButton a.drugClass {
-    background: url(../images/icons/silk/pill.png) center left no-repeat;
-}
-.linkButton a.warehouse {
-    background: url(../images/icons/silk/building.png) center left no-repeat;
-}
-.linkButton a.site {
-    background: url(../images/icons/silk/map.png) center left no-repeat;
-}
-.linkButton a.location {
-    background: url(../images/icons/silk/building.png) center left no-repeat;
-}
-.linkButton a.locationType {
-    background: url(../images/icons/silk/building_key.png) center left no-repeat;
-}
-.linkButton a.inventory {
-    background: url(../images/icons/silk/book.png) center left no-repeat;
-}
-.linkButton a.eventType {
-    background: url(../images/icons/silk/calendar.png) center left no-repeat;
-}
-.linkButton a.import {
-    background: url(../images/icons/silk/table_add.png) center left no-repeat;
-}
-.linkButton a.menu {
-    background: url(../images/icons/silk/document.png) center left no-repeat;
-}
-.linkButton a.account {
-    background: url(../images/icons/document.png) center left no-repeat;
-}
-.linkButton a.main {
-    background: url(../images/icons/document.png) center left no-repeat;
-}
-.linkButton a.auth {
-    background: url(../images/icons/document.png) center left no-repeat;
-}
-.linkButton a.user {
-    background: url(../images/icons/user.png) center left no-repeat;
-}
-.linkButton a.role {
-    background: url(../images/icons/silk/shield.png) center left no-repeat;
-}
-.linkButton a.admins {
-    background: url(../images/icons/users.png) center left no-repeat;
-}
-.linkButton a.group {
-    background: url(../images/icons/silk/group.png) center left no-repeat;
-}
-.linkButton a.people {
-    background: url(../images/icons/silk/group.png) center left no-repeat;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
 }
 
-.linkButton a.admin {
-    background: url(../images/icons/profile.png) center left no-repeat;
+.buttons input:hover, .buttons input:focus,
+.buttons a:hover, .buttons a:focus {
+    background-color: #999999;
+    color: #ffffff;
+    outline: none;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
-.linkButton a.transaction {
-    background: url(../images/icons/document.png) center left no-repeat;
+
+.no-borderradius .buttons input:hover, .no-borderradius .buttons input:focus,
+.no-borderradius .buttons a:hover, .no-borderradius .buttons a:focus {
+    background-color: transparent;
+    color: #444444;
+    text-decoration: underline;
 }
-.linkButton a.stockCard {
-	background: url(../images/icons/silk/book.png) center left no-repeat;
+
+.buttons .delete, .buttons .edit, .buttons .save {
+    background-position: 0.7em center;
+    background-repeat: no-repeat;
+    text-indent: 25px;
 }
-.linkButton a.recordInventory {
-	background: url(../images/icons/silk/book_add.png) center left no-repeat;
+
+.ie6 .buttons input.delete, .ie6 .buttons input.edit, .ie6 .buttons input.save,
+.ie7 .buttons input.delete, .ie7 .buttons input.edit, .ie7 .buttons input.save {
+    padding-left: 36px;
 }
-.linkButton a.country {
-    background: url(../images/icons/map.png) center left no-repeat;
+
+.buttons .delete {
+    background-image: url(../images/skin/database_delete.png);
 }
-.linkButton a.inventorylineitem {
-    background: url(../images/icons/package.png) center left no-repeat;
+
+.buttons .edit {
+    background-image: url(../images/skin/database_edit.png);
 }
-.linkButton a.product {
-    background: url(../images/icons/silk/package.png) center left no-repeat;
+
+.buttons .save {
+    background-image: url(../images/skin/database_save.png);
 }
-.linkButton a.order {
-    background: url(../images/icons/silk/order.png) center left no-repeat;
+
+a.skip {
+    position: absolute;
+    left: -9999px;
 }
-.linkButton a.transactionentry {
-    background: url(../images/icons/silk/document.png) center left no-repeat;
-}
-.linkButton a.documentupload {
-    background: url(../images/icons/document.png) center left no-repeat;
-}
-.linkButton a.building {
-    background: url(../images/icons/building.png) center left no-repeat;
-}
-.linkButton a.shipper {
-    background: url(../images/icons/silk/lorry.png) center left no-repeat;
-}
-.linkButton a.shipperService {
-    background: url(../images/icons/silk/map.png) center left no-repeat;
-}
-.linkButton a.ups {
-    background: url(../images/icons/ups.jpg) center left no-repeat;
-}
-.linkButton a.usps {
-    background: url(../images/icons/usps.jpg) center left no-repeat;
-}
-.linkButton a.fedex {
-    background: url(../images/icons/fedex.jpg) center left no-repeat;
-}
-.linkButton a.browse {
-    background: url(../images/icons/browse.png) center left no-repeat;
-}
-.linkButton a.dashboard {
-    background: url(../images/icons/silk/application_view_tile.png) center left no-repeat;
-}
-.linkButton a.metadata {
-    background: url(../images/icons/wrench.png) center left no-repeat;
-}
-.linkButton a.bullet {
-    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-}
-.linkButton a.invalid {
-    background: url(../images/icons/silk/cross.png) center left no-repeat;
-}
-.linkButton a.new {
-    background: url(../images/icons/silk/add.png) center left no-repeat;
-}
-.linkButton a.edit {
-    background: url(../images/icons/silk/pencil.png) center left no-repeat;
-}
-.linkButton a.browse {
-    background: url(../images/icons/silk/magnifier.png) center left no-repeat;
-}
-.linkButton a.view {
-    background: url(../images/icons/silk/magnifier.png) center left no-repeat;
-}
-.linkButton a.delete {
-    background: url(../images/icons/silk/delete.png) center left no-repeat;
-}
-.linkButton a.trash {
-    background: url(../images/icons/silk/bin.png) center left no-repeat;
-}
-.linkButton a.export {
-    background: url(../images/icons/silk/arrow_down.png) center left no-repeat;
-}
-.linkButton a.indent {
-    background: url(../images/icons/indent.gif) center left no-repeat;
-}
-.linkButton a.outline {
-    background: url(../images/icons/silk/chart_organization.png) center left no-repeat;
+
+a.skip:focus, a.skip:active {
+    position: relative;
+    left: 0px;
 }

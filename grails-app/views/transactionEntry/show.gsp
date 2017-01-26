@@ -14,7 +14,8 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
+            <div class="box">
+                <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
                 <table>
                     <tbody>
                     
@@ -49,19 +50,18 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="transactionEntry.transaction.label" default="Transaction" /></td>
                             
-                            <td valign="top" class="value"><g:link controller="transaction" action="show" id="${transactionEntryInstance?.transaction?.id}">${transactionEntryInstance?.transaction?.encodeAsHTML()}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="transaction" action="edit" id="${transactionEntryInstance?.transaction?.id}">${transactionEntryInstance?.transaction?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
                     
 						<tr class="prop">
-                        	<td valign="top"></td>
-                        	<td valign="top">                         
+                        	<td valign="top" colspan="2">
 					            <div class="buttons">
 					                <g:form>
 					                    <g:hiddenField name="id" value="${transactionEntryInstance?.id}" />
-					                    <g:actionSubmit class="edit" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
+					                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 					                </g:form>
 					            </div>
 							</td>
