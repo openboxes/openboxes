@@ -67,7 +67,7 @@
 								<button name="filter" class="button icon search">
 									<warehouse:message code="default.button.filter.label"/> </button>
 
-                                   <g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
+                                   <g:link params="[downloadFormat:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
                                            class="button">Download as CSV</g:link>
 
                             </div>

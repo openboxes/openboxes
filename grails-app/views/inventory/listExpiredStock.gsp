@@ -48,14 +48,10 @@
 		            </g:form>
 				</div>
 				<div class="yui-u">
-		            <div class="box">
-                        <div class="right middle">
-                            <g:link params="[format:'csv',category:params.category]" controller="${controllerName}" action="${actionName}"
-                                    class="button">Download as CSV</g:link>
-
-                        </div>
+					<div class="box">
                         <h2>
-							<warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
+							<warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/>
+							<small>${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/></small>
                         </h2>
 						<table>
 							<tr>					
@@ -137,13 +133,17 @@
 												<tfoot>
 													<tr style="border-top: 1px solid lightgrey">
 														<td colspan="8">
-															<div>
+															<div class="buttonBar">
 																<g:render template="./actionsExpiredStock" />
-                                                            </div>
+
+																<g:link params="[downloadFormat:'csv',category:params.category]" controller="${controllerName}" action="${actionName}" class="button middle">
+																	<img src="${resource(dir:'images/icons/silk',file:'database_save.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
+																	&nbsp;Download as CSV</g:link>
+															</div>
 														</td>
-													</tr>									
+													</tr>
 												</tfoot>
-											</table>		
+											</table>
 										</form>		
 									</div>
 								</td>

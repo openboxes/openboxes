@@ -67,9 +67,9 @@
                                     </div>
                                 </div>
                             </div>
-                    </div>
+                        </div>
 
-                        <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
+                        <g:link params="[downloadFormat:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
                     </div>
                     <g:set var="totalStockValue" value="${0.00}"/>
 
