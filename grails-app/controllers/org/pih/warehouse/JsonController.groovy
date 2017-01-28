@@ -975,17 +975,24 @@ class JsonController {
 		}
 		
 		items.unique{ it.id }
-		def json = items.collect{
-            def quantity = quantityMap[it]?:0
-            def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
+		def json
+		if (items) {
+			json = items.collect {
+				def quantity = quantityMap[it]?:0
+				def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
 
-			def type = it.class.simpleName.toLowerCase()
-			[   id: it.id,
-                type: it.class,
-                url: request.contextPath + "/" + type  + "/redirectById/" + it.id,
-				value: it.name,
-                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + it.unitOfMeasure ]
+				def type = it.class.simpleName.toLowerCase()
+				[   id: it.id,
+					type: it.class,
+					url: request.contextPath + "/" + type  + "/redirectById/" + it.id,
+					value: it.name,
+					label: it.productCode + " " + it.name + " (" + manufuacturerInfo + "): " + quantity + " " + (it?.unitOfMeasure?:"each") ]
+			}
 		}
+		else {
+			json = [[id: 0, type: "none", url: "${request.contextPath}/dashboard/index", label: "${g.message(code:'default.searchResults.label', args: [0])}"]]
+		}
+
 		render json as JSON
 	}
 
