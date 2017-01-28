@@ -933,7 +933,7 @@ class ProductController {
      * Upload CSV file
      */
 	def uploadCsv(ImportDataCommand command) {
-		
+
 		log.info "uploadCsv " + params
 			
 		def columns

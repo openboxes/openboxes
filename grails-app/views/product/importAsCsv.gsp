@@ -24,6 +24,8 @@
 
             <div class="tabs tabs-ui">
                 <ul>
+                    <li><a href="#download-template-tab"><warehouse:message code="product.import.step0.label" default="Step 0"/>.
+                        <warehouse:message code="product.import.download.label" default="Download template file"/></a></li>
                     <li><a href="#upload-data-tab"><warehouse:message code="product.import.step1.label" default="Step 1"/>.
                         <warehouse:message code="product.import.upload.label" default="Upload data file"/></a></li>
                     <li><a href="#verify-data-tab">
@@ -32,11 +34,36 @@
                     <li><a href="#import-data-tab">
                         <warehouse:message code="product.import.step2.label" default="Step 3"/>.
                         <warehouse:message code="product.import.save.label" default="Import products"/></a></li>
-                    <div class="button-group">
-                        <a class="prev button icon arrowleft" href="#">Previous</a>
-                        <a class="next button icon arrowright">Next</a>
-                    </div>
                 </ul>
+
+                <div id="download-template-tab">
+                    <table>
+                        <tbody>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message code="import.file.label" default="Choose a starter data file"/></label>
+                                </td>
+                                <td class="value">
+                                    <div class="">
+                                        <g:link controller="batch" action="downloadCsvTemplate" params="[template:'products.csv']" class="button">
+                                            <warehouse:message code="import.product.template.label" default="Download CSV template"/>
+                                        </g:link>
+                                        <b>
+                                            -- OR --
+                                        </b>
+                                        <g:link controller="product" action="exportAsCsv" class="button">
+                                            <warehouse:message code="import.product.exportAll.label" default="Download CSV of all products"/>
+                                        </g:link>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr/>
+                    <div class="button-bar right">
+                        <a class="next button icon arrowright"><g:message code="default.button.next.label"/></a>
+                    </div>
+                </div>
                 <div id="upload-data-tab" style="padding: 10px;" class="ui-tabs-hide">
                     <div id="upload-form" class="dialog">
                         <g:uploadForm controller="product" action="uploadCsv" fragment="verify-data-tab">
@@ -44,24 +71,6 @@
                             <input name="type" type="hidden" value="product"/>
                             <table>
                                 <tbody>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label><warehouse:message code="import.file.label" default="Choose a starter data file"/></label>
-                                        </td>
-                                        <td class="value">
-                                            <div class="">
-                                                <g:link controller="batch" action="downloadCsvTemplate" params="[template:'products.csv']" class="button icon arrowdown">
-                                                    <warehouse:message code="import.product.template.label" default="Download CSV template"/>
-                                                </g:link>
-                                                <b>
-                                                -- OR --
-                                                </b>
-                                                <g:link controller="product" action="exportAsCsv" class="button icon arrowdown">
-                                                    <warehouse:message code="import.product.exportAll.label" default="Download CSV of all products"/>
-                                                </g:link>
-                                            </div>
-                                        </td>
-                                    </tr>
                                     <tr class="prop">
                                         <td class="name">
                                             <label><warehouse:message code="import.file.label" default="Choose the data file you'd like to import"/></label>
@@ -88,9 +97,15 @@
                                 </tbody>
                             </table>
                         </g:uploadForm>
+                        <hr/>
+                        <div class="button-bar left">
+                            <a class="prev button icon arrowleft"><g:message code="default.button.previous.label"/></a>
+                        </div>
+                        <div class="button-bar right">
+                            <a class="next button icon arrowright"><g:message code="default.button.next.label"/></a>
+                        </div>
                     </div>
                 </div>
-
                 <div id="verify-data-tab" class="ui-tabs-hide">
                     <g:if test="${command?.products && !productsHaveBeenImported}">
                         <div id="verify" class="dialog">
@@ -187,6 +202,13 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <hr/>
+                            <div class="button-bar left">
+                                <a class="prev button icon arrowleft"><g:message code="default.button.previous.label"/></a>
+                            </div>
+                            <div class="button-bar right">
+                                <a class="next button icon arrowright"><g:message code="default.button.next.label"/></a>
+                            </div>
                         </div>
                     </g:if>
                     <g:else>
@@ -266,22 +288,21 @@
                                             </script>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td class="name">
-                                        </td>
-                                        <td class="value">
-                                            <g:hiddenField name="importNow" value="${true }"/>
-                                            <button type="submit" class="button">
-                                            <%-- <img src="${resource(dir:'images/skin',file:'database_save.png')}" alt="upload" />--%>
-                                                ${warehouse.message(code: 'default.button.import.label', default: 'Import')}</button>
-                                            &nbsp;
-                                            <a href="${createLink(controller: "product", action: "importAsCsv")}" >
-                                                <warehouse:message code="default.button.cancel.label"/>
-                                            </a>
-                                        </td>
-                                    </tr>
                                     </tbody>
                                 </table>
+
+                                <hr/>
+                                <div class="button-bar left">
+                                    <a class="prev button icon arrowleft"><g:message code="default.button.previous.label"/></a>
+                                </div>
+
+                                <div class="button-bar right">
+                                    <g:hiddenField name="importNow" value="${true }"/>
+                                    <button type="submit" class="button">
+                                        <%-- <img src="${resource(dir:'images/skin',file:'database_save.png')}" alt="upload" />--%>
+                                        ${warehouse.message(code: 'default.button.import.label', default: 'Import')}</button>
+                                </div>
+
                             </div>
                         </g:form>
                     </g:if>
@@ -293,9 +314,6 @@
 
                 </div>
             </div>
-
-
-
         </div>
 			
 		<script type="text/javascript">

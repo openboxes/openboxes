@@ -41,5 +41,9 @@ class ImportDataCommand {
 		inventoryItems(nullable:true)
 		transaction(nullable:true)
 	}
+
+	String toString() {
+		return "filename: ${filename}, importFile: ${importFile}, type: ${type}, location: ${location}"
+	}
 	
 }
