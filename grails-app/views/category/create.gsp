@@ -23,30 +23,30 @@
         </g:isUserAdmin>
     </div>
 
-    <div class="yui-gd">
+    <div class="yui-ga">
         <div class="yui-u first">
-            <h1><format:category category="${categoryInstance}"/></h1>
             <g:form action="save" method="post" >
-                <fieldset>
+                <div class="box">
+                    <h2><warehouse:message code="default.create.label" args="[warehouse.message(code: 'category.label')]"/></h2>
                     <table>
                         <tbody>
-                        <tr class="prop">
-                            <td class="name">
-                                <label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
-                            </td>
-                            <td class="value">
-                                <select name="parentCategory.id" style="display: inline">
-                                    <option value="null"></option>
-                                    <g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
-                                </select>
-                            </td>
-                        </tr>
                         <tr class="prop">
                             <td valign="top" class="name ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
                                 <label for="name" class="desc"><warehouse:message code="default.name.label" default="Name" /></label>
                             </td>
                             <td class="value">
                                 <g:textField name="name" class="text" size="80" value="${categoryInstance?.name}" />
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
+                            </td>
+                            <td class="value">
+                                <select name="parentCategory.id" style="display: inline" class="chzn-select-deselect">
+                                    <option value="null"></option>
+                                    <g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
+                                </select>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -58,8 +58,7 @@
                         </tr>
                         </tbody>
                     </table>
-                </fieldset>
-
+                </div>
             </g:form>
         </div>
     </div>

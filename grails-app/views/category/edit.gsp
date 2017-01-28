@@ -27,17 +27,10 @@
 
                 <g:form action="saveCategory">
                     <g:hiddenField name="id" value="${categoryInstance?.id }"/>
-                    <fieldset>
-                        <legend><h1><format:category category="${categoryInstance}"/></h1></legend>
+
+                    <div class="box">
+                        <h2><format:category category="${categoryInstance}"/></h2>
                         <table>
-                            <tr class="prop odd">
-                                <td class="name">
-                                    <label><warehouse:message code="category.parent.label"/></label>
-                                </td>
-                                <td class="value">
-                                    <g:selectCategory_v2 name="parentCategory.id" class="chzn-select" value="${categoryInstance?.parentCategory?.id}"/>
-                                </td>
-                            </tr>
                             <tr class="prop even">
 
 
@@ -46,6 +39,14 @@
                                 </td>
                                 <td class="value">
                                     <g:textField name="name" value="${categoryInstance?.name }" class="text" size="60"/>
+                                </td>
+                            </tr>
+                            <tr class="prop odd">
+                                <td class="name">
+                                    <label><warehouse:message code="category.parent.label"/></label>
+                                </td>
+                                <td class="value">
+                                    <g:selectCategory_v2 name="parentCategory.id" class="chzn-select" value="${categoryInstance?.parentCategory?.id}"/>
                                 </td>
                             </tr>
                             <tr class="prop even">
@@ -127,7 +128,7 @@
                                 </td>
                             </tr>
                         </table>
-                    </fieldset>
+                    </div>
                 </g:form>
 
             </div>

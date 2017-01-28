@@ -36,10 +36,17 @@ class CategoryController {
 		def child = Category.get(params.child);
 		log.info parent;
 		log.info child;
-		child.parentCategory = parent;
-		if (!child.hasErrors() && child.save(flush:true)) { 
-			flash.message = "${warehouse.message(code: 'default.success.message')}"
-		}
+
+        if (!parent.parents.contains(child)) {
+            child.parentCategory = parent;
+            if (!child.hasErrors() && child.save(flush:true)) {
+                flash.message = "${warehouse.message(code: 'default.success.message')}"
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'category.cannotMoveParentIntoChild.message', default: "You cannot move a parent category into one of its children!")}"
+        }
+
 		redirect(action: "tree");
 	}
 
