@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.transaction.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -376,6 +377,7 @@ class InventoryItemController {
 		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]
 	}
 
+	@Transactional
 	def saveInventoryItem() {
 		log.info "save inventory item " + params
 		def productInstance = Product.get(params.product.id)
@@ -603,16 +605,16 @@ class InventoryItemController {
 			itemInstance.lotNumber = params?.lotNumber
 			
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
 			}
 			else {
-				flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
 				log.info "There were errors trying to save inventory item " + itemInstance?.errors
 				//flash.message = "There were errors"
 			}
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
 		}
 		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 	}
@@ -747,11 +749,11 @@ class InventoryItemController {
 		}
 	}
 	*/
-	
+	@Transactional
 	def create() {
 		def inventoryItem = new InventoryItem(params)
 		if (InventoryItem && inventoryItem.save() ) { 
-			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label'), params.lotNumber])}"
 		}
 		else { 
 			flash.message = "${warehouse.message(code: 'default.not.created.message', args: [warehouse.message(code: 'inventoryItem.label')])}"
@@ -765,16 +767,16 @@ class InventoryItemController {
 		if (inventoryItem) {
 			try {
 				inventoryItem.delete(flush: true)
-				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item'), params.lotNumber])}"
 				//redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item'), params.lotNumber])}"
 				//redirect(action: "list", id: params.id)
 			}
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item'), params.lotNumber])}"
 			//redirect(action: "list")
 		}
 
