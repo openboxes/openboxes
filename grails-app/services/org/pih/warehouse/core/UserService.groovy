@@ -81,12 +81,11 @@ class UserService {
 
 
     def findPersons(String query, Map params) {
-        def criteria = Person.createCriteria()
-        def results = criteria.list (params) {
+        def results = Person.createCriteria().list (params) {
             or {
-                like("firstName", query)
-                like("lastName", query)
-                like("email", query)
+                ilike("firstName", query)
+                ilike("lastName", query)
+                ilike("email", query)
             }
             order("lastName", "desc")
         }

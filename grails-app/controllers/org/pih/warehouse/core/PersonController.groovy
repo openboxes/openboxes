@@ -24,9 +24,24 @@ class PersonController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
 
+        def personInstanceList
+        def personInstanceCount = 0;
 
-		def personInstanceList = Person.list(params)
-        respond personInstanceList, model:[personInstanceCount: Person.count()]
+        params.max = Math.min(params.max ? params.int('max') : 15, 100)
+
+        if (params.q) {
+            def terms = "%" + params.q + "%"
+            personInstanceList = userService.findPersons(terms, params)
+            personInstanceCount = personInstanceList.totalCount
+        }
+        else {
+            personInstanceList = Person.list(params)
+            personInstanceCount = Person.count()
+        }
+
+        log.info "personInstanceList: " + personInstanceList
+
+        respond personInstanceList, model:[personInstanceCount: personInstanceCount]
     }
 
     def show(Person personInstance) {
