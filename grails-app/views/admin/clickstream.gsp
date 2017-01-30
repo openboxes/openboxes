@@ -106,18 +106,21 @@
                                 <a href="?limit=1000">1000</a>
                             </td>
                         </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <label><g:message code="default.button.download.label"/></label>
+                            </td>
+                            <td class="value">
+                                <g:link controller="admin" action="clickstream" params="[downloadFormat:'csv']" class="button icon log">
+                                    <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
+                                </g:link>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
 
             <div class="yui-u">
-
-                <div class="buttonBar">
-                    <g:link controller="admin" action="clickstream" params="[downloadFormat:'csv']" class="button icon log">
-                        <warehouse:message code="default.downloadAsCsv" default="Download as CSV"/>
-                    </g:link>
-                </div>
-
 
                 <div class="box">
                     <h2><warehouse:message code="clickstream.label" default="Clickstream"/>
