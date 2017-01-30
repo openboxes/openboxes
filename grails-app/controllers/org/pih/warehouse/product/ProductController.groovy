@@ -580,12 +580,9 @@ class ProductController {
 	}
 
 	def barcode() {
-		BarcodeFormat format = BarcodeFormat.valueOf(params.barcodeFormat)
-		File file = File.createTempFile("barcode-", ".png")
-		barcodeService.renderImageToFile(file, params.data, (params.width?:125) as int, (params.height?:50) as int, format)
-		response.contentType = "image/png"
-		response.outputStream << file.bytes
-		file.delete()
+		BarcodeFormat format = params.barcodeFormat ? BarcodeFormat.valueOf(params.barcodeFormat) : BarcodeFormat.CODE_128
+        barcodeService.renderImage(response, params.data, (params.width?:125) as int, (params.height?:50) as int, format)
+        return;
 	}
 
 
