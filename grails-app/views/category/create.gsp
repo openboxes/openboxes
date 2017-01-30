@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
+    <g:set var="entityName" value="${warehouse.message(code: 'category.label', default: 'Category')}" />
     <title><warehouse:message code="category.productCategories.label" /></title>
 </head>
 <body>
@@ -16,17 +17,18 @@
     </g:hasErrors>
 
 
-    <div class="buttonBar">
-        <g:link class="button" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-        <g:isUserAdmin>
-            <g:link class="button" controller="category" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-        </g:isUserAdmin>
+    <div class="nav" role="navigation">
+        <ul>
+            <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+            <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+            <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+        </ul>
     </div>
 
     <div class="yui-ga">
         <div class="yui-u first">
             <g:form action="save" method="post" >
-                <div class="box">
+                <div class="dialog box">
                     <h2><warehouse:message code="default.create.label" args="[warehouse.message(code: 'category.label')]"/></h2>
                     <table>
                         <tbody>
@@ -43,10 +45,8 @@
                                 <label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
                             </td>
                             <td class="value">
-                                <select name="parentCategory.id" style="display: inline" class="chzn-select-deselect">
-                                    <option value="null"></option>
-                                    <g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
-                                </select>
+                                <g:selectCategory name="parentCategory.id" class="chzn-select-deselect"
+                                                  noSelection="['null':'']"/>
                             </td>
                         </tr>
                         <tr class="prop">

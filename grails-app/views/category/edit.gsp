@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
+    <g:set var="entityName" value="${warehouse.message(code: 'category.label', default: 'Category')}" />
     <title><warehouse:message code="category.productCategories.label" /></title>
 </head>
 <body>
@@ -15,11 +16,12 @@
             <div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
         </g:hasErrors>
 
-        <div class="buttonBar">
-            <g:link class="button" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-            <g:isUserAdmin>
-                <g:link class="button" controller="category" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-            </g:isUserAdmin>
+        <div class="nav" role="navigation">
+            <ul>
+                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+            </ul>
         </div>
 
         <div class="yui-ga">
@@ -28,7 +30,7 @@
                 <g:form action="saveCategory">
                     <g:hiddenField name="id" value="${categoryInstance?.id }"/>
 
-                    <div class="box">
+                    <div class="dialog box">
                         <h2><format:category category="${categoryInstance}"/></h2>
                         <table>
                             <tr class="prop even">
@@ -123,6 +125,9 @@
                                 <td colspan="2" style="text-align:center">
 
                                     <button type="submit" name="save" class="button">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
+                                    <g:link action="deleteCategory" id="${category?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" class="button">
+                                        ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+                                    </g:link>
                                     &nbsp;
                                     <g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                 </td>

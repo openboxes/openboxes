@@ -9,13 +9,15 @@
 **/ 
 package org.pih.warehouse.product
 
+import grails.transaction.Transactional
+
 class CategoryController {
 
 	def productService;
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
-        redirect(action: "list", params: params)
+        redirect(action: "tree", params: params)
     }
 	
 	
@@ -51,25 +53,31 @@ class CategoryController {
 	}
 
 	def saveCategory() {
-		log.info params;
-		
-		def categoryInstance = Category.get(params.id)		
+        def rootCategory = productService.getRootCategory()
+		def categoryInstance = Category.get(params.id)
 		if (!categoryInstance) {
 			categoryInstance = new Category(params)
 		}
 		else {
 			categoryInstance.properties = params;
 		}
+
+        // If a parent category is not selected, but the system already has a root
+        // category then we assign current root category as parent
+        if (!categoryInstance.parentCategory && rootCategory) {
+            categoryInstance.parentCategory = rootCategory
+        }
 		
 		if (!categoryInstance.hasErrors() && categoryInstance.save()) {
 			flash.message = "${warehouse.message(code: 'category.saved.message', arg: [format.category(category:categoryInstance)])}"
-			redirect(action: "tree", model: [rootCategory : productService.getRootCategory()])
+			redirect(action: "tree", model: [rootCategory : rootCategory])
 		}
 		else {	
 			render(view: "edit", model: [categoryInstance: categoryInstance])
 		}
 	}
-	
+
+    @Transactional
 	def deleteCategory() {
 		log.info params
 		def categoryInstance = Category.get(params.id)
@@ -77,6 +85,7 @@ class CategoryController {
 		if (categoryInstance) { 
 			try { 
 				categoryInstance.delete(flush:true);
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
 			} catch (Exception e) { 
 				//categoryInstance.errors.reject(e.getMessage())
 				throw e;
@@ -105,8 +114,17 @@ class CategoryController {
         return [categoryInstance: categoryInstance, rootCategory: productService.getRootCategory()]
     }
 
+    @Transactional
     def save() {
+        log.info "save: " + params
+        def rootCategory = productService.getRootCategory()
         def categoryInstance = new Category(params)
+
+        // If a parent category is not selected, but the system already has a root
+        // category then we assign current root category as parent
+        if (!categoryInstance.parentCategory && rootCategory) {
+            categoryInstance.parentCategory = rootCategory
+        }
 
         if (categoryInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
@@ -140,7 +158,10 @@ class CategoryController {
         }
     }
 
+    @Transactional
     def update() {
+        log.info "update: " + params
+
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {
             if (params.version) {
