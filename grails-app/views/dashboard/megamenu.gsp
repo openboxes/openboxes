@@ -467,7 +467,7 @@
                     </div>
 
                     <div class="megaButton">
-                        <g:link controller="locationGroup" action="list" class="site">
+                        <g:link controller="locationGroup" action="index" class="site">
                             <warehouse:message code="location.sites.label" />
                         </g:link>
                     </div>
@@ -477,12 +477,12 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="shipper" action="list" class="shipper">
+                        <g:link controller="shipper" action="index" class="shipper">
                             <warehouse:message code="location.shippers.label" />
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="locationType" action="list"
+                        <g:link controller="locationType" action="index"
                             class="locationType">
                             <warehouse:message code="location.locationTypes.label" />
                         </g:link>
@@ -494,7 +494,7 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="person" action="list" class="people">
+                        <g:link controller="person" action="index" class="people">
                             <warehouse:message code="person.list.label" />
                         </g:link>
                     </div>

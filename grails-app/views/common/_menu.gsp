@@ -253,7 +253,7 @@
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link controller="person" action="list"><warehouse:message code="person.list.label"/></g:link>
+					<g:link controller="person" action="index"><warehouse:message code="person.list.label"/></g:link>
 				</span>		
 			</li>
 			<li>
