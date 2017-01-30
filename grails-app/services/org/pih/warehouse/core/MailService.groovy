@@ -239,7 +239,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) { 
-		sendHtmlMailWithAttachment(userInstance, userInstance?.email, subject, body, bytes, name, mimeType, null)
+		sendHtmlMailWithAttachment(userInstance, [userInstance?.email], null, subject, body, bytes, name, mimeType)
 	}	
 
 	/**
