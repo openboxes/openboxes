@@ -20,31 +20,23 @@
 	            </div>
             </g:hasErrors>
 
-			<div class="buttonBar">
-				<g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
-				<g:isUserAdmin>
-					<g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
-				</g:isUserAdmin>
+			<div class="nav" role="navigation">
+				<ul>
+					<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+					<li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+					<li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+				</ul>
 			</div>
-
 
             <g:form method="post" >
                 	<g:hiddenField name="id" value="${attributeInstance?.id}" />
                 	<g:hiddenField name="version" value="${attributeInstance?.version}" />
-	                <div class="box">
-						<h2>${attributeInstance.name}</h2>
+	                <div class="dialog box">
+						<h2><warehouse:message code="default.${createEdit}.label" args="[entityName]" /></h2>
 
 						<table>
 	                        <tbody>
 
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label for="name"><warehouse:message code="default.id.label" default="ID" /></label>
-									</td>
-									<td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'id', 'errors')}">
-										${attributeInstance?.id?:"new"}
-									</td>
-								</tr>
 
 	                            <tr class="prop">
 	                                <td valign="top" class="name">

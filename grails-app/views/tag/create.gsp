@@ -19,8 +19,18 @@
 	                <g:renderErrors bean="${tagInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
+            </div>
+
             <g:form action="save" method="post" >
-                <div class="dialog">
+                <div class="dialog box">
+                    <h2><warehouse:message code="default.create.label" args="[entityName]" /></h2>
                     <table>
                         <tbody>
 
@@ -33,6 +43,7 @@
                                 </td>
                             </tr>
 
+                            <%--
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="updatedBy"><warehouse:message code="tag.updatedBy.label" default="Updated By" /></label>
@@ -68,16 +79,23 @@
                                     <g:datePicker name="lastUpdated" precision="minute" value="${tagInstance?.lastUpdated}"  />
                                 </td>
                             </tr>
+                            --%>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
+
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'lastUpdated', 'errors')}">
+                                    <div class="left">
+                                        <g:submitButton name="create" class="button" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
+                                        <g:link action="list" class="button">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+                                    </div>
+                                </td>
+                            </tr>
 
 
                         </tbody>
                     </table>
-                    <div class="buttons center">
-                        <g:submitButton name="create" class="button" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
-
-                        <g:link action="list" class="button">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-
-                    </div>
 
                 </div>
             </g:form>

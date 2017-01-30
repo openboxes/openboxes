@@ -15,13 +15,14 @@
 				<div class="message">${flash.message}</div>
             </g:if>
             <div>
-            
-				<div class="buttonBar">
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
-	            	<g:isUserAdmin>
-                        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
-	                </g:isUserAdmin>
-            	</div>
+
+                <div class="nav" role="navigation">
+                    <ul>
+                        <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                        <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                        <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                    </ul>
+                </div>
 
 
 
@@ -97,13 +98,14 @@
 
                     <div class="yui-u">
 
-                        <div class="box">
+
+                        <div class="dialog box">
                             <h2>
-                                Showing ${productInstanceTotal > params.max ? params.max : productInstanceTotal} of ${productInstanceTotal} ${warehouse.message(code:'products.label')}
-                                <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button icon arrowdown">${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}</g:link>
-
+                                <g:message code="default.list.label" args="[entityName]"/>
+                                <small><g:message code="default.showing.message" args="[params.max]"/></small>
+                                <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]"
+                                        class="button">${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}</g:link>
                             </h2>
-
 
                             <table>
                                 <thead>
@@ -120,8 +122,10 @@
                                         <g:sortableColumn property="vendorCode" title="${warehouse.message(code: 'product.vendorCode.label')}" params="${params}"/>
                                         <g:sortableColumn property="createdBy" title="${warehouse.message(code: 'default.createdBy.label')}" params="${params}"/>
                                         <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'default.dateCreated.label')}" params="${params}"/>
+                                        <%--
                                         <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" params="${params}"/>
                                         <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" params="${params}"/>
+                                        --%>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -163,21 +167,23 @@
                                                 ${productInstance?.createdBy }
                                             </td>
                                             <td align="center">
-                                                ${productInstance?.dateCreated }
+                                                <g:formatDate date="${productInstance?.dateCreated }"/>
                                             </td>
+                                            <%--
                                             <td align="center">
                                                 ${productInstance?.updatedBy }
                                             </td>
                                             <td align="center">
                                                 ${productInstance?.lastUpdated }
                                             </td>
+                                            --%>
                                         </tr>
                                     </g:each>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="paginateButtons">
-                            <g:paginate total="${productInstanceTotal}" params="${params }" />
+                            <div class="pagination">
+                                <g:paginate total="${productInstanceTotal}" params="${params }" />
+                            </div>
                         </div>
 
                     </div>

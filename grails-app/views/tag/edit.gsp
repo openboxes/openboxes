@@ -21,6 +21,14 @@
 	            </div>
             </g:hasErrors>
 
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
+            </div>
+
 
             <div class="yui-g">
                 <div class="yui-u first">
@@ -58,7 +66,8 @@
                                           <label for="updatedBy.id"><warehouse:message code="tag.updatedBy.label" default="Updated By" /></label>
                                         </td>
                                         <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'updatedBy', 'errors')}">
-                                            <g:select name="updatedBy.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${tagInstance?.updatedBy?.id}" noSelection="['null': '']" />
+                                            <g:select name="updatedBy.id" from="${org.pih.warehouse.core.User.list()}" class="chzn-select-deselect"
+                                                      optionKey="id" value="${tagInstance?.updatedBy?.id}" noSelection="['null': '']" />
                                         </td>
                                     </tr>
 
@@ -67,7 +76,8 @@
                                           <label for="createdBy.id"><warehouse:message code="tag.createdBy.label" default="Created By" /></label>
                                         </td>
                                         <td valign="top" class="value ${hasErrors(bean: tagInstance, field: 'createdBy', 'errors')}">
-                                            <g:select name="createdBy.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${tagInstance?.createdBy?.id}" noSelection="['null': '']" />
+                                            <g:select name="createdBy.id" from="${org.pih.warehouse.core.User.list()}" class="chzn-select-deselect"
+                                                      optionKey="id" value="${tagInstance?.createdBy?.id}" noSelection="['null': '']" />
                                         </td>
                                     </tr>
 
@@ -110,7 +120,7 @@
                 </div>
                 <div class="yui-u">
 
-                    <div class="box">
+                    <div class="dialog box">
                         <h2>
                             <warehouse:message code="tag.products.label" default="Products" />
                             (${tagInstance?.products?.size()})
@@ -126,7 +136,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="right">
+                                    <td class="left">
                                         <button class="button icon add">
                                             ${warehouse.message(code:'tag.addToProducts.label', default: 'Add to products')}
                                         </button>

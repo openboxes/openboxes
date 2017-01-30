@@ -15,28 +15,21 @@
             </g:if>
 
 
-            <div class="buttonBar">
-                <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
-                <g:isUserAdmin>
-                    <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
-                </g:isUserAdmin>
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="list"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
             </div>
 
+            <div class="dialog box">
 
-            <div class="box">
-
-                <h2>${attributeInstance.name}</h2>
+                <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
 
                 <table>
                     <tbody>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="default.id.label" default="Id" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: attributeInstance, field: "id")}</td>
-                            
-                        </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="default.name.label" default="Name" /></td>
                             
