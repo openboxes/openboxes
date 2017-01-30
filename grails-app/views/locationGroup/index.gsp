@@ -20,7 +20,8 @@
             </div>
 
 
-			<div class="box">           	
+			<div class="box">
+                <h2><warehouse:message code="locationGroups.label" /></h2>
                 <table>
                     <thead>
                         <tr>      
@@ -53,7 +54,7 @@
                 </table>
             </div>
             <div class="paginateButtons">
-                <g:paginate total="${locationGroupInstanceTotal}" />
+                <g:paginate total="${locationGroupInstanceCount}" />
             </div>
         </div>
     </body>

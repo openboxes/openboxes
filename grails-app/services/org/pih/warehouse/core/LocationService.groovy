@@ -31,7 +31,6 @@ class LocationService {
 	
 	def getLoginLocations(Location currentLocation) {
         log.info "Get login locations (currentLocation=${currentLocation?.name})"
-
         // Get all locations that match the required activity (using inclusive OR)
 		def locations = new HashSet()
 		def requiredActivities = ConfigHelper.listValue(grailsApplication.config.openboxes.chooseLocation.requiredActivities)
@@ -45,7 +44,6 @@ class LocationService {
 
 
 	Map getLoginLocationsMap(Location currentLocation) {
-        log.info "TEST Get login locations map (currentLocation=${currentLocation?.name})"
         def locationMap = [:]
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)
@@ -54,7 +52,6 @@ class LocationService {
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }
         return locationMap;
-        //return getLoginLocations(currentLocation).sort { it?.locationGroup }.reverse().groupBy { it?.locationGroup }
 	}
 	
 	List getDepots() {

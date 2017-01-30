@@ -13,7 +13,6 @@
 <head>
 	<!-- YUI -->
 	<yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
-	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'menu.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'form.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'footer.css')}" type="text/css" media="print, screen, projection" />

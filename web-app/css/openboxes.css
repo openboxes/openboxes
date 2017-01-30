@@ -61,9 +61,6 @@ a:hover {
     text-decoration: underline;
 }
 
-a.button:link,a.button:visited {
-    color:#333;
-}
 a.button:hover {
     color: white;
 }

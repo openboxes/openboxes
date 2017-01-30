@@ -21,6 +21,7 @@
             <g:render template="summary" />
 
 			<div class="dialog box">
+				<h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
 				<table>
 					<tbody>
 						<tr class="prop">
