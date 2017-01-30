@@ -504,7 +504,8 @@ class UserController {
 		try {
 			def subject = "${warehouse.message(code:'email.userPhotoChanged.message',args:[userInstance?.email])}";
 			def body = "${g.render(template:'/email/userPhotoChanged',model:[userInstance:userInstance])}"
-			mailService.sendHtmlMailWithAttachment(userInstance, subject, body.toString(), userInstance.photo, "photo.png", "image/png");
+
+            mailService.sendHtmlMailWithAttachment(userInstance, subject.toString(), body.toString(), userInstance.photo, "photo.png", "image/png");
 			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}"
 		} 
 		catch (Exception e) { 
@@ -569,5 +570,14 @@ class UserController {
 	
 		IIO.write( bi, 'JPEG', out )
 	}
-    
+
+
+	def convertUserToPerson() {
+		log.info "Convert user to person " + params
+
+		userService.convertUserToPerson(params.id)
+		redirect(controller: "person", action: "show", id: params.id)
+	}
+
+
 }

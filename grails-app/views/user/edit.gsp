@@ -115,7 +115,7 @@
 
                                 <div class="box">
                                     <h2><warehouse:message code="user.authorization.label" default="Authorization"/></h2>
-                                    <table style="width:auto;">
+                                    <table>
                                         <tbody>
 
                                             <g:isUserAdmin>
@@ -161,7 +161,7 @@
                                                     </td>
                                                     <td valign="top">
                                                         <div id="location-roles" style="overflow-y:auto; max-height:200px;">
-                                                            <table style="width:auto;">
+                                                            <table>
                                                                 <thead>
                                                                 <tr>
                                                                     <th><warehouse:message code="location.label"/></th>

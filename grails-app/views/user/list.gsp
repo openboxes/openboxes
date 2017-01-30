@@ -4,7 +4,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<title><warehouse:message code="users.label" /></title>
+    <g:set var="entityName" value="${warehouse.message(code: 'user.label', default: 'User')}" />
+    <title><warehouse:message code="users.label" /></title>
 </head>
 <body>
     <div class="body">
@@ -13,10 +14,13 @@
 	        </g:if>
 
 
-			<div class="buttonBar">
-                <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
-                <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
-           	</div>
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
+            </div>
 
             <div class="yui-gf">
                 <div class="yui-u first">

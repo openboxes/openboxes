@@ -1,5 +1,5 @@
 <g:if test="${userInstance.photo}">
-    <g:link action="viewPhoto" id="${userInstance?.id }">
+    <g:link action="viewPhoto" id="${userInstance?.id }" target="_blank">
         <img
                 src="${createLink(controller:'user', action:'viewThumb', id:userInstance.id)}"
                 style="vertical-align: middle" />

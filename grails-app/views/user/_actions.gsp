@@ -7,7 +7,7 @@
 	<div class="actions">
 		<div class="action-menu-item">
 			<g:link class="list" action="list">
-				<img src="${resource(dir:'images/icons/silk',file:'table.png')}" class="middle"/>&nbsp;
+				<img src="${resource(dir:'images/icons/silk',file:'text_list_numbers.png')}" class="middle"/>&nbsp;
 				${warehouse.message(code: 'user.list.label')}
 			</g:link>
 		</div>
@@ -31,6 +31,18 @@
 			</div>
 		</g:if>
 		<div class="action-menu-item">
+			<g:link action="toggleActivation" id="${userInstance?.id}">
+				<g:if test="${userInstance?.active}">
+					<img src="${resource(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;
+					${warehouse.message(code: 'user.deactivate.label')}
+				</g:if>
+				<g:else>
+					<img src="${resource(dir:'images/icons/silk',file:'user_add.png')}" class="middle"/>&nbsp;
+					${warehouse.message(code: 'user.activate.label')}
+				</g:else>
+			</g:link>
+		</div>
+		<div class="action-menu-item">
 			<g:link controller="user" action="changePhoto"
 				id="${userInstance?.id }">
 				<img src="${resource(dir:'images/icons/silk',file:'photo_add.png')}" class="middle"/>&nbsp;
@@ -47,6 +59,7 @@
 			</div>
 			--%>
 		<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
+			<hr>
 			<div class="action-menu-item">
 				<g:link action="sendTestEmail" id="${userInstance?.id }">
 					<img src="${resource(dir:'images/icons/silk',file:'email.png')}" class="middle"/>&nbsp;
@@ -63,21 +76,14 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
                     <warehouse:message code="user.accountConfirmed.label" default="Account confirmed email"/></g:link>
             </div>
+			<hr/>
+			<div class="action-menu-item">
+				<g:link action="convertUserToPerson" id="${userInstance?.id }">
+					<img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch_bluegreen.png')}"/>&nbsp;
+					<warehouse:message code="person.convertUserToPerson.label"/></g:link>
+			</div>
 
-
-        </g:isUserInRole>
-		<div class="action-menu-item">
-			<g:link action="toggleActivation" id="${userInstance?.id}">
-				<g:if test="${userInstance?.active}">
-                    <img src="${resource(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;
-					${warehouse.message(code: 'user.deactivate.label')}
-				</g:if>
-				<g:else>
-                    <img src="${resource(dir:'images/icons/silk',file:'user_add.png')}" class="middle"/>&nbsp;
-					${warehouse.message(code: 'user.activate.label')}
-				</g:else>
-			</g:link>
-		</div>
+		</g:isUserInRole>
 		<div class="action-menu-item">
 			<g:link class="delete" action="delete" id="${userInstance?.id}"
 				onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
