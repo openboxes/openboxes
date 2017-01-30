@@ -11,7 +11,7 @@
 </head>
 <body>
 	<div class="body">
-
+		<g:render template="summary" />
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -19,14 +19,9 @@
 		</g:if>
 		<g:form controller="location" method="post"
 			action="uploadLogo" enctype="multipart/form-data">
-			<fieldset>
-				<div class="dialog">
+				<div class="dialog box">
+					<h2><warehouse:message code="location.uploadLogo.label" /></h2>
 					<table>
-						<thead>
-							<tr>
-								<td colspan="2"><g:render template="summary" /></td>
-							</tr>
-						</thead>
 						<tbody>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message

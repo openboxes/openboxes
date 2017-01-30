@@ -80,16 +80,14 @@ class InventoryService implements ApplicationContextAware {
 	 *
 	 * @param warehouse
 	 */
-	void saveLocation(Location warehouse) {
-		log.debug("saving warehouse " + warehouse)
-		log.debug("location type " + warehouse.locationType)
-		// make sure a warehouse has an inventory
-		if (!warehouse.inventory) {
-			addInventory(warehouse)
+	void saveLocation(Location location) {
+		// make sure the location has an inventory
+		if (!location.inventory) {
+			addInventory(location)
 		}
-		log.debug warehouse.locationType
+		log.debug location.locationType
 
-		warehouse.save(failOnError: true)
+		location.save(flush:true)
 	}
 
 	/**

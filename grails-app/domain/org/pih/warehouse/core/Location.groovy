@@ -78,11 +78,26 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	
 	static transients = ["transactions", "events", "shipments", "requests", "orders" ]
 	
-	List getTransactions() { return Transaction.findAllByDestinationOrSource(this,this) }
-	List getEvents() { return Event.findAllByEventLocation(this) }
-	List getShipments() { return Shipment.findAllByOriginOrDestination(this,this) }
-	List getRequests() { return Requisition.findAllByOriginOrDestination(this,this) }
-	List getOrders() { return Order.findAllByOriginOrDestination(this,this) } 
+	List getTransactions() {
+		return Transaction.findAllByDestinationOrSource(this,this)
+	}
+
+	List getEvents() {
+		return Event.findAllByEventLocation(this)
+	}
+
+	List getShipments() {
+		return Shipment.where { origin == this || destination == this }.findAll()
+	}
+
+	List getRequests() {
+		return Requisition.where { origin == this || destination == this }.findAll()
+	}
+
+	List getOrders() {
+		return Order.where { origin == this || destination == this }.findAll()
+	}
+
 	List getUsers() { return User.findAllByWarehouse(this) }
 	
 	String toString() { return this.name } 

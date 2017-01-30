@@ -68,138 +68,195 @@
 				</ul>		
 				<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
 					<div id="tabs-transactions" class="dialog">
-						<table>
-							<tr>
-								<th>Actions</th>							
-								<th>Id</th>
-								<th>Date</th>
-								<th>Type</th>
-								<th>Inventory</th>
-								<th>Source</th>
-								<th>Destination</th>
-							</tr>
-							<g:each var="transaction" in="${locationInstance?.transactions }" status="i">
-								<tr class="${i%2?'odd':'even' }">
-									<td>
-										<g:render template="../transaction/actions" model="[transactionInstance:transaction]"/>
-									</td>
-									<td>${transaction.id }</td>
-									<td>${transaction.transactionDate }</td>
-									<td>${transaction.transactionType?.name }</td>
-									<td>${transaction.inventory }</td>
-									<td>${transaction.source }</td>
-									<td>${transaction.destination }</td>
-									<%-- 
-									<td><g:link controller="inventory" action="showTransaction" id="${transaction.id }">show</g:link></td>
-									<td><g:link controller="inventory" action="editTransaction" id="${transaction.id }">edit</g:link></td>
-									<td><g:link controller="location" action="deleteTransaction" id="${transaction.id }" 
-										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-										params="['location.id':locationInstance?.id]" fragment="tabs-transactions">delete</g:link></td>
-										--%>
-								</tr>
-							</g:each>
-						</table>
+
+                        <div class="box">
+                            <h2><g:message code="transactions.label"/></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th><g:message code="default.actions.label"/></th>
+                                        <th><g:message code="default.id.label"/></th>
+                                        <th><g:message code="transaction.date.label"/></th>
+                                        <th><g:message code="transaction.type.label"/></th>
+                                        <th><g:message code="transaction.inventory.label"/></th>
+                                        <th><g:message code="transaction.source.label"/></th>
+                                        <th><g:message code="transaction.destination.label"/></th>
+                                    </tr>
+                                </thead>
+                                <g:each var="transaction" in="${locationInstance?.transactions }" status="i">
+                                    <tr class="${i%2?'odd':'even' }">
+                                        <td>
+                                            <g:render template="../transaction/actions" model="[transactionInstance:transaction]"/>
+                                        </td>
+                                        <td>${transaction.id }</td>
+                                        <td>${transaction.transactionDate }</td>
+                                        <td>${transaction.transactionType?.name }</td>
+                                        <td>${transaction.inventory }</td>
+                                        <td>${transaction.source }</td>
+                                        <td>${transaction.destination }</td>
+                                        <%--
+                                        <td><g:link controller="inventory" action="showTransaction" id="${transaction.id }">show</g:link></td>
+                                        <td><g:link controller="inventory" action="editTransaction" id="${transaction.id }">edit</g:link></td>
+                                        <td><g:link controller="location" action="deleteTransaction" id="${transaction.id }"
+                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                            params="['location.id':locationInstance?.id]" fragment="tabs-transactions">delete</g:link></td>
+                                            --%>
+                                    </tr>
+                                </g:each>
+                            </table>
+                        </div>
 					</div>
 					<div id="tabs-shipments" class="dialog">
-						<table>
-							<tr>
-								<th>Actions</th>							
-								<th>Id</th>
-								<th>Type</th>
-								<th>Status</th>
-								<th>Date</th>
-								<th>Source</th>
-								<th>Destination</th>
-							</tr>						
-							<g:each var="shipment" in="${locationInstance?.shipments }" status="i">
-								<tr class="${i%2?'odd':'even' }">
-									<td>
-										<g:render template="../shipment/actions" model="[shipmentInstance:shipment]"/>
-									</td>
-									<td>${shipment.id }</td>
-									<td>${shipment.shipmentType?.name }</td>
-									<td>
-										<format:metadata obj="${shipment?.status?.code}"/>
-										<g:prettyDateFormat date="${shipment?.status?.date}" />
-									</td>
-									<td>
-										${shipment?.status?.date}
-									</td>
-									<td>${shipment.origin }</td>
-									<td>${shipment.destination }</td>
-								</tr>
-							</g:each>
-						</table>
+                        <div class="box">
+                        <h2><g:message code="shipments.label"/></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th><g:message code="default.actions.label"/></th>
+                                        <th><g:message code="default.id.label"/></th>
+                                        <th><g:message code="shipping.name.label"/></th>
+                                        <th><g:message code="shipping.shipmentType.label"/></th>
+                                        <th><g:message code="shipping.status.label"/></th>
+                                        <th><g:message code="shipping.origin.label"/></th>
+                                        <th><g:message code="shipping.destination.label"/></th>
+                                    </tr>
+                                </thead>
+                                <g:each var="shipment" in="${locationInstance?.shipments }" status="i">
+                                    <tr class="${i%2?'odd':'even' }">
+                                        <td>
+                                            <g:render template="../shipment/actions" model="[shipmentInstance:shipment]"/>
+                                        </td>
+                                        <td>${shipment.id }</td>
+                                        <td>${shipment.shipmentType?.name }</td>
+                                        <td>
+                                            <format:metadata obj="${shipment?.status?.code}"/>
+                                            <g:prettyDateFormat date="${shipment?.status?.date}" />
+                                        </td>
+                                        <td>
+                                            ${shipment?.status?.date}
+                                        </td>
+                                        <td>${shipment.origin }</td>
+                                        <td>${shipment.destination }</td>
+                                    </tr>
+                                </g:each>
+                            </table>
+                        </div>
 					</div>
 					<div id="tabs-events" class="dialog">
-						<table>
-							<g:each var="event" in="${locationInstance?.events }">
-								<tr>
-									<td>${event.id }</td>
-									<td>${event }</td>
-									<td><g:link controller="event" action="show" id="${event.id }">show</g:link></td>
-									<td><g:link controller="event" action="edit" id="${event.id }">edit</g:link></td>
-									<td>
-										<g:link controller="location" action="deleteEvent" id="${event.id }" 
-											onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-											params="['location.id':locationInstance?.id]" fragment="tabs-events">delete</g:link>
-									</td>
-								</tr>
-							</g:each>
-						</table>
+                        <div class="box">
+                            <h2><g:message code="events.label"/></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th><g:message code="default.id.label"/></th>
+                                        <th><g:message code="default.name.label"/></th>
+                                        <th><g:message code="default.actions.label"/></th>
+                                    </tr>
+                                </thead>
+                                <g:each var="event" in="${locationInstance?.events }" status="i">
+                                    <tr class="${i%2?'odd':'even' }">
+                                        <td>${event.id }</td>
+                                        <td>${event }</td>
+                                        <td>
+                                            <g:link controller="event" action="show" id="${event.id }" class="button"><g:message code="default.button.show.label"/></g:link>
+                                            <g:link controller="event" action="edit" id="${event.id }" class="button"><g:message code="default.button.edit.label"/></g:link>
+                                            <g:link controller="location" action="deleteEvent" id="${event.id }" class="button"
+                                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                                    params="['location.id':locationInstance?.id]" fragment="tabs-events"><g:message code="default.button.delete.label"/></g:link>
+                                        </td>
+                                    </tr>
+                                </g:each>
+                            </table>
+                        </div>
 					</div>
 					<div id="tabs-requests" class="dialog">
-						<table>
-							<g:each var="requestInstance" in="${locationInstance?.requests }">
-								<tr>
-									<td>${requestInstance.id }</td>
-									<td>${requestInstance }</td>
-									<td><g:link controller="requisition" action="show" id="${requestInstance.id }">show</g:link></td>
-									<td><g:link controller="requisition" action="edit" id="${requestInstance.id }">edit</g:link></td>
-									<td><g:link controller="location" action="deleteRequest" id="${requestInstance.id }" 
-										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-										params="['location.id':locationInstance?.id]" fragment="tabs-requests">delete</g:link></td>
-								</tr>
-							</g:each>
-						</table>
+                        <div class="box">
+                            <h2><g:message code="requisitions.label"/></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th><g:message code="default.id.label"/></th>
+                                        <th><g:message code="default.name.label"/></th>
+                                        <th><g:message code="default.actions.label"/></th>
+                                    </tr>
+                                </thead>
+                                <g:each var="requestInstance" in="${locationInstance?.requests }" status="i">
+                                    <tr class="${i%2?'odd':'even' }">
+                                        <td>${requestInstance.id }</td>
+                                        <td>${requestInstance.name }</td>
+                                        <td>
+                                            <g:link controller="requisition" action="show" id="${requestInstance.id }" class="button"><g:message code="default.button.show.label"/></g:link>
+                                            <g:link controller="requisition" action="edit" id="${requestInstance.id }" class="button"><g:message code="default.button.edit.label"/></g:link>
+                                            <g:link controller="location" action="deleteRequest" id="${requestInstance.id }" class="button"
+                                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                                    params="['location.id':locationInstance?.id]" fragment="tabs-requests"><g:message code="default.button.delete.label"/></g:link>
+                                        </td>
+                                    </tr>
+                                </g:each>
+                            </table>
+                        </div>
 					</div>
 					<div id="tabs-orders" class="dialog">
-						<table>
-							<g:each var="order" in="${locationInstance?.orders }">
-								<tr>
-									<td>${order.id }</td>
-									<td>${order }</td>
-									<td><g:link controller="order" action="show" id="${order.id }">show</g:link></td>
-									<td><g:link controller="order" action="edit" id="${order.id }">edit</g:link></td>
-									<td><g:link controller="location" action="deleteOrder" id="${order.id }" 
-										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-										params="['location.id':locationInstance?.id]" fragment="tabs-orders">delete</g:link></td>
-								</tr>
-							</g:each>
-						</table>
+						<div class="box">
+                            <h2><g:message code="orders.label"/></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th><g:message code="default.id.label"/></th>
+                                        <th><g:message code="default.name.label"/></th>
+                                        <th><g:message code="default.actions.label"/></th>
+                                    </tr>
+                                </thead>
+                                <g:each var="order" in="${locationInstance?.orders }" status="i">
+                                    <tr class="${i%2?'odd':'even' }">
+                                        <td>${order.id }</td>
+                                        <td>${order.description }</td>
+                                        <td>
+                                            <g:link controller="order" action="show" id="${order.id }" class="button"><g:message code="default.button.show.label"/></g:link>
+                                            <g:link controller="order" action="edit" id="${order.id }" class="button"><g:message code="default.button.edit.label"/></g:link>
+                                            <g:link controller="location" action="deleteOrder" id="${order.id }" class="button"
+                                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                                    params="['location.id':locationInstance?.id]" fragment="tabs-orders"><g:message code="default.button.delete.label"/></g:link>
+                                        </td>
+                                    </tr>
+                                </g:each>
+                            </table>
+                        </div>
 					</div>
 					<div id="tabs-users" class="dialog">
-						<table>
-							<g:each var="user" in="${locationInstance?.users }">
-								<tr>
-									<td>${user.id }</td>
-									<td>${user }</td>
-									<td><g:link controller="user" action="show" id="${user.id }">show</g:link></td>
-									<td><g:link controller="user" action="edit" id="${user.id }">edit</g:link></td>
-									<td><g:link controller="location" action="deleteUser" id="${user.id }" 
-										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-										params="['location.id':locationInstance?.id]" fragment="tabs-users">delete</g:link></td>
-								</tr>
-							</g:each>
-						</table>
-	
-					</div>				
+                        <div class="box">
+                            <h2><g:message code="orders.label"/></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th><g:message code="default.id.label"/></th>
+                                        <th><g:message code="default.name.label"/></th>
+                                        <th><g:message code="default.actions.label"/></th>
+                                    </tr>
+                                </thead>
+                                <g:each var="user" in="${locationInstance?.users }" status="i">
+                                    <tr class="${i%2?'odd':'even' }">
+                                        <td>${user.id }</td>
+                                        <td>${user.name }</td>
+                                        <td>
+                                            <g:link controller="user" action="show" id="${user.id }" class="button"><g:message code="default.button.show.label"/></g:link>
+                                            <g:link controller="user" action="edit" id="${user.id }" class="button"><g:message code="default.button.edit.label"/></g:link>
+                                            <g:link controller="location" action="deleteUser" id="${user.id }" class="button"
+                                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                                    params="['location.id':locationInstance?.id]" fragment="tabs-users"><g:message code="default.button.delete.label"/></g:link></td>
+                                    </tr>
+                                </g:each>
+                            </table>
+                        </div>
+					</div>
 				</g:isUserInRole>
 				<div id="tabs-details" class="dialog">
 		            <g:form method="post" action="update">
 		                <g:hiddenField name="id" value="${locationInstance?.id}" />
 		                <g:hiddenField name="version" value="${locationInstance?.version}" />
-		                
+
+                        <div class="box">
+                            <h2><g:message code="location.label"/></h2>
 		                    <table>
 		                        <tbody>
 		                            <tr class="prop">
@@ -367,9 +424,10 @@
 		                            --%>
 		                        </tbody>
 		                    </table>
-		                
-		               
-		            </g:form>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
         </div>
 	    <script type="text/javascript">
 

@@ -13,7 +13,9 @@
     </head>
     <body>
         <div class="body">
-        
+
+            <g:render template="summary"/>
+
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -22,7 +24,6 @@
 	                <g:renderErrors bean="${locationInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:render template="summary"/>
 
             <g:form method="post" action="update">
                 <g:hiddenField name="id" value="${locationInstance?.id}" />
@@ -44,15 +45,13 @@
                                         </td>
                                     </tr>
                                     <tr class="prop">
-                                        <td valign="top" class="name">
+                                        <td valign="top" class="name ${hasErrors(bean: locationInstance, field: 'locationType', 'errors')}">
                                             <label for="name"><warehouse:message code="location.locationType.label" /></label>
 
                                         </td>
-                                        <td valign="top" class="value">
+                                        <td valign="top" class="value ">
                                             <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" class="chzn-select-deselect"
                                                 optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.locationType?.id}" noSelection="['null':'']" />
-
-
                                         </td>
                                     </tr>
                                     <tr class="prop">
@@ -169,9 +168,12 @@
                                     </td>
                                     <td valign="top" class="value">
                                         <g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-                                        <g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px"
-                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}"
+                                        <g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size()+1 }"
+                                            class="chzn-select-deselect" placeholder="Use default"
+                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}"
+                                                  value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities?:''}"
                                                   noSelection="['':warehouse.message(code:'location.useDefaultActivities.label')]" />
+                                        <p class="fade"><g:message code="location.supportedActivities.message"/></p>
 
                                     </td>
                                 </tr>
@@ -181,6 +183,8 @@
                     </div>
                     <div style="width: 49%;margin: 5px; float: left;">
                         <div class="box">
+                            <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
+
                             <h2>
                                 <img src="${resource(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                                 <warehouse:message code="address.label" default="Address"/>

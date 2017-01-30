@@ -3,6 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
+        <g:set var="entityName" value="${message(code: 'location.label', default: 'Location')}" />
         <title><warehouse:message code="locations.label" /></title>
         <style>
         	.vertical-text { 
@@ -34,7 +35,17 @@
             </g:if>
            	
            	<div>
-				<div class="buttonBar">            	
+
+                <div class="nav" role="navigation">
+                    <ul>
+                        <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                        <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                        <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                    </ul>
+                </div>
+
+
+                <div class="buttonBar">
                     <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
                     <g:isUserAdmin>
                         <g:link class="button icon add" action="edit"><warehouse:message code="default.add.label"

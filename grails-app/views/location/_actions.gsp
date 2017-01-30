@@ -8,7 +8,7 @@
 		<g:if test="${params.action!='list'}">
 			<div class="action-menu-item">
 	       		<g:link class="list" action="list">
-					<img src="${resource(dir:'images/icons/silk',file:'table.png')}" class="middle"/>&nbsp;
+					<img src="${resource(dir:'images/icons/silk',file:'text_list_numbers.png')}" class="middle"/>&nbsp;
 	       			<warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
 	       		</g:link>
 			</div>

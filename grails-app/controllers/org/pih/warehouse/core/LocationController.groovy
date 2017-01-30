@@ -73,7 +73,11 @@ class LocationController {
 			return [locationInstance: locationInstance]
 		}
 	}
-	
+
+	def create() {
+		redirect(action: "edit")
+	}
+
 	def edit() {
 		def locationInstance = inventoryService.getLocation(params.id)
 		if (!locationInstance) {
@@ -84,7 +88,8 @@ class LocationController {
 			return [locationInstance: locationInstance]
 		}
 	}
-	
+
+
 	def update() {
 		def locationInstance = inventoryService.getLocation(params.id)
 
@@ -102,23 +107,23 @@ class LocationController {
 
 			locationInstance.properties = params
 
-			if (!locationInstance.hasErrors()) {
-				try {
+			if (locationInstance.validate() && !locationInstance.hasErrors()) {
+                try {
 					inventoryService.saveLocation(locationInstance)
 					if (locationInstance?.id == session?.warehouse?.id) {
 						session.warehouse = locationInstance
 					}
 					
 				} catch (ValidationException e) {
-					render(view: "edit", model: [locationInstance: locationInstance])
+                	render(view: "edit", model: [locationInstance: locationInstance])
 					return
 				}
 
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 				redirect(action: "list", id: locationInstance.id)
 			}
 			else {
-				render(view: "edit", model: [locationInstance: locationInstance])
+                render(view: "edit", model: [locationInstance: locationInstance])
 			}
 		}
 		else {
@@ -199,7 +204,7 @@ class LocationController {
 					if (!locationInstance.hasErrors()) {
 						inventoryService.saveLocation(locationInstance)
 						session.warehouse = locationInstance
-						flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), locationInstance.id])}"
+						flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 					}
 					else {
 						// there were errors, the logo was not saved
