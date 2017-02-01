@@ -9,14 +9,14 @@
                 <thead>
                     <tr class="prop odd">
                         <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
+                            <label class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></label>
                         </td>
                     </tr>
                 </thead>
     			<tbody>
                 <tr class="prop">
                     <td class="center" style="width: 1%">
-                        <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
 
                     <td>
@@ -102,7 +102,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
                     <td>
                         <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT']">
@@ -114,10 +114,6 @@
 
                     </td>
                 </tr>
-
-
-
-
 				</tbody>
                 <tfoot>
                     <tr>

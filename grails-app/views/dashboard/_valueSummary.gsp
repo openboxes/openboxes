@@ -4,7 +4,7 @@
         <warehouse:message code="inventory.value.label" default="Stock Value Summary"/>
         <%--
         <g:remoteLink controller="json" action="refreshTotalStockValue" onSuccess="refresh();" onFailure="showError();">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
+            <img src="${resource(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
         --%>
     </h2>
     <div class="widget-content" style="padding:0; margin:0">
@@ -14,7 +14,7 @@
                 <thead>
                     <tr class="prop odd">
                         <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
+                            <label class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></label>
                         </td>
                     </tr>
                 </thead>
@@ -81,7 +81,7 @@
     <h2>
         <warehouse:message code="inventory.stockValueDetails.label" default="Stock Value Details"/>
         <g:remoteLink controller="json" action="refreshTotalStockValue" onSuccess="refresh();" onFailure="showError();">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
+            <img src="${resource(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
 
     </h2>
     <div class="widget-content" style="padding:0; margin:0">
