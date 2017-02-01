@@ -11,39 +11,47 @@
     </head>
     <body>
         <div class="body">
+
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
+            </div>
+
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">
-            
-				<div class="buttonBar">
-                    <g:link action="list" class="button icon log"><warehouse:message code="default.button.list.label" default="List"/></g:link>
-                    <g:link action="create" class="button icon add"><warehouse:message code="default.button.add.label" default="Add"/></g:link>
-                    <g:link action="export" class="button icon arrowdown"><warehouse:message code="default.button.download.label" default="Download"/></g:link>
-            	</div>
-
+            <div class="dialog">
 
                 <div class="yui-gf">
                     <div class="yui-u first">
 
-                        <div class="dialog box">
+                        <div class="box">
                             <h2><warehouse:message code="filters.label" default="Filters"/></h2>
                             <g:form action="list" method="get">
-                                <g:selectLocation name="location.id"/>
-
+                                <div class="filter-list-item">
+                                    <lable></lable>
+                                    <g:selectLocation name="location.id" class="chzn-select-deselect" value="${params?.location?.id}" noSelection="['':'']"/>
+                                </div>
+                                <div class="filter-list-item">
+                                    <button class="button">${g.message(code:'default.button.filter.label')}</button>
+                                </div>
                             </g:form>
                         </div>
                     </div>
                     <div class="yui-u">
 
                         <div class="box">
-                            <h2><warehouse:message code="results.label" default="Results"/></h2>
+                            <h2>
+                                <warehouse:message code="default.list.label" args="[g.message(code:'inventoryLevels.label')]" />
+                                <g:link action="export" class="button"><warehouse:message code="default.button.download.label" default="Download"/></g:link>
+                            </h2>
 
                             <table>
                                 <thead>
                                     <tr>
-
-                                        <g:sortableColumn property="id" title="${warehouse.message(code: 'inventoryLevel.id.label', default: 'Id')}" />
 
                                         <th><warehouse:message code="inventoryLevel.product.label" default="Product" /></th>
 
@@ -64,9 +72,7 @@
                                 <g:each in="${inventoryLevelInstanceList}" status="i" var="inventoryLevelInstance">
                                     <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                                        <td><g:link action="edit" id="${inventoryLevelInstance.id}">${fieldValue(bean: inventoryLevelInstance, field: "id")}</g:link></td>
-
-                                        <td>${fieldValue(bean: inventoryLevelInstance, field: "product")}</td>
+                                        <td><g:link action="edit" id="${inventoryLevelInstance.id}">${fieldValue(bean: inventoryLevelInstance, field: "product")}</g:link></td>
 
                                         <td>${fieldValue(bean: inventoryLevelInstance, field: "inventory")}</td>
 
@@ -83,9 +89,9 @@
                                 </g:each>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="paginateButtons">
-                            <g:paginate total="${inventoryLevelInstanceTotal}" />
+                            <div class="paginateButtons">
+                                <g:paginate total="${inventoryLevelInstanceTotal}" />
+                            </div>
                         </div>
                     </div>
                 </div>

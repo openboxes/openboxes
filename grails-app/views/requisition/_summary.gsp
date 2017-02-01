@@ -153,8 +153,14 @@
             --%>
         </table>
 	</g:if>
+    <g:else>
+        <div class="title">
+            <g:message code="default.create.label" args="[g.message(code: 'requisition.label')]"/>
+
+        </div>
+    </g:else>
 </div>
-<div id="flow-header" class="buttonBar">
+<div id="flow-header">
     <%--
     <g:render template="/requisition/flowHeader" model="[requisition:requisition]"/>
     --%>

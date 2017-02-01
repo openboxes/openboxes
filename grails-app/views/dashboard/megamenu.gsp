@@ -377,6 +377,11 @@
                     <g:link controller="tag" action="list" class="list"><warehouse:message code="product.tags.label"/></g:link>
                 </div>
                 <div class="megaButton">
+                    <g:link controller="inventoryLevel" action="list" class="site">
+                        <warehouse:message code="inventoryLevels.label" default="Inventory Levels" />
+                    </g:link>
+                </div>
+                <div class="megaButton">
                     <g:link controller="unitOfMeasure" action="list" class="list"><warehouse:message code="unitOfMeasure.label"/></g:link>
                 </div>
                 <div class="megaButton">
@@ -426,11 +431,70 @@
         <li><a href="javascript:void(0)"> <warehouse:message code="configuration.label" default="Configuration" /></a>
             <div style="min-width: 200px;">
                 <div class="buttonsBar">
+                    <div class="megaButton">
+                        <g:link controller="person" action="index" class="people">
+                            <warehouse:message code="person.list.label" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="user" action="list" class="user">
+                            <warehouse:message code="users.label" />
+                        </g:link>
+                    </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="location" action="list" class="location">
+                            <warehouse:message code="locations.label" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="locationType" action="index"
+                                class="locationType">
+                            <warehouse:message code="location.locationTypes.label" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="locationGroup" action="index">
+                            <warehouse:message code="location.locationGroup.label" />
+                        </g:link>
+                    </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="shipper" action="index" class="shipper">
+                            <warehouse:message code="location.shippers.label" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="eventType" action="list"
+                                class="eventType">
+                            <warehouse:message code="eventTypes.label" default="Event types" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="requisitionTemplate" action="list" class="list">
+                            <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
+                        <%--(${requisitionTemplates.size()})--%>
+                        </g:link>
+                    </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="inventory" action="editTransaction" class="create"><g:message code="default.create.label" args="[g.message(code:'transaction.label')]"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="inventory" action="listAllTransactions" class="list"><g:message code="default.list.label" args="[g.message(code:'transactions.label')]"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory"><g:message code="default.import.label" args="[g.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/></g:link>
+                    </div>
+                    <hr/>
                     <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
                         <div class="megaButton">
                             <g:link controller="admin" action="showSettings" class="list">
                                 <warehouse:message code="default.show.label"
-                                                   args="[warehouse.message(code:'default.settings.label')]" />
+                                                   args="[g.message(code:'default.settings.label')]" />
                             </g:link>
                         </div>
                     </g:authorize>
@@ -458,69 +522,6 @@
                         <g:link controller="admin" action="sendMail" class="list">
                             <warehouse:message code="config.sendMail.label" default="Send mail"/>
                         </g:link>
-                    </div>
-                    <hr/>
-                    <div class="megaButton">
-                        <g:link controller="inventoryLevel" action="list" class="site">
-                            <warehouse:message code="inventoryLevels.label" default="Inventory levels" />
-                        </g:link>
-                    </div>
-
-                    <div class="megaButton">
-                        <g:link controller="locationGroup" action="index" class="site">
-                            <warehouse:message code="location.sites.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="location" action="list" class="location">
-                            <warehouse:message code="locations.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="shipper" action="index" class="shipper">
-                            <warehouse:message code="location.shippers.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="locationType" action="index"
-                            class="locationType">
-                            <warehouse:message code="location.locationTypes.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="eventType" action="list"
-                                class="eventType">
-                            <warehouse:message code="location.eventTypes.label" default="Event types" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="person" action="index" class="people">
-                            <warehouse:message code="person.list.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="requisitionTemplate" action="list" class="list">
-                            <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
-                            <%--(${requisitionTemplates.size()})--%>
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="inventory" action="listAllTransactions" class="list"><warehouse:message code="transactions.label"/></g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="user" action="list" class="user">
-                            <warehouse:message code="users.label" />
-                        </g:link>
-                    </div>
-                    <hr/>
-                    <div class="megaButton">
-                        <g:link controller="inventory" action="editTransaction" class="create"><warehouse:message code="transaction.add.label"/></g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label', default: 'Inventory')]"/></g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/></g:link>
                     </div>
 
                 </div>

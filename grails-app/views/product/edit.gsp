@@ -1107,37 +1107,29 @@
 								<table>
 		                            <tr class="prop">
 		                                <td class="name">
-		                                    <label for="name">Name</label>
+		                                    <label for="name"><g:message code="default.name.label"/></label>
 		                                </td>
 		                                <td class="value ">
-											<g:textField name="name" size="10" class="medium text" />
+											<g:textField name="name" size="60" class="medium text" />
 		                                </td>
 		                            </tr>
 		                            <tr class="prop">
 		                                <td class="name">
-		                                    <label for="code">Type</label>
+		                                    <label for="code"><g:message code="default.type.label"/></label>
 		                                </td>
 		                                <td class="value ">
-											<g:select name="type" from="${org.pih.warehouse.core.UnitOfMeasureType.list() }" value="${packageInstance?.uom }" noSelection="['null':'']"></g:select>
+											<g:select name="type" from="${org.pih.warehouse.core.UnitOfMeasureType.list() }"
+                                                      value="${packageInstance?.uom }" noSelection="['null':'']"></g:select>
 		                                    <span class="fade"></span>
 		                                </td>
 		                            </tr>
 
 		                            <tr class="prop">
 		                                <td class="name">
-		                                    <label for="code">Code</label>
+		                                    <label for="code"><g:message code="default.code.label"/></label>
 		                                </td>
 		                                <td class="value ">
 		                                    <g:textField name="code" size="10" class="medium text" />
-		                                    <span class="fade"></span>
-		                                </td>
-		                            </tr>
-									<tr class="prop">
-		                                <td class="name">
-		                                    <label for="name">Name</label>
-		                                </td>
-		                                <td class="value ">
-		                                    <g:textField name="name" size="40" class="medium text" />
 		                                    <span class="fade"></span>
 		                                </td>
 		                            </tr>

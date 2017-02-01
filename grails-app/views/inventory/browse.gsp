@@ -162,6 +162,15 @@
                                 <g:if test="${commandInstance?.searchTerms}">
                                     "${commandInstance.searchTerms }"
                                 </g:if>
+
+                                <div class="page-size right" style="margin-right: 15px;">
+                                    <warehouse:message code="inventory.browseResultsPerPage.label"/>:
+                                    <g:if test="${params.max != '10'}"><g:link action="browse" class="button" params="${[max:10, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+                                    <g:if test="${params.max != '25'}"><g:link action="browse" class="button" params="${[max:25, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
+                                    <g:if test="${params.max != '50'}"><g:link action="browse" class="button" params="${[max:50, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
+                                    <g:if test="${params.max != '100'}"><g:link action="browse" class="button" params="${[max:100, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
+                                    <g:if test="${params.max != '-1'}"><g:link action="browse" class="button" params="${[max:-1, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                                </div>
                             </h2>
                             <div id="tabs-1" style="padding: 0px;">
 					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
@@ -340,6 +349,7 @@
                                                                    <span class="fade">${inventoryItem?.product?.productCode }</span>
                                                                </td>
                                                                <td class="checkable left middle">
+                                                                   <small class="fade">${inventoryItem?.product?.category}</small>
                                                                    <g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
                                                                        <div title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">
                                                                            <g:if test="${inventoryItem?.product?.name?.trim()}">
@@ -348,9 +358,7 @@
                                                                            <g:else>
                                                                                <warehouse:message code="product.untitled.label"/>
                                                                            </g:else>
-                                                                           <span class="fade">(${inventoryItem?.product?.category})</span>
                                                                        </div>
-
                                                                    </g:link>
                                                                </td>
                                                                <td class="checkable middle left">
@@ -445,17 +453,6 @@
                                 <g:paginate total="${numProducts}"
                                             action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
-
-                                <div class="page-size">
-                                    <warehouse:message code="inventory.browseResultsPerPage.label"/>:
-                                    <g:if test="${params.max != '10'}"><g:link action="browse" params="${[max:10, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
-                                    <g:if test="${params.max != '25'}"><g:link action="browse" params="${[max:25, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
-                                    <g:if test="${params.max != '50'}"><g:link action="browse" params="${[max:50, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
-                                    <g:if test="${params.max != '100'}"><g:link action="browse" params="${[max:100, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
-                                    <g:if test="${params.max != '-1'}"><g:link action="browse" params="${[max:-1, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
-                                </div>
-
-                                <div class="clearfix"></div>
                             </div>
 						</div>
 					</div>

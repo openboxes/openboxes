@@ -1736,14 +1736,16 @@ ul.treeList li ul li {
 .triangle-isosceles {
     position:relative;
     padding:15px;
-    margin:1em 0 3em;
+    margin:1em 0 4em;
     color:#000;
-    background:#f3961c;
-
+    background:#f2dede;
+    font-size: 1.5em;
+    line-height: 1.5em;
     /* css3 */
     -moz-border-radius:10px;
     -webkit-border-radius:10px;
     border-radius:10px;
+    margin-left: 20px;
     background:-moz-linear-gradient(top, #f9d835, #f3961c);
     background:linear-gradient(top, #f9d835, #f3961c);
 }
@@ -1753,12 +1755,16 @@ ul.treeList li ul li {
     content:"";
     display:block; /* reduce the damage in FF3.0 */
     position:absolute;
-    bottom:-15px;
-    left:50px;
+    top:15px;
+    left:-15px;
     width:0;
-    border-width:15px 15px 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 15px solid #f2dede;
+    /*border-width:15px 15px 0;
     border-style:solid;
-    border-color:#f3961c transparent;
+    border-color:#f3961c transparent;*/
 }
 
 /* megamenu

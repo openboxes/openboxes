@@ -23,7 +23,8 @@
                         <format:product product="${productInstance}"/>
                     </g:elseif>
                     <g:else>
-                        <g:select name="product.id" class="chzn-select" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${inventoryLevelInstance?.product?.id}"/>
+                        <g:select name="product.id" class="chzn-select" from="${org.pih.warehouse.product.Product.list()}"
+                                  optionKey="id" value="${inventoryLevelInstance?.product?.id}" noSelection="['':'']"/>
                     </g:else>
                 </td>
             </tr>
@@ -32,7 +33,8 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
-                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-inventory-id" name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
+                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-inventory-id" name="inventory.id"
+                              from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
                                 style="width: 300px;"
                                 noSelection="['null':warehouse.message(code:'inventoryLevel.chooseInventory.label',default:'Choose inventory')]"
                                 value="${inventoryLevelInstance?.inventory?.id}" class="chzn-select-deselect" />
@@ -108,7 +110,6 @@
             </tbody>
         </table>
     </div>
-    <hr/>
     <div class="buttons">
 
         <g:if test="${!inventoryLevelInstance?.id}">

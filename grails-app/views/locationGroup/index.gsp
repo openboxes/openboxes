@@ -12,6 +12,15 @@
 				<div class="message">${flash.message}</div>
             </g:if>
 
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
+            </div>
+
+
             <div class="buttonBar">
                 <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locationGroup.label').toLowerCase()]"/></g:link>
                 <g:isUserAdmin>

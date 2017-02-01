@@ -21,7 +21,7 @@
 
 					<div class="title">
 						<g:if test="${!shipmentInstance.id}">
-							New Shipment
+							<g:message code="default.create.label" args="[g.message(code: 'shipment.label')]"/>
 						</g:if>
 						<g:else>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">

@@ -4,43 +4,46 @@
 		<g:hiddenField name="id" value="${packageInstance?.id}"/>							
 		<table>
 			<tbody>						
-				<g:if test="${productInstance }">
-					<tr class="prop">
-						<td class="name"><label><warehouse:message code="product.label"/></label></td>
-						<td class="value">
-							<format:product product="${productInstance}" />
-						</td>
-					</tr>
-				</g:if>
-                <tr class="prop">
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label for="name">${warehouse.message(code:'default.name.label')}</label>
+					</td>
+					<td valign="top" class="value ">
+						<g:textField name="name" size="60" class="medium text" value="${packageInstance?.name }" />
+					</td>
+				</tr>
+				<tr class="prop">
                     <td class="name">
                         <label>
-                            <warehouse:message code="package.uom.label"/>
+                            <warehouse:message code="package.type.label"/>
                         </label>
                     </td>
                     <td class="value middle">
                         <div class="middle">
-                            1
-                            <g:select name="uom.id"
-                                      from="${org.pih.warehouse.core.UnitOfMeasure.list() }"
-                                      value="${packageInstance?.uom?.id }"
-                                      optionKey="id" optionValue="name"
-                                      noSelection="['null':'']"></g:select>
-                            =
-                            <g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
-                            ${productInstance?.unitOfMeasure?:warehouse.message(code: 'default.each.label') }
+							<span style="width: 100px">
+								<g:select name="uom.id" class="chzn-select-deselect"
+										  from="${org.pih.warehouse.core.UnitOfMeasure.list() }"
+										  value="${packageInstance?.uom?.id }"
+										  optionKey="id" optionValue="name"
+										  noSelection="['null':'']"></g:select>
+							</span>
                         </div>
                     </td>
                 </tr>
 				<tr class="prop">
-					<td valign="top" class="name">
-					    <label for="name">${warehouse.message(code:'default.name.label')}</label>
+					<td class="name">
+						<label>
+							<warehouse:message code="package.quantity.label"/>
+						</label>
 					</td>
-					<td valign="top" class="value ">
-						<g:textField name="name" size="60" class="medium text" value="${packageInstance?.name }" />
-				    </td>
-				</tr>										
-				
+					<td class="value middle">
+						<div class="middle">
+							<g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
+							${productInstance?.unitOfMeasure?:warehouse.message(code: 'default.each.label') }
+						</div>
+					</td>
+				</tr>
+
 				<tr class="prop">
 					<td class="name">
 						<label>

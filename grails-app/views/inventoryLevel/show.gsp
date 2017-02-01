@@ -14,7 +14,8 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
+            <div class="dialog box">
+                <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
                 <table>
                     <tbody>
                     

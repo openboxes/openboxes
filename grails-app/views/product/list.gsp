@@ -82,6 +82,7 @@
                                     </p>
                                 </div>
 
+
                                 <div class="filter-list-item center middle">
                                     <button type="submit" class="button icon search">
                                         ${warehouse.message(code: 'default.button.find.label')}
