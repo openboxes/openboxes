@@ -816,7 +816,7 @@ class ProductService {
 		def category = Category.findByName(categoryName)
 		if (!category) {
 			category = new Category(parentCategory: rootCategory, name: categoryName)
-			category.save(failOnError:true)
+			category.save(flush:true)
 		}
 		return category;
 	}
