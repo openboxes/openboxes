@@ -1,13 +1,9 @@
-<head>
-    <link rel="stylesheet" type="text/css" href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-    <style>
-        #dataTable_filter { margin: 5px;}
-        #dataTable_length { margin: 5px; }
-        #dataTable_info { margin: 5px; }
-        #dataTable_paginate { margin: 0px; }
-
-    </style>
-</head>
+<style>
+    #dataTable_filter { margin: 5px;}
+    #dataTable_length { margin: 5px; }
+    #dataTable_info { margin: 5px; }
+    #dataTable_paginate { margin: 0px; }
+</style>
 
 <div class="box">
     <h2>
@@ -19,15 +15,15 @@
             <div class="actions">
                 <div class="action-menu-item">
                     <g:link controller="dashboard" action="downloadFastMoversAsCsv">
-                        <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                        <warehouse:message code="dashboard.downloadFastMoversAsCsv.label" default="Download fast movers as CSV"/>
+                        <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="Download Fast Movers as CSV" style="vertical-align: middle" />
+                        <warehouse:message code="dashboard.downloadFastMoversAsCsv.label" default="Download Fast Movers as CSV"/>
                     </g:link>
 
                 </div>
             </div>
         </div>
 
-        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast moving items (last 30 days)"/>
+        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast Movers (last 30 days)"/>
         <span class="beta">Beta</span>
         <%--
         <span class="action-menu">
@@ -47,34 +43,33 @@
     </h2>
 
 
-	<div class="widget-content" style="padding:0px;; margin:0">
-        <table id="dataTable">
+	<div class="widget-content" style="padding:0; margin:0">
+        <table id="fastMoversDataTable">
             <thead>
-                <th>Rank</th>
+                <%--<th>Rank</th>--%>
                 <th>Code</th>
                 <th>Product</th>
-                <th># Requisitions</th>
-                <th>Quantity Requested</th>
-                <th>Quantity On Hand</th>
+                <th>Requests</th>
+                <th>Demand</th>
+                <th>QoH</th>
             </thead>
             <tbody>
 
             </tbody>
         </table>
 	</div>
-    <br/><br/>
+
 </div>
-<script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
     $(window).load(function(){
 
-        var dataTable = $('#dataTable').dataTable( {
+        var dataTable = $('#fastMoversDataTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
             "iDisplayLength": 5,
             "bSearch": false,
             "bScrollCollapse": true,
-            "bJQueryUI": false,
+            "bJQueryUI": true,
             "bAutoWidth": true,
             "sPaginationType": "two_button",
             "sAjaxSource": "${request.contextPath}/json/getFastMovers",
@@ -104,7 +99,7 @@
 //            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> <br/><br/> Loading... "
+                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
             },
             //"fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,
@@ -115,23 +110,23 @@
             "aoColumns": [
 
                 //{ "mData": "id", "bVisible":false }, // 0
-                { "mData": "rank", "sWidth": "1%" }, // 1
+                //{ "mData": "rank", "sWidth": "1%" }, // 1
                 { "mData": "productCode", "sWidth": "1%" }, // 2
                 { "mData": "name" }, // 3
-                { "mData": "requisitionCount", "sWidth": "5%"  }, // 4
-                { "mData": "quantityRequested", "sWidth": "5%"  }, // 5
-                { "mData": "quantityOnHand", "sWidth": "5%"  } // 5
+                { "mData": "requisitionCount", "sWidth": "5%", "sType": 'numeric' }, // 4
+                { "mData": "quantityRequested", "sWidth": "5%", "sType": 'numeric' }, // 5
+                { "mData": "quantityOnHand", "sWidth": "5%", "sType": 'numeric' } // 5
                 //
 
             ],
             "bUseRendered": false,
-            "aaSorting": [[ 3, "desc" ], [4, "desc"]],
+            "aaSorting": [[ 2, "desc"],[3, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 //console.log(nRow);
                 //console.log(aData);
                 //console.log(iDisplayIndex);
 
-                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
+                $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
                         aData["name"] + '</a>');
                 return nRow;
             }

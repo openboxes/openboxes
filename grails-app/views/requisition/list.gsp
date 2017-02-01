@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'requests.label', default: 'Requisitions').toLowerCase()}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'requests.label', default: 'Requisitions')}" />
         <title>
 	        <warehouse:message code="requisition.label"/>
 		</title>
@@ -27,7 +27,7 @@
                         <tr>
                             <td class="top">
                                 <div class="title">
-                                    <warehouse:message code="requisition.list.label" /> (${requisitions.totalCount})
+                                    <warehouse:message code="default.list.label" args="${[entityName]}" /> (${requisitions.totalCount})
                                 </div>
                             </td>
                             <td class="right">
@@ -42,7 +42,14 @@
                     </tbody>
                 </table>
             </div>
+
             <div class="buttonBar">
+                <div class="button-group">
+                    <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
+                        ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
+                        (${requisitionStatistics["MINE"]?:0 })
+                    </g:link>
+                </div>
                 <div class="button-group">
                     <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
                         <warehouse:message code="default.all.label"/>
@@ -57,12 +64,6 @@
                             </g:link>
                         </g:if>
                     </g:each>
-                </div>
-                <div class="button-group">
-                    <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
-                        ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
-                        (${requisitionStatistics["MINE"]?:0 })
-                    </g:link>
                 </div>
                 <%--
                 <div class="buttonBar button-group">
@@ -98,8 +99,7 @@
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="requisition.destination.label"/></label>
                                     <p style="line-height: 16px; font-size: 1.2em;">
-                                        ${session.warehouse.name}
-                                        <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
+                                        <g:select id="destinationId" name="destination.id" value="${session.warehouse.id}" from="${[session.warehouse]}" class="chzn-select" readOnly="readOnly"/>
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
@@ -124,7 +124,7 @@
                                     </p>
                                     <p>
                                         <g:checkBox name="commodityClassIsNull" value="${params?.commodityClassIsNull}"/>
-                                        <label><warehouse:message code="requisition.commodityClassIsNull" default="Commodity class is null"/></label>
+                                        <label><warehouse:message code="requisition.commodityClassIsNull" default="Include if commodity class is empty"/></label>
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
@@ -156,10 +156,10 @@
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
-                                    <p>
-                                        <g:checkBox name="relatedToMe" value="${params?.relatedToMe}"/>
-                                        <label><warehouse:message code="requisition.relatedToMe" default="Only include requisitions related to me"/></label>
-                                    </p>
+                                    <label>
+                                        <g:checkBox name="relatedToMe" value="${params?.relatedToMe}"></g:checkBox>
+                                        <warehouse:message code="requisition.relatedToMe.label" default="Only include requisitions related to me"/>
+                                    </label>
                                 </div>
                                 <hr/>
                                 <div class="filter-list-item">
@@ -487,7 +487,7 @@
                 $(".dialog-box").hide();
                 $(".dialog-box").dialog({ autoOpen:false, height: 400, width:800 });
 
-                $(".dialog-trigger").toggle(function(){
+                $(".dialog-trigger").hover(function(){
                         $($(this).attr("data-id")).dialog('open');
                     },
                     function() {

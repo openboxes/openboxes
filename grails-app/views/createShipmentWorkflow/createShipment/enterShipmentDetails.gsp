@@ -110,7 +110,7 @@
 								</tr>
 								<g:if test="${!shipmentWorkflow?.isExcluded('expectedDeliveryDate')}">
 									<tr class="prop">
-										<td valign="top" class="name"><label><warehouse:message code="shipping.expectedDeliveryDate.label"/></td>
+										<td valign="top" class="name"><label><warehouse:message code="shipping.expectedDeliveryDate.label"/></label></td>
 										<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"> 
 											<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
 												value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy" size="15"/>

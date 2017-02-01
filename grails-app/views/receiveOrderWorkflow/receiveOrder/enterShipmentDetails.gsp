@@ -28,9 +28,11 @@
 			<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
 			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>			
 			<div class="dialog">
-				<div class="box">
+
+			<g:render template="../order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
+
+			<div class="box">
 					<h2>${warehouse.message(code:'order.wizard.enterShipmentDetails.label', default: 'Enter shipment details')}</h2>
-					<g:render template="../order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
 					<table>
 						<tbody>
 							<tr class='prop'>
@@ -125,7 +127,6 @@
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
 							<g:submitButton class="button" name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
-							<g:link class="button" action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 						</span>
 					</div>
 					

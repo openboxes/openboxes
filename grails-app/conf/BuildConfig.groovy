@@ -11,6 +11,7 @@
 
 grails.servlet.version = "3.0" // Change depending on target container compliance (2.5 or 3.0)
 grails.project.class.dir = "target/classes"
+grails.project.docs.output.dir = "web-app/docs"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 grails.project.work.dir = "target/work"
@@ -47,8 +48,8 @@ grails.project.dependency.resolution = {
 		excludes "xml-apis"
 	}
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
-	checksums true // Whether to verify checksums on resolve
-    	legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
+    checksums true // Whether to verify checksums on resolve
+    legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
 
 	repositories {
 		inherits true // Whether to inherit repository definitions from plugins
@@ -63,6 +64,7 @@ grails.project.dependency.resolution = {
 		//mavenRepo "http://repository.codehaus.org"
 		//mavenRepo "http://download.java.net/maven/2/"
 		//mavenRepo "http://repository.jboss.com/maven2/"
+        mavenRepo "http://repo.grails.org/grails/core/"
         mavenRepo "http://repo.grails.org/grails/plugins/"
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
 
@@ -122,15 +124,15 @@ grails.project.dependency.resolution = {
 //		test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 //		test 'dumbster:dumbster:1.6'
 //		//test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
-//		
+//
 //        compile 'org.grails:grails-test:2.4.4'
 
 	}
 	plugins {
 
 		build ":tomcat:7.0.70" // or ":tomcat:8.0.22"
-        	//test ":spock:0.7"
-        	test ":build-test-data:2.4.0"
+        // test ":spock:0.7"
+        test ":build-test-data:2.4.0"
 
 		// plugins for the compile step
 		compile ":scaffolding:2.1.2"
@@ -203,12 +205,12 @@ grails.project.dependency.resolution = {
 
 		/* spock from the grails repo doesn't work with grails 1.3 we've included our own build of it.*/
 		//test(name:'spock', version:'0.6')
-		
+
 		//runtime(":liquibase:1.9.3.6") { excludes 'data-source' }
 //		runtime(':mail:1.0.7') { excludes 'mail', 'spring-test' }
 //		runtime(':excel-import:1.0.0') { excludes 'poi-contrib', 'poi-scratchpad' }
 		//runtime(':hibernate:1.3.9') { excludes 'antlr' }
-		//runtime(':tomcat:1.3.9') 
+		//runtime(':tomcat:1.3.9')
 		//runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
 //		runtime(':quartz2:2.1.6.2')
 //		runtime(":jquery:1.7.2")

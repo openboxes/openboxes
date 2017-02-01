@@ -33,8 +33,9 @@
     <%--<g:if env="development"><asset:stylesheet src="errors.css"/></g:if>--%>
 </head>
 
-<body>
-<%-- Grails 2.5.4 Error Page --%>
+  <body>
+  
+  	<div class="" style="padding: 10px;">
 
 <%--
 <g:if env="development">
@@ -64,7 +65,7 @@
 <h2>Error Details</h2>
 <div class="message">
     <strong>Error ${request?.'javax.servlet.error.status_code'}:</strong>
-    ${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
+        ${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
     <strong>Servlet:</strong> ${request?.'javax.servlet.error.servlet_name'}<br/>
     <strong>URI:</strong> ${request?.'javax.servlet.error.request_uri'}<br/>
     <g:if test="${exception}">
@@ -81,89 +82,87 @@
         </div>
     </g:if>
 </div>
-<g:if test="${exception}">
-    <h2>Stack Trace</h2>
-    <div class="stack">
-        <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
-    </div>
-</g:if>
-<g:set var="targetUri"
-       value="${(request.forwardURI - request.contextPath) + (request.queryString ? '?' : '') + (request.queryString ?: '')}"/>
-<div id="error-dialog" class="dialog" title="Report a Bug">
-    <g:if test="${util.ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)}">
-        <div id="errors"></div>
-        <g:form controller="errors" action="processError" onsubmit="return checkFormSubmission();">
-            <g:hiddenField id="dom" name="dom" value=""/>
-            <g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
-            <g:hiddenField name="targetUri" value="${targetUri}"/>
-            <g:hiddenField name="request.statusCode" value="${request?.'javax.servlet.error.status_code'}"/>
-            <g:hiddenField name="request.errorMessage"
-                           value="${request?.'javax.servlet.error.message'?.encodeAsHTML()}"/>
-            <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
-            <g:hiddenField name="exception.class" value="${exception?.className}"/>
-            <g:hiddenField name="exception.date" value="${new Date()}"/>
-            <g:set var="absoluteTargetUri" value="${g.resource(url: targetUri, absolute: true)}"/>
-            <g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
-            <g:set var="summary"
-                   value="${exception?.cause?.class?.name ?: exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
-            <table>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message code="error.reportedTo.label"/></label>
-                    </td>
-                    <td class="value">
-                        <g:set var="recipients"
-                               value="${util.ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients)}"/>
-                        <g:if test="${recipients}">
-                            Support <a href="mailto:${recipients.join(";")}" target="_blank">${recipients.join(";")}</a>
-                        </g:if>
-                        <g:else>
-                            OpenBoxes Support <a href="mailto:errors@openboxes.com"
-                                                 target="_blank">errors@openboxes.com</a>
-                        </g:else>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message code="error.reportedBy.label"/></label>
-                    </td>
-                    <td class="value">
-                        ${session?.user?.name}
-                        <a href="mailto:${session?.user?.email}" target="_blank">${session?.user?.email}</a>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message code="error.summary.label"/></label>
-                    </td>
-                    <td class="value">
-                        <g:textField name="summary" class="text" size="80"
-                                     value="" placeholder="${warehouse.message(code: 'error.summary.message')}"/>
-                        <br/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message code="error.details.label"/></label>
-                    </td>
-                    <td class="value">
-                        <g:textArea id="comments" name="comments" cols="80" rows="10"
-                                    placeholder="${warehouse.message(code: 'error.details.message')}"></g:textArea>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
+	<g:if test="${exception}">
+	    <h2>Stack Trace</h2>
+	    <div class="stack">
+	      <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
+	    </div>
+	</g:if>
+	<g:set var="targetUri"
+           value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
+	<div id="error-dialog" class="dialog" title="Report a Bug">
+        <g:if test="${util.ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)}">
+            <div id="errors"></div>
+            <g:form controller="errors" action="processError" onsubmit="return checkFormSubmission();">
+                <g:hiddenField id="dom" name="dom" value=""/>
+                <g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
+                <g:hiddenField name="targetUri" value="${targetUri}"/>
+                <g:hiddenField name="request.statusCode" value="${request?.'javax.servlet.error.status_code'}"/>
+                <g:hiddenField name="request.errorMessage" value="${request?.'javax.servlet.error.message'?.encodeAsHTML()}"/>
+                <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
+                <g:hiddenField name="exception.class" value="${exception?.className}"/>
+                <g:hiddenField name="exception.date" value="${new Date() }"/>
+                <g:set var="absoluteTargetUri" value="${g.createLinkTo(url: targetUri, absolute: true) }"/>
+                <g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
+                <g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
+                <table>
+                    <tr class="prop">
+                        <td class="name">
+                            <label><warehouse:message code="error.reportedTo.label"/></label>
+                        </td>
+                        <td class="value">
+                            <g:set var="recipients"
+                                   value="${util.ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients)}"/>
+                            <g:if test="${recipients}">
+                                Support <a href="mailto:${recipients.join(";")}" target="_blank">${recipients.join(";")}</a>
+                            </g:if>
+                            <g:else>
+                                OpenBoxes Support <a href="mailto:errors@openboxes.com" target="_blank">errors@openboxes.com</a>
+                            </g:else>
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td class="name">
+                            <label><warehouse:message code="error.reportedBy.label"/></label>
+                        </td>
+                        <td class="value">
+                            <g:if test="${session.user}">
+                                ${session?.user?.name }
+                                <a href="mailto:${session?.user?.email }" target="_blank">${session?.user?.email }</a>
 
-                    </td>
-                    <td class="value">
-                        <g:checkBox name="ccMe" value="${true}"/>&nbsp;
-                        <warehouse:message code="default.reportCcMe.label"/>
-                    </td>
-                </tr>
-                <g:hiddenField name="clickstream"
-                               value="${util.ClickstreamUtil.getClickstreamAsString(session.clickstream)}"/>
-                <g:hiddenField name="stacktrace"
-                               value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>
+                                <g:if test="${session.user}">
+                                    <g:checkBox name="ccMe" value="${true }" />&nbsp;
+                                    <warehouse:message code="default.reportCcMe.label" />
+                                </g:if>
+
+                            </g:if>
+                            <g:else>
+                                ${grailsApplication.config.grails.mail.from}
+                            </g:else>
+
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td class="name">
+                            <label><warehouse:message code="error.summary.label"/></label>
+                        </td>
+                        <td class="value">
+                            <g:textField name="summary" class="text" size="80"
+                                value="" placeholder="${warehouse.message(code:'error.summary.message') }"/>
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td class="name">
+                            <label><warehouse:message code="error.details.label"/></label>
+                        </td>
+                        <td class="value">
+                            <g:textArea id="comments" name="comments" cols="80" rows="10"
+                                placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>
+                        </td>
+                    </tr>
+                    <g:hiddenField name="clickstream" value="${util.ClickstreamUtil.getClickstreamAsString(session.clickstream)}"/>
+                    <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>
 
                 <%--
                 <tr class="prop">

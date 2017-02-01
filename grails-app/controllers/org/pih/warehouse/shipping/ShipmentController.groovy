@@ -344,6 +344,32 @@ class ShipmentController {
 		}
 		redirect(controller:"shipment", action : "showDetails", id: shipmentInstance.id)
 	}
+
+
+	def bulkReceiveShipments = {
+		def shipmentIds = params.list("shipment.id")
+		try {
+			shipmentService.receiveShipments(shipmentIds, null, session.user.id, session.warehouse.id, true)
+			flash.message = "Successfully received shipments"
+
+		} catch (Exception e) {
+			flash.message = "Error occurred while bulk receiving shipments: " + e.message
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
+
+
+	def bulkRollbackShipments = {
+		def shipmentIds = params.list("shipment.id")
+		try {
+			shipmentService.rollbackShipments(shipmentIds)
+			flash.message = "Successfully rolled back last event for selected shipments"
+
+		} catch (Exception e) {
+			flash.message = "Error occurred while bulk receiving shipments: " + e.message
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
 	
 	
 	def receiveShipment(ReceiveShipmentCommand command) {

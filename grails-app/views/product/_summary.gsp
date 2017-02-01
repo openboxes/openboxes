@@ -36,7 +36,7 @@
 							</g:if>
 						</div>	
 			            <div id="product-title" class="title">
-			            	${productInstance?.productCode }
+			            	<small>${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
 			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
 			                </g:link>				
@@ -80,10 +80,10 @@
 							</g:else>
 						</g:if>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-							<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>safsafsa
+							<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
 						</g:elseif>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-							<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>fsafsa
+							<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
 						</g:elseif>
 						<g:else>
 							none

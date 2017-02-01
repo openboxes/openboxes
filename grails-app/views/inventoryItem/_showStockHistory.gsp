@@ -80,6 +80,13 @@
                         <g:set var="count" value="${0}"/>
                         <g:set var="previousTransaction" value='${null }'/>
                         <g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate} }" status="status">
+
+                            <%
+                                if(transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
+                                    balanceByInventoryItem = [:]
+                                }
+                            %>
+
                             <g:each var="transactionEntry" in="${transaction.transactionEntries.findAll { it.inventoryItem.product?.id ==  commandInstance?.productInstance?.id}}" status="status2">
                                 <g:set var="rowClass" value=""/>
                                 <%
@@ -269,7 +276,6 @@
                         <th class="center">
                             <g:formatNumber number="${balanceByInventoryItem?.values()?.sum()?:0}" format="#,###"/>
                         </th>
-
                     </tr>
                 </tfoot>
             </table>

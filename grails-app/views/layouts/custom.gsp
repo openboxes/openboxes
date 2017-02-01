@@ -15,7 +15,10 @@
     <link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${resource(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${resource(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
-    <%--<link rel="stylesheet" href="${resource(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />--%>
+    <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />--%>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
+    <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
+
 
     <!-- Include javascript files -->
     <%--
@@ -159,6 +162,9 @@
 <script src="${resource(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
 <script src="${resource(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
 <script src="${resource(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
+<script src="${resource(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
+
 <!-- JIRA Issue Collector -->
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.jira.issue.collector.enabled)}">
     <script type="text/javascript" src="${grailsApplication.config.openboxes.jira.issue.collector.url}"></script>
@@ -420,6 +426,9 @@
             event.preventDefault();
         });
 
+        $('.dataTable').dataTable({
+            "bJQueryUI": true
+        });
     });
 </script>
 
@@ -533,6 +542,15 @@
                     type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");
     </script>
     <!--End of Zopim Live Chat Script-->
+
+    <g:if test="${session.user}">
+        <script>
+            $zopim(function() {
+                $zopim.livechat.setName('${session?.user?.name}');
+                $zopim.livechat.setEmail('${session?.user?.email}');
+            });
+        </script>
+    </g:if>
 </g:if>
 <r:layoutResources/>
 

@@ -22,7 +22,8 @@ class UrlMappings {
 
 		"/admin/manage/$action?"(controller: "adminManage")
 		"/adminManage/$action?"(controller: "errors", action: "urlMapping")
-		"/api/$action/$id"(controller:"api", parseRequest:true){
+        "/snapshot/$action?"(controller: "inventorySnapshot")
+        "/api/$action/$id"(controller:"api", parseRequest:true){
 			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 		//"/test/searchByFirstName.json?q=$q"(controller:"test") { 
@@ -34,12 +35,11 @@ class UrlMappings {
 		//}
 		"401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
-        	"405"(controller:"errors", action:"handleMethodNotAllowed")
-
-        	//"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
-        	//"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
+        "405"(controller:"errors", action:"handleMethodNotAllowed")
+        //"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
+        //"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
 		"500"(controller:"errors", action:"handleException")
-        	"/"(controller:"home", action:"index")
+        "/"(controller:"home", action:"index")
 	}
 
 

@@ -10,9 +10,12 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
+import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
@@ -27,7 +30,7 @@ class OrderService {
 	def identifierService
 	def inventoryService
 	
-	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
+	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, User orderedBy, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
 			and {
 				eq("destination", orderPlacedBy)
@@ -35,6 +38,7 @@ class OrderService {
 				if (status) { eq("status", status) }
 				if (orderedFromDate) { ge("dateOrdered", orderedFromDate) }
 				if (orderedToDate) { le("dateOrdered", orderedToDate) }
+				if (orderedBy) { eq("orderedBy", orderedBy)}
 			}
 		}
 		return orders
@@ -110,7 +114,7 @@ class OrderService {
 	 * @param orderCommand
 	 * @return
 	 */
-	OrderCommand saveOrderShipment(OrderCommand orderCommand) { 
+	OrderCommand saveOrderShipment(OrderCommand orderCommand) {
 		def shipmentInstance = new Shipment()
 		def shipments = orderCommand?.order?.listShipments();
 		def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1;
@@ -124,17 +128,19 @@ class OrderService {
 		
 		orderCommand?.shipment = shipmentInstance
 		orderCommand?.orderItems.each { orderItemCommand ->
-			
+
 			// Ignores any null order items and makes sure that the order item has a product and quantity
 			if (orderItemCommand && orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
 
 				// Find or create a new inventory item based on the product and lot number provided
 				def inventoryItem = null
 
-				// Need to use new session here otherwise it flushes the current session and causes an error
-				InventoryItem.withNewSession {
-					inventoryItem = inventoryService.findOrCreateInventoryItem(orderItemCommand.productReceived, orderItemCommand.lotNumber, orderItemCommand.expirationDate)
-				}
+				// Need to use withSession here otherwise it flushes the current session and causes an error
+                InventoryItem.withSession { session ->
+                    inventoryItem = inventoryService.findOrCreateInventoryItem(orderItemCommand.productReceived, orderItemCommand.lotNumber, orderItemCommand.expirationDate)
+                    session.flush()
+                    session.clear()
+                }
 
 				def shipmentItem = new ShipmentItem();
 				shipmentItem.lotNumber = orderItemCommand.lotNumber
@@ -144,7 +150,7 @@ class OrderService {
 				shipmentItem.recipient = orderCommand?.recipient;
 				shipmentItem.inventoryItem = inventoryItem
 				shipmentInstance.addToShipmentItems(shipmentItem)
-				
+
 				def orderShipment = new OrderShipment(shipmentItem:shipmentItem, orderItem:orderItemCommand?.orderItem)
 				shipmentItem.addToOrderShipments(orderShipment)
 				orderItemCommand?.orderItem.addToOrderShipments(orderShipment)
@@ -172,8 +178,8 @@ class OrderService {
 			
 			// FIXME 
 			// receiptInstance.validate() && !receiptInstance.hasErrors()
-			if (!receiptInstance.hasErrors() && receiptInstance.save()) { 
-				shipmentService.receiveShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation, true);
+			if (!receiptInstance.hasErrors() && receiptInstance.save()) {
+                shipmentService.receiveShipment(shipmentInstance?.id, null, orderCommand?.currentUser?.id, orderCommand?.currentLocation?.id, true);
 			}
 			else { 
 				throw new ShipmentException(message: "Unable to save receipt ", shipment: shipmentInstance)
@@ -329,6 +335,167 @@ class OrderService {
 	   return orderMap;
    }
 
-	
+    /**
+     * Rollback the latest status change for the given order.
+     *
+     * @param orderInstance
+     */
+    public void rollbackOrderStatus(String orderId) {
+
+		Order orderInstance = Order.get(orderId)
+		if (!orderInstance) {
+			throw new RuntimeException("Unable to locate order with order ID ${orderId}")
+		}
+
+		try {
+
+            if (orderInstance.status == OrderStatus.RECEIVED || orderInstance.status == OrderStatus.PARTIALLY_RECEIVED) {
+                orderInstance?.listShipments().each { shipmentInstance ->
+                    if (shipmentInstance) {
+
+                        def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
+                        transactions.each { transactionInstance ->
+                            if (transactionInstance) {
+                                shipmentInstance.removeFromIncomingTransactions(transactionInstance)
+                                transactionInstance?.delete();
+                            }
+                        }
+
+                        shipmentInstance.shipmentItems.toArray().each { shipmentItem ->
+
+                            // Remove all order shipment records associated with this shipment item
+                            shipmentItem.orderShipments.toArray().each { orderShipment ->
+                                orderShipment.orderItem.removeFromOrderShipments(orderShipment)
+                                orderShipment.shipmentItem.removeFromOrderShipments(orderShipment)
+                                orderShipment.delete()
+                            }
+
+                            // Remove the shipment item from the shipment
+                            shipmentInstance.removeFromShipmentItems(shipmentItem)
+
+                            // Delete the shipment item
+                            shipmentItem.delete()
+                        }
+
+                        // Delete all receipt items associated with the receipt
+                        shipmentInstance.receipt.receiptItems.toArray().each { receiptItem ->
+                            shipmentInstance.receipt.removeFromReceiptItems(receiptItem)
+                            receiptItem.delete()
+                        }
+
+                        // Delete the receipt from the shipment
+                        shipmentInstance.receipt.delete()
+                        shipmentInstance?.receipt = null;
+
+                        // Delete the shipment
+                        shipmentInstance.delete();
+
+                    }
+                }
+                orderInstance.status = OrderStatus.PLACED
+            }
+            else if (orderInstance.status == OrderStatus.PLACED) {
+                orderInstance?.status = OrderStatus.PENDING
+            }
+
+
+        } catch (Exception e) {
+            log.error("Failed to rollback order status due to error: " + e.message, e)
+            throw new RuntimeException("Failed to rollback order status for order ${orderId}" + e.message, e)
+        }
+    }
+
+    /**
+     * Import the order items into the order represented by the given order ID.
+     *
+     * @param orderId
+     * @param orderItems
+     * @return
+     */
+    boolean importOrderItems(String orderId, List orderItems) {
+
+        int count = 0
+        try {
+            log.info "Order line items " + orderItems
+
+            Order order = Order.get(orderId)
+
+            if (validateOrderItems(orderItems)) {
+
+                orderItems.each { item ->
+
+                    log.info "Order item: " + item
+                    def productCode = item["productCode"]
+                    def quantity = item["quantity"]
+                    def unitPrice = item["unitPrice"]
+
+                    if (productCode) {
+                        def product = Product.findByProductCode(productCode)
+                        if (!product) {
+                            throw new ProductException("Unable to locate product with product code ${productCode}")
+                        }
+                        OrderItem orderItem = new OrderItem(product: product, quantity: quantity, unitPrice: unitPrice)
+                        order.addToOrderItems(orderItem)
+                        count++
+                    }
+
+                }
+
+                if (count < orderItems?.size()) {
+                    return false
+                }
+                order.save(flush:true)
+                return true
+            }
+
+
+        } catch (Exception e) {
+            log.error("Unable to import packing list items due to exception: " + e.message, e)
+            //throw new RuntimeException("make sure this causes a rollback", e)
+            throw new RuntimeException(e.message)
+        }
+
+        return false
+    }
+
+    /**
+     * Parse the given text into a list of maps.
+     *
+     * @param inputStream
+     * @return
+     */
+    List parseOrderItems(String text) {
+
+        List orderItems = []
+
+        try {
+            def settings = [skipLines: 1]
+            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
+            csvMapReader.fieldKeys = ['productCode','productName','vendorCode', 'quantity', 'unitOfMeasure', 'unitPrice']
+            orderItems = csvMapReader.toList()
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
+
+        }
+        finally {
+            if (inputStream) inputStream.close();
+        }
+
+        return orderItems
+    }
+
+    /**
+     * Validates whether the order item details are valid.
+     *
+     * TODO Need to implement the validation logic :)
+     *
+     * @param orderItems
+     * @return
+     */
+    boolean validateOrderItems(List orderItems) {
+        return true
+    }
+
 	
 }

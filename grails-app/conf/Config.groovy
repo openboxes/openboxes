@@ -18,10 +18,23 @@ import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
-grails.config.locations = ["file:${userHome}/.grails/${appName}-config.properties", "file:${userHome}/.grails/${appName}-config.groovy" ]
+grails.config.locations = [
+	"classpath:${appName}-config.properties",
+	"classpath:${appName}-config.groovy",
+	"file:${userHome}/.grails/${appName}-config.properties",
+	"file:${userHome}/.grails/${appName}-config.groovy"
+]
 
-if (System.properties["${appName}.config.location"]) {
-    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+// Allow admin to override the config location using command line argument
+configLocation = System.properties["${appName}.config.location"]
+if (configLocation) {
+    grails.config.locations << "file:" + configLocation
+}
+
+// Allow admin to override the config location using environment variable
+configLocation = System.env["${appName.toString().toUpperCase()}_CONFIG_LOCATION"]
+if (configLocation) {
+    grails.config.locations << "file:" + configLocation
 }
 
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
@@ -31,19 +44,19 @@ grails.project.groupId = appName // change this to alter the default package nam
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
-    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
-    atom:          'application/atom+xml',
-    css:           'text/css',
-    csv:           'text/csv',
-    form:          'application/x-www-form-urlencoded',
-    html:          ['text/html','application/xhtml+xml'],
-    js:            'text/javascript',
-    json:          ['application/json', 'text/json'],
-    multipartForm: 'multipart/form-data',
-    rss:           'application/rss+xml',
-    text:          'text/plain',
-    hal:           ['application/hal+json','application/hal+xml'],
-    xml:           ['text/xml', 'application/xml']
+                      all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
+                      atom:          'application/atom+xml',
+                      css:           'text/css',
+                      csv:           'text/csv',
+                      form:          'application/x-www-form-urlencoded',
+                      html:          ['text/html','application/xhtml+xml'],
+                      js:            'text/javascript',
+                      json:          ['application/json', 'text/json'],
+                      multipartForm: 'multipart/form-data',
+                      rss:           'application/rss+xml',
+                      text:          'text/plain',
+                      hal:           ['application/hal+json','application/hal+xml'],
+                      xml:           ['text/xml', 'application/xml']
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -77,9 +90,37 @@ grails {
     }
 }
 
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside ${}
+                scriptlet = 'html' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        // filteringCodecForContentType.'text/html' = 'html'
+    }
+}
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
+
+/* Indicates which activities are required for a location to allow logins */
+openboxes.chooseLocation.requiredActivities = ["MANAGE_INVENTORY"]
+
+/* Grails resources plugin */
+grails.resources.adhoc.includes = []
+grails.resources.adhoc.excludes = ["*"]
+
+grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
+grails.mime.use.accept.header = false
+
 
 // The default codec used to encode data with ${}
 grails.views.default.codec="html" // none, html, base64
@@ -114,7 +155,7 @@ grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
 
-// Set to true if BootStrap.groovy is failing to add all sample data 
+// Set to true if BootStrap.groovy is failing to add all sample data
 grails.gorm.failOnError = false
 
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
@@ -128,10 +169,6 @@ grails.web.disable.multipart=false
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
-
-
-// request parameters to mask when logging exceptions
-grails.exceptionresolver.params.exclude = ['password']
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
@@ -156,13 +193,13 @@ mail.error.server = 'localhost'
 mail.error.port = 25
 mail.error.from = 'justin@openboxes.com'
 mail.error.to = 'errors@openboxes.com'
-mail.error.subject = '[OpenBoxes]['+GrailsUtil.environment+']'
+mail.error.subject = '[OpenBoxes '+GrailsUtil.environment+']'
 mail.error.debug = true
 
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
-	        grails.logging.jul.usebridge = true
+        grails.logging.jul.usebridge = true
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
@@ -179,13 +216,13 @@ environments {
 		grails.mail.enabled = false
 	}
 	production {  
-	        grails.logging.jul.usebridge = false
+        grails.logging.jul.usebridge = false
 		// Should be configured in openboxes-config.properties
 		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
 		grails.mail.enabled = true
-        	grails.mail.prefix = "[OpenBoxes]"
-    	}
+        grails.mail.prefix = "[OpenBoxes]"
+    }
 	staging {  
 		grails.serverURL = "http://localhost:8080/${appName}"
 		uiperformance.enabled = false
@@ -196,10 +233,10 @@ environments {
 
 // Default mail settings
 grails {
-	mail { 		
-		// By default we enable email.  You can enable/disable email using environment settings below or in your 
-		// ${user.home}/openboxes-config.properties file 
-		enabled = true			
+	mail {
+		// By default we enable email.  You can enable/disable email using environment settings below or in your
+		// ${user.home}/openboxes-config.properties file
+		enabled = true
 		from = "info@openboxes.com"
 		prefix = "[OpenBoxes]" + "["+GrailsUtil.environment+"]"
 		host = "localhost"
@@ -274,6 +311,8 @@ log4j.main = {
 			'BootStrap',
             'liquibase',
 			'org.liquibase',
+            'grails.quartz2',
+            'org.quartz',
             'grails.plugin.databasemigration',
 			'com.gargoylesoftware.htmlunit'
 
@@ -441,8 +480,13 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
 
-// Background jobs
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
+// Calculate current quantity on hand
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+
+// Calculate historical quantity on hand
+openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
+openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 * * * * ?" // every minute
+openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // LDAP configuration
 openboxes.ldap.enabled = false
@@ -472,7 +516,7 @@ openboxes.stockCard.consumption.reasonCodes = [ ReasonCode.STOCKOUT, ReasonCode.
 
 // Localization configuration - default and supported locales
 openboxes.locale.defaultLocale = 'en'
-openboxes.locale.supportedLocales = ['en','fr','es']
+openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es' , 'pt']
 
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"

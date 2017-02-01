@@ -4,9 +4,7 @@
 
 <div class="box">
     <h2>
-        <warehouse:message code="requisitions.label"/>
-    </h2>
-
+        <warehouse:message code="requisition.summary.label" default="Requisition Summary"/>
 
         <%--
         <span class="action-menu">
@@ -30,16 +28,23 @@
             </div>
         </span>
         --%>
-
+    </h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
-			<g:if test="${!requisitionStatistics.ALL}">
+			<g:if test="${!requisitionStatistics?.ALL}">
 				<div style="margin:10px;" class="center empty">
 					<span class="fade"><warehouse:message code="requisition.noRecent.label"/></span>
                 </div>
 			</g:if>
 			<g:else>
                 <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <g:set var="i" value="${0}"/>
                         <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list()}">
@@ -67,26 +72,6 @@
                             </g:if>
 
                         </g:each>
-                        <%--
-                        <g:if test="${requisitionStatistics['MINE']}">
-                            <tr class="${i%2?'odd':'even'}">
-                                <td class="center" style="width: 1%">
-                                    <img src="${resource(dir:'images/icons/silk', file: 'user.png')}"/>
-
-                                </td>
-                                <td>
-                                    <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                        <warehouse:message code="requisitions.mine.label" default="My requisitions"/>
-                                    </g:link>
-                                </td>
-                                <td class="right">
-                                    <g:link controller="requisition" action="list" params="[status:status]" fragment="${statusMessage}">
-                                        ${requisitionStatistics["MINE"]?:0}
-                                    </g:link>
-                                </td>
-                            </tr>
-                        </g:if>
-                        --%>
                     </tbody>
                     <tfoot>
                         <tr class="odd">
@@ -95,7 +80,7 @@
                             </th>
                             <th class="right">
                                 <g:link controller="requisition" action="list">
-                                    ${requisitionStatistics["ALL"]?:0}
+                                    ${requisitionStatistics?."ALL"?:0}
                                 </g:link>
                             </th>
                         </tr>

@@ -55,25 +55,48 @@
     -->
     <changeSet author="jmiranda (generated)" id="1383077886142-3">
         <validCheckSum>3:4a5c90d1ca6cad88c3bc976380ab056a</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="FK98293BFB217F5972"/>
+            </not>
+        </preConditions>
         <createIndex indexName="FK98293BFB217F5972" tableName="synonym" unique="false">
             <column name="created_by_id"/>
         </createIndex>
     </changeSet>
+
     <changeSet author="jmiranda (generated)" id="1383077886142-4">
         <validCheckSum>3:a38a94b55b14f193d8baf9dfb51e088e</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK98293BFB217F5972"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="synonym"
                                  constraintName="FK98293BFB217F5972" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="user"/>
+
     </changeSet>
 
     <changeSet author="jmiranda (generated)" id="1383077886142-5">
         <validCheckSum>3:6f665b5d6c028245bc658c49053a4ad4</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="FK98293BFB426DD105"/>
+            </not>
+        </preConditions>
         <createIndex indexName="FK98293BFB426DD105" tableName="synonym" unique="false">
             <column name="updated_by_id"/>
         </createIndex>
     </changeSet>
+
     <changeSet author="jmiranda (generated)" id="1383077886142-6">
         <validCheckSum>3:eaac8e14fb22fa8553d4aba7b680ef4a</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK98293BFB426DD105"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="synonym"
                                  constraintName="FK98293BFB426DD105" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="user"/>
@@ -81,12 +104,23 @@
 
     <changeSet author="jmiranda (generated)" id="1383077886142-7">
         <validCheckSum>3:45e3d9db736600b84441f12681f8ab40</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="FK299E50ABDED5FAE7"/>
+            </not>
+        </preConditions>
         <createIndex indexName="FK299E50ABDED5FAE7" tableName="synonym" unique="false">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
+
     <changeSet author="jmiranda (generated)" id="1383077886142-8">
         <validCheckSum>3:3e7d64a8805943003e95fc339457edce</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK299E50ABDED5FAE7"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="synonym"
                                  constraintName="FK299E50ABDED5FAE7" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="product"/>

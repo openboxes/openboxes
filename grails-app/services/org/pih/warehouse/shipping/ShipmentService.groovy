@@ -173,7 +173,7 @@ class ShipmentService {
 		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate, 
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 		
-		log.info "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
+		log.debug "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
 		return shipments
 	}
 	
@@ -201,7 +201,7 @@ class ShipmentService {
 			shipmentMap.put(key, shipmentList)
 		}
 
-        log.info "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return shipmentMap;
 	}
@@ -1131,11 +1131,44 @@ class ShipmentService {
 		}
 
 	}
-	
-	
 
-	
-	
+	void receiveShipments(List shipmentIds, String comment, String userId, String locationId, Boolean creditStockOnReceipt) {
+		if (!shipmentIds) {
+			throw new IllegalArgumentException("Must select at least one shipment in order to use bulk receipt")
+		}
+		shipmentIds.each { shipmentId ->
+            Shipment shipment = Shipment.get(shipmentId)
+            shipment.receipt = createReceipt(shipment, shipment.actualShippingDate+1)
+			receiveShipment(shipmentId, comment, userId, locationId, creditStockOnReceipt)
+		}
+	}
+
+    void rollbackShipments(List shipmentIds) {
+        if (!shipmentIds) {
+            throw new IllegalArgumentException("Must select at least one shipment in order to use bulk rollback")
+        }
+        shipmentIds.each { shipmentId ->
+            Shipment.withNewSession {
+                Shipment shipment = Shipment.get(shipmentId)
+                rollbackLastEvent(shipment)
+            }
+        }
+    }
+
+    void markShipmentsAsReceived(List shipmentIds) {
+        if (!shipmentIds) {
+            throw new IllegalArgumentException("Must select at least one shipment in order to use mark as received")
+        }
+
+        Location location = Location.get(session.warehouse.id)
+        shipmentIds.each { shipmentId ->
+            Shipment shipment = Shipment.get(shipmentId)
+            markAsReceived(shipment, location)
+        }
+    }
+
+
+
 	void markAsReceived(Shipment shipment, Location location) { 
 		try { 
 			// Add a Received event to the shipment
@@ -1169,7 +1202,7 @@ class ShipmentService {
 	 * @param location
 	 */
 	void receiveShipment(String shipmentId, String comment, String userId, String locationId, Boolean creditStockOnReceipt) {
-
+        log.info "Receiving shipment " + shipmentId
 		User user = User.get(userId)
 		Location location = Location.get(locationId)
 		Shipment shipmentInstance = Shipment.get(shipmentId)
