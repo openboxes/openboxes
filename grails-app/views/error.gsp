@@ -35,7 +35,7 @@
 
   <body>
   
-  	<div class="" style="padding: 10px;">
+  	<div style="padding: 0px;">
 
 <%--
 <g:if env="development">

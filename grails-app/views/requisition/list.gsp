@@ -440,6 +440,11 @@
                                     </g:each>
                                 </tbody>
                             </table>
+                            <div class="paginateButtons">
+                                <g:paginate total="${requisitions.totalCount}" controller="requisition" action="list" max="${params.max}"
+                                            params="${pageParams.findAll {it.value}}"/>
+
+                            </div>
 
 
                 </div>
@@ -464,11 +469,6 @@
 						</g:each>
 					</div>
 					--%>
-                    <div class="paginateButtons">
-                        <g:paginate total="${requisitions.totalCount}" controller="requisition" action="list" max="${params.max}"
-                            params="${pageParams.findAll {it.value}}"/>
-
-                    </div>
 				</div>
 			</div>		
         </div>

@@ -11,6 +11,15 @@
     </head>
     <body>
         <div class="body">
+
+			<div class="nav" role="navigation">
+				<ul>
+					<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+					<li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+					<li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+				</ul>
+			</div>
+
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -20,10 +29,11 @@
 	            </div>
             </g:hasErrors>
             <g:form method="post" >
-            	<fieldset>
+            	<div class="dialog">
 	                <g:hiddenField name="id" value="${locationTypeInstance?.id}" />
 	                <g:hiddenField name="version" value="${locationTypeInstance?.version}" />
-	                <div class="dialog">
+	                <div class="box">
+						<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 	                    <table>
 	                        <tbody>
 	                        
@@ -32,7 +42,7 @@
 	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${locationTypeInstance?.name}" />
+	                                    <g:textField name="name" value="${locationTypeInstance?.name}" class="text"/>
 	                                </td>
 	                            </tr>
 	                        	                        
@@ -41,7 +51,7 @@
 	                                  <label for="description"><warehouse:message code="default.description.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
-	                                    <g:textField name="description" value="${locationTypeInstance?.description}" />
+	                                    <g:textField name="description" value="${locationTypeInstance?.description}" class="text" />
 	                                </td>
 	                            </tr>
 	                        
@@ -50,7 +60,7 @@
 	                                  <label for="sortOrder"><warehouse:message code="default.sortOrder.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
-	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" />
+	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" class="text" />
 	                                </td>
 	                            </tr>
 	                        
@@ -61,18 +71,17 @@
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'supportedActivities', 'errors')}">
 	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
 	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size() }" style="width: 300px" 
-	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationTypeInstance?.supportedActivities}" />
+	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}"
+												  class="chzn-select-deselect" value="${locationTypeInstance?.supportedActivities}" />
 	                                </td>
 	                            </tr>	                            
 	                        	                        
                             	<tr class="prop">
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	
-						                <div class="buttons left">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-						                </div>
-		    						</td>                    	
+										<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+										<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+		    						</td>
 	                        	</tr>	                        
 	                        </tbody>
 	                    </table>

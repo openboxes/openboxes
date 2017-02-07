@@ -76,10 +76,10 @@
 						</tr>	 			
 		 			</g:unless>
 		 		</tbody>	 			
-			</table>			
-		</div>
-		<div class="paginateButtons">
-			<g:paginate total="${activityListTotal}" params="[daysToInclude:params.daysToInclude]"/>
+			</table>
+            <div class="paginateButtons">
+                <g:paginate total="${activityListTotal}" params="[daysToInclude:params.daysToInclude]"/>
+            </div>
 		</div>
 	</div>
 </div>	

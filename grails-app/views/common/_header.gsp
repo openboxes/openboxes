@@ -45,13 +45,6 @@
                                         </li>
                                         --%>
 
-                                        <%--
-                                        <li>
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" style="vertical-align: middle" />
-                                            <g:link controller="cart" action="list">Cart <span style="color: orange; font-weight: bold;">${session?.cart ? session?.cart?.items?.size() : '0'}</span></g:link>
-
-                                        </li>
-                                        --%>
                                         <li class="action-menu-item">
                                             <g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}"/>

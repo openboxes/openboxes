@@ -29,10 +29,7 @@
     </head>
     <body>        
         <div class="body">
-        
-            <g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
-            </g:if>
+
            	
            	<div>
 
@@ -45,19 +42,11 @@
                 </div>
 
 
-                <div class="buttonBar">
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
-                    <g:isUserAdmin>
-                        <g:link class="button icon add" action="edit"><warehouse:message code="default.add.label"
-                             args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
-                    </g:isUserAdmin>
-                </div>
-
                 <div class="yui-gf">
                     <div class="yui-u first">
 
                         <div class="dialog box">
-                            <h2>Filters</h2>
+                            <h2><g:message code="default.filters.label"/></h2>
                             <g:form action="list" method="get">
                                 <div>
                                     <div class="filter-list-item">
@@ -92,8 +81,14 @@
 
                         <div class="box">
                             <h2>
-                                ${warehouse.message(code: 'default.showing.message', args: [locationInstanceList?.size()?:0]) }
+                                <warehouse:message code="locations.label" />
+                                <small>${warehouse.message(code: 'default.showing.message', args: [locationInstanceList?.size()?:0]) }</small>
                             </h2>
+
+
+                            <g:if test="${flash.message}">
+                                <div class="message">${flash.message}</div>
+                            </g:if>
                             <table>
                                 <thead>
                                     <tr style="height: 100px;">
@@ -156,16 +151,8 @@
                                 </div>
                             </g:if>
                         </div>
-
-
                     </div>
                 </div>
-
-
-
-
-	           		             
-
             </div>
         </div>
     </body>

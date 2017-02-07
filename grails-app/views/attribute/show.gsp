@@ -67,14 +67,13 @@
                     
                     
 						<tr class="prop">
-                        	<td valign="top" colspan="2">
-					            <div class="buttons">
-					                <g:form>
-					                    <g:hiddenField name="id" value="${attributeInstance?.id}" />
-					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-					                </g:form>
-					            </div>
+                            <td valign="top"></td>
+                        	<td valign="top">
+                                <g:form>
+                                    <g:hiddenField name="id" value="${attributeInstance?.id}" />
+                                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
+                                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                </g:form>
 							</td>
 						</tr>                    
                     </tbody>

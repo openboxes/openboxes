@@ -102,9 +102,9 @@
                             </g:unless>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="paginateButtons">
-                        <g:paginate total="${userInstanceTotal}" params="${params}"/>
+                        <div class="paginateButtons">
+                            <g:paginate total="${userInstanceTotal}" params="${params}"/>
+                        </div>
                     </div>
                 </div>
             </div>

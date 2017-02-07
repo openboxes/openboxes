@@ -37,9 +37,7 @@
                                 </ul>
                                 <g:each var="shipmentStatusCode" in="${shipmentMap.keySet() }">
                                     <div id="${format.metadata(obj: shipmentStatusCode) }" style="padding: 10px;">
-
-
-                                        <g:if test="${shipmentStatusCode== org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
+                                        <g:if test="${shipmentStatusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
                                             <div class="button-group">
                                                 <button id="bulkReceive" type="submit" class="button icon approve">
                                                     <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
@@ -49,7 +47,7 @@
                                                 </button>
                                             </div>
                                         </g:if>
-                                        <g:if test="${shipmentStatusCode== org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+                                        <g:if test="${shipmentStatusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
                                             <div class="button-group">
                                                 <button id="bulkRollback" type="submit" class="button icon approve">
                                                     <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>

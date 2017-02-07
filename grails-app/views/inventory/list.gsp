@@ -20,10 +20,6 @@
                 <div class="yui-u first">
                     <div class="button-container button-bar">
 
-                        <div class="right">
-                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
-                        </div>
-
                         <div class="button-group">
                             <g:link class="button icon arrowleft" controller="dashboard"><warehouse:message code="inventory.backToDashboard.label"/></g:link>
                         </div>
@@ -110,7 +106,7 @@
 
 
 
-                    <div class="box">
+                    <div class="box" >
                         <h2>
                             <warehouse:message code="${controllerName}.${actionName}.label"/> -
                             <warehouse:message code="default.showing.message" args="[quantityMap?.keySet()?.size()]"/>

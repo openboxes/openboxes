@@ -21,14 +21,8 @@
 		</g:if>
 		<div class="list">
 
-			<div>
-				<span class="linkButton"> <g:link class="new" action="create" controller="locationType">
-						<warehouse:message code="default.add.label"
-							args="[warehouse.message(code: 'locationType.label')]" />
-					</g:link>
-				</span>
-			</div>
-			<table>
+
+			<table class="dataTable">
 				<thead>
 					<tr>
 
@@ -76,9 +70,9 @@
 					</g:each>
 				</tbody>
 			</table>
-		</div>
-		<div class="paginateButtons">
-			<g:paginate total="${locationTypeInstanceTotal}" />
+			<div class="paginateButtons">
+				<g:paginate total="${locationTypeInstanceTotal}" />
+			</div>
 		</div>
 	</div>
 </body>

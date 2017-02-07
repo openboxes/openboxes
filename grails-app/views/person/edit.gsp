@@ -28,7 +28,8 @@
                 </ul>
             </div>
 
-            <g:form method="put">
+
+            <g:form url="[resource:personInstance, action:'update']" method="PUT">
                 <g:hiddenField name="id" value="${personInstance?.id}" />
                 <g:hiddenField name="version" value="${personInstance?.version}" />
                 <div class="dialog box">
@@ -86,15 +87,9 @@
                             <tr class="prop">
                                 <td valign="top" class="name"></td>
                                 <td valign="top" class="value">
-                                    <div class="left">
-                                        <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Update')}" />
-                                        &nbsp;
-                                        <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-                                        &nbsp;
-                                        <g:link action="convertPersonToUser" id="${personInstance?.id }" class="button"><warehouse:message code="person.convertPersonToUser.label"/></g:link>
-                                        &nbsp;
-                                        <g:link action="index">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-                                    </div>
+                                    <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Update')}" />
+                                    <g:link action="convertPersonToUser" id="${personInstance?.id }" class="button"><warehouse:message code="person.convertPersonToUser.label"/></g:link>
+                                    <g:link action="index" class="button">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                 </td>
                             </tr>
                         </tbody>

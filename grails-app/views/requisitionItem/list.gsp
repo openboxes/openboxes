@@ -139,9 +139,9 @@
                                 </g:each>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="paginateButtons">
-                            <g:paginate total="${requisitionItemInstanceTotal}" params="${params}" />
+                            <div class="paginateButtons">
+                                <g:paginate total="${requisitionItemInstanceTotal}" params="${params}" />
+                            </div>
                         </div>
                     </div>
                 </div>

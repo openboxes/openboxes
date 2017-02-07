@@ -14,19 +14,21 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">
-            
-				<div class="buttonBar">
-                    <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="['eventType']"/></g:link>
-            	</div>
+            <div class="dialog">
+
+                <div class="nav" role="navigation">
+                    <ul>
+                        <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                        <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                        <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                    </ul>
+                </div>
 
                 <div class="box">
                     <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
                     <table>
                         <thead>
                             <tr>
-
-                                <g:sortableColumn property="id" title="${warehouse.message(code: 'eventType.id.label', default: 'Id')}" />
 
                                 <g:sortableColumn property="name" title="${warehouse.message(code: 'eventType.name.label', default: 'Name')}" />
 
@@ -42,9 +44,7 @@
                         <g:each in="${eventTypeInstanceList}" status="i" var="eventTypeInstance">
                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                                <td><g:link action="edit" id="${eventTypeInstance.id}">${fieldValue(bean: eventTypeInstance, field: "id")}</g:link></td>
-
-                                <td>${fieldValue(bean: eventTypeInstance, field: "name")}</td>
+                                <td><g:link action="edit" id="${eventTypeInstance.id}">${fieldValue(bean: eventTypeInstance, field: "name")}</g:link></td>
 
                                 <td>${fieldValue(bean: eventTypeInstance, field: "description")}</td>
 
@@ -55,11 +55,11 @@
                         </g:each>
                         </tbody>
                     </table>
+                    <div class="paginateButtons">
+                        <g:paginate total="${eventTypeInstanceTotal}" />
+                    </div>
                 </div>
 
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${eventTypeInstanceTotal}" />
             </div>
         </div>
     </body>

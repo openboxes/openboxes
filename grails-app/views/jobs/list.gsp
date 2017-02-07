@@ -79,9 +79,9 @@
                     </g:unless>
                     </tbody>
                 </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${jobKeys}" params="${params}"/>
+                <div class="paginateButtons">
+                    <g:paginate total="${jobKeys}" params="${params}"/>
+                </div>
             </div>
         </div>
     </div>

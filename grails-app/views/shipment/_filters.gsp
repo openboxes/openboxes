@@ -7,15 +7,13 @@
 				<tr>
 					<td>
 						<g:hiddenField name="max" value="${params.max?:10 }"/>
-                        <div>
-                            <label>${warehouse.message(code:'default.searchTerms.label', default: "Search terms")}</label>
-                        </div>
+                        <label>${warehouse.message(code:'default.searchTerms.label', default: "Search terms")}</label>
                         <div>
                             <g:textField name="terms"
                                 value="${params.terms}"
                                 style="width: 100%;"
                                 placeholder="${warehouse.message(code:'shipping.searchTerms.label', default: 'Search by name, shipment number')}"
-                                class="text medium"/>
+                                class="text"/>
                         </div>
 					</td>
 				</tr>
@@ -42,9 +40,7 @@
                 <tr class="prop">
                     <td>
                         <div>
-                            <div>
-                                <label>${warehouse.message(code: 'shipping.status.label')}</label>
-                            </div>
+                            <label>${warehouse.message(code: 'shipping.status.label')}</label>
                             <div>
                                 <g:select name="status" class="chzn-select-deselect"
                                           from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
@@ -58,9 +54,7 @@
                 <tr class="prop">
                     <td>
                         <div>
-                            <div>
-                                <label>${warehouse.message(code:'shipping.shipmentType.label', default: "Shipment type")}</label>
-                            </div>
+                            <label>${warehouse.message(code:'shipping.shipmentType.label', default: "Shipment type")}</label>
                             <div>
                                 <g:select name="shipmentType" class="chzn-select-deselect"
                                     from="${org.pih.warehouse.shipping.ShipmentType.list()}"
@@ -112,49 +106,39 @@
                 --%>
 
                 <tr class="prop">
+                    <td>
+
+                        <label>${warehouse.message(code: 'shipping.lastUpdatedFrom.label', default: 'Last updated after')}</label>
+                        <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
+                                            value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="20" />
+
+
+
+                    </td>
+                </tr>
+                <tr class="prop">
                     <td class="left">
 
-                        <table>
-                            <tr>
-                                <td>
-                                    <label>${warehouse.message(code: 'shipping.lastUpdatedFrom.label', default: 'Last updated after')}</label>
+                        <label>${warehouse.message(code: 'shipping.lastUpdatedTo.label', default: 'Last updated before')}</label>
+                        <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
+                                            value="${lastUpdatedTo}" format="MM/dd/yyyy" size="20" />
 
-                                </td>
-                                <td>
-                                    <label>${warehouse.message(code: 'shipping.lastUpdatedTo.label', default: 'Last updated before')}</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <g:jqueryDatePicker id="lastUpdatedFrom" name="lastUpdatedFrom" numberOfMonths="2" changeMonthAndYear="true"
-                                                        value="${lastUpdatedFrom}" format="MM/dd/yyyy" size="20" />
-
-                                </td>
-                                <td>
-                                    <g:jqueryDatePicker id="lastUpdatedTo" name="lastUpdatedTo" numberOfMonths="2" changeMonthAndYear="true"
-                                                        value="${lastUpdatedTo}" format="MM/dd/yyyy" size="20" />
-
-                                </td>
-                            </tr>
-                        </table>
-                        <div>
-                        </div>
                     </td>
                 </tr>
-                <%--
-                <tr class="prop">
-                    <td>
-                        <label>${warehouse.message(code: 'shipping.status.label')}</label>
-                        <div>
-                            <g:select name="status" class="filter"
-                                from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
-                                optionKey="name" optionValue="${{format.metadata(obj:it)}}"
-                                value="${status}"
-                                noSelection="['':warehouse.message(code:'default.all.label')]" />
-                        </div>
-                    </td>
-                </tr>
-                --%>
+                        <%--
+                        <tr class="prop">
+                            <td>
+                                <label>${warehouse.message(code: 'shipping.status.label')}</label>
+                                <div>
+                                    <g:select name="status" class="filter"
+                                        from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
+                                        optionKey="name" optionValue="${{format.metadata(obj:it)}}"
+                                        value="${status}"
+                                        noSelection="['':warehouse.message(code:'default.all.label')]" />
+                                </div>
+                            </td>
+                        </tr>
+                        --%>
                 <tr class="prop">
                     <td colspan="2">
 						<div class="center">

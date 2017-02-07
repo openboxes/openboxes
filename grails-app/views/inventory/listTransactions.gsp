@@ -212,9 +212,9 @@
                                 </g:each>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="pagination">
-                        <g:paginate total="${transactionCount}" params="['transactionType.id':transactionTypeSelected?.id]"/>
+                        <div class="paginateButtons">
+                            <g:paginate total="${transactionCount}" params="['transactionType.id':transactionTypeSelected?.id]"/>
+                        </div>
                     </div>
 
                 </div>

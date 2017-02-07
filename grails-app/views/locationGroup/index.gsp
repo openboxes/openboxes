@@ -61,9 +61,9 @@
 	                    </g:each>
                     </tbody>
                 </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${locationGroupInstanceCount}" />
+                <div class="paginateButtons">
+                    <g:paginate total="${locationGroupInstanceCount}" />
+                </div>
             </div>
         </div>
     </body>

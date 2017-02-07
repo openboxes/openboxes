@@ -99,11 +99,10 @@
                         	<td valign="top"></td>
                         	<td valign="top" colspan="2">
 					            <div class="button-bar">
-					                <g:form>
-					                    <g:hiddenField name="id" value="${personInstance?.id}" />
-					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-					                </g:form>
+                                    <g:form url="[resource:personInstance, action:'delete']" method="DELETE">
+                                        <g:link class="edit button" action="edit" resource="${personInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                                        <g:actionSubmit class="delete button" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                    </g:form>
 					            </div>
 							</td>
 						</tr>                    

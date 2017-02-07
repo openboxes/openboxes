@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
 
 
+
     <!-- Include javascript files -->
     <%--
     <g:javascript library="application"/>
@@ -30,7 +31,10 @@
     <script src="https://code.jquery.com/ui/1.8.24/jquery-ui.min.js"></script>
 
     <%--<jqui:resources />--%>
+    <!--
     <link href="${resource(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+    -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.8.24/themes/smoothness/jquery-ui.css" type="text/css" rel="stylesheet" media="screen, projection" />
 
     <!-- Include Jquery Validation and Jquery Validation UI plugins -->
     <jqval:resources />
@@ -38,7 +42,7 @@
 
     <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes.css')}" type="text/css" media="all" />
 
-<!-- jquery validation messages -->
+    <!-- jquery validation messages -->
     <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
         <script src="${resource(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>

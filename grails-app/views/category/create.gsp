@@ -9,12 +9,6 @@
 </head>
 <body>
 <div class="body">
-    <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
-    </g:if>
-    <g:hasErrors bean="${categoryInstance}">
-        <div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
-    </g:hasErrors>
 
 
     <div class="nav" role="navigation">
@@ -30,6 +24,15 @@
             <g:form action="save" method="post" >
                 <div class="dialog box">
                     <h2><warehouse:message code="default.create.label" args="[warehouse.message(code: 'category.label')]"/></h2>
+
+                    <g:if test="${flash.message}">
+                        <div class="message">${flash.message}</div>
+                    </g:if>
+                    <g:hasErrors bean="${categoryInstance}">
+                        <div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
+                    </g:hasErrors>
+
+
                     <table>
                         <tbody>
                         <tr class="prop">

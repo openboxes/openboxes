@@ -11,97 +11,109 @@
     </head>
     <body>
         <div class="body">
+
+            <div class="nav" role="navigation">
+                <ul>
+                    <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                    <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                    <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                </ul>
+            </div>
+
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
+
+
+
             <div class="dialog">
-                <table>
-                    <tbody>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="default.id.label"/></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "id")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="default.name.label" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "name")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="default.description.label" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "description")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="shipper.trackingUrl.label" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "trackingUrl")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="shipper.trackingFormat.label"  /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "trackingFormat")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="shipper.parameterName.label"  /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "parameterName")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="default.dateCreated.label" /></td>
-                            
-                            <td valign="top" class="value"><format:datetime obj="${shipperInstance?.dateCreated}" /></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="default.lastUpdated.label"  /></td>
-                            
-                            <td valign="top" class="value"><format:datetime obj="${shipperInstance?.lastUpdated}" /></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="shipper.shipperServices.label" /></td>
-                            
-                            <td valign="top" style="text-align: left;" class="value">
-                                <ul>
-                                <g:each in="${shipperInstance.shipperServices}" var="s">
-                                    <li><g:link controller="shipperService" action="show" id="${s.id}">${s?.encodeAsHTML()}</g:link></li>
-                                </g:each>
-                                </ul>
-                            </td>
-                            
-                        </tr>
-                    
-                    
-						<tr class="prop">
-                        	<td valign="top"></td>
-                        	<td valign="top">                         
-					            <div class="buttons">
-					                <g:form>
-					                    <g:hiddenField name="id" value="${shipperInstance?.id}" />
-					                    <g:actionSubmit class="edit" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-					                </g:form>
-					            </div>
-							</td>
-						</tr>                    
-                    </tbody>
-                </table>
+                <div class="box">
+                    <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
+                    <table>
+                        <tbody>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="default.id.label"/></td>
+
+                                <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "id")}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="default.name.label" /></td>
+
+                                <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "name")}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="default.description.label" /></td>
+
+                                <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "description")}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="shipper.trackingUrl.label" /></td>
+
+                                <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "trackingUrl")}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="shipper.trackingFormat.label"  /></td>
+
+                                <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "trackingFormat")}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="shipper.parameterName.label"  /></td>
+
+                                <td valign="top" class="value">${fieldValue(bean: shipperInstance, field: "parameterName")}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="default.dateCreated.label" /></td>
+
+                                <td valign="top" class="value"><format:datetime obj="${shipperInstance?.dateCreated}" /></td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="default.lastUpdated.label"  /></td>
+
+                                <td valign="top" class="value"><format:datetime obj="${shipperInstance?.lastUpdated}" /></td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><warehouse:message code="shipper.shipperServices.label" /></td>
+
+                                <td valign="top" style="text-align: left;" class="value">
+                                    <ul>
+                                    <g:each in="${shipperInstance.shipperServices}" var="s">
+                                        <li><g:link controller="shipperService" action="show" id="${s.id}">${s?.encodeAsHTML()}</g:link></li>
+                                    </g:each>
+                                    </ul>
+                                </td>
+
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"></td>
+                                <td valign="top" class="value">
+                                    <g:form>
+                                        <g:hiddenField name="id" value="${shipperInstance?.id}" />
+                                        <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
+                                        <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                    </g:form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </body>

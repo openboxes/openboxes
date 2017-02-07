@@ -49,7 +49,7 @@
 				</g:each>
 				</tbody>
 			</table>
-			<div class="pagination">
+			<div class="paginateButtons">
 				<g:paginate total="${transactionEntryInstanceCount ?: 0}" />
 			</div>
 		</div>

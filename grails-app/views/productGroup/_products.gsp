@@ -33,13 +33,15 @@
                     <div class="fade">${product?.vendorCode }</div>
                 </td>
                 <td class="middle">
-                    <g:link controller="product" action="edit" id="${product.id}" class="button icon edit">
-                        <warehouse:message code="default.button.edit.label"/>
-                    </g:link>
-                    <g:remoteLink controller="productGroup" action="deleteProductFromProductGroup" update="products" class="button icon trash"
-                                  id="${productGroup.id}" params="['product.id':product.id]">
-                        <warehouse:message code="default.button.delete.label"/>
-                    </g:remoteLink>
+                    <div class="button-group">
+                        <g:link controller="product" action="edit" id="${product.id}" class="button small">
+                            <warehouse:message code="default.button.edit.label"/>
+                        </g:link>
+                        <g:remoteLink controller="productGroup" action="deleteProductFromProductGroup" update="products" class="button small"
+                                      id="${productGroup.id}" params="['product.id':product.id]">
+                            <warehouse:message code="default.button.delete.label"/>
+                        </g:remoteLink>
+                    </div>
                 </td>
             </tr>
         </g:each>
@@ -61,8 +63,12 @@
                         <%--
                         <input id="product" type="text" name="product" value="" size="80" class="medium text"/>
                         --%>
-                        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" width="500" styleClass="text"/>
-                        <button  class="button icon add">${warehouse.message(code:'default.button.add.label')}</button>
+
+                        <label><g:message code="default.add.label" args="[g.message(code: 'product.label')]"/></label>
+                        <div>
+                            <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" width="500" styleClass="text"/>
+                            <button class="button">${warehouse.message(code:'default.button.add.label')}</button>
+                        </div>
                     </g:formRemote>
                 </td>
             </tr>

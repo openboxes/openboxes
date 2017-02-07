@@ -34,7 +34,7 @@
                     <div class="buttons center">
                         <button type="submit" class="button">${warehouse.message(code: 'default.button.search.label')}</button>
                         &nbsp;
-                        <g:link controller="person" action="index"><g:message code="default.button.reset.label" default="Reset"/></g:link>
+                        <g:link controller="person" action="index" class="button"><g:message code="default.button.reset.label" default="Reset"/></g:link>
                     </div>
                 </g:form>
             </div>
@@ -48,7 +48,6 @@
                     <thead>
                     <tr>
 
-                        <th><g:message code="default.actions.label"/> </th>
 
                         <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" />
 
@@ -58,15 +57,13 @@
 
                         <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" />
 
+                        <th><g:message code="default.actions.label"/> </th>
                     </tr>
                     </thead>
                     <tbody>
                     <g:each in="${userInstanceList?:personInstanceList}" status="i" var="personInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                            <td>
-                                <g:link action="edit" id="${personInstance?.id}" class="button"><g:message code="default.button.edit.label"/></g:link>
-                            </td>
 
                             <td>
                                 ${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
@@ -83,6 +80,18 @@
 
                             <td>${fieldValue(bean: personInstance, field: "phoneNumber")}</td>
 
+                            <td>
+                                <div class="button-group">
+                                    <g:link action="edit" id="${personInstance?.id}" class="button"><g:message code="default.button.edit.label"/></g:link>
+                                    <g:if test="${personInstance.class.simpleName=='Person'}">
+                                        <g:form url="[resource:personInstance, action:'delete']" method="DELETE" style="display: inline">
+                                            <g:actionSubmit class="delete button" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                        </g:form>
+                                    </g:if>
+                                </div>
+
+                            </td>
+
                         </tr>
                     </g:each>
                     <g:unless test="${userInstanceList?:personInstanceList}">
@@ -95,7 +104,7 @@
                     </g:unless>
                     </tbody>
                 </table>
-                <div class="pagination">
+                <div class="paginateButtons">
                     <g:paginate total="${personInstanceCount}" />
                 </div>
             </div>

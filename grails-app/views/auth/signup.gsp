@@ -73,10 +73,8 @@
 									  <label for="locale"><warehouse:message code="default.locale.label"/></label>
 									</td>
 									<td class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-										<div style="width: 235px">
-											<g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
-													  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
-										</div>
+										<g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
+												  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
 									</td>
 								</tr>
 								<tr class="prop">

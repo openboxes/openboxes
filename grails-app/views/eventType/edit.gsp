@@ -20,80 +20,72 @@
 	            </div>
             </g:hasErrors>
             <g:form method="post" >
-            	<fieldset>
-	                <g:hiddenField name="id" value="${eventTypeInstance?.id}" />
-	                <g:hiddenField name="version" value="${eventTypeInstance?.version}" />
-	                <div class="dialog">
-	                    <table>
-	                        <tbody>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="eventType.name.label" default="Name" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${eventTypeInstance?.name}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="description"><warehouse:message code="eventType.description.label" default="Description" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'description', 'errors')}">
-	                                    <g:textField name="description" value="${eventTypeInstance?.description}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="sortOrder"><warehouse:message code="eventType.sortOrder.label" default="Sort Order" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'sortOrder', 'errors')}">
-	                                    <g:textField name="sortOrder" value="${fieldValue(bean: eventTypeInstance, field: 'sortOrder')}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="eventCode"><warehouse:message code="eventType.eventCode.label" default="Event Status" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventCode', 'errors')}">
-	                                    <g:select name="eventCode" from="${org.pih.warehouse.core.EventCode?.values()}" value="${eventTypeInstance?.eventCode}" noSelection="['': '']" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="activityType"><warehouse:message code="eventType.activityType.label" default="Activity Type" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'activityType', 'errors')}">
-	                                    <g:select name="activityType" from="${org.pih.warehouse.core.ActivityType?.values()}" value="${eventTypeInstance?.activityType}" noSelection="['': '']" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="eventType"><warehouse:message code="eventType.eventType.label" default="Event Type" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventType', 'errors')}">
-	                                    <g:select name="eventType" from="${org.pih.warehouse.core.EventTypes?.values()}" value="${eventTypeInstance?.eventType}"  />
-	                                </td>
-	                            </tr>
-	                        	                        
-                            	<tr class="prop">
-		                        	<td valign="top"></td>
-		                        	<td valign="top">                        	
-						                <div class="buttons">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-						                </div>
-		    						</td>                    	
-	                        	</tr>	                        
-	                        </tbody>
-	                    </table>
-	                </div>
-                </fieldset>
+				<g:hiddenField name="id" value="${eventTypeInstance?.id}" />
+				<g:hiddenField name="version" value="${eventTypeInstance?.version}" />
+				<div class="dialog">
+
+                    <div class="nav" role="navigation">
+                        <ul>
+                            <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                            <li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+                            <li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+                        </ul>
+                    </div>
+
+					<div class="box">
+						<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
+						<table>
+							<tbody>
+
+								<tr class="prop">
+									<td valign="top" class="name">
+									  <label for="name"><warehouse:message code="eventType.name.label" default="Name" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'name', 'errors')}">
+										<g:textField name="name" value="${eventTypeInstance?.name}" class="text" size="100"/>
+									</td>
+								</tr>
+
+								<tr class="prop">
+									<td valign="top" class="name">
+									  <label for="description"><warehouse:message code="eventType.description.label" default="Description" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'description', 'errors')}">
+										<g:textField name="description" value="${eventTypeInstance?.description}" class="text" size="100"/>
+									</td>
+								</tr>
+
+								<tr class="prop">
+									<td valign="top" class="name">
+									  <label for="sortOrder"><warehouse:message code="eventType.sortOrder.label" default="Sort Order" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'sortOrder', 'errors')}">
+										<g:textField name="sortOrder" value="${fieldValue(bean: eventTypeInstance, field: 'sortOrder')}" class="text" size="10"/>
+									</td>
+								</tr>
+
+								<tr class="prop">
+									<td valign="top" class="name">
+									  <label for="eventCode"><warehouse:message code="eventType.eventCode.label" default="Event Code" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventCode', 'errors')}">
+										<g:select name="eventCode" from="${org.pih.warehouse.core.EventCode?.values()}"
+                                                  class="chzn-select-deselect"
+                                                  value="${eventTypeInstance?.eventCode}" noSelection="['': '']" />
+									</td>
+								</tr>
+
+								<tr class="prop">
+									<td valign="top" class="name"></td>
+									<td valign="top">
+										<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+										<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
             </g:form>
         </div>
     </body>

@@ -16,13 +16,6 @@
     </head>
     <body>
         <div class="body">
-            <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
-            </g:if>
-			<g:hasErrors bean="${categoryInstance}">
-				<div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
-			</g:hasErrors>
-
 
             <div class="nav" role="navigation">
                 <ul>
@@ -36,6 +29,14 @@
                 <div class="yui-u first">
                     <div id="category-tree" class="box">
                         <h2><g:message code="categories.label"/></h2>
+
+                        <g:if test="${flash.message}">
+                            <div class="message">${flash.message}</div>
+                        </g:if>
+                        <g:hasErrors bean="${categoryInstance}">
+                            <div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
+                        </g:hasErrors>
+
                         <%-- Display the category tree from the ROOT node --%>
                         <g:render template="tree" model="[category:rootCategory, level: 0]"/>
                     </div>

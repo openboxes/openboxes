@@ -15,9 +15,10 @@
 <body>
 	<div class="body">
         <div class="summary">
-            <span class="title">
-                <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" style="vertical-align: middle"/>
-                <warehouse:message code="notFound.label" default="Page Not Found"/></span>
+            <span class="title middle">
+                <img src="${resource(dir: 'images/icons/silk', file: 'map_error.png')}" />
+                <warehouse:message code="notFound.label" default="Page Not Found"/>
+            </span>
             <div class="right">
                 <button class="button open-dialog">
                     <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}" />
@@ -35,9 +36,9 @@
 			</div>
 		</g:if>
 
-        <div>
+        <div style="margin: 50px;">
 
-            <table style="width:auto;">
+            <table style="width:auto;margin-left: auto; margin-right: auto;">
                 <tr>
                     <td>
                         <div style="">
@@ -46,7 +47,7 @@
 
                     </td>
                     <td>
-                        <div class="triangle-isosceles">
+                        <div class="triangle-isosceles" style="width: 250px;">
                             <warehouse:message code="errors.notFound.message"/>
                         </div>
                     </td>

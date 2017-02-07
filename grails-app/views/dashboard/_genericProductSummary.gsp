@@ -31,7 +31,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
                     <td>
                         <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK_OBSOLETE']">
@@ -88,7 +88,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
                     <td>
                         <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT_OBSOLETE']">
@@ -102,7 +102,7 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.critical.label",default:"Critical")}'/>
                     </td>
                     <td>
                         <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT']">

@@ -442,18 +442,18 @@
                                             </g:if>
                                         </tbody>
 									</table>
+                                    <div class="paginateButtons">
+
+                                        <g:set var="pageParams"
+                                               value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+
+                                        <g:paginate total="${numProducts}"
+                                                    action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+
+                                    </div>
 
 								</form>		
 							</div>
-                            <div class="pagination">
-
-                                <g:set var="pageParams"
-                                       value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
-
-                                <g:paginate total="${numProducts}"
-                                            action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
-
-                            </div>
 						</div>
 					</div>
 				</div>    	

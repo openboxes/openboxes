@@ -59,9 +59,9 @@
                     </g:each>
                     </tbody>
                 </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${shipmentItemInstanceTotal}" />
+                <div class="paginateButtons">
+                    <g:paginate total="${shipmentItemInstanceTotal}" />
+                </div>
             </div>
         </div>
     </body>

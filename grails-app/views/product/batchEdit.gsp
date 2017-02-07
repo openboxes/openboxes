@@ -37,7 +37,7 @@
                             </div>
                             <div>
                                 <g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}"/>
-                                <label><warehouse:message code="product.includeCategoryChildren.label" default="Include category children"/></label>
+                                <label for="includeCategoryChildren"><warehouse:message code="product.includeCategoryChildren.label" default="Include category children"/></label>
                             </div>
                         </div>
                         <%--
@@ -50,18 +50,14 @@
                         --%>
                         <div class="filter">
                             <label><warehouse:message code="product.name.label"/></label>
-                            <div>
-                                <g:textField name="name" value="${params.name}" class="text" size="40"/>
-                            </div>
+                            <g:textField name="name" value="${params.name}" class="text" size="40"/>
                         </div>
                         <div class="filter">
                             <label><warehouse:message code="product.productCode.label"/></label>
-                            <div>
-                                <g:textField name="productCode" value="${params.productCode}" class="text" size="40"/>
-                            </div>
+                            <g:textField name="productCode" value="${params.productCode}" class="text" size="40"/>
                             <div>
                                 <g:checkBox name="productCodeIsNull" value="${params?.productCodeIsNull}"/>
-                                <label><warehouse:message code="product.productCodeIsNull.label" default="Product code is empty"/></label>
+                                <label for="productCodeIsNull"><warehouse:message code="product.productCodeIsNull.label" default="Product code is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
@@ -74,7 +70,7 @@
                             </div>
                             <div>
                                 <g:checkBox name="unitOfMeasureIsNull" value="${params?.unitOfMeasureIsNull}"/>
-                                <label><warehouse:message code="product.unitOfMeasureIsNull.label" default="Unit of measure is empty"/></label>
+                                <label for="unitOfMeasureIsNull"><warehouse:message code="product.unitOfMeasureIsNull.label" default="Unit of measure is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
@@ -87,7 +83,7 @@
                             </div>
                             <div>
                                 <g:checkBox name="brandNameIsNull" value="${params?.brandNameIsNull}"/>
-                                <label><warehouse:message code="product.brandNameIsNull.label" default="Brand name is empty"/></label>
+                                <label for="brandNameIsNull"><warehouse:message code="product.brandNameIsNull.label" default="Brand name is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
@@ -100,7 +96,7 @@
                             </div>
                             <div>
                                 <g:checkBox name="manufacturerIsNull" value="${params?.manufacturerIsNull}"/>
-                                <label><warehouse:message code="product.manufacturerIsNull.label" default="Manufacturer is empty"/></label>
+                                <label for="manufacturerIsNull"><warehouse:message code="product.manufacturerIsNull.label" default="Manufacturer is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
@@ -113,7 +109,7 @@
                             </div>
                             <div>
                                 <g:checkBox name="manufacturerCodeIsNull" value="${params?.manufacturerCodeIsNull}"/>
-                                <label><warehouse:message code="product.manufacturerCodeIsNull.label" default="Manufacturer code is empty"/></label>
+                                <label for="manufacturerCodeIsNull"><warehouse:message code="product.manufacturerCodeIsNull.label" default="Manufacturer code is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
@@ -126,7 +122,7 @@
                             </div>
                             <div>
                                 <g:checkBox name="vendorIsNull" value="${params?.vendorIsNull}"/>
-                                <label><warehouse:message code="product.vendorIsNull.label" default="Vendor is empty"/></label>
+                                <label for="vendorIsNull"><warehouse:message code="product.vendorIsNull.label" default="Vendor is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
@@ -139,23 +135,31 @@
                             </div>
                             <div>
                                 <g:checkBox name="vendorCodeIsNull" value="${params?.vendorCodeIsNull}"/>
-                                <label><warehouse:message code="product.vendorCodeIsNull.label" default="Vendor code is empty"/></label>
+                                <label for="vendorCodeIsNull"><warehouse:message code="product.vendorCodeIsNull.label" default="Vendor code is empty"/></label>
                             </div>
                         </div>
                         <div class="filter">
                             <label><warehouse:message code="default.createdBy.label"/></label>
                             <div>
-                                <g:selectUser name="createdById" class="chzn-select" value="${params.createdById}" noSelection="['':'']" style="width:100%;"/>
+                                <g:selectUser name="createdById" class="chzn-select-deselect"
+                                              value="${params.createdById}" noSelection="['':'']"/>
                             </div>
                         </div>
                         <div class="filter">
                             <label><warehouse:message code="default.updatedBy.label"/></label>
                             <div>
-                                <g:selectUser name="updatedById" class="chzn-select" value="${params.updatedById}" noSelection="['':'']" style="width:100%;"/>
+                                <g:selectUser name="updatedById" class="chzn-select-deselect"
+                                              value="${params.updatedById}" noSelection="['':'']"/>
                             </div>
                         </div>
                         <div class="buttons center">
                             <button type="submit" class="button"> ${warehouse.message(code: 'default.button.find.label')}</button>
+
+                            <g:link controller="product" action="batchEdit" class="button">
+                                <warehouse:message code="default.reset.label" default="Reset"/>
+                            </g:link>
+
+
                         </div>
                     </g:form>
                 </div>
@@ -178,11 +182,7 @@
                             </label>
                             <g:if test="${commandInstance?.productInstanceList}">
                                 <warehouse:message code="default.showingPaginatedResults.message" args="[firstResult, pageCount, totalCount]"/>
-
                             </g:if>
-                            <g:link controller="product" action="batchEdit">
-                                <warehouse:message code="default.reset.label" default="Reset"/>
-                            </g:link>
 
                         </h2>
 
@@ -364,14 +364,6 @@
                                         <warehouse:message code="default.unitOfMeasure.label" /></th>
                                     <th valign="top">
                                         <warehouse:message code="product.coldChain.label" /></th>
-                                    <th valign="top">
-                                        <warehouse:message code="default.createdBy.label" /></th>
-                                    <th valign="top">
-                                        <warehouse:message code="default.updatedBy.label" /></th>
-                                    <th valign="top">
-                                        <warehouse:message code="default.dateCreated.label" /></th>
-                                    <th valign="top">
-                                        <warehouse:message code="default.lastUpdated.label" /></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -419,19 +411,6 @@
                                                 <td valign="top" style="text-align: center;" class="${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
                                                     <g:checkBox name="productInstanceList[${status }].coldChain" value="${productInstance?.coldChain}" />
                                                 </td>
-                                                <td valign="top" class="${hasErrors(bean: productInstance, field: 'createdBy', 'errors')}">
-                                                    ${productInstance?.createdBy}
-                                                </td>
-                                                <td valign="top" class="${hasErrors(bean: productInstance, field: 'updatedBy', 'errors')}">
-                                                    ${productInstance?.updatedBy}
-                                                </td>
-                                                <td valign="top" class="${hasErrors(bean: productInstance, field: 'dateCreated', 'errors')}">
-                                                    ${productInstance?.dateCreated}
-                                                </td>
-                                                <td valign="top" class="${hasErrors(bean: productInstance, field: 'lastUpdated', 'errors')}">
-                                                    ${productInstance?.lastUpdated}
-                                                </td>
-
                                             </tr>
 
                                         <%--
@@ -463,26 +442,26 @@
                                     </g:if>
                                     <g:else>
                                         <tr>
-                                            <td colspan="11" class="center empty">
+                                            <td colspan="9" class="center empty">
                                                 <warehouse:message code="default.noResults.message" default="No results"/>
                                             </td>
                                         </tr>
                                     </g:else>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="paginateButtons">
-                            <div class="left">
-                                <g:paginate total="${products?.totalCount}" params="['categoryId':params?.categoryId]" max="${params.max}"/>
-                            </div>
-                            <div class="right">
-                                <warehouse:message code="batchEdit.resultsPerPage.label" default="Results per page"/>:
-                                <g:if test="${params.max != '5'}"><g:link action="batchEdit" params="[max:5]">5</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
-                                <g:if test="${params.max != '10'}"><g:link action="batchEdit" params="[max:10]">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
-                                <g:if test="${params.max != '25'}"><g:link action="batchEdit" params="[max:25]">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
-                                <g:if test="${params.max != '50'}"><g:link action="batchEdit" params="[max:50]">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
-                                <g:if test="${params.max != '100'}"><g:link action="batchEdit" params="[max:100]">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
-                                <g:if test="${params.max != '-1'}"><g:link action="batchEdit" params="[max:-1]">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                            <div class="paginateButtons">
+                                <div class="left">
+                                    <g:paginate total="${products?.totalCount}" params="['categoryId':params?.categoryId]" max="${params.max}"/>
+                                </div>
+                                <div class="right">
+                                    <warehouse:message code="batchEdit.resultsPerPage.label" default="Results per page"/>:
+                                    <g:if test="${params.max != '5'}"><g:link action="batchEdit" params="[max:5]">5</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+                                    <g:if test="${params.max != '10'}"><g:link action="batchEdit" params="[max:10]">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+                                    <g:if test="${params.max != '25'}"><g:link action="batchEdit" params="[max:25]">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
+                                    <g:if test="${params.max != '50'}"><g:link action="batchEdit" params="[max:50]">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
+                                    <g:if test="${params.max != '100'}"><g:link action="batchEdit" params="[max:100]">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
+                                    <g:if test="${params.max != '-1'}"><g:link action="batchEdit" params="[max:-1]">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                                </div>
                             </div>
                         </div>
 
@@ -493,7 +472,7 @@
                                     ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
                                 </button>
                                 &nbsp;
-                                <g:link controller="inventory" action="browse">
+                                <g:link controller="inventory" action="browse" class="button">
                                     ${warehouse.message(code: 'default.button.cancel.label')}
                                 </g:link>
                             </div>

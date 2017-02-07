@@ -31,21 +31,20 @@
                                 <g:hiddenField name="sort" value="${params.sort?:'name'}"/>
                                 <g:hiddenField name="order" value="${params.order?:'asc'}"/>
 
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <label><warehouse:message code="default.name.label"/></label>
-                                        </td>
-                                        <td>
-                                            <g:textField name="q" value="${params.q}" class="text"></g:textField>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <hr/>
-                                <div class="buttons center">
+                                <div class="filter-list-item">
+                                    <label><warehouse:message code="default.name.label"/></label>
+                                    <g:textField name="q" value="${params.q}" class="text"></g:textField>
+
+                                </div>
+
+
+                                <div class="buttons">
                                     <button type="submit" class="button icon search">
                                         ${warehouse.message(code: 'default.button.find.label')}
                                     </button>
+                                    <g:link action="list" class="button icon reload">
+                                        ${warehouse.message(code: 'default.button.reset.label')}
+                                    </g:link>
                                 </div>
 
 
@@ -57,7 +56,10 @@
                     <div class="yui-u">
 
                         <div class="dialog box">
-                            <h2><warehouse:message code="attributes.label" default="Attributes"/></h2>
+                            <h2>
+                                <warehouse:message code="attributes.label" default="Attributes"/>
+                                <small><g:message code="default.showing.message" args="[attributeInstanceList.size()]"/></small>
+                            </h2>
                             <table>
                                 <thead>
                                 <tr>
@@ -77,7 +79,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${attributeInstanceTotal}" />
+                                <g:paginate total="${attributeInstanceCount}" />
                             </div>
 
                         </div>

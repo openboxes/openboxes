@@ -11,6 +11,15 @@
     </head>
     <body>
         <div class="body">
+
+			<div class="nav" role="navigation">
+				<ul>
+					<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+					<li><g:link class="list" action="index"><warehouse:message code="default.list.label" args="[entityName]"/></g:link></li>
+					<li><g:link class="create" action="create"><g:message code="default.create.label" args="[entityName]" /></g:link></li>
+				</ul>
+			</div>
+
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -19,88 +28,90 @@
 	                <g:renderErrors bean="${shipperInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form method="post" >
-            	<fieldset>
-	                <g:hiddenField name="id" value="${shipperInstance?.id}" />
-	                <g:hiddenField name="version" value="${shipperInstance?.version}" />
-	                <div class="dialog">
-	                    <table>
-	                        <tbody>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'name', 'errors')}">
-	                                    <g:textArea name="name" cols="40" rows="5" value="${shipperInstance?.name}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="description"><warehouse:message code="default.description.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'description', 'errors')}">
-	                                    <g:textArea name="description" cols="40" rows="5" value="${shipperInstance?.description}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="trackingUrl"><warehouse:message code="shipper.trackingUrl.label"/></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'trackingUrl', 'errors')}">
-	                                    <g:textArea name="trackingUrl" cols="40" rows="5" value="${shipperInstance?.trackingUrl}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="trackingFormat"><warehouse:message code="shipper.trackingFormat.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'trackingFormat', 'errors')}">
-	                                    <g:textArea name="trackingFormat" cols="40" rows="5" value="${shipperInstance?.trackingFormat}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="parameterName"><warehouse:message code="shipper.parameterName.label"/></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'parameterName', 'errors')}">
-	                                    <g:textArea name="parameterName" cols="40" rows="5" value="${shipperInstance?.parameterName}" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="shipperServices"><warehouse:message code="shipper.shipperServices.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'shipperServices', 'errors')}">
-	                                    
-<ul>
-<g:each in="${shipperInstance?.shipperServices?}" var="s">
-    <li><g:link controller="shipperService" action="show" id="${s.id}">${s?.encodeAsHTML()}</g:link></li>
-</g:each>
-</ul>
-<g:link controller="shipperService" action="create" params="['shipper.id': shipperInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'shipperService.label', default: 'ShipperService')])}</g:link>
+            <g:form url="[resource: shipperInstance, action: 'update']">
+				<g:hiddenField name="id" value="${shipperInstance?.id}" />
+				<g:hiddenField name="version" value="${shipperInstance?.version}" />
+				<div class="dialog">
 
-	                                </td>
-	                            </tr>
-	                        	                        
-                            	<tr class="prop">
-		                        	<td valign="top"></td>
-		                        	<td valign="top">                        	
-						                <div class="buttons">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-						                </div>
-		    						</td>                    	
-	                        	</tr>	                        
-	                        </tbody>
-	                    </table>
-	                </div>
-                </fieldset>
+					<div class="box">
+                        <h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
+                        <table>
+                            <tbody>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="name"><warehouse:message code="default.name.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'name', 'errors')}">
+                                        <g:textArea name="name" cols="40" rows="5" value="${shipperInstance?.name}" />
+                                    </td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="description"><warehouse:message code="default.description.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'description', 'errors')}">
+                                        <g:textArea name="description" cols="40" rows="5" value="${shipperInstance?.description}" />
+                                    </td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="trackingUrl"><warehouse:message code="shipper.trackingUrl.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'trackingUrl', 'errors')}">
+                                        <g:textArea name="trackingUrl" cols="40" rows="5" value="${shipperInstance?.trackingUrl}" />
+                                    </td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="trackingFormat"><warehouse:message code="shipper.trackingFormat.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'trackingFormat', 'errors')}">
+                                        <g:textArea name="trackingFormat" cols="40" rows="5" value="${shipperInstance?.trackingFormat}" />
+                                    </td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="parameterName"><warehouse:message code="shipper.parameterName.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'parameterName', 'errors')}">
+                                        <g:textArea name="parameterName" cols="40" rows="5" value="${shipperInstance?.parameterName}" />
+                                    </td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="shipperServices"><warehouse:message code="shipper.shipperServices.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'shipperServices', 'errors')}">
+
+        <ul>
+        <g:each in="${shipperInstance?.shipperServices?}" var="s">
+        <li><g:link controller="shipperService" action="show" id="${s.id}">${s?.encodeAsHTML()}</g:link></li>
+        </g:each>
+        </ul>
+        <g:link controller="shipperService" action="create" params="['shipper.id': shipperInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'shipperService.label', default: 'ShipperService')])}</g:link>
+
+                                    </td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top"></td>
+                                    <td valign="top">
+                                        <div class="buttons">
+                                            <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+                                            <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+				</div>
             </g:form>
         </div>
     </body>

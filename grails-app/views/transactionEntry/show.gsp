@@ -56,14 +56,13 @@
                     
                     
 						<tr class="prop">
-                        	<td valign="top" colspan="2">
-					            <div class="buttons">
-					                <g:form>
-					                    <g:hiddenField name="id" value="${transactionEntryInstance?.id}" />
-					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-					                </g:form>
-					            </div>
+                        	<td valign="top" class="name">
+                            </td>
+                            <td valign="top" class="value">
+                                <g:form url="[resource:transactionEntryInstance, action:'delete']" method="DELETE">
+                                    <g:link class="edit button" action="edit" resource="${transactionEntryInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                                    <g:actionSubmit class="delete button" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                </g:form>
 							</td>
 						</tr>                    
                     </tbody>
