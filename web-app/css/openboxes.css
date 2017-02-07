@@ -595,7 +595,7 @@ th.desc a {
 -------------------------------------------------------------- */
 
 
-label       { font-weight: normal; white-space: nowrap; }
+label       { font-weight: normal; white-space: normal; }
 fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
 legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
@@ -1030,6 +1030,14 @@ button.action-btn, button.previous, button.next {
     padding: 10px;
     display: block;
     color: #333;
+}
+
+.megaButton label {
+    padding: 5px 10px 5px 10px;
+    display: block;
+    color: #666;
+    background-color: lightgrey;
+    font-weight: lighter;
 }
 
 .megaButton:hover {
@@ -1882,7 +1890,7 @@ div#dashboard li {
 }
 
 .prop {
-    border-top: 1px dotted #ccc;
+    border-top: 0px dotted #ccc;
 }
 
 .prop .first {
@@ -3052,6 +3060,12 @@ input {
     box-sizing : border-box;
 }
 
+/* prevents text inputs from overflowing their parent */
+input.text {
+    box-sizing : border-box;
+    width: 100%
+}
+
 .childContainer .tag {
     margin-left: 25px;
 }
@@ -3109,7 +3123,7 @@ input {
     text-decoration: underline;
 }
 
-.nav a.home, .nav a.list, .nav a.create {
+.nav a.home, .nav a.list, .nav a.create, .nav a.export {
     background-position: 0.7em center;
     background-repeat: no-repeat;
     text-indent: 25px;
@@ -3125,6 +3139,10 @@ input {
 
 .nav a.create {
     background-image: url(../images/skin/database_add.png);
+}
+
+.nav a.export {
+    background-image: url(../images/skin/database_save.png);
 }
 
 
@@ -3169,6 +3187,7 @@ label {
     display: inline-block;
     margin: 0 0.25em 0 0;
 }
+
 
 input, select, textarea {
     background-color: #fcfcfc;
