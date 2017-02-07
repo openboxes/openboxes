@@ -23,7 +23,7 @@ grails.project.docs.output.dir = "web-app/docs"
 // Inline plugins
 //grails.plugin.location.spock='spock/'
 //grails.plugin.location.liquibase='liquibase/'
-
+grails.plugin.location.'watch-scaffolding' = '../watch-scaffolding'
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
