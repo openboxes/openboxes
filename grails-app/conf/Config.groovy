@@ -199,7 +199,8 @@ mail.error.debug = true
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
-        grails.logging.jul.usebridge = true
+		grails.resources.debug = true
+		grails.logging.jul.usebridge = true
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
@@ -271,8 +272,12 @@ log4j.main = {
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
             'org.hibernate.impl.SessionFactoryObjectFactory',
             'com.gargoylesoftware.htmlunit.DefaultCssErrorHandler',
-            'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
-            'org.grails.plugin.resource.ResourceProcessor'
+            'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl',
+            'org.grails.plugin.resource.ResourceProcessor',
+			'grails.app.services.org.grails.plugin.resource',
+			'grails.app.taglib.org.grails.plugin.resource',
+			'org.grails.plugin.resource.ResourceTagLib',
+			'grails.app.resourceMappers.org.grails.plugin.resource'
             //'org.jumpmind.symmetric.config.PropertiesFactoryBean'
 
 	warn	'org.mortbay.log',
