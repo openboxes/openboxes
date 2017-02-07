@@ -575,7 +575,8 @@ class ProductController {
 	def search() {
 		log.info "search " + params
 		if (params.q) {
-			def products = productService.findProducts(URLEncoder.encode(params.q))
+			List searchTerms = params.q.split(" ")
+			def products = productService.findProducts(searchTerms)
 			[ products : products ]
 		}
 	}

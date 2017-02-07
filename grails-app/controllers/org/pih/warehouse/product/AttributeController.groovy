@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.product
 
+import org.pih.warehouse.core.Person
+
 class AttributeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -18,8 +20,24 @@ class AttributeController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [attributeInstanceList: Attribute.list(params), attributeInstanceTotal: Attribute.count()]
+
+		def attributeInstanceList
+		def attributeInstanceCount
+
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+
+		if (params.q) {
+			String searchTerms = "%" + params.q + "%"
+			attributeInstanceList = Attribute.findAllByNameIlike(searchTerms, params)
+			attributeInstanceCount = Attribute.countByNameIlike(searchTerms, params)
+		}
+		else {
+			attributeInstanceList = Attribute.list(params)
+			attributeInstanceCount = Attribute.count()
+		}
+
+
+        [attributeInstanceList: attributeInstanceList, attributeInstanceCount: attributeInstanceCount]
     }
 	
 	def show() {

@@ -69,7 +69,7 @@ class CategoryController {
         }
 		
 		if (!categoryInstance.hasErrors() && categoryInstance.save()) {
-			flash.message = "${warehouse.message(code: 'category.saved.message', arg: [format.category(category:categoryInstance)])}"
+			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
 			redirect(action: "tree", model: [rootCategory : rootCategory])
 		}
 		else {	
