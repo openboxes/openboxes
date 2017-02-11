@@ -28,7 +28,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="inventory.transferTo.label" default="Transfer to" /></label></td>
 								<td valign="top" class="value">
-                                    ${session.warehouse.name}
+									<input type="text" disabled="disabled" class="text" value="${session.warehouse.name}"/>
 								</td>
 							</tr>
                             <tr class="prop">
@@ -46,14 +46,22 @@
                                 </td>
                             </tr>
 
-                        <tr class="prop">
+                        	<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>
 								<td valign="top" class="value">
-									<g:textField name="quantity" size="6" value="" class="text"/>
-									${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+									<g:textField name="quantity" size="6" value="" class="text" placeholder="${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}"/>
+
 									
 								</td>
-							</tr>  	        
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name"><label><warehouse:message code="default.comment.label" /></label></td>
+								<td valign="middle" class="value">
+									<g:textArea name="comment"></g:textArea>
+
+								</td>
+							</tr>
+
 						</tbody>
 						<tfoot>
 							<tr>
@@ -62,7 +70,7 @@
 										<warehouse:message code="inventory.returnStock.label" default="Return stock"/>
 									</button>
 									&nbsp;
-									<a href="javascript:void(-1);" id="btnReturnClose-${itemInstance?.id }" class="middle">
+									<a href="javascript:void(-1);" id="btnReturnClose-${itemInstance?.id }" class="button">
 										<warehouse:message code="default.button.cancel.label"/>
 									</a>
 								</td>
@@ -76,7 +84,7 @@
 </div>		
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#dlgReturnStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 800, height: 400 });
+		$("#dlgReturnStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 600 });
 		$("#btnReturnStock-${itemInstance?.id}").click(function() { $("#dlgReturnStock-${itemInstance?.id}").dialog('open'); });
 		$("#btnReturnClose-${itemInstance?.id}").click(function() { $("#dlgReturnStock-${itemInstance?.id}").dialog('close'); });
 	});

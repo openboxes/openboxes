@@ -2319,7 +2319,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param params
 	 */
-	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location destination, Location source, Integer quantity) {
+	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location destination, Location source, Integer quantity, String comment) {
 		def transaction = new Transaction();
 		//def inventoryInstance = Inventory.get(params?.inventory?.id)
 		Integer quantityOnHand = getQuantity(inventoryItem);
@@ -2376,7 +2376,7 @@ class InventoryService implements ApplicationContextAware {
 			transaction.transactionType = (destination) ? TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) : TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory;
 			transaction.transactionNumber = generateTransactionNumber()
-
+			transaction.comment = comment
 			// Add transaction entry to transaction
 			transactionEntry.inventoryItem = inventoryItem;
 			transactionEntry.quantity = quantity
@@ -4303,8 +4303,8 @@ class InventoryService implements ApplicationContextAware {
                     statusMessage = "STOCK_OUT_OBSOLETE"
                 }
                 else {
-                    statusMessage = "STOCK_OUT"
-                }
+                statusMessage = "STOCK_OUT"
+            }
             }
             else {
                 if (minQuantity && minQuantity > 0 && currentQuantity <= minQuantity ) {
@@ -4321,8 +4321,8 @@ class InventoryService implements ApplicationContextAware {
                         statusMessage = "IN_STOCK_OBSOLETE"
                     }
                     else {
-                        statusMessage = "IN_STOCK"
-                    }
+                    statusMessage = "IN_STOCK"
+                }
                 }
                 else {
                     statusMessage = "OBSOLETE"

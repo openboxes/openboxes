@@ -32,8 +32,16 @@
                         <tr class="prop">
                             <td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>
                             <td valign="middle" class="value">
-                                <g:textField name="quantity" size="6" value="" class="text"/>
-                                ${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                                <g:textField name="quantity" size="6" value="" class="text"
+                                             placeholder="${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}"/>
+
+
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name"><label><warehouse:message code="default.comment.label" /></label></td>
+                            <td valign="middle" class="value">
+                                <g:textArea name="comment"></g:textArea>
 
                             </td>
                         </tr>
@@ -41,11 +49,11 @@
                         <tfoot>
                         <tr>
                             <td colspan="2" class="center">
-                                <button>
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.transferStock.label"/>
+                                <button class="button icon approve">
+                                    <warehouse:message code="inventory.transferStock.label"/>
                                 </button>
                                 &nbsp;
-                                <a href="javascript:void(-1);" id="btnTransferClose-${itemInstance?.id }" class="middle">
+                                <a href="javascript:void(-1);" id="btnTransferClose-${itemInstance?.id }" class="button">
                                     <warehouse:message code="default.button.cancel.label"/>
                                 </a>
                             </td>
@@ -59,7 +67,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#dlgTransferStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 800, height: 400 });
+        $("#dlgTransferStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 600, height: 400});
         $("#btnTransferStock-${itemInstance?.id}").click(function() { $("#dlgTransferStock-${itemInstance?.id}").dialog('open'); });
         $("#btnTransferClose-${itemInstance?.id}").click(function() { $("#dlgTransferStock-${itemInstance?.id}").dialog('close'); });
     });
