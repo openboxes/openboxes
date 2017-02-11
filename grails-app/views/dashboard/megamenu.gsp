@@ -112,14 +112,9 @@
 			</g:link>
 			<div class="buttonsBar" style="min-width: 200px;">
                 <div class="megaButton">
-                    <g:link controller="purchaseOrderWorkflow" action="index" class="create">
-                        <warehouse:message code="order.create.label"/>
-                    </g:link>
-                </div>
-                <hr/>
-                <div class="megaButton">
 					<g:link controller="order" action="list" params="[status:'PENDING']" class="list"><warehouse:message code="order.list.label"/></g:link>
 				</div>
+                <%--
 				<g:each in="${incomingOrders}" var="orderStatusRow">
 					<div class="megaButton">
 						<g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="order-status-${orderStatusRow[0] }">
@@ -127,6 +122,13 @@
 						</g:link>
 					</div>					
 				</g:each>
+				--%>
+                <hr/>
+                <div class="megaButton">
+                    <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                        <warehouse:message code="order.create.label"/>
+                    </g:link>
+                </div>
 			</div>
 		</li>
 	</g:authorize>

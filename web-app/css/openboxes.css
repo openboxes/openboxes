@@ -3110,3 +3110,33 @@ textarea {
     text-decoration: none;
 }
 
+/* =============================================================================
+                            Dashboard draggable content
+   ========================================================================== */
+
+.column {
+    width:32%;
+    margin-right:.5%;
+    float:left;
+    min-height: 300px;
+}
+.column .dragbox {
+    #margin:5px;
+    background:#fff;
+    position:relative;
+    #border:1px solid #ddd;
+}
+.column .dragbox h2 {
+    margin:0;
+    border-bottom:1px solid #eee;
+    cursor:move;
+}
+.box-content {
+    background:#fff;
+    min-height:100px; margin:5px;
+    font-size:0.8em; line-height:1.5em;
+}
+.column .placeholder {
+    background: #f0f0f0;
+    border:2px dashed #883533;
+}

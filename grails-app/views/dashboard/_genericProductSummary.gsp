@@ -1,7 +1,6 @@
 <div class="box">
     <h2>
-        <warehouse:message code="inventory.genericProductSummary.label" default="Inventory status by generic product"/>
-        <span class="beta">Beta</span>
+        <warehouse:message code="inventory.genericProductSummary.label" default="Generic Product Summary"/>
     </h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="alertSummary">
@@ -9,16 +8,16 @@
     			<tbody>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
+                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
                     </td>
 
                     <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT']">
-                            <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK']">
+                            <warehouse:message code="inventory.listInStock.label" />
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="IN_STOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
@@ -26,14 +25,28 @@
                     <td class="center" style="width: 1%">
                         <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
                     </td>
+
                     <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT_OBSOLETE']">
-                            <warehouse:message code="inventory.listOutOfStockObsolete.label" default="Stocked out, but obsolete"/>
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'OVERSTOCK']">
+                            <warehouse:message code="inventory.listOverStock.label" />
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="STOCK_OUT_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="OVERSTOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="center" style="width: 1%">
+                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                    </td>
 
+                    <td>
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'REORDER']">
+                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
+                        </g:link>
+                    </td>
+                    <td class="right">
+                        <div id="REORDER" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
                 <tr>
@@ -52,72 +65,24 @@
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.alerts.label",default:"Critical")}'/>
                     </td>
 
                     <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'REORDER']">
-                            <warehouse:message code="inventory.listReorderStock.label" default="Items that are below reorder level"/>
+                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT']">
+                            <warehouse:message code="inventory.listOutOfStock.label" default="Items that have stocked out"/>
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="REORDER" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
-
-
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
-                    </td>
-
-                    <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'OVERSTOCK']">
-                            <warehouse:message code="inventory.listOverStock.label" />
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="OVERSTOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
-                    </td>
-
-                    <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK']">
-                            <warehouse:message code="inventory.listInStock.label" />
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="IN_STOCK" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK_OBSOLETE']">
-                            <warehouse:message code="inventory.listInStockObsolete.label" default="In stock, but obsolete"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="IN_STOCK_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-
-
 
 
 				</tbody>
                 <tfoot>
                     <tr>
                         <th class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle" title='${warehouse.message(code:"default.total.label",default:"Total")}'/>
                         </th>
                         <th>
                             <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'ALL']">
@@ -125,7 +90,7 @@
                             </g:link>
                         </th>
                         <th class="right">
-                            <div id="TOTAL"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="TOTAL" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
                         </th>
                     </tr>
 

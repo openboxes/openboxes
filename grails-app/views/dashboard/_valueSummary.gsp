@@ -51,7 +51,7 @@
                             <div id="progressbar"></div>
                         </td>
                     </tr>
-                    --%>
+                --%>
                 </tbody>
                 <tfoot>
                     <tr class="odd">
@@ -65,11 +65,14 @@
         </div>
     </div>
 </div>
+
 <script type="text/javascript">
 
     $(window).load(function(){
-        $( "#progressbar" ).progressbar({ value: 0 });
-        //$( "#progressPercentage").html('')
+        loadSummaryData();
+    });
+
+    function loadSummaryData() {
         $.ajax({
             dataType: "json",
             timeout: 120000,
@@ -79,44 +82,30 @@
                 console.log(data);
                 var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
                 var progress = data.hitCount / data.totalCount
+                var progressSummary = data.hitCount + " out of " + data.totalCount;
+                var progressPercentage = progress*100;
+                var lastUpdated = data.lastUpdated;
+                $(".lastUpdated").html(lastUpdated);
                 $('#totalStockValue').html(value);
-
-                if (progress < 0.1) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 10% of all products");
-                }
-                else if (progress < 0.25) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 25% of all products");
-                }
-                else if (progress < 0.5) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 50% of all products");
-                }
-                else if (progress < 0.75) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 75% of all products");
-                }
-                else if (progress < 0.90) {
-                    $("#totalStockSummary").html("* Pricing data is available for less than 90% of all products");
+                if (progress < 1.0) {
+                    $("#totalStockSummary").html("* Pricing data is available for less " + progressPercentage  + "% of all products");
                 }
                 else {
-                    $("#totalStockSummary").html("* Pricing data is available for more than 90% of all products");
+                    $("#totalStockSummary").html("* Pricing data is available for all products");
                 }
-                var progressSummary = data.hitCount + " out of " + data.totalCount;
                 $('#progressSummary').html(progressSummary);
-                var progressPercentage = progress*100;
                 $( "#progressbar" ).progressbar({ value: progressPercentage });
                 $( "#progressPercentage").html("<span title='" + progressSummary + "'>" + formatPercentage(progressPercentage) + "</span>");
-
             },
             error: function(xhr, status, error) {
-                //console.log(xhr);
-                //console.log(status);
-                //console.log(error);
                 $('#totalStockValue').html('ERROR');
                 $("#totalStockSummary").html('Unable to calculate total value due to error: ' + error + " " + status + " " + xhr);
             }
         });
-    });
+    }
+
     function formatPercentage(x) {
-        return x.toFixed(0) + "%"
+        return x + "%"
     }
 
     function formatCurrency(x) {

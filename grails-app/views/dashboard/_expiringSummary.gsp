@@ -2,6 +2,13 @@
     <h2>
         <warehouse:message code="inventory.expiring.label" default="Expiration Summary"/>
         <img id="expiration-summary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+
+        <div class="right" style="padding: 5px;">
+            <g:link controller="dashboard" action="flushCache" class="button small icon reload">
+                ${warehouse.message(code:'default.button.refresh.label', default: 'Refresh')}
+            </g:link>
+        </div>
+
     </h2>
     <div class="widget-content" style="padding:0; margin:0">
         <div id="expiration-summary-details">

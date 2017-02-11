@@ -122,6 +122,13 @@ class DashboardController {
         def outgoingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentOutgoingShipments)
         def incomingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentIncomingShipments)
 
+        def incomingOrders = orderService.getIncomingOrders(location)
+        def incomingOrdersByStatus = incomingOrders.groupBy { it.status }
+
+        incomingOrders.each {
+            log.info "Incoming order: " + it.description + " " + it.origin + " " + it.destination
+        }
+
         // Days to include for activity list
         int daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
 
@@ -143,7 +150,8 @@ class DashboardController {
             requisitions: [],
             //requisitions:  requisitionService.getAllRequisitions(session.warehouse),
             //outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
-            //incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
+            incomingOrders: incomingOrders,
+            incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
             outgoingShipmentsByStatus : outgoingShipmentsByStatus,
             incomingShipmentsByStatus : incomingShipmentsByStatus,
 			daysToInclude: daysToInclude,

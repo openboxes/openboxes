@@ -33,46 +33,46 @@
 	    			<tbody>
 						<tr>
 							<td class="center" style="width: 1%">
-								<p class="title">
+								<g:link controller="shipment" action="list"
+										params="['type':'incoming','status':pending, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+									${warehouse.message(code: 'dashboard.inbound.pending.label', args: [session.warehouse.name]) }
+								</g:link>
+								<p class="indicator">
 									<g:link controller="shipment" action="list"
                                             params="[type:'incoming', status:pending, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
 										${shipmentsPending.objectList.size}
 									</g:link>
 
 								</p>
-                                <g:link controller="shipment" action="list"
-                                        params="['type':'incoming','status':pending, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
-                                    ${warehouse.message(code: 'dashboard.inbound.pending.label', args: [session.warehouse.name]) }
-                                </g:link>
 
 							</td>
 
 							<td class="center" style="width: 1%">
-								<p class="title">
+								<g:link controller="shipment" action="list"
+										params="['type':'incoming','status':shipped, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+									${warehouse.message(code: 'dashboard.inbound.shipped.label', args: [session.warehouse.name]) }
+								</g:link>
+								<p class="indicator">
 									<g:link controller="shipment" action="list"
                                             params="['type':'incoming','status':shipped, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
 										${shipmentsEnroute.objectList.size}
 									</g:link>
 								</p>
-								<g:link controller="shipment" action="list"
-                                        params="['type':'incoming','status':shipped, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
-									${warehouse.message(code: 'dashboard.inbound.shipped.label', args: [session.warehouse.name]) }
-								</g:link>
 
 							</td>
 
 							<td class="center" style="width: 1%">
-								<p class="title">
+								<g:link controller="shipment" action="list"
+										params="['type':'incoming',status:received,dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+									${warehouse.message(code: 'dashboard.inbound.received.label', args: [session.warehouse.name]) }
+								</g:link>
+								<p class="indicator">
 									<g:link controller="shipment" action="list"
                                             params="['type':'incoming','status':received, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
 										${shipmentsReceived.objectList.size}
 									</g:link>
                                 </p>
 
-                                <g:link controller="shipment" action="list"
-                                        params="['type':'incoming','status':received, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
-                                    ${warehouse.message(code: 'dashboard.inbound.received.label', args: [session.warehouse.name]) }
-                                </g:link>
 
 							</td>
 						</tr>							
@@ -83,7 +83,11 @@
 								<warehouse:message code="default.total.label"/>
 							</th>
 							<th class="right">
-								${incomingShipmentsTotal }
+								<div class="indicator">
+									<g:link controller="shipment" action="list" params="[dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+									${incomingShipmentsTotal }
+									</g:link>
+								</div>
 							</th>
 						</tr>
 			    	</tfoot>

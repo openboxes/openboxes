@@ -13,7 +13,7 @@
     <h2>
 
         <div class="action-menu" style="position:absolute;top:5px;right:5px">
-            <button class="action-btn">
+            <button class="action-btn button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
             </button>
             <div class="actions">

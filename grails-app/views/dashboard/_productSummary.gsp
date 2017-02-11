@@ -11,6 +11,12 @@
     <h2>
         <warehouse:message code="inventory.productSummary.label" default="Product Summary"/>
         <img id="product-summary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+
+        <div class="right" style="padding: 5px;">
+            <g:link controller="dashboard" action="flushCache" class="button icon reload">
+                ${warehouse.message(code:'default.button.refresh.label', default: 'Refresh')}
+            </g:link>
+        </div>
     </h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="product-summary-details">
