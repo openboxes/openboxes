@@ -42,20 +42,6 @@
 								<td valign='top'class='value'>
 									<div id="origin">
 										${order?.origin?.name}
-
-									</div>
-								</td>
-							</tr>
-
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='shipmentType.id'><warehouse:message code="order.shipmentType.label"/>:</label>
-								</td>
-								<td valign='top'class='value'>
-									<div style="width:300px">
-										<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" class="chzn-select-deselect"
-												  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
-
 									</div>
 								</td>
 							</tr>
@@ -66,8 +52,17 @@
 								<td valign='top'class='value'>
 									<div id="destination">
 										${order?.destination?.name}
-
 									</div>
+								</td>
+							</tr>
+
+						<tr class='prop'>
+								<td valign='top' class='name'>
+									<label for='shipmentType.id'><warehouse:message code="order.shipmentType.label"/>:</label>
+								</td>
+								<td valign='top'class='value'>
+                                    <g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" class="chzn-select-deselect"
+                                              optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
 								</td>
 							</tr>
 
@@ -76,10 +71,8 @@
 									<label for='recipient.id'><warehouse:message code="shipping.recipient.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<div  style="width:300px">
-										<g:select class="chzn-select-deselect" name="recipient.id" from="${org.pih.warehouse.core.Person.list().sort()}"
-											optionKey="id" optionValue='${{ it.lastName + ", " + it.firstName + " (" + it.email + ")" }}' value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
-									</div>
+                                    <g:select class="chzn-select-deselect" name="recipient.id" from="${org.pih.warehouse.core.Person.list().sort()}"
+                                        optionKey="id" optionValue='${{ it.lastName + ", " + it.firstName + " (" + it.email + ")" }}' value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -87,7 +80,9 @@
 									<label for='dateOrdered'><warehouse:message code="order.dateOrdered.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<div id="dateOrdered"><g:formatDate date="${orderCommand.dateOrdered}" format="MMM dd, yyyy"/></div>
+									<div id="dateOrdered"><g:formatDate date="${orderCommand.dateOrdered}" format="MMM dd, yyyy hh:mm:ss"/></div>
+                                    <g:hiddenField name="dateOrdered" value="${format.datetime(obj:orderCommand?.dateOrdered)}"/>
+
 								</td>
 							</tr>
 
@@ -95,7 +90,8 @@
 								<td valign='top' class='name'>
 									<label for='shippedOn'><warehouse:message code="shipping.shippedOn.label"/>:</label>
 								</td>
-								<td valign='top'class='value'>									
+								<td valign='top'class='value'>
+									<%--
 									<g:jqueryDatePicker 
 										id="shippedOn" 
 										name="shippedOn" 
@@ -104,6 +100,9 @@
 										value="${orderCommand?.shippedOn }" 
 										format="MM/dd/yyyy"
 										showTrigger="false" />
+									--%>
+									<g:datePicker name="shippedOn" value="${orderCommand?.shippedOn}"/>
+
 								</td>
 							</tr>								
 							<tr class='prop'>
@@ -111,6 +110,7 @@
 									<label for='deliveredOn'><warehouse:message code="shipping.deliveredOn.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
+									<%--
 									<g:jqueryDatePicker 
 										id="deliveredOn" 
 										name="deliveredOn" 
@@ -119,6 +119,9 @@
 										value="${orderCommand?.deliveredOn }" 
 										format="MM/dd/yyyy"
 										showTrigger="false" />
+									--%>
+
+									<g:datePicker name="deliveredOn" value="${orderCommand?.deliveredOn}"/>
 								</td>
 							</tr>									
 	
