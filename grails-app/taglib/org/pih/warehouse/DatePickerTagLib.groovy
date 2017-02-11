@@ -75,10 +75,6 @@ class DatePickerTagLib {
 						buttonImage: '${request.contextPath}/images/icons/silk/calendar.png',
 						minDate: ${minDate},
 						maxDate: ${maxDate}
-						//buttonText: '...',
-						//showButtonPanel: true,
-						//showOtherMonths: true,
-						//selectOtherMonths: true
 
 					}).keyup(function(e) {
                         if(e.keyCode == 8 || e.keyCode == 46) {
@@ -105,16 +101,7 @@ class DatePickerTagLib {
 				});
 			</script>""";
 
-		if (showTrigger) {
-			html += """
-			<style>
-				.ui-datepicker-trigger {
-					#position: relative; left: -16px; top: -1px;
-				}
-			</style>
-			""";
-		}
-		
+
 				
 		out << html;
 				
