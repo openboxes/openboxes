@@ -9,11 +9,14 @@
 **/ 
 package org.pih.warehouse.order
 
+import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
@@ -23,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile
 class OrderController {
 	def orderService
     def reportService
+    def inventoryService
+    def identifierService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -535,7 +540,8 @@ class OrderController {
                     redirect(action: "show", id: params.id)
                     return;
                 }
-                List lineItems = orderService.parseOrderItems(multipartFile.inputStream)
+				String fileContents = IOUtils.toString(multipartFile.inputStream, "UTF-8");
+                List lineItems = orderService.parseOrderItems(fileContents)
                 log.info "Line items: " + lineItems
 
                 if (orderService.importOrderItems(params.id, lineItems)) {

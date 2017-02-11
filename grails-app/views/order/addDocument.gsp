@@ -32,21 +32,6 @@
 					<table>
 						<tbody>
 							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message
-									code="document.selectFile.label" /></label>
-								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
-									<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
-									<g:if test="${!documentInstance?.id}">
-										<input name="fileContents" type="file" />
-									</g:if>
-									<g:else>
-										${documentInstance?.filename}
-									</g:else>
-								</td>
-							</tr>
-							<tr class="prop">
 								<td valign="top" class="name"><label class="optional"><warehouse:message
 										code="document.number.label"/></label>
 								</td>
@@ -75,6 +60,21 @@
 												  value="${documentInstance?.documentType?.id}"
 												  optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 									</div>
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name"><label><warehouse:message
+										code="document.selectFile.label" /></label>
+								</td>
+								<td valign="top"
+									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
+								<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
+									<g:if test="${!documentInstance?.id}">
+										<input name="fileContents" type="file" />
+									</g:if>
+									<g:else>
+										${documentInstance?.filename}
+									</g:else>
 								</td>
 							</tr>
 

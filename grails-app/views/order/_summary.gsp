@@ -189,6 +189,10 @@
             <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
         </g:link>
+
+    </div>
+
+    <div class="button-group">
         <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
@@ -198,6 +202,7 @@
             <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
         </g:link>
+
     </div>
 
     <div class="button-group">

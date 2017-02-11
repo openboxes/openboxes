@@ -50,22 +50,48 @@
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
                                     <input type="text" id="orderNumber" name='orderNumber'
-                                           value="${order?.orderNumber?.encodeAsHTML()}" size="50" class="text"
+                                           value="${order?.orderNumber?.encodeAsHTML()}" class="text"
                                            placeholder="${warehouse.message(code:'order.orderNumber.placeholder')}"/>
                                 </td>
                             </tr>
-                            <tr class='prop'>
+                        <tr class='prop'>
+                            <td valign='top' class='name middle'>
+                                <label for="destination.id"><warehouse:message code="order.orderFor.label"/></label>
+                            </td>
+                            <td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
+                                <g:if test="${order?.destination }">
+                                    ${order?.destination?.name } <small>${order?.destination?.address}</small>
+                                    <g:hiddenField name="destination.id" value="${order?.destination?.id}"/>
+                                </g:if>
+                                <g:else>
+                                    ${session?.warehouse?.name }
+                                    <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
+                                </g:else>
+
+                            </td>
+                        </tr>
+                        <tr class='prop'>
+                            <td valign='top' class='name middle'><label for='origin.id'>
+                                <warehouse:message code="order.orderFrom.label"/></label>
+                            </td>
+                            <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+                                <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
+                                                       optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
+
+                            </td>
+                        </tr>
+
+
+                        <tr class='prop'>
                                 <td class='name top'><label for='status'>
                                     <warehouse:message code="order.status.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'status','errors')}'>
-                                    <div style="width:300px">
-                                        <g:select name="status"
-                                                  from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
-                                                  optionValue="${{format.metadata(obj:it)}}" value="${order?.status}"
-                                                  noSelection="['':warehouse.message(code:'')]" />
+                                    <g:select name="status"
+                                              from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
+                                              optionValue="${{format.metadata(obj:it)}}" value="${order?.status}"
+                                              noSelection="['':warehouse.message(code:'')]" />
 
-                                    </div>
 
                                 </td>
                             </tr>
@@ -85,41 +111,11 @@
 
 
                             <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='origin.id'>
-                                    <warehouse:message code="order.orderFrom.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-                                    <div style="width: 300px;">
-                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
-                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
-                                    </div>
-
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'>
-                                    <label for="destination.id"><warehouse:message code="order.orderFor.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
-                                    <g:if test="${order?.destination }">
-                                        ${order?.destination?.name }
-                                        <g:hiddenField name="destination.id" value="${order?.destination?.id}"/>
-                                    </g:if>
-                                    <g:else>
-                                        ${session?.warehouse?.name }
-                                        <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
-                                    </g:else>
-
-                                </td>
-                            </tr>
-                            <tr class='prop'>
                                 <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.orderedBy.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
-                                    <div style="width: 300px;">
                                         <g:select class="chzn-select-deselect" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort()}"
                                                   optionKey="id" value="${order?.orderedBy?.id}" noSelection="['null':'']" />
-                                    </div>
                                 </td>
                             </tr>
                         </tbody>

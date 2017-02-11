@@ -478,9 +478,6 @@ class OrderService {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
 
         }
-        finally {
-            if (inputStream) inputStream.close();
-        }
 
         return orderItems
     }
