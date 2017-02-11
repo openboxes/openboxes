@@ -20,7 +20,7 @@
                                 <td class="center" width="25%">
 
                                     <g:link controller="order" action="list" params="[status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
-                                        <div style="min-height: 30px;" >${format.metadata(obj:entry.key)}</div>
+                                        <div>${format.metadata(obj:entry.key)}</div>
                                     </g:link>
 
                                     <g:link controller="order" action="list"
