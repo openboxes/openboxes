@@ -201,16 +201,26 @@ class DashboardController {
         redirect(action: "index")
     }
 
+
+
     @Cacheable("dashboardCache")
     def productSummary = {
         def results = [:]
         try {
             def location = Location.get(session.warehouse.id)
-            results = dashboardService.getProductSummary(location)
+            results.productSummary = dashboardService.getProductSummary(location)
+
+            def lastUpdated = dashboardService.getInventoryItemSummaryLastUpdated(location)
+            results.lastUpdated = g.formatDate(date:lastUpdated, format: 'EEE, dd MMM yyyy hh:mm a z', timeZone: session.timezone)
+
         } catch (Exception e) {
+            log.error("Error occurred while generating product summary " + e.message, e)
             results.error = true
             results.message = e.message
         }
+
+        log.info "Results " + results
+
         render(results as JSON)
     }
 
@@ -220,7 +230,11 @@ class DashboardController {
         def results = [:]
         try {
             def location = Location.get(session.warehouse.id)
-            results = dashboardService.getExpirationSummary(location)
+            results.expirationSummary = dashboardService.getExpirationSummary(location)
+
+            def lastUpdated = dashboardService.getInventoryItemSummaryLastUpdated(location)
+            results.lastUpdated = g.formatDate(date:lastUpdated, format: 'EEE, dd MMM yyyy hh:mm a z', timeZone: session.timezone)
+
         } catch (Exception e) {
             results.error = true
             results.message = e.message

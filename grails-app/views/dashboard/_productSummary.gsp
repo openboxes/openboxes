@@ -8,7 +8,7 @@
 </style>
 
 <div class="box">
-    <h2>
+    <h2 id="productSummaryTitle" title="">
         <warehouse:message code="inventory.productSummary.label" default="Product Summary"/>
         <img id="product-summary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
 
@@ -30,7 +30,6 @@
                     </tr>
                 </thead>
     			<tbody>
-
 				</tbody>
 			</table>
 		</div>
@@ -48,7 +47,8 @@
             success: function (data) {
                 console.log(data);
                 if (!data.error) {
-                    renderProductSummary(data);
+                    renderProductSummary(data.productSummary);
+                    $("#productSummaryTitle").attr("title", "Database was automatically updated on " + data.lastUpdated);
                 }
                 else {
                     renderProductSummaryError(data);

@@ -1,5 +1,5 @@
 <div class="box">
-    <h2>
+    <h2 id="expirationSummaryTitle" title="">
         <warehouse:message code="inventory.expiring.label" default="Expiration Summary"/>
         <img id="expiration-summary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
 
@@ -39,7 +39,8 @@
             success: function (data) {
                 console.log("expiration summary: ", data);
                 if (!data.error) {
-                    renderExpirationSummary(data);
+                    renderExpirationSummary(data.expirationSummary);
+                    $("#expirationSummaryTitle").attr("title", "Database was automatically updated on " + data.lastUpdated);
                 }
                 else {
                     renderExpirationSummaryError(data);

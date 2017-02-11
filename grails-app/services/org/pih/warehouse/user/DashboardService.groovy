@@ -175,10 +175,27 @@ class DashboardService {
         return activityList
     }
 
+    def getInventoryItemSummaryLastUpdated(Location location) {
+        Sql sql = new Sql(dataSource)
+        String query = """
+            SELECT 
+                MAX(last_updated) as max_last_updated
+            FROM inventory_item_summary
+            WHERE location_id = :locationId
+        """
+        def results = sql.rows(query, [locationId:location.id]);
+
+        Date lastUpdated = new Date(results[0].max_last_updated.getTime())
+
+        return lastUpdated
+    }
+
+
     def getProductSummary(Location location) {
         long startTime = System.currentTimeMillis()
         Sql sql = new Sql(dataSource)
 
+        // Used to generate links
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 
         def results = sql.rows(productAggregationQuery, [locationId:location.id]);
@@ -192,10 +209,6 @@ class DashboardService {
             def label = "${g.message(code: labelCode)}"
             [label: label, code: it.status_code, status: status, count: it.count, cost: cost, url: url, styleClass: styleClass]
         }
-
-        //dashboardAlerts = dashboardAlerts.groupBy { it.status }
-
-        //if (sql) sql.close();
 
         log.info "getProductSummary(): " + (System.currentTimeMillis() - startTime) + " ms"
         return productSummary
