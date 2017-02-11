@@ -17,26 +17,28 @@
                         <tr>
                             <g:each var="entry" in="${incomingOrdersByStatus}" status="i">
                                 <g:set var="incomingOrdersValue" value="${incomingOrdersByStatus[entry.key]}"/>
-                                <td class="center">
-                                    <g:link controller="order" action="list" params="['status':entry?.key]">
-                                        ${format.metadata(obj:entry.key)}
-                                    </g:link>
-                                    <g:link controller="order" action="list"
-                                            params="[type:'incoming', status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
-                                    <div class="indicator">
-                                            ${incomingOrdersValue.objectList.size()}
-                                    </div>
-                                        </g:link>
-                                    <g:set var="totalAmount" value="${incomingOrdersValue.objectList.sum { it.totalPrice() }}"/>
-                                    <div class="">
-                                        <g:if test="${totalAmount}">
-                                            <g:formatNumber number="${totalAmount}" type="currency"/>
-                                        </g:if>
-                                        <g:else>
-                                            $0.00
-                                        </g:else>
-                                    </div>
+                                <td class="center" width="25%">
 
+                                    <g:link controller="order" action="list" params="[status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+                                        <div style="min-height: 30px;" >${format.metadata(obj:entry.key)}</div>
+                                    </g:link>
+
+                                    <g:link controller="order" action="list"
+                                            params="[status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+                                        <div class="indicator">${incomingOrdersValue.objectList.size()}</div>
+                                    </g:link>
+                                    <g:set var="totalAmount" value="${incomingOrdersValue.objectList.sum { it.totalPrice() }}"/>
+                                    <div class="currency">
+                                        <g:link controller="order" action="list"
+                                                params="[type:'incoming', status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
+                                            <g:if test="${totalAmount}">
+                                                <g:formatNumber number="${totalAmount}" type="currency"/>
+                                            </g:if>
+                                            <g:else>
+                                                $0.00
+                                            </g:else>
+                                        </g:link>
+                                    </div>
                                 </td>
                             </g:each>
                         </tr>
