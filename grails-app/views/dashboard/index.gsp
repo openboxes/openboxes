@@ -73,7 +73,7 @@
                     forcePlaceholderSize: true,
                     opacity: 0.4,
                     stop: function(event, ui){
-                        saveState();
+                        //saveState();
                     }
                 }).disableSelection();
 
@@ -97,7 +97,7 @@
                 $("#results").html("loading..");
                 var sortorder = {items : items};
                 $.ajax({
-                    url: "/openboxes/dashboard/saveState",
+                    url: "${request.contextPath}/dashboard/saveState",
                     async: false,
                     data: sortorder,
                     dataType: "html",
