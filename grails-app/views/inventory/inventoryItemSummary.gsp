@@ -23,41 +23,41 @@
 			</g:if>
 
             <div class="yui-gf" style="margin: 0; padding: 0">
-                <div class="yui-u first filters">
-                    <div>
-                        <div style="margin: 20px;">
-                            <h1><warehouse:message code="inventory.status.label" default="Status"/></h1>
+                <div class="yui-u first">
+                    <div class="filters">
+                        <h1><warehouse:message code="inventory.status.label" default="Status"/></h1>
 
-                            <table>
+                        <table>
 
-                                <g:each in="${expirationSummary}" var="status">
-                                    <%-- exclude subtotal rows --%>
-                                    <g:if test="${status.label}">
-                                        <tr class="prop ${status.styleClass} ${status.code} ${status.status}">
-                                            <td>
-                                                <a href="${status.url}">${status.label}</a>
-                                            </td>
-                                            <td class="right">
-                                                <a href="${status.url}">${status.count}</a>
-                                            </td>
-                                        </tr>
-                                    </g:if>
+                            <g:each in="${expirationSummary}" var="status">
+                                <%-- exclude subtotal rows --%>
+                                <g:if test="${status.label}">
+                                    <tr class="prop ${status.styleClass} ${status.code} ${status.status}">
+                                        <td>
+                                            <a href="${status.url}">${status.label}</a>
+                                        </td>
+                                        <td class="right">
+                                            <a href="${status.url}">${status.count}</a>
+                                        </td>
+                                    </tr>
+                                </g:if>
 
-                                </g:each>
-                            </table>
-                        </div>
-                        <hr/>
+                            </g:each>
+                        </table>
                     </div>
-                                    </div>
+                </div>
                 <div class="yui-u">
 
-                    <h1 style="margin-top: 10px;">
-                        <warehouse:message code="dashboard.${params.id}.label"/>
-                        <small><warehouse:message code="default.showing.message" args="[inventoryItemList?.size()]"/></small>
+                    <div class="button-bar">
                         <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" id="${params.id}" class="button">Download CSV</g:link>
-                    </h1>
+                    </div>
 
-                    <div style="margin: 10px; max-height:670px;overflow:auto;" >
+                    <div class="box">
+                        <h2>
+                            <warehouse:message code="dashboard.${params.id}.label"/>
+                            <small><warehouse:message code="default.showing.message" args="[inventoryItemList?.size()]"/></small>
+
+                        </h2>
                         <table>
                             <tr>
                                 <th class="center"><warehouse:message code="inventoryLevel.status.label"/></th>
@@ -101,7 +101,7 @@
                                                 ${entry.productCode}
                                             </td>
                                             <td>
-                                                <g:link controller="inventoryItem" action="showStockCard" id="${entry.id}">
+                                                <g:link controller="inventoryItem" action="showStockCard" id="${entry.productId}">
                                                     ${entry?.productName}
                                                 </g:link>
                                             </td>
