@@ -48,8 +48,10 @@
                         <tr class="prop">
                             <td valign="top" class="name"><label><warehouse:message code="inventory.newQuantity.label" /></label></td>
                             <td valign="top" class="value">
-                                <g:textField id="newQuantity" name="newQuantity" size="6" value="${itemQuantity }" class="text"/>
-                                ${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                                <g:textField id="newQuantity" name="newQuantity" size="6"
+                                             value="${itemQuantity }" class="text"
+                                            placehoder="${commandInstance?.productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}"/>
+
 
                             </td>
                         </tr>
@@ -75,7 +77,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '500px' });
+        $("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 600 });
         $("#btnAdjustStock-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('open'); });
         $("#btnAdjustClose-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('close'); });
     });
