@@ -122,6 +122,7 @@ mail.error.debug = true
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
+        grails.resources.debug = true
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false

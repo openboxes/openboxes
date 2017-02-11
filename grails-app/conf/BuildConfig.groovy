@@ -61,9 +61,6 @@ grails.project.dependency.resolution = {
         compile "org.jadira.usertype:usertype.jodatime:1.9"
 
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
-        //runtime ":resources:1.2.RC2"
-        //runtime ":cached-resources:1.0"
-
         runtime 'org.springframework:spring-test:3.0.5.RELEASE'
 
         test ("org.codehaus.geb:geb-spock:0.6.3") {
@@ -104,6 +101,8 @@ grails.project.dependency.resolution = {
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
         runtime(':quartz2:2.1.6.2')
         runtime(":resources:1.1.6")
+        //runtime ":resources:1.2.RC2"
+        //runtime ":cached-resources:1.0"
         runtime(":zipped-resources:1.0") { excludes 'resources' }
         runtime(":cached-resources:1.0") { excludes 'resources' }
         runtime(":cache-headers:1.1.5")
