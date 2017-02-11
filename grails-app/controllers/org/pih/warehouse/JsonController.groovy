@@ -291,8 +291,18 @@ class JsonController {
         def location = Location.get(session?.warehouse?.id)
         def result = inventoryService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
+        def coverage = (result.hitCount / result.totalCount) * 100
+        def message = "Pricing data is available for ${coverage}% of all products"
 
-        def map = [totalStockValue:result.totalStockValue, hitCount: result.hitCount, missCount: result.missCount, totalCount: result.totalCount]
+        def map = [
+                totalValue:totalValue,
+                totalStockValue: result.totalStockValue,
+                hitCount: result.hitCount,
+                missCount: result.missCount,
+                totalCount: result.totalCount,
+                coverage: coverage,
+                message: message
+        ]
         render map as JSON
     }
 
@@ -998,7 +1008,6 @@ class JsonController {
 		}
 		render json as JSON
 	}
-
 
 
 	def globalSearch = {

@@ -430,6 +430,7 @@ class DashboardService {
         def productDetailsList = results.collect { [
                 status: it.status,
                 statusCode: it.status_code,
+                productId: it.product_id,
                 productCode: it.product_code,
                 productName: it.product_name,
                 unitOfMeasure: it.unit_of_measure,

@@ -126,7 +126,7 @@ class AuthController {
 	/**
 	 * Allows user to log out of the system
 	 */
-	@CacheFlush(["dashboardCache", "megamenuCache"])
+	@CacheFlush(["megamenuCache"])
 	def logout = { 
 		session.targetUri = null    	
 		session.user = null;
