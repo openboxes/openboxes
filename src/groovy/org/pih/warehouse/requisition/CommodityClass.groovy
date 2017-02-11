@@ -18,6 +18,7 @@ public enum CommodityClass {
 	CONTROLLED_SUBSTANCE(4),
 	HAZARDOUS_MATERIAL(5),
     DURABLE(6),
+	OTHER(100)
 
 	int sortOrder
 
