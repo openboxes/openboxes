@@ -34,44 +34,34 @@
             </g:if>
            	
            	<div>
-				<div class="buttonBar">            	
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
-                    <g:isUserAdmin>
-                        <g:link class="button icon add" action="edit"><warehouse:message code="default.add.label"
-                             args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
-                    </g:isUserAdmin>
-                </div>
+
 
                 <div class="yui-gf">
                     <div class="yui-u first">
 
-                        <div class="dialog box">
-                            <h2>Filters</h2>
+                        <div class="dialog filters">
+                            <h3><g:message code="default.filters.label"/></h3>
                             <g:form action="list" method="get">
-                                <div>
-                                    <div class="filter-list-item">
-                                            <label class="clear"><warehouse:message code="location.name.label"/></label>
-                                            <g:textField name="q" value="${params.q }" class="text" />
-                                    </div>
-                                    <div class="filter-list-item">
-                                            <label class="clear"><warehouse:message code="location.locationType.label"/></label>
-                                            <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
-                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                      value="${params?.locationType?.id}" noSelection="['null':'']" />
-                                    </div>
-                                    <div class="filter-list-item">
-
-                                            <label class="clear"><warehouse:message code="location.locationGroup.label"/></label>
-                                            <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
-                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                      value="${params?.locationGroup?.id}" noSelection="['null':'']" />
-                                    </div>
-                                    <hr/>
-                                    <div class="filter-list-item center">
-                                            <button type="submit" class="button icon search">
-                                                ${warehouse.message(code: 'default.button.find.label')}
-                                            </button>
-                                    </div>
+                                <label class="clear"><warehouse:message code="location.name.label"/></label>
+                                <div class="filter-list-item">
+                                    <g:textField name="q" value="${params.q }" class="text" />
+                                </div>
+                                <label class="clear"><warehouse:message code="location.locationType.label"/></label>
+                                <div class="filter-list-item">
+                                    <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
+                                              optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                              value="${params?.locationType?.id}" noSelection="['null':'']" />
+                                </div>
+                                <label class="clear"><warehouse:message code="location.locationGroup.label"/></label>
+                                <div class="filter-list-item">
+                                    <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
+                                              optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                              value="${params?.locationGroup?.id}" noSelection="['null':'']" />
+                                </div>
+                                <div class="buttons">
+                                        <button type="submit" class="button icon search">
+                                            ${warehouse.message(code: 'default.button.find.label')}
+                                        </button>
                                 </div>
                             </g:form>
                         </div>
@@ -79,6 +69,14 @@
                     </div>
                     <div class="yui-u">
 
+
+                        <div class="buttonBar">
+                            <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
+                            <g:isUserAdmin>
+                                <g:link class="button icon add" action="edit"><warehouse:message code="default.add.label"
+                                                                                                 args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
+                            </g:isUserAdmin>
+                        </div>
                         <div class="box">
                             <h2>
                                 ${warehouse.message(code: 'default.showing.message', args: [locationInstanceList?.size()?:0]) }

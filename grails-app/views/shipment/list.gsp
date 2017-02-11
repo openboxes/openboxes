@@ -10,10 +10,9 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            <div class="yui-gf" style="margin: 0; padding: 0">
-                <div class="yui-u first filters">
+            <div class="yui-gf">
+                <div class="yui-u first">
                     <g:render template="filters" model="[]"/>
-
                 </div>
                 <div class="yui-u">
 

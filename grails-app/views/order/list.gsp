@@ -14,16 +14,15 @@
 			</g:if>
 
 			<div class="yui-gf" style="padding: 0; margin: 0">
-				<div class="yui-u first filters">
+				<div class="yui-u first">
 					<g:render template="filters" model="[]"/>
 
 				</div>
 				<div class="yui-u">
-
 					<div class="box">
 						<h2><warehouse:message code="default.list.label" args="[entityName]" /> <small>(<g:formatNumber number="${totalPrice}"/>
                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</small></h2>
-						<table class="${orders?'dataTable':''}">
+						<table>
 							<thead>
 								<tr>
 									<th>${warehouse.message(code: 'default.actions.label')}</th>
@@ -41,7 +40,7 @@
 							<tbody>
 								<g:unless test="${orders}">
 									<tr class="prop">
-										<td colspan="9">
+										<td colspan="10">
 											<div class="empty fade center">
 												<warehouse:message code="orders.none.message"/>
 											</div>
@@ -51,14 +50,16 @@
 
 								<g:each var="orderInstance" in="${orders}" status="i">
 									<g:set var="totalPrice" value="${totalPrice + (orderInstance.totalPrice()?:0)}"/>
-									<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 										<td class="middle">
 											<div class="action-menu">
 												<g:render template="/order/actions" model="[orderInstance:orderInstance,hideDelete:true]"/>
 											</div>
 										</td>
 										<td class="middle">
-											<format:metadata obj="${orderInstance?.status}"/>
+											<g:link action="show" id="${orderInstance.id}">
+												<format:metadata obj="${orderInstance?.status}"/>
+											</g:link>
 										</td>
 										<td class="middle">
 											<g:link action="show" id="${orderInstance.id}">
@@ -85,7 +86,7 @@
 										<td class="middle right">
 											<g:formatNumber number="${orderInstance?.totalPrice()}" />
 										</td>
-										<td>
+										<td class="middle">
                                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</td>
 									</tr>

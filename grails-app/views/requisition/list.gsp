@@ -20,8 +20,8 @@
 
 
             <div class="yui-gf">
-				<div class="yui-u first filters">
-                    <div style="margin: 10px;">
+				<div class="yui-u first">
+                    <div class="filters">
                         <h1><warehouse:message code="default.filters.label"/></h1>
                         <g:form action="list" method="GET">
                             <div class="filter-list">
@@ -59,7 +59,7 @@
                                     </p>
                                     <p>
                                         <g:checkBox name="commodityClassIsNull" value="${params?.commodityClassIsNull}"/>
-                                        <label><warehouse:message code="requisition.commodityClassIsNull" default="Include if commodity class is empty"/></label>
+                                        <label for="commodityClassIsNull"><warehouse:message code="requisition.commodityClassIsNull" default="Include if commodity class is empty"/></label>
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
@@ -448,9 +448,15 @@
                                     </g:each>
                                 </tbody>
                             </table>
+                            <div class="paginateButtons">
+                                <g:paginate total="${requisitions.totalCount}" controller="requisition" action="list" max="${params.max}"
+                                            params="${pageParams.findAll {it.value}}"/>
+
+                            </div>
 
 
-                </div>
+
+                    </div>
                     <%--
 					<g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
 					<g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
@@ -472,11 +478,6 @@
 						</g:each>
 					</div>
 					--%>
-                    <div class="paginateButtons">
-                        <g:paginate total="${requisitions.totalCount}" controller="requisition" action="list" max="${params.max}"
-                            params="${pageParams.findAll {it.value}}"/>
-
-                    </div>
 				</div>
 			</div>		
         </div>

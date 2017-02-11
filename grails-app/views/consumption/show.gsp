@@ -19,12 +19,8 @@
 
 
 
-    <div class="yui-gf">
-
-
-
-
-            <div class="yui-u first filters">
+        <div class="yui-gf">
+            <div class="yui-u first">
                 <g:render template="filters" model="[command:command]"/>
             </div>
             <div class="yui-u">

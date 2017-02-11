@@ -852,9 +852,15 @@ label.error {
     font-weight: bold;
     color: black;
 }
+
+/* Removed trigger because it was not rendering properly when page is resized */
 .ui-datepicker-trigger {
-    position: relative; left: -16px; top: -1px;
+    display: none;
+    position: relative;
+    right: 10px;
+    top: 0px;
 }
+
 .buttons {
     padding-top: 10px;
     /*border-top: 3px solid lightgrey;*/
@@ -2985,17 +2991,17 @@ select {
    ========================================================================== */
 
 .filters {
+    padding: 10px;
     background-color: #f5f5f5;
     border-right: 1px solid lightgrey;
-    height: 100%;
-    margin: 5px;
+    min-height: 100%;
 }
 
 ul.filter-list {
     list-style: none;
     padding: 0;
 }
-.filter-list-item, .filter { margin: 10px;  }
+.filter-list-item, .filter { margin: 5px 0 5px 0;  }
 .filter-list-item {
     padding: 0 5px 0 0;
 }
@@ -3004,6 +3010,11 @@ ul.filter-list {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.filter-list-item label {
+    display: inline;
+}
+
 
 
 /* =============================================================================
@@ -3069,6 +3080,33 @@ input {
     box-sizing : border-box;
 }
 
+input.text {
+    width: 100%;
+
+}
+
 .childContainer .tag {
     margin-left: 25px;
 }
+
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+
+}
+
+.indicator {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
+    color: #666;
+    margin: 10px 0px 10px 0px;
+    display: block;
+    text-align: center;
+}
+.indicator a:hover {
+    text-decoration: none;
+}
+

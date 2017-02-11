@@ -16,19 +16,12 @@
             </g:if>
             <div>
             
-				<div class="buttonBar">
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
-	            	<g:isUserAdmin>
-                        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
-	                </g:isUserAdmin>
-            	</div>
-
 
 
                 <div class="yui-gf">
                     <div class="yui-u first">
-                        <div class="box">
-                            <h2>${warehouse.message(code:'default.filters.label')}</h2>
+                        <div class="filters">
+                            <h3>${warehouse.message(code:'default.filters.label')}</h3>
                             <g:form action="list" method="get">
                                 <g:hiddenField name="sort" value="${params.sort}"/>
                                 <g:hiddenField name="order" value="${params.order}"/>
@@ -81,15 +74,11 @@
                                     </p>
                                 </div>
 
-                                <div class="filter-list-item center middle">
+                                <div class="buttons">
                                     <button type="submit" class="button icon search">
                                         ${warehouse.message(code: 'default.button.find.label')}
                                     </button>
-
-
-
                                 </div>
-
                             </g:form>
                         </div>
                     </div>
@@ -97,10 +86,19 @@
 
                     <div class="yui-u">
 
+                        <div class="button-bar">
+                            <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+                            <g:isUserAdmin>
+                                <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+                            </g:isUserAdmin>
+                            <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button icon arrowdown">${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}</g:link>
+                        </div>
+
+
+
                         <div class="box">
                             <h2>
                                 Showing ${productInstanceTotal > params.max ? params.max : productInstanceTotal} of ${productInstanceTotal} ${warehouse.message(code:'products.label')}
-                                <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button icon arrowdown">${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}</g:link>
 
                             </h2>
 
@@ -175,9 +173,9 @@
                                     </g:each>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="paginateButtons">
-                            <g:paginate total="${productInstanceTotal}" params="${params }" />
+                            <div class="paginateButtons">
+                                <g:paginate total="${productInstanceTotal}" params="${params }" />
+                            </div>
                         </div>
 
                     </div>
