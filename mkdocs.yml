@@ -31,6 +31,8 @@ pages:
 # Developer Guide
 - ['developer-guide/introduction.md', 'Developer Guide', 'Introduction']
 - ['developer-guide/getting-started.md', 'Developer Guide', 'Getting Started']
+- ['developer-guide/contributing/index.md', 'Contributing', 'Introduction']
+- ['developer-guide/contributing/syncing-a-fork.md', 'Contributing', 'Syncing a Fork']
 - ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
 
 # Support - add a page like https://readthedocs.org/support/
