@@ -4,7 +4,7 @@
 * OpenBoxes is entirely free to use. This can be a significant advantage in the face of limited operational resources.
 
 ## Inventory Visibility & Tracking
-* Not only does OpenBoxes allow you to view your inventory at a glance, it provides an historical record of inventory 
+* Not only does OpenBoxes allow you to view your inventory at a glance, it provides a historical record of inventory 
   transactions. This data is invaluable to accurately understand and forecast demand for future planning periods.
 * OpenBoxes allows you to set inventory max, min, and reorder points — this allows the user to quickly
   assess if supplies are overstocked, at appropriate stock levels, or in danger of being out of
