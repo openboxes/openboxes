@@ -6,7 +6,7 @@ repo_url: https://github.com/openboxes/openboxes
 include_search: true
 #use_absolute_urls: true
 use_directory_urls: true
-copyright: Copyright &copy; 2015, OpenBoxes
+copyright: Copyright &copy; 2017, OpenBoxes
 google_analytics: ['UA-37396941-2', 'OpenBoxes']
 
 pages:
