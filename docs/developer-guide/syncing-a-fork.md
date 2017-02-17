@@ -2,28 +2,27 @@
 # Syncing your fork
 
 ## Resources
-* https://help.github.com/articles/configuring-a-remote-for-a-fork/
+
+* [Configuring a Remote for a Fork](https://help.github.com/articles/configuring-a-remote-for-a-fork/)
+* [Syncing a Fork](https://help.github.com/articles/syncing-a-fork/)
 
 ## List your remote repositories
 
         $ git remote -v
         origin  https://github.com/YOUR_USERNAME/openboxes.git (fetch)
         origin  https://github.com/YOUR_USERNAME/openboxes.git (push)
-
-
-## Add the openboxes repository as an upstream remote repository
+        
+## Add the upstream remote 
 
         $ git remote add upstream https://github.com/openboxes/openboxes.git
-        
-        
-## Verify that the new upstream repository has been added.
+               
+## Verify upstream remote
 
         $ git remote -v
         origin    https://github.com/YOUR_USERNAME/YOUR_FORK.git (fetch)
         origin    https://github.com/YOUR_USERNAME/YOUR_FORK.git (push)
         upstream  https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git (fetch)
         upstream  https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git (push)
-        
         
 ## Pull changes into your fork as upstream/master
 
@@ -34,11 +33,8 @@
         Receiving objects: 100% (4165/4165), 1.83 MiB | 329.00 KiB/s, done.
         Resolving deltas: 100% (2728/2728), completed with 583 local objects.
         From https://github.com/openboxes/openboxes
-         * [new branch]      157-integrate-with-keen-io -> upstream/157-integrate-with-keen-io
-         * [new branch]      2.2        -> upstream/2.2
          * [new branch]      develop    -> upstream/develop
          * [new branch]      feature/94-upgrade-to-grails-2.5.x -> upstream/feature/94-upgrade-to-grails-2.5.x
-         * [new branch]      gh-pages   -> upstream/gh-pages
          * [new branch]      hotfix/100-improve-performance-qoh-calculation -> upstream/hotfix/100-improve-performance-qoh-calculation
          * [new branch]      hotfix/161-support-additional-languages -> upstream/hotfix/161-support-additional-languages
          * [new branch]      hotfix/163-add-health-endpoint-for-monitoring -> upstream/hotfix/163-add-health-endpoint-for-monitoring
@@ -47,11 +43,12 @@
          * [new branch]      master     -> upstream/master
          * [new branch]      user-guide-docs -> upstream/user-guide-docs
 
-## Checkout the branch you want to sync (probably either develop or master)
+## Checkout the branch you want to sync 
+This will likely either be `develop` or `master`. 
         
         $ git checkout master
         
-## Merge upstream/master into master        
+## Merge upstream/master into you local master
         
         $ git merge upstream/master
 
@@ -61,4 +58,5 @@
         
 ## Profit
 
+![Profit](../img/profit.jpg)
 ![Profit](img/profit.jpg)
