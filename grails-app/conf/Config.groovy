@@ -428,6 +428,10 @@ jqueryValidationUi {
 }
 
 
+// Allow users to customize logo image url as well as labale
+openboxes.logo.url = ""
+openboxes.logo.label = "OpenBoxes"
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
