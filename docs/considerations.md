@@ -1,17 +1,20 @@
-# Drawbacks of using OpenBoxes:
-While open-source software is free to download and use, there are several costs and drawbacks that should be taken
+# Considerations
+While open-source software is free to download and use, there are costs and limitations that should be taken
 into consideration before you begin the adoption process.
 
 ## System Administration
 An OpenBoxes installation requires a system administrator to install, monitor, maintain, and upgrade the software
-  and server components throughout the software lifecycle. These tasks require competent IT personnel.
+and server components throughout the software lifecycle. These tasks require competent IT personnel.
 
 ## Time
 While OpenBoxes has been streamlined considerably since its creation, there may be significant time
 costs associated with using this inventory management system. Examples of potentially time-intensive tasks include:
 
-*  Creating products to track within the system
-*  Data entry associated with recording/adjusting inventory
+* Master Data Management e.g. creating products to track within the system
+* Periodic Reviews e.g. stock counts, min/max/reorder review, obsolete inventory
+* Data Entry e.g. recording/adjusting inventory
+* Forecasting e.g. requires external review of demand/consumption data, 
+ 
 
 ## Training 
 While OpenBoxes is a relatively simple inventory management tool, some training is appropriate to

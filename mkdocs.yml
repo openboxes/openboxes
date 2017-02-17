@@ -14,7 +14,7 @@ pages:
 # About:
 - ['index.md', 'About', 'Introduction']
 - ['benefits.md', 'About', 'Benefits']
-- ['drawbacks.md', 'About', 'Drawbacks']
+- ['considerations.md', 'About', 'Considerations']
 
 # Installation
 - ['installation/index.md', 'Installation',  'Overview']
@@ -36,6 +36,7 @@ pages:
 - ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
 
 # Support - add a page like https://readthedocs.org/support/
+- ['support/introduction.md', 'Support', 'Introduction']
 
 # Continuous Integration
 # User Guide

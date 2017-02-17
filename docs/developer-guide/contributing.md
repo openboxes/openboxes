@@ -8,6 +8,9 @@ Here are a few examples of areas we need a considerable amount of help.
 * Improve documentation
 * Write unit, integration, functional tests
 
+## Resources
+* [GitHub Guide on Forking](https://guides.github.com/activities/forking/)
+
 ## Procedure
 
 1. Find or create an issue for the feature or bug in [GitHub Issues.](https://github.com/openboxes/openboxes/issues)
