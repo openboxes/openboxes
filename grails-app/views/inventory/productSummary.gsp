@@ -50,138 +50,131 @@
                 <div class="yui-u">
 
 
+                    <div class="button-bar">
+                        <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" id="${params.id}" class="button">Download CSV</g:link>
+                    </div>
 
-                    <g:form controller="order" action="generate" method="POST">
-
-                        <div class="button-bar">
-                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" id="${params.id}" class="button">Download CSV</g:link>
-                            <button class="button">Generate PO</button>
-
-                        </div>
-
-                        <div class="box">
-                            <h2>
-                                <warehouse:message code="dashboard.${params.id}.label"/>
-                                <small><warehouse:message code="default.showing.message" args="[productList?.size()]"/></small>
-                            </h2>
-                            <table class="list">
-                                <tr>
-                                    <th class="center"><warehouse:message code="inventoryLevel.status.label"/></th>
-                                    <th><warehouse:message code="product.productCode.label"/></th>
-                                    <th><warehouse:message code="product.label"/></th>
-                                    <th><warehouse:message code="product.genericProduct.label"/></th>
-                                    <th><warehouse:message code="category.label"/></th>
-                                    <%--
-                                    <th><warehouse:message code="product.manufacturer.label"/></th>
-                                    <th><warehouse:message code="product.vendor.label"/></th>
-                                    <th class="left"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
-                                    <th class="left"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></th>
-                                    --%>
-                                    <%--
-                                    <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
-                                    <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
-                                    <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
-                                    --%>
-                                    <th class="center"><warehouse:message code="inventory.qoh.label" default="QoH"/></th>
-                                    <th class="center border-right"><warehouse:message code="product.uom.label" default="UoM"/></th>
-                                    <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
-                                    <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
-                                </tr>
-                                <tbody>
-                                    <g:each var="entry" in="${productList}" status="i">
-                                        <tr class="prop ${i%2?'odd':'even'} ${entry.statusCode}">
-                                            <td>
-                                                <g:message code="dashboard.${entry.status}.label"/>
-                                            </td>
-                                            <td>
-                                                ${entry.productCode}
-                                            </td>
-                                            <td>
-                                                <g:link controller="inventoryItem" action="showStockCard" id="${entry.id}">
-                                                    ${entry?.productName}
-                                                    <g:hiddenField name="product.id" value="${entry.id}"/>
-                                                </g:link>
-                                            </td>
-                                            <td>
-                                                ${entry?.genericProductName?:""}
-                                            </td>
-                                            <td>
-                                                ${entry?.categoryName}
-
-                                            </td>
-                                            <%--
-                                            <td>
-                                                ${entry.manufacturer}
-
-                                            </td>
-                                            <td>
-                                                ${entry.vendor}
-                                            </td>
-                                            <td class="left">
-                                                ${entry?.binLocation?:""}
-                                            </td>
-                                            <td class="center">
-                                                ${entry?.abcClass?:""}
-                                            </td>
-                                            --%>
-
-                                            <%--
-                                            <td class="center">
-                                                ${entry?.minQuantity?:"--"}
-                                            </td>
-                                            <td class="center">
-                                                ${entry?.reorderQuantity?:"--"}
-                                            </td>
-                                            <td class="center">
-                                                ${entry?.maxQuantity?:"--"}
-                                            </td>
-                                            --%>
-                                            <td class="center">
-                                                ${entry.quantity}
-                                            </td>
-                                            <td class="center border-right">
-                                                ${entry?.unitOfMeasure}
-                                            </td>
-                                            <td class="center">
-                                                <g:if test="${entry?.pricePerUnit}">
-                                                    <g:formatNumber number="${entry.pricePerUnit}" minFractionDigits="2"/>
-                                                </g:if>
-                                                <g:else>
-                                                    --
-                                                </g:else>
-                                            </td>
-                                            <td class="center">
-                                                <g:if test="${entry.totalCost}">
-                                                    <g:formatNumber number="${entry.totalCost}" minFractionDigits="2"/>
-                                                </g:if>
-                                                <g:else>
-                                                    --
-                                                </g:else>
-                                            </td>
-                                        </tr>
-                                    </g:each>
-                                </tbody>
-                                <g:unless test="${!quantityMap}">
-                                    <tr>
-                                        <td colspan="12" class="center">
-                                            <div class="empty fade">
-                                                <warehouse:message code="default.emptyResults.message" default="No results found"/>
-                                            </div>
+                    <div class="box">
+                        <h2>
+                            <warehouse:message code="dashboard.${params.id}.label"/>
+                            <small><warehouse:message code="default.showing.message" args="[productList?.size()]"/></small>
+                        </h2>
+                        <table class="list">
+                            <tr>
+                                <th class="center"><warehouse:message code="inventoryLevel.status.label"/></th>
+                                <th><warehouse:message code="product.productCode.label"/></th>
+                                <th><warehouse:message code="product.label"/></th>
+                                <th><warehouse:message code="product.genericProduct.label"/></th>
+                                <th><warehouse:message code="category.label"/></th>
+                                <%--
+                                <th><warehouse:message code="product.manufacturer.label"/></th>
+                                <th><warehouse:message code="product.vendor.label"/></th>
+                                <th class="left"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
+                                <th class="left"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></th>
+                                --%>
+                                <%--
+                                <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
+                                --%>
+                                <th class="center"><warehouse:message code="inventory.qoh.label" default="QoH"/></th>
+                                <th class="center border-right"><warehouse:message code="product.uom.label" default="UoM"/></th>
+                                <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
+                                <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
+                            </tr>
+                            <tbody>
+                                <g:each var="entry" in="${productList}" status="i">
+                                    <tr class="prop ${i%2?'odd':'even'} ${entry.statusCode}">
+                                        <td>
+                                            <g:message code="dashboard.${entry.status}.label"/>
                                         </td>
+                                        <td>
+                                            ${entry.productCode}
+                                        </td>
+                                        <td>
+                                            <g:link controller="inventoryItem" action="showStockCard" id="${entry.id}">
+                                                ${entry?.productName}
+                                                <g:hiddenField name="product.id" value="${entry.id}"/>
+                                            </g:link>
+                                        </td>
+                                        <td>
+                                            ${entry?.genericProductName?:""}
+                                        </td>
+                                        <td>
+                                            ${entry?.categoryName}
 
+                                        </td>
+                                        <%--
+                                        <td>
+                                            ${entry.manufacturer}
+
+                                        </td>
+                                        <td>
+                                            ${entry.vendor}
+                                        </td>
+                                        <td class="left">
+                                            ${entry?.binLocation?:""}
+                                        </td>
+                                        <td class="center">
+                                            ${entry?.abcClass?:""}
+                                        </td>
+                                        --%>
+
+                                        <%--
+                                        <td class="center">
+                                            ${entry?.minQuantity?:"--"}
+                                        </td>
+                                        <td class="center">
+                                            ${entry?.reorderQuantity?:"--"}
+                                        </td>
+                                        <td class="center">
+                                            ${entry?.maxQuantity?:"--"}
+                                        </td>
+                                        --%>
+                                        <td class="center">
+                                            ${entry.quantity}
+                                        </td>
+                                        <td class="center border-right">
+                                            ${entry?.unitOfMeasure}
+                                        </td>
+                                        <td class="center">
+                                            <g:if test="${entry?.pricePerUnit}">
+                                                <g:formatNumber number="${entry.pricePerUnit}" minFractionDigits="2"/>
+                                            </g:if>
+                                            <g:else>
+                                                --
+                                            </g:else>
+                                        </td>
+                                        <td class="center">
+                                            <g:if test="${entry.totalCost}">
+                                                <g:formatNumber number="${entry.totalCost}" minFractionDigits="2"/>
+                                            </g:if>
+                                            <g:else>
+                                                --
+                                            </g:else>
+                                        </td>
                                     </tr>
+                                </g:each>
+                            </tbody>
+                            <g:unless test="${!quantityMap}">
+                                <tr>
+                                    <td colspan="12" class="center">
+                                        <div class="empty fade">
+                                            <warehouse:message code="default.emptyResults.message" default="No results found"/>
+                                        </div>
+                                    </td>
 
-                                </g:unless>
-                            </table>
-                        </div>
-                        <hr/>
-                        <div class="title right middle">
-                            <warehouse:message code="inventory.totalValue.label" default="Total value"/>
-                            <small><g:formatNumber number="${totalValue?:0}"/>
-                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</small>
-                        </div>
+                                </tr>
 
-                    </g:form>
+                            </g:unless>
+                        </table>
+                    </div>
+                    <hr/>
+                    <div class="title right middle">
+                        <warehouse:message code="inventory.totalValue.label" default="Total value"/>
+                        <small><g:formatNumber number="${totalValue?:0}"/>
+                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</small>
+                    </div>
                 </div>
             </div>
 		</div>
