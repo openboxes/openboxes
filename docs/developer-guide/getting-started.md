@@ -1,6 +1,6 @@
-# Setup development environment
+# Getting Started
 
-## Install Dependencies
+## Dependencies
 
 ### Required
 * Java 7
@@ -13,7 +13,7 @@ NOTE: We are in the process of upgrading to Grails 2.5.5 [(see this feature bran
 ### Optional, but recommended
 * [IntelliJ IDEA] (https://www.jetbrains.com/idea/download/)
 
-## Basic setup instructions for developers
+## Instructions
 These instructions are for developers only.  If you are a system administrator looking to install OpenBoxes on your
 own server, please check out our [Installation](installation/index) page.
 
@@ -58,8 +58,9 @@ Create openboxes user
 mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
 ```
 
-### 5. Create Openboxes configuration file 
-Edit `$HOME/.grails/openboxes-config.properties`
+### 5. Create configuration file(s)
+
+Create or edit a file called `$HOME/.grails/openboxes-config.properties`.
 
 ```
 # Database connection settings
@@ -91,10 +92,13 @@ grails.mail.enabled=false
 #google.analytics.webPropertyID = <Google Analytics Key>
 ```
 
-NOTE: If you are running in development mode with a copy of an existing production database, you will need to
-instruct the application to not setup test fixtures automatically by uncommenting the above property:
+**NOTE:** If you are running in development mode with a copy of an existing database, you may want to
+instruct the application to bypass the test data fixtures automatically. You can achieve this by commenting 
+out the `openboxes.fixtures.enabled` property. Unfortunately, 
+the .properties files DO NOT deal well with boolean values so commenting out is the only way to set this property. 
+If you want a more elegant approach, you can add all boolean properties to `openboxes-config.groovy`.
 ```
-openboxes.fixtures.enabled=false
+#openboxes.fixtures.enabled=true
 ```
 
 ### 6. Grails Upgrade or Grails Compile 
