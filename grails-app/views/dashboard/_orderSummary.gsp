@@ -17,6 +17,8 @@
                         <tr>
                             <g:each var="entry" in="${incomingOrdersByStatus}" status="i">
                                 <g:set var="incomingOrdersValue" value="${incomingOrdersByStatus[entry.key]}"/>
+                                <g:set var="incomingItemCount" value="${incomingOrdersValue.objectList.collect { it.orderItems.size() }.sum()}"/>
+
                                 <td class="center" width="25%">
 
                                     <g:link controller="order" action="list" params="[status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
@@ -25,7 +27,10 @@
 
                                     <g:link controller="order" action="list"
                                             params="[status:entry.key, dateCreatedFrom:dateCreatedFrom, dateCreatedTo:dateCreatedTo]">
-                                        <div class="indicator">${incomingOrdersValue.objectList.size()}</div>
+                                        <div class="indicator">${incomingOrdersValue.objectList.size()} orders</div>
+                                        <div class="indicator">${incomingItemCount?:0} items</div>
+
+
                                     </g:link>
                                     <g:set var="totalAmount" value="${incomingOrdersValue.objectList.sum { it.totalPrice() }}"/>
                                     <div class="currency">
