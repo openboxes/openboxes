@@ -1,20 +1,26 @@
-# Drawbacks of using OpenBoxes:
-While open-source software is free to download and use, there are several costs and drawbacks that should be taken
+# Considerations
+While open-source software is free to download and use, there are costs and limitations that should be taken
 into consideration before you begin the adoption process.
 
 ## System Administration
 An OpenBoxes installation requires a system administrator to install, monitor, maintain, and upgrade the software
-  and server components throughout the software lifecycle. These tasks require competent IT personnel.
+and server components throughout the software lifecycle. These tasks require competent IT personnel.
 
 ## Time
 While OpenBoxes has been streamlined considerably since its creation, there may be significant time
-costs associated with using this inventory management system. Examples of potentially time-intensive tasks include:
+costs associated with using this inventory management system. 
 
-*  Creating products to track within the system
-*  Data entry associated with recording/adjusting inventory
+Examples of potentially time-intensive tasks include, but are not limited to:
+
+* Master Data Management e.g. creating products to track within the system
+* Periodic Reviews e.g. stock counts, min/max/reorder review, fast moving vs. obsolete inventory
+* Data Entry e.g. recording and adjusting inventory 
+* Forecasting e.g. period review of demand/consumption data, disease incidence, population growth, 
+service expansion within the hospital
+ 
 
 ## Training 
-While OpenBoxes is a relatively simple inventory management tool, some training is appropriate to
+While OpenBoxes is a relatively simple inventory management tool, some training is required to
 allow users to successfully utilize all of the functionality offered by the system.
 
 ## Hospital-Centric
@@ -27,9 +33,10 @@ for that location (customer) against your facility depot, and fulfill that PO in
 This feature will eventually be implemented as pharmacists would like to generate a sales order when filling a 
 prescription for a patient.
       
-2) The Requisition feature (similar to Tranfer Orders) which is used to move stock from a facility depot to a 
-point-of-service (e.g. ward, pharmacy) is primarily used within the depot. In other words, Requisitions are 
-created by a warehouse manager within the hospital depot (instead of the requesting party, a nurse or pharmacist).
+2) The Requisition feature (i.e. Pull Replenishment) which is used to move stock from a facility depot to a 
+point-of-service location (e.g. ward, pharmacy) is primarily used within the depot. In other words, Requisitions are 
+created by a warehouse manager within the hospital depot instead of by the requesting party (i.e. a nurse or pharmacist).
+
 This was a decision made in order to save time and avoid the need for adding time-intensive processes for nurses 
 and pharmacists. In the use case at Mirebalis Hospital, nurses and pharmacists will send a paper requisitions to the hospital depot, 
 warehouse staff will enter the requisition into the system and proceed to fulfill that requisition. OpenBoxes will 

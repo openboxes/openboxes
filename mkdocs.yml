@@ -14,7 +14,7 @@ pages:
 # About:
 - ['index.md', 'About', 'Introduction']
 - ['benefits.md', 'About', 'Benefits']
-- ['drawbacks.md', 'About', 'Drawbacks']
+- ['considerations.md', 'About', 'Considerations']
 
 # Installation
 - ['installation/index.md', 'Installation',  'Overview']
@@ -25,17 +25,18 @@ pages:
 # Configuration
 - ['configuration.md', 'Configuration Guide', 'Configuration']
 
-# Configuration
-- ['user-guide/introduction.md', 'User Guide', 'Introduction']
-
 # Developer Guide
-- ['developer-guide/introduction.md', 'Developer Guide', 'Introduction']
+- ['developer-guide/index.md', 'Developer Guide', 'Introduction']
 - ['developer-guide/getting-started.md', 'Developer Guide', 'Getting Started']
 - ['developer-guide/contributing.md', 'Developer Guide', 'Contributing']
 - ['developer-guide/syncing-a-fork.md', 'Developer Guide', 'Syncing a Fork']
 - ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
 
 # Support - add a page like https://readthedocs.org/support/
+- ['support/index.md', 'Support', 'Introduction']
+
+# User Guide
+- ['user-guide/index.md', 'User Guide', 'Introduction']
 
 # Continuous Integration
 # User Guide

@@ -433,6 +433,10 @@ jqueryValidationUi {
 }
 
 
+// Allow users to customize logo image url as well as labale
+openboxes.logo.url = ""
+openboxes.logo.label = "OpenBoxes"
+
 // Grails Sentry/Raven plugin
 // NOTE: You'll need to enable the plugin and set a DSN using an external config properties file
 // (namely, openboxes-config.properties or openboxes-config.groovy)

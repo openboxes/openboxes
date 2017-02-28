@@ -13,11 +13,17 @@ import org.pih.warehouse.core.Location
 
 class ImageTagLib {
 
+    def grailsApplication
+
     def displayLogo = { attrs, body ->
 
         Location location = Location.get(attrs.location)
+        def logo = [
+                url: grailsApplication.config.openboxes.logo.url,
+                label: grailsApplication.config.openboxes.logo.label
+        ]
 
-        out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs,location:location]);
+        out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs,location:location,logo:logo]);
     }
 
 
