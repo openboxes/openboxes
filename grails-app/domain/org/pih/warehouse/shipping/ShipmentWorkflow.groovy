@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.core.Document
+
 // import java.io.Serializable;
 // import java.util.Date;
 
@@ -19,7 +21,7 @@ class ShipmentWorkflow implements Serializable {
 	ShipmentType shipmentType  	// the shipment type this workflow is associated with
 	String excludedFields   	// comma-delimited (with no spaces) list of Shipment fields to exclude in this workflow
 	String documentTemplate		// the template to use when auto-generating documents for this workflow
-	
+
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
@@ -30,10 +32,12 @@ class ShipmentWorkflow implements Serializable {
 	
 	// Core association mappings
 	static hasMany = [ referenceNumberTypes : ReferenceNumberType,
-	                   containerTypes : ContainerType ]
+	                   containerTypes : ContainerType,
+					   documentTemplates: Document ]
 	         
 	static mapping = {
 		id generator: 'uuid'
+        documentTemplates joinTable: [name: 'shipment_workflow_document', column: 'document_id', key: 'shipment_workflow_id']
 	}
 	          
     static constraints = {

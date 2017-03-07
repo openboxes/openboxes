@@ -22,8 +22,9 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	
 	String id
 	String name
+    Address address
+
 	byte [] logo				// logo
-	Address address
 	String fgColor	= "000000"
 	String bgColor = "FFFFFF"
 	
@@ -46,6 +47,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
+        //consignee(nullable:true, maxSize: 255)
 		address(nullable:true)
 		locationType(nullable:false)
 		locationGroup(nullable:true)
@@ -73,7 +75,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		cache true
 	}
 	
-	static transients = ["transactions", "events", "shipments", "requests", "orders" ]
+	static transients = ["transactions", "events", "shipments", "requests", "orders"]
 	
 	List getTransactions() { return Transaction.findAllByDestinationOrSource(this,this) }
 	List getEvents() { return Event.findAllByEventLocation(this) }
