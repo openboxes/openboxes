@@ -16,13 +16,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem;
-
-// import java.io.Serializable;
-// import java.sql.ResultSet;
-// import java.text.SimpleDateFormat;
 import au.com.bytecode.opencsv.CSVWriter
-//import com.ocpsoft.pretty.time.PrettyTime;
-
 
 class ShipmentController {
 	
@@ -725,8 +719,6 @@ class ShipmentController {
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
-
-
 
 	def editDocument = {
 		def shipmentInstance = Shipment.get(params?.shipmentId);
