@@ -17,6 +17,7 @@ grails.project.test.reports.dir	= "target/test-reports"
 
 grails.plugin.location.spock='spock/'
 grails.plugin.location.liquibase='liquibase/'
+grails.plugin.location.'watch-scaffolding'='watch-scaffolding/'
 
 // Development configuration property used to enable xrebel features
 //grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
