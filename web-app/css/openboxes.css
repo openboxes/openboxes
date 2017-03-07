@@ -3051,3 +3051,12 @@ input {
 .childContainer .tag {
     margin-left: 25px;
 }
+
+.new-container {
+    border-top: 2px solid #ddd;
+}
+
+.packing-unit {
+   background-color: #f7f7f7;
+
+}

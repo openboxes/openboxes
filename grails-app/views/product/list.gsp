@@ -16,14 +16,12 @@
             </g:if>
             <div>
             
-				<div class="buttonBar">
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+				<div class="button-bar">
+                    <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
 	            	<g:isUserAdmin>
-                        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+                        <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
 	                </g:isUserAdmin>
             	</div>
-
-
 
                 <div class="yui-gf">
                     <div class="yui-u first">
