@@ -10,6 +10,7 @@
 package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
+import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.CellStyle
@@ -1770,22 +1771,38 @@ class ShipmentService {
      * @param address address string in RFC822 format
      * @return
      */
-    Person findOrCreatePerson(String address) {
-        InternetAddress emailAddress = new InternetAddress(address)
-        Person person = Person.findByEmail(emailAddress.address)
+    Person findOrCreatePerson(String recipient) {
+        Person person
+		if (EmailValidator.getInstance().isValid(recipient)) {
+			InternetAddress emailAddress = new InternetAddress(recipient, false)
+			person = Person.findByEmail(emailAddress.address)
 
-        // Person record not found, creating a new person as long as the name is provided
-        if (!person) {
-            // If there's no personal attribute we cannot determine the first and last name of the recipient.
-            // This will return null and should throw an error
-            if (!emailAddress.personal) {
-                throw new RuntimeException("Unable to find a recipient with email address ${address}.")
+			// Person record not found, creating a new person as long as the name is provided
+			if (!person) {
+				// If there's no personal attribute we cannot determine the first and last name of the recipient.
+				// This will return null and should throw an error
+				if (!emailAddress.personal) {
+					throw new RuntimeException("Unable to find a recipient with email address ${recipient}.")
+				}
+				String[] names = emailAddress.personal.split(" ", 2)
+				person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
+				person.save(flush: true)
+			}
+		}
+        else {
+            String[] names = recipient.split(" ", 2)
+            if (names.length <= 1) {
+                throw new RuntimeException("Recipient must have at least two names (i.e. first name and last name)")
             }
-            String [] names = emailAddress.personal.split(" ", 2)
-            person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
-            person.save(flush:true)
+
+            person = Person.findByFirstNameAndLastName(names[0], names[1])
+            if (!person) {
+                person = new Person(firstName: names[0], lastName: names[1])
+                person.save(flush: true)
+            }
         }
         return person
+
     }
 
 	boolean importPackingList(String shipmentId, InputStream inputStream) {
