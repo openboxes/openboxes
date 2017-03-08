@@ -363,20 +363,13 @@
                                                 </g:if>
                                                 <td class="left">
                                                     <g:if test="${shipmentItem?.recipient }">
-                                                        ${shipmentItem?.recipient?.name}
-                                                        <div class="fade">${shipmentItem?.recipient?.email}</div>
+                                                        <div title="${shipmentItem?.recipient?.email}">${shipmentItem?.recipient?.name}</div>
                                                     </g:if>
-                                                    <g:else>
-
-                                                    </g:else>
                                                 </td>
                                                 <td class="left" >
                                                     <g:if test="${shipmentItem?.receiptItem?.comment }">
                                                         ${shipmentItem?.receiptItem?.comment}
                                                     </g:if>
-                                                    <g:else>
-
-                                                    </g:else>
                                                 </td>
 
                                             </tr>
