@@ -9,7 +9,7 @@
                 <thead>
                     <tr class="prop odd">
                         <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></label>
+                            <div class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
                 </thead>

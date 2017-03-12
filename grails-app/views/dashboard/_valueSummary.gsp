@@ -14,7 +14,7 @@
                 <thead>
                     <tr class="prop odd">
                         <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></label>
+                            <div class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
                 </thead>
@@ -145,8 +145,12 @@
                 var progressSummary = data.hitCount + " out of " + data.totalCount;
                 var progressPercentage = progress*100;
                 var lastUpdated = data.lastUpdated;
-                $(".lastUpdated").html(lastUpdated);
-
+                if (lastUpdated) {
+                    $(".lastUpdated").html(lastUpdated);
+                }
+                else {
+                    $(".lastUpdated").html("<div class='error'>An unexpected error occurred while loading data</div>")
+                }
 
                 $('#totalStockValue').html(value);
 

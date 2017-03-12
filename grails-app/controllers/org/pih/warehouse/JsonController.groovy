@@ -211,19 +211,25 @@ class JsonController {
 
     //@Cacheable("dashboardCache")
     def getGenericProductSummary() {
+
         def startTime = System.currentTimeMillis()
-        def location = Location.get(session?.warehouse?.id)
-        def genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
+        def genericProductByStatusMap = [:]
+        try {
+            def location = Location.get(session?.warehouse?.id)
+            genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
 
 
-        render ([elapsedTime: (System.currentTimeMillis()-startTime),
-                totalCount:genericProductByStatusMap.values().size(),
+        } catch (Exception e) {
+
+        }
+        render([elapsedTime              : (System.currentTimeMillis() - startTime),
+                totalCount               : genericProductByStatusMap.values().size(),
                 genericProductByStatusMap: genericProductByStatusMap] as JSON)
 
     }
 
     // FIXME Remove - Only used for comparison
-    def getQuantityByProductMap = {
+    def getQuantityByProductMap() {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
 
@@ -232,7 +238,7 @@ class JsonController {
 
 
     // FIXME Remove - Only used for compaison
-    def getQuantityByProductMap2 = {
+    def getQuantityByProductMap2() {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getCurrentInventory(location)
 
@@ -240,7 +246,7 @@ class JsonController {
     }
 
     // FIXME Remove - Only used for compaison
-    def getQuantityByInventoryItem = {
+    def getQuantityByInventoryItem() {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityForInventory(location.inventory)
 
@@ -249,8 +255,8 @@ class JsonController {
     }
 
     // FIXME Remove - Only used for compaison
-    def getQuantityByInventoryItem2 = {
-        def location = Location.get(session?.warehouse?.id)
+    def getQuantityByInventoryItem2() {
+            def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityOnHandByInventoryItem(location)
 
         quantityMap = quantityMap.sort()
@@ -259,50 +265,68 @@ class JsonController {
 
     //@Cacheable("dashboardCache")
     def getDashboardAlerts() {
-        def location = Location.get(session?.warehouse?.id)
-        def dashboardAlerts = inventoryService.getDashboardAlerts(location)
+        def dashboardAlerts = [:]
+        try {
+            def location = Location.get(session?.warehouse?.id)
+            dashboardAlerts = inventoryService.getDashboardAlerts(location)
+        } catch (Exception e) {
 
+        }
         render dashboardAlerts as JSON
     }
 
     //@Cacheable("dashboardCache")
     def getDashboardExpiryAlerts() {
-        def location = Location.get(session?.warehouse?.id)
-        def map = inventoryService.getExpirationSummary(location)
-        render map as JSON
+        def expirationSummary = [:]
+        try {
+            def location = Location.get(session?.warehouse?.id)
+            expirationSummary = inventoryService.getExpirationSummary(location)
+        } catch (Exception e) {
+            log.error("Unable to generate dashboard expirty alerts due to error: " + e.message, e)
+
+        }
+        render expirationSummary as JSON
     }
 
     //@Cacheable("dashboardCache")
     def getTotalStockValue() {
-        def location = Location.get(session?.warehouse?.id)
-        def result = inventoryService.getTotalStockValue(location)
-        def totalValue = g.formatNumber(number: result.totalStockValue)
-        def lastUpdated = inventoryService.getLastUpdatedInventorySnapshotDate()
-        lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
-        def data = [
-                lastUpdated: lastUpdated,
-                anotherAttr: "anotherValue",
-                totalStockValue:result.totalStockValue,
-                hitCount: result.hitCount,
-                missCount: result.missCount,
-                totalCount: result.totalCount,
-                totalValue: totalValue]
+        def data = [:]
+        try {
+            def location = Location.get(session?.warehouse?.id)
+            def result = inventoryService.getTotalStockValue(location)
+            def totalValue = g.formatNumber(number: result.totalStockValue)
+            def lastUpdated = inventoryService.getLastUpdatedInventorySnapshotDate()
+            lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
+            data = [
+                    lastUpdated    : lastUpdated,
+                    totalStockValue: result.totalStockValue,
+                    hitCount       : result.hitCount,
+                    missCount      : result.missCount,
+                    totalCount     : result.totalCount,
+                    totalValue     : totalValue]
+
+        } catch (Exception e) {
+            log.error("Unable to generate total stock value due to error: " + e.message, e)
+        }
         render data as JSON
     }
 
-    def getStockValueByProduct = {
-        def location = Location.get(session?.warehouse?.id)
-        def result = inventoryService.getTotalStockValue(location)
-
+    def getStockValueByProduct() {
         def stockValueByProduct = []
-        result.stockValueByProduct.sort { it.value }.reverseEach { product, value ->
+        try {
+            def location = Location.get(session?.warehouse?.id)
+            def result = inventoryService.getTotalStockValue(location)
 
-            value = g.formatNumber(number: value, format: "#######.00")
-            stockValueByProduct << [id: product.id, productCode: product.productCode, productName: product.name, unitPrice: product.pricePerUnit, totalValue: value ]
+            result.stockValueByProduct.sort { it.value }.reverseEach { product, value ->
+                value = g.formatNumber(number: value, format: "#######.00")
+                stockValueByProduct << [id: product.id, productCode: product.productCode, productName: product.name, unitPrice: product.pricePerUnit, totalValue: value]
+            }
+
+        } catch (Exception e) {
+            log.error("Unable to generate stock value by product due to error: " + e.message, e)
+
         }
-
-        def map = [aaData: stockValueByProduct]
-        render map as JSON
+        render ([aaData: stockValueByProduct] as JSON)
     }
 
     //@CacheFlush("dashboardTotalStockValueCache")
@@ -1416,17 +1440,20 @@ class JsonController {
      * Dashboard > Fast movers
      */
     def getFastMovers() {
-        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-        def date = new Date()
-        if (params.date) {
-            date = dateFormat.parse(params.date)
-            date.clearTime()
+        try {
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            def date = new Date()
+            if (params.date) {
+                date = dateFormat.parse(params.date)
+                date.clearTime()
+            }
+            def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+            data = inventoryService.getFastMovers(location, date, params.max ?: 0 as int)
+            render ([aaData: data?.results?:[]] as JSON)
+        } catch (Exception e) {
+
         }
-        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-
-        def data = inventoryService.getFastMovers(location, date, params.max?:0 as int)
-
-        render ([aaData: data?.results?:[]] as JSON)
+        render ([aaData: []] as JSON)
     }
 
 
@@ -1436,17 +1463,17 @@ class JsonController {
     }
 
 
-    def enableCalculateHistoricalQuantityJob = {
+    def enableCalculateHistoricalQuantityJob() {
         CalculateHistoricalQuantityJob.enabled = true
         render([message: "CalculateHistoricalQuantityJob has been ${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"] as JSON)
     }
 
-    def disableCalculateHistoricalQuantityJob = {
+    def disableCalculateHistoricalQuantityJob() {
         CalculateHistoricalQuantityJob.enabled = false
         render([message: "CalculateHistoricalQuantityJob has been ${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"] as JSON)
     }
 
-    def statusCalculateHistoricalQuantityJob = {
+    def statusCalculateHistoricalQuantityJob() {
         render "${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"
     }
 
