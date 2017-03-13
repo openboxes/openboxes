@@ -14,10 +14,7 @@ label.error {
 	font-weight: bold; 
 	color: black; 
 }
-.ui-datepicker-trigger {
-	position: relative; left: -16px; top: -1px;
-}
-.buttons { 
+.buttons {
 	padding-top: 10px; 
 	/*border-top: 3px solid lightgrey;*/
 	text-align: center; 

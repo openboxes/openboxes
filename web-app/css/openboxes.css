@@ -838,8 +838,16 @@ label.error {
     color: black;
 }
 .ui-datepicker-trigger {
-    position: relative; left: -16px; top: -1px;
+    position: relative;
+    left: 3px;
+    top: -20px;
 }
+
+input.hasDatepicker {
+    padding-left: 20px;
+}
+
+
 .buttons {
     padding-top: 10px;
     /*border-top: 3px solid lightgrey;*/
