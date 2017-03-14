@@ -53,7 +53,7 @@ class InventoryExcelImporter extends AbstractExcelImporter {
             productCode:([expectedType: StringType, defaultValue:null]),
             product:([expectedType: StringType, defaultValue:null]),
             lotNumber:([expectedType: StringType, defaultValue:null]),
-            expirationDate:([expectedType: StringType, defaultValue:null]),
+            expirationDate:([expectedType: DateType, defaultValue:null]),
             manufacturer:([expectedType: StringType, defaultValue:null]),
             manufacturerCode:([expectedType: StringType, defaultValue:null]),
             quantity:([expectedType: IntType, defaultValue:null]),
