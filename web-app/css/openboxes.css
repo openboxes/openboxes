@@ -609,21 +609,21 @@ legend span {
 
 input[type=text],
 input[type=password],
-input.text, input.large,
+input.text, input.large, input.datepicker,
 textarea, select {
     background-color:#fff;
     border:1px solid #bbb;
 }
 input[type=text]:focus,
 input[type=password]:focus,
-input.text:focus, input.large:focus, span.large:focus,
+input.text:focus, input.large:focus, span.large:focus, input.datepicker:focus,
 textarea:focus, select:focus {
     border-color:#666;
 }
 
 input[type=text],
 input[type=password],
-input.text, input.large, span.large,
+input.text, input.large, span.large, input.datepicker,
 textarea, select {
     margin:0;
 }
@@ -634,7 +634,7 @@ input[type=submit] {
 	height: 200px;
 }*/
 
-input.text, input.large, span.large   { padding:5px; }
+input.text, input.large, span.large, input.datepicker   { padding:5px; }
 textarea      { padding:5px; }
 
 input[type=checkbox], input[type=radio],
@@ -839,14 +839,10 @@ label.error {
 }
 .ui-datepicker-trigger {
     position: relative;
-    left: 3px;
-    top: -20px;
+    right: 0;
+    top: -2px;
+    padding: 1px;
 }
-
-input.hasDatepicker {
-    padding-left: 20px;
-}
-
 
 .buttons {
     padding-top: 10px;
@@ -1898,7 +1894,7 @@ div#dashboard li {
 }
 
 .prop {
-    border-top: 0px dotted #ccc;
+    border-top: 1px dotted #ccc;
 }
 
 .prop .first {
@@ -1906,7 +1902,7 @@ div#dashboard li {
 }
 
 .prop .name {
-    width: 25%;
+    width: 30%;
     background-color: #F7F7F7;
     text-align: right;
 }
@@ -1921,7 +1917,7 @@ div#dashboard li {
 
 .prop .value {
     text-align:left;
-    /*width: 30%;*/
+    width: 70%;
     background-color: white;
     vertical-align: top;
     line-height: 1.5em;
@@ -3072,6 +3068,11 @@ input {
 input.text {
     box-sizing : border-box;
     width: 100%
+}
+
+input.datepicker {
+    box-sizing : border-box;
+    width: auto;
 }
 
 .childContainer .tag {

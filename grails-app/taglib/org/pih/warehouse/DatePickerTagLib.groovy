@@ -52,8 +52,8 @@ class DatePickerTagLib {
 		
 		def html = """
 			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text'
-					placeholder='${placeholder}' class='${cssClass} text' size="${size}" ${readOnly?"readonly='readonly'":""}/>
+			<input id='${id}-datepicker' name='${name}-datepicker' type=text'
+					placeholder='${placeholder}' class='${cssClass} datepicker' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {

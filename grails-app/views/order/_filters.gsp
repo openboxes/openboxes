@@ -95,24 +95,18 @@
                     <td>
 
                         <label class="block">${warehouse.message(code: 'default.lastUpdateAfter.label', default: 'Last updated after')}</label>
-                        <div>
-                            <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
-                                                size="40" numberOfMonths="2" changeMonthAndYear="false"
-                                                value="${statusStartDate}" format="MM/dd/yyyy"/>
-                        </div>
-                        <a href="javascript:void(0);" id="clearStartDate">clear</a>
+                        <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
+                                            size="40" numberOfMonths="2" changeMonthAndYear="false"
+                                            value="${statusStartDate}" format="MM/dd/yyyy"/>
                     </td>
                 </tr>
 
                 <tr class="prop">
                     <td>
                         <label class="block">${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
-                        <div>
-                            <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="40"
-                                                numberOfMonths="2" changeMonthAndYear="true"
-                                                value="${statusEndDate}" format="MM/dd/yyyy"/>
-                        </div>
-                        <a href="javascript:void(0);" id="clearEndDate">clear</a>
+                        <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="40"
+                                            numberOfMonths="2" changeMonthAndYear="true"
+                                            value="${statusEndDate}" format="MM/dd/yyyy"/>
                     </td>
                 </tr>
 
