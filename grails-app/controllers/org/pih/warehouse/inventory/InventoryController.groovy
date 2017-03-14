@@ -635,7 +635,7 @@ class InventoryController {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getHealthyStock(location)
         def statusMap = inventoryService.getInventoryStatus(location)
-        if (params.format == "csv") {
+        if (params.downloadFormat == "csv") {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
