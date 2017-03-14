@@ -24,15 +24,15 @@
                     </div>
                     --%>
                     <div>
-                        <g:radio name="type" value="inventory" checked="${params.type=='inventory'}"/>
-                        <label><warehouse:message code="import.inventory.label" default="Inventory"/></label>
+                        <g:radio name="type" id="inventory" value="inventory" checked="${params.type=='inventory'}"/>
+                        <label for="inventory"><warehouse:message code="import.inventory.label" default="Inventory"/></label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventory.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
-                        <label><warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/></label>
+                        <g:radio name="type" id="inventoryLevel" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
+                        <label for="inventoryLevel"><warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/></label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevel.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>

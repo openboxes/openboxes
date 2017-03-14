@@ -1902,7 +1902,7 @@ div#dashboard li {
 }
 
 .prop .name {
-    width: 30%;
+    width: 25%;
     background-color: #F7F7F7;
     text-align: right;
 }
@@ -1917,7 +1917,7 @@ div#dashboard li {
 
 .prop .value {
     text-align:left;
-    width: 70%;
+    width: 75%;
     background-color: white;
     vertical-align: top;
     line-height: 1.5em;
