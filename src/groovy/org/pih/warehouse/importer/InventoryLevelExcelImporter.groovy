@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.importer
 
+import grails.util.Holders
 import org.grails.plugins.excelimport.*
 import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 // import java.text.ParseException;
@@ -16,7 +17,6 @@ import static org.grails.plugins.excelimport.ExpectedPropertyType.*
 class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 	def dataService
-	def grailsApplication
 
 	static Map cellMap = [ sheet:'Sheet1', startRow: 1, cellMap: [] ]
 
@@ -82,7 +82,7 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 	InventoryLevelExcelImporter(String fileName) {
 		super(fileName)
-		dataService = grailsApplication.mainContext.getBean("dataService")
+		dataService = Holders.grailsApplication.mainContext.getBean("dataService")
 	}
 
 

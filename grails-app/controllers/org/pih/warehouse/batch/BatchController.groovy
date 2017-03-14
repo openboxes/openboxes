@@ -86,11 +86,11 @@ class BatchController {
 
     def importData(ImportDataCommand command) {
 		
-		log.info params 
-		log.info command.location
+		log.info "Import data: " + params
+		log.info "Location: " + command.location
+		log.info "Type: " + command.type
 
-		// def dataMapList = null;
-		if ("POST".equals(request.getMethod())) {
+		if ("POST".equals(request.method)) {
 			File localFile = null;
 			if (request instanceof DefaultMultipartHttpServletRequest) {
 				def uploadFile = request.getFile('xlsFile');
@@ -141,7 +141,7 @@ class BatchController {
                     }
 					else {
 						//throw new RuntimeException("Unable to import data using ${command.type} importer")
-                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
+                        //command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
                     }
 				}
 				catch (OfficeXmlFileException e) {

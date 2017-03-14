@@ -28,7 +28,7 @@
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
                     <input name="type" type="hidden" value="${params.type }"/>
 
-                    <div class="box">
+                    <div class="box dialog">
                         <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
                         <table>
                             <tr class="prop">
@@ -125,11 +125,9 @@
                             <tr>
                                 <th data-class="expand"></th>
 
-                                <th>1</th>
+                                <th>Row</th>
                                 <g:each var="column" in="${commandInstance?.columnMap?.columnMap }" status="i">
-                                    <th data-hide='${i>3?"phone,tablet":""}' ><warehouse:message code="import.${column.value}.label"/>
-
-                                    </th>
+                                    <th><warehouse:message code="import.${column.value}.label"/></th>
                                 </g:each>
                                 <th>Warnings</th>
                             </tr>

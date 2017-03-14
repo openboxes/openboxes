@@ -9,17 +9,11 @@
                     <input name="xlsFile" type="file" />
                 </td>
             </tr>
-
             <tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="default.type.label"/></label>
                 </td>
                 <td class="value">
-
-
-
-
-
                     <%--
                     <div>
                         <g:radio name="type" value="product" checked="${params.type=='product'}"/>
@@ -43,6 +37,7 @@
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
+                    <%--
                     <div>
                         <g:radio name="type" value="productPrice" checked="${params.type=='productPrice'}" disabled="true"/>
                         <label><warehouse:message code="import.productPrice.label" default="Product pricing"/></label>
@@ -58,6 +53,7 @@
                         <label><warehouse:message code="import.purchaseOrder.label" default="Purchase orders"/></label>
                         <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
                     </div>
+                    --%>
                     <%--
                     <div class="chzn-container">
                         <g:select name="type" class="chzn-select-deselect"
@@ -69,19 +65,24 @@
             </tr>
             <tr class="prop">
                 <td class="name">
-                    <label><warehouse:message code="inventory.label"/></label>
+                    <label><warehouse:message code="location.label"/></label>
                 </td>
                 <td class="value">
                     ${session?.warehouse?.name }
                     <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
                 </td>
             </tr>
+
+
             <tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="default.date.label"/></label>
                 </td>
                 <td class="value">
-                    <g:jqueryDatePicker id="date" name="date" value="${new Date()}"/>
+                    <div>
+                        <g:jqueryDatePicker id="date" name="date" class="datepicker" value="${new Date()}" placeholder=""/>
+
+                    </div>
                 </td>
             </tr>
             <tr class="prop">

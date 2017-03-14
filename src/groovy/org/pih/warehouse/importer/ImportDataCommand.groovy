@@ -16,7 +16,7 @@ import org.pih.warehouse.core.Location;
 class ImportDataCommand {
 	def filename
 	def importFile
-	def type
+	String type
 	Location location
     Date date
 	def columnMap
