@@ -34,7 +34,7 @@ class TagController {
         def tagInstance = new Tag(params)
         if (tagInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
-            redirect(action: "list", id: tagInstance.id)
+            redirect(action: "edit", id: tagInstance.id)
         }
         else {
             render(view: "create", model: [tagInstance: tagInstance])
@@ -78,7 +78,7 @@ class TagController {
             tagInstance.properties = params
             if (!tagInstance.hasErrors() && tagInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
-                redirect(action: "list", id: tagInstance.id)
+                redirect(action: "edit", id: tagInstance.id)
             }
             else {
                 render(view: "edit", model: [tagInstance: tagInstance])
@@ -117,12 +117,11 @@ class TagController {
     }
 
     def addToProducts() {
-        println "add to products " + params
         Tag tag = Tag.get(params.id)
 
         if (tag) {
             if (params.productCodesToBeAdded) {
-                flash.message = "Added products " + params
+                flash.message = "Added products to tag ${tag?.tag}"
                 def productCodes = params.productCodesToBeAdded.split(",")
                 productCodes.each { productCode ->
                     def product = Product.findByProductCodeLike(productCode)
