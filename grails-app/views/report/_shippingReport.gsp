@@ -6,6 +6,10 @@
 
     <style type="text/css">
         table { width: 100%; }
+
+        .report-header {
+            min-height: 36px;
+        }
         body {
             font-family: arial, sans-serif ;
             font-size: 10px;
@@ -15,7 +19,7 @@
             text-align: center ;
         }
         th {
-            border-bottom: 2px solid #333333 ;
+            border: 1px solid grey ;
         }
         td {
             border-bottom: 1px dotted #999999 ;
@@ -29,14 +33,17 @@
             margin: 50px 0 50px 0;
         }
         .title {
-            font-size: 32px;
-            float: left;
+            text-align: center;
+            font-size: 24px;
+            float: right;
         }
         .subtitle {
+            float: right;
             font-size: 16px;
         }
         .logo {
-            float: right;
+            float: left;
+            text-align: center;
         }
         .clearfix {
             overflow: auto;
@@ -57,12 +64,16 @@
 
     <div class="report-header report-section clearfix">
         <div class="logo">
-            <rendering:inlineImage bytes="${logo.bytes}" mimeType="${logo.mimeType}"/>
+            <g:if test="${logo}">
+                <rendering:inlineImage bytes="${logo?.bytes}" mimeType="${logo.mimeType}" height="48"/>
+            </g:if>
         </div>
         <div class="title">
-            <warehouse:message code="report.shippingReport.heading"/>
+            <h1 class="title"><warehouse:message code="report.shippingReport.heading"/></h1>
         </div>
     </div>
+
+    <hr/>
 
     <div class="report-summary report-section">
         <table>
@@ -81,7 +92,8 @@
                     </label>
                 </th>
                 <td width="25%">
-                    ${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }
+                    <g:set var="lpn" value="${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }"/>
+                    ${lpn?:"N/A"}
                 </td>
             </tr>
             <tr>

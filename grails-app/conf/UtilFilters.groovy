@@ -19,24 +19,26 @@ class UtilFilters {
 
         profiler(controller: '*', action: '*') {
             before = {
-                request._timeBeforeRequest = System.currentTimeMillis()
-            }
-
-            after = {
-                request._timeAfterRequest = System.currentTimeMillis()
-            }
-
-            afterView = {
                 if (params.showTime) {
                     session._showTime = params.showTime == "on"
                 }
-                if (session._showTime) {
-                    def actionDuration = request._timeAfterRequest - request._timeBeforeRequest
-                    def viewDuration = System.currentTimeMillis() - request._timeAfterRequest
 
-                    request.actionDuration = actionDuration
-                    request.viewDuration = viewDuration
-                    log.info("Request duration for (${controllerName}/${actionName}): ${actionDuration}ms/${viewDuration}ms")
+                request._timeBeforeRequest = System.currentTimeMillis()
+            }
+
+            after = { Map model ->
+                request._timeAfterRequest = System.currentTimeMillis()
+                if (session._showTime) {
+                    request.actionDuration = request._timeAfterRequest - request._timeBeforeRequest
+                }
+            }
+
+            afterView = { Exception e ->
+
+                log.info "Request " + request
+                if (session._showTime) {
+                    flash.viewDuration = System.currentTimeMillis() - request._timeAfterRequest
+                    log.info("Request duration for (${controllerName}/${actionName}): ${request.actionDuration}ms/${flash.viewDuration}ms")
                 }
             }
         }

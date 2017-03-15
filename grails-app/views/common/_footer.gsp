@@ -54,13 +54,14 @@
             &nbsp;&nbsp; | &nbsp;&nbsp;
             <span>
                 Page load:
-                <b>${(request?.viewDuration?:0)/1000}s</b>
+                <b>${(flash?.viewDuration?:0)/1000}s</b>
             </span>
-            <%--
-            <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
-                (disable)
-            </g:link>
-            --%>
+
+        <%--
+        <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
+            (disable)
+        </g:link>
+        --%>
         </g:if>
 
     <%--

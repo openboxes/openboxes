@@ -94,7 +94,8 @@ textarea {
     /*
     width: 250px;
     height: 150px;*/
-    vertical-align: top;
+    width: 100%;
+    vertical-align: middle;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -3067,7 +3068,7 @@ input {
 /* prevents text inputs from overflowing their parent */
 input.text {
     box-sizing : border-box;
-    width: 100%
+    width: 100%;
 }
 
 input.datepicker {
