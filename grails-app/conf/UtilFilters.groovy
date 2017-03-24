@@ -34,8 +34,6 @@ class UtilFilters {
             }
 
             afterView = { Exception e ->
-
-                log.info "Request " + request
                 if (session._showTime) {
                     flash.viewDuration = System.currentTimeMillis() - request._timeAfterRequest
                     log.info("Request duration for (${controllerName}/${actionName}): ${request.actionDuration}ms/${flash.viewDuration}ms")

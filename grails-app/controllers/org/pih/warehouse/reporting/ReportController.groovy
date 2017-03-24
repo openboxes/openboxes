@@ -177,7 +177,7 @@ class ReportController {
 		if (!command?.hasErrors()) { 			
 			reportService.generateTransactionReport(command);			
 		}
-		render(view: 'showTransactionReport', model: [command : command])
+		render(view: 'printTransactionReport', model: [command : command])
 	}
 	
 	def showShippingReport(ChecklistReportCommand command) {
@@ -244,6 +244,8 @@ class ReportController {
             log.info "BaseUri is $baseUri"
             log.info("Session ID: " + session.id)
             log.info "Fetching url $url"
+
+
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream()
             reportService.generatePdf(url, baos)
