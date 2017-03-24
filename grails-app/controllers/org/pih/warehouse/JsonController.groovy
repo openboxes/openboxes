@@ -1448,10 +1448,10 @@ class JsonController {
                 date.clearTime()
             }
             def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-            data = inventoryService.getFastMovers(location, date, params.max ?: 0 as int)
+            def data = inventoryService.getFastMovers(location, date, params.max ?: 0 as int)
             render ([aaData: data?.results?:[]] as JSON)
         } catch (Exception e) {
-
+            log.error("Unable to fetch fast movers due to error: " + e.message, e)
         }
         render ([aaData: []] as JSON)
     }
