@@ -32,8 +32,8 @@
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="requisition-summary">
 			<g:if test="${!requisitionStatistics?.ALL}">
-				<div style="margin:10px;" class="center empty">
-					<span class="fade"><warehouse:message code="requisition.noRecent.label"/></span>
+				<div class="center empty fade">
+                    <warehouse:message code="requisition.noRecent.label"/>
                 </div>
 			</g:if>
 			<g:else>
@@ -87,8 +87,6 @@
 
                     </tfoot>
                 </table>
-
-
 			</g:else>
 		</div>
 	</div>	

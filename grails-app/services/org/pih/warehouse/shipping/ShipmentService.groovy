@@ -183,7 +183,7 @@ class ShipmentService {
 	 * @param shipments
 	 * @return
 	 */
-	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
+	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) {
 		def startTime = System.currentTimeMillis()
 		def shipmentMap = new TreeMap<ShipmentStatusCode, ListCommand>();
 		
@@ -191,7 +191,7 @@ class ShipmentService {
 			shipmentMap[it] = [];
 		}
 		shipments.each {
-			
+
 			def key = it.getStatus().code;			 
 			def shipmentList = shipmentMap[key];
 			if (!shipmentList) {
