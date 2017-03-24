@@ -38,34 +38,39 @@
                 <g:isUserAdmin>
                     <table>
                         <thead>
-                            <tr>
-                                <th><warehouse:message code="tag.name.label" default="Tag"/></th>
-                                <th><warehouse:message code="tag.count.label" default="Count"/></th>
-                                <th><warehouse:message code="tag.active.label" default="Active"/></th>
-                                <th><warehouse:message code="default.actions.label"/></th>
-                            </tr>
+                        <tr>
+                            <th><warehouse:message code="tag.name.label" default="Tag"/></th>
+                            <th><warehouse:message code="tag.count.label" default="Count"/></th>
+                            <th><warehouse:message code="tag.active.label" default="Active"/></th>
+                            <th><warehouse:message code="default.actions.label"/></th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <g:each in="${tags }" var="tag" status="i">
-                                <tr class="${i%2?'odd':'even'}">
-                                    <td>
-                                        ${tag.key.tag?:"Empty tag"}
-                                    </td>
-                                    <td>
-                                        ${tag?.value}
-                                    </td>
-                                    <td>
-                                        ${tag.key.isActive}
-                                    </td>
-                                    <td>
-                                        <g:link controller="dashboard" action="hideTag" id="${tag.key}" params="[editTags:true]">
-                                            <img src="${resource(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
-                                    </td>
-                                </tr>
-                            </g:each>
+                        <g:each in="${tags }" var="tag" status="i">
+                            <tr class="${i%2?'odd':'even'}">
+                                <td>
+                                    ${tag.key.tag?:"Empty tag"}
+                                </td>
+                                <td>
+                                    ${tag?.value}
+                                </td>
+                                <td>
+                                    ${tag.key.isActive}
+                                </td>
+                                <td>
+                                    <g:link controller="dashboard" action="hideTag" id="${tag?.key?.id}" params="[editTags:true]">
+                                        <img src="${resource(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
+                                </td>
+                            </tr>
+                        </g:each>
                         </tbody>
                     </table>
                 </g:isUserAdmin>
+                <g:if test="${!tags}">
+                    <div class="center fade empty">
+                        <warehouse:message code="tag.noTags.label"/>
+                    </div>
+                </g:if>
             </g:if>
             <g:else>
                 <g:if test="${tags}">
@@ -79,8 +84,8 @@
                     </div>
                 </g:if>
                 <g:else>
-                    <div style="margin:10px;" class="center">
-                        <span class="fade"><warehouse:message code="tag.noTags.label"/></span>
+                    <div style="margin:10px;" class="center fade empty">
+                        <warehouse:message code="tag.noTags.label"/>
                     </div>
                 </g:else>
             </g:else>
