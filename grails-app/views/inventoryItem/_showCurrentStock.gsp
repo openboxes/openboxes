@@ -49,12 +49,18 @@
                             <g:render template="actionsCurrentStock" model="[itemInstance:itemInstance,itemQuantity:itemQuantity]" />
                         </td>
                         <td class="middle">
-
-                            <span class="lotNumber">
-                                ${itemInstance?.lotNumber ?: '<span class="fade"><warehouse:message code="default.none.label"/></span>' }
-                            </span>
-                            <g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
-                            </g:link>
+                            <g:if test="${itemInstance?.lotNumber}">
+                                <span class="lotNumber">
+                                    <g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
+                                    ${itemInstance?.lotNumber}
+                                    </g:link>
+                                </span>
+                            </g:if>
+                            <g:else>
+                                <span class="fade">
+                                    <warehouse:message code="default.none.label"/>
+                                </span>
+                            </g:else>
                         </td>
                         <td class="middle">
                             <g:if test="${itemInstance?.expirationDate}">
