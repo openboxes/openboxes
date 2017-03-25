@@ -173,10 +173,18 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <label>
+                    <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
+                    <label for="includeLocationBreakdown">
                         <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
                     </label>
-                    <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <g:checkBox name="includeMonthlyBreakdown" value="${command.includeMonthlyBreakdown}"/>
+                    <label for="includeMonthlyBreakdown">
+                        <warehouse:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown in CSV"/>
+                    </label>
 
 
                 </td>

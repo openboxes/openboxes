@@ -21,6 +21,7 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
@@ -42,16 +43,6 @@ class ConsumptionController {
             render(view: "show", model: [command:command])
             return;
         }
-
-        println "selectedTags " + command.selectedTags
-        println "selectedCategories " + command.selectedCategories
-        println "toLocations " + command.toLocations
-        println "fromLocations " + command.fromLocations
-
-        //if (!command.fromLocation) {
-        //    command.fromLocation = Location.get(session.warehouse.id)
-        //}
-
 
         List selectedLocations = [] //= session.invoiceList
         params.each {
@@ -75,9 +66,6 @@ class ConsumptionController {
             }
         }
 
-        println "fromLocations: " + command.fromLocations.size()
-        println "toLocations: " + command.toLocations.size()
-        println "selectedLocations: " + selectedLocations.size()
         command.selectedLocations = selectedLocations
 
         def fromLocations = []
@@ -98,6 +86,8 @@ class ConsumptionController {
         transactions.addAll(command.debits)
         transactions.addAll(command.credits)
 
+        // Sort transaction by date ascending
+        transactions = transactions.sort { it.transactionDate }
 
         //command.toLocations.clear();
         // Iterate over all transactions
@@ -121,17 +111,10 @@ class ConsumptionController {
                     command.rows[product].product = product
                 }
 
-                // Keep track of quantity out based on transasction type
+                // Keep track of quantity out based on transaction type
                 if (transaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
                     command.rows[product].transferOutQuantity += transactionEntry.quantity
                     command.rows[product].transferOutTransactions << transaction
-
-                    // Initialize transfer out by location
-                    def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
-                    if (!transferOutQuantity) { command.rows[product].transferOutMap[transaction.destination] = 0 }
-
-                    // Add to the total transfer out per location
-                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
                 }
                 else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
                     command.rows[product].expiredQuantity += transactionEntry.quantity
@@ -146,6 +129,25 @@ class ConsumptionController {
                     command.rows[product].transferInTransactions << transaction
                 }
 
+                // Capture location and month breakdown
+                if (transaction.transactionType.transactionCode == TransactionCode.DEBIT) {
+                    // Add to total transfer out (initialize transfer out by location map)
+                    def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
+                    if (!transferOutQuantity) {
+                        command.rows[product].transferOutMap[transaction.destination] = 0
+                    }
+                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
+
+                    // Add to total transfer out by month (initialize transfer out by month map)
+                    String dateKey = transaction.transactionDate.format("yyyy-MM")
+                    def transferOutMonthlyQuantity = command.rows[product].transferOutMonthlyMap[dateKey]
+                    if (!transferOutMonthlyQuantity) {
+                        command.rows[product].transferOutMonthlyMap[dateKey] = 0
+                    }
+                    command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
+                    command.selectedDates.add(dateKey)
+                }
+
                 // All transactions
                 command.rows[product].transactions << transaction
 
@@ -154,6 +156,7 @@ class ConsumptionController {
                 //    command.productMap[transactionEntry.inventoryItem.product] = 0
                 //}
                 //command.productMap[transactionEntry.inventoryItem.product] += transactionEntry.quantity
+
             }
         }
 
@@ -269,6 +272,11 @@ class ConsumptionController {
                         'Months remaining': g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1)?:'',
                 ]
 
+                if (command.includeMonthlyBreakdown) {
+                    command.selectedDates.each { date ->
+                        csvrow[date.toString()] = row.transferOutMonthlyMap[date]?:""
+                    }
+                }
 
                 if (command.selectedProperties) {
                     command.selectedProperties.each { property ->
@@ -325,11 +333,13 @@ class ShowConsumptionCommand {
     List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<TransactionType> transactionTypes = []
+    List <String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class));
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class));
     List<Tag> selectedTags = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Tag.class));
 
     Boolean includeLocationBreakdown = false
+    Boolean includeMonthlyBreakdown = false
 
     def productDomain = new DefaultGrailsDomainClass( Product.class )
 
@@ -345,12 +355,8 @@ class ShowConsumptionCommand {
     def transferOutMap = [:]
 
     static constraints = {
-        fromDate(nullable: false)
-        toDate(nullable: false)
         fromLocations(nullable: false)
         toLocations(nullable: true)
-        //fromLocation(nullable: true)
-        //toLocation(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)
     }
@@ -393,6 +399,7 @@ class ShowConsumptionRowCommand {
 
 
     Map<Location, Integer> transferOutMap = new TreeMap<Location, Integer>();
+    Map<String, Integer> transferOutMonthlyMap = new TreeMap<String, Integer>();
 
     static constraints = {
 
@@ -432,7 +439,6 @@ class ShowConsumptionRowCommand {
             }
         }
         return transferOutLocations
-
     }
 
 }

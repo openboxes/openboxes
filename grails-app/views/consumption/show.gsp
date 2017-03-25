@@ -163,6 +163,14 @@
                                         ${command.includeLocationBreakdown?'yes':'no'}
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label><warehouse:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown"/></label>
+                                    </td>
+                                    <td>
+                                        ${command.includeMonthlyBreakdown?'yes':'no'}
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                         <div class="clear"></div>
