@@ -1235,8 +1235,9 @@ a:hover {
 
 #loginForm {
     width:400px;
+    padding: 50px;
     position: absolute;
-    top: 20%;
+    top: 15%;
     left: 50%;
     margin-left: -225px;
 }
@@ -3068,7 +3069,7 @@ input {
 /* prevents text inputs from overflowing their parent */
 input.text {
     box-sizing : border-box;
-    width: 100%;
+    width: auto;
 }
 
 input.datepicker {
