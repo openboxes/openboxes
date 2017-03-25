@@ -27,7 +27,7 @@
         <g:if test="${!params.print}">
             <div class="yui-u first">
                 <div id="parameters" class="box">
-                            <h2><g:message code="report.parameters.label" default="Report Parameters"/></h2>
+                    <h2><g:message code="report.parameters.label" default="Report Parameters"/></h2>
                     <g:form controller="report" action="generateTransactionReport" method="GET">
                         <g:if test="${command?.product }">
                             <div class="prop">
@@ -40,22 +40,23 @@
                         </g:if>
 
                         <div class="prop">
-
                             <label><warehouse:message code="report.location.label"/></label>
                             <g:selectLocation class="chzn-select-deselect" name="location.id" noSelection="['null':'']"
                                               maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
                         </div>
                         <div class="prop">
-
                             <label><warehouse:message code="report.category.label"/></label>
                             <g:selectCategory id="category.id"
                                               name="category.id"
                                               multiple="false"
                                               class="chzn-select-deselect"
                                               noSelection="['null':'']"
-                                              style="width:100%;"
                                               value="${params.list('category.id')}"/>
 
+                            <div>
+                                <g:checkBox name="includeChildren" value="${command?.includeChildren }"/>
+                                <label for="includeChildren"><warehouse:message code="report.includeChildren.label"/></label>
+                            </div>
 
                         </div>
                         <div class="prop">
@@ -73,22 +74,17 @@
 
                         </div>
                         <div class="prop">
-                            <label><warehouse:message code="report.options.label"/></label>
                             <div>
                                 <g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />
-                                <warehouse:message code="report.hideInactiveProducts.label"/>
+                                <label for="hideInactiveProducts"><warehouse:message code="report.hideInactiveProducts.label"/></label>
                             </div>
                             <div>
                                 <g:checkBox name="showTransferBreakdown" value="${command?.showTransferBreakdown}" />
-                                <warehouse:message code="report.showTransferBreakdown.label"/>
-                            </div>
-                            <div>
-                                <g:checkBox name="includeChildren" value="${command?.includeChildren }"/>
-                                <warehouse:message code="report.includeChildren.label"/>
+                                <label for="showTransferBreakdown"><warehouse:message code="report.showTransferBreakdown.label"/></label>
                             </div>
                             <div>
                                 <g:checkBox name="insertPageBreakBetweenCategories" value="${command?.insertPageBreakBetweenCategories }"/>
-                                <warehouse:message code="report.insertPageBreakBetweenCategories.label"/>
+                                <label for="includeChildren"><warehouse:message code="report.insertPageBreakBetweenCategories.label"/></label>
                             </div>
                         </div>
 
@@ -103,7 +99,7 @@
         </g:if>
         <div class="yui-u">
 
-            <g:if test="${!command?.product && !params.print }">
+            <g:if test="${!command?.product && !params.print && command?.entries}">
                 <div style="padding: 5px;">
                     <label><warehouse:message code="report.exportAs.label"/></label>
                     <g:link target="_blank" controller="report" action="generateTransactionReport" class="button"
