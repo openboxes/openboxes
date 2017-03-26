@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda" id="1488408290676-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shipment_workflow_document_template"/>
+            </not>
+        </preConditions>
+        <createTable tableName="shipment_workflow_document_template">
+            <column name="shipment_workflow_id" type="CHAR(38)"/>
+            <column name="document_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda" id="1488408290676-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD08A526BC800AA15"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="document_id" baseTableName="shipment_workflow_document" constraintName="FKD08A526BC800AA15" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1488408290676-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD08A526BDED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="shipment_workflow_document" constraintName="FKD08A526BDED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+</databaseChangeLog>

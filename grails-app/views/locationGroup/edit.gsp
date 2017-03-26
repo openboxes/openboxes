@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'warehouse.label', default: 'Location')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'locationGroup.label', default: 'Location Group')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
@@ -17,136 +17,121 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${locationInstance}">
+            <g:hasErrors bean="${locationGroupInstance}">
 	            <div class="errors">
-	                <g:renderErrors bean="${locationInstance}" as="list" />
+	                <g:renderErrors bean="${locationGroupInstance}" as="list" />
 	            </div>
             </g:hasErrors>
                         
-			<g:render template="summary"/>			            			
-            <g:form method="post" action="update">
-                <g:hiddenField name="id" value="${locationInstance?.id}" />
-                <g:hiddenField name="version" value="${locationInstance?.version}" />
-                <div class="dialog">
+			<g:render template="summary"/>
+
+            <div class="button-bar">
+                <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[entityName]"/></g:link>
+                <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
+            </div>
+
+
+            <g:form method="post">
+                <g:hiddenField name="id" value="${locationGroupInstance?.id}" />
+                <g:hiddenField name="address.id" value="${locationGroupInstance?.address?.id}" />
+                <g:hiddenField name="version" value="${locationGroupInstance?.version}" />
+                <div class="dialog box">
+					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
                     <table>
                         <tbody>
                             <tr class="prop">
                                 <td valign="top" class="name">
 									<label for="name"><warehouse:message code="default.name.label" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
-									<g:textField name="name" value="${locationInstance?.name}" class="text" size="80"/>
+                                <td valign="top" class="value ${hasErrors(bean: locationGroupInstance, field: 'name', 'errors')}">
+									<g:textField name="name" value="${locationGroupInstance?.name}" class="text" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-									<label for="name"><warehouse:message code="location.locationType.label" /></label>
-	
+                                    <label for="name"><warehouse:message code="address.address.label" /></label>
                                 </td>
-                                <td valign="top" class="value">
-                                	<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" 
-                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.locationType?.id}" noSelection="['null':'']" />
-                                		
-                                	
+                                <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'address', 'errors')}">
+                                    <g:textField name="address.address" value="${locationGroupInstance?.address?.address}" class="text" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-									<label for="name"><warehouse:message code="location.locationGroup.label" /></label>
+                                    <label for="name"><warehouse:message code="address.address2.label" /></label>
                                 </td>
-                                <td valign="top" class="value">
-                                	<g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}" optionKey="id" value="${locationInstance?.locationGroup?.id}" noSelection="['null':'']" />
-                                </td>
-                            </tr>	         
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                	<label for="manager"><warehouse:message code="warehouse.manager.label" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'manager', 'errors')}">
-                                	<g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${locationInstance?.manager?.id}"  noSelection="['null':'']" />
+                                <td valign="top" class="value ${hasErrors(bean: locationInstance?.address, field: 'address2', 'errors')}">
+                                    <g:textField name="address.address2" value="${locationGroupInstance?.address?.address2}" class="text" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-	                                <label for="manager"><warehouse:message code="warehouse.properties.label" /></label>
+                                    <label for="name"><warehouse:message code="address.city.label" /></label>
                                 </td>
-                                <td valign="top" class="value${hasErrors(bean: locationInstance, field: 'active', 'errors')}">
-									<div>
-										<g:checkBox name="active" value="${locationInstance?.active}" />
-										<warehouse:message code="warehouse.active.label" />
-									</div>										
-									<div>
-										<g:checkBox name="local" value="${locationInstance?.local}" />
-										<warehouse:message code="warehouse.local.label" />
-									</div>
-                                </td>
-                            </tr>
-                            
-                            <tr class="prop">
-                                <td valign="top" class="name">
-									<label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
-                                </td>
-                                <td valign="top" class="value">
-                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px" 
-                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}"
-                                		noSelection="['':warehouse.message(code:'location.useDefaultActivities.label')]" />
-                                	
+                                <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'city', 'errors')}">
+                                    <g:textField name="address.city" value="${locationGroupInstance?.address?.city}" class="text" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>
+                                    <label for="name"><warehouse:message code="address.stateOrProvince.label" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'bgColor', 'errors')}">
-									<g:textField name="bgColor" value="${locationInstance?.bgColor}" class="text" size="10"/>
-									<%--                                    
-                                    <g:select name="bgColor" class="colorpicker" 
-                                    	from="${org.pih.warehouse.core.Constants.COLORS}" 
-                                    	value="${locationInstance?.bgColor}" />
-                                    
-                                   	<span class="fade">#${locationInstance?.bgColor }</span>
-                                   	 --%>
+                                <td valign="top" class="value ${hasErrors(bean: locationInstance?.address, field: 'stateOrProvince', 'errors')}">
+                                    <g:textField name="address.stateOrProvince" value="${locationInstance?.address?.stateOrProvince}" class="text" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="fgColor"><warehouse:message code="warehouse.fgColor.label" /></label>
+                                    <label for="name"><warehouse:message code="address.postalCode.label" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'fgColor', 'errors')}">
-									<g:textField name="fgColor" value="${locationInstance?.fgColor}" class="text" size="10"/>
-                                    <%-- 
-                                    <g:select name="fgColor" class="colorpicker" 
-                                    	from="${org.pih.warehouse.core.Constants.COLORS}" 
-                                    	value="${locationInstance?.fgColor}"/>
-                                
-                                   	<span class="fade">#${locationInstance?.fgColor }</span>
-                                   	--%>
+                                <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'postalCode', 'errors')}">
+                                    <g:textField name="address.postalCode" value="${locationGroupInstance?.address?.postalCode}" class="text" size="80"/>
                                 </td>
                             </tr>
-                            
-                            <%-- 
+
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="parentLocation"><warehouse:message code="warehouse.parentLocation.label" default="Parent Location" /></label>
+                                    <label for="name"><warehouse:message code="address.country.label" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'parentLocation', 'errors')}">
-									<g:select name="parentLocation.id" from="${org.pih.warehouse.core.Location.list()}" 
-										optionKey="id" optionValue="name" value="" noSelection="['null': '']" />							
+                                <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'country', 'errors')}">
+                                    <g:textField name="address.country" value="${locationGroupInstance?.address?.country}" class="text" size="80"/>
                                 </td>
                             </tr>
-                            --%>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="name"><warehouse:message code="address.description.label" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'description', 'errors')}">
+                                    <g:textArea name="address.description" value="${locationGroupInstance?.address?.description}" class="text" rows="6" cols="80"/>
+                                </td>
+                            </tr>
+                        <%--
+                            <tr class="prop">
+                                <td class="name">
+
+                                </td>
+                                <td class="value">
+                                    <ul>
+                                        <g:each in="${locationGroupInstance.locations}" var="location">
+                                            <li>${location.name }</li>
+                                        </g:each>
+                                    </ul>
+                                </td>
+                            </tr>
+                        --%>
+                        </tbody>
+                        <tfoot>
                             <tr class="prop">
                             
-                            	<td valign="top" class="name">
+                            	<td valign="top">
                             	
                             	</td>
-                            	<td class="value">
+                            	<td valign="top">
 									<div class="buttons left">
-					                   <button type="submit" class="button icon approve">								
-											<warehouse:message code="default.button.save.label"/>
-										</button>
-										&nbsp;
+                                        <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+
+                                        <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+
+                                        &nbsp;
 										<g:link action="list">
 											${warehouse.message(code: 'default.button.cancel.label')}						
 										</g:link>			
@@ -154,7 +139,7 @@
 								</td>
 							</tr>
                             
-                        </tbody>
+                        </tfoot>
                     </table>
                 </div>
 	                

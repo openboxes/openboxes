@@ -382,6 +382,9 @@
                 <div class="megaButton">
                     <g:link controller="unitOfMeasureClass" action="list" class="list"><warehouse:message code="unitOfMeasureClass.label"/></g:link>
                 </div>
+                <div class="megaButton">
+                    <g:link controller="inventoryLevel" action="list" class="site"><warehouse:message code="inventoryLevels.label" default="Inventory Levels" /></g:link>
+                </div>
                 <g:isUserAdmin>
                     <div>
                         <hr/>
@@ -461,30 +464,14 @@
                     </div>
                     <hr/>
                     <div class="megaButton">
-                        <g:link controller="inventoryLevel" action="list" class="site">
-                            <warehouse:message code="inventoryLevels.label" default="Inventory levels" />
-                        </g:link>
-                    </div>
-
-                    <div class="megaButton">
-                        <g:link controller="locationGroup" action="list" class="site">
-                            <warehouse:message code="location.sites.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="location" action="list" class="location">
-                            <warehouse:message code="locations.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="shipper" action="list" class="shipper">
-                            <warehouse:message code="location.shippers.label" />
+                        <g:link controller="documentType" action="list">
+                            <warehouse:message code="documentTypes.label" default="Document Types"/>
                         </g:link>
                     </div>
                     <div class="megaButton">
                         <g:link controller="locationType" action="list"
-                            class="locationType">
-                            <warehouse:message code="location.locationTypes.label" />
+                                class="locationType">
+                            <warehouse:message code="location.locationTypes.label" default="Location Types" />
                         </g:link>
                     </div>
                     <div class="megaButton">
@@ -493,6 +480,34 @@
                             <warehouse:message code="location.eventTypes.label" default="Event types" />
                         </g:link>
                     </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="location" action="list" class="location">
+                            <warehouse:message code="locations.label" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="locationGroup" action="list" class="site">
+                            <warehouse:message code="locationGroups.label" default="Location Groups" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="shipper" action="list" class="shipper">
+                            <warehouse:message code="location.shippers.label" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="shipmentWorkflow" action="list" >
+                            <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="document" action="list" >
+                            <warehouse:message code="documents.label" default="Documents" />
+                        </g:link>
+                    </div>
+
+                    <hr/>
                     <div class="megaButton">
                         <g:link controller="person" action="list" class="people">
                             <warehouse:message code="person.list.label" />

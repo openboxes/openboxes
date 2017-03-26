@@ -5,5 +5,8 @@
 
     <include file="0.7.x/changelog-2016-05-04-2329-add-missing-primary-keys.xml"/>
     <include file="0.7.x/changelog-2016-05-04-2329-add-missing-foreign-key-constraints.xml"/>
+    <include file="0.7.x/changelog-2017-03-01-1644-create-table-shipment-workflow-document-template.xml"/>
+    <include file="0.7.x/changelog-2017-03-06-1953-add-shipping-document-templates.xml"/>
+
 
 </databaseChangeLog>
