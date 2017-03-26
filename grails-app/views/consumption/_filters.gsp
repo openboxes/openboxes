@@ -103,7 +103,7 @@
                                                 <format:metadata obj="${locationTypeEntry}"/>
                                             </legend>
                                             <div style="max-height: 150px; overflow: auto;">
-                                                <table >
+                                                <table style="width: auto;">
                                                     <tbody>
                                                         <g:each var="toLocation" in="${locationTypeEntry.value}">
                                                             <tr>
@@ -114,7 +114,7 @@
                                                                     <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
                                                                 </td>
                                                                 <td class="middle">
-                                                                    <label for="selectedLocation_${toLocation?.id}" style="white-space: pre-wrap"><format:metadata obj="${toLocation}"/></label>
+                                                                    <label for="selectedLocation_${toLocation?.id}" style="white-space: pre-wrap;"><format:metadata obj="${toLocation}"/></label>
                                                                 </td>
                                                             </tr>
                                                         </g:each>
@@ -191,7 +191,7 @@
                 <td class="center" colspan="2">
                     <div>
                         <button class="button icon search">
-                            <warehouse:message code="default.button.getData.label" default="Get data"/>
+                            <warehouse:message code="default.button.runReport.label" default="Run Report"/>
                         </button>
                         &nbsp;
                         <g:link controller="consumption" action="show">${warehouse.message(code:'default.button.reset.label', default: 'Reset')}</g:link>

@@ -218,7 +218,7 @@
                                     --%>
                                     <th class="center border-right"><warehouse:message code="consumption.balance.label" default="Balance"/></th>
 
-      e                              <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
+                                    <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
                                     <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
                                     <th class="center border-right"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
 
