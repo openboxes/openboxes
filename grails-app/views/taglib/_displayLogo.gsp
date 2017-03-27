@@ -6,9 +6,9 @@
 <g:elseif test="${logo}">
     <a href="${createLink(uri: '/dashboard/index')}">
         <g:if test="${logo.url}">
-            <img class="logo" src="${logo.url}" class="middle" />
+            <img class="logo middle" src="${logo.url}" />
         </g:if>
-        <span class="middle">${logo.label}</span></a>
+        <span class="middle">${logo.label}</span>
     </a>
 </g:elseif>
 <g:else>
