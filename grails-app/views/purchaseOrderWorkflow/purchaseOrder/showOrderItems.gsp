@@ -58,7 +58,7 @@
                                         <a href="javascript:void(-1);" id="edit-item-dialog-${orderItem?.id}" class="button icon edit edit-item-button" data-order-item-id="${orderItem?.id}">
                                             <warehouse:message code="default.button.edit.label"/>
                                         </a>
-                                        <g:link action="purchaseOrder" id="${orderItem.id}" event="deleteItem" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                        <g:link action="purchaseOrder" id="${orderItem.id}" event="deleteItem" params="[execution:params.execution]" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                                             <warehouse:message code="default.button.delete.label"/>
                                         </g:link>
                                     </g:if>
@@ -156,13 +156,6 @@
                                 <td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
                                 <td valign='top' class='value'>
                                     <input type="text" id="quantity" name='quantity' value="" size="10" class="text" />
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name'>
-                                    <label for='unitOfMeasure'><warehouse:message code="product.unitOfMeasure.label"/>:</label>
-                                </td>
-                                <td valign='top' class='value'>
                                     <g:hiddenField name="unitOfMeasure" value="each"/>
                                     each
                                 </td>
@@ -213,14 +206,7 @@
                         </td>
                         <td valign='top' class='value'>
                             <input type="text" id="edit-quantity" name='quantity' value="" size="10" class="text" />
-                        </td>
-                    </tr>
-                    <tr class='prop'>
-                        <td valign='top' class='name'>
-                            <label for='unitOfMeasure'><warehouse:message code="product.unitOfMeasure.label"/>:</label>
-                        </td>
-                        <td valign='top' class='value'>
-                            <div id="edit-uom"></div>
+                            <span id="edit-uom"></span>
                         </td>
                     </tr>
                     <tr class='prop'>
@@ -311,7 +297,9 @@
                         $("#edit-product-id").val(data.product.id);
                         $("#edit-product-name").html(data.product.productCode + " " + data.product.name);
                         $("#edit-orderId").val(data.order.id);
-                        $("#edit-uom").text(data.product.unitOfMeasure);
+                        if (data.product.unitOfMeasure) {
+                            $("#edit-uom").text(data.product.unitOfMeasure);
+                        }
                         $("#edit-orderItemId").val(data.id);
                         $("#edit-quantity").val(data.quantity);
                         $("#edit-unitPrice").val(data.unitPrice);

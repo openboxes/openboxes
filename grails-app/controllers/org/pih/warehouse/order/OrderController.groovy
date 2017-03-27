@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.order
 
+import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
@@ -473,7 +474,7 @@ class OrderController {
 		}
 	}
 
-	def downloadOrderItems = {
+	def downloadOrderItems() {
 		def orderInstance = Order.get(params.id)
 		if (!orderInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -520,7 +521,7 @@ class OrderController {
 		}
 	}
 
-    def importOrderItems = {
+    def importOrderItems() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -535,7 +536,8 @@ class OrderController {
                     redirect(action: "show", id: params.id)
                     return;
                 }
-                List lineItems = orderService.parseOrderItems(multipartFile.inputStream)
+				String fileContents = IOUtils.toString(multipartFile.inputStream, "UTF-8");
+                List lineItems = orderService.parseOrderItems(fileContents)
                 log.info "Line items: " + lineItems
 
                 if (orderService.importOrderItems(params.id, lineItems)) {

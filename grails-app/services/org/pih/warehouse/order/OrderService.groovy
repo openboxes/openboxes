@@ -195,7 +195,8 @@ class OrderService {
 	 * @param order
 	 * @return
 	 */	
-	Order saveOrder(Order order) { 		
+	Order saveOrder(Order order) {
+
 		// update the status of the order before saving
 		order.updateStatus()
 		
@@ -203,7 +204,7 @@ class OrderService {
 			order.orderNumber = identifierService.generateOrderIdentifier()
 		}
 
-		if (!order.hasErrors() && order.save()) {
+		if (!order.hasErrors() && order.save(flush:true)) {
 			return order;
 		}
 		else {
@@ -405,6 +406,14 @@ class OrderService {
         }
     }
 
+
+    boolean addOrderItem(String orderId, OrderItem orderItem) {
+        Order order = Order.get(orderId)
+        log.info "order items: " + order.orderItems
+        order.addToOrderItems(orderItem)
+        return order.save(flush:true)
+    }
+
     /**
      * Import the order items into the order represented by the given order ID.
      *
@@ -477,9 +486,6 @@ class OrderService {
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
 
-        }
-        finally {
-            if (inputStream) inputStream.close();
         }
 
         return orderItems

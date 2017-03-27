@@ -108,39 +108,25 @@ class PurchaseOrderWorkflowController {
 				} 
 				else { 
 					orderItem = new OrderItem(params);
-				}				
+				}
 				
 				orderItem.requestedBy = Person.get(session.user.id)
 				
-				if (params?.product?.id && params?.category?.id) { 
-					log.info("error with product and category")
-					orderItem.errors.rejectValue("product.id", "Please choose a product OR a category OR enter a description")
-					flow.orderItem = orderItem
-					return error()
-				}				
-				else if (params?.product?.id) { 
-					def product = Product.get(params?.product?.id)
-					if (product) { 
-						orderItem.description = product.name
-						orderItem.category = product.category
-					}
-				}
-				else if (params?.category?.id) { 
-					def category = Category.get(params?.category?.id) 
-					if (category) {
-						orderItem.description = category.name
-						//orderItem.category = category
-					}
-				}
-				
+                def product = Product.get(params?.product?.id)
+                if (product) {
+                    orderItem.description = product.name
+                    orderItem.category = product.category
+                }
+
 				if (!orderItem.validate() || orderItem.hasErrors()) { 
 					flow.orderItem = orderItem
 					return error();
 				}
-				flow.order.addToOrderItems(orderItem);
-				if (!orderService.saveOrder(flow.order)) {
-					return error()
-				}
+
+                if (!orderService.addOrderItem(flow.order.id, orderItem)) {
+                    return error()
+                }
+
 				flow.orderItem = null
 				
 			}.to("showOrderItems")
