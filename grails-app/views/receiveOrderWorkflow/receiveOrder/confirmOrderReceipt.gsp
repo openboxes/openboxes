@@ -39,87 +39,91 @@
 			<g:render template="../order/summary" model="[orderInstance:order,currentState:'confirmOrderReceipt']"/>
 
 			<div class="dialog">
-				<fieldset>
-
-					<table>
-						<tbody>
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='summary'><warehouse:message code="default.summary.label"/></label>
-								</td>
-								<td valign='top'class='value'>
-									<warehouse:message code="order.youAreAboutToCreateANewShipment.message" 
-										args="[format.metadata(obj:orderCommand?.shipmentType), orderCommand?.order?.origin?.name?.encodeAsHTML(),
-										orderCommand?.order?.destination?.name?.encodeAsHTML(),format.date(obj:orderCommand?.deliveredOn)]"/>
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='id'>Order Number:</label></td>
-								<td valign='top' class='value'>
-									<g:if test="${orderCommand?.order?.orderNumber }">
-										${orderCommand?.order?.orderNumber }
-									</g:if>
-									<g:else>
-										<span class="fade">New Order</span>
-									</g:else>
-								</td>
-							</tr>
-							
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Order from:</label></td>
-								<td valign='top' class='value'>
-									${orderCommand?.order?.origin?.name?.encodeAsHTML()}
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Destination:</label></td>
-								<td valign='top' class='value'>
-									${orderCommand?.order?.destination?.name?.encodeAsHTML()}
-								</td>
-							</tr>
-							
-							
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='orderedBy'>Shipment type</label>
-								</td>
-								<td valign='top'class='value'>
-									${orderCommand?.shipmentType?.name}
-								</td>
-							</tr>
-							
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='shippedOn'>Shipped on</label>
-								</td>
-								<td valign='top'class='value'>									
-									<format:date obj="${orderCommand?.shippedOn}"/>
-								</td>
-							</tr>								
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='deliveredOn'>Delivered on</label>
-								</td>
-								<td valign='top'class='value'>
-									<format:date obj="${orderCommand?.deliveredOn}"/>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-
-					<g:if test="${orderItems }">
+				<div class="yui-g">
+					<div class="yui-u first">
 						<div class="box">
+							<h2><g:message code="shipment.label"/></h2>
+							<table>
+								<tbody>
+								<tr class='prop'>
+									<td valign='top' class='name'>
+										<label for='summary'><warehouse:message code="default.summary.label"/></label>
+									</td>
+									<td valign='top'class='value'>
+										<warehouse:message code="order.youAreAboutToCreateANewShipment.message"
+														   args="[format.metadata(obj:orderCommand?.shipmentType), orderCommand?.order?.origin?.name?.encodeAsHTML(),
+																  orderCommand?.order?.destination?.name?.encodeAsHTML(),format.date(obj:orderCommand?.deliveredOn)]"/>
+									</td>
+								</tr>
+								<tr class='prop'>
+									<td valign='top' class='name'><label for='id'>Order Number:</label></td>
+									<td valign='top' class='value'>
+										<g:if test="${orderCommand?.order?.orderNumber }">
+											${orderCommand?.order?.orderNumber }
+										</g:if>
+										<g:else>
+											<span class="fade">New Order</span>
+										</g:else>
+									</td>
+								</tr>
+
+								<tr class='prop'>
+									<td valign='top' class='name'><label for='source'>Order from:</label></td>
+									<td valign='top' class='value'>
+										${orderCommand?.order?.origin?.name?.encodeAsHTML()}
+									</td>
+								</tr>
+								<tr class='prop'>
+									<td valign='top' class='name'><label for="destination">Destination:</label></td>
+									<td valign='top' class='value'>
+										${orderCommand?.order?.destination?.name?.encodeAsHTML()}
+									</td>
+								</tr>
+
+
+								<tr class='prop'>
+									<td valign='top' class='name'>
+										<label for='orderedBy'>Shipment type</label>
+									</td>
+									<td valign='top'class='value'>
+										${orderCommand?.shipmentType?.name}
+									</td>
+								</tr>
+
+								<tr class='prop'>
+									<td valign='top' class='name'>
+										<label for='shippedOn'>Shipped on</label>
+									</td>
+									<td valign='top'class='value'>
+										<format:date obj="${orderCommand?.shippedOn}"/>
+									</td>
+								</tr>
+								<tr class='prop'>
+									<td valign='top' class='name'>
+										<label for='deliveredOn'>Delivered on</label>
+									</td>
+									<td valign='top'class='value'>
+										<format:date obj="${orderCommand?.deliveredOn}"/>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="yui-u">
+						<g:if test="${orderItems }">
+							<div class="box">
 
 
 
-							<h2>
-								<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-								<warehouse:message code="order.itemsReceived.label"/>
+								<h2>
+									<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
+									<warehouse:message code="order.itemsReceived.label"/>
 
-							</h2>
+								</h2>
 
-							<table id="orderItems">
-								<thead>
+								<table id="orderItems">
+									<thead>
 									<tr class="even">
 										<th></th>
 										<th><warehouse:message code="product.productCode.label"/></th>
@@ -131,11 +135,11 @@
 										<th class="center"><warehouse:message code="order.received.label"/></th>
 										<%-- <td class="center"><warehouse:message code="order.remaining.label"/></td>--%>
 									</tr>
-								</thead>
-								<tbody>
-										<g:set var="i" value="${0 }"/>
-										<g:each var="entrymap" in="${orderItems?.groupBy { it?.orderItem } }">
-											<g:each var="orderItem" in="${entrymap.value}">
+									</thead>
+									<tbody>
+									<g:set var="i" value="${0 }"/>
+									<g:each var="entrymap" in="${orderItems?.groupBy { it?.orderItem } }">
+										<g:each var="orderItem" in="${entrymap.value}">
 
 											<g:if test="${orderItem?.quantityReceived > 0}">
 												<tr class="">
@@ -173,24 +177,23 @@
 											<g:set var="i" value="${i + 1}"/>
 										</g:each>
 									</g:each>
-								</tbody>
-							</table>
-						</div>
-					</g:if>
-					<g:else>
-						<span class="fade"><warehouse:message code="order.noItems.label"/></span>
-					</g:else>
-
-
-					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<span class="formButton"> 
-							<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
-							<g:submitButton name="submit" value="${warehouse.message(code:'default.button.finish.label')}" class="button"></g:submitButton>
-
-						</span>
+									</tbody>
+								</table>
+							</div>
+						</g:if>
+						<g:else>
+							<span class="fade"><warehouse:message code="order.noItems.label"/></span>
+						</g:else>
 					</div>
-				</fieldset>
-			</div>				
+				</div>
+				<div class="buttons">
+					<span class="formButton">
+						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
+						<g:submitButton name="submit" value="${warehouse.message(code:'default.button.finish.label')}" class="button"></g:submitButton>
+
+					</span>
+				</div>
+			</div>
 				
 				
 		</g:form>

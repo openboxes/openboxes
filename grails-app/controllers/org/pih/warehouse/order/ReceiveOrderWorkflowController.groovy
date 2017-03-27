@@ -52,6 +52,10 @@ class ReceiveOrderWorkflowController {
 		}
 		enterShipmentDetails {
 			on("next") { OrderCommand cmd ->
+
+                // Added to fix issue with date parameters not being bound to command object
+				bindData(cmd, params)
+
 				flow.orderCommand = cmd
 				if (flow.orderCommand.hasErrors()) {
 					return error() 	

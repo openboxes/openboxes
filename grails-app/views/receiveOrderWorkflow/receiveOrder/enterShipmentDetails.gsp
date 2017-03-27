@@ -83,7 +83,7 @@
 									<label for='dateOrdered'><warehouse:message code="order.dateOrdered.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<div id="dateOrdered"><g:formatDate date="${orderCommand.dateOrdered}" format="MMM dd, yyyy"/></div>
+									<div id="dateOrdered"><g:formatDate date="${order.dateOrdered}" format="MMM dd, yyyy"/></div>
 								</td>
 							</tr>
 
