@@ -32,24 +32,9 @@
 				<g:form action="saveComment">
 					<g:hiddenField name="id" value="${commentInstance?.id}" />
 					<g:hiddenField name="order.id" value="${orderInstance?.id}" />
+					<g:hiddenField name="sender.id" value="${session.user.id }"/>
 					<table>
 						<tbody>
-							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" /></label></td>
-								<td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
-									<div style="width:300px">
-										<g:select id="recipient.id" class="chzn-select-deselect" name='recipient.id' noSelection="${['':'Select one ...']}"
-												  from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
-									</div>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message code="comment.sender.label"/></label></td>
-								<td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'sender', 'errors')}">
-									<g:hiddenField name="sender.id" value="${session.user.id }"/>
-									 ${session.user.firstName} ${session.user.lastName} <span class="fade">(${session.user.username})</span>
-								</td>
-							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="default.comment.label"/></label></td>
 								<td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
