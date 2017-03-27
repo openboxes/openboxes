@@ -66,6 +66,14 @@
                 </tr>
                 <tr>
                     <td>
+                        <label><warehouse:message code="order.orderedBy.label" default="Ordered by"/></label>
+                    </td>
+                    <td>
+                        ${orderInstance?.orderedBy.name}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <label><warehouse:message code="order.dateOrdered.label" default="Date ordered"/></label>
                     </td>
                     <td>
@@ -83,31 +91,36 @@
         <div class="report-summary section">
             <table width="100%">
                 <tr>
-                    <td>
+                    <td width="55%">
                         <table>
                             <tr>
                                 <td class="top left" width="25%">
                                     <label><warehouse:message code="order.orderedFrom.label" default="Supplier"/></label>
                                 </td>
                                 <td class="top left" width="75%">
-                                    <b>${orderInstance?.origin?.name }</b>
-                                    <g:if test="${orderInstance?.origin?.address}">
-                                        ${orderInstance?.origin?.address?.address}<br/>
-                                        <g:if test="${orderInstance?.origin?.address?.address2}">
-                                            ${orderInstance?.origin?.address?.address2}<br/>
+                                    ${orderInstance?.origin?.name }
+                                    <div class="address">
+                                        <g:if test="${orderInstance?.origin?.address}">
+                                            ${orderInstance?.origin?.address?.address}<br/>
+                                            <g:if test="${orderInstance?.origin?.address?.address2}">
+                                                ${orderInstance?.origin?.address?.address2}<br/>
+                                            </g:if>
+                                            ${orderInstance?.origin?.address?.city},
+                                            ${orderInstance?.origin?.address?.stateOrProvince}<br/>
+                                            ${orderInstance?.origin?.address?.country}<br/>
+                                            ${orderInstance?.destination?.address?.description}
                                         </g:if>
-                                        ${orderInstance?.origin?.address?.city},
-                                        ${orderInstance?.origin?.address?.stateOrProvince}<br/>
-                                        ${orderInstance?.origin?.address?.country}<br/>
-                                        ${orderInstance?.destination?.address?.description}
-                                    </g:if>
+                                        <g:else>
+                                            <g:message code="location.noAddress.message" default="No address on record"/>
+                                        </g:else>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
 
 
                     </td>
-                    <td class="right">
+                    <td >
                         <table>
                             <tr>
                                 <td class="top" width="25%">
@@ -115,21 +128,23 @@
                                 </td>
                                 <td class="top left" width="75%">
                                     <div>
-                                        <b>${orderInstance?.destination?.name }</b>
+                                        ${orderInstance?.destination?.name }
                                     </div>
-                                    <div>
-                                        c/o ${orderInstance?.orderedBy?.name }
-                                    </div>
-                                    <g:if test="${orderInstance?.destination?.address}">
-                                        ${orderInstance?.destination?.address?.address}<br/>
-                                        <g:if test="${orderInstance?.destination?.address?.address2}">
-                                            ${orderInstance?.destination?.address?.address2}<br/>
+                                    <div class="address">
+                                        <g:if test="${orderInstance?.destination?.address}">
+                                            ${orderInstance?.destination?.address?.address}<br/>
+                                            <g:if test="${orderInstance?.destination?.address?.address2}">
+                                                ${orderInstance?.destination?.address?.address2}<br/>
+                                            </g:if>
+                                            ${orderInstance?.destination?.address?.city}
+                                            ${orderInstance?.destination?.address?.stateOrProvince}<br/>
+                                            ${orderInstance?.destination?.address?.country}<br/>
+                                            ${orderInstance?.destination?.address?.description}
                                         </g:if>
-                                        ${orderInstance?.destination?.address?.city}
-                                        ${orderInstance?.destination?.address?.stateOrProvince}<br/>
-                                        ${orderInstance?.destination?.address?.country}<br/>
-                                        ${orderInstance?.destination?.address?.description}
-                                    </g:if>
+                                        <g:else>
+                                            <g:message code="location.noAddress.message" default="No address on record"/>
+                                        </g:else>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
