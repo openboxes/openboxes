@@ -1,4 +1,3 @@
-<g:isUserAdmin>
 <div class="box">
     <h2>
         <warehouse:message code="inventory.value.label" default="Stock Value Summary"/>
@@ -139,7 +138,7 @@
             url: "${request.contextPath}/json/getTotalStockValue?location.id=${session.warehouse.id}",
             //data: data,
             success: function (data) {
-                console.log(data);
+                console.log("updating total stock value", data);
                 var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
                 var progress = data.hitCount / data.totalCount
                 var progressSummary = data.hitCount + " out of " + data.totalCount;
@@ -269,5 +268,4 @@
     }
 
 </script>
-</g:isUserAdmin>
 
