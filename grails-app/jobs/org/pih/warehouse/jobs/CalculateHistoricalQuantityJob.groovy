@@ -6,7 +6,7 @@ import org.quartz.JobExecutionContext
 class CalculateHistoricalQuantityJob {
 
     static dates = []
-    static enabled = true
+    static enabled = false
     def inventoryService
 
     // cron job needs to be triggered after the staging deployment
@@ -15,7 +15,7 @@ class CalculateHistoricalQuantityJob {
     }
 
     def execute(JobExecutionContext context) {
-        enabled = ConfigHolder.config.openboxes.jobs.calculateHistoricalQuantityJob.enabled
+        enabled = Holders.grailsApplication.config.openboxes.jobs.calculateHistoricalQuantityJob.enabled?:false
         if (enabled) {
             log.info "Executing calculate historical quantity job at ${new Date()} with context ${context}"
             if (!dates) {
