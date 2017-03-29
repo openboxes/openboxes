@@ -518,18 +518,6 @@ class InventoryController {
 	def listTransactions() {
 		redirect(action: "listAllTransactions")
 	}
-	
-	def listDailyTransactions() {
-		def dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		def dateSelected = (params.date) ? dateFormat.parse(params.date) : new Date();
-		
-		def transactionsByDate = Transaction.list().groupBy { DateUtil.clearTime(it?.transactionDate) }?.entrySet()?.sort{ it.key }?.reverse()
-		
-		def transactions = Transaction.findAllByTransactionDate(dateSelected);
-		
-		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
-	}
-
 
 
     def list() {

@@ -16,90 +16,69 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			
-			
-			<%-- 
-			<table>
-				<tr>
-            		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
-			            <g:form action="listDailyTransactions" method="get">
-			            	<table >
-			            		<tr>
-			            			<th>Show daily transactions for </th>
-			            			<th></th>
-			            		</tr>
-			            		<tr>
-									<td>
-						           		<g:select name="threshold"
-											from="['1':'one week', '14':'two weeks', '30':'one month', 
-												'60':'two months', '90':'three months',
-												'180': 'six months', '365':'one year']"
-											optionKey="key" optionValue="value" value="${thresholdSelected}" 
-											noSelection="['':'--All--']" />&nbsp;&nbsp;    
-						           	</td>
-									<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
-										<button name="filter">
-											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;Filter </button>
-									</td>							           	
-								</tr>
-							</table>
-			            </g:form>
-            		</td>
-            	</tr>
-			</table>
-			<br/>			
-			--%>
-			
+           <div class="summary">
+               <h1><warehouse:message code="transaction.dailyTransactions.label"/></h1>
+           </div>
 								
-			<fieldset>		
-				<div class="box">
-					<h2><warehouse:message code="transaction.dailyTransactionsFor.label"/> ${session.warehouse.name}
-                        <span class="fade">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h2>
+			<div class="yui-gf">
 
-                    <table>
-                        <tr>
-                            <td width="15%">
-                                <div class="list">
-                                    <table class="scrollTable">
-                                        <thead class="fixedHeader">
-                                            <tr>
-                                                <th class="odd"><warehouse:message code="default.dates.label"/></th>
-                                            </tr>
-                                        </thead>
 
-                                        <g:if test="${transactionsByDate }">
-                                            <tbody class="scrollContent">
-                                                <g:each var="entry" in="${transactionsByDate }" status="i">
-                                                    <g:set var="isDateSelected" value="${dateSelected == entry.key}"/>
-                                                    <g:set var="dateParam" value="${formatDate(date: entry.key, format: 'dd/MM/yyyy') }"/>
-                                                    <g:set var="dateDisplay" value="${formatDate(date: entry.key, format: 'EEEE, MMMMM dd, yyyy') }"/>
-                                                    <tr class="prop ${i%2?'odd':'even' }">
-                                                        <td class="left">
-                                                            <g:if test="${!isDateSelected}">
-                                                                <g:link action="listDailyTransactions" params="[date: dateParam]">
-                                                                    ${dateDisplay }
-                                                                </g:link>
-                                                            </g:if>
-                                                            <g:else>
-                                                                <span class="selected">${dateDisplay }</span>
-                                                            </g:else>
-                                                            (${entry.value.size() })
-                                                        </td>
-                                                    </tr>
-                                                </g:each>
-                                            </tbody>
-                                        </g:if>
-                                        <g:else>
-                                            <warehouse:message code="transaction.noTransactions.label"/>
-                                        </g:else>
-                                    </table>
-                                </div>
+                <div class="yui-u first">
 
-                            </td>
-                            <td class="left">
+                    <div class="dialog box">
+                        <h2></h2>
+                        <table class="scrollTable">
+                            <thead class="fixedHeader">
+                            <tr>
+                                <th class="odd"><warehouse:message code="default.dates.label"/></th>
+                            </tr>
+                            </thead>
 
-                                <div class="list">
-                                    <table>
-                                        <thead>
+                            <g:if test="${transactionsByDate }">
+                                <tbody class="scrollContent">
+                                <g:each var="entry" in="${transactionsByDate }" status="i">
+                                    <g:set var="isDateSelected" value="${dateSelected == entry.key}"/>
+                                    <g:set var="dateParam" value="${formatDate(date: entry.key, format: 'dd/MM/yyyy') }"/>
+                                    <g:set var="dateDisplay" value="${formatDate(date: entry.key, format: 'EEEE, MMMMM dd, yyyy') }"/>
+                                    <tr class="prop ${i%2?'odd':'even' }">
+                                        <td class="left">
+                                            <g:if test="${!isDateSelected}">
+                                                <g:link action="listDailyTransactions" params="[date: dateParam]">
+                                                    ${dateDisplay }
+                                                </g:link>
+                                            </g:if>
+                                            <g:else>
+                                                <span class="selected">${dateDisplay }</span>
+                                            </g:else>
+                                            (${entry.value.size() })
+                                        </td>
+                                    </tr>
+                                </g:each>
+                                </tbody>
+                            </g:if>
+                            <g:else>
+                                <warehouse:message code="transaction.noTransactions.label"/>
+                            </g:else>
+                        </table>
+                    </div>
+
+                </div>
+
+
+                <div class="yui-u">
+
+
+                    <div class="box">
+                        <h2><warehouse:message code="transaction.dailyTransactionsFor.label"/> ${session.warehouse.name}
+                            <span class="fade">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h2>
+
+                        <table>
+                            <tr>
+                                <td class="left">
+
+                                    <div class="list">
+                                        <table>
+                                            <thead>
                                             <tr class="odd">
                                                 <%--<th width="2%"><warehouse:message code="default.actions.label"/></th> --%>
                                                 <th><warehouse:message code="default.datetime.label"/></th>
@@ -109,8 +88,8 @@
                                                 <th><warehouse:message code="product.lotNumber.label"/></th>
                                                 <th><warehouse:message code="default.quantity.label"/></th>
                                             </tr>
-                                        </thead>
-                                        <tbody>
+                                            </thead>
+                                            <tbody>
                                             <g:set var="counter" value="${0 }" />
                                             <g:each var="transaction" in="${transactions}" status="i">
                                                 <g:each var="transactionEntry" in="${transaction.transactionEntries}" status="j">
@@ -120,7 +99,7 @@
                                                         </td>
                                                         <td>
                                                             <g:link controller="inventory" action="showTransaction" id="${transaction.id }">
-                                                            ${transaction?.transactionNumber }
+                                                                ${transaction?.transactionNumber }
                                                             </g:link>
                                                         </td>
                                                         <td>
@@ -146,14 +125,16 @@
                                                     </tr>
                                                 </g:each>
                                             </g:each>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
-			</fieldset>
+
+			</div>
 		</div>
 		
 	</body>

@@ -292,9 +292,6 @@
                 </div>
                 --%>
                 <div class="megaButton">
-                    <g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link>
-                </div>
-                <div class="megaButton">
                     <g:link controller="report" action="showShippingReport"><warehouse:message code="report.showShippingReport.label"/></g:link>
                 </div>
                 <div class="megaButton">
