@@ -107,19 +107,19 @@
 
                 $("#bulkReceive").click(function(event){
                     event.preventDefault();
-                    $("#listForm").attr("action", "bulkReceiveShipments")
+                    $("#listForm").attr("action", "bulkReceiveShipments");
                     $("#listForm").submit();
                 });
 
                 $("#bulkRollback").click(function(event){
                     event.preventDefault();
-                    $("#listForm").attr("action", "bulkRollbackShipments")
+                    $("#listForm").attr("action", "bulkRollbackShipments");
                     $("#listForm").submit();
                 });
 
                 $("#bulkMarkAsReceived").click(function(event){
                     event.preventDefault();
-                    $("#listForm").attr("action", "markShipmentsAsReceived")
+                    $("#listForm").attr("action", "bulkMarkAsReceived");
                     $("#listForm").submit();
                 });
 
