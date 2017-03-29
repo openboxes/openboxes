@@ -83,7 +83,7 @@
                                 <label><warehouse:message code="default.comment.label" /></label>
                             </td>
                             <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
-                                <g:textArea name="comment" cols="80" rows="10"/>
+                                <g:textArea name="comment" cols="80" rows="6"/>
                             </td>
                         </tr>
                         </tbody>
@@ -129,7 +129,7 @@
                                             <th style="text-align: center;"><warehouse:message code="inventoryLevel.binLocation.label" /></th>
                                             <th style="text-align: center;"><warehouse:message code="shipping.shipped.label" /></th>
                                             <th style="text-align: center;"><warehouse:message code="shipping.received.label" /></th>
-                                            <th style="text-align: center;"><warehouse:message code="default.comment.label" /></th>
+                                            <th><warehouse:message code="default.comment.label" /></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -175,8 +175,8 @@
                                                 <td style="text-align: center;" class="middle">
                                                     <g:textField class="text" name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" size="3"/>
                                                 </td>
-                                                <td style="text-align: center;" class="middle">
-                                                    <g:textArea class="text" name="receiptItems[${i}].comment" value="${receiptItem?.comment}" cols="40" rows="1"/>
+                                                <td class="middle">
+                                                    <g:textField class="text" name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="60" placeholder="Reason for variance"/>
                                                 </td>
                                             </tr>
 
