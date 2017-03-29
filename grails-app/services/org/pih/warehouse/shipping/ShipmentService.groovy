@@ -1138,7 +1138,7 @@ class ShipmentService {
 		}
 		shipmentIds.each { shipmentId ->
             Shipment shipment = Shipment.get(shipmentId)
-            shipment.receipt = createReceipt(shipment, shipment.actualShippingDate+1)
+            shipment.receipt = createReceipt(shipment, shipment.actualShippingDate)
 			receiveShipment(shipmentId, comment, userId, locationId, creditStockOnReceipt)
 		}
 	}
@@ -1151,34 +1151,34 @@ class ShipmentService {
             Shipment.withNewSession {
                 Shipment shipment = Shipment.get(shipmentId)
                 rollbackLastEvent(shipment)
+                shipment.save(flush:true)
             }
         }
     }
 
-    void markShipmentsAsReceived(List shipmentIds) {
+    void markAsReceived(List shipmentIds) {
         if (!shipmentIds) {
             throw new IllegalArgumentException("Must select at least one shipment in order to use mark as received")
         }
 
-        Location location = Location.get(session.warehouse.id)
         shipmentIds.each { shipmentId ->
             Shipment shipment = Shipment.get(shipmentId)
-            markAsReceived(shipment, location)
+            markAsReceived(shipment)
         }
     }
 
 
 
-	void markAsReceived(Shipment shipment, Location location) { 
+	void markAsReceived(Shipment shipment) {
 		try { 
 			// Add a Received event to the shipment
-			createShipmentEvent(shipment, new Date(), EventCode.RECEIVED, location);
+			createShipmentEvent(shipment, new Date(), EventCode.RECEIVED, shipment.destination);
 											
 			// Save updated shipment instance
 			shipment.save();
 			
 		} catch (Exception e) { 
-			throw new ShipmentException();
+			throw new ShipmentException(e);
 		}
 	}
 	
@@ -1215,10 +1215,10 @@ class ShipmentService {
 			if (shipmentInstance.wasReceived()) {
 				throw new ShipmentException(message: "Shipment has already been received.", shipment: shipmentInstance)
 			}
-			
-			if (shipmentInstance.receipt.getActualDeliveryDate() > new Date()) { 
+			Date now = new Date()
+			if (shipmentInstance.receipt.getActualDeliveryDate() > now) {
 				throw new ReceiptException(
-					message: "Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today.", 
+					message: "Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today [" + now + "].",
 					shipment: shipmentInstance,
 					receipt: shipmentInstance.receipt)
 			}
@@ -1264,18 +1264,19 @@ class ShipmentService {
 							throw new ShipmentException("Failed to receive shipment while saving inventory item ",
 								shipment: shipmentInstance)
 						}
-						
+
 						// Create a new transaction entry
 						TransactionEntry transactionEntry = new TransactionEntry();
 						transactionEntry.quantity = it.quantityReceived;
 						transactionEntry.inventoryItem = inventoryItem;
 						creditTransaction.addToTransactionEntries(transactionEntry);
 						//creditTransaction.incomingShipment = shipmentInstance
+
 					}
 					
 					// TODO: had to comment out these flash.message because they were throwing a no-such
 					// property exception; can you use "flash" within a service method?
-					if (!creditTransaction.hasErrors() && creditTransaction.save()) { 
+					if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) {
 						// saved successfully
 						//flash.message = "Transaction was created successfully"
 					}
@@ -1287,7 +1288,7 @@ class ShipmentService {
 					}
 
 					// Associate the incoming transaction with the shipment					
-					shipmentInstance.addToIncomingTransactions(creditTransaction) 
+					shipmentInstance.addToIncomingTransactions(creditTransaction)
 					shipmentInstance.save(flush:true);
 					
 				}
@@ -1325,6 +1326,7 @@ class ShipmentService {
 			receiptItem.setQuantityShipped (it.quantity);
 			receiptItem.setQuantityReceived (it.quantity);
 			receiptItem.setLotNumber(it.lotNumber);
+            receiptItem.setShipmentItem(it)
 			receiptItem.setExpirationDate(it.expirationDate);
 			receiptInstance.addToReceiptItems(receiptItem);
 		}

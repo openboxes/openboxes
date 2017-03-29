@@ -13,5 +13,6 @@ import org.pih.warehouse.receiving.Receipt;
 
 class ReceiptException extends RuntimeException {
 	String message
+	Shipment shipment
 	Receipt receipt		
 }

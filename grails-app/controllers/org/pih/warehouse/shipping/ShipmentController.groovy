@@ -345,6 +345,26 @@ class ShipmentController {
 		redirect(controller:"shipment", action : "showDetails", id: shipmentInstance.id)
 	}
 
+	def bulkMarkAsReceived() {
+		log.info "params " + params
+
+		def shipmentIds = params.list("shipment.id")
+		if (shipmentIds) {
+			try {
+				shipmentService.markAsReceived(shipmentIds)
+				flash.message = "Successfully marked shipments [${shipmentIds.join(',')}] as received"
+
+			} catch (Exception e) {
+				flash.message = "Error occurred while bulk receiving shipments: " + e.message
+			}
+		}
+		else {
+			flash.message = "Please select at least one shipment to mark as received"
+
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
+
 
 	def bulkReceiveShipments = {
 		def shipmentIds = params.list("shipment.id")
