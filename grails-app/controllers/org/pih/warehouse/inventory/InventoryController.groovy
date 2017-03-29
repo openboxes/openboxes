@@ -210,9 +210,15 @@ class InventoryController {
 	def search(QuantityOnHandReportCommand command) {
         def quantityMapByDate = [:]
         def startTime = System.currentTimeMillis()
-        println "search " + params
+        log.info "search " + params
 
-        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tags
+        log.info "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tags
+
+        // Automatic binding does not handle the case where only one item is selected
+        def tags = params.list("tags")
+        if (tags && tags.size() == 1) {
+            command.tags = tags
+        }
 
         if (command.validate()) {
 
@@ -260,8 +266,7 @@ class InventoryController {
             command.locations.each { location ->
                 for (date in command?.dates) {
                     println "Get quantity map " + date + " location = " + location
-                    def quantityMap = [:]
-                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tags)
+                    def quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tags)
                     def existingQuantityMap = quantityMapByDate[date]
                     if (existingQuantityMap) {
                         quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)

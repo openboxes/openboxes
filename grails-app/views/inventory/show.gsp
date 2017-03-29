@@ -9,11 +9,12 @@
     <div class="body">
 
 
-
-
+        <div class="summary">
+            <h1>${g.message(code:'report.baselineQoHReport.label', default: 'Baseline QoH Report')}</h1>
+        </div>
         <%--
                     <h1>${location}</h1>
-                    ${quantityMap.keySet().size()} results (${elapsedTime/1000} seconds)
+
                     --%>
         <%--
         <div class="action-menu">
@@ -36,7 +37,7 @@
 
                 <div class="box" style="height:100%;">
                     <h2 class="middle">
-                        Baseline QoH Report
+                        ${g.message(code:'report.baselineQoHReport.label', default: 'Baseline QoH Report')}
                         <%--
                         <g:if test="${command?.locations}">
                             <g:each var="location" in="${command?.locations}">
