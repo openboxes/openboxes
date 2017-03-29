@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.transaction.Transactional
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -16,6 +17,7 @@ import org.pih.warehouse.inventory.TransactionException
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import org.springframework.web.multipart.MultipartFile
 
+@Transactional
 class CreateShipmentWorkflowController {
 
 	MailService mailService
