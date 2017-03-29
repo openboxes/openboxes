@@ -72,7 +72,7 @@
 
                 <div class="action-menu-item">
                     <g:link controller="createShipmentWorkflow" action="createShipment" event="enterTrackingDetails"
-                            id="${shipmentInstance.id}">
+                            id="${shipmentInstance.id}" params="[skipTo:'Tracking']">
                         <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" class="middle"/>&nbsp;
                         <warehouse:message code="shipping.enterTrackingDetails.label"/>
                     </g:link>
