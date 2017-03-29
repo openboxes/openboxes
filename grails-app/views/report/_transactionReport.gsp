@@ -3,118 +3,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="print" />
     <title><warehouse:message code="report.showTransactionReport.label" /></title>
+    <style>
+    table, th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+    table {
+        border-collapse: collapse;
+    }
+
+    </style>
 </head>
 <body>
 
-<g:if test="${command.product }">
-    <style>
-    .debit:before { content: '-'; }
-    .debit:after { content: ''; }
-    .credit:before { content: '+'; }
-    .credit:after { content: ''; }
-    .product_inventory { font-weight: bold; }
-    .inventory { font-weight: bold; }
-    </style>
-    <g:set var="i" value='${0 }'/>
-    <g:each var="entry" in="${command?.entries }">
-        <g:if test="${command?.product == entry?.value?.product}">
-            <div class="buttonBar">
-                <g:link class="button" controller="report" action="generateTransactionReport" params="['location.id':command?.location?.id,'category.id':command?.category.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':params.includeChildren]" style="display: inline">
-                    <warehouse:message code="report.backToInventoryReport.label"/>
-                </g:link>
 
-                <g:link class="button" controller="report" action="generateTransactionReport" params="['product.id':command?.product?.id,'category.id':command?.category?.id,'location.id':command?.location?.id,startDate:params.startDate,endDate:params.endDate,showEntireHistory:true,'includeChildren':params.includeChildren]">
-                    <warehouse:message code="report.showEntireHistory.label"/></g:link>
-
-                <g:link class="button" controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory">
-                    <warehouse:message code="report.showStockCard.label"/></g:link>
-            </div>
-            <g:each var="itemEntry" in="${entry.value.entries}">
-                <div class="box">
-                    <h2>
-                        ${entry.key }
-                        ${itemEntry.key.lotNumber ?: 'EMPTY'}
-                        <span class="circle">${itemEntry?.value?.quantityRunning}</span>
-                    </h2>
-
-                    <table style="border: 1px solid lightgrey" class="report">
-                        <thead>
-                        <tr class="${i++%2?'odd':'even' }">
-                            <th wdith="1%">
-                                <warehouse:message code="report.transactionDate.label"/>
-                            </th>
-                            <th wdith="1%">
-                                <warehouse:message code="report.transactionTime.label" default="Time"/>
-                            </th>
-                            <th>
-                                <warehouse:message code="report.transactionType.label"/>
-                            </th>
-                            <th class="center">
-                                <warehouse:message code="report.quantityChange.label"/>
-                            </th>
-                            <th class="center">
-                                <warehouse:message code="report.quantityBalance.label"/>
-                            </th>
-                        </tr>
-                        </thead>
-                        <g:if test="${itemEntry.value.transactionEntries}">
-                            <tbody>
-                            <tr>
-                                <td><format:date obj="${command?.startDate}" format="MMM dd yyyy"/></td>
-                                <td><format:date obj="${command?.startDate}" format="hh:mma"/></td>
-                                <td><warehouse:message code="report.initialQuantity.label"/></td>
-                                <td></td>
-                                <td class="center">${itemEntry?.value?.quantityInitial }</td>
-                            </tr>
-                            <g:each var="row" in="${itemEntry.value.transactionEntries}">
-                                <g:set var="transactionTypeCode" value="${row?.transactionEntry?.transaction?.transactionType?.transactionCode?.toString()?.toLowerCase()}"/>
-                                <tr class="${i++%2?'odd':'even' }">
-                                    <td>
-                                        <format:date obj="${row.transactionEntry?.transaction?.transactionDate}" format="MMM dd yyyy"/>
-                                    </td>
-                                    <td>
-                                        <format:date obj="${row.transactionEntry?.transaction?.transactionDate}" format="hh:mma"/>
-                                    </td>
-                                    <td>
-                                        <g:link controller="inventory" action="showTransaction" id="${row?.transactionEntry?.transaction?.id }">
-                                            <format:metadata obj="${row.transactionEntry?.transaction?.transactionType}"/>
-                                        </g:link>
-                                    </td>
-                                    <td class="center">
-                                        <span class="${transactionTypeCode}">${row.transactionEntry?.quantity }</span>
-                                    </td>
-                                    <td class="center">${row.balance }</td>
-                                </tr>
-                            </g:each>
-
-                            </tbody>
-                            <tfoot>
-                            <tr>
-                                <td><format:date obj="${command?.endDate}" format="MMM dd yyyy"/></td>
-                                <td><format:date obj="${command?.endDate}" format="hh:mma"/></td>
-
-                                <td><warehouse:message code="report.finalQuantity.label"/></td>
-                                <td></td>
-                                <td class="center">${itemEntry?.value?.quantityFinal }</td>
-                            </tr>
-                            </tfoot>
-                        </g:if>
-                        <g:else>
-                            <tbody>
-                            <tr>
-                                <td colspan="5">
-                                    <warehouse:message code="transaction.noTransactions.label"/>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </g:else>
-                    </table>
-                </div>
-            </g:each>
-        </g:if>
-    </g:each>
-</g:if>
-<g:else>
     <div>
 
         <h1 align="center">
@@ -252,6 +154,5 @@
             </div>
         </g:each>
     </div>
-</g:else>
 </body>
 </html>
