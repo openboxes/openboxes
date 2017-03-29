@@ -1,14 +1,15 @@
 <%@page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.core.ActivityCode"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
-    <li>
+    <li class="mm-item">
         <g:link controller="dashboard" action="index">
             <warehouse:message code="dashboard.label" />&nbsp;
         </g:link>
     </li>
 
     <g:isUserAdmin>
-        <li><a href="javascript:void(0)"> <warehouse:message code="analytics.label" default="Analytics"/></a>
+        <li class="mm-item">
+            <a href="javascript:void(0)"> <warehouse:message code="analytics.label" default="Analytics"/></a>
             <div style="min-width: 200px;">
                 <div class="buttonsBar">
                     <div class="megaButton">
@@ -31,7 +32,7 @@
     </g:isUserAdmin>
 
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
-		<li>
+		<li class="mm-item">
 			<g:link controller="inventory" action="browse">
 				<warehouse:message code="inventory.label" />&nbsp;
 			</g:link>
@@ -106,7 +107,7 @@
 	</g:authorize>
 	
 	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
-		<li>
+		<li class="mm-item">
 			<g:link controller="order" action="list" class="list">			
 				<warehouse:message code="orders.label"/>
 			</g:link>
@@ -131,7 +132,7 @@
 		</li>
 	</g:authorize>
 	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
-		<li>
+		<li class="mm-item">
                 <g:link controller="requisition" action="list">
                     <warehouse:message code="requests.label"/>
                 </g:link>
@@ -206,7 +207,7 @@
 	</g:authorize>		
 	
 	<g:authorize activity="[ActivityCode.SEND_STOCK]">
-		<li>
+		<li class="mm-item">
 			<g:link controller="shipment" action="list" params="[type:'outgoing']">
 				<warehouse:message code="shipping.label" />
 			</g:link>
@@ -237,7 +238,7 @@
         </li>
 	</g:authorize>		
 	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
-		<li>
+		<li class="mm-item">
 			<g:link controller="shipment" action="list" params="[type: 'incoming']">
 				<warehouse:message code="receiving.label" />
 			</g:link>
@@ -268,86 +269,88 @@
 			</div>
 		</li>		
 	</g:authorize>			
-	<li>
+	<li class="mm-item">
 		<a href="javascript:void(0)">
 			<warehouse:message code="report.label" />
 		</a>
-		<div class="buttonsBar" style="min-width: 200px;">
-            <%--
-            <div class="megaButton">
-                <g:link controller="report" action="list"><warehouse:message code="report.list.label" default="List reports"/></g:link>
+
+        <div class="mm-item-content" style="min-width: 200px;">
+
+            <div class="left">
+                <div class="megaButton">
+                    <g:link controller="inventory" action="show"><warehouse:message code="report.baselineQohReport.label" default="Baseline QoH report"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="consumption" action="show"><warehouse:message code="report.consumption.label" default="Consumption report"/></g:link>
+                </div>
+                <%--
+                <div class="megaButton">
+                    <g:link controller="inventory" action="showConsumption" class="report_consumption"><warehouse:message code="inventory.consumption.label"/></g:link>
+                </div>
+                --%>
+                <div class="megaButton">
+                    <g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="report" action="showShippingReport"><warehouse:message code="report.showShippingReport.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="report" action="showInventorySamplingReport"><warehouse:message code="report.showInventorySamplingReport.label" default="Inventory sampling report"/></g:link>
+                </div>
             </div>
-            --%>
-            <div class="megaButton">
-                <g:link controller="inventory" action="show">
-                    <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH report"/>
-                </g:link>
+            <div class="left">
+
+                <div class="megaButton">
+                    <g:link controller="inventory" action="listExpiredStock" class="report-expired"><warehouse:message code="inventory.expiredStock.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="inventory" action="listExpiringStock" class="report-expiring"><warehouse:message code="inventory.expiringStock.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="inventory" action="listLowStock" class="report-low"><warehouse:message code="inventory.lowStock.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="inventory" action="listReorderStock" class="report-reorder"><warehouse:message code="inventory.reorderStock.label"/></g:link>
+                </div>
+            </div>
+            <div class="left">
+                <div class="megaButton">
+                    <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="inventory" action="exportLatestInventoryDate" class="list"><warehouse:message code="product.exportLatestInventoryDate.label" default="Export latest inventory date"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
+                </div>
+                <%--
+                <div class="megaButton">
+                    <g:link controller="requisitionItem" action="listPending" class=""><warehouse:message code="requisitionItem.listPending.label" default="List pending items"/></g:link>
+                </div>
+                --%>
+                <div class="megaButton">
+                    <g:link controller="requisition" action="export" class="list"><warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/></g:link>
+                </div>
+                <div class="megaButton">
+                    <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/></g:link>
+                </div>
             </div>
 
-			<div class="megaButton">
-				<g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
-			</div>
-            <div class="megaButton">
-                <g:link controller="consumption" action="show"><warehouse:message code="report.consumption.label" default="Consumption report"/></g:link>
-            </div>
-            <%--
-			<div class="megaButton">
-				<g:link controller="inventory" action="showConsumption" class="report_consumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
-			</div>
-			--%>
-			<div class="megaButton">
-				<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link>
-			</div>
-			<div class="megaButton">
-				<g:link controller="report" action="showShippingReport"><warehouse:message code="report.showShippingReport.label"/></g:link>
-			</div>
-            <div class="megaButton">
-                <g:link controller="report" action="showInventorySamplingReport"><warehouse:message code="report.showInventorySamplingReport.label" default="Inventory sampling report"/></g:link>
-            </div>
-            <hr/>
-			<div class="megaButton">
-				<g:link controller="inventory" action="listExpiredStock" class="report-expired"><warehouse:message code="inventory.expiredStock.label"/></g:link>
-			</div>
-			<div class="megaButton">
-				<g:link controller="inventory" action="listExpiringStock" class="report-expiring"><warehouse:message code="inventory.expiringStock.label"/></g:link>
-			</div>
-			<div class="megaButton">
-				<g:link controller="inventory" action="listLowStock" class="report-low"><warehouse:message code="inventory.lowStock.label"/></g:link>
-			</div>
-			<div class="megaButton">
-				<g:link controller="inventory" action="listReorderStock" class="report-reorder"><warehouse:message code="inventory.reorderStock.label"/></g:link>
-			</div>
-            <hr/>
-            <div class="megaButton">
-                <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
-            </div>
-            <div class="megaButton">
-                <g:link controller="inventory" action="exportLatestInventoryDate" class="list"><warehouse:message code="product.exportLatestInventoryDate.label" default="Export latest inventory date"/></g:link>
-            </div>
-            <div class="megaButton">
-                <g:link controller="inventoryLevel" action="export" class="list"><warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/></g:link>
-            </div>
-            <%--
-            <div class="megaButton">
-                <g:link controller="requisitionItem" action="listPending" class=""><warehouse:message code="requisitionItem.listPending.label" default="List pending items"/></g:link>
-            </div>
-            --%>
-            <div class="megaButton">
-                <g:link controller="requisition" action="export" class="list"><warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/></g:link>
-            </div>
-            <div class="megaButton">
-                <g:link controller="requisitionItem" action="listCanceled" class=""><warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/></g:link>
-            </div>
 		</div>
 	</li>
 
 <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
-    <li>
+    <li class="mm-item">
         <a href="javascript:void(0)">
             <warehouse:message code="products.label" />
         </a>
-        <div>
-            <div class="buttonsBar" style="min-width: 200px;">
+        <div class="mm-item-content" style="min-width: 200px;">
+
+            <div class="left">
+
                 <div class="megaButton">
                     <g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
                 </div>
@@ -387,10 +390,9 @@
                 <div class="megaButton">
                     <g:link controller="unitOfMeasureClass" action="index" class="list"><warehouse:message code="unitOfMeasureClass.label"/></g:link>
                 </div>
-                <g:isUserAdmin>
-                    <div>
-                        <hr/>
-                    </div>
+            </div>
+            <g:isUserAdmin>
+                <div class="left">
                     <div class="megaButton">
                         <g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
                     </div>
@@ -411,35 +413,34 @@
                     <div class="megaButton">
                         <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>
                     </div>
-                    <g:isUserAdmin>
-                        <hr/>
-                        <div class="megaButton">
-                            <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/></g:link>
-                        </div>
-                        <div class="megaButton">
-                            <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory"><g:message code="default.import.label" args="[g.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/></g:link>
-                        </div>
-                    </g:isUserAdmin>
-
-                <%--
-                <div class="megaButton">
-                    <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'product.label')]"/></g:link>
                 </div>
-                <div class="megaButton">
-                    <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'productPrice.label')]"/></g:link>
+                <div class="left">
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory"><g:message code="default.import.label" args="[g.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/></g:link>
+                    </div>
                 </div>
-                --%>
+            </g:isUserAdmin>
 
-                </g:isUserAdmin>
+            <%--
+            <div class="megaButton">
+                <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'product.label')]"/></g:link>
             </div>
+            <div class="megaButton">
+                <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'productPrice.label')]"/></g:link>
+            </div>
+            --%>
+
         </div>
     </li>
 </g:authorize>
 <g:isUserAdmin>
 
-        <li><a href="javascript:void(0)"> <warehouse:message code="configuration.label" default="Configuration" /></a>
-            <div style="min-width: 200px;">
-                <div class="buttonsBar">
+        <li class="mm-item"><a href="javascript:void(0)"> <warehouse:message code="configuration.label" default="Configuration" /></a>
+            <div style="min-width: 30%" class="mm-item-content">
+                <div class="left">
                     <div class="megaButton">
                         <label><warehouse:message code="users.label" default="Users" /></label>
                     </div>
@@ -453,7 +454,8 @@
                             <warehouse:message code="users.label" />
                         </g:link>
                     </div>
-                    <hr/>
+                </div>
+                <div class="left">
                     <div class="megaButton">
                         <label><warehouse:message code="locations.label" default="Locations" /></label>
                     </div>
@@ -474,7 +476,8 @@
                             <warehouse:message code="locationGroups.label" />
                         </g:link>
                     </div>
-                    <hr/>
+                </div>
+                <div class="left">
                     <div class="megaButton">
                         <label><warehouse:message code="shipping.label" default="Shipping" /></label>
                     </div>
@@ -500,18 +503,20 @@
                         </g:link>
                     </div>
                     <hr/>
+                </div>
+                <div class="left">
                     <div class="megaButton">
                         <label><warehouse:message code="requisitions.label" default="Requisitions" /></label>
                     </div>
-
-
                     <div class="megaButton">
                         <g:link controller="requisitionTemplate" action="list" class="list">
                             <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
                         <%--(${requisitionTemplates.size()})--%>
                         </g:link>
                     </div>
-                    <hr/>
+                </div>
+                <div class="left">
+
                     <div class="megaButton">
                         <label><warehouse:message code="transactions.label" default="Transasctions" /></label>
                     </div>
@@ -522,11 +527,12 @@
                     <div class="megaButton">
                         <g:link controller="inventory" action="editTransaction" class="create"><g:message code="default.create.label" args="[g.message(code:'transaction.label')]"/></g:link>
                     </div>
-                    <hr/>
+                </div>
+                <div class="left">
+
                     <div class="megaButton">
                         <label><warehouse:message code="other.label" default="Other" /></label>
                     </div>
-
                     <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
                         <div class="megaButton">
                             <g:link controller="admin" action="showSettings" class="list">
