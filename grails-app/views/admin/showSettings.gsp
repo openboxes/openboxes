@@ -8,7 +8,7 @@
         <title><warehouse:message code="admin.title" default="Settings" /></title>
     </head>
     <body>        
-		<div id="settings" role="main" class="yui-ga">
+		<div id="settings" role="main" class="yui-ga dialog">
 
             <g:if test="${flash.message}">
                 <div class="message">${flash.message}</div>
@@ -157,12 +157,14 @@
                                         <label>${property.key}</label>
                                     </td>
                                     <td>
-                                        <g:if test="${property.key?.contains('password') && property.value }">
-                                            ${util.StringUtil.mask(property.value, "*")}
+                                        <g:if test="${property.value}">
+                                            <g:if test="${property.key?.contains('password') || property.key?.contains('key') || property.key?.contains('Key') }">
+                                                ${util.StringUtil.mask(property.value, "*")}
+                                            </g:if>
+                                            <g:else>
+                                                ${property.value }
+                                            </g:else>
                                         </g:if>
-                                        <g:else>
-                                            ${property.value }
-                                        </g:else>
                                     </td>
                                 </tr>
                             </g:each>
@@ -185,12 +187,14 @@
                                             <label>${property.key }</label>
                                         </td>
                                         <td class="value">
-                                            <g:if test="${property?.key?.contains('password') && property.value}">
-                                                ${util.StringUtil.mask(property?.value, "*")}
+                                            <g:if test="${property.value}">
+                                                <g:if test="${property.key?.contains('password') || property.key?.contains('key') || property.key?.contains('Key') }">
+                                                    ${util.StringUtil.mask(property.value, "*")}
+                                                </g:if>
+                                                <g:else>
+                                                    ${property.value }
+                                                </g:else>
                                             </g:if>
-                                            <g:else>
-                                                ${property.value }
-                                            </g:else>
                                         </td>
                                     </tr>
                                 </g:each>
@@ -221,12 +225,14 @@
                                                 <label>${property.key }</label>
                                             </td>
                                             <td class="value">
-                                                <g:if test="${property?.key?.contains('password') && property.value}">
-                                                    ${util.StringUtil.mask(property?.value, "*")}
+                                                <g:if test="${property.value}">
+                                                    <g:if test="${property.key?.contains('password') || property.key?.contains('key') || property.key?.contains('Key') }">
+                                                        ${util.StringUtil.mask(property.value, "*")}
+                                                    </g:if>
+                                                    <g:else>
+                                                        ${property.value }
+                                                    </g:else>
                                                 </g:if>
-                                                <g:else>
-                                                    ${property.value }
-                                                </g:else>
                                             </td>
                                         </tr>
                                     </g:if>
