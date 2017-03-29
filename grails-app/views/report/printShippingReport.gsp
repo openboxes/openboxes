@@ -25,7 +25,6 @@
 		</g:hasErrors>
 
 
-	hello world
 		<g:if test="${command?.shipment }">
             <div class="center">
                 <table id="summary-table" style="width: auto;">

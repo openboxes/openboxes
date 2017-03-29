@@ -177,7 +177,14 @@ class ReportController {
 		if (!command?.hasErrors()) { 			
 			reportService.generateTransactionReport(command);			
 		}
-		render(view: 'printTransactionReport', model: [command : command])
+
+        // Print as HTML
+        if (params.print) {
+            render(view: 'printTransactionReport', model: [command: command])
+        }
+        else {
+            render(view: 'showTransactionReport', model: [command: command])
+        }
 	}
 	
 	def showShippingReport(ChecklistReportCommand command) {
@@ -218,46 +225,14 @@ class ReportController {
 	}
 	
 
-	def downloadTransactionReport() {
-
-        try {
-            def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
-
-            // JSESSIONID is required because otherwise the login page is rendered
-            def url = baseUri + params.url + ";jsessionid=" + session.getId()
-            url += "?print=true"
-            url += "&location.id=" + params.location.id
-            url += "&category.id=" + params.category.id
-            url += "&startDate=" + params.startDate
-            url += "&endDate=" + params.endDate
-            url += "&showTransferBreakdown=" + params.showTransferBreakdown
-            url += "&hideInactiveProducts=" + params.hideInactiveProducts
-            url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
-            url += "&includeChildren=" + params.includeChildren
-            url += "&includeEntities=true"
-
-            // Let the browser know what content type to expect
-            //response.setHeader("Content-disposition", "attachment;") // removed filename=
-            response.setContentType("application/pdf")
-
-            // Render pdf to the response output stream
-            log.info "BaseUri is $baseUri"
-            log.info("Session ID: " + session.id)
-            log.info "Fetching url $url"
-
-
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream()
-            reportService.generatePdf(url, baos)
-
-            response.outputStream << baos
-            response.outputStream.flush()
-        }
-        catch (Exception e) {
-            flash.message = e.message
-            redirect(controller: "errors", action: "handleException")
+	def downloadTransactionReport(InventoryReportCommand command) {
+        // We always need to initialize the root category
+        command.rootCategory = productService.getRootCategory();
+        if (!command?.hasErrors()) {
+            reportService.generateTransactionReport(command);
         }
 
+        pdfRenderingService.render(template:"/report/transactionReport", model:[command:command], response)
 	}
 	
 	def downloadShippingReport(ChecklistReportCommand command) {

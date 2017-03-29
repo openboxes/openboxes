@@ -13,6 +13,7 @@
 <head>
 	<!-- YUI -->
 	<yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
+
 	<link rel="stylesheet" href="${resource(dir:'css',file:'menu.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'form.css')}" type="text/css" media="print, screen, projection" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'footer.css')}" type="text/css" media="print, screen, projection" />
@@ -28,9 +29,18 @@
 		@page port { size:portrait; }
 		.landscape { page:land; width: 26.7cm;  }
 		.portrait { page:port; }
-		.report { -fs-table-paginate: paginate;  }
-		.report .total { border-right: 1px solid black; }
-		.report th { border-bottom: 1px solid black; }
+		.report { -fs-table-paginate: paginate; width: 100%; }
+		.report .total { border-right: 1px solid lightgrey; }
+		.report th { border: 1px solid lightgrey; text-align: left; }
+        .report td.value { text-align: right; }
+        table, th, td {
+            border: 1px solid lightgrey;
+            padding: 10px;
+        }
+        table {
+            border-collapse: collapse;
+        }
+
 		<g:if test='${params.insertPageBreakBetweenCategories}'>
 			.report { page-break-after: always; }
 		</g:if>

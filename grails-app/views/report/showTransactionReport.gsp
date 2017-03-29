@@ -21,98 +21,101 @@
     </g:hasErrors>
 
 
-    <!-- Do not use YUI format for printing -->
-    <div class="${!params.print?'yui-gf':''}">
+    <div class="summary">
 
-        <g:if test="${!params.print}">
-            <div class="yui-u first">
-                <div id="parameters" class="box">
-                    <h2><g:message code="report.parameters.label" default="Report Parameters"/></h2>
-                    <g:form controller="report" action="generateTransactionReport" method="GET">
-                        <g:if test="${command?.product }">
-                            <div class="prop">
-                                <label><warehouse:message code="report.product.label"/></label>
-                                <div>
-                                    <format:product product="${command?.product }"/>
-                                    <g:hiddenField name="product.id" value="${command?.product?.id }"/>
-                                </div>
-                            </div>
-                        </g:if>
-
-                        <div class="prop">
-                            <label><warehouse:message code="report.location.label"/></label>
-                            <g:selectLocation class="chzn-select-deselect" name="location.id" noSelection="['null':'']"
-                                              maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
-                        </div>
-                        <div class="prop">
-                            <label><warehouse:message code="report.category.label"/></label>
-                            <g:selectCategory id="category.id"
-                                              name="category.id"
-                                              multiple="false"
-                                              class="chzn-select-deselect"
-                                              noSelection="['null':'']"
-                                              value="${params.list('category.id')}"/>
-
-                            <div>
-                                <g:checkBox name="includeChildren" value="${command?.includeChildren }"/>
-                                <label for="includeChildren"><warehouse:message code="report.includeChildren.label"/></label>
-                            </div>
-
-                        </div>
-                        <div class="prop">
-                            <label><warehouse:message code="report.dateRange.label"/></label>
-                            <table>
-                                <tr>
-                                    <td>
-                                        From: <g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
-                                    </td>
-                                    <td>
-                                        To: <g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </div>
-                        <div class="prop">
-                            <div>
-                                <g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />
-                                <label for="hideInactiveProducts"><warehouse:message code="report.hideInactiveProducts.label"/></label>
-                            </div>
-                            <div>
-                                <g:checkBox name="showTransferBreakdown" value="${command?.showTransferBreakdown}" />
-                                <label for="showTransferBreakdown"><warehouse:message code="report.showTransferBreakdown.label"/></label>
-                            </div>
-                            <div>
-                                <g:checkBox name="insertPageBreakBetweenCategories" value="${command?.insertPageBreakBetweenCategories }"/>
-                                <label for="includeChildren"><warehouse:message code="report.insertPageBreakBetweenCategories.label"/></label>
-                            </div>
-                        </div>
-
-                        <div class="prop center">
-                            <button type="submit" class="button"><warehouse:message code="report.runReport.label"/></button>
-
-                            <g:link controller="report" action="showTransactionReport" class="button"><g:message code="default.button.reset.label" default="Reset"></g:message></g:link>
-                        </div>
-                    </g:form>
-                </div>
+        <g:if test="${!command?.product && command?.entries}">
+            <div class="right">
+                <label><warehouse:message code="report.exportAs.label"/></label>
+                <g:link target="_blank" controller="report" action="generateTransactionReport" class="button"
+                        params="[print:true,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
+                    <warehouse:message code="report.exportAs.html.label"/>
+                </g:link>
+                <g:link target="_blank" controller="report" action="downloadTransactionReport" class="button"
+                        params="[print:true,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
+                    <warehouse:message code="report.exportAs.pdf.label"/>
+                </g:link>
             </div>
+            <div class="clearfix"></div>
         </g:if>
+
+        <h1><g:message code="report.transactionReport.title"/></h1>
+    </div>
+
+    <div class="yui-gf">
+
+        <div class="yui-u first">
+            <div id="parameters" class="box">
+                <h2><g:message code="report.parameters.label" default="Report Parameters"/></h2>
+                <g:form controller="report" action="generateTransactionReport" method="GET">
+                    <g:if test="${command?.product }">
+                        <div class="prop">
+                            <label><warehouse:message code="report.product.label"/></label>
+                            <div>
+                                <format:product product="${command?.product }"/>
+                                <g:hiddenField name="product.id" value="${command?.product?.id }"/>
+                            </div>
+                        </div>
+                    </g:if>
+                    <div class="prop">
+                        <label><warehouse:message code="report.dateRange.label"/></label>
+                        <table>
+                            <tr>
+                                <td>
+                                    From: <g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
+                                </td>
+                                <td>
+                                    To: <g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    <div class="prop">
+                        <label><warehouse:message code="report.location.label"/></label>
+                        <g:selectLocation class="chzn-select-deselect" name="location.id" noSelection="['null':'']"
+                                          maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
+                    </div>
+                    <div class="prop">
+                        <label><warehouse:message code="report.category.label"/></label>
+                        <g:selectCategory id="category.id"
+                                          name="category.id"
+                                          multiple="false"
+                                          class="chzn-select-deselect"
+                                          noSelection="['null':'']"
+                                          value="${params.list('category.id')}"/>
+
+                        <div>
+                            <g:checkBox name="includeChildren" value="${command?.includeChildren }"/>
+                            <label for="includeChildren"><warehouse:message code="report.includeChildren.label"/></label>
+                        </div>
+
+                    </div>
+
+                    <div class="prop">
+                        <div>
+                            <g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />
+                            <label for="hideInactiveProducts"><warehouse:message code="report.hideInactiveProducts.label"/></label>
+                        </div>
+                        <div>
+                            <g:checkBox name="showTransferBreakdown" value="${command?.showTransferBreakdown}" />
+                            <label for="showTransferBreakdown"><warehouse:message code="report.showTransferBreakdown.label"/></label>
+                        </div>
+                        <div>
+                            <g:checkBox name="insertPageBreakBetweenCategories" value="${command?.insertPageBreakBetweenCategories }"/>
+                            <label for="insertPageBreakBetweenCategories"><warehouse:message code="report.insertPageBreakBetweenCategories.label"/></label>
+                        </div>
+                    </div>
+
+                    <div class="prop center">
+                        <button type="submit" class="button"><warehouse:message code="report.runReport.label"/></button>
+
+                        <g:link controller="report" action="showTransactionReport" class="button"><g:message code="default.button.reset.label" default="Reset"></g:message></g:link>
+                    </div>
+                </g:form>
+            </div>
+        </div>
+
         <div class="yui-u">
-
-            <g:if test="${!command?.product && !params.print && command?.entries}">
-                <div style="padding: 5px;">
-                    <label><warehouse:message code="report.exportAs.label"/></label>
-                    <g:link target="_blank" controller="report" action="generateTransactionReport" class="button"
-                            params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
-                        <warehouse:message code="report.exportAs.html.label"/>
-                    </g:link>
-                    <g:link target="_blank" controller="report" action="downloadTransactionReport" class="button"
-                            params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
-                        <warehouse:message code="report.exportAs.pdf.label"/>
-                    </g:link>
-                </div>
-            </g:if>
-
             <g:if test="${command.product }">
                 <style>
                 .debit:before { content: '-'; }
@@ -228,21 +231,14 @@
                         <g:set var="category" value="${productEntry.key }"/>
 
                         <div class="box">
-
                             <h2>
                                 <format:category category="${category}"/>
-                                <small class="left fade">
-                                    ${format.date(obj:command?.startDate, format: 'MMM dd, yyyy')} - ${format.date(obj:command?.endDate, format: 'MMM dd, yyyy')}
-                                </small>
-                                <g:if test="${!params.print}">
-                                    <g:link controller="report" action="generateTransactionReport" class="button" params="['location.id':command?.location?.id,'category.id':category?.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':false,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories,'showTransferBreakdown':command?.showTransferBreakdown,'hideInactiveProducts':command?.hideInactiveProducts]" style="display: inline">
-                                        <warehouse:message code="report.showThisCategoryOnly.label"/>
-                                    </g:link>
-                                </g:if>
 
+                                <g:link controller="report" action="generateTransactionReport" class="button" params="['location.id':command?.location?.id,'category.id':category?.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':false,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories,'showTransferBreakdown':command?.showTransferBreakdown,'hideInactiveProducts':command?.hideInactiveProducts]">
+                                    <warehouse:message code="report.showThisCategoryOnly.label"/>
+                                </g:link>
                             </h2>
-
-                            <div class="list">
+                            <div class="dialog">
                                 <table class="report">
                                     <thead>
                                     <tr style="border-top: 1px solid lightgrey;">
@@ -312,15 +308,9 @@
                                         <g:set var="entry" value="${command.entries[product].totals }"/>
                                         <tr class="${j%2 ? 'even' : 'odd' }">
                                             <td class="left" style="width: 35%">
-                                                <g:if test="${!params.print }">
-                                                    <g:link controller="report" action="generateTransactionReport" params="['product.id':product?.id,'category.id':category?.id,'location.id':command?.location?.id,startDate:params.startDate,endDate:params.endDate,includeChildren:command?.includeChildren,pageBreak:params.pageBreak]">
-                                                        <format:product product="${product }"/>
-                                                    </g:link>
-
-                                                </g:if>
-                                                <g:else>
+                                                <g:link controller="report" action="generateTransactionReport" params="['product.id':product?.id,'category.id':category?.id,'location.id':command?.location?.id,startDate:params.startDate,endDate:params.endDate,includeChildren:command?.includeChildren,pageBreak:params.pageBreak]">
                                                     <format:product product="${product }"/>
-                                                </g:else>
+                                                </g:link>
                                             </td>
                                             <td class="right total start nowrap">
                                                 <span class="${(entry?.quantityInitial>=0)?'credit':'debit'}">
@@ -331,7 +321,7 @@
                                                 <span class="${(entry?.quantityTransferredIn>=0)?'credit':'debit'}">
                                                     ${entry?.quantityTransferredIn ?: 0}
                                                 </span>
-                                                <g:if test="${command.showTransferBreakdown && !params.print }">
+                                                <g:if test="${command.showTransferBreakdown}">
                                                     <img src="${resource(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
                                                     <div class="hidden details">
                                                         <g:if test="${entry.quantityTransferredInByLocation }">
@@ -408,7 +398,7 @@
                                             </g:if>
                                             <td class="right nowrap">
                                                 <span class="${(entry?.quantityTransferredOut>0)?'debit':'credit'}">${entry?.quantityTransferredOut?:0}</span>
-                                                <g:if test="${command.showTransferBreakdown && !params.print }">
+                                                <g:if test="${command.showTransferBreakdown}">
                                                     <img src="${resource(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
                                                     <div class="hidden details">
                                                         <g:if test="${entry.quantityTransferredOutByLocation }">

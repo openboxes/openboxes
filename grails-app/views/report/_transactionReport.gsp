@@ -5,19 +5,6 @@
     <title><warehouse:message code="report.showTransactionReport.label" /></title>
 </head>
 <body>
-<g:if test="${!command?.product && !params.print && command?.entries}">
-    <div style="padding: 5px;">
-        <label><warehouse:message code="report.exportAs.label"/></label>
-        <g:link target="_blank" controller="report" action="generateTransactionReport" class="button"
-                params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
-            <warehouse:message code="report.exportAs.html.label"/>
-        </g:link>
-        <g:link target="_blank" controller="report" action="downloadTransactionReport" class="button"
-                params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
-            <warehouse:message code="report.exportAs.pdf.label"/>
-        </g:link>
-    </div>
-</g:if>
 
 <g:if test="${command.product }">
     <style>
@@ -144,12 +131,6 @@
 
                 <h2>
                     <format:category category="${category}"/>
-                    <g:if test="${!params.print}">
-                        <g:link controller="report" action="generateTransactionReport" class="button" params="['location.id':command?.location?.id,'category.id':category?.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':false,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories,'showTransferBreakdown':command?.showTransferBreakdown,'hideInactiveProducts':command?.hideInactiveProducts]" style="display: inline">
-                            <warehouse:message code="report.showThisCategoryOnly.label"/>
-                        </g:link>
-                    </g:if>
-
                 </h2>
 
                 <div class="list">
@@ -222,15 +203,7 @@
                             <g:set var="entry" value="${command.entries[product].totals }"/>
                             <tr class="${j%2 ? 'even' : 'odd' }">
                                 <td class="left" style="width: 35%">
-                                    <g:if test="${!params.print }">
-                                        <g:link controller="report" action="generateTransactionReport" params="['product.id':product?.id,'category.id':category?.id,'location.id':command?.location?.id,startDate:params.startDate,endDate:params.endDate,includeChildren:command?.includeChildren,pageBreak:params.pageBreak]">
-                                            <format:product product="${product }"/>
-                                        </g:link>
-
-                                    </g:if>
-                                    <g:else>
-                                        <format:product product="${product }"/>
-                                    </g:else>
+                                    <format:product product="${product }"/>
                                 </td>
                                 <td class="right total start nowrap">
                                     <span class="${(entry?.quantityInitial>=0)?'credit':'debit'}">
@@ -241,64 +214,6 @@
                                     <span class="${(entry?.quantityTransferredIn>=0)?'credit':'debit'}">
                                         ${entry?.quantityTransferredIn ?: 0}
                                     </span>
-                                    <g:if test="${command.showTransferBreakdown && !params.print }">
-                                        <img src="${resource(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
-                                        <div class="hidden details">
-                                            <g:if test="${entry.quantityTransferredInByLocation }">
-                                                <h2>
-                                                    <table>
-                                                        <tr class="unhighlight">
-                                                            <td class="">
-                                                                <format:product product="${product }"/>
-                                                            </td>
-                                                            <td class="right middle">
-                                                                <img src="${resource(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </h2>
-                                                <table>
-                                                    <thead>
-                                                    <tr>
-                                                        <th>
-                                                            <warehouse:message code="default.from.label"/>
-                                                        </th>
-                                                        <th class="right">
-                                                            <warehouse:message code="default.qty.label"/>
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <g:each var="xferInMapEntry" in="${entry.quantityTransferredInByLocation.sort { it.key } }" status="xinStatus">
-                                                        <tr class="${xinStatus%2?'even':'odd' }">
-                                                            <td>
-                                                                ${xferInMapEntry.key }
-
-                                                            </td>
-                                                            <td class="right">
-                                                                ${xferInMapEntry.value }
-                                                            </td>
-                                                        </tr>
-                                                    </g:each>
-                                                    </tbody>
-                                                    <tfoot>
-                                                    <tr>
-                                                        <td>
-
-                                                        </td>
-                                                        <td class="right">
-                                                            ${entry?.quantityTransferredIn?:0}
-                                                        </td>
-                                                    </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </g:if>
-                                            <g:unless test="${entry.quantityTransferredInByLocation }">
-                                                <warehouse:message code="default.none.label"/>
-                                            </g:unless>
-                                        </div>
-                                    </g:if>
-
                                 </td>
                                 <td class="right nowrap">
                                     <span class="${(entry?.quantityFound>=0)?'credit':'debit'}">${entry?.quantityFound ?: 0}</span>
@@ -308,74 +223,8 @@
                                         ${entry?.quantityTotalIn ?: 0}
                                     </span>
                                 </td>
-
-                                <g:if test="${command.showTransferBreakdown }">
-                                    <g:each var="location" in="${transferOutLocations }">
-                                        <td class="center nowrap">
-                                            <span class="${(entry?.quantityTransferredOutByLocation[location]>0)?'debit':'credit'}">${entry.quantityTransferredOutByLocation[location]?:0}</span>
-                                        </td>
-                                    </g:each>
-                                </g:if>
                                 <td class="right nowrap">
                                     <span class="${(entry?.quantityTransferredOut>0)?'debit':'credit'}">${entry?.quantityTransferredOut?:0}</span>
-                                    <g:if test="${command.showTransferBreakdown && !params.print }">
-                                        <img src="${resource(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
-                                        <div class="hidden details">
-                                            <g:if test="${entry.quantityTransferredOutByLocation }">
-                                                <h2>
-                                                    <table>
-                                                        <tr class="unhighlight">
-                                                            <td class="left middle">
-                                                                <label>
-                                                                    <format:product product="${product }"/>
-                                                                </label>
-                                                            </td>
-                                                            <td class="right middle">
-                                                                <img src="${resource(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </h2>
-                                                <table>
-                                                    <thead>
-                                                    <tr>
-                                                        <th>
-                                                            <warehouse:message code="default.to.label"/>
-                                                        </th>
-                                                        <th class="right">
-                                                            <warehouse:message code="default.qty.label"/>
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <g:each var="xferOutMapEntry" in="${entry.quantityTransferredOutByLocation.sort { it.key } }" status="xoutStatus">
-                                                        <tr class="${xoutStatus%2?'even':'odd' }">
-                                                            <td>
-                                                                ${xferOutMapEntry.key }
-
-                                                            </td>
-                                                            <td class="right">
-                                                                ${xferOutMapEntry.value }
-                                                            </td>
-                                                        </tr>
-                                                    </g:each>
-                                                    </tbody>
-                                                    <tfoot>
-                                                    <tr>
-                                                        <td>
-                                                        </td>
-                                                        <td class="right">
-                                                            ${entry?.quantityTransferredOut?:0}
-                                                        </td>
-                                                    </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </g:if>
-                                            <g:unless test="${entry.quantityTransferredOutByLocation }">
-                                                <warehouse:message code="default.none.label"/>
-                                            </g:unless>
-                                        </div>
-                                    </g:if>
                                 </td>
                                 <td class="right nowrap">
                                     <span class="${(entry?.quantityExpired>0)?'debit':'credit'}">${entry?.quantityExpired ?: 0}</span>
