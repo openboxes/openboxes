@@ -541,11 +541,6 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="admin" action="manage" class="list">
-                            <warehouse:message code="default.appinfo.label" default="Show app-info" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
                         <g:link controller="admin" action="cache" class="list">
                             <warehouse:message code="default.cache.label" default="Show cache" />
                         </g:link>
