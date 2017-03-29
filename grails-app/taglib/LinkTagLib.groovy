@@ -15,6 +15,16 @@ class LinkTagLib extends ApplicationTagLib {
             if (missManager || missAdmin) return
         }
 
+        // Add execution parameter to link if this is a webflow link and the execution parameter is missing
+        if (attrs.event) {
+            if (params.execution && !attrs?.params?.execution) {
+                if (!attrs.params) {
+                    attrs.params = [:]
+                }
+                attrs.params.execution = params.execution
+            }
+        }
+
         def applicationTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         applicationTagLib.link.call(attrs, body)
     }
