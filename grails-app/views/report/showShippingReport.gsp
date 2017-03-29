@@ -24,6 +24,26 @@
 			</div>
 		</g:hasErrors>
 
+        <div class="summary">
+
+            <div class="right">
+                <g:link class="button" controller="report" action="showShippingReport" params="['downloadFormat':'html','shipment.id':command?.shipment?.id]">
+                    <warehouse:message code="report.preview.html.label" default="HTML"/>
+                </g:link>
+                <g:link class="button" controller="report" action="showShippingReport" params="[downloadFormat:'pdf','shipment.id':command?.shipment?.id]">
+                    <warehouse:message code="report.preview.pdf.label" default="PDF"/>
+                </g:link>
+                <%--
+                <g:link class="button" controller="report" action="showShippingReport" params="[downloadFormat:'docx','shipment.id':command?.shipment?.id]">
+                    <warehouse:message code="report.exportAs.docx.label"/>
+                </g:link>
+                --%>
+            </div>
+            <div class="clearfix"></div>
+            <h1><warehouse:message code="report.showShippingReport.label" /></h1>
+
+        </div>
+
         <div class="yui-gf">
             <div class="yui-u first">
                 <div class="box">
@@ -55,23 +75,7 @@
                                 </span>
                                 --%>
                             </tr>
-                            <tr class="prop">
-                                <td>
-                                    <label><warehouse:message code="report.previewAs.label" default="Preview as"/></label>
 
-                                    <g:link class="button" controller="report" action="showShippingReport" params="['downloadFormat':'html','shipment.id':command?.shipment?.id]">
-                                        <warehouse:message code="report.preview.html.label" default="HTML"/>
-                                    </g:link>
-                                    <g:link class="button" controller="report" action="showShippingReport" params="[downloadFormat:'pdf','shipment.id':command?.shipment?.id]">
-                                        <warehouse:message code="report.preview.pdf.label" default="PDF"/>
-                                    </g:link>
-                                    <%--
-                                    <g:link class="button" controller="report" action="showShippingReport" params="[downloadFormat:'docx','shipment.id':command?.shipment?.id]">
-                                        <warehouse:message code="report.exportAs.docx.label"/>
-                                    </g:link>
-                                    --%>
-                                </td>
-                            </tr>
                         </table>
 
                     </g:form>
