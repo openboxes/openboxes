@@ -1,0 +1,11 @@
+<plugin name='watch-scaffolding' version='0.1' grailsVersion='2.0 &gt; *'>
+  <author>Your name</author>
+  <title>Watch Scaffolding Plugin</title>
+  <description>Watches for changes to scaffolding templates and reloads dynamically-scaffolded
+controllers and views.
+</description>
+  <documentation>http://grails.org/plugin/watch-scaffolding</documentation>
+  <resources />
+  <dependencies />
+  <behavior />
+</plugin>
