@@ -12,7 +12,7 @@ $ github_changelog_generator openboxes/openboxes --token «your-40-digit-github-
 
 - Include recipient in shipment import [\#180](https://github.com/openboxes/openboxes/issues/180)
 - Allow users to upload docx templates for shipping documents [\#181](https://github.com/openboxes/openboxes/issues/181)
-- Add monthly breakdown to consumption report [\]#184](https://github.com/openboxes/openboxes/issues/184)
+- Add monthly breakdown to consumption report [\#184](https://github.com/openboxes/openboxes/issues/184)
 
 ## [v0.7.15](https://github.com/openboxes/openboxes/tree/v0.7.15) (2017-02-17)
 [Full Changelog](https://github.com/openboxes/openboxes/compare/v0.7.14...v0.7.15)
@@ -52,13 +52,6 @@ $ github_changelog_generator openboxes/openboxes --token «your-40-digit-github-
 
 - Hotfix/163 add health endpoint for monitoring [\#164](https://github.com/openboxes/openboxes/pull/164) ([jmiranda](https://github.com/jmiranda))
 
-## [v0.9.0-alpha-1](https://github.com/openboxes/openboxes/tree/v0.9.0-alpha-1) (2016-08-08)
-[Full Changelog](https://github.com/openboxes/openboxes/compare/v0.7.11...v0.9.0-alpha-1)
-
-**Closed issues:**
-
-- Transaction report is loading very slow on system with over 10000 products [\#155](https://github.com/openboxes/openboxes/issues/155)
-
 ## [v0.7.11](https://github.com/openboxes/openboxes/tree/v0.7.11) (2016-06-28)
 [Full Changelog](https://github.com/openboxes/openboxes/compare/v0.7.10...v0.7.11)
 
@@ -91,9 +84,6 @@ $ github_changelog_generator openboxes/openboxes --token «your-40-digit-github-
 **Merged pull requests:**
 
 - Hotfix/62 missing foreign key constraints [\#145](https://github.com/openboxes/openboxes/pull/145) ([jmiranda](https://github.com/jmiranda))
-
-## [v0.8.0-alpha.1](https://github.com/openboxes/openboxes/tree/v0.8.0-alpha.1) (2016-04-30)
-[Full Changelog](https://github.com/openboxes/openboxes/compare/v0.7.8...v0.8.0-alpha.1)
 
 ## [v0.7.8](https://github.com/openboxes/openboxes/tree/v0.7.8) (2016-04-28)
 [Full Changelog](https://github.com/openboxes/openboxes/compare/v0.7.7...v0.7.8)
