@@ -206,9 +206,9 @@
 	        return false;
 		});
 		$(".open-dialog").click(function() {
-			var dom = document.getElementsByTagName('html')[0].innerHTML;
-			dom = "<html>" + dom + "</html>"
-			$("#dom").val(dom);
+			//var dom = document.getElementsByTagName('html')[0].innerHTML;
+			//dom = "<html>" + dom + "</html>"
+			//$("#dom").val(dom);
 			
 			$("#error-dialog").dialog({ 
 				autoOpen: true, 
