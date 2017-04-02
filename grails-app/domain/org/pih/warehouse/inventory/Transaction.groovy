@@ -71,14 +71,22 @@ class Transaction implements Comparable, Serializable {
 	User updatedBy
 	Date dateCreated
 	Date lastUpdated
-	
+
+    Inventory inventory
+
+    LocalTransfer outboundTransfer
+    LocalTransfer inboundTransfer
+
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
-    static belongsTo = [ inventory : Inventory ]
+    static belongsTo = [LocalTransfer, Requisition, Shipment]
+
+    static mappedBy = [outboundTransfer: 'destinationTransaction',
+                       inboundTransfer: 'sourceTransaction']
 
 	static mapping = { 
 		id generator: 'uuid'
-		//cache true
+		transactionEntries cascade: "all-delete-orphan"
 	}
 	
 	// Transient attributs
@@ -93,11 +101,13 @@ class Transaction implements Comparable, Serializable {
 		outgoingShipment(nullable:true)
 		incomingShipment(nullable:true)
 		requisition(nullable:true)
+        outboundTransfer(nullable:true)
+        inboundTransfer(nullable:true)
 		confirmed(nullable:true)
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)
 		comment(nullable:true)
-		transactionDate(nullable:false, 
+		transactionDate(nullable:false,
 			validator: { value -> value < new Date() })  // transaction date cannot be in the future
 		
 		source(nullable:true, 
@@ -119,7 +129,8 @@ class Transaction implements Comparable, Serializable {
 
 
     LocalTransfer getLocalTransfer() {
-        return LocalTransfer.findBySourceTransactionOrDestinationTransaction(this, this)
+        //return LocalTransfer.findBySourceTransactionOrDestinationTransaction(this, this)
+        return inboundTransfer?:outboundTransfer?:null
     }
 
 
