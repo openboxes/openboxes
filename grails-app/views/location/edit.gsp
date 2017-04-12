@@ -338,7 +338,7 @@
                                             <th><g:message code="binLocation.locationNumber.label" default="Locator"/></th>
                                         </tr>
 
-                                        <g:each in="${locationInstance?.locations.sort { it.name }}" var="binLocation" status="status">
+                                        <g:each in="${locationInstance?.locations?.sort { it.name }}" var="binLocation" status="status">
                                             <tr class="prop ${status%2?'even':'odd'}">
                                                 <td>
                                                     <div class="action-menu">
