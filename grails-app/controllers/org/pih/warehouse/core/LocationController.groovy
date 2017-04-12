@@ -120,7 +120,7 @@ class LocationController {
 					redirect(action: "edit", id: locationInstance.parentLocation.id)
 				}
 				else {
-					redirect(action: "list", id: locationInstance.id)
+					redirect(action: "edit", id: locationInstance.id)
 				}
 			}
 			else {
@@ -151,12 +151,6 @@ class LocationController {
 			flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 			redirect(action: "edit", id: params.id)
 		}
-	}
-
-
-	def addBinLocation = {
-
-
 	}
 		
 	/**
