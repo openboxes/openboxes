@@ -22,6 +22,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	
 	String id
 	String name
+	String locationNumber
+
 	byte [] logo				// logo
 	Address address
 	String fgColor	= "000000"
@@ -40,7 +42,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 
-	
 	static belongsTo = [ parentLocation : Location ]
 	static hasMany = [ locations : Location, supportedActivities : String, employees: User  ]
 		
@@ -48,6 +49,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		name(nullable:false, blank: false, maxSize: 255)
 		address(nullable:true)
 		locationType(nullable:false)
+        locationNumber(nullable:true, unique: true)
 		locationGroup(nullable:true)
 		parentLocation(nullable:true)
 		bgColor(nullable:true, validator: {bgColor, obj ->

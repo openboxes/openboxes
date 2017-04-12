@@ -23,8 +23,10 @@ class LocationType implements Comparable, Serializable {
 	Integer sortOrder = 0;
 	Date dateCreated;
 	Date lastUpdated;
+
+	LocationTypeCode locationTypeCode
 			
-	static hasMany = [ supportedActivities : String ]
+	static hasMany = [ supportedActivities : String]
 	
 	static mapping = {
 		id generator: 'uuid'
@@ -34,6 +36,7 @@ class LocationType implements Comparable, Serializable {
 	
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
+        locationTypeCode(nullable:true)
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)		
 		dateCreated(display:false)

@@ -5,5 +5,6 @@
 
     <include file="0.7.x/changelog-2016-05-04-2329-add-missing-primary-keys.xml"/>
     <include file="0.7.x/changelog-2016-05-04-2329-add-missing-foreign-key-constraints.xml"/>
+    <include file="0.7.x/changelog-2017-04-02-0025-bin-locations.xml"/>
 
 </databaseChangeLog>
