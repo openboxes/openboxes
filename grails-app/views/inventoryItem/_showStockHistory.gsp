@@ -9,7 +9,7 @@
 <div class="box">
     <h2><warehouse:message code="inventory.stockHistory.label"/></h2>
     <g:form method="GET" action="showTransactionLog">
-        <g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+        <g:hiddenField name="product.id" value="${commandInstance?.product?.id }"/>
             <table>
                 <g:set var="enableFilter" value="${!params.disableFilter}"/>
                 <thead>
@@ -82,7 +82,7 @@
                                 }
                             %>
 
-                            <g:each var="transactionEntry" in="${transaction.transactionEntries.findAll { it.inventoryItem.product?.id ==  commandInstance?.productInstance?.id}}" status="status2">
+                            <g:each var="transactionEntry" in="${transaction.transactionEntries.findAll { it.inventoryItem.product?.id ==  commandInstance?.product?.id}}" status="status2">
                                 <g:set var="rowClass" value=""/>
                                 <%
                                     if (!balanceByInventoryItem[transactionEntry.inventoryItem]) {

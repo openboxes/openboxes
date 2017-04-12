@@ -5,11 +5,11 @@
 		<%--
 		<warehouse:message code="inventory.currentAndPendingStock.label"/>
 		 --%>
-		<format:product product="${commandInstance?.productInstance}"/>
+		<format:product product="${commandInstance?.product}"/>
 	</content>
 
 	<content tag="heading">
-		<format:product product="${commandInstance?.productInstance}"/>
+		<format:product product="${commandInstance?.product}"/>
 	</content>
 
 	<content tag="content">

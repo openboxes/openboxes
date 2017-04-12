@@ -7,7 +7,7 @@
 </script>	   
 <div id="dlgEditItem-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.editItem.label')}" style="padding: 10px; display: none;" >	
 	
-	<div class="dialog" style="padding: 10px;" >	
+	<div class="dialog">
 
 		<g:form name="editInventoryItem" controller="inventoryItem" action="update">
 			<g:hiddenField name="id" value="${itemInstance?.id}"/>
@@ -17,17 +17,18 @@
 			
 			<table>
 				<tbody>
-				
-				
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.label" /></label></td>                            
 						<td valign="top" class="value">
 							<format:product product="${itemInstance?.product}"/>
 						</td>
-						<td>
 					</tr>
-					
-					
+					<tr class="prop">
+						<td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
+						<td valign="top" class="value">
+							${binLocation?.locationNumber}
+						</td>
+					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>                            
 						<td valign="top" class="value">
@@ -48,7 +49,7 @@
 								<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="default.button.save.label"/>
 							</button>
 							&nbsp;
-							<a href="javascript:void();" id="btnEditClose-${itemInstance?.id }">
+							<a href="javascript:void(-1);" id="btnEditClose-${itemInstance?.id }">
 								<warehouse:message code="default.button.cancel.label"/>
 							</a>
 						</td>

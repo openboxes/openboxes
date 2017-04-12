@@ -40,7 +40,8 @@
 			<hr />
 		</div>
 		<div class="action-menu-item">
-			<g:link name="recordInventoryLink" controller="inventoryItem" action="showRecordInventory" params="['productInstance.id': productInstance?.id,'inventoryInstance.id':inventoryInstance?.id]">
+			<g:link name="recordInventoryLink" controller="inventoryItem" action="showRecordInventory"
+					params="['product.id': productInstance?.id,'inventory.id':inventoryInstance?.id]">
 				<img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
 				<warehouse:message code="inventory.record.label"/>
 			</g:link>

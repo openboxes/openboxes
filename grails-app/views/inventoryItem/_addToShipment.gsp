@@ -14,8 +14,8 @@
 			<tr>
 				<td>
 					<g:form controller="inventoryItem" action="addToShipment">
-						<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id}"/>
-						<g:hiddenField name="inventory.id" value="${commandInstance?.inventoryInstance?.id}"/>
+						<g:hiddenField name="product.id" value="${commandInstance?.product?.id}"/>
+						<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
 						<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
 						<table>
 							<tbody>
@@ -28,7 +28,7 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="item.label"/></label></td>                            
 									<td valign="top" class="value">
-									 	<format:product product="${commandInstance?.productInstance}"/>
+									 	<format:product product="${commandInstance?.product}"/>
 										<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
 									</td>
 								</tr>						

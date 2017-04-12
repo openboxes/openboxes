@@ -12,7 +12,7 @@ class InventoryItemControllerTests extends ControllerUnitTestCase {
         def inventory = new Inventory(id: "inventory1")
         def myLocation = new Location(id: "1234", inventory: inventory)
         Product p = new Product(id:"pro1", name:"product1");
-        RecordInventoryCommand com = new RecordInventoryCommand(productInstance: p, inventoryInstance: inventory)
+        RecordInventoryCommand com = new RecordInventoryCommand(product: p, inventory: inventory)
         InventoryItem i1 = new InventoryItem(id: "item1", product: p)
         InventoryItem i2 = new InventoryItem(id: "item2", product: p)
         InventoryItem i3 = new InventoryItem(id: "item3", product: p)

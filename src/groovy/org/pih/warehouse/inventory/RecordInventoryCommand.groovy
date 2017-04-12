@@ -11,25 +11,24 @@ package org.pih.warehouse.inventory
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 class RecordInventoryCommand {
 	
-	Product productInstance;
-	Inventory inventoryInstance;
-	InventoryLevel inventoryLevelInstance
+	Product product;
+	Inventory inventory;
+	InventoryLevel inventoryLevel
 	Integer totalQuantity
 	Date transactionDate = new Date()
 	RecordInventoryRowCommand recordInventoryRow;
 	List<RecordInventoryRowCommand> recordInventoryRows =
 		LazyList.decorate(new ArrayList(),FactoryUtils.instantiateFactory(RecordInventoryRowCommand.class));
-		//ListUtils.lazyList([], FactoryUtils.constantFactory(new RecordInventoryRowCommand())) 
-		// new ListUtils.lazyList(new ArrayList(),{new RecordInventoryRowCommand()} as Factory)
-	
+
 	static constraints = {
-		productInstance(nullable:false)
-		inventoryInstance(nullable:true) 
-		inventoryLevelInstance(nullable:true)
+		product(nullable:false)
+		inventory(nullable:true)
+		inventoryLevel(nullable:true)
 		totalQuantity(nullable:true)
 		transactionDate(nullable:false)		
 		recordInventoryRows(validator: { val, obj, errors -> 
