@@ -671,7 +671,7 @@
 								<th><warehouse:message code="shipping.container.label"/></th>
 								<th><warehouse:message code="product.productCode.label"/></th>
 								<th><warehouse:message code="product.label"/></th>
-								<th><warehouse:message code="product.uom.label"/></th>
+								<th class="left"><warehouse:message code="receiptItem.binLocation.label" default="Bin Location"/></th>
 								<th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
 								<th class="center"><warehouse:message code="default.expires.label"/></th>
 								<th class="center"><warehouse:message code="shipping.shipped.label"/></th>
@@ -681,6 +681,7 @@
 								<th class="center"><warehouse:message code="shipping.totalReceived.label"/></th>
 								--%>
 								</g:if>
+								<th><warehouse:message code="product.uom.label"/></th>
 								<th><warehouse:message code="shipping.recipient.label"/></th>
 								<th class="left"><warehouse:message code="default.comment.label"/></th>
 							</tr>
@@ -692,14 +693,11 @@
 									<g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
 									<g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
 									<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''} shipmentItem">
-										<g:if test="${newContainer }">
-											<td class="top left" >
+										<td class="top left" >
+											<g:if test="${newContainer }">
 												<g:render template="container" model="[container:shipmentItem?.container,showDetails:true]"/>
-											</td>
-										</g:if>
-										<g:else>
-											<td></td>
-										</g:else>
+											</g:if>
+										</td>
 										<td>
 											${shipmentItem?.inventoryItem?.product?.productCode}
 										</td>
@@ -709,10 +707,10 @@
 											</g:link>
 										</td>
 										<td>
-											${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+											${shipmentItem?.receiptItem?.binLocation?.locationNumber}
 										</td>
-										<td class="lotNumber">
-											${shipmentItem?.inventoryItem?.lotNumber}
+										<td>
+											<div class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber}</div>
 										</td>
 										<td class="center expirationDate">
 
@@ -743,6 +741,10 @@
 											</td>
 											--%>
 										</g:if>
+										<td>
+											${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+										</td>
+
 										<td class="left">
 											<g:if test="${shipmentItem?.recipient }">
 												${shipmentItem?.recipient?.name}

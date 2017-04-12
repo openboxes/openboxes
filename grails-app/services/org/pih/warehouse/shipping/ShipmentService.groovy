@@ -1268,6 +1268,7 @@ class ShipmentService {
 						// Create a new transaction entry
 						TransactionEntry transactionEntry = new TransactionEntry();
 						transactionEntry.quantity = it.quantityReceived;
+						transactionEntry.binLocation = it.binLocation
 						transactionEntry.inventoryItem = inventoryItem;
 						creditTransaction.addToTransactionEntries(transactionEntry);
 						//creditTransaction.incomingShipment = shipmentInstance

@@ -374,11 +374,13 @@ class ShipmentController {
 	def receiveShipment = { ReceiveShipmentCommand command -> 
 		log.info "params: " + params
 		def receiptInstance
+		def shipmentItems
+		def location = Location.get(session.warehouse.id)
 		def shipmentInstance = Shipment.get(params.id)
         def userInstance = User.get(session.user.id)
-		def shipmentItems = []
-		
-		
+		def binLocations = Location.findByParentLocation(location)
+
+
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: 'incoming'])
@@ -463,7 +465,7 @@ class ShipmentController {
 			}
 		}
 		render(view: "receiveShipment", model: [
-			shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
+			shipmentInstance: shipmentInstance, receiptInstance:receiptInstance, binLocations:binLocations ])
 	}
 
 
