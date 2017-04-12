@@ -8,7 +8,7 @@
 		<hr/>
 	</div>
 	<div class="action-menu-item">					
-		<g:link controller="inventoryItem" action="showRecordInventory" params="['productInstance.id': product?.id,'inventoryInstance.id':inventory?.id]">
+		<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id': product?.id,'inventory.id':inventory?.id]">
 			<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>&nbsp;
 			<warehouse:message code="inventory.record.label"/>
 		</g:link>

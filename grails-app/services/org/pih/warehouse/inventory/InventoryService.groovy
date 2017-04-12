@@ -38,6 +38,7 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
 import util.InventoryUtil
 
+import java.sql.Timestamp
 import java.text.ParseException;
 import java.util.Random
 
@@ -1250,6 +1251,10 @@ class InventoryService implements ApplicationContextAware {
 		return getQuantity(location.inventory, inventoryItem)
 	}
 
+    Map<Product, Map<InventoryItem, Integer>> getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries) {
+        return getQuantityByProductAndInventoryItemMap(entries, false)
+    }
+
 	/**
 	 * Converts a list of passed transaction entries into a quantity
 	 * map indexed by product and then by inventory item
@@ -1266,9 +1271,10 @@ class InventoryService implements ApplicationContextAware {
 	 * @param entries
 	 * @return
 	 */
-	Map<Product, Map<InventoryItem, Integer>> getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries) {
+	Map getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries, Boolean useBinLocation) {
 		def startTime = System.currentTimeMillis()
 		def quantityMap = [:]
+
         def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
         def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
 
@@ -1277,6 +1283,8 @@ class InventoryService implements ApplicationContextAware {
             // first make sure the transaction entries are sorted, with most recent first
             entries = entries.sort().reverse()
 
+
+            // Iterate over all transaction entries until we hit an end condition
             entries.each { transactionEntry ->
 
                 // There are cases where the transaction entry might be null, so we need to check for this edge case
@@ -1285,63 +1293,77 @@ class InventoryService implements ApplicationContextAware {
                     def inventoryItem = transactionEntry.inventoryItem
                     def product = inventoryItem.product
                     def transaction = transactionEntry.transaction
-
-                    //boolean hasReachedInventoryTransaction = false
-                    //boolean hasReachedProductInventoryTransaction = false
+                    def binLocation = transactionEntry.binLocation
 
                     // first see if this is an entry we can skip (because we've already reached a product inventory transaction
                     // for this product, or a inventory transaction for this inventory item)
-
-                    //hasReachedInventoryTransaction = reachedInventoryTransaction[product][inventoryItem]
-
                     if (!(reachedProductInventoryTransaction[product] && reachedProductInventoryTransaction[product] != transaction) &&
                             !(reachedInventoryTransaction[product] && reachedInventoryTransaction[product][inventoryItem]
                                     && reachedInventoryTransaction[product][inventoryItem] != transaction)) {
 
-                        //println "PROCESS ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
                         // check to see if there's an entry in the map for this product and create if needed
-                        if (!quantityMap[product]) {
-                            quantityMap[product] = [:]
-                        }
-
                         // check to see if there's an entry for this inventory item in the map and create if needed
-                        if (!quantityMap[product][inventoryItem]) {
-                            quantityMap[product][inventoryItem] = 0
+                        if (useBinLocation) {
+                            if (!quantityMap[product]) {
+                                quantityMap[product] = [:]
+                            }
+                            if (!quantityMap[product][inventoryItem]) {
+                                quantityMap[product][inventoryItem] = [:]
+                            }
+                            if (!quantityMap[product][inventoryItem][binLocation]) {
+                                quantityMap[product][inventoryItem][binLocation] = 0
+                            }
+                        }
+                        else {
+                            if (!quantityMap[product]) {
+                                quantityMap[product] = [:]
+                            }
+                            if (!quantityMap[product][inventoryItem]) {
+                                quantityMap[product][inventoryItem] = 0
+                            }
                         }
 
-                        //println "Transaction entry " + transactionEntry.id
-                        //println "Transaction " + transactionEntry.transaction
                         // now update quantity as necessary
-                        def code = transactionEntry.transaction.transactionType.transactionCode
-
-                        if (code == TransactionCode.CREDIT) {
-                            quantityMap[product][inventoryItem] += transactionEntry.quantity
+                        def transactionCode = transactionEntry.transaction.transactionType.transactionCode
+                        if (transactionCode == TransactionCode.CREDIT) {
+                            if (useBinLocation) {
+                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                            }
+                            else {
+                                quantityMap[product][inventoryItem] += transactionEntry.quantity
+                            }
                         }
-                        else if (code == TransactionCode.DEBIT) {
-                            quantityMap[product][inventoryItem] -= transactionEntry.quantity
+                        else if (transactionCode == TransactionCode.DEBIT) {
+                            if (useBinLocation) {
+                                quantityMap[product][inventoryItem][binLocation] -= transactionEntry.quantity
+                            }
+                            else {
+                                quantityMap[product][inventoryItem] -= transactionEntry.quantity
+                            }
                         }
-                        else if (code == TransactionCode.INVENTORY) {
-                            quantityMap[product][inventoryItem] += transactionEntry.quantity
-
+                        else if (transactionCode == TransactionCode.INVENTORY) {
+                            if (useBinLocation) {
+                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                            }
+                            else {
+                                quantityMap[product][inventoryItem] += transactionEntry.quantity
+                            }
                             // mark that we are done with this inventory item (after this transaction)
                             if (!reachedInventoryTransaction[product]) {
                                 reachedInventoryTransaction[product] = [:]
                             }
                             reachedInventoryTransaction[product][inventoryItem] = transaction
                         }
-                        else if (code == TransactionCode.PRODUCT_INVENTORY) {
-                            quantityMap[product][inventoryItem] += transactionEntry.quantity
-
+                        else if (transactionCode == TransactionCode.PRODUCT_INVENTORY) {
+                            if (useBinLocation) {
+                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                            }
+                            else {
+                                quantityMap[product][inventoryItem] += transactionEntry.quantity
+                            }
                             // mark that we are done with this product (after this transaction)
-                            reachedProductInventoryTransaction[inventoryItem.product] = transaction
+                            reachedProductInventoryTransaction[product] = transaction
                         }
-                        else {
-                            throw new RuntimeException("Transaction code ${code} is not valid")
-                        }
-                    }
-                    else {
-                        //println "IGNORE  ${product.name?.padRight(20)} LOT #${inventoryItem?.lotNumber?.padRight(10)} ${transaction?.transactionDate?.format("dd-MMM-yyyy hh:mma")?.padRight(20)} ${transaction?.transactionType?.transactionCode?.toString()?.padRight(10)} ${transactionEntry?.quantity?.toString()?.padRight(5)}"
-
                     }
                 }
             }
@@ -1417,6 +1439,33 @@ class InventoryService implements ApplicationContextAware {
 		return quantityMap
 	}
 
+
+    /**
+     * Converts list of passed transactions entries into a list of bin locations.
+     *
+     * @param entries
+     * @return
+     */
+    List getQuantityByBinLocation(List<TransactionEntry> entries) {
+        def startTime = System.currentTimeMillis()
+        def binLocations = []
+
+        // first get the quantity and inventory item map
+        Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
+        quantityBinLocationMap.keySet().each { product ->
+            quantityBinLocationMap[product].keySet().each { inventoryItem ->
+                quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
+                    def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
+                    binLocations << [product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
+                }
+            }
+
+        }
+        binLocations = binLocations.sort { it?.binLocation }
+        return binLocations
+    }
+
+
     def getQuantityByProductGroup(Location location) {
         def quantityMap = getQuantityByProductMap(location.inventory)
 
@@ -1439,6 +1488,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+    //@Cacheable("quantityOnHandCache")
 	Map<Product, Integer> getQuantityByProductMap(Inventory inventory) {
         def startTime = System.currentTimeMillis()
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
@@ -1589,13 +1639,18 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @return current quantity of the given inventory item.
 	 */
-	Integer getQuantity(InventoryItem inventoryItem) {
+	Integer getQuantity(Location binLocation, InventoryItem inventoryItem) {
 		def startTime = System.currentTimeMillis()
 		def currentLocation = getCurrentLocation()
-		def quantity = getQuantity(currentLocation.inventory, inventoryItem)
+		def quantity = getQuantity(currentLocation.inventory, binLocation, inventoryItem)
         log.info "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantity
 	}
+
+
+    Integer getQuantity(Inventory inventory, InventoryItem inventoryItem) {
+        return getQuantity(inventory, null, inventoryItem)
+    }
 
 	/**
 	 * Gets the quantity of a specific inventory item at a specific inventory
@@ -1604,28 +1659,34 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventory
 	 * @return
 	 */
-	Integer getQuantity(Inventory inventory, InventoryItem inventoryItem) {
+	Integer getQuantity(Inventory inventory, Location binLocation, InventoryItem inventoryItem) {
 
 		if (!inventory) {
-            log.debug AuthService.currentLocation
 			def currentLocation = AuthService?.currentLocation?.get()
-            log.debug currentLocation
 			if (!currentLocation?.inventory)
 				throw new Exception("Inventory not found")
 
 			inventory = currentLocation.inventory
 		}
 		def transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(inventory, inventoryItem)
-		def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
+        if (binLocation) {
+            List binLocations = getQuantityByBinLocation(transactionEntries)
+            log.info "Bin locations: " + binLocations
+            def entry = binLocations.find { it.inventoryItem == inventoryItem }
+            return entry?.quantity?:0
+        }
+        else {
+            def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
 
-		// FIXME was running into an issue where a proxy object was being used to represent the inventory item
-		// so the map.get() method was returning null.  So we needed to fully load the inventory item using
-		// the GORM get method.
-        // inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
-        //log.debug "inventoryItem -> " + inventoryItem.class
-		inventoryItem = InventoryItem.get(inventoryItem.id)
-		Integer quantity = quantityMap[inventoryItem]
-		return quantity ?: 0;
+            // FIXME was running into an issue where a proxy object was being used to represent the inventory item
+            // so the map.get() method was returning null.  So we needed to fully load the inventory item using
+            // the GORM get method.
+            // inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
+            //log.debug "inventoryItem -> " + inventoryItem.class
+            inventoryItem = InventoryItem.get(inventoryItem.id)
+            Integer quantity = quantityMap[inventoryItem]
+            return quantity ?: 0;
+        }
 	}
 
 
@@ -1719,32 +1780,33 @@ class InventoryService implements ApplicationContextAware {
     //@Cacheable("stockCardCommandCache")
 	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
 		// Get basic details required for the whole page
-		cmd.productInstance = Product.get(params?.product?.id ?: params.id);  // check product.id and id
-        if (!cmd.productInstance) {
+		cmd.product = Product.get(params?.product?.id ?: params.id);  // check product.id and id
+        if (!cmd.product) {
             throw new ProductException("Product with identifier '${params?.product?.id?:params.id}' could not be found")
         }
 
-		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
-		cmd.inventoryLevelInstance = getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
+		cmd.inventory = cmd.warehouse?.inventory
+		cmd.inventoryLevel = getInventoryLevelByProductAndInventory(cmd.product, cmd.inventory)
 
 		// Get current stock of a particular product within an inventory
 		// Using set to make sure we only return one object per inventory items
-		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.product, cmd.inventory);
 		cmd.inventoryItemList = inventoryItems as List
 		cmd.inventoryItemList?.sort { it.expirationDate }?.sort { it.lotNumber }
 
-        cmd.totalQuantity = getQuantityOnHand(cmd.warehouseInstance, cmd.productInstance)
+        cmd.totalQuantity = getQuantityOnHand(cmd.warehouse, cmd.product)
 
 		// Get all lot numbers for a given product
-		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.productInstance) as List
+		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.product) as List
 
 		// Get transaction log for a particular product within an inventory
-		cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventoryInstance, [cmd.productInstance]);
+		cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventory, [cmd.product]);
 		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
 		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
 
 		// create the quantity map for this product
 		cmd.quantityByInventoryItemMap = getQuantityByInventoryItemMap(cmd.transactionEntryList)
+        cmd.quantityByBinLocation = getQuantityByBinLocation(cmd.transactionEntryList)
 
 		return cmd
 	}
@@ -1768,29 +1830,27 @@ class InventoryService implements ApplicationContextAware {
 		commandInstance.transactionDate = new Date()
 		//commandInstance.transactionDate.clearTime()
 
-		if (!commandInstance?.productInstance) {
+		if (!commandInstance?.product) {
 			commandInstance.errors.reject("error.product.invalid", "Product does not exist");
 		}
 		else {
 			commandInstance.recordInventoryRow = new RecordInventoryRowCommand();
 
 			// get all transaction entries for this product at this inventory
-			def transactionEntryList = getTransactionEntriesByInventoryAndProduct(commandInstance?.inventoryInstance, [
-				commandInstance?.productInstance
-			])
-			// create a map of inventory item quantities from this
-			def quantityByInventoryItemMap = getQuantityByInventoryItemMap(transactionEntryList)
+			def transactionEntryList = getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [commandInstance?.product])
 
-			quantityByInventoryItemMap.keySet().each {
-				def quantity = quantityByInventoryItemMap[it]
+            // Get list of bin locations
+            List binLocationEntries = getQuantityByBinLocation(transactionEntryList)
 
+            binLocationEntries.each {
 				def inventoryItemRow = new RecordInventoryRowCommand()
 				inventoryItemRow.id = it.id
-				inventoryItemRow.lotNumber = it.lotNumber
-				inventoryItemRow.expirationDate = it.expirationDate
-				//inventoryItemRow.description = it.description;
-				inventoryItemRow.oldQuantity = quantity
-				inventoryItemRow.newQuantity = quantity
+                inventoryItemRow.inventoryItem = it.inventoryItem
+                inventoryItemRow.binLocation = it.binLocation
+				inventoryItemRow.lotNumber = it?.inventoryItem?.lotNumber
+				inventoryItemRow.expirationDate = it?.inventoryItem?.expirationDate
+				inventoryItemRow.oldQuantity = it.quantity
+				inventoryItemRow.newQuantity = it.quantity
 				commandInstance.recordInventoryRows.add(inventoryItemRow)
 			}
 
@@ -1811,75 +1871,78 @@ class InventoryService implements ApplicationContextAware {
 		try {
 			// Validation was done during bind, but let's do this just in case
 			//if (cmd.validate()) {
-				def inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
-				// Create a new transaction
-				def transaction = new Transaction(cmd.properties)
-				transaction.inventory = cmd.inventoryInstance
-				transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+            def inventoryItems = getInventoryItemsByProductAndInventory(cmd.product, cmd.inventory)
 
-				// Process each row added to the record inventory page
-				cmd.recordInventoryRows.each { row ->
+            // Create a new transaction
+            def transaction = new Transaction(cmd.properties)
+            transaction.inventory = cmd.inventory
+            transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
-					if (row) {
-						// 1. Find an existing inventory item for the given lot number and product and description
-						def inventoryItem =
-								findInventoryItemByProductAndLotNumber(cmd.productInstance, row.lotNumber)
+            // Process each row added to the record inventory page
+            cmd.recordInventoryRows.each { row ->
 
-						// 2. If the inventory item doesn't exist, we create a new one
-						if (!inventoryItem) {
-							inventoryItem = new InventoryItem();
-							inventoryItem.properties = row.properties
-							inventoryItem.product = cmd.productInstance;
-							if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+                if (row) {
+                    // 1. Find an existing inventory item for the given lot number and product and description
+                    def inventoryItem =
+                            findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
 
-							}
-							else {
-								// TODO Old error message = "Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid"
-								inventoryItem.errors.allErrors.each { error ->
-									cmd.errors.reject("inventoryItem.invalid",
-											[
-												inventoryItem,
-												error.getField(),
-												error.getRejectedValue()] as Object[],
-											"[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+                    // 2. If the inventory item doesn't exist, we create a new one
+                    if (!inventoryItem) {
+                        inventoryItem = new InventoryItem();
+                        inventoryItem.properties = row.properties
+                        inventoryItem.product = cmd.product;
+                        if (!inventoryItem.hasErrors() && inventoryItem.save()) {
 
-								}
-								// We need to fix these errors before we can move on
-								return cmd;
-							}
-						}
-						// 3. Create a new transaction entry (even if quantity didn't change)
-						def transactionEntry = new TransactionEntry();
-						transactionEntry.properties = row.properties;
-						transactionEntry.quantity = row.newQuantity
-						transactionEntry.inventoryItem = inventoryItem;
-						transaction.addToTransactionEntries(transactionEntry);
-					}
-				}
+                        }
+                        else {
+                            // TODO Old error message = "Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid"
+                            inventoryItem.errors.allErrors.each { error ->
+                                cmd.errors.reject("inventoryItem.invalid",
+                                        [
+                                            inventoryItem,
+                                            error.getField(),
+                                            error.getRejectedValue()] as Object[],
+                                        "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
 
-                // 4. Make sure that the inventory item has been saved before we process the transactions
-				if (!cmd.hasErrors()) {
-					// Check if there are any changes recorded ... no reason to
-					if (!transaction.transactionEntries) {
-						// We could do this, but it keeps us from changing the lot number and description
-						cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction");
-					}
-					else {
-						if (!transaction.hasErrors() && transaction.save()) {
-							// We saved the transaction successfully
-						}
-						else {
-							transaction.errors.allErrors.each { error ->
-								cmd.errors.reject("transaction.invalid",
-										[
-											transaction,
-											error.getField(),
-											error.getRejectedValue()] as Object[],
-										"Property [${error.getField()}] of [${transaction.class.name}] with value [${error.getRejectedValue()}] is invalid");
-							}
-						}
-					}
-				}
+                            }
+                            // We need to fix these errors before we can move on
+                            return cmd;
+                        }
+                    }
+                    // 3. Create a new transaction entry (even if quantity didn't change)
+                    def transactionEntry = new TransactionEntry()
+                    transactionEntry.properties = row.properties
+                    transactionEntry.quantity = row.newQuantity
+                    transactionEntry.product = inventoryItem?.product
+                    transactionEntry.inventoryItem = inventoryItem
+                    transactionEntry.binLocation = row.binLocation
+                    transaction.addToTransactionEntries(transactionEntry)
+                }
+            }
+
+            // 4. Make sure that the inventory item has been saved before we process the transactions
+            if (!cmd.hasErrors()) {
+                // Check if there are any changes recorded ... no reason to
+                if (!transaction.transactionEntries) {
+                    // We could do this, but it keeps us from changing the lot number and description
+                    cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction");
+                }
+                else {
+                    if (!transaction.hasErrors() && transaction.save()) {
+                        // We saved the transaction successfully
+                    }
+                    else {
+                        transaction.errors.allErrors.each { error ->
+                            cmd.errors.reject("transaction.invalid",
+                                    [
+                                        transaction,
+                                        error.getField(),
+                                        error.getRejectedValue()] as Object[],
+                                    "Property [${error.getField()}] of [${transaction.class.name}] with value [${error.getRejectedValue()}] is invalid");
+                        }
+                    }
+                }
+            }
 			//}
 		} catch (Exception e) {
 			log.error("Error saving an inventory record to the database ", e);
@@ -2140,7 +2203,6 @@ class InventoryService implements ApplicationContextAware {
 		}
         log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
 
-
 		return transactionEntries;
 	}
 
@@ -2190,6 +2252,7 @@ class InventoryService implements ApplicationContextAware {
 	boolean adjustStock(InventoryItem itemInstance, Map params) {
 
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
+        def binLocation = Location.get(params.binLocation.id)
 
 		if (itemInstance && inventoryInstance) {
 			def transactionEntry = new TransactionEntry(params);
@@ -2213,10 +2276,12 @@ class InventoryService implements ApplicationContextAware {
 				//transactionInstance.transactionDate.clearTime();
 				transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
 				transactionInstance.inventory = inventoryInstance;
+                transactionInstance.comment = params.comment
 
 				// Add transaction entry to transaction
 				transactionEntry.inventoryItem = itemInstance;
 				transactionEntry.quantity = quantity
+                transactionEntry.binLocation = binLocation
 				transactionInstance.addToTransactionEntries(transactionEntry);
 				if (!transactionInstance.hasErrors() && transactionInstance.save()) {
 
@@ -2237,12 +2302,13 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param params
 	 */
-	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location destination, Location source, Integer quantity) {
+	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location binLocation, Location destination, Location source, Integer quantity) {
 		def transaction = new Transaction();
-		//def inventoryInstance = Inventory.get(params?.inventory?.id)
-		Integer quantityOnHand = getQuantity(inventoryItem);
-        log.debug "quantityOnHand: " + quantityOnHand
-		
+
+        Integer quantityOnHand = getQuantity(binLocation, inventoryItem);
+
+        log.info "Quantity on hand: " + quantityOnHand
+
 		if (inventoryItem && inventory) {
 			def transactionEntry = new TransactionEntry();
 			transactionEntry.quantity = quantity;
@@ -2296,13 +2362,12 @@ class InventoryService implements ApplicationContextAware {
 			transaction.transactionNumber = generateTransactionNumber()
 
 			// Add transaction entry to transaction
+            transactionEntry.binLocation = binLocation
 			transactionEntry.inventoryItem = inventoryItem;
 			transactionEntry.quantity = quantity
 			transaction.addToTransactionEntries(transactionEntry);
 			
 			if (!transaction.hasErrors() && transaction.save()) {
-				// saved successfully
-				log.info("Saved transaction " + transaction)
 				if (!saveLocalTransfer(transaction)) {
 					throw new ValidationException("Unable to save local transfer", transaction.errors)
 				}
@@ -3287,7 +3352,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getQuantityOnHand(product) {
+    def getQuantityOnHand(Product product) {
         log.info ("Get getQuantityOnHand() for product ${product?.name} at all locations")
         def quantityMap = [:]
         def locations = Location.list()
@@ -3892,7 +3957,7 @@ class InventoryService implements ApplicationContextAware {
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
-        propertyInstanceMap.get().clear()
+        //propertyInstanceMap.get().clear()
         printStatus(index)
     }
 
@@ -3904,46 +3969,83 @@ class InventoryService implements ApplicationContextAware {
         lastBatchStarted = batchEnded
     }
 
+    def getDistinctProducts(Location location) {
 
+
+        def productCount = TransactionEntry.createCriteria().get {
+            projections {
+                inventoryItem {
+                    countDistinct "product.id"
+                }
+            }
+            transaction {
+                eq("inventory", location.inventory)
+            }
+        }
+        log.info "Product count: " + productCount
+
+
+        def params = [:]
+        params.max = Math.min(params.max?.toInteger() ?: 1000, 1000)
+        def offset = 0
+        while(offset <= productCount) {
+            params.offset = params.offset ? params.offset.toInteger() : 0
+            def products = TransactionEntry.createCriteria().list(params) {
+                projections {
+                    inventoryItem {
+                        distinct "product.id"
+                    }
+                }
+                transaction {
+                    eq("inventory", location.inventory)
+                }
+            }
+            log.info "products " + products?.size()
+            offset += params.max
+        }
+    }
 
 
     def getQuantityMap(Location location) {
-        def quantityMap = [:]
-        def products = Product.list()
-        products.each { product ->
-            calculateQuantityOnHand(product, location)
+        def quantityMap = getMostRecentQuantityOnHand(location)
+        def productIds = getDistinctProducts(location)
+        productIds.eachWithIndex { productId, index ->
+            Product product = Product.load(productId)
+            def stockCountEntry = quantityMap[product.id]
+            def quantityOnHand = calculateQuantityOnHand(product, location, stockCountEntry?.quantityOnHand?:0, stockCountEntry?.stockCountDate)
+			quantityMap[product.productCode] = quantityOnHand
+
         }
         return quantityMap
     }
 
-    def calculateQuantityOnHand(InventoryItem inventoryItem, Location location) {
-        throw new UnsupportedOperationException("Method has not been implemented yet")
+    def calculateQuantityOnHand(Product product, Location location, Long quantityOnHand, Timestamp stockCountDate) {
+        def quantityDebit = getQuantityChangeSince(product, location, TransactionCode.DEBIT, stockCountDate)[0]?:0
+        def quantityCredit = 0//getQuantityChangeSince(product, location, TransactionCode.CREDIT, stockCountDate)[0]?:0
+        return quantityOnHand - quantityDebit + quantityCredit
     }
 
+    //resultTransformer CriteriaSpecification.ALIAS_TO_ENTITY_MAP
+
+    def getMostRecentQuantityOnHand(Location location) {
+        def quantityMap = [:]
+        def results = Transaction.executeQuery( """
+                                    SELECT te.inventoryItem.product.id, max(te.transaction.transactionDate), sum(te.quantity)
+                                    FROM TransactionEntry te
+                                    JOIN te.transaction
+                                    JOIN te.inventoryItem
+                                    WHERE te.transaction.inventory = :inventory
+                                    AND te.transaction.transactionType.transactionCode = :transactionCode
+                                    group by te.transaction.transactionDate, te.inventoryItem.product
+                                    order by te.transaction.transactionDate desc
+                                    """, [inventory:location.inventory, transactionCode:TransactionCode.PRODUCT_INVENTORY] );
 
 
-    def calculateQuantityOnHand(Product product, Location location) {
-		long startTime = System.currentTimeMillis()
-
-        def quantityOnHand = 0
-        def stockCountDate = null
-        def mostRecentStockCount = getMostRecentQuantityOnHand(product, location)
-        if (mostRecentStockCount) {
-            stockCountDate = mostRecentStockCount[0][0]
-            quantityOnHand = mostRecentStockCount[0][1]
+        results = results.collect { row ->
+            quantityMap[row[0]] = [stockCountDate: row[1], quantityOnHand: row[2] ]
         }
 
-        println "stockCountDate: " + stockCountDate
-        println "quantityOnHand: " + quantityOnHand
-
-        def quantityDebit = getQuantityChangeSince(product, location, TransactionCode.DEBIT, stockCountDate)[0]?:0
-        def quantityCredit = getQuantityChangeSince(product, location, TransactionCode.CREDIT, stockCountDate)[0]?:0
-
-        println "quantityDebit: " + quantityDebit
-        println "quantityCredit: " + quantityCredit
-
-		log.info ("Time to calculate quantity on hand: " + (System.currentTimeMillis() - startTime) + " ms")
-        return quantityOnHand - quantityDebit + quantityCredit
+        return quantityMap
     }
 
 
@@ -4243,6 +4345,9 @@ class InventoryService implements ApplicationContextAware {
         }
         return data
     }
+
+
+
 
 }
 

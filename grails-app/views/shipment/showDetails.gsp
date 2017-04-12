@@ -281,6 +281,11 @@
                             <li><a href="#transactions-tab"><warehouse:message code="Transactions.label" default="Transactions"/></a></li>
                         </ul>
                         <div id="details-tab">
+
+
+
+
+
                             <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
                             <div id="items" class="box">
                                 <h2>
@@ -292,7 +297,7 @@
                                         <th><warehouse:message code="shipping.container.label"/></th>
                                         <th><warehouse:message code="product.productCode.label"/></th>
                                         <th><warehouse:message code="product.label"/></th>
-                                        <th><warehouse:message code="product.uom.label"/></th>
+                                        <th class="left"><warehouse:message code="receiptItem.binLocation.label" default="Bin Location"/></th>
                                         <th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
                                         <th class="center"><warehouse:message code="default.expires.label"/></th>
                                         <th class="center"><warehouse:message code="shipping.shipped.label"/></th>
@@ -302,6 +307,7 @@
                                         <th class="center"><warehouse:message code="shipping.totalReceived.label"/></th>
                                         --%>
                                         </g:if>
+                                        <th><warehouse:message code="product.uom.label"/></th>
                                         <th><warehouse:message code="shipping.recipient.label"/></th>
                                         <th class="left"><warehouse:message code="default.comment.label"/></th>
                                     </tr>
@@ -328,6 +334,9 @@
                                                 </td>
                                                 <td>
                                                     ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                                                </td>
+                                                <td>
+                                                    ${shipmentItem?.receiptItem?.binLocation?.locationNumber}
                                                 </td>
                                                 <td class="lotNumber">
                                                     ${shipmentItem?.inventoryItem?.lotNumber}
@@ -361,6 +370,10 @@
                                                 </td>
                                                 --%>
                                                 </g:if>
+                                                <td>
+                                                    ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                                                </td>
+
                                                 <td class="left">
                                                     <g:if test="${shipmentItem?.recipient }">
                                                         <div title="${shipmentItem?.recipient?.email}">${shipmentItem?.recipient?.name}</div>
@@ -371,7 +384,6 @@
                                                         ${shipmentItem?.receiptItem?.comment}
                                                     </g:if>
                                                 </td>
-
                                             </tr>
                                             <g:set var="previousContainer" value="${shipmentItem.container }"/>
                                         </g:each>

@@ -22,7 +22,7 @@ class LocationService {
 	
 	
 	def getAllLocations() {
-		return Location.findAllByActive(true);
+		return Location.findAllByActiveAndParentLocationIsNull(true);
 	}
 
 	def getLoginLocations(Integer currentLocationId) {
@@ -45,7 +45,7 @@ class LocationService {
 
 
 	Map getLoginLocationsMap(Location currentLocation) {
-        log.info "TEST Get login locations map (currentLocation=${currentLocation?.name})"
+        log.info "Get login locations map (currentLocation=${currentLocation?.name})"
         def locationMap = [:]
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)

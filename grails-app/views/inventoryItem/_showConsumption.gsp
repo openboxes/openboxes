@@ -252,7 +252,7 @@ $(function () {
 });
 </script>
 <div id="consumption-config-dialog" title="${warehouse.message(code:'consumption.configuration.label', default:'Configuration')}">
-    <g:formRemote name="consumption" url="[controller: 'inventoryItem', action: 'showConsumption', params: [id: commandInstance?.productInstance?.id]]" update="consumption">
+    <g:formRemote name="consumption" url="[controller: 'inventoryItem', action: 'showConsumption', params: [id: commandInstance?.product?.id]]" update="consumption">
 
         <table>
             <tr class="prop">

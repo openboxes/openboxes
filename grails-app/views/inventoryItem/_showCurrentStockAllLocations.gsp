@@ -1,4 +1,4 @@
-<div class="box">
+<div class="box dialog">
     <h2><warehouse:message code="inventory.currentStockEverywhere.label" default="Current stock everywhere"/></h2>
     <table>
         <thead>
@@ -27,7 +27,7 @@
                         </td>
                         <td>
                             <g:formatNumber number="${entry.value?:0}" format="###,###.#" maxFractionDigits="1"/>
-                             ${commandInstance?.productInstance?.unitOfMeasure}
+                             ${commandInstance?.product?.unitOfMeasure}
                         </td>
                     </tr>
                 </g:each>
@@ -39,7 +39,7 @@
                     <th></th>
                     <th>
                         <g:formatNumber number="${totalQuantity?:0}" format="###,###.#" maxFractionDigits="1"/>
-                        ${commandInstance?.productInstance?.unitOfMeasure}
+                        ${commandInstance?.product?.unitOfMeasure}
                     </th>
                 </tr>
             </tfoot>

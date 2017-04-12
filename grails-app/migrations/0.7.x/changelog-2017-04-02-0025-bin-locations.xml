@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1491110822184-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location_type" columnName="location_type_code"/>
+            </not>
+        </preConditions>
+        <comment>Enum used to distinguish the different types of locations (storage, consumption, production).</comment>
+        <addColumn tableName="location_type">
+            <column name="location_type_code" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1491110822184-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location" columnName="location_number"/>
+            </not>
+        </preConditions>
+        <comment>Unique location short code to be used for display purposes (BOS for Boston, AB-12-40 for bin location).</comment>
+        <addColumn tableName="location">
+            <column name="location_number" type="VARCHAR(255)">
+                <constraints nullable="true" unique="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1491110822184-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="receipt_item" columnName="bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="receipt_item">
+            <column name="bin_location_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1491110822184-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment_item" columnName="bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment_item">
+            <column name="bin_location_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1491110822184-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="transaction_entry" columnName="bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="transaction_entry">
+            <column name="bin_location_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1491110822184-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="transaction_entry" columnName="product_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="transaction_entry">
+            <column name="product_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1491110822184-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKAE3064BA69DB749D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="receipt_item"
+                                 constraintName="FKAE3064BA69DB749D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1491110822184-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKDA3BB29869DB749D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="shipment_item"
+                                 constraintName="FKDA3BB29869DB749D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1491110822184-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKABC21FD169DB749D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="transaction_entry"
+                                 constraintName="FKABC21FD169DB749D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1491110822184-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKABC21FD1DED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="transaction_entry"
+                                 constraintName="FKABC21FD1DED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -111,7 +111,7 @@
 						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                         ${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
                     </g:link>
-                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button">
+                    <g:link controller='inventoryItem' action='showRecordInventory' params="['product.id':productInstance?.id]" class="button">
 						<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
 						${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
                     </g:link>

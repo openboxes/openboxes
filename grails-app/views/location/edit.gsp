@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.core.LocationTypeCode; org.pih.warehouse.core.Location" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -35,6 +35,8 @@
                             <li><a href="#location-details-tab"><warehouse:message code="location.label"/></a></li>
                             <li><a href="#location-status-tab"><warehouse:message code="location.status.label" default="Status"/></a></li>
                             <li><a href="#location-address-tab"><warehouse:message code="location.address.label" default="Address"/></a></li>
+                            <li><a href="#location-binLocation-tab"><warehouse:message code="location.binLocations.label" default="Bin Locations"/></a></li>
+
                         </ul>
                         <div id="location-details-tab">
                             <div class="box">
@@ -54,14 +56,20 @@
                                         </tr>
                                         <tr class="prop">
                                             <td valign="top" class="name">
+                                                <label for="locationNumber"><warehouse:message code="location.locationNumber.label" default="Short Code"/></label>
+                                            </td>
+                                            <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'locationNumber', 'errors')}">
+                                                <g:textField name="locationNumber" value="${locationInstance?.locationNumber}" class="text" size="80"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td valign="top" class="name">
                                                 <label for="name"><warehouse:message code="location.locationType.label" /></label>
 
                                             </td>
                                             <td valign="top" class="value">
                                                 <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" class="chzn-select-deselect"
                                                     optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.locationType?.id}" noSelection="['null':'']" />
-
-
                                             </td>
                                         </tr>
                                         <tr class="prop">
@@ -305,7 +313,7 @@
 
                                         </td>
                                         <td>
-                                            <div class="buttons left">
+                                            <div class="buttons center">
                                                 <button type="submit" class="button icon approve">
                                                     <warehouse:message code="default.button.save.label"/>
                                                 </button>
@@ -328,47 +336,163 @@
                
             </g:form>
         </div>
+            <div id="location-binLocation-tab">
+                <div class="box">
+                    <h2><warehouse:message code="binLocations.label" default="Bin Locations" /></h2>
+                    <div class="list">
+                        <table>
+                            <tr>
+                                <th></th>
+                                <th><g:message code="binLocation.label" default="Bin Location"/></th>
+                                <th><g:message code="binLocation.locationNumber.label" default="Locator"/></th>
+                            </tr>
+
+                            <g:each in="${locationInstance?.locations}" var="binLocation" status="status">
+                                <tr class="prop ${status%2?'even':'odd'}">
+                                    <td>
+                                        <div class="action-menu">
+                                            <button class="action-btn">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
+                                                     style="vertical-align: middle" />
+                                            </button>
+                                            <div class="actions">
+                                                <div class="action-menu-item">
+                                                    <g:link class="edit" action="edit" id="${binLocation?.id}">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
+                                                        ${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'location.label')])}
+                                                    </g:link>
+                                                </div>
+                                                <div class="action-menu-item">
+                                                    <g:link class="delete" action="delete" id="${binLocation?.id}"
+                                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
+                                                        ${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'location.label')])}
+                                                    </g:link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        ${binLocation.name}
+                                    </td>
+                                    <td>
+                                        ${binLocation.locationNumber}
+                                    </td>
+                                </tr>
+                            </g:each>
+                            <g:unless test="${locationInstance.locations}">
+                                <tr>
+                                    <td>
+                                        <div class="emtpty center">
+                                            <g:message code="location.noBinLocations.label" default="No bin locations"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </g:unless>
+                        </table>
+                    </div>
+                </div>
+                <div class="box">
+                    <h2><warehouse:message code="default.add.label" args="[entityName]" /></h2>
+                    <div class="dialog">
+                        <g:form controller="location" action="update">
+                            <g:hiddenField name="parentLocation.id" value="${locationInstance?.id}" />
+                            <g:hiddenField name="version" value="${locationInstance?.version}" />
+
+
+                            <table>
+                                <tbody>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="name"><warehouse:message code="location.locationType.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.findByLocationTypeCode(org.pih.warehouse.core.LocationTypeCode.BIN_LOCATION)}" class="chzn-select-deselect"
+                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${binLocation?.locationType?.id}" noSelection="['null':'']" />
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="name"><warehouse:message code="default.name.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
+                                        <g:textField name="name" value="${binLocation?.name}" class="text" size="80"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="locationNumber"><warehouse:message code="location.locationNumber.label" default="Short Code"/></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'locationNumber', 'errors')}">
+                                        <g:textField name="locationNumber" value="${binLocation?.locationNumber}" class="text" size="80"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="name"><warehouse:message code="default.description.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'description', 'errors')}">
+                                        <g:textField name="description" value="${binLocation?.description}" class="text" size="80"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <button type="submit" class="button icon approve">
+                                            <warehouse:message code="default.button.save.label"/>
+                                        </button>
+
+                                    </td>
+                                </tr>
+
+
+                                </tbody>
+                            </table>
+
+                        </g:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 	    <script type="text/javascript">
+
+            function selectCombo(comboBoxElem, value) {
+                alert(comboBoxElem + " " + value)
+                if (comboBoxElem != null) {
+                    if (comboBoxElem.options) {
+                        for (var i = 0; i < comboBoxElem.options.length; i++) {
+                            if (comboBoxElem.options[i].value == value &&
+                                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
+                                comboBoxElem.options[i].selected = true;
+                                break
+                            }
+                        }
+                    }
+                }
+            }
 
             $(document).ready(function() {
 
-                $(".tabs").tabs({
-                    cookie : {
-                        expires : 1
-                    }
+                $(".tabs").tabs({cookie:{expires:1}});
+
+                /*
+                $('#bgColor').colorpicker({
+                    size: 20,
+                    label: '',
+                    hide: true
                 });
+
+                $('#fgColor').colorpicker({
+                    size: 20,
+                    label: '',
+                    hide: true
+                });
+                */
             });
 
-	        function selectCombo(comboBoxElem, value) {
-		        alert(comboBoxElem + " " + value)
-				if (comboBoxElem != null) {
-					if (comboBoxElem.options) { 
-						for (var i = 0; i < comboBoxElem.options.length; i++) {
-				        	if (comboBoxElem.options[i].value == value &&
-				                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
-				                comboBoxElem.options[i].selected = true;
-				                break
-				        	}
-						}
-					}
-				}
-			}						
-	    	/*
-	        $(document).ready(function() {
-	            $('#bgColor').colorpicker({
-	                size: 20,
-	                label: '',
-	                hide: true
-	            });
-
-	            $('#fgColor').colorpicker({
-	                size: 20,
-	                label: '',
-	                hide: true
-	            });
-			
-	        });
-	        */
-	    </script>        
+        </script>
     </body>
 </html>

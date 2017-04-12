@@ -1,7 +1,7 @@
 <div>	
 	<div style="text-align: center;">
 		<g:form method="GET" action="showStockCard">
-			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+			<g:hiddenField name="product.id" value="${commandInstance?.product?.id }"/>
 			<div>
 				<table>
 					<thead>

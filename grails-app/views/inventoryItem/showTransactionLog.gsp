@@ -1,7 +1,7 @@
 <g:applyLayout name="stockCard">
 
 	<content tag="title">
-		<format:product product="${commandInstance?.productInstance}"/>
+		<format:product product="${commandInstance?.product}"/>
 	</content>
 	
 	<content tag="heading">	

@@ -19,10 +19,10 @@ class StockCardCommand {
 	InventoryItem inventoryItem;
 	
 	// Entire page
-	Product productInstance;
-	Location warehouseInstance;
-	Inventory inventoryInstance;
-	InventoryLevel inventoryLevelInstance;
+	Product product;
+	Location warehouse;
+	Inventory inventory;
+	InventoryLevel inventoryLevel;
 	Integer totalQuantity
 
 	// Current stock section
@@ -33,6 +33,8 @@ class StockCardCommand {
 	Map<Transaction, List<TransactionEntry>> transactionEntriesByTransactionMap;
 	Map<InventoryItem, List<TransactionEntry>> transactionEntriesByInventoryItemMap
 	Map<InventoryItem, Integer> quantityByInventoryItemMap
+	List quantityByBinLocation
+
 	Map requisitionMap = [:]
 	Map orderMap = [:]
 	Map shipmentMap = [:]

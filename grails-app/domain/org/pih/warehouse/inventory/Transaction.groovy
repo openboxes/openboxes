@@ -52,7 +52,8 @@ class Transaction implements Comparable, Serializable {
 	
 	String id
     Location source	    		
-    Location destination					    		 
+    Location destination
+
 	Date transactionDate	    		// Date entered into the warehouse
 	Shipment outgoingShipment			// Outgoing shipment associated with a transfer out transasction
 	Shipment incomingShipment			// Incoming shipment associated with a transfer in transasction
@@ -108,10 +109,10 @@ class Transaction implements Comparable, Serializable {
 		dateConfirmed(nullable:true)
 		comment(nullable:true)
 		transactionDate(nullable:false,
-			validator: { value -> value < new Date() })  // transaction date cannot be in the future
+			validator: { value -> value <= new Date() })  // transaction date cannot be in the future
 		
-		source(nullable:true, 
-			validator: { value, obj-> 
+		source(nullable:true,
+			validator: { value, obj->
 							if (value && obj.destination) { return false }   // transaction cannot have both a source and a destination
 							if (value && obj.inventory?.warehouse == value) { return false }   // source warehouse can't be the same as transaction warehouse
 							if (obj.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID && !value) { return false } // transfer in transaction must have source

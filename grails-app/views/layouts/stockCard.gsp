@@ -31,20 +31,20 @@
 				<g:renderErrors bean="${flash.errors}" as="list" />
 			</div>
 		</g:hasErrors>
-		
-		<g:render template="../product/summary" model="[productInstance:commandInstance?.productInstance,
-			inventoryInstance:commandInstance?.inventoryInstance,
-			inventoryLevelInstance: commandInstance?.inventoryLevelInstance,
+		<g:render template="../product/summary" model="[productInstance:commandInstance?.product,
+			inventoryInstance:commandInstance?.inventory,
+			inventoryLevelInstance: commandInstance?.inventoryLevel,
 			totalQuantity: commandInstance?.totalQuantity]"/>
-
-		<div class="dialog">		
+		<div class="dialog">
             <div class="yui-gf">
                 <div class="yui-u first">
+
                     <g:render template="productDetails"
-                        model="[productInstance:commandInstance?.productInstance,
-                            inventoryInstance:commandInstance?.inventoryInstance,
-                            inventoryLevelInstance: commandInstance?.inventoryLevelInstance,
+                        model="[productInstance:commandInstance?.product,
+                            inventoryInstance:commandInstance?.inventory,
+                            inventoryLevelInstance: commandInstance?.inventoryLevel,
                             totalQuantity: commandInstance?.totalQuantity]"/>
+
                 </div>
                 <div class="yui-u">
                     <g:pageProperty name="page.content"/>

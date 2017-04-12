@@ -56,6 +56,15 @@ class JsonController {
         }
     }
 
+    def calculateQuantityOnHand = {
+        def location = Location.load(params.locationId)
+        def products = Product.list(params)
+        products.each { product ->
+            inventoryService.calculateQuantityOnHand(product, location)
+        }
+    }
+
+
     def addToRequisitionItems = {
 
         def requisition = Requisition.get(params.requisitionId)
@@ -1199,12 +1208,25 @@ class JsonController {
         render ([mostRecentQuantityOnHand:object] as JSON)
     }
 
+
+    def mostRecentQuantityOnHandByLocation = {
+        def location = Location.get(session?.warehouse?.id)
+        def results = inventoryService.getMostRecentQuantityOnHand(location)
+        render ([results:results] as JSON)
+    }
+
     def quantityMap = {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityMap(location)
         render ([quantityMap:quantityMap] as JSON)
     }
 
+
+    def distinctProducts = {
+        def location = Location.get(session?.warehouse?.id)
+        def products = inventoryService.getDistinctProducts(location)
+        render ([products:null] as JSON)
+    }
 
     def scanBarcode = {
         log.info "Scan barcode: " + params
