@@ -1,11 +1,11 @@
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#btnEditItem-${itemInstance?.id}").click(function() { $("#dlgEditItem-${itemInstance?.id}").dialog('open'); });									
-		$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });			
-		$("#btnEditClose-${itemInstance?.id}").click( function() { $("#dlgEditItem-${itemInstance?.id}").dialog('close'); });	
+		$("#btnEditItem-${dialogId}").click(function() { $("#dlgEditItem-${dialogId}").dialog('open'); });
+		$("#dlgEditItem-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
+		$("#btnEditClose-${dialogId}").click( function() { $("#dlgEditItem-${dialogId}").dialog('close'); });
 	});
 </script>	   
-<div id="dlgEditItem-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.editItem.label')}" style="padding: 10px; display: none;" >	
+<div id="dlgEditItem-${dialogId}" title="${warehouse.message(code: 'inventory.editItem.label')}" style="padding: 10px; display: none;" >
 	
 	<div class="dialog">
 
@@ -49,7 +49,7 @@
 								<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="default.button.save.label"/>
 							</button>
 							&nbsp;
-							<a href="javascript:void(-1);" id="btnEditClose-${itemInstance?.id }">
+							<a href="javascript:void(-1);" id="btnEditClose-${dialogId }">
 								<warehouse:message code="default.button.cancel.label"/>
 							</a>
 						</td>

@@ -1,11 +1,9 @@
-<div id="dlgReturnStock-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.returnStock.label', default: 'Return stock')}" style="display: none;" >
+<div id="dlgReturnStock-${dialogId}" title="${warehouse.message(code: 'inventory.returnStock.label', default: 'Return stock')}" style="display: none;" >
 	<div class="dialog">
-
 		<table>
 			<tr>
 				<td>
 					<g:form controller="inventoryItem" action="transferStock">
-
                         <g:hiddenField name="id" value="${itemInstance?.id}"/>
 						<g:hiddenField name="product.id" value="${itemInstance?.product?.id}"/>
 						<g:hiddenField name="binLocation.id" value="${binLocation?.id}"/>
@@ -65,7 +63,7 @@
 											<warehouse:message code="inventory.returnStock.label" default="Return stock"/>
 										</button>
 										&nbsp;
-										<a href="javascript:void(-1);" id="btnReturnClose-${itemInstance?.id }" class="middle">
+										<a href="javascript:void(-1);" id="btnReturnClose-${dialogId }" class="middle">
 											<warehouse:message code="default.button.cancel.label"/>
 										</a>
 									</td>
@@ -80,9 +78,9 @@
 </div>		
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#dlgReturnStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 800 });
-		$("#btnReturnStock-${itemInstance?.id}").click(function() { $("#dlgReturnStock-${itemInstance?.id}").dialog('open'); });
-		$("#btnReturnClose-${itemInstance?.id}").click(function() { $("#dlgReturnStock-${itemInstance?.id}").dialog('close'); });
+		$("#dlgReturnStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
+		$("#btnReturnStock-${dialogId}").click(function() { $("#dlgReturnStock-${dialogId}").dialog('open'); });
+		$("#btnReturnClose-${dialogId}").click(function() { $("#dlgReturnStock-${dialogId}").dialog('close'); });
 	});
 </script>	
 

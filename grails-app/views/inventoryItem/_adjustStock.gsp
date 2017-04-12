@@ -1,7 +1,5 @@
-<div id="dlgAdjustStock-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.adjustStock.label')}" style="display: none;">
-
+<div id="dlgAdjustStock-${dialogId}" title="${warehouse.message(code: 'inventory.adjustStock.label')}" style="display: none;">
     <div class="dialog">
-
         <table>
             <tr>
                 <td>
@@ -80,7 +78,7 @@
                                         <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.adjustStock.label"/>
                                     </button>
                                     &nbsp;
-                                    <a href="javascript:void(-1);" id="btnAdjustClose-${itemInstance?.id }" class="middle">
+                                    <a href="javascript:void(-1);" id="btnAdjustClose-${dialogId }" class="middle">
                                         <warehouse:message code="default.button.cancel.label"/>
                                     </a>
                                 </td>
@@ -96,9 +94,9 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 600 });
-        $("#btnAdjustStock-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('open'); });
-        $("#btnAdjustClose-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('close'); });
+        $("#dlgAdjustStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 600 });
+        $("#btnAdjustStock-${dialogId}").click(function() { $("#dlgAdjustStock-${dialogId}").dialog('open'); });
+        $("#btnAdjustClose-${dialogId}").click(function() { $("#dlgAdjustStock-${dialogId}").dialog('close'); });
         $(".binLocation").livequery(function() {
             $(this).chosen({ allow_single_deselect:true, width: '100%' });
         });

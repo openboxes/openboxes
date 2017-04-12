@@ -1,7 +1,5 @@
-<div id="dlgTransferStock-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.transferStock.label')}" style="display: none;" >
-
+<div id="dlgTransferStock-${dialogId}" title="${warehouse.message(code: 'inventory.transferStock.label')}" style="display: none;" >
     <div class="dialog">
-
         <table>
             <tr>
                 <td>
@@ -65,7 +63,7 @@
                                         <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.transferStock.label"/>
                                     </button>
                                     &nbsp;
-                                    <a href="javascript:void(-1);" id="btnTransferClose-${itemInstance?.id }" class="middle">
+                                    <a href="javascript:void(-1);" id="btnTransferClose-${dialogId }" class="middle">
                                         <warehouse:message code="default.button.cancel.label"/>
                                     </a>
                                 </td>
@@ -81,9 +79,9 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#dlgTransferStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: 800 });
-        $("#btnTransferStock-${itemInstance?.id}").click(function() { $("#dlgTransferStock-${itemInstance?.id}").dialog('open'); });
-        $("#btnTransferClose-${itemInstance?.id}").click(function() { $("#dlgTransferStock-${itemInstance?.id}").dialog('close'); });
+        $("#dlgTransferStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
+        $("#btnTransferStock-${dialogId}").click(function() { $("#dlgTransferStock-${dialogId}").dialog('open'); });
+        $("#btnTransferClose-${dialogId}").click(function() { $("#dlgTransferStock-${dialogId}").dialog('close'); });
     });
 </script>
 
