@@ -1,4 +1,4 @@
-<div>
+<div class="summary">
 	<table style="width:auto;">
 		<tr>
 			<td class="middle" width="1%">
