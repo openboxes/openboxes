@@ -27,7 +27,9 @@ size and perm generation memory allocated to Tomcat to something minimal (see st
 * Ubuntu 14.04 LTS (your cloud provider should allow you to choose this as the base image for your server)
 * Tomcat 7 (`sudo apt-get install tomcat7`)
 * MySQL 5.5+ (`sudo apt-get install mysql-server`)
-* JRE 7 (`sudo apt-get install openjdk-7-jre`)
+* Java 7 (`sudo apt-get install openjdk-7-jre`)
+
+**IMPORTANT:** For the time being, you **MUST** use Java 7! The version of Grails that we're using does not support Java 8. We are working on upgrading to the latest version of Grails, but we're still several months away from completing that migration. 
 
 #### Optional dependencies
 * SMTP Server (runs over `localhost:25` by default)
