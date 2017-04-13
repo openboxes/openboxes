@@ -18,8 +18,6 @@
 	            </div>
             </g:hasErrors>
 
-			<g:render template="summary"/>
-
 			<div class="button-bar">
 				<g:link class="button" action="list"><warehouse:message code="default.list.label" args="['${domainClass.propertyName}']"/></g:link>
 				<g:link class="button" action="create"><warehouse:message code="default.add.label" args="['${domainClass.propertyName}']"/></g:link>

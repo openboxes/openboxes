@@ -46,7 +46,7 @@
                 else {
                     def sb = new StringBuffer("<g:")
                     cp.password ? sb << "passwordField " : sb << "textField "
-                    sb << "name=\"${property.name}\" "
+                    sb << "class=\"text\" size=\"80\" name=\"${property.name}\" "
                     if (cp.maxSize) sb << "maxlength=\"${cp.maxSize}\" "
                     if (!cp.editable) sb << "readonly=\"readonly\" "
                     sb << "value=\"\${${domainInstance}?.${property.name}}\" />"
