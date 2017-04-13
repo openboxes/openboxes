@@ -333,9 +333,6 @@
                                                     </g:link>
                                                 </td>
                                                 <td>
-                                                    ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-                                                </td>
-                                                <td>
                                                     ${shipmentItem?.receiptItem?.binLocation?.locationNumber}
                                                 </td>
                                                 <td class="lotNumber">

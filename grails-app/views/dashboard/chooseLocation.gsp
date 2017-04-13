@@ -76,13 +76,16 @@
                                     <tbody>
                                         <g:set var="count" value="${0 }"/>
                                         <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                            <tr>
+                                            <tr class="prop">
+                                                <td class="top left" width="25%">
+                                                    <h3 class="left">${entry.key?:warehouse.message(code:'locationGroup.empty.label') }</h3>
+                                                </td>
                                                 <td class="top left" >
-                                                    <h3>${entry.key?:warehouse.message(code:'locationGroup.empty.label') }</h3>
+
                                                     <g:set var="locationGroup" value="${entry.key }"/>
                                                     <g:each var="warehouse" in="${entry.value.sort() }" status="status">
                                                         <div class="left" style="margin: 2px;">
-                                                            <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
+                                                            <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button">
                                                                 <format:metadata obj="${warehouse}"/>
                                                             </a>
                                                         </div>

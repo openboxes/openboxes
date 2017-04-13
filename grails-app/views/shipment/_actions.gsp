@@ -211,6 +211,7 @@
                              alt="Rollback Last Event" class="middle"/>&nbsp;
                         <warehouse:message code="shipping.rollbackLastEvent.label"/></g:link>
                 </div>
+                <hr/>
                 <div class="action-menu-item">
                     <g:link controller="shipment" action="renderShippedEmail" id="${shipmentInstance?.id}">
                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;

@@ -43,6 +43,12 @@
                         <g:if test="${entry?.inventoryItem?.expirationDate}">
                             <div title="${prettytime.display(date: entry?.inventoryItem?.expirationDate)}">
                                 <format:date obj="${entry?.inventoryItem?.expirationDate}"  format="MMM dd, yyyy"/>
+                                <g:if test="${new Date().after(entry?.inventoryItem?.expirationDate)}">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" class="middle" title="${g.message(code:'default.expired.label')}"/>
+                                </g:if>
+                                <g:elseif test="${(new Date()+90).after(entry?.inventoryItem?.expirationDate)}">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" class="middle" title="${g.message(code:'default.expiring.label')}"/>
+                                </g:elseif>
                             </div>
                         </g:if>
                         <g:else>
