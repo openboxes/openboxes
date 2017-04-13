@@ -14,6 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
+import org.hibernate.annotations.Cache
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -1392,6 +1393,7 @@ class JsonController {
     /**
      * Dashboard > Fast movers
      */
+    @Cacheable("fastMoversCache")
     def getFastMovers = {
         log.info "getRequisitionItems: " + params
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
@@ -1411,6 +1413,13 @@ class JsonController {
     def getOrderItem = {
         def orderItem = OrderItem.get(params.id)
         render ([id:orderItem.id, product:orderItem.product, order:orderItem.order, quantity:orderItem.quantity, unitPrice:orderItem.unitPrice] as JSON)
+    }
+
+
+    def pendingShipments = {
+        def location = Location.get(session?.warehouse?.id)
+        def shipments = shipmentService.getPendingShipments(location)
+        render ([count: shipments.size(), shipments:shipments] as JSON)
     }
 
 
