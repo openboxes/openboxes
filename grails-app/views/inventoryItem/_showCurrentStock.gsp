@@ -22,7 +22,7 @@
         </thead>
         <tbody>
 
-            <g:each var="entry" in="${commandInstance.quantityByBinLocation}" status="status">
+            <g:each var="entry" in="${commandInstance.quantityByBinLocation.sort { it?.inventoryItem?.expirationDate }}" status="status">
                 <g:set var="styleClass" value="${(status%2==0)?'even':'odd' }"/>
                 <tr class="prop ${styleClass}">
                     <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
