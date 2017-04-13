@@ -253,7 +253,7 @@ class InventoryItemController {
 	 */
 	def showLotNumbers = { StockCardCommand cmd ->
 		// add the current warehouse to the command object
-		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+		cmd.warehouse = Location.get(session?.warehouse?.id)
 
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -269,7 +269,7 @@ class InventoryItemController {
 	 */
 	def showTransactionLog = { StockCardCommand cmd ->
 		// add the current warehouse to the command object
-		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+		cmd.warehouse = Location.get(session?.warehouse?.id)
 
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -283,7 +283,7 @@ class InventoryItemController {
 	*/
    def showGraph = { StockCardCommand cmd ->
 	   // add the current warehouse to the command object
-	   cmd.warehouseInstance = Location.get(session?.warehouse?.id)
+	   cmd.warehouse = Location.get(session?.warehouse?.id)
 
 	   // now populate the rest of the commmand object
 	   def commandInstance = inventoryService.getStockCardCommand(cmd, params)
