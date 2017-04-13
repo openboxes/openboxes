@@ -34,56 +34,52 @@ class ShipmentService {
     boolean transactional = true
 
     MailService mailService;
-	def sessionFactory;
-	def productService
-	def inventoryService;
-	def identifierService
-	def documentService
+    def sessionFactory;
+    def productService
+    def inventoryService;
+    def identifierService
+    def documentService
 
-	
-	/**
-	 * Returns the shipment referenced by the passed id parameter;
-	 * if id is null, returns a new Shipment object
-	 * 
-	 * @param shipmentId
-	 * @return
-	 */
-	Shipment getShipmentInstance(String shipmentId) {
-		return getShipmentInstance(shipmentId, null)
-	}
-	
-	/**
-	 * Returns the shipment referenced by the passed id parameter;
-	 * if id is null, returns a new Shipment object of the specified
-	 * shipment type
-	 * 
-	 * @param shipmentId
-	 * @param shipmentType
-	 * @return
-	 */
-	Shipment getShipmentInstance(String shipmentId, String shipmentType) {
-		if (shipmentId) {
-			Shipment shipment = Shipment.get(shipmentId)
-			if (!shipment) {
-				throw new Exception("No shipment found with shipmentId " + shipmentId)
-			}
-			else {
-				return shipment
-			}
-		}
-		else {
-			Shipment shipment = new Shipment()
-			
-			if (shipmentType) {
-				ShipmentType shipmentTypeObject = ShipmentType.findByNameIlike(shipmentType)
-				if (!shipmentTypeObject) {
-					throw new Exception(shipmentType + " is not a valid shipment type")
-				}
-				else {
-					shipment.shipmentType = shipmentTypeObject
-				}
-			}		
-			return shipment
+    /**
+     * Returns the shipment referenced by the passed id parameter;
+     * if id is null, returns a new Shipment object
+     *
+     * @param shipmentId
+     * @return
+     */
+    Shipment getShipmentInstance(String shipmentId) {
+        return getShipmentInstance(shipmentId, null)
+    }
+
+    /**
+     * Returns the shipment referenced by the passed id parameter;
+     * if id is null, returns a new Shipment object of the specified
+     * shipment type
+     *
+     * @param shipmentId
+     * @param shipmentType
+     * @return
+     */
+    Shipment getShipmentInstance(String shipmentId, String shipmentType) {
+        if (shipmentId) {
+            Shipment shipment = Shipment.get(shipmentId)
+            if (!shipment) {
+                throw new Exception("No shipment found with shipmentId " + shipmentId)
+            } else {
+                return shipment
+            }
+        } else {
+            Shipment shipment = new Shipment()
+
+            if (shipmentType) {
+                ShipmentType shipmentTypeObject = ShipmentType.findByNameIlike(shipmentType)
+                if (!shipmentTypeObject) {
+                    throw new Exception(shipmentType + " is not a valid shipment type")
+                } else {
+                    shipment.shipmentType = shipmentTypeObject
+                }
+            }
+            return shipment
 		}
 	}
 	
@@ -92,7 +88,7 @@ class ShipmentService {
 	 * @param sort
 	 * @param order
 	 * @return	all shipments sorted by the given sort column and ordering
-	 */
+     */
 	List<Shipment> getAllShipments(String sort, String order) {
 		return Shipment.list(['sort':sort, 'order':order])
 	}
@@ -141,7 +137,7 @@ class ShipmentService {
 				eq("origin", location)
 				or {
 					//between("expectedShippingDate",null,null)
-					between("expectedShippingDate",now-daysBefore,now+daysAfter)
+					between("expectedShippingDate", now -daysBefore, now +daysAfter)
 					isNull("expectedShippingDate")
 				}
 			}
@@ -276,52 +272,71 @@ class ShipmentService {
 	List<Shipment> getShipmentsByName(String name) {
 		return Shipment.withCriteria { 
 			ilike("name", "%" +name + "%")
-		}
-	}
-	
-	/**
-	 * 
-	 * @param name
-	 * @param location
-	 * @return
-	 */
-	List<Shipment> getShipmentsByNameAndDestination(String name, Location location) {
-		return Shipment.withCriteria {
-			and { 
-				ilike("name", "%" +name + "%")
-				eq("destination", location)
-			}
-		}
-	}
+        }
+    }
 
-	
-	/**
-	 * 
-	 * @param name
-	 * @param location
-	 * @return
-	 */
-	List<Shipment> getShipmentsByNameAndOrigin(String name, Location location) {
-		return Shipment.withCriteria {
-			and {
-				ilike("name", "%" +name + "%")
-				eq("origin", location)
-			}
-		}
-	}
+    /**
+     *
+     * @param name
+     * @param location
+     * @return
+     */
+    List<Shipment> getShipmentsByNameAndDestination(String name, Location location) {
+        return Shipment.withCriteria {
+            and {
+                ilike("name", "%" + name + "%")
+                eq("destination", location)
+            }
+        }
+    }
 
-	
+    /**
+     *
+     * @param name
+     * @param location
+     * @return
+     */
+    List<Shipment> getShipmentsByNameAndOrigin(String name, Location location) {
+        return Shipment.withCriteria {
+            and {
+                ilike("name", "%" + name + "%")
+                eq("origin", location)
+            }
+        }
+    }
+
+
+    List<Shipment> getPendingShipments(Location origin) {
+        return getPendingShipments(origin, null)
+    }
+
 	/**
 	 * 
 	 * @param location
 	 * @return
 	 */
-	List<Shipment> getPendingShipments(Location location) { 
+	List<Shipment> getPendingShipments(Location origin, Location destination) {
 		def shipments = Shipment.withCriteria {
-			eq("origin", location)
+			if (origin) {
+                eq("origin", origin)
+            }
+            if (destination) {
+                eq("destination", destination)
+            }
+            or {
+                isEmpty('events')
+                events {
+                    eventType {
+                        not {
+                            // TODO This should really be a list managed by the EventCode enum e.g. EventCode.listPending()
+                            'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
+                        }
+                    }
+                }
+            }
 		}
 		
-		return shipments.findAll { !it.hasShipped() }
+		return shipments
 	}
 	
 	/**
@@ -351,8 +366,8 @@ class ShipmentService {
 	 * @param location
 	 * @return
 	 */
-	List<Shipment> getIncomingShipments(Location location) {
-		return Shipment.withCriteria { eq("destination", location) }.findAll { it.isPending() }		
+	List<Shipment> getIncomingShipments(Location destination) {
+        return getPendingShipments(null, destination)
 	}
 	
 	
@@ -362,8 +377,8 @@ class ShipmentService {
 	 * @param location
 	 * @return
 	 */
-	List<Shipment> getOutgoingShipments(Location location) {
-		return Shipment.withCriteria { eq("origin", location) }.findAll { it.isPending() } 		
+	List<Shipment> getOutgoingShipments(Location origin) {
+        getPendingShipments(origin, null)
 	}
 
 	
