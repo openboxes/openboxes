@@ -27,75 +27,72 @@
 			<g:form action="receiveShipment" method="POST">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 
+                <div class="box">
+                    <h2>
+                        <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"/>
+                        <label><warehouse:message code="receiving.label"/></label>
+                    </h2>
+
+                    <table>
+                        <tbody>
+                        <tr class="prop">
+                            <td class="name middle">
+                                <label><warehouse:message code="shipping.origin.label" /></label>
+                            </td>
+                            <td class="value">
+                                ${shipmentInstance?.origin?.name }
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name middle">
+                                <label><warehouse:message code="shipping.destination.label" /></label>
+                            </td>
+                            <td class="value">
+                                ${shipmentInstance?.destination?.name }
+                            </td>
+                        </tr>
+
+                        <tr class="prop">
+                            <td valign="middle" class="name middle">
+                                <label><warehouse:message code="shipping.deliveredOn.label"/></label>
+                            </td>
+                            <td valign="top"
+                                class="value ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
+                                nowrap="nowrap">
+                                <%--
+                                <g:jqueryDatePicker name="actualDeliveryDate"
+                                                    value="${receiptInstance?.actualDeliveryDate}" format="MM/dd/yyyy" />
+                                --%>
+                                <g:datePicker name="actualDeliveryDate" value="${receiptInstance?.actualDeliveryDate}" precision="minute" noSelection="['':'']"/>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name middle">
+                                <label><warehouse:message code="shipping.recipient.label" /></label>
+                            </td>
+                            <td class="value">
+                                <g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                               width="300"
+                                               styleClass="text"
+                                               valueId="${receiptInstance?.recipient?.id}"
+                                               valueName="${receiptInstance?.recipient?.name}"/>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td valign="middle" class="name top">
+                                <label><warehouse:message code="default.comment.label" /></label>
+                            </td>
+                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
+                                <g:textArea name="comment" cols="80" rows="4"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="tabs tabs-ui">
                     <ul>
-                        <li><a href="#tabs-header"><warehouse:message code="receipt.label" default="Receipt Header"/></a></li>
                         <li><a href="#tabs-details"><warehouse:message code="receipt.receiptItems.label" default="Receipt Items"/></a></li>
                     </ul>
-                    <div id="tabs-header" class="ui-tabs-hide">
-                        <div class="box">
-                            <h2>
-                                <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"/>
-                                <label><warehouse:message code="receiving.label"/></label>
-                            </h2>
-
-                            <table>
-                                <tbody>
-                                <tr class="prop">
-                                    <td class="name middle">
-                                        <label><warehouse:message code="shipping.origin.label" /></label>
-                                    </td>
-                                    <td class="value">
-                                        ${shipmentInstance?.origin?.name }
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td class="name middle">
-                                        <label><warehouse:message code="shipping.destination.label" /></label>
-                                    </td>
-                                    <td class="value">
-                                        ${shipmentInstance?.destination?.name }
-                                    </td>
-                                </tr>
-
-                                <tr class="prop">
-                                    <td valign="middle" class="name middle">
-                                        <label><warehouse:message code="shipping.deliveredOn.label"/></label>
-                                    </td>
-                                    <td valign="top"
-                                        class="value ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
-                                        nowrap="nowrap">
-                                        <%--
-                                        <g:jqueryDatePicker name="actualDeliveryDate"
-                                                            value="${receiptInstance?.actualDeliveryDate}" format="MM/dd/yyyy" />
-                                        --%>
-                                        <g:datePicker name="actualDeliveryDate" value="${receiptInstance?.actualDeliveryDate}" precision="minute" noSelection="['':'']"/>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td class="name middle">
-                                        <label><warehouse:message code="shipping.recipient.label" /></label>
-                                    </td>
-                                    <td class="value">
-                                        <g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName"
-                                                       width="300"
-                                                       styleClass="text"
-                                                       valueId="${receiptInstance?.recipient?.id}"
-                                                       valueName="${receiptInstance?.recipient?.name}"/>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="middle" class="name top">
-                                        <label><warehouse:message code="default.comment.label" /></label>
-                                    </td>
-                                    <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
-                                        <g:textArea name="comment" cols="80" rows="10"/>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                     <div id="tabs-details" class="ui-tabs-hide">
                         <div class="box ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}">
                             <h2>
