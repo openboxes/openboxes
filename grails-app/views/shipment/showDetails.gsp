@@ -333,7 +333,15 @@
                                                     </g:link>
                                                 </td>
                                                 <td>
-                                                    ${shipmentItem?.receiptItem?.binLocation?.locationNumber}
+                                                    <g:if test="${shipmentItem?.binLocation?.locationNumber}">
+                                                        ${shipmentItem?.binLocation?.locationNumber}
+                                                        <span class="fade">(<g:message code="default.picking.label" default="Picking"/>)</span>
+                                                    </g:if>
+                                                    <g:if test="${shipmentItem?.receiptItem?.binLocation?.locationNumber}">
+                                                        ${shipmentItem?.receiptItem?.binLocation?.locationNumber}
+                                                        <span class="fade">(<g:message code="default.putaway.label" default="Putaway"/>)</span>
+                                                    </g:if>
+
                                                 </td>
                                                 <td class="lotNumber">
                                                     ${shipmentItem?.inventoryItem?.lotNumber}
