@@ -1,7 +1,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#dlgAddToShipment-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
+		$("#dlgAddToShipment-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800, height: 500 });
 		$("#btnAddToShipment-${dialogId}").click(function() { $("#dlgAddToShipment-${dialogId}").dialog('open'); });
 		$("#btnAddClose-${dialogId}").click(function() { $("#dlgAddToShipment-${dialogId}").dialog('close'); });
 	});
@@ -17,6 +17,7 @@
 					<td>
 						<g:form controller="inventoryItem" action="addToShipment">
 							<g:hiddenField name="product.id" value="${commandInstance?.product?.id}"/>
+                            <g:hiddenField name="binLocation.id" value="${binLocation?.id}"/>
 							<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
 							<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
 							<table>
@@ -24,25 +25,50 @@
 									<tr class="prop">
 										<td valign="top" class="name"><label><warehouse:message code="inventory.label"/></label></td>
 										<td valign="top" class="value">
-												${commandInstance?.inventoryInstance?.warehouse?.name }
+												${commandInstance?.inventory?.warehouse?.name }
 										</td>
 									</tr>
+
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><label><warehouse:message code="product.label"/></label></td>
+                                        <td valign="top" class="value">
+                                            <format:product product="${commandInstance?.product}"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label"/></label></td>
+                                        <td valign="top" class="value">
+                                            <g:if test="${binLocation}">
+                                                ${binLocation?.locationNumber}
+
+                                            </g:if>
+                                            <g:else>
+                                                ${g.message(code:'default.label')}
+                                            </g:else>
+                                        </td>
+                                    </tr>
 									<tr class="prop">
-										<td valign="top" class="name"><label><warehouse:message code="item.label"/></label></td>
+										<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label"/></label></td>
 										<td valign="top" class="value">
-											<format:product product="${commandInstance?.product}"/>
-											<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
+                                            <g:if test="${itemInstance}">
+    											${itemInstance?.lotNumber }
+                                            </g:if>
+                                            <g:else>
+                                                ${g.message(code:'default.empty.label')}
+                                            </g:else>
 										</td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label><warehouse:message code="shipping.addToShipment.label"/></label></td>
 										<td valign="top" class="value">
 
-											<select id="shipmentContainer" name="shipmentContainer">
+											<select id="shipmentContainer" name="shipmentContainer" class="chzn-select-deselect">
 												<option value="null"></option>
 												<g:each var="shipmentInstance" in="${commandInstance?.pendingShipmentList }">
 													<g:set var="expectedShippingDate" value="${prettyDateFormat(date: shipmentInstance?.expectedShippingDate)}"/>
-													<g:set var="label" value="${shipmentInstance?.name + ' to ' + shipmentInstance?.destination?.name + ', departing ' + expectedShippingDate}"/>
+													<g:set var="label" value="${shipmentInstance?.shipmentNumber + ' - ' + shipmentInstance?.name + ' to ' + shipmentInstance?.destination?.name + ', departing ' + expectedShippingDate}"/>
 													<optgroup label="${label }">
 														<option value="${shipmentInstance?.id }:0">
 															<g:set var="looseItems" value="${shipmentInstance?.shipmentItems?.findAll { it.container == null }}"/>

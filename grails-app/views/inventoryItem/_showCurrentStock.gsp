@@ -26,7 +26,7 @@
                 <g:set var="styleClass" value="${(status%2==0)?'even':'odd' }"/>
                 <tr class="prop ${styleClass}">
                     <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
-                        <g:render template="actionsCurrentStock" model="[inventoryInstance:commandInstance?.inventory,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantity]" />
+                        <g:render template="actionsCurrentStock" model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantity]" />
                     </td>
                     <td>
                         <g:if test="${entry?.binLocation}">

@@ -35,11 +35,11 @@
                     <warehouse:message code="shipping.addToShipment.label"/>
                 </a>
             </div>
-            <g:render template="editItemDialog" model="[dialogId:dialogId, inventoryInstance:inventoryInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-            <g:render template="adjustStock" model="[dialogId:dialogId, inventoryInstance:inventoryInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-            <g:render template="transferStock" model="[dialogId:dialogId, inventoryInstance:inventoryInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-            <g:render template="returnStock" model="[dialogId:dialogId, inventoryInstance:inventoryInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-            <g:render template="addToShipment" model="[dialogId:dialogId, inventoryInstance:inventoryInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+            <g:render template="editItemDialog" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
+            <g:render template="adjustStock" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+            <g:render template="transferStock" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+            <g:render template="returnStock" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+            <g:render template="addToShipment" model="[dialogId:dialogId, commandInstance:commandInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
         </div>
     </g:isUserManager>
 </div>

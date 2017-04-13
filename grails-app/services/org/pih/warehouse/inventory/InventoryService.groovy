@@ -1798,6 +1798,8 @@ class InventoryService implements ApplicationContextAware {
 
         cmd.totalQuantity = getQuantityOnHand(cmd.warehouse, cmd.product)
 
+        cmd.pendingShipmentList = shipmentService.getPendingShipments(cmd.warehouse);
+
 		// Get all lot numbers for a given product
 		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.product) as List
 

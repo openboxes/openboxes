@@ -422,7 +422,8 @@ class ShipmentService {
 	 * @param statusEndDate
 	 * @return
 	 */
-	List<Shipment> getShipments(String terms, ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate, Date lastUpdatedStart, Date lastUpdatedEnd) {
+	List<Shipment> getShipments(String terms, ShipmentType shipmentType, Location origin, Location destination,
+                                ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate, Date lastUpdatedStart, Date lastUpdatedEnd, Integer limit) {
 
         log.info "Get shipments: " + terms + " " + shipmentType + " " + origin + " " + destination + " " + lastUpdatedStart + " " + lastUpdatedEnd
 
@@ -439,20 +440,44 @@ class ShipmentService {
                 if (destination) { eq("destination", destination) }
                 if (lastUpdatedStart) { ge("lastUpdated", lastUpdatedStart)}
                 if (lastUpdatedEnd) { le("lastUpdated", lastUpdatedEnd)}
+                if (statusCode) {
+                    if (statusCode in [ShipmentStatusCode.PENDING, ShipmentStatusCode.CREATED]) {
+                        or {
+                            isEmpty('events')
+                            events {
+                                eventType {
+                                    not {
+                                        'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (statusCode == ShipmentStatusCode.SHIPPED) {
+                        events {
+                            eventType {
+                                'in'("eventCode", [EventCode.SHIPPED])
+                            }
+                        }
+                    }
+                    else if (statusCode == ShipmentStatusCode.RECEIVED) {
+                        events {
+                            eventType {
+                                'in'("eventCode", [EventCode.RECEIVED])
+                            }
+                        }
+                    }
+                }
+                order("lastUpdated", "desc")
+                order("dateCreated", "desc")
             }
+            maxResults(limit)
 
         }
 
         log.info "Shipments: " + shipments.size()
 		
-		// now filter by event code and eventdate
-		shipments = shipments.findAll( { def status = it.getStatus()
-											if (statusCode && status.code != statusCode) { return false }
-											//if (statusStartDate && status.date < statusStartDate) { return false }
-											//if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
-											return true
-										} )		
-		
+
 		shipments = shipments.findAll() { (!statusStartDate || it.expectedShippingDate >= statusStartDate) && (!statusEndDate || it.expectedShippingDate <= statusEndDate) }
 			
 		return shipments
@@ -759,14 +784,20 @@ class ShipmentService {
 	 */
 	boolean validateShipmentItem(ShipmentItem shipmentItem) { 
 		def location = Location.get(shipmentItem?.shipment?.origin?.id);
-		log.info("Validating shipment item at " + location?.name + " for product " + shipmentItem.product + " and lot number " + shipmentItem.lotNumber)
-		def onHandQuantity = inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
-		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + onHandQuantity + "]");
+		log.info("Validating shipment item at " + location?.name + " for product " + shipmentItem.product + " and lot number " + shipmentItem.inventoryItem)
+
+        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
+        // FIXME Please refactor this mess at a later date
+        def quantityOnHand = shipmentItem.binLocation ?
+                inventoryService.getQuantity(shipmentItem.binLocation, shipmentItem.inventoryItem) :
+                inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
+
+		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
 		if (!shipmentItem.validate()) { 
 			throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
 		}
 		
-		if (shipmentItem.quantity > onHandQuantity) {
+		if (shipmentItem.quantity > quantityOnHand) {
 			shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
 			throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
 		}
@@ -1223,8 +1254,14 @@ class ShipmentService {
 		User user = User.get(userId)
 		Location location = Location.get(locationId)
 		Shipment shipmentInstance = Shipment.get(shipmentId)
+
+
 		//try {
-			
+
+            if (shipmentInstance?.destination != location) {
+                throw new ShipmentException(message: "Shipment must be received by the destination location ${shipmentInstance?.destination?.name}", shipment: shipmentInstance)
+
+            }
 			if (!shipmentInstance.hasShipped()) { 
 				throw new ShipmentException(message: "Shipment has not been shipped yet.", shipment: shipmentInstance)
 			}

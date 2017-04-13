@@ -65,21 +65,12 @@ class InventoryItemController {
         try {
             long startTime = System.currentTimeMillis()
 
-            // add the current warehouse to the command object
+            // add the current warehouse to the command object which prevents location from being spoofed
             cmd.warehouse = Location.get(session?.warehouse?.id)
-            // now populate the rest of the commmand object
-            def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-			//log.info "get stock card command: " + (System.currentTimeMillis() - startTime) + " ms"
-			//startTime = System.currentTimeMillis()
-            // populate the pending shipments
-            // TODO: move this into the service layer after we find a way to add shipping service to inventory service
-            // (that is, find a workaround to GRAILS-5080)
-            //	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-            //commandInstance.pendingShipmentList =
-            //    shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
-            //log.info "get pending shipments: " + (System.currentTimeMillis() - startTime) + " ms"
-            //startTime = System.currentTimeMillis()
+            // now populate the rest of the commmand object
+            inventoryService.getStockCardCommand(cmd, params)
+            startTime = System.currentTimeMillis()
 
             //def quantityMap = inventoryService.getQuantityOnHand(commandInstance.warehouseInstance, commandInstance?.productInstance)
 
@@ -87,7 +78,7 @@ class InventoryItemController {
             //startTime = System.currentTimeMillis()
 
 
-            [ commandInstance: commandInstance ]
+            [ commandInstance: cmd ]
         } catch (ProductException e) {
             flash.message = e.message
             redirect(controller: "dashboard", action: "index")
@@ -668,6 +659,7 @@ class InventoryItemController {
 		def containerInstance = null;
 		def productInstance = Product.get(params?.product?.id);
 		def personInstance = Person.get(params?.recipient?.id);
+        def binLocation = Location.get(params?.binLocation?.id)
 		def inventoryItem = InventoryItem.get(params?.inventoryItem?.id);
 		
 		def shipmentContainer = params.shipmentContainer?.split(":")
@@ -682,6 +674,7 @@ class InventoryItemController {
 		
 		def shipmentItem = new ShipmentItem(
 			product: productInstance,
+            binLocation: binLocation,
 			lotNumber: inventoryItem.lotNumber?:'',
 			expirationDate: inventoryItem?.expirationDate,
 			inventoryItem: inventoryItem,
