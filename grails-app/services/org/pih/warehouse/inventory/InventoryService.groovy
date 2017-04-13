@@ -1456,7 +1456,9 @@ class InventoryService implements ApplicationContextAware {
             quantityBinLocationMap[product].keySet().each { inventoryItem ->
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
-                    binLocations << [product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
+                    if (quantity != 0) {
+                        binLocations << [product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
+                    }
                 }
             }
 
@@ -1843,16 +1845,16 @@ class InventoryService implements ApplicationContextAware {
             List binLocationEntries = getQuantityByBinLocation(transactionEntryList)
 
             binLocationEntries.each {
-				def inventoryItemRow = new RecordInventoryRowCommand()
-				inventoryItemRow.id = it.id
-                inventoryItemRow.inventoryItem = it.inventoryItem
-                inventoryItemRow.binLocation = it.binLocation
-				inventoryItemRow.lotNumber = it?.inventoryItem?.lotNumber
-				inventoryItemRow.expirationDate = it?.inventoryItem?.expirationDate
-				inventoryItemRow.oldQuantity = it.quantity
-				inventoryItemRow.newQuantity = it.quantity
-				commandInstance.recordInventoryRows.add(inventoryItemRow)
-			}
+                    def inventoryItemRow = new RecordInventoryRowCommand()
+                    inventoryItemRow.id = it.id
+                    inventoryItemRow.inventoryItem = it.inventoryItem
+                    inventoryItemRow.binLocation = it.binLocation
+                    inventoryItemRow.lotNumber = it?.inventoryItem?.lotNumber
+                    inventoryItemRow.expirationDate = it?.inventoryItem?.expirationDate
+                    inventoryItemRow.oldQuantity = it.quantity
+                    inventoryItemRow.newQuantity = it.quantity
+                    commandInstance.recordInventoryRows.add(inventoryItemRow)
+                }
 
 		}
 		//return commandInstance
