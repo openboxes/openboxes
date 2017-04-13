@@ -219,6 +219,8 @@
 
 	$(document).ready(function() {
 
+	    // FIXME all pages that extend the stock card layout need to hide the loading modal
+        $(".loading").hide();
 
         // If there's already at least an existing row we don't want to create a blank row
         var rows = $("#inventoryItemsTable tbody tr");
