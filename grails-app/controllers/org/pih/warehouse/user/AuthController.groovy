@@ -91,19 +91,17 @@ class AuthController {
 				session.user = userInstance;
                 session.userName = userInstance?.username
 				
-				// For now, we'll just execute this code in dev environments
-				if (GrailsUtil.environment == "development") { 
-					// PIMS-782 Force the user to select a warehouse each time
-					if (userInstance?.warehouse) { 
-						session.warehouse = userInstance.warehouse
-					}
-					
-					if (session?.targetUri) {
-						redirect(uri: session.targetUri);
-						//session.removeAttribute("targetUri")
-						return;
-					}
+				// PIMS-782 Force the user to select a warehouse each time
+				if (userInstance?.warehouse && userInstance?.rememberLastLocation) {
+					session.warehouse = userInstance.warehouse
 				}
+
+				if (session?.targetUri) {
+					redirect(uri: session.targetUri);
+					//session.removeAttribute("targetUri")
+					return;
+				}
+
 				redirect(controller:'dashboard',action:'index')
 			}
 			else {
