@@ -69,10 +69,6 @@ class ShipmentController {
 		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination,
                 statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo, params.max)
 
-        if (shipments?.size() == params.max) {
-            flash.message = "${g.message(code: 'shipment.limitHasBeenReached.message', args: [params.max])}"
-        }
-
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b ->
 			return b.lastUpdated <=> a.lastUpdated
