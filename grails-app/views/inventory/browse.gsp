@@ -108,7 +108,7 @@
                                         <tr class="">
                                             <td class="middle">
                                                 <g:if test="${tags }">
-                                                    <div id="tagcloud">
+                                                    <div id="tagcloud" style="max-height: 200px; overflow: auto;" >
                                                         <g:each in="${tags }" var="tag" status="status">
                                                             <g:set var="selectedTag" value="${params.tag == tag.key.tag }"/>
                                                             <span class="${selectedTag?'selected':'' }">
