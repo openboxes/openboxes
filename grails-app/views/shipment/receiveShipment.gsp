@@ -153,7 +153,8 @@
                                                         <format:expirationDate obj="${inventoryItem?.expirationDate }"/>
                                                     </td>
                                                     <td class="center">
-                                                        <g:selectBinLocation name="receiptItems[${i}].binLocation" noSelection="['':'']" value="${receiptItem?.binLocation}"/>
+                                                        <g:selectBinLocation name="receiptItems[${i}].binLocation"
+                                                                             class="chzn-select-deselect" noSelection="['':'']" value="${receiptItem?.binLocation}"/>
                                                     </td>
                                                     <td style="text-align: center;" class="middle">
                                                         <g:hiddenField name="receiptItems[${i}].quantityShipped" value="${receiptItem?.quantityShipped}"/>
