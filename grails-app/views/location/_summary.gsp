@@ -11,9 +11,13 @@
                     </g:if>
                     <g:else>
                         ${warehouse.message(code:'location.new.label', default: "New location")}
-
                     </g:else>
+                    <small>(<format:metadata obj="${locationInstance?.locationType}"/>)</small>
 				</span>
+                <g:if test="${locationInstance?.parentLocation}">
+                    <g:link controller="location" action="edit" id="${locationInstance?.parentLocation?.id}">Back to ${locationInstance?.parentLocation?.name}</g:link>
+                </g:if>
+
 			</td>
 			<td class="right">
 				<div class="right">

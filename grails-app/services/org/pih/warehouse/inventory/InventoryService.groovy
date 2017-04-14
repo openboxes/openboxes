@@ -1440,6 +1440,25 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
+    List getQuantityByBinLocation(Location location, Location binLocation) {
+        List transactionEntries = getTransactionEntriesByInventoryAndBinLocation(location?.inventory, binLocation)
+        List binLocations = getQuantityByBinLocation(transactionEntries)
+        return binLocations
+    }
+
+    List getQuantityByBinLocation(Location location, Product product) {
+        List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, [product])
+        List binLocations = getQuantityByBinLocation(transactionEntries)
+        return binLocations
+    }
+
+    List getQuantityByBinLocation(Location location, InventoryItem inventoryItem) {
+        List transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(location?.inventory, inventoryItem)
+        List binLocations = getQuantityByBinLocation(transactionEntries)
+        return binLocations
+    }
+
+
     /**
      * Converts list of passed transactions entries into a list of bin locations.
      *
@@ -1457,7 +1476,8 @@ class InventoryService implements ApplicationContextAware {
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
                     if (quantity != 0) {
-                        binLocations << [product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
+                        binLocations << [id: binLocation?.id, value: "Bin: " + binLocation?.locationNumber + " Quantity: " + quantity,
+                                         product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
                     }
                 }
             }
@@ -2230,6 +2250,27 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return transactionEntries;
 	}
+
+    /**
+     * Get all transaction entries over list of products/inventory items.
+     *
+     * @param inventoryInstance
+     * @return
+     */
+    List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = criteria.list {
+            eq("binLocation", binLocation)
+            transaction {
+                eq("inventory", inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        }
+        return transactionEntries;
+    }
+
+
 
 	/**
 	 * Gets all transaction entries for a inventory item within an inventory

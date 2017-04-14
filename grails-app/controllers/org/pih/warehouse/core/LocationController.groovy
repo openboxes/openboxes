@@ -152,7 +152,22 @@ class LocationController {
 			redirect(action: "edit", id: params.id)
 		}
 	}
-		
+
+    def showContents = {
+        def binLocation = Location.get(params.id);
+        if (!binLocation) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+
+        }
+        else {
+            List contents = inventoryService.getQuantityByBinLocation(binLocation.parentLocation, binLocation)
+            return [binLocation: binLocation, contents:contents]
+        }
+
+
+    }
+
+
 	/**
 	 * Render location logo
 	 */
