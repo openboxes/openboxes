@@ -63,22 +63,21 @@
                             <div id="chooseLocationSelect">
                                 <table>
                                     <tbody>
-                                        <tr class="prop">
-                                            <td>
-                                                <h4><g:message code="user.lastLoginLocation.label" default="Previous Login"/></h4>
-                                            </td>
-                                            <td>
-                                                <g:if test="${session.user.warehouse}">
-                                                    <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button">
-                                                        <format:metadata obj="${session?.user?.warehouse}"/>
-                                                    </a>
-                                                </g:if>
-                                                <span class="fade">
-                                                    <g:formatDate date="${session?.user?.lastLoginDate}" format="MMM dd, yyyy hh:mm a z"/>
-                                                </span>
-                                            </td>
-
-                                        </tr>
+                                        <g:if test="${session.user.warehouse}">
+                                            <tr class="prop">
+                                                <td>
+                                                    <h4><g:message code="user.favoriteLocations.label"/></h4>
+                                                </td>
+                                                <td class="middle">
+                                                        <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button">
+                                                            <format:metadata obj="${session?.user?.warehouse}"/>
+                                                        </a>
+                                                    <span class="fade">
+                                                        <g:formatDate date="${session?.user?.lastLoginDate}" format="MMM dd, yyyy hh:mm a z"/>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </g:if>
 
 
                                         <g:set var="count" value="${0 }"/>

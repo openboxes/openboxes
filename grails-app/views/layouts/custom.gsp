@@ -94,7 +94,7 @@
         <div id="megamenu">
             <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
             <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                Loading...
+                ${g.message(code: 'default.loading.label')}
             </div>
 
         </div>

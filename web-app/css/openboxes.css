@@ -1224,15 +1224,16 @@ a:hover {
 }
 
 #chooseLocation {
-    width: 700px;
+    width: 800px;
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -350px;
+    margin-left: -400px;
 }
 #chooseLocationSelect {
     max-height: 400px;
     overflow: auto;
+    margin-bottom: 5px
 }
 
 #loginForm {
