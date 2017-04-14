@@ -50,6 +50,8 @@ class LocationService {
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)
         if (locations) {
+
+			locations = locations.collect { [id: it?.id, name: it?.name, locationType: it.locationType?.name, locationGroup: it?.locationGroup?.name,  ]}
             locationMap = locations.groupBy { it?.locationGroup }
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }

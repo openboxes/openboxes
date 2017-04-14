@@ -93,7 +93,7 @@
                                                     <g:each var="warehouse" in="${entry.value.sort() }" status="status">
                                                         <div class="left" style="margin: 2px;">
                                                             <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button">
-                                                                <format:metadata obj="${warehouse}"/>
+                                                                ${warehouse.name}
                                                             </a>
                                                         </div>
                                                     </g:each>
