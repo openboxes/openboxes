@@ -1,6 +1,10 @@
 <div class="wizard-box">
 	<div class="wizard-steps">
-        <g:set var="wizardSteps" value="${['Details':'enterShipmentDetails', 'Tracking':'enterTrackingDetails', 'Pack':'enterContainerDetails', 'Send':'sendShipment']}"/>
+        <g:set var="wizardSteps" value="${['Details':'enterShipmentDetails',
+                                           'Tracking':'enterTrackingDetails',
+                                           'Packing':'enterContainerDetails',
+                                           'Picking':'pickShipmentItems',
+                                           'Sending':'sendShipment']}"/>
 
         <g:each var="wizardStep" in="${wizardSteps}" status="status">
 

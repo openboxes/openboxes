@@ -29,14 +29,12 @@
 				</div>
 			</g:hasErrors>
 
-
-
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<g:hiddenField name="shipment.id" value="${shipmentInstance?.id}"/>
 				
 					<g:render template="../shipment/summary" />	
-					<g:render template="flowHeader" model="['currentState':'Send']"/>
+					<g:render template="flowHeader" model="['currentState':'Sending',stage: actionName]"/>
 					<g:set var="shipmentItemsWithRecipient" value="${shipmentInstance.allShipmentItems.findAll { it.recipient } }"/>
 					<g:set var="includeNotifications" value="${shipmentItemsWithRecipient || (!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier) || (!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient)}"/>
 					
@@ -189,9 +187,11 @@
 															<tr>
 																<th><warehouse:message code="container.label"/></th>
 																<th><warehouse:message code="product.label"/></th>
+																<th><warehouse:message code="location.binLocation.label"/></th>
 																<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
 																<th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
 																<th><warehouse:message code="default.quantity.label"/></th>
+                                                                <th><warehouse:message code="default.uom.label"/></th>
 															</tr>
 															<g:set var="previousContainer"/>
 															<g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
@@ -199,12 +199,23 @@
 																<tr class="${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
 																	<td class="right-border">																	
 																		<g:if test="${!isSameAsPrevious }">
-																			${shipmentItem?.container?.name }
+																			<g:if test="${shipmentItem?.container}">
+																				${shipmentItem?.container?.name }
+																			</g:if>
+																			<g:else>
+																				<g:message code="default.label"/>
+																			</g:else>
 																		</g:if>
 																	</td>
 																	<td>
-																		<format:product product="${shipmentItem?.inventoryItem?.product}"/> 
+                                                                        <g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
+                                                                            ${shipmentItem?.inventoryItem?.product?.productCode}
+                                                                            <format:product product="${shipmentItem?.inventoryItem?.product}"/>
+                                                                    </g:link>
 																	</td>
+                                                                    <td>
+                                                                        ${shipmentItem?.binLocation}
+                                                                    </td>
 																	<td>
 																		<span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>																	
 																	</td>
@@ -222,8 +233,10 @@
 																	</td>
 																	<td>
 																		${shipmentItem?.quantity }
-																		${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
 																	</td>
+                                                                    <td>
+                                                                        ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+                                                                    </td>
 																</tr>
 																<g:set var="previousContainer" value="${shipmentItem?.container }"/>
 															</g:each>

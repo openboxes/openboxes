@@ -52,6 +52,8 @@ class CreateShipmentWorkflowController {
 						return enterShipmentDetails()
 					else if (params.skipTo == 'Tracking')
 						return enterTrackingDetails()
+                    else if (params.skipTo == 'Picking')
+                        return pickShipmentItems()
 					else if (params.skipTo == 'Sending')
 						return sendShipment()
 				}
@@ -61,6 +63,7 @@ class CreateShipmentWorkflowController {
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
     	}
@@ -120,6 +123,7 @@ class CreateShipmentWorkflowController {
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
@@ -189,6 +193,7 @@ class CreateShipmentWorkflowController {
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
@@ -222,7 +227,7 @@ class CreateShipmentWorkflowController {
 
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
-			}.to("sendShipment")	// formerly showDetails
+			}.to("pickShipmentItems")
 			
 			on("save") {
 				try {
@@ -492,20 +497,82 @@ class CreateShipmentWorkflowController {
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			//on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
     	}
 
+        pickShipmentItems {
 
+			on("back").to("enterContainerDetails")
+
+			on("next").to("sendShipmentAction")
+
+			on("save") {
+				shipmentService.saveShipment(flow.shipmentInstance)
+			}.to("finish")
+
+
+			on("autoPickShipmentItems") {
+				try {
+					log.info "AutoPick: " + params
+
+					//shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
+					//flash.message = "System has automatically picked items"
+                    flash.message = "Psych! This feature has not been implemented yet. But imagine how great life will be when it's finished."
+				} catch (ShipmentItemException e) {
+					flash.message = e.message
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
+			}.to("pickShipmentItems")
+
+
+            on("pickShipmentItem") {
+                log.info "Pick shipment item " + params
+
+                try {
+                    def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+                    shipmentItemInstance.properties = params
+                    if (shipmentItemInstance.save(flush:true)) {
+                        flash.message = "Successfully picked shipment item. "
+
+                    } else {
+                        flash.message = "Failed to pick shipment item due to an unknown error."
+                    }
+                } catch (ShipmentItemException e) {
+                    [itemInstance: e.shipmentItem]
+                } catch (Exception e) {
+                    log.error("Failed to import packing list due to the following error: " + e.message, e)
+                    flash.message = "Failed to import packing list due to the following error: " + e.message
+                }
+
+            }.to("pickShipmentItems")
+
+
+			on("cancel").to("finish")
+			on("success").to("finish")
+
+			// Top-level navigation transitions
+			on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+            on("pickShipmentItems").to("pickShipmentItems")
+			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
+
+
+		}
 
 		sendShipment {
 						
 			// All transition buttons on the bottom of the page
 			on("back") {
 
-			}.to("enterContainerDetails")
+			}.to("pickShipmentItems")
 			
 			on("next").to("sendShipmentAction")
 				
@@ -520,6 +587,7 @@ class CreateShipmentWorkflowController {
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
 			
@@ -598,7 +666,6 @@ class CreateShipmentWorkflowController {
 							
 						}
 						else {
-                            log.info "test 4"
 							return error();
 						}
 					}

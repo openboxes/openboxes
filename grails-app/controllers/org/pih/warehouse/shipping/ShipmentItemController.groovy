@@ -9,9 +9,15 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.core.Location
+
 class ShipmentItemController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    def inventoryService
+    def shipmentService
+
 
     def index = {
         redirect(action: "list", params: params)
@@ -106,4 +112,50 @@ class ShipmentItemController {
             redirect(action: "list")
         }
     }
+
+    def pick = {
+        def shipmentItemInstance = ShipmentItem.get(params.id)
+        if (!shipmentItemInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), params.id])}"
+        }
+        else {
+            Location location = Location.load(session.warehouse.id)
+            List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
+
+            [shipmentItemInstance: shipmentItemInstance, binLocations: binLocations]
+        }
+    }
+
+
+    def updatePicklistItem = {
+
+
+        def shipmentItemInstance = ShipmentItem.get(params.id)
+        if (shipmentItemInstance) {
+            if (params.version) {
+                def version = params.version.toLong()
+                if (shipmentItemInstance.version > version) {
+
+                    shipmentItemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem')] as Object[], "Another user has updated this ShipmentItem while you were editing")
+                    render(view: "pick", model: [shipmentItemInstance: shipmentItemInstance])
+                    return
+                }
+            }
+            //shipmentItemInstance.properties = params
+            if (!shipmentItemInstance.hasErrors() && shipmentItemInstance.save(flush: true)) {
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), shipmentItemInstance.id])}"
+                redirect(action: "pick", id: shipmentItemInstance.id)
+            }
+            else {
+                render(view: "pick", model: [shipmentItemInstance: shipmentItemInstance])
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), params.id])}"
+            redirect(action: "pick")
+        }
+
+    }
+
+
 }
