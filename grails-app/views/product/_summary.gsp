@@ -103,22 +103,28 @@
             </td>
             <td>
                 <div class="button-container">
-                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
-						${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
-                    </g:link>
-                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                        ${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
-                    </g:link>
-                    <g:link controller='inventoryItem' action='showRecordInventory' params="['product.id':productInstance?.id]" class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
-						${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
-                    </g:link>
-                    <g:link controller='inventory' action='browse' class="button">
+					<g:link controller='inventory' action='browse' class="button">
 						<img src="${resource(dir: 'images/icons/silk', file: 'application_form_magnify.png')}" />&nbsp;
 						${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
-                    </g:link>
+					</g:link>
+					<div class="button-group">
+						<g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+							${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
+						</g:link>
+						<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
+							${warehouse.message(code: 'inventory.showStockCard.label', default: 'Show stock')}
+						</g:link>
+						<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]" class="button">
+							<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
+							<warehouse:message code="inventory.showLotNumbers.label"/>
+						</g:link>
+						<g:link controller='inventoryItem' action='showRecordInventory' params="['product.id':productInstance?.id]" class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
+							${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
+						</g:link>
+					</div>
                 </div>
             </td>
         </tr>

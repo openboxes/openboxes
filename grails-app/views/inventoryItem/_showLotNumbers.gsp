@@ -114,7 +114,7 @@
 								</g:else>
 							</td>
 							<td class="top center">
-								${itemQuantity?:"N/A" }
+								${itemQuantity }
 															
 							</td>
                             <td>
@@ -153,11 +153,10 @@
 										years="${yearStart..yearEnd }"/>						
 								</td>
                                 <td class="center">
-                                    N/A
                                 </td>
 								<td class="center">
 									<button class="button icon add">
-										<warehouse:message code="default.button.add.label"/>
+										<warehouse:message code="default.button.save.label"/>
 									</button>						
 								</td>
 							</tr>

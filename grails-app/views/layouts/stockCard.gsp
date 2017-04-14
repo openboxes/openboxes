@@ -161,13 +161,11 @@
 		<div class="dialog">
             <div class="yui-gf">
                 <div class="yui-u first">
-
                     <g:render template="productDetails"
                         model="[productInstance:commandInstance?.product,
                             inventoryInstance:commandInstance?.inventory,
                             inventoryLevelInstance: commandInstance?.inventoryLevel,
                             totalQuantity: commandInstance?.totalQuantity]"/>
-
                 </div>
                 <div class="yui-u">
 
@@ -179,6 +177,7 @@
 	</div>
 	<script>
 		$(document).ready(function() {
+            $(".loading").hide();
 
 			$('.nailthumb-container img').nailthumb({width : 60, height : 60});
 			
@@ -200,8 +199,6 @@
 			});
 		});
 
-
-		
 	</script>
 
 
