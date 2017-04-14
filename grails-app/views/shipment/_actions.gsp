@@ -9,7 +9,7 @@
         <g:if test="${shipmentInstance?.destination?.id == session.warehouse.id}">
             <div class="action-menu-item">
                 <g:link controller="shipment" action="list" params="[type: 'incoming']">
-                    <img src="${createLinkTo(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>&nbsp;
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'lorry.png')}" class="middle"/>&nbsp;
                     <warehouse:message code="shipping.listIncoming.label"/>
                 </g:link>
             </div>
@@ -17,7 +17,7 @@
         <g:else>
             <div class="action-menu-item">
                 <g:link controller="shipment" action="list">
-                    <img src="${createLinkTo(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>&nbsp;
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'lorry.png')}" class="middle"/>&nbsp;
                     <warehouse:message code="shipping.listOutgoing.label"/>
                 </g:link>
             </div>
@@ -87,6 +87,7 @@
                 </div>
             </g:if>
         </g:if>
+        <%--
         <div class="action-menu-item">
             <g:link controller="shipment" action="addDocument" id="${shipmentInstance.id}">
                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_add.png')}"
@@ -98,7 +99,7 @@
                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'comment_add.png')}"
                      class="middle"/>&nbsp;<warehouse:message code="shipping.addComment.label" default="Add comment"/></g:link>
         </div>
-
+        --%>
         <div class="action-menu-item">
             <hr/>
         </div>

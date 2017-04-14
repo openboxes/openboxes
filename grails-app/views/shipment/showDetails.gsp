@@ -12,7 +12,21 @@
 	<div class="body">
 
         <g:render template="summary"/>
+        <div class="summary-actions">
+            <table>
+                <tr>
+                    <td width="1%">
+                        <g:render template="../shipment/actions" model="[shipmentInstance:shipmentInstance]" />
+                    </td>
+                    <td>
+                        <div class="button-container">
+                            <g:render template="buttons"/>
+                        </div>
+                    </td>
+                </tr>
 
+            </table>
+        </div>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
