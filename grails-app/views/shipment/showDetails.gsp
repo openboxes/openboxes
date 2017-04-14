@@ -252,37 +252,160 @@
 									</tr>
 								</g:if>
 								--%>
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label><warehouse:message
-												code="shipping.timeToProcess.label" default="Time to process" /></label>
-									</td>
-									<td valign="top" class="value">
-										<g:relativeTime timeDuration="${shipmentInstance?.timeToProcess()}"/>
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label><warehouse:message
-												code="shipping.timeInCustoms.label" default="Time in customs"/></label>
-									</td>
-									<td valign="top" class="value">
-										<g:relativeTime timeDuration="${shipmentInstance?.timeInCustoms()}"/>
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label><warehouse:message
-												code="shipping.timeInTransit.label" default="Time in transit"/></label>
-									</td>
-									<td valign="top" class="value">
-										<g:relativeTime timeDuration="${shipmentInstance?.timeInTransit()}"/>
-									</td>
-								</tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message
+                                                code="shipping.comments.label" default="Comments"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:each var="comment" in="${shipmentInstance?.comments}">
+                                            <div class="comment">
+                                                <b>${comment?.sender?.name}</b> ·
+                                                <span class="fade">
+                                                    <g:prettyDateFormat date="${comment?.dateCreated }"/>
+                                                </span>
+                                                <blockquote>
+                                                    <g:if test="${comment?.recipient}">
+                                                        <span class="fade" title="${comment?.recipient?.name}">@${comment?.recipient?.username}</span>
+                                                    </g:if>
+                                                    ${comment?.comment}
+                                                </blockquote>
+                                            </div>
+                                        </g:each>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message
+                                                code="shipping.comments.label" default="Documents"/></label>
+                                    </td>
+                                    <td valign="top" class="value" style="padding: 0; margin: 0">
+                                        <table style="width: 100%; >
+                                            <tbody>
+                                            <tr class="odd">
+                                                <td>
+                                                    <img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" class="middle"/>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]">
+                                                            <label><g:message code="shipping.packingList.label"/></label></g:link>
+                                                    </div>
 
+                                                </td>
+                                            </tr>
+                                            <tr class="even">
+                                                <td>
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]">
+                                                            <label><g:message code="shipping.paginatedPackingList.label" default="Packing List (paginated)"/></label>
+                                                        </g:link>
+                                                    </div>
 
+                                                </td>
+                                            </tr>
+                                            <tr class="odd">
+                                                <td>
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
+                                                            <label><g:message code="shipping.goodsReceiptNote.label" default="Goods Receipt Note (Excel)"/></label>
+                                                        </g:link>
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                            <tr class="even">
+                                                <td>
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>
+                                                </td>
+                                                <td>
+                                                    <g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
+                                                        <label><g:message code="shipping.certificateOfDonation" default="Certificate of Donation"/></label>
+                                                    </g:link>
+                                                </td>
+                                            </tr>
+                                            <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
+                                                <tr id="document-${document.id}" class="${i%2==0?'odd':'even'}">
+                                                    <td class="middle">
+                                                        <g:set var="f" value="${document?.filename?.toLowerCase()}"/>
+                                                        <g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
+                                                        </g:if>
+                                                        <g:elseif test="${f.endsWith('.pdf') }">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_acrobat.png')}"/>
+                                                        </g:elseif>
+                                                        <g:elseif test="${f.endsWith('.doc')||f.endsWith('.docx') }">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"/>
+                                                        </g:elseif>
+                                                        <g:elseif test="${f.endsWith('.xls')||f.endsWith('.xlsx')||f.endsWith('.csv') }">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"/>
+                                                        </g:elseif>
+                                                        <g:elseif test="${f.endsWith('.gz')||f.endsWith('.jar')||f.endsWith('.zip')||f.endsWith('.tar') }">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_compressed.png')}"/>
+                                                        </g:elseif>
+                                                        <g:else>
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white.png')}"/>
+                                                        </g:else>
+                                                    </td>
+                                                    <td class="middle">
+                                                        <g:link controller="document" action="download" id="${document.id}" params="[shipmentId:shipmentInstance?.id]" title="${document?.filename}">
+                                                            <label><format:metadata obj="${document?.name}"/></label>
+                                                        </g:link>
+                                                    </td>
+
+                                                </tr>
+
+                                            </g:each>
+
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
 							</tbody>
 						</table>
+                    </div>
+                    <div class="box">
+                        <h2>
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'clock.png')}" alt="Lead Time" style="vertical-align: middle"/>
+                            <g:message code="shipping.leadtime.label" default="Lead Time"/>
+                        </h2>
+                        <table>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label><warehouse:message
+                                            code="shipping.timeToProcess.label" default="Time to process" /></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:relativeTime timeDuration="${shipmentInstance?.timeToProcess()}"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label><warehouse:message
+                                            code="shipping.timeInCustoms.label" default="Time in customs"/></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:relativeTime timeDuration="${shipmentInstance?.timeInCustoms()}"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label><warehouse:message
+                                            code="shipping.timeInTransit.label" default="Time in transit"/></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:relativeTime timeDuration="${shipmentInstance?.timeInTransit()}"/>
+                                </td>
+                            </tr>
+
+                        </table>
+
 					</div>
 				</div>
 				<div class="yui-u">

@@ -12,11 +12,13 @@
 							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle;" />
 					</g:else>
 				</td>
-                <td width="1%" class="middle">
-                    <div>
-                        <g:render template="../shipment/actions" />
-                    </div>
-                </td>
+				<g:if test="${actionName != 'showDetails'}">
+					<td width="1%" class="middle">
+						<div>
+							<g:render template="../shipment/actions" />
+						</div>
+					</td>
+				</g:if>
 				<td class="middle">
 
 					<div class="title">
