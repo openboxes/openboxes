@@ -1,5 +1,5 @@
 <%@ page import="util.ConfigHelper" %>
-<div id="consumption">
+<div id="consumption" class="box">
 
 
     <h2>
