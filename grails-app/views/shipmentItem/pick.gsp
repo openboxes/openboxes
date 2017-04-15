@@ -9,6 +9,10 @@
 <body>
 <div class="dialog">
 
+    <div class="success">
+        <g:message code="binLocation.recommended.label" default="Denotes recommended bin location(s)"/>
+    </div>
+
     <g:form controller="createShipmentWorkflow" action="createShipment" params="[execution:params.execution]">
         <fieldset>
             <g:hiddenField name="id" value="${shipmentItemInstance?.shipment?.id}" />
@@ -44,28 +48,68 @@
                     </tr>
                     <tr class="prop">
                         <td valign="top" class="name">
-                            <label for="binLocation"><warehouse:message code="shipmentItem.binLocation.label" /></label>
-                        </td>
-                        <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'binLocation', 'errors')}">
-                            <g:select name="binLocation.id" class="chzn-select-deselect"
-                                      from="${binLocations}"
-                                      noSelection="['null':'']"
-                                      optionKey="id"
-                                      optionValue="${{it.value}}"
-                                      value="${shipmentItemInstance?.binLocation?.id}" />
-                        </td>
-                    </tr>
-
-
-                    <tr class="prop">
-                        <td valign="top" class="name">
                             <label for="quantity"><warehouse:message code="shipmentItem.quantity.label" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'quantity', 'errors')}">
                             <g:textField name="quantity" value="${shipmentItemInstance?.quantity}" class="text"/>
                         </td>
                     </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="binLocation"><warehouse:message code="shipmentItem.binLocation.label" /></label>
+                        </td>
+                        <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'binLocation', 'errors')}">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th><g:message code="default.bin.label" default="Bin"/></th>
+                                        <th><g:message code="default.lot.label" default="Lot"/></th>
+                                        <th><g:message code="default.exp.label" default="Exp"/></th>
+                                        <th><g:message code="default.qty.label" default="Qty"/></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <g:radio name="binLocation.id" value="null" checked="${shipmentItemInstance?.binLocation==null}"/>
+                                        </td>
+                                        <td>
+                                            None
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
 
+                                    </tr>
+                                    <g:each var="entry" in="${binLocations}">
+                                        <tr class="${entry.quantity>=shipmentItemInstance?.quantity?'success':'warning'}">
+                                            <td>
+                                                <g:radio name="binLocation.id" value="${entry?.binLocation?.id}"
+                                                         checked="${shipmentItemInstance?.binLocation?.id==entry?.binLocation?.id}"/>
+                                            </td>
+                                            <td>
+                                                ${entry?.binLocation?.name?:'Default'}
+                                            </td>
+                                            <td>
+                                                ${entry?.inventoryItem?.lotNumber}
+                                            </td>
+                                            <td>
+                                                <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
+                                            </td>
+                                            <td>
+                                                ${entry?.quantity}
+                                            </td>
+                                        </tr>
+                                    </g:each>
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
                     <tr class="prop">
                         <td valign="top" class="name"></td>
                         <td valign="top" class="value">
@@ -78,7 +122,9 @@
                     </tr>
                     </tbody>
                 </table>
+
             </div>
+
         </fieldset>
     </g:form>
 </div>

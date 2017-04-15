@@ -1476,7 +1476,9 @@ class InventoryService implements ApplicationContextAware {
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
                     if (quantity != 0) {
-                        binLocations << [id: binLocation?.id, value: "Bin: " + binLocation?.locationNumber + " Quantity: " + quantity,
+
+						def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber?:"") + ", Qty: " + quantity
+                        binLocations << [id: binLocation?.id, value: value,
                                          product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
                     }
                 }
@@ -2280,9 +2282,13 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem item) {
 		return TransactionEntry.createCriteria().list() {
-            inventoryItem { eq("product", item?.product) }
-            //eq("inventoryItem", inventoryItem)
-            transaction { eq("inventory", inventory) }
+            eq("inventoryItem", item)
+            inventoryItem {
+                eq("product", item?.product)
+            }
+            transaction {
+                eq("inventory", inventory)
+            }
 		}
 	}
 

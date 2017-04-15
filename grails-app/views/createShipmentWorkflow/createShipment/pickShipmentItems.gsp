@@ -153,7 +153,7 @@
                 $("#dlgPickItem").dialog({
                     autoOpen: false,
                     modal: true,
-                    width: 600
+                    width: 800
                 });
 
                 $(".btnPickItem").click(function(event){

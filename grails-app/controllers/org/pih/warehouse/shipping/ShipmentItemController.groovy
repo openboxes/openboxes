@@ -121,6 +121,7 @@ class ShipmentItemController {
         else {
             Location location = Location.load(session.warehouse.id)
             List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
+            //binLocations = binLocations.findAll { it.binLocation }
 
             [shipmentItemInstance: shipmentItemInstance, binLocations: binLocations]
         }
