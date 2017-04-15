@@ -32,7 +32,7 @@
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
                                 <td valign="top" class="value">
-                                    ${binLocation?.locationNumber}
+                                    ${binLocation?.name}
 
                                 </td>
                             </tr>

@@ -49,7 +49,7 @@
                             </g:link>
                         </td>
                         <td class="center">
-                            ${transactionEntry?.binLocation?.locationNumber }
+                            ${transactionEntry?.binLocation?.name }
                         </td>
                         <td class="center">
                             ${transactionEntry?.inventoryItem?.lotNumber }

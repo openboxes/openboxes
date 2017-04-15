@@ -419,7 +419,7 @@
 											<td class="middle">
 												<div class="binLocation">
 													<g:if test="${shipmentItem?.binLocation}">
-														${shipmentItem?.binLocation?.locationNumber}
+														${shipmentItem?.binLocation?.name}
 													</g:if>
 													<g:else>
 														<g:message code="default.label"/>

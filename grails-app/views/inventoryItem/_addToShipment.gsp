@@ -41,8 +41,7 @@
                                         <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label"/></label></td>
                                         <td valign="top" class="value">
                                             <g:if test="${binLocation}">
-                                                ${binLocation?.locationNumber}
-
+                                                ${binLocation?.name}
                                             </g:if>
                                             <g:else>
                                                 ${g.message(code:'default.label')}

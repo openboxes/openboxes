@@ -30,7 +30,7 @@
                     </td>
                     <td>
                         <g:if test="${entry?.binLocation}">
-                            ${entry?.binLocation?.locationNumber}
+                            <g:link controller="location" action="edit" id="${entry.binLocation?.id}">${entry?.binLocation?.name}</g:link>
                         </g:if>
                         <g:else>
                             <warehouse:message code="default.label" default="Default"/>
