@@ -7,9 +7,6 @@
 <body>
 
 <div class="dialog">
-    <label>${g.message(code:'location.binLocation.label')}</label>
-    ${binLocation}
-
     <fieldset>
         <table>
             <thead>
@@ -23,7 +20,14 @@
             <tbody>
                 <g:each var="entry" in="${contents}" status="status">
                     <tr class="${status%2?'even':'odd'}">
-                        <td>${entry.product}</td>
+
+
+                        <td>
+                            <g:link controller="inventoryItem" action="showStockCard" id="${entry?.product?.id}">
+                                ${entry?.product?.productCode}
+                                ${entry?.product?.name}
+                            </g:link>
+                        </td>
                         <td>${entry?.inventoryItem?.lotNumber}</td>
                         <td><g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM yyyy"/></td>
                         <td>${entry?.quantity}</td>

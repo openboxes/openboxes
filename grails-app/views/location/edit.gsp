@@ -36,6 +36,11 @@
                                 <li><a href="#location-address-tab"><warehouse:message code="location.address.label" default="Address"/></a></li>
                                 <li><a href="#location-binLocations-tab"><warehouse:message code="location.binLocations.label" default="Bin Locations"/></a></li>
                             </g:if>
+                            <g:else>
+                                <li><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message code="binLocation.contents.label" default="Contents"/></a></li>
+                            </g:else>
+
+
                         </ul>
                         <div id="location-details-tab">
                             <div class="box">
