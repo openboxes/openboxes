@@ -584,21 +584,25 @@ class JsonController {
 		def inventoryItems = []
 		def location = Location.get(session.warehouse.id);
 		if (params.term) {
+
+            boolean includeQuantity = true
 			// Improved the performance of the auto-suggest by moving 
 			def tempItems = inventoryService.findInventoryItems(params.term)
 
 			if (tempItems) {
 
                 if (tempItems.size() > 100) {
-                    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items. Too many items for term "{0}". Try searching by product code.', args: [params.term, tempItems.size()])}"
+                    //includeQuantity = false
+                    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
                     inventoryItems << [id: 'null', value: message]
                 }
                 else {
                     def quantitiesByInventoryItem = [:]
-                    tempItems.each { inventoryItem ->
-                        def quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
-                        quantitiesByInventoryItem[inventoryItem] = quantity?:0
-                        //quantitiesByInventoryItem[inventoryItem] = 1
+                    if (includeQuantity) {
+                        tempItems.each { inventoryItem ->
+                            def quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
+                            quantitiesByInventoryItem[inventoryItem] = quantity ?: 0
+                        }
                     }
 
                     tempItems.each {
@@ -606,26 +610,29 @@ class JsonController {
                         quantity = (quantity) ?: 0
 
                         def localizedName = localizationService.getLocalizedString(it.product.name)
-                        localizedName = (it.product.productCode?:" - ") + " " + localizedName
+                        localizedName = (it.product.productCode ?: " - ") + " " + localizedName
+                        inventoryItems = inventoryItems.sort { it.expirationDate }
+
                         if (quantity > 0) {
                             inventoryItems << [
-                                id: it.id,
-                                value: it.lotNumber,
-                                label:  (localizedName + " [Item: " + (it.lotNumber?:"Default") + "] QoH: " + quantity + " " + it?.product?.unitOfMeasure?:"EA"),
-                                valueText: it.lotNumber,
-                                lotNumber: it.lotNumber,
-                                product: it.product.id,
-                                productId: it.product.id,
-                                productName: localizedName,
-                                quantity: quantity,
-                                expirationDate: it.expirationDate
+                                    id            : it.id,
+                                    value         : it.lotNumber,
+                                    label         : (localizedName + " [Lot: " + (it.lotNumber ?: "Default") + ", Exp: " + it.expirationDate.format("MM/yy")
+                                            + ", QoH: " + quantity + " " + (it?.product?.unitOfMeasure ?: "EA") + "]"),
+                                    valueText     : it.lotNumber,
+                                    lotNumber     : it.lotNumber,
+                                    product       : it.product.id,
+                                    productId     : it.product.id,
+                                    productName   : localizedName,
+                                    quantity      : quantity,
+                                    expirationDate: it.expirationDate
                             ]
                         }
                     }
                 }
 			}
 		}
-		if (inventoryItems.size() == 0) { 
+		if (inventoryItems.size() == 0) {
 			def message = "${warehouse.message(code:'inventory.noItemsFound.message', args: [params.term])}"
 			inventoryItems << [id: 'null', value: message]			
 		}
