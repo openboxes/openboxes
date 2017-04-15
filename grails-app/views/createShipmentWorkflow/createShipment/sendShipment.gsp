@@ -349,7 +349,7 @@
 		                            	</label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: command, field: 'comments', 'errors')}">
-	                                    <g:textArea name="comments" value="${command?.comments }" cols="100" rows="5"/>
+	                                    <g:textArea name="comments" value="${command?.comments }" cols="100" rows="5" style="width: 100%"/>
 	                                </td>
 		                        </tr>  	        
 							</tbody>
