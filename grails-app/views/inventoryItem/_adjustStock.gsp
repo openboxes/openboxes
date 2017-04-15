@@ -7,6 +7,7 @@
                         <g:hiddenField name="id" value="${itemInstance?.id}"/>
                         <g:hiddenField name="product.id" value="${itemInstance?.product?.id}"/>
                         <g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+                        <g:hiddenField name="binLocation.id" value="${binLocation?.id}"/>
 
                         <table>
                             <tbody>
@@ -19,7 +20,11 @@
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
                                 <td valign="top" class="value">
+                                    <%--
                                     <g:selectBinLocation name="binLocation.id" value="${binLocation?.id}" class="binLocation" noSelection="['':'']"/>
+                                    --%>
+                                    ${binLocation?.name}
+
                                 </td>
                             </tr>
                             <tr class="prop">
