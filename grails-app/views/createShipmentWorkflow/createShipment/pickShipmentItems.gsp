@@ -29,8 +29,6 @@
 				</div>
 			</g:hasErrors>
 
-
-
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<g:hiddenField name="shipment.id" value="${shipmentInstance?.id}"/>
@@ -47,22 +45,33 @@
                         <thead>
 
                         <tr>
-                            <th class="right-border"><warehouse:message code="container.label"/></th>
+                            <th class="right-border"><g:message code="container.label"/></th>
                             <th class="middle center"><input type="checkbox" class="checkAll"/></th>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="location.binLocation.label"/></th>
-                            <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
-                            <th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
-                            <th colspan="2" class="center"><warehouse:message code="default.quantity.label"/></th>
-                            <th></th>
+                            <th><g:message code="product.label"/></th>
+                            <th><g:message code="location.binLocation.label"/></th>
+                            <th><g:message code="inventoryItem.lotNumber.label"/></th>
+                            <th><g:message code="inventoryItem.expirationDate.label"/></th>
+                            <th class="center"><g:message code="default.qty.label"/></th>
+                            <th class="center border-right"><g:message code="default.uom.label"/></th>
+                            <th class="border-right" style="padding:0;margin:0">
+                                <table>
+                                    <td><g:message code="default.status.label" default="Status"/></th>
+                                    <td><g:message code="default.bin.label" default="Bin"/></th>
+                                    <td><g:message code="default.lot.label" default="Lot"/></th>
+                                    <td><g:message code="default.exp.label" default="Exp"/></th>
+                                    <td><g:message code="default.qty.label" default="Qty"/></th>
+                                    <td><g:message code="default.uom.label" default="UOM"/></th>
+                                </table>
+                            </th>
+                            <th><g:message code="default.actions.label"/></th>
                         </tr>
                         </thead>
                         <g:set var="previousContainer"/>
                         <tbody>
                             <g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
                                 <g:set var="isSameAsPrevious" value="${shipmentItem?.container == previousContainer}"/>
-                                <tr class="${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
-                                    <td class="right-border">
+                                <tr class="prop ${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
+                                    <td class="top right-border">
                                         <g:if test="${!isSameAsPrevious }">
                                             <g:if test="${shipmentItem?.container}">
                                                 ${shipmentItem?.container?.name }
@@ -72,22 +81,22 @@
                                             </g:else>
                                         </g:if>
                                     </td>
-                                    <td class="middle center">
+                                    <td class="top center">
                                         <g:checkBox class="shipment-item" name="shipmentItem.id" value="${shipmentItem?.id}" checked="${false}"/>
                                     </td>
-                                    <td class="middle">
+                                    <td class="top">
                                         <g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
                                             ${shipmentItem?.inventoryItem?.product?.productCode}
                                             <format:product product="${shipmentItem?.inventoryItem?.product}"/>
                                         </g:link>
                                     </td>
-                                    <td class="middle">
+                                    <td class="top">
                                         ${shipmentItem?.binLocation}
                                     </td>
-                                    <td class="middle">
+                                    <td class="top">
                                         <span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>
                                     </td>
-                                    <td class="middle">
+                                    <td class="top">
                                         <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
                                             <span class="expirationDate">
                                                 <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="d MMMMM yyyy"/>
@@ -99,17 +108,88 @@
                                             </span>
                                         </g:else>
                                     </td>
-                                    <td class="middle right">
+                                    <td class="top right">
                                         ${shipmentItem?.quantity }
                                     </td>
-                                    <td class="middle left">
+                                    <td class="top left border-right">
                                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
                                     </td>
-                                    <td class="middle">
+                                    <td class="top border-right" style="padding: 0; margin: 0">
+                                        <g:set var="binLocations" value="${quantityMap[shipmentItem?.inventoryItem?.product]}"/>
+                                        <table>
+                                            <g:if test="${status==0}">
+                                                <thead>
+                                                    <tr>
+
+                                                    </tr>
+                                                </thead>
+                                            </g:if>
+                                            <tbody>
+                                            <g:each var="entry" in="${binLocations}">
+                                                <g:set var="fade" value="${entry.quantity<shipmentItem?.quantity}"/>
+                                                <g:set var="picked" value="${entry.inventoryItem==shipmentItem?.inventoryItem&&entry.binLocation==shipmentItem?.binLocation}"/>
+                                                <tr class="${fade}">
+                                                    <%--
+                                                    <td>
+                                                        <g:radio name="binLocation.id" value="${entry?.binLocation?.id}"
+                                                                 checked="${shipmentItemInstance?.binLocation?.id==entry?.binLocation?.id}"/>
+                                                    </td>
+                                                    --%>
+                                                    <td>
+                                                        <g:if test="${picked}">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" title="${g.message(code:'picklist.picked.label')}">
+                                                        </g:if>
+
+                                                    </td>
+                                                    <td class="left" width="20%">
+                                                        ${entry?.binLocation?.name?:'Default'}
+                                                    </td>
+                                                    <td class="left" width="30%">
+                                                        <div style="text-overflow: clip ellipsis">
+
+                                                        <g:if test="${entry?.inventoryItem?.lotNumber}">
+                                                            ${entry?.inventoryItem?.lotNumber}
+                                                        </g:if>
+                                                        <g:else>
+                                                            <g:message code="default.empty.label"/>
+                                                        </g:else>
+                                                        </div>
+                                                    </td>
+                                                    <td class="left" width="20%">
+                                                        <g:if test="${entry?.inventoryItem?.expirationDate}">
+                                                            <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
+                                                        </g:if>
+                                                        <g:else>
+                                                            <g:message code="default.never.label"/>
+                                                        </g:else>
+                                                    </td>
+                                                    <td class="left" width="10%">
+                                                        ${entry?.quantity}
+                                                    </td>
+                                                    <td class="left" width="10%">
+                                                        ${entry?.product?.unitOfMeasure?:"EA"}
+                                                    </td>
+                                                    <%--
+                                                    <td>
+                                                        <g:if test="${entry.quantity>=shipmentItem?.quantity}">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" >
+                                                        </g:if>
+                                                        <g:else>
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" >
+                                                        </g:else>
+                                                    </td>
+                                                    --%>
+                                                </tr>
+                                            </g:each>
+
+                                            </tbody>
+                                        </table>
+
+                                    </td>
+                                    <td>
                                         <a href="javascript:void(-1)" data-id="${shipmentItem?.id}" data-execution="${params.execution}"
                                            class="btnPickItem button"><g:message code="shipping.pickShipmentItem.label"/></a>
                                     </td>
-
                                 </tr>
                                 <g:set var="previousContainer" value="${shipmentItem?.container }"/>
                             </g:each>
@@ -129,7 +209,6 @@
                         </tfoot>
 
                     </table>
-
 
                 </div>
                 <div class="buttons">

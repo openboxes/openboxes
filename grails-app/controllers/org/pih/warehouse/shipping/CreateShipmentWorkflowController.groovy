@@ -497,6 +497,7 @@ class CreateShipmentWorkflowController {
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("prepareShipmentItems").to("prepareShipmentItems")
 			on("pickShipmentItems").to("pickShipmentItems")
 			//on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
@@ -504,7 +505,32 @@ class CreateShipmentWorkflowController {
 			on("showDetails").to("showDetails")
     	}
 
-        pickShipmentItems {
+		pickShipmentItems {
+
+			action {
+
+				Map quantityMap = [:]
+				Location location = Location.load(session.warehouse.id)
+//				List inventoryItems = flow?.shipmentInstance?.shipmentItems*.inventoryItem
+//				inventoryItems.each { inventoryItem ->
+//					quantityMap[inventoryItem] = inventoryService.getQuantityByBinLocation(location,inventoryItem)
+//				}
+                List products = flow?.shipmentInstance?.shipmentItems*.product
+                products.each { product ->
+                    quantityMap[product] = inventoryService.getQuantityByBinLocation(location,product)
+                }
+
+				[quantityMap:quantityMap]
+			}
+			on("error").to "showPicklistItems"
+			on(Exception).to "showPicklistItems"
+			on("success").to "showPicklistItems"
+		}
+
+        showPicklistItems {
+
+			// Needed to add an action state above to
+			render(view: "pickShipmentItems")
 
 			on("back").to("enterContainerDetails")
 
