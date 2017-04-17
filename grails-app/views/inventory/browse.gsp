@@ -328,7 +328,7 @@
 
 
                                 <g:paginate total="${numProducts}"
-                                            action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+                                            action="browse" max="${params.max}" params="${[tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
                                 <div class="right">
                                     <warehouse:message code="inventory.browseResultsPerPage.label"/>:
