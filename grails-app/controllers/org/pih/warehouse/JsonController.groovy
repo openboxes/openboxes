@@ -219,6 +219,7 @@ class JsonController {
         render jsonResponse as JSON
     }
 
+    @Cacheable("inventoryBrowserCache")
 	def getQuantityToReceive = {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
@@ -227,6 +228,7 @@ class JsonController {
 		render (quantityToReceive?:"0")
 	}
 
+    @Cacheable("inventoryBrowserCache")
 	def getQuantityToShip = {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
@@ -235,6 +237,7 @@ class JsonController {
 		render (quantityToShip?:"0")
 	}
 
+    @Cacheable("inventoryBrowserCache")
 	def getQuantityOnHand = {
 		def product = Product.get(params?.product?.id)
 		def location = Location.get(params?.location?.id)
