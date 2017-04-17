@@ -22,137 +22,27 @@
             
             
 			<div class="dialog">
-                <div id="inventory-summary" class="summary">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td class="top">
-                                    <div class="title">
-                                        <warehouse:message code="inventory.browse.label" default="Browse inventory"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </div>
+                <g:render template="summary"/>
 
 				<!-- Inventory Browser -->
 	        	<g:set var="varStatus" value="${0}"/>
-	        	<g:set var="totalProducts" value="${0}"/> 							        	
-        	
-	            <div class="yui-gf">
+	        	<g:set var="totalProducts" value="${0}"/>
+
+                <g:set var="showQuantity" value="${(params.max as int) <= 25}"/>
+
+                <g:if test="${!showQuantity }">
+                    <div class="message">
+                        <warehouse:message code="inventory.tooManyProducts.message"></warehouse:message>
+                    </div>
+                </g:if>
+
+
+                <div class="yui-gf">
 					<div class="yui-u first">
-                        <%--
                         <g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>
-                        --%>
-
-                        <div>
-                            <g:form method="GET" controller="inventory" action="browse">
-                                <div class="box">
-                                    <h2><warehouse:message code="inventory.filterByProduct.label"/></h2>
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <g:hiddenField name="max" value="${params.max?:10 }"/>
-                                                <g:textField name="searchTerms"
-                                                             value="${commandInstance.searchTerms}"
-                                                             placeholder="${warehouse.message(code:'inventory.searchTerms.label')}"
-                                                             class="text medium" style="width:100%;"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <g:selectCategory id="subcategoryId"
-                                                                  name="subcategoryId"
-                                                                  class="chzn-select-deselect"
-                                                                  noSelection="['null':'']"
-                                                                  style="width:100%;"
-                                                                  value="${commandInstance?.subcategoryInstance?.id}"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div >
-                                                    <div>
-                                                        <g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>
-                                                        <warehouse:message code="inventory.showHiddenProducts.label"/>
-                                                    </div>
-                                                    <div>
-                                                        <g:checkBox name="showOutOfStockProducts" value="${commandInstance.showOutOfStockProducts}" size="24"/>
-                                                        <warehouse:message code="inventory.showOutOfStockProducts.label"/>
-
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="center">
-                                                    <button type="submit" class="button icon search" name="searchPerformed" value="true">
-                                                        <warehouse:message code="default.search.label"/>
-                                                    </button>
-
-
-                                                    <g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]" class="button icon reload">
-                                                        <warehouse:message code="inventoryBrowser.resetAll.label" default="Reset all"/>
-                                                    </g:link>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="box">
-                                    <h2><warehouse:message code="inventory.browseByTag.label"/></h2>
-                                    <table>
-                                        <tr class="">
-                                            <td class="middle">
-                                                <g:if test="${tags }">
-                                                    <div id="tagcloud" style="max-height: 200px; overflow: auto;" >
-                                                        <g:each in="${tags }" var="tag" status="status">
-                                                            <g:set var="selectedTag" value="${params.tag == tag.key.tag }"/>
-                                                            <span class="${selectedTag?'selected':'' }">
-                                                                <g:link controller="inventory" action="browse" params="['tag':tag.key.tag,'max':params.max]" rel="${tag?.key?.products?.size() }">
-                                                                    ${tag?.key?.tag } (${tag?.key?.products?.size() })</g:link>
-                                                            </span>
-                                                        </g:each>
-                                                    </div>
-                                                </g:if>
-                                                <g:else>
-                                                    <div class="empty middle center">
-                                                        ${warehouse.message(code: 'tags.empty.label', default:'No public tags') }
-                                                    </div>
-                                                </g:else>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="box">
-                                    <h2><warehouse:message code="inventory.browseByCategory.label"/></h2>
-                                    <table>
-                                        <g:each var="category" in="${commandInstance?.categoryInstance?.categories}">
-                                            <tr class="prop">
-                                                <td class="middle">
-                                                    <g:link controller="inventory" action="browse" params="['subcategoryId':category?.id,'max':params.max,'searchPerformed':true,'showHiddenProducts':params.showHiddenProducts?:'on','showOutOfStockProducts':params.showOutOfStockProducts?:'on']">
-                                                        ${category?.name } (${category?.products?.size() })
-                                                    </g:link>
-                                                </td>
-                                            </tr>
-                                        </g:each>
-                                    </table>
-                                </div>
-                            </g:form>
-                        </div>
                     </div>
 					<div class="yui-u">
 									
-						<g:set var="showQuantity" value="${(params.max as int) <= 25}"/>	
-
-						<g:if test="${!showQuantity }">
-							<div class="notice">
-								<warehouse:message code="inventory.tooManyProducts.message"></warehouse:message>
-							</div>
-						</g:if>
                         <div class="box">
                             <h2>
                                 <g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
@@ -187,28 +77,31 @@
 													<input type="checkbox" id="toggleCheckbox">	
 												</th>
 												<th class="middle" style="width: 1%">
-													<warehouse:message code="product.productCode.label"/>
+													<g:message code="product.productCode.label"/>
 												</th>
 												<th class="middle">
-													<warehouse:message code="product.name.label"/>
+													<g:message code="product.name.label"/>
+												</th>
+                                                <th class="middle">
+                                                    <g:message code="category.label"/>
+                                                </th>
+												<th class="middle">
+													<g:message code="product.manufacturer.label"/>
 												</th>
 												<th class="middle">
-													<warehouse:message code="product.manufacturer.label"/>
+													<g:message code="product.brandName.label"/>
 												</th>
 												<th class="middle">
-													<warehouse:message code="product.brandName.label"/>
-												</th>
-												<th class="middle">
-													<warehouse:message code="product.manufacturerCode.label"/>
+													<g:message code="product.manufacturerCode.label"/>
 												</th>
 												<th class="center" style="width: 7%;">
-													<warehouse:message code="inventory.qtyin.label"/>
+													<g:message code="inventory.qtyin.label"/>
 												</th>
 												<th class="center" style="width: 7%;">
-													<warehouse:message code="inventory.qtyout.label"/>
+													<g:message code="inventory.qtyout.label"/>
 												</th>
 												<th class="center middle" style="width: 7%;">
-													<warehouse:message code="default.qty.label"/>
+													<g:message code="default.qty.label"/>
 												</th>
 				           					</tr>
 										</thead>
@@ -218,27 +111,8 @@
                                                 <g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
                                                    <g:set var="category" value="${entry.key }"/>
                                                    <g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
-                                                   <%--
-                                                    <tr class="category-header">
-                                                       <td colspan="11" style="padding:0; margin:0;">
-                                                           <span class="fade">
-                                                               <h2 style="border-top: 2px solid lightgrey;">
-                                                                   <format:category category="${category }"/>
-                                                                   (${categoryInventoryItems.size() })
-
-                                                               </h2>
-                                                           </span>
-
-                                                       </td>
-                                                   </tr>
-                                                    --%>
                                                    <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
                                                        <g:if test="${inventoryItem.product }">
-                                                           <%--<cache:render cachekey="${inventoryItem?.product?.id}" template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]" />--%>
-                                                           <%--<g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product',showQuantity:showQuantity]" />--%>
-
-
-
                                                            <tr class="${counter%2==0?'even':'odd' } product prop">
                                                                <td class="center middle">
                                                                    <g:if test="${inventoryItem?.product?.images }">
@@ -257,7 +131,7 @@
                                                                    <div class="action-menu hover">
                                                                        <button class="action-btn">
                                                                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
-                                                                                   style="vertical-align: middle" />
+                                                                                style="vertical-align: middle" />
                                                                        </button>
                                                                        <div class="actions left">
                                                                            <div class="action-menu-info">
@@ -357,10 +231,12 @@
                                                                            <g:else>
                                                                                <warehouse:message code="product.untitled.label"/>
                                                                            </g:else>
-                                                                           <span class="fade">(${inventoryItem?.product?.category})</span>
                                                                        </div>
 
                                                                    </g:link>
+                                                               </td>
+                                                               <td class="checkable middle">
+                                                                   ${inventoryItem?.product?.category}
                                                                </td>
                                                                <td class="checkable middle left">
                                                                    <span class="fade">${inventoryItem?.product?.manufacturer }</span>
@@ -430,42 +306,41 @@
                                                    </g:each>
                                                 </g:each>
 										    </g:if>
-
-                                            <g:if test="${numProducts == 0}">
+                                            <g:unless test="${commandInstance?.categoryToProductMap}">
 												<tr>
-													<td colspan="11" class="even center">
+													<td colspan="12" class="even center">
 														<div class="fade empty">
-
-                                                            <warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
+                                                            <warehouse:message code="inventory.searchNoMatch.message"
+                                                                               args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
 														</div>
 													</td>
 												</tr>
-                                            </g:if>
+                                            </g:unless>
                                         </tbody>
 									</table>
 
 								</form>		
 							</div>
+                            <div class="paginateButtons">
 
-						</div>
-                        <div class="paginateButtons">
-
-                            <g:set var="pageParams"
-                                   value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+                                <g:set var="pageParams"
+                                       value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
 
-                            <g:paginate total="${numProducts}"
-                                        action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+                                <g:paginate total="${numProducts}"
+                                            action="browse" max="${params.max}" params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
 
-                            <div class="right">
-                                <warehouse:message code="inventory.browseResultsPerPage.label"/>:
-                                <g:if test="${params.max != '10'}"><g:link action="browse" params="${[max:10, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
-                                <g:if test="${params.max != '25'}"><g:link action="browse" params="${[max:25, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
-                                <g:if test="${params.max != '50'}"><g:link action="browse" params="${[max:50, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
-                                <g:if test="${params.max != '100'}"><g:link action="browse" params="${[max:100, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
-                                <g:if test="${params.max != '-1'}"><g:link action="browse" params="${[max:-1, tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                                <div class="right">
+                                    <warehouse:message code="inventory.browseResultsPerPage.label"/>:
+                                    <g:if test="${params.max != '10'}"><g:link action="browse" params="${[max:10, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+                                    <g:if test="${params.max != '25'}"><g:link action="browse" params="${[max:25, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
+                                    <g:if test="${params.max != '50'}"><g:link action="browse" params="${[max:50, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
+                                    <g:if test="${params.max != '100'}"><g:link action="browse" params="${[max:100, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
+                                    <g:if test="${params.max != '-1'}"><g:link action="browse" params="${[max:-1, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                                </div>
                             </div>
-                        </div>
+						</div>
+
 					</div>
 				</div>    	
 			</div>
