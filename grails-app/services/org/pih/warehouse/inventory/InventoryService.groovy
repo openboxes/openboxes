@@ -211,13 +211,7 @@ class InventoryService implements ApplicationContextAware {
 		def rootCategory = productService?.getRootCategory();
 		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory();
 
-		// Get current inventory for the given products
-		//if (commandInstance?.categoryInstance != rootCategory || commandInstance?.searchPerformed || commandInstance.tag) {
 		getCurrentInventory(commandInstance);
-		//}
-		//else {
-		//   commandInstance?.categoryToProductMap = [:]
-		//}
 
 		return commandInstance;
 	}
@@ -244,14 +238,14 @@ class InventoryService implements ApplicationContextAware {
 		List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms?.split(" ")) : null);
 		log.info "searchTerms = " + searchTerms
 		log.debug("get products: " + commandInstance?.warehouseInstance)
-		log.info "command.tag  = " + commandInstance.tag
+		log.info "command.tag  = " + commandInstance.tags
 
 		def products = []
 
         // User wants to view all products that match the given tag
-		if (commandInstance.tag) {
-			commandInstance.numResults = countProductsByTags(commandInstance.tag)
-			products = getProductsByTags(commandInstance.tag, commandInstance?.maxResults as int, commandInstance?.offset as int)
+		if (commandInstance.tags) {
+			commandInstance.numResults = countProductsByTags(commandInstance.tags)
+			products = getProductsByTags(commandInstance.tags, commandInstance?.maxResults as int, commandInstance?.offset as int)
 		}
 
         // User wants to view all products in the given shipment
@@ -278,96 +272,32 @@ class InventoryService implements ApplicationContextAware {
             log.info " * After removing all hidden products: " + (System.currentTimeMillis() - startTime) + " ms"
 			startTime = System.currentTimeMillis()
 			
-			// now localize to only match products for the current locale
-			// TODO: this would also have to handle the category filtering
-			//  products = products.findAll { product ->
-			//  def localizedProductName = getLocalizationService().getLocalizedString(product.name);
-			// TODO: obviously, this would have to use the actual locale
-			// return productFilters.any {
-			//   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
-			// }
-			// }
 		}
 		products = products?.sort() { map1, map2 -> map1.category <=> map2.category ?: map1.name <=> map2.name };
-        log.info " * Sort products " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-		
-		// Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
-		def quantityOnHandMap = [:]//getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory, products);
-        log.info " * Get quantity on hand map " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-		
-		def quantityOutgoingMap = [:] 
-		// getOutgoingQuantityByProduct(commandInstance?.warehouseInstance, products);
-        log.info " * Get outgoing map " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-		
-		def quantityIncomingMap = [:] 
-		// getIncomingQuantityByProduct(commandInstance?.warehouseInstance, products);
-        log.info " * Get incoming map: " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-		
-		
-		def quantityOnHand = 0;
-		def quantityToReceive = 0;
-		def quantityToShip = 0;
-		
-		startTime = System.currentTimeMillis()
+        log.info "Sort products " + (System.currentTimeMillis() - startTime) + " ms"
+
 		def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy { it.product }
-        log.debug " * Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
-		def inventoryLevel
+
+        log.info "Products: " + products
+
 		products.each { product ->
 			def innerStartTime = System.currentTimeMillis()
-			inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
-			//log.debug "product " + product
-			//log.debug "inventoryLevel.class.name = " + inventoryLevel?.class?.name
-			//log.debug "inventoryLevels " + inventoryLevel
-			
-						
-			if (inventoryLevel && inventoryLevel instanceof ArrayList) { 
+			def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
+			if (inventoryLevel && inventoryLevel instanceof ArrayList) {
 				throw new Exception("Cannot have multiple inventory levels for a single product [" + product.productCode + ":" + product.name + "]: " + inventoryLevel)
 			
 			}
-			quantityOnHand = quantityOnHandMap[product] ?: 0
-			quantityToReceive = quantityIncomingMap[product] ?: 0
-			quantityToShip = quantityOutgoingMap[product] ?: 0
-			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
-				inventoryItemCommands << getInventoryItemCommand(product,						
-						commandInstance?.warehouseInstance?.inventory,
-						inventoryLevel,
-						quantityOnHand, quantityToReceive, quantityToShip,
-						commandInstance?.showOutOfStockProducts)
-			}
+            inventoryItemCommands << getInventoryItemCommand(product,
+                    commandInstance?.warehouseInstance?.inventory,
+                    inventoryLevel, 0, 0, 0, commandInstance?.showOutOfStockProducts)
             log.info " * process product : " + (System.currentTimeMillis() - innerStartTime) + " ms"
 		}
         log.info " * process on hand quantity: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 		
-		/*
-		def productGroups = getProductGroups(commandInstance);
-		productGroups.each { productGroup ->
-			def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)
-			inventoryItemCommand.inventoryItems = new ArrayList();
-			productGroup.products.each { product ->
-				inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
-				inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
-				inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
-				inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory,
-						quantityOnHandMap[product] ?: 0,
-						quantityIncomingMap[product] ?: 0,
-						quantityOutgoingMap[product] ?: 0,
-						commandInstance.showOutOfStockProducts)
 
-				// Remove all products in the product group from the main productd list
-				inventoryItemCommands.removeAll { it.product == product }
-			}
-			inventoryItemCommands << inventoryItemCommand
-		}
-		log.debug " * after creating inventory items: " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-		*/
-		
 		commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
 
         log.info " * Get category to product map: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -1045,26 +975,28 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 		}
+        log.info "Get supported products: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		def products = Product.createCriteria().list() {
-			if (terms) {
-				createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
-                createAlias("inventoryLevels", "inventoryLevels", CriteriaSpecification.LEFT_JOIN)
-			}
+        startTime = System.currentTimeMillis()
+		def products = Product.createCriteria().list(max: maxResult, offset: offset) {
+//			if (terms) {
+//				createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
+//                createAlias("inventoryLevels", "inventoryLevels", CriteriaSpecification.LEFT_JOIN)
+//			}
 			if(categories) {
 				inList("category", categories)
             }
-			if (!showHidden) {
-				not {
-					inList("id", (unsupportedProducts.collect { it.id })?: [""])
-				}
-			}
+//			if (!showHidden) {
+//				not {
+//					inList("id", (unsupportedProducts.collect { it.id })?: [""])
+//				}
+//			}
 			if (terms) {
 				and {
                     terms.each { term ->
                         or {
-                            ilike('inventoryItems.lotNumber', "%" + term + "%")
-                            ilike('inventoryLevels.binLocation', "%" + term + "%")
+//                            ilike('inventoryItems.lotNumber', "%" + term + "%")
+//                            ilike('inventoryLevels.binLocation', "%" + term + "%")
                             ilike("name", "%" + term + "%")
                             ilike("description", "%" + term + "%")
                             ilike("brandName", "%" +term + "%")
@@ -1082,27 +1014,10 @@ class InventoryService implements ApplicationContextAware {
                     }
 				}
 			}
+            order("name", "asc")
+        }
+        log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		}
-        log.info " * Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-
-		//products = products.collect { it }.unique { it.id }
-        log.info " * Get unique IDs: " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-
-
-        log.info "Max " + maxResult
-        log.info "Offset " + offset
-		products = Product.createCriteria().list(max: maxResult, offset: offset) {
-			inList("id", (products.collect { it.id })?: [""])
-			//order("category", "asc")
-			order("name", "asc")
-		}
-
-        log.info " * Re-query for products by ID: " + (System.currentTimeMillis() - startTime) + " ms"
-		startTime = System.currentTimeMillis()
-	
 		return products;	
 	}
 
@@ -1126,12 +1041,16 @@ class InventoryService implements ApplicationContextAware {
 	def getProductsByTags(List<String> inputTags, int max, int offset) {
         log.info "Get products by tags=${inputTags} max=${max} offset=${offset}"
 		def products = Product.withCriteria {
-			tags { 'in'('tag', inputTags) }
+			tags {
+                'in'('id', inputTags)
+            }
 			if (max > 0) maxResults(max)
 			firstResult(offset)
-			//maxResults(params.max)
-			//firstResult(params.offset)
+//			maxResults(params.max)
+//			firstResult(params.offset)
 		}
+        log.info "Products: " + products
+
 		return products
 	}
 
@@ -1139,7 +1058,7 @@ class InventoryService implements ApplicationContextAware {
         log.debug "Get products by tags: " + inputTags
 		def results = Product.withCriteria {
 			projections { count('id') }
-			tags { 'in'('tag', inputTags) }
+			tags { 'in'('id', inputTags) }
 		}
 		//log.debug "Results " + results[0]
 		return results[0]
@@ -1451,6 +1370,13 @@ class InventoryService implements ApplicationContextAware {
         List binLocations = getQuantityByBinLocation(transactionEntries)
         return binLocations
     }
+
+    List getQuantityByBinLocation(Location location, List<Product> products) {
+        List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, products)
+        List binLocations = getQuantityByBinLocation(transactionEntries)
+        return binLocations
+    }
+
 
     List getQuantityByBinLocation(Location location, InventoryItem inventoryItem) {
         List transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(location?.inventory, inventoryItem)

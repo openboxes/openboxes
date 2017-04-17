@@ -39,6 +39,15 @@ beans = {
         timeToLive = 86400       // 1 day = 60 * 60 * 24
         timeToIdle = 43200        // 12 hours = 60 * 60 * 12
     }
+    inventoryBrowserCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "inventoryBrowserCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour
+        timeToIdle = 500        // 5 minutes
+    }
 
     fastMoversCache(EhCacheFactoryBean) { bean ->
         cacheManager = ref("springcacheCacheManager")

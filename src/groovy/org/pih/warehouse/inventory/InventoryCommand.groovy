@@ -35,7 +35,7 @@ class InventoryCommand {
     def numResults = 0
 
 	// Tags
-	List tag
+	List tags
 	
 	static constraints = {
         shipment(nullable:true)

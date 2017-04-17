@@ -79,7 +79,6 @@ class SelectTagLib {
     @Cacheable("selectTagCache")
     def selectTag = { attrs, body ->
         def tags = Tag.list(sort:"tag").collect { [ id: it.id, name: it.tag, productCount: it?.products?.size() ]}
-        log.info tags
         attrs.from = tags
         attrs.value = attrs.value
         attrs.optionKey = "id"

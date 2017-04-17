@@ -70,31 +70,18 @@ class InventoryController {
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
     //@Cacheable("inventoryControllerCache")
-	def browse = { InventoryCommand cmd ->
+	def browse = { InventoryCommand commandInstance ->
         if(!params.max) params.max = 10
         if(!params.offset) params.offset = 0
 
+        log.info "Tags: " + commandInstance.tags
+
 		// Get the current warehouse from either the request or the session
-		cmd.warehouseInstance = Location.get(params?.warehouse?.id) 
-		if (!cmd.warehouseInstance) {
-			cmd.warehouseInstance = Location.get(session?.warehouse?.id);
+        commandInstance.warehouseInstance = Location.get(params?.warehouse?.id)
+		if (!commandInstance.warehouseInstance) {
+            commandInstance.warehouseInstance = Location.get(session?.warehouse?.id);
 		}
 
-		// Get the primary category from either the request or the session or as the first listed by default
-		def quickCategories = productService.getQuickCategories();
-		/*
-		cmd.categoryInstance = Category.get(params?.categoryId)
-		if (!cmd.categoryInstance) {
-			cmd.categoryInstance = Category.get(session?.inventoryCategoryId);
-			if (!cmd.categoryInstance) {
-				cmd.categoryInstance = productService.getRootCategory() 
-				//cmd.categoryInstance =  quickCategories.get(0);
-			}
-		}
-		session?.inventoryCategoryId = cmd?.categoryInstance?.id
-		*/
-		cmd.categoryInstance = productService.getRootCategory()
-		
 		// if we have arrived via a quick link tab, reset any subcategories or search terms in the session
 		if (params?.resetSearch) {
 			session?.inventorySubcategoryId = null
@@ -102,45 +89,45 @@ class InventoryController {
 		}
 		
 		// Pre-populate the sub-category and search terms from the session
-		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
-		cmd.searchTerms = session?.inventorySearchTerms
-		cmd.showHiddenProducts = session?.showHiddenProducts
-		cmd.showUnsupportedProducts = session?.showUnsupportedProducts
-		cmd.showNonInventoryProducts = session?.showNonInventoryProducts
-		cmd.showOutOfStockProducts = session?.showOutOfStockProducts ?: true
+        commandInstance.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
+        commandInstance.searchTerms = session?.inventorySearchTerms
+        commandInstance.showHiddenProducts = session?.showHiddenProducts
+        commandInstance.showUnsupportedProducts = session?.showUnsupportedProducts
+        commandInstance.showNonInventoryProducts = session?.showNonInventoryProducts
+        commandInstance.showOutOfStockProducts = session?.showOutOfStockProducts ?: true
 		
 		// If a new search is being performed, override the session-based terms from the request
 		if (request.getParameter("searchPerformed")) {
-			cmd.subcategoryInstance = Category.get(params?.subcategoryId)
-			session?.inventorySubcategoryId = cmd.subcategoryInstance?.id
-			
-			cmd.searchTerms = params.searchTerms
-			session?.inventorySearchTerms = cmd.searchTerms
-			
-			cmd.showHiddenProducts = params?.showHiddenProducts == "on"
-			session?.showHiddenProducts = cmd.showHiddenProducts
+            commandInstance.subcategoryInstance = Category.get(params?.subcategoryId)
+			session?.inventorySubcategoryId = commandInstance.subcategoryInstance?.id
 
-			cmd.showUnsupportedProducts = params?.showUnsupportedProducts == "on"
-			session?.showUnsupportedProducts = cmd.showUnsupportedProducts
+            commandInstance.searchTerms = params.searchTerms
+			session?.inventorySearchTerms = commandInstance.searchTerms
 
-			cmd.showOutOfStockProducts = params?.showOutOfStockProducts == "on"
-			session?.showOutOfStockProducts = cmd.showOutOfStockProducts
-			
-			cmd.showNonInventoryProducts = params?.showNonInventoryProducts == "on"
-			session?.showNonInventoryProducts = cmd.showNonInventoryProducts
+            commandInstance.showHiddenProducts = params?.showHiddenProducts == "on"
+			session?.showHiddenProducts = commandInstance.showHiddenProducts
+
+            commandInstance.showUnsupportedProducts = params?.showUnsupportedProducts == "on"
+			session?.showUnsupportedProducts = commandInstance.showUnsupportedProducts
+
+            commandInstance.showOutOfStockProducts = params?.showOutOfStockProducts == "on"
+			session?.showOutOfStockProducts = commandInstance.showOutOfStockProducts
+
+            commandInstance.showNonInventoryProducts = params?.showNonInventoryProducts == "on"
+			session?.showNonInventoryProducts = commandInstance.showNonInventoryProducts
 
 		}
-        cmd.maxResults = params?.max
-        cmd.offset = params?.offset
+        commandInstance.maxResults = params?.max
+        commandInstance.offset = params?.offset
 
 		// Pass this to populate the matching inventory items
-		inventoryService.browseInventory(cmd);
+		inventoryService.browseInventory(commandInstance);
 
 		def tags = productService.getPopularTags()
 
 		def categories = productService.getTopLevelCategories()
 		
-		[ commandInstance: cmd, quickCategories: quickCategories, tags : tags, numProducts : cmd.numResults, categories: categories, rootCategory: productService.getRootCategory() ]
+		[ commandInstance: commandInstance, tags : tags, numProducts : commandInstance.numResults, categories: categories, rootCategory: productService.getRootCategory() ]
 	}
 	
 		
@@ -1081,31 +1068,43 @@ class InventoryController {
 	}
 	
 	
-	def listAllTransactions = {		
-		
-		// FIXME Using the dynamic finder Inventory.findByLocation() does not work for some reason
-		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
-		
+	def listAllTransactions = {
+
+        Location location = Location.get(session.warehouse.id)
+        def currentInventory = location.inventory
+
+        Date transactionDateFrom = params.transactionDateFrom ? Date.parse("MM/dd/yyyy", params.transactionDateFrom): null
+        Date transactionDateTo = params.transactionDateTo ? Date.parse("MM/dd/yyyy", params.transactionDateTo) : null
+
 		// we are only showing transactions for the inventory associated with the current warehouse
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		params.sort = params?.sort ?: "dateCreated"
 		params.order = params?.order ?: "desc"
-		def transactions = []
-		def transactionCount = 0;
+
+
 		def transactionType = TransactionType.get(params?.transactionType?.id)
-		if (transactionType) { 
-			transactions = Transaction.findAllByInventoryAndTransactionType(currentInventory, transactionType, params);			
-			transactionCount = Transaction.countByInventoryAndTransactionType(currentInventory, transactionType);
-		}
-		else { 
-			transactions = Transaction.findAllByInventory(currentInventory, params);
-			transactionCount = Transaction.countByInventory(currentInventory);
-		}
-		def transactionMap = Transaction.findAllByInventory(currentInventory).groupBy { it?.transactionType?.id } 
-		log.debug(transactionMap.keySet())
+        def transactions = Transaction.createCriteria().list(params) {
+            and {
+                eq("inventory", currentInventory)
+                if (transactionType) {
+                    eq("transactionType", transactionType)
+                }
+                if (params.transactionNumber) {
+                    ilike("transactionNumber", "%" + params.transactionNumber + "%")
+                }
+                if (params.transactionDateFrom) {
+                    ge("transactionDate", transactionDateFrom)
+                }
+                if (params.transactionDateTo) {
+                    le("transactionDate", transactionDateTo)
+                }
+            }
+            maxResults(params.max)
+            order(params.sort, params.order)
+        }
+
 		render(view: "listTransactions", model: [transactionInstanceList: transactions, 
-			transactionCount: transactionCount, transactionTypeSelected: transactionType, 
-			transactionMap: transactionMap ])
+			transactionCount: transactions.totalCount, transactionTypeSelected: transactionType])
 	}
 
 		
@@ -1279,6 +1278,8 @@ class InventoryController {
             if (productIds) {
                 products = Product.getAll(productIds)
                 command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds);
+
+                command.binLocations = inventoryService.getQuantityByBinLocation(warehouseInstance, products)
             }
 		}
 		// If given a list of inventory items, we just return those inventory items
@@ -1306,17 +1307,16 @@ class InventoryController {
 		
 	}
 
-	
-	
 	/**
 	 * Save a transaction that sets the current inventory level for stock.
 	 */
 	def saveInventoryTransaction = { TransactionCommand command ->
-		log.debug ("Saving inventory adjustment " + params)
+		log.info ("Saving inventory adjustment " + params)
+        log.info "Command: " + command
 
 		def transaction = command?.transactionInstance;
 		def warehouseInstance = Location.get(session?.warehouse?.id);
-		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
+		//def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 		
 		// Item cannot have a negative quantity
 		command.transactionEntries.each {
@@ -1336,8 +1336,11 @@ class InventoryController {
 					// If the quantity changes, we record a new transaction entry
 					//if (it.quantity != onHandQuantity) { 
 					def transactionEntry = new TransactionEntry()
+                    transactionEntry.product = it.inventoryItem.product
 					transactionEntry.inventoryItem = it.inventoryItem
 					transactionEntry.quantity = it.quantity
+                    transactionEntry.binLocation = it.binLocation
+                    transactionEntry.comments = it.comment
 					transaction.addToTransactionEntries(transactionEntry)
 					//}
 				}
@@ -1357,12 +1360,13 @@ class InventoryController {
 		// After the attempt to save the transaction, there might be errors on the transaction
 		if (transaction.hasErrors()) {
 			log.debug ("has errors" + transaction.errors)
-			
+
 			// Get the list of products that the user selected from the inventory browser			
 			if (params.product?.id) {
 				def productIds = params.list('product.id')
 				def products = productIds.collect { String.valueOf(it); }
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
+                command.binLocations = inventoryService.getQuantityByBinLocation(warehouseInstance, products)
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
@@ -1370,15 +1374,11 @@ class InventoryController {
 				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
 				command?.productInventoryItems = inventoryItems.groupBy { it.product }
 			}
-	
 			
 			// Populate the command object and render the form view.
 			command.transactionInstance = transaction
 			command.warehouseInstance = warehouseInstance
-			command.quantityMap = quantityMap;
-			command.transactionTypeList = TransactionType.list();
-			command.locationList = Location.list();
-			
+
 			render(view: "createTransaction", model: [command: command]);
 		}
 	}
@@ -1389,13 +1389,17 @@ class InventoryController {
 	 * TRANSFER_OUT, CONSUMED, DAMAGED, EXPIRED
 	 */
 	def saveDebitTransaction = { TransactionCommand command ->
-		log.debug ("Saving debit transactions " + params)
-		
-		log.debug("size: " + command?.transactionEntries?.size());
-			
+		log.info ("Saving debit transactions " + params)
+		log.info("size: " + command?.transactionEntries?.size());
+
+
+        // Get the products involved
+        def productIds = params.list('product.id').collect { String.valueOf(it); }
+        List products = Product.getAll(productIds)
+
 		def transaction = command?.transactionInstance;
 		def warehouseInstance = Location.get(session?.warehouse?.id);
-		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
+		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory, products)
 		
 		// Quantity cannot be greater than on hand quantity
 		command.transactionEntries.each {
@@ -1413,7 +1417,9 @@ class InventoryController {
 					if (it.quantity) { 
 						def transactionEntry = new TransactionEntry()
 						transactionEntry.inventoryItem = it.inventoryItem
+                        transactionEntry.product = it.product
 						transactionEntry.quantity = it.quantity
+                        transactionEntry.binLocation = it.binLocation
 						transaction.addToTransactionEntries(transactionEntry)
 					}
 				}
@@ -1436,9 +1442,8 @@ class InventoryController {
 			
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
-				def productIds = params.list('product.id')
-				def products = productIds.collect { String.valueOf(it); }
-				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
+				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds);
+                command.binLocations = inventoryService.getQuantityByBinLocation(warehouseInstance, products)
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
@@ -1451,9 +1456,7 @@ class InventoryController {
 			command.transactionInstance = transaction
 			command.warehouseInstance = warehouseInstance
 			command.quantityMap = quantityMap;
-			command.transactionTypeList = TransactionType.list();
-			command.locationList = Location.list();
-			
+
 			render(view: "createTransaction", model: [command: command]);
 		}
 	}
@@ -1470,9 +1473,7 @@ class InventoryController {
 		log.debug("Saving credit transaction: " + params)
 		def transactionInstance = command?.transactionInstance
 		def warehouseInstance = Location.get(session?.warehouse?.id);
-		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 
-		
 		// Quantity cannot be less than 0 or else it would be in a debit transaction
 		command.transactionEntries.each {
 			if (it.quantity < 0) {
@@ -1482,8 +1483,7 @@ class InventoryController {
 
 		// We need to process each transaction entry to make sure that it has a valid inventory item (or we will create one if not)
 		command.transactionEntries.each { 
-			log.debug(it?.inventoryItem?.id + " " + it.product + " " + it.lotNumber + " " + it.expirationDate)
-			if (!it.inventoryItem) { 
+			if (!it.inventoryItem) {
 				// Find an existing inventory item for the given lot number and product and description
 				log.debug("Find inventory item " + it.product + " " + it.lotNumber)
 				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
@@ -1512,7 +1512,8 @@ class InventoryController {
 		// Now that all transaction entries in the command have inventory items, 
 		// we need to create a persistable transaction entry
 		command.transactionEntries.each {
-			def transactionEntry = new TransactionEntry(inventoryItem: it.inventoryItem, quantity: it.quantity)			
+			def transactionEntry = new TransactionEntry(inventoryItem: it.inventoryItem,
+                    product: it.inventoryItem.product, binLocation: it.binLocation, quantity: it.quantity)
 			transactionInstance.addToTransactionEntries(transactionEntry)
 		}
 
@@ -1549,95 +1550,10 @@ class InventoryController {
 			}
 			
 			// Populate the command object and render the form view.
-			//command.transactionInstance = transaction
 			command.warehouseInstance = warehouseInstance
-			command.quantityMap = quantityMap;
-			command.transactionTypeList = TransactionType.list();
-			command.locationList = Location.list();
-			
+
 			render(view: "createTransaction", model: [command: command]);
 		}
-	}
-	
-	/**
-	 * Save a transaction that debits stock from the given inventory.
-	 * 
-	 * Not used at the moment.  
-	 */
-	def saveOutgoingTransfer = { Transaction transaction, TransactionCommand command ->
-		log.debug ("Saving stock transfer " + params)
-
-		def warehouseInstance = Location.get(session?.warehouse?.id);
-		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
-		
-		// Validate transaction entries
-		log.debug ("BEGINNING")
-		def transactionEntriesToRemove = []
-		transaction.transactionEntries.each {
-			log.debug("transaction entry " + it.inventoryItem + " " + it.quantity);
-			def quantityOnHand = quantityMap[it.inventoryItem]
-			if (quantityOnHand < it.quantity) {
-				transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", 
-													[it?.inventoryItem?.lotNumber] as Object[], "")
-			} 
-			
-			if (!it.quantity) { 
-				log.debug ("remove " + it?.inventoryItem?.id + " from transaction entries")
-				transactionEntriesToRemove.add(it)
-			}
-		}
-
-		// Remove any transaction entries that are invalid
-		transactionEntriesToRemove.each {
-			log.debug("REMOVE " + it.inventoryItem + " " + it.quantity);
-			transaction.transactionEntries.remove(it)
-		}
-		
-		log.debug ("REMAINING")
-		transaction.transactionEntries.each {
-			log.debug("transaction entry " + it.inventoryItem + " " + it.quantity);
-		}
-		// Check to see if there are errors, if not save the transaction 		
-		if (!transaction.hasErrors()) { 
-			try { 
-				// Validate the transaction object
-				if (!transaction.hasErrors() && transaction.validate()) { 
-					transaction.save(failOnError: true)				
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
-					//redirect(controller: "inventory", action: "browse")
-					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)					
-				} 
-			} catch (ValidationException e) { 
-				log.debug ("caught validation exception " + e)
-			}
-		}
-
-		// After the attempt to save the transaction, there might be errors on the transaction		
-		if (transaction.hasErrors()) { 
-			log.debug ("has errors" + transaction.errors)
-			
-			// Get the list of products that the user selected from the inventory browser
-			if (params.product?.id) {
-				def productIds = params.list('product.id')
-				def products = productIds.collect { String.valueOf(it); }
-				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
-			}
-			// If given a list of inventory items, we just return those inventory items
-			else if (params?.inventoryItem?.id) {
-				def inventoryItemIds = params.list('inventoryItem.id')
-				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
-				command?.productInventoryItems = inventoryItems.groupBy { it.product }
-			}
-			
-			// Populate the command object and render the form view.
-			command.transactionInstance = transaction
-			command.warehouseInstance = warehouseInstance
-			command.quantityMap = quantityMap;
-			command.transactionTypeList = TransactionType.list();
-			command.locationList = Location.list();
-			
-			render(view: "createTransaction", model: [command: command]);
-		}			
 	}
 
 	def editTransaction = {

@@ -22,74 +22,48 @@
                             <warehouse:message code="default.filters.label"/>
                         </h2>
                         <form>
-                            <table>
+                            <div class="filter">
+                                <label>
+                                    <g:message code="transaction.inventory.label"/>
+                                </label>
+                                <div class="value">
+                                    ${session.warehouse.name}
+                                </div>
+                            </div>
+                            <div class="filter">
+                                <label><g:message code="transaction.transactionNumber.label"/></label>
+                                <g:textField name="transactionNumber" style="width: 100%" class="text" value="${params.transactionNumber}"></g:textField>
+                            </div>
+                            <div class="filter">
+                                <label><g:message code="transaction.transactionType.label"/></label>
+                                <select id="transactionTypeSelect" name="transactionType.id" class="chzn-select-deselect">
+                                    <option value="">
+                                        <warehouse:message code="transactionType.all.label"/>
+                                    </option>
+                                    <g:each var="transactionType" in="${org.pih.warehouse.inventory.TransactionType.list()}">
+                                        <g:set var="selected" value="${transactionTypeSelected == transactionType }"/>
+                                        <option value="${transactionType?.id}" ${selected?'selected="selected"':'' }>
+                                        <format:metadata obj="${transactionType }"/>
+                                    </g:each>
+                                </select>
+                            </div>
+                            <div class="filter">
 
-                                <tr>
-                                    <td>
-                                        <label>
-                                            <warehouse:message code="transaction.inventory.label"/>
-                                        </label>
+                                <label>
+                                    <warehouse:message code="default.dateRange.label" default="Date Range"/>
+                                </label>
+                                <div>
+                                    <g:jqueryDatePicker id="transactionDateFrom" name="transactionDateFrom" placeholder="${g.message(code:'default.from.label')}"
+                                                        value="${params.transactionDateFrom}" format="MM/dd/yyyy"/>
+                                    <label>-</label>
+                                    <g:jqueryDatePicker id="transactionDateTo" name="transactionDateTo" placeholder="${g.message(code:'default.to.label')}"
+                                                        value="${params.transactionDateTo}" format="MM/dd/yyyy"/>
+                                </div>
+                            </div>
+                            <div class="filter">
+                                <g:submitButton name="search" value="Search" class="button"></g:submitButton>
+                            </div>
 
-                                    </td>
-                                    <td>
-                                        ${session.warehouse.name}
-                                    </td>
-
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label>
-                                            <warehouse:message code="transaction.transactionType.label"/>
-
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <select id="transactionTypeSelect" name="transactionType.id">
-                                            <option value="">
-                                                <warehouse:message code="transactionType.all.label"/>
-                                            </option>
-                                            <g:each var="transactionType" in="${org.pih.warehouse.inventory.TransactionType.list()}">
-                                                <g:set var="numberOfTransactions" value="${transactionMap[transactionType?.id]?.size()?:0}"/>
-                                                <g:set var="selected" value="${transactionTypeSelected == transactionType }"/>
-                                                <g:if test="${numberOfTransactions > 0 }">
-                                                    <option value="${transactionType?.id}" ${selected?'selected="selected"':'' }>
-                                                    <format:metadata obj="${transactionType }"/>
-                                                    (${numberOfTransactions })
-
-                                                </g:if>
-                                            </g:each>
-                                        </select>
-                                    </td>
-                                </tr>
-
-                                <%--
-                                <tr>
-                                    <td>
-                                        <label>
-                                            <warehouse:message code="transaction.transactionDate.label"/>
-
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <g:jqueryDatePicker id="transactionDateFrom" name="transactionDateFrom"
-                                                                value="${params.transactionDateFrom}" format="MM/dd/yyyy"/>
-                                            <g:jqueryDatePicker id="transactionDateTo" name="transactionDateTo"
-                                                                value="${params.transactionDateTo}" format="MM/dd/yyyy"/>
-                                        </div>
-                                    </td>
-                                </tr>
-                                --%>
-                                <tr>
-                                    <td colspan="2" class="right">
-
-                                        <g:submitButton name="search" value="Search" class="button"></g:submitButton>
-                                    </td>
-
-                                </tr>
-
-
-                            </table>
                         </form>
                     </div>
                 </div>
@@ -115,13 +89,7 @@
                                         <warehouse:message code="default.createdBy.label"/>
                                     </th>
                                     <th class="center">
-                                        <warehouse:message code="default.updatedBy.label"/>
-                                    </th>
-                                    <th class="center">
                                         <warehouse:message code="default.dateCreated.label"/>
-                                    </th>
-                                    <th class="center">
-                                        <warehouse:message code="default.lastUpdated.label"/>
                                     </th>
                                 </tr>
                             </thead>
@@ -204,20 +172,7 @@
 
                                         </td>
                                         <td class="center">
-                                            <g:if test="${transactionInstance?.updatedBy}">
-                                                ${transactionInstance?.updatedBy?.name }
-                                            </g:if>
-                                            <g:else>
-                                                <span class="fade">
-                                                    <warehouse:message code="default.nobody.label" default="Nobody"/>
-                                                </span>
-                                            </g:else>
-                                        </td>
-                                        <td class="center">
                                             ${transactionInstance?.dateCreated }
-                                        </td>
-                                        <td class="center">
-                                            ${transactionInstance?.lastUpdated }
                                         </td>
                                     </tr>
                                 </g:each>
