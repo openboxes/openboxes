@@ -331,15 +331,18 @@ class DashboardController {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
-      //   def startTime = System.currentTimeMillis()
+		//def startTime = System.currentTimeMillis()
 
-        // Shipments
-		def incomingShipments = Shipment.findAllByDestination(location).groupBy{it.status.code}.sort()
+        // Inbound Shipments
+		def incomingShipments = null //Shipment.findAllByDestination(location).groupBy{it.status.code}.sort()
         def incomingShipmentsCount = Shipment.countByDestination(location)
 
-		def outgoingShipments = Shipment.findAllByOrigin(location).groupBy{it.status.code}.sort();
+
+		// Outbound Shipments
+		def outgoingShipments = null //Shipment.findAllByOrigin(location).groupBy{it.status.code}.sort();
         def outgoingShipmentsCount = Shipment.countByOrigin(location)
-        // Orders
+
+		// Orders
 		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
 
         // Requisitions
