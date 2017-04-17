@@ -19,7 +19,7 @@ class AuthTagLib {
 	def supports = { attrs, body ->
 		def location = Location.load(session.warehouse.id)
 		if (location && location.supports(attrs.activityCode)) {
-			out << body
+			out << body()
 		}
 	}
 
