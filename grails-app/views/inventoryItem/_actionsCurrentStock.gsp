@@ -11,12 +11,14 @@
                     <warehouse:message code="inventory.editItem.label"/>
                 </a>
             </div>
-            <div class="action-menu-item">
-                <a  href="javascript:void(0);" id="btnAdjustStock-${dialogId}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
-                    <warehouse:message code="inventory.adjustStock.label"/>
-                </a>
-            </div>
+            <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+                <div class="action-menu-item">
+                    <a  href="javascript:void(0);" id="btnAdjustStock-${dialogId}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
+                        <warehouse:message code="inventory.adjustStock.label"/>
+                    </a>
+                </div>
+            </g:supports>
             <div class="action-menu-item">
                 <a  href="javascript:void(0);" id="btnTransferStock-${dialogId}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'book_next.png')}"/>&nbsp;
