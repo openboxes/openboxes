@@ -32,8 +32,8 @@
         <warehouse:message code="tags.label" default="Tags"/>
     </h2>
 
-	<div class="widget-content">
-        <div id="tag-summary">
+	<div class="widget-content" style="max-height: 300px; overflow: auto; padding: 0; margin: 0" >
+        <div id="tag-summary" >
             <g:if test="${params.editTags}">
                 <g:isUserAdmin>
                     <table>
@@ -129,8 +129,8 @@
     $(window).load(function(){
         $("#tagcloud a").tagcloud({
             size: {
-                start:1.2,
-                end: 1.5,
+                start:1.0,
+                end: 2.0,
                 unit: 'em'
             },
             color: {
