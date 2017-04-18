@@ -16,7 +16,18 @@ import com.ocpsoft.pretty.time.PrettyTime
 import groovy.time.TimeDuration;
 
 class DateTagLib {
-   	
+
+
+	def expirationDate = { attrs, body ->
+        log.info "Attrs " + attrs
+
+        log.info "attrs.date " + attrs.date
+//        if (attrs.date == null) {
+//            throwTagError('Tag ["expirationDate"] missing required attribute ["date"]')
+//        }
+        out << g.render(template: '/taglib/expirationDate', model: [attrs:attrs])
+	}
+
 	def relativeDate = { attrs, body ->
 		
 		Date now = new Date();
@@ -71,7 +82,7 @@ class DateTagLib {
 		
 		def now = new Date() 
 		if (now - date < 1) { 
-			out << "${warehouse.message(code:'default.today.label')}"
+			out << "${g.message(code:'default.today.label')}"
 		}
 		else { 
 			out << 	p.format(date);
