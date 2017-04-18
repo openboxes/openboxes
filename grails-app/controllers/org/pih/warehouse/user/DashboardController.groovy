@@ -397,9 +397,9 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-    @CacheFlush(["dashboardCache", "megamenuCache"])
+    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache", "quantityOnHandCache", "selectTagCache", "selectTagsCache", "selectCategoryCache"])
     def flushCache = {
-        flash.message = "Cache has been flushed"
+        flash.message = "Caches have been flushed"
         redirect(action: "index")
     }
 
