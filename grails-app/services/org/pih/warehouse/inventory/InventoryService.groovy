@@ -1377,8 +1377,13 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
+    List getItemQuantityByBinLocation(Location location, List<InventoryItem> inventoryItems) {
+        List transactionEntries = getTransactionEntriesByInventoryAndInventoryItems(location?.inventory, inventoryItems)
+        List binLocations = getQuantityByBinLocation(transactionEntries)
+        return binLocations
+    }
 
-    List getQuantityByBinLocation(Location location, InventoryItem inventoryItem) {
+    List getItemQuantityByBinLocation(Location location, InventoryItem inventoryItem) {
         List transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(location?.inventory, inventoryItem)
         List binLocations = getQuantityByBinLocation(transactionEntries)
         return binLocations
@@ -2220,6 +2225,21 @@ class InventoryService implements ApplicationContextAware {
             }
 		}
 	}
+
+    /**
+     * Gets all transaction entries for a inventory item within an inventory
+     *
+     * @param inventoryItem
+     * @param inventory
+     */
+    List getTransactionEntriesByInventoryAndInventoryItems(Inventory inventory, List<InventoryItem> inventoryItems) {
+        return TransactionEntry.createCriteria().list() {
+            'in'("inventoryItem", inventoryItems)
+            transaction {
+                eq("inventory", inventory)
+            }
+        }
+    }
 
 	/**
 	 * Adjusts the stock level by adding a new transaction entry with a

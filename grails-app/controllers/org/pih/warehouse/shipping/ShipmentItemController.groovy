@@ -120,8 +120,7 @@ class ShipmentItemController {
         }
         else {
             Location location = Location.load(session.warehouse.id)
-            List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
-            //binLocations = binLocations.findAll { it.binLocation }
+            List binLocations = inventoryService.getItemQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
 
             [shipmentItemInstance: shipmentItemInstance, binLocations: binLocations]
         }
@@ -129,7 +128,6 @@ class ShipmentItemController {
 
 
     def updatePicklistItem = {
-
 
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (shipmentItemInstance) {

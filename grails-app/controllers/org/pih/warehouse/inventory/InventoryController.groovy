@@ -1261,10 +1261,8 @@ class InventoryController {
 		def command = new TransactionCommand();
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
-		//transactionInstance?.transactionDate = new Date();
-		//transactionInstance?.source = warehouseInstance
-		log.debug("transactionType " + transactionInstance?.transactionType)
-		if (!transactionInstance?.transactionType) { 
+
+		if (!transactionInstance?.transactionType) {
 			flash.message = "Cannot create transaction for unknown transaction type";			
 			redirect(controller: "inventory", action: "browse")
 		}
@@ -1291,7 +1289,8 @@ class InventoryController {
             if (productIds) {
                 products = Product.getAll(productIds)
             }
-			command?.productInventoryItems = inventoryItems.groupBy { it.product }
+			//command?.productInventoryItems = inventoryItems.groupBy { it.product }
+            command.binLocations = inventoryService.getItemQuantityByBinLocation(warehouseInstance, inventoryItems)
 		}
 
         println "Product inventory items " + command?.productInventoryItems
