@@ -1,12 +1,13 @@
 <g:if test="${attrs.date}">
     <div>
-        <format:date obj="${attrs.date}"  format="MMM dd, yyyy"/>
         <g:if test="${new Date().after(attrs.date)}">
-            <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" class="middle" title="${g.message(code:'default.expired.label')} ${prettytime.display(date: attrs.date)}"/>
+            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${g.message(code:'default.expired.label')} ${prettytime.display(date: attrs.date)}"/>
         </g:if>
         <g:elseif test="${(new Date()+90).after(attrs.date)}">
-            <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" class="middle" title="${g.message(code:'default.expiring.label')} ${prettytime.display(date: attrs.date)}"/>
+            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${g.message(code:'default.expiring.label')} ${prettytime.display(date: attrs.date)}"/>
         </g:elseif>
+        <format:date obj="${attrs.date}"  format="MMM dd, yyyy"/>
+
     </div>
 </g:if>
 <g:else>

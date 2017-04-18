@@ -661,7 +661,7 @@ class InventoryController {
             expiredStockMap[inventoryItem] = quantityMap[inventoryItem]
         }
         if (params.format == "csv") {
-            def filename = "Expired stock | " + warehouse.name + ".csv"
+            def filename = "Expired stock | " + location?.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
             render(contentType: "text/csv", text:getCsvForInventoryMap(expiredStockMap))
             return;
@@ -1293,6 +1293,9 @@ class InventoryController {
 			//command?.productInventoryItems = inventoryItems.groupBy { it.product }
             command.binLocations = inventoryService.getItemQuantityByBinLocation(warehouseInstance, inventoryItems)
 		}
+        else {
+            throw new RuntimeException("You must select at least one product or inventory item")
+        }
 
         println "Product inventory items " + command?.productInventoryItems
 

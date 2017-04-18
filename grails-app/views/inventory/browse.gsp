@@ -18,13 +18,12 @@
 	            <div class="errors">
 	                <g:renderErrors bean="${commandInstance}" as="list" />
 	            </div>
-            </g:hasErrors>   
-            
-            
-			<div class="dialog">
-                <g:render template="summary"/>
+            </g:hasErrors>
 
-				<!-- Inventory Browser -->
+            <g:render template="summary"/>
+
+            <div class="dialog">
+
 	        	<g:set var="varStatus" value="${0}"/>
 	        	<g:set var="totalProducts" value="${0}"/>
 

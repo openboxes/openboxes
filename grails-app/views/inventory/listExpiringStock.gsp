@@ -13,10 +13,16 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			
-			<h3><warehouse:message code="inventory.expiringStock.label"/></h3>
-			
-			<div class="yui-gf">
+			<div class="summary">
+                <h3><warehouse:message code="inventory.expiringStock.label"/></h3>
+            </div>
+
+            <div class="buttons" style="text-align: left">
+                <g:render template="./actionsExpiringStock" />
+            </div>
+
+
+            <div class="yui-gf">
 				<div class="yui-u first">
 		            <g:form action="listExpiringStock" method="get">
 						<div class="dialog box">
@@ -31,13 +37,6 @@
                                                 value="${categorySelected?.id}"
 												noSelection="['': warehouse.message(code:'default.all.label')]" />
 							</div>
-                            <%--
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="inventory.expiresBefore.label" default="Expires before"/></label>
-                                <g:jqueryDatePicker id="expiresBefore" name="expiresBefore" value="${params.expiresBefore}" style="width:100px;"/>
-                            </div>
-                            --%>
-
 							<div class="filter-list-item">
 		           				<label><warehouse:message code="inventory.expiresWithin.label"/></label>
 				           		<g:select name="threshold" class="chzn-select-deselect"
@@ -67,8 +66,6 @@
 								<button name="filter" class="button icon search">
 									<warehouse:message code="default.button.filter.label"/> </button>
 
-                                   <g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
-                                           class="button">Download as CSV</g:link>
 
                             </div>
 							<div class="clear"></div>
@@ -81,7 +78,7 @@
                         <h2>
                             <warehouse:message code="inventoryItems.expiring.label" default="Expiring inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
                         </h2>
-                        <div class="">
+                        <div class="dialog">
                             <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
                                 <table>
                                     <thead>
@@ -153,15 +150,6 @@
                                             </tr>
                                         </g:unless>
                                     </tbody>
-                                    <tfoot>
-                                        <tr style="border-top: 1px solid lightgrey">
-                                            <td colspan="8">
-                                                <div>
-                                                    <g:render template="./actionsExpiringStock" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </form>
                         </div>

@@ -2,8 +2,6 @@
 <g:form action="saveInventoryTransaction">
     <div class="box">
         <h2><g:message code="inventory.adjustStock.label"/></h2>
-
-
         <g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
         <g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
         <g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
@@ -92,7 +90,7 @@
                         <td class="middle">
                             <g:hiddenField id="oldQuantity-${status}" name="transactionEntries[${status }].oldQuantity" value="${entry?.quantity?:0 }" />
                             <g:textField id="newQuantity-${status}" name="transactionEntries[${status }].quantity"
-                                         value="${entry?.quantity?:0 }" autocomplete="off" size="10" style="font-size: 5em; text-align: right" />
+                                         value="${entry?.quantity?:0 }" autocomplete="off" size="10" style="text-align: right" class="text" />
                             <img data-id="${status}" class="add" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${g.message(code: 'default.button.increment.label') }"/>
                             <img data-id="${status}" class="minus" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${g.message(code: 'default.button.decrement.label') }"/>
                             <img data-id="${status}" class="reload" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" alt="${g.message(code: 'default.button.reload.label') }"/>

@@ -22,9 +22,21 @@
 	            <div class="errors">
 	                <g:renderErrors bean="${command?.transactionInstance}" as="list" />
 	            </div>
-            </g:hasErrors>    
+            </g:hasErrors>
 
-				<div class="dialog">
+			<div class="buttons" style="text-align: left">
+				<g:link controller="dashboard" action="index" class="button">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
+					&nbsp;<warehouse:message code="dashboard.label"/>
+				</g:link>
+
+				<g:link controller="inventory" action="browse" class="button">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
+					&nbsp;<warehouse:message code="inventory.browse.label"/>
+				</g:link>
+			</div>
+
+			<div class="dialog">
 					<g:if test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}">
 						<g:render template="outgoingTransfer"></g:render>
 					</g:if>

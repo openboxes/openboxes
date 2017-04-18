@@ -65,14 +65,24 @@
 									<th><warehouse:message code="default.expires.label"/></th>
 									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
 									<th><warehouse:message code="inventory.consumed.label"/></th>
-									<th><warehouse:message code="default.actions.label"/></th>
+									<th class="center middle">
+
+                                        <img data-id="all" class="plus action" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
+                                        &nbsp;
+                                        <img data-id="all" class="minus action" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
+                                        &nbsp;
+                                        <img data-id="all" class="reset action" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
+                                        &nbsp;
+                                        <img data-id="all" class="max action" src="${createLinkTo(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
+
+                                    </th>
 								</tr>
 							</thead>
 							<tbody>
 								<g:unless test="${command?.binLocations}">
 									<tr>
-										<td colspan="6" class="center empty">
-                                            <warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:command?.productInstance)]"/>
+										<td colspan="10" class="center empty">
+                                            <warehouse:message code="inventory.noItemsCurrentlyInStock.message" />
 										</td>
 									</tr>
 								</g:unless>
@@ -100,7 +110,6 @@
 										</td>
 										<td>
                                             <g:expirationDate date="${entry?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
-
 										</td>
 										<td>
 											${onHandQuantity?:0} ${entry?.product?.unitOfMeasure }
@@ -110,7 +119,7 @@
 											<g:if test="${onHandQuantity > 0}">
 												<g:if test="${command?.transactionInstance?.transactionEntries }">
 													<g:textField id="newQuantity-${status}" name="transactionEntries[${status }].quantity"
-														value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="10" autocomplete="off" />
+														value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="10" autocomplete="off" class="text"/>
 												</g:if>
 												<g:else>
 													<g:textField id="newQuantity-${status}" name="transactionEntries[${status }].quantity" class="text" size="10"
@@ -121,14 +130,14 @@
 												0
 											</g:else>
                                         </td>
-                                        <td>
-                                            <img data-id="${status}" class="add" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
+                                        <td class="center middle">
+                                            <img data-id="${status}" class="plus action" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
                                             &nbsp;
-                                            <img data-id="${status}" class="minus" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
+                                            <img data-id="${status}" class="minus action" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
                                             &nbsp;
-                                            <img data-id="${status}" class="reset" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
+                                            <img data-id="${status}" class="reset action" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
                                             &nbsp;
-                                            <img data-id="${status}" class="all" src="${createLinkTo(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
+                                            <img data-id="${status}" class="max action" src="${createLinkTo(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
 										</td>
 									</tr>
 
@@ -158,32 +167,66 @@
 
 
 <script>
+
 	$(document).ready(function() {
 		alternateRowColors("#inventoryConsumedTable");
 
-        $(".add").livequery('click', function(event) {
+        $(".plus").click(function(event) {
             event.preventDefault();
-            changeQuantity($(this).data("id"), +1);
+            var id = $(this).data("id");
+            if (id == "all") {
+                $(".plus").each(function(index, element) {
+                    changeQuantity($(this).data("id"), +1);
+                });
+            }
+            else {
+                changeQuantity($(this).data("id"), +1);
+            }
         });
 
-        $(".minus").livequery('click', function(event) {
+        $(".minus").click(function(event) {
             event.preventDefault();
-            changeQuantity($(this).data("id"), -1);
+            var id = $(this).data("id");
+            if (id == "all") {
+                $(".plus").each(function(index, element) {
+                    changeQuantity($(this).data("id"), -1);
+                });
+            }
+            else {
+                changeQuantity($(this).data("id"), -1);
+            }
         });
 
-        $(".all").livequery('click', function(event) {
+        $(".max").click(function(event) {
             event.preventDefault();
-            reloadQuantity($(this).data("id"));
+            var id = $(this).data("id");
+            if (id == "all") {
+                $(".plus").each(function(index, element) {
+                    reloadQuantity($(this).data("id"));
+                });
+            }
+            else {
+                reloadQuantity($(this).data("id"));
+            }
         });
 
-        $(".reset").livequery('click', function(event) {
+        $(".reset").click(function(event) {
             event.preventDefault();
-            resetQuantity($(this).data("id"));
+            var id = $(this).data("id");
+            if (id == "all") {
+                $(".plus").each(function(index, element) {
+                    resetQuantity($(this).data("id"));
+                });
+            }
+            else {
+                resetQuantity($(this).data("id"));
+            }
         });
+
 		/**
 		 * Delete a row from the table.
 		 */		
-		$(".delete").livequery('click', function(event) {
+		$(".delete").click(function(event) {
 			$(this).closest('tr').fadeTo(400, 0, function () { 
 		        $(this).remove();
 		        renameRowFields($("#inventoryConsumedTable"));
@@ -197,22 +240,31 @@
         var oldQuantity = parseInt($("#oldQuantity-" + id).val(), 10);
         var quantityField = $("#newQuantity-" + id);
         quantityField.val(oldQuantity);
-        quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
+        animate(quantityField);
+        //quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
     }
 
     function resetQuantity(id) {
         var quantityField = $("#newQuantity-" + id);
         quantityField.val(0);
-        quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
+        animate(quantityField);
+        //quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
     }
-
 
     function changeQuantity(id, delta) {
         var quantityField = $("#newQuantity-" + id);
-        quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
         var currentQuantity = parseInt(quantityField.val(), 10);
+        animate(quantityField);
         quantityField.val(currentQuantity+delta);
     }
+
+    function animate(field) {
+        field.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
+    }
+
+
+
+
 </script>
 
 

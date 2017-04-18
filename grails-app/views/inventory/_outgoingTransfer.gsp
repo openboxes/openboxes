@@ -59,7 +59,7 @@
 				</td>
 				<td class="value">
 					<span class="value">
-						<g:textArea cols="120" rows="5" name="transactionInstance.comment"
+						<g:textArea cols="120" rows="5" name="transactionInstance.comment" style="width:100%"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -85,16 +85,6 @@
 			<tbody>
 
 			<g:set var="status" value="${0 }"/>
-
-			<g:unless test="${command?.productInventoryItems}">
-				<tr>
-					<td colspan="6" class="center">
-						<!-- empty -->
-					</td>
-				</tr>
-			</g:unless>
-
-            ${command?.quantityMap}
 
 			<g:each var="entry" in="${command?.binLocations }">
                 <%-- Used in case we need to render this view again on a validation error --%>
@@ -143,7 +133,7 @@
 								</g:if>
 								<g:else>
 									<g:textField name="transactionEntries[${status }].quantity" class="text"
-												 value="" size="10" autocomplete="off" />
+												 value="${0}" size="10" autocomplete="off" />
 								</g:else>
 								<g:set var="status" value="${status+1 }"/>
 
@@ -153,11 +143,18 @@
 							</g:else>
 						</td>
 						<td class="center">
-							<img class="delete" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>
+							<img class="delete" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}"/>
 						</td>
 					</tr>
 				</g:if>
 			</g:each>
+            <g:unless test="${command?.binLocations}">
+                <tr>
+                    <td colspan="8" class="center empty fade">
+                        <g:message code="default.empty.label"/>
+                    </td>
+                </tr>
+            </g:unless>
 			</tbody>
 		</table>
 	</div>
