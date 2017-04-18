@@ -48,66 +48,70 @@
     </div>
     <div class="box">
         <h2><g:message code="transaction.transactionEntries.label"/></h2>
-        <table id="adjustStockTable">
-            <thead>
-            <tr class="odd">
-                <th><g:message code="product.label"/></th>
-                <th><g:message code="location.binLocation.label"/></th>
-                <th><g:message code="inventoryItem.lotNumber.label"/></th>
-                <th><g:message code="inventoryItem.expirationDate.label"/></th>
-                <th><g:message code="inventory.onHandQuantity.label"/></th>
-                <th><g:message code="default.qty.label"/></th>
-                <th><g:message code="default.comments.label" default="Reason Code"/></th>
-                <th><g:message code="default.actions.label"/></th>
-            </tr>
-            </thead>
-            <tbody>
-            <g:each var="entry" in="${command?.binLocations }" status="status">
-                <g:hiddenField name="product.id" value="${entry?.product?.id }"/>
-                <g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${entry?.inventoryItem?.id }"/>
-                <tr class="row">
-                    <td class="middle">
-                        <format:product product="${entry?.product }"/>
-                    </td>
-                    <td class="middle">
-                        <g:hiddenField name="transactionEntries[${status }].binLocation.id" value="${entry?.binLocation?.id }" />
-                        <g:if test="${entry?.binLocation}">
-                            ${entry?.binLocation?.name }
-                        </g:if>
-                        <g:else>
-                            <g:message code="default.label"/>
-                        </g:else>
-                    </td>
-                    <td class="middle">
-                        ${entry?.inventoryItem?.lotNumber }
-                    </td>
-                    <td class="middle">
-                        <format:date obj="${entry?.inventoryItem?.expirationDate }" format="d MMM yyyy"/>
-                    </td>
-                    <td class="middle">
-                        ${entry?.quantity?:0}
-                    </td>
-                    <td class="middle">
-                        <g:hiddenField id="oldQuantity-${status}" name="transactionEntries[${status }].oldQuantity" value="${entry?.quantity?:0 }" />
-                        <g:textField id="newQuantity-${status}" name="transactionEntries[${status }].quantity"
-                                     value="${entry?.quantity?:0 }" autocomplete="off" class="text" size="10" />
-                        <img data-id="${status}" class="add" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${g.message(code: 'default.button.increment.label') }"/>
-                        <img data-id="${status}" class="minus" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${g.message(code: 'default.button.decrement.label') }"/>
-                        <img data-id="${status}" class="reload" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" alt="${g.message(code: 'default.button.reload.label') }"/>
-                    </td>
-                    <td>
-                        <g:textField name="transactionEntries[${status }].comment" placeholder="${g.message(code:'reasonCode.label', default: 'Reason Code')}"
-                                     value="" autocomplete="off" class="text" size="30" />
-                    </td>
-                    <td class="middle">
-                        <img class="delete"
-                             src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" title="${g.message(code: 'default.button.delete.label') }"
-                             onclick="return confirm('Are you sure you want to delete this item?')"/>
-                    </td>
+        <div class="list">
+
+            <table id="adjustStockTable">
+                <thead>
+                <tr class="odd">
+                    <th><g:message code="product.label"/></th>
+                    <th><g:message code="location.binLocation.label"/></th>
+                    <th><g:message code="inventoryItem.lotNumber.label"/></th>
+                    <th><g:message code="inventoryItem.expirationDate.label"/></th>
+                    <th><g:message code="inventory.onHandQuantity.label"/></th>
+                    <th><g:message code="default.qty.label"/></th>
+                    <th><g:message code="default.comments.label" default="Reason Code"/></th>
+                    <th><g:message code="default.actions.label"/></th>
                 </tr>
-            </g:each>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <g:each var="entry" in="${command?.binLocations }" status="status">
+                    <g:hiddenField name="product.id" value="${entry?.product?.id }"/>
+                    <g:hiddenField name="transactionEntries[${status }].binLocation.id" value="${entry?.binLocation?.id }" />
+                    <g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${entry?.inventoryItem?.id }"/>
+                    <tr class="row">
+                        <td class="middle">
+                            <format:product product="${entry?.product }"/>
+                        </td>
+                        <td class="middle">
+                            <g:if test="${entry?.binLocation}">
+                                ${entry?.binLocation?.name }
+                            </g:if>
+                            <g:else>
+                                <g:message code="default.label"/>
+                            </g:else>
+                        </td>
+                        <td class="middle">
+                            ${entry?.inventoryItem?.lotNumber }
+                        </td>
+                        <td class="middle">
+                            <format:date obj="${entry?.inventoryItem?.expirationDate }" format="d MMM yyyy"/>
+                        </td>
+                        <td class="middle">
+                            ${entry?.quantity?:0}
+                        </td>
+                        <td class="middle">
+                            <g:hiddenField id="oldQuantity-${status}" name="transactionEntries[${status }].oldQuantity" value="${entry?.quantity?:0 }" />
+                            <g:textField id="newQuantity-${status}" name="transactionEntries[${status }].quantity"
+                                         value="${entry?.quantity?:0 }" autocomplete="off" size="10" style="font-size: 5em; text-align: right" />
+                            <img data-id="${status}" class="add" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${g.message(code: 'default.button.increment.label') }"/>
+                            <img data-id="${status}" class="minus" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${g.message(code: 'default.button.decrement.label') }"/>
+                            <img data-id="${status}" class="reload" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" alt="${g.message(code: 'default.button.reload.label') }"/>
+                        </td>
+                        <td>
+                            <g:textField name="transactionEntries[${status }].comment" placeholder="${g.message(code:'reasonCode.label', default: 'Reason Code')}"
+                                         value="" autocomplete="off" class="text" size="30" />
+                        </td>
+                        <td class="middle">
+                            <img class="delete"
+                                 src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" title="${g.message(code: 'default.button.delete.label') }"
+                                 onclick="return confirm('Are you sure you want to delete this item?')"/>
+                        </td>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <div class="center buttons">
