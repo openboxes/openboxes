@@ -315,7 +315,6 @@ th a:link, th a:visited, th a:hover {
     display: block;
     font-size: 10px;
     text-decoration: none;
-    width: 100%;
 }
 th.asc a, th.desc a {
     background-position: right;
