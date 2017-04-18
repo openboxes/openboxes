@@ -23,7 +23,12 @@
                                     <%--
                                     <g:selectBinLocation name="binLocation.id" value="${binLocation?.id}" class="binLocation" noSelection="['':'']"/>
                                     --%>
-                                    ${binLocation?.name}
+                                    <g:if test="${binLocation}">
+                                        ${binLocation?.name}
+                                    </g:if>
+                                    <g:else>
+                                        <g:message code="default.label"/>
+                                    </g:else>
 
                                 </td>
                             </tr>

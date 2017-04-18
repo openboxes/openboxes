@@ -35,10 +35,10 @@
 						<g:render template="inventoryAdjustment"></g:render>
 					</g:elseif>
 					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryExpired"></g:render>
+						<g:render template="inventoryConsumed"></g:render>
 					</g:elseif>
 					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryDamaged"></g:render>
+						<g:render template="inventoryConsumed"></g:render>
 					</g:elseif>
 					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID}">
 						<g:render template="inventoryConsumed"></g:render>

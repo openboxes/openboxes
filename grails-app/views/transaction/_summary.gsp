@@ -1,4 +1,4 @@
-<table class="summary" border="0">
+<table class="summary">
 	<tr>
 		<td class="middle" style="width:1%">
 			<g:render template="../transaction/actions"/>
