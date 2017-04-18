@@ -246,6 +246,10 @@ class JsonController {
         //println "${createLink(controller:'inventoryItem', action: 'showStockCard', id: product.id)}"
 		render (quantityOnHand?:"0")
 	}
+    @Cacheable("inventoryBrowserCache")
+    def flushInventoryBrowserCache = {
+        redirect(controller: "inventory", action: "browse")
+    }
 
 
     @Cacheable("dashboardCache")

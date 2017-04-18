@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
@@ -87,7 +88,7 @@ class InventoryController {
 			session?.inventorySubcategoryId = null
 			session?.inventorySearchTerms = null
 		}
-		
+
 		// Pre-populate the sub-category and search terms from the session
         commandInstance.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
         commandInstance.searchTerms = session?.inventorySearchTerms
@@ -95,7 +96,7 @@ class InventoryController {
         commandInstance.showUnsupportedProducts = session?.showUnsupportedProducts
         commandInstance.showNonInventoryProducts = session?.showNonInventoryProducts
         commandInstance.showOutOfStockProducts = session?.showOutOfStockProducts ?: true
-		
+
 		// If a new search is being performed, override the session-based terms from the request
 		if (request.getParameter("searchPerformed")) {
             commandInstance.subcategoryInstance = Category.get(params?.subcategoryId)
@@ -1309,6 +1310,7 @@ class InventoryController {
 	/**
 	 * Save a transaction that sets the current inventory level for stock.
 	 */
+    @CacheFlush("inventoryBrowserCache")
 	def saveInventoryTransaction = { TransactionCommand command ->
 		log.info ("Saving inventory adjustment " + params)
         log.info "Command: " + command
@@ -1349,7 +1351,7 @@ class InventoryController {
 					transaction.save(failOnError: true)
 					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
 					//redirect(controller: "inventory", action: "browse")
-					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
+					redirect(controller: "inventory", action: "browse")
 				}
 			} catch (ValidationException e) {
 				log.debug ("caught validation exception " + e)
@@ -1387,6 +1389,8 @@ class InventoryController {
 	 * 
 	 * TRANSFER_OUT, CONSUMED, DAMAGED, EXPIRED
 	 */
+
+    @CacheFlush("inventoryBrowserCache")
 	def saveDebitTransaction = { TransactionCommand command ->
 		log.info ("Saving debit transactions " + params)
 		log.info("size: " + command?.transactionEntries?.size());
@@ -1428,7 +1432,7 @@ class InventoryController {
 					transaction.save(failOnError: true)
 					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
 					//redirect(controller: "inventory", action: "browse")
-					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
+					redirect(controller: "inventory", action: "browse")
 				}
 			} catch (ValidationException e) {
 				log.debug ("caught validation exception " + e)
@@ -1467,6 +1471,7 @@ class InventoryController {
 	 * 
 	 * TRANSFER_IN
 	 */
+    @CacheFlush("inventoryBrowserCache")
 	def saveCreditTransaction = { TransactionCommand command ->
 
 		log.debug("Saving credit transaction: " + params)
@@ -1524,7 +1529,7 @@ class InventoryController {
 					transactionInstance.save(failOnError: true)
 					flash.message = "Successfully saved transaction " + transactionInstance?.transactionNumber?:transactionInstance?.id
 					//redirect(controller: "inventory", action: "browse")
-					redirect(controller: "inventory", action: "showTransaction", id: transactionInstance?.id)
+					redirect(controller: "inventory", action: "browse")
 				}
 			} catch (ValidationException e) {
 				log.debug ("caught validation exception " + e)
