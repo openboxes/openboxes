@@ -36,29 +36,6 @@
 				</a>
 			</div>
 			<div class="action-menu-item">
-				<hr />
-			</div>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="addToShipmentBtn"> <img
-					src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"
-					alt="${warehouse.message(code: 'inventory.addToShipment.label') }" />
-					&nbsp;<g:message code="inventory.addToShipment.label" />
-				</a>
-			</div>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="addToProductGroupBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'link_add.png')}"
-					alt="${warehouse.message(code: 'productGroup.addProducts.label') }"
-					style="vertical-align: middle" /> &nbsp;<g:message
-						code="productGroup.addProducts.label" />
-				</a>
-			</div>
-			<div class="action-menu-item">
-				<hr />
-			</div>
-			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryConsumedBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}"
@@ -85,9 +62,29 @@
 						code="inventory.inventoryExpired.label" />
 				</a>
 			</div>
-			<div class="action-menu-item">
-				<hr />
-			</div>
+            <div class="action-menu-item">
+                <hr />
+            </div>
+            <div class="action-menu-item">
+                <a href="javascript:void(0);" class="actionButton"
+                   id="addToShipmentBtn"> <img
+                        src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"
+                        alt="${warehouse.message(code: 'inventory.addToShipment.label') }" />
+                    &nbsp;<g:message code="inventory.addToShipment.label" />
+                </a>
+            </div>
+            <div class="action-menu-item">
+                <a href="javascript:void(0);" class="actionButton"
+                   id="addToProductGroupBtn"> <img
+                        src="${createLinkTo(dir:'images/icons/silk',file:'link_add.png')}"
+                        alt="${warehouse.message(code: 'productGroup.addProducts.label') }"
+                        style="vertical-align: middle" /> &nbsp;<g:message
+                        code="productGroup.addProducts.label" />
+                </a>
+            </div>
+            <div class="action-menu-item">
+                <hr />
+            </div>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="markAsSupported"> <img

@@ -28,7 +28,8 @@
 	        	<g:set var="varStatus" value="${0}"/>
 	        	<g:set var="totalProducts" value="${0}"/>
 
-                <g:set var="showQuantity" value="${(params.max as int) <= 25}"/>
+                <g:set var="maxResults" value="${(params.max as int)}"/>
+                <g:set var="showQuantity" value="${maxResults>0 && maxResults <= 100}"/>
 
                 <g:if test="${!showQuantity }">
                     <div class="message">
@@ -42,7 +43,7 @@
                         <g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>
                     </div>
 					<div class="yui-u">
-									
+
                         <div class="box">
                             <h2>
                                 <g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
@@ -74,7 +75,7 @@
                                                    <g:render template="./actions" model="[]"/>
 				           						</th>
 												<th class="center middle" style="width: 1%">
-													<input type="checkbox" id="toggleCheckbox">	
+													<input type="checkbox" id="toggleCheckbox">
 												</th>
 												<th class="middle" style="width: 1%">
 													<g:message code="product.productCode.label"/>
