@@ -127,23 +127,41 @@
     </div>
 </g:isUserManager>
 
-<div class="button-group">
-    <g:link target="_blank" controller="report" action="printShippingReport"
-            params="['shipment.id': shipmentInstance?.id]" class="button">
-        <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-        <warehouse:message code="shipping.downloadPackingList.label"/>
-        <span class="fade">(.pdf)</span>
-    </g:link>
-    <g:link target="_blank" controller="report" action="printPaginatedPackingListReport"
-            params="['shipment.id': shipmentInstance?.id]" class="button">
-        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_break.png')}" class="middle"/>&nbsp;
-        <warehouse:message code="shipping.downloadPackingList.label"/>
-        <span class="fade">(.pdf)</span>
-    </g:link>
-    <g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id}" class="button">
-        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_white_excel.png')}"
-             class="middle"/>&nbsp;
-        <warehouse:message code="shipping.downloadPackingList.label"/> <span class="fade">(.xls)</span>
-    </g:link>
+<div class="right">
+
+    <div class="action-menu">
+        <div class="action-btn">
+            <div class="button">
+                <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp; <g:message code="default.button.download.label"/>
+
+            </div>
+        </div>
+        <div class="actions">
+            <div class="action-menu-item">
+                <g:link target="_blank" controller="report" action="printShippingReport"
+                        params="['shipment.id': shipmentInstance?.id]">
+                    <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
+                    <warehouse:message code="shipping.downloadPackingList.label"/>
+                    <span class="fade">(.pdf)</span>
+                </g:link>
+            </div>
+            <div class="action-menu-item">
+                <g:link target="_blank" controller="report" action="printPaginatedPackingListReport"
+                        params="['shipment.id': shipmentInstance?.id]">
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_break.png')}" class="middle"/>&nbsp;
+                    <warehouse:message code="shipping.downloadPackingList.label"/>
+                    <span class="fade">(.pdf)</span>
+                </g:link>
+            </div>
+            <div class="action-menu-item">
+                <g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id}">
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_white_excel.png')}"
+                         class="middle"/>&nbsp;
+                    <warehouse:message code="shipping.downloadPackingList.label"/> <span class="fade">(.xls)</span>
+                </g:link>
+            </div>
+        </div>
+    </div>
+
 </div>
 
