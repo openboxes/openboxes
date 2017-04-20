@@ -299,8 +299,8 @@
                         </g:else>
                     </td>
                     <td class="left">
-                        <g:if test="${shipmentItem?.receiptItems()}">
-                            ${shipmentItem?.receiptItems()?.first()?.comment}
+                        <g:if test="${shipmentItem?.receiptItems}">
+                            ${shipmentItem?.receiptItems*.comment}
                         </g:if>
                     </td>
                 </tr>
