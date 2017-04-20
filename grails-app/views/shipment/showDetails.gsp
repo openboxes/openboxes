@@ -12,30 +12,23 @@
 	<div class="body">
 
         <g:render template="summary"/>
-        <div class="summary-actions">
-            <table>
-                <tr>
-                    <td width="1%">
-                        <g:render template="../shipment/actions" model="[shipmentInstance:shipmentInstance]" />
-                    </td>
-                    <td>
-                        <div class="button-container">
-                            <g:render template="buttons"/>
-                        </div>
-                    </td>
-                </tr>
 
-            </table>
+        <g:if test="${flash.message}">
+            <div class="message">${flash.message}</div>
+        </g:if>
+        <g:hasErrors bean="${shipmentInstance}">
+            <div class="errors">
+                <g:renderErrors bean="${shipmentInstance}" as="list" />
+            </div>
+        </g:hasErrors>
+
+        <div class="buttons">
+            <div class="button-container" style="text-align: left">
+                <g:render template="../shipment/actions" model="[shipmentInstance:shipmentInstance]" />
+                <g:render template="buttons"/>
+            </div>
         </div>
-		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
-		</g:if>
-		<g:hasErrors bean="${shipmentInstance}">
-			<div class="errors">
-				<g:renderErrors bean="${shipmentInstance}" as="list" />
-			</div>
-		</g:hasErrors>	
-			
+
 		<div class="dialog">
 
 			<div class="yui-gf">
@@ -412,16 +405,13 @@
                     <div id="shipment-details-tabs" class="tabs">
                         <ul>
                             <li><a href="#details-tab"><warehouse:message code="shipping.contents.label"/></a></li>
+                            <li><a href="#receipt-tab"><warehouse:message code="receipt.label" default="Receipt"/></a></li>
                             <li><a href="#documents-tab"><warehouse:message code="documents.label" default="Documents"/></a></li>
                             <li><a href="#comments-tab"><warehouse:message code="comments.label" default="Comments"/></a></li>
                             <li><a href="#events-tab"><warehouse:message code="events.label" default="Comments"/></a></li>
-                            <li><a href="#transactions-tab"><warehouse:message code="Transactions.label" default="Transactions"/></a></li>
+                            <li><a href="#transactions-tab"><warehouse:message code="transactions.label" default="Transactions"/></a></li>
                         </ul>
                         <div id="details-tab">
-
-
-
-
 
                             <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
                             <div id="items" class="box">
@@ -434,7 +424,15 @@
                                         <th><warehouse:message code="shipping.container.label"/></th>
                                         <th><warehouse:message code="product.productCode.label"/></th>
                                         <th><warehouse:message code="product.label"/></th>
-                                        <th class="left"><warehouse:message code="receiptItem.binLocation.label" default="Bin Location"/></th>
+                                        <th class="left">
+                                            <warehouse:message code="receiptItem.binLocation.label" default="Bin Location"/>
+                                            <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
+                                                <small><warehouse:message code="location.picking.label"/></small>
+                                            </g:if>
+                                            <g:elseif test="${shipmentInstance?.destination?.id == session.warehouse?.id}">
+                                                <small><warehouse:message code="location.putaway.label"/></small>
+                                            </g:elseif>
+                                        </th>
                                         <th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
                                         <th class="center"><warehouse:message code="default.expires.label"/></th>
                                         <th class="center"><warehouse:message code="shipping.shipped.label"/></th>
@@ -470,14 +468,21 @@
                                                     </g:link>
                                                 </td>
                                                 <td>
-                                                    <g:if test="${shipmentItem?.binLocation}">
-                                                        ${shipmentItem?.binLocation?.name}
-                                                        <span class="fade">(<g:message code="default.picking.label" default="Picking"/>)</span>
+                                                    <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
+                                                        <g:if test="${shipmentItem?.binLocation}">
+                                                            ${shipmentItem?.binLocation?.name?:g.message(code:'default.label')}
+                                                        </g:if>
+
                                                     </g:if>
-                                                    <g:if test="${shipmentItem?.receiptItem?.binLocation}">
-                                                        ${shipmentItem?.receiptItem?.binLocation?.name}
-                                                        <span class="fade">(<g:message code="default.putaway.label" default="Putaway"/>)</span>
-                                                    </g:if>
+                                                    <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
+                                                        <g:if test="${shipmentItem?.receiptItems}">
+                                                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems}">
+                                                                <div>
+                                                                    ${receiptItem?.binLocation?.name?:g.message(code:'default.label')}
+                                                                </div>
+                                                            </g:each>
+                                                        </g:if>
+                                                    </g:elseif>
 
                                                 </td>
                                                 <td class="lotNumber">
@@ -503,14 +508,10 @@
                                                 </td>
                                                 <g:if test="${shipmentInstance?.wasReceived()}">
                                                     <g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
-                                                    <td class="center" style="white-space:nowrap;${shipmentItem?.receiptItem?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}">
-                                                        <g:formatNumber number="${shipmentItem?.receiptItem?.quantityReceived }" format="###,##0"/>
+                                                    <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
+                                                        <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
                                                     </td>
-                                                <%--
-                                                <td class="center">
-                                                    ${shipmentItem?.totalQuantityReceived()}
-                                                </td>
-                                                --%>
+
                                                 </g:if>
                                                 <td>
                                                     ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
@@ -522,9 +523,11 @@
                                                     </g:if>
                                                 </td>
                                                 <td class="left" >
+                                                    <%--
                                                     <g:if test="${shipmentItem?.receiptItem?.comment }">
                                                         ${shipmentItem?.receiptItem?.comment}
                                                     </g:if>
+                                                    --%>
                                                 </td>
                                             </tr>
                                             <g:set var="previousContainer" value="${shipmentItem.container }"/>
@@ -538,6 +541,58 @@
                                         </tr>
                                     </g:else>
 
+                                </table>
+                            </div>
+                        </div>
+                        <div id="receipt-tab">
+                            <div id="receipt" class="box">
+                                <h2>
+                                    <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" />
+                                    <label><warehouse:message code="shipping.receipt.label"/></label>
+                                </h2>
+
+                                <div>
+                                    <label>Receipt</label>
+                                    ${shipmentInstance?.receipt}
+                                </div>
+                                <div>
+                                    <label>Backref to Shipment</label>
+                                    ${shipmentInstance?.receipt?.shipment}
+                                </div>
+
+                                <table>
+                                    <tr>
+                                        <th></th>
+                                        <th><g:message code="product.label"/></th>
+                                        <th><g:message code="location.binLocation.label"/></th>
+                                        <th><g:message code="inventoryItem.lotNumber.label"/></th>
+                                        <th><g:message code="inventoryItem.expirationDate.label"/></th>
+                                        <th><g:message code="default.quantity.label"/></th>
+                                    </tr>
+
+                                    <g:each var="receiptItem" in="${shipmentInstance?.receipt?.receiptItems}">
+                                        <tr>
+                                            <td>
+                                                ${receiptItem?.id}
+
+                                            </td>
+                                            <td>
+                                                ${receiptItem?.product}
+                                            </td>
+                                            <td>
+                                                ${receiptItem?.binLocation?.name}
+                                            </td>
+                                            <td>
+                                                ${receiptItem?.inventoryItem?.lotNumber}
+                                            </td>
+                                            <td>
+                                                <g:expirationDate date="${receiptItem?.inventoryItem?.expirationDate}"/>
+                                            </td>
+                                            <td>
+                                                ${receiptItem?.quantityReceived} out of ${receiptItem?.quantityShipped}
+                                            </td>
+                                        </tr>
+                                    </g:each>
                                 </table>
                             </div>
                         </div>

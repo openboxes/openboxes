@@ -1240,7 +1240,23 @@ class ShipmentService {
 			throw new ValidationException("Receive shipment is not valid", command.errors)
 		}
 	}
-		
+
+
+	boolean validateReceipt(Receipt receiptInstance) {
+
+		if (!receiptInstance.validate()) {
+			throw new ValidationException("receipt ${receiptInstance} not valid", receiptInstance.errors)
+		}
+
+		// validate all shipments items
+		receiptInstance.shipment.shipmentItems.each { shipmentItem ->
+			if (!shipmentItem.validate()) {
+				throw new ValidationException("shipment item ${shipmentItem} not valid", receiptInstance.errors)
+			}
+
+		}
+
+	}
 	
 	/**
 	 * 
@@ -1581,10 +1597,44 @@ class ShipmentService {
 	   }
 	   return quantityMap;
    }
+
+
+	void deleteReceipt(Shipment shipmentInstance) {
+		if (shipmentInstance?.receipt) {
+			shipmentInstance?.receipt.delete()
+			shipmentInstance?.receipt = null
+		}
+	}
+
+	void deleteInboundTransactions(Shipment shipmentInstance) {
+		def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
+		transactions.each { transactionInstance ->
+			if (transactionInstance) {
+				shipmentInstance.removeFromIncomingTransactions(transactionInstance)
+				transactionInstance?.delete();
+			}
+		}
+
+	}
+
+	void deleteOutboundTransactions(Shipment shipmentInstance) {
+		def transactions = Transaction.findAllByOutgoingShipment(shipmentInstance)
+		transactions.each { transactionInstance ->
+			if (transactionInstance) {
+				shipmentInstance.removeFromOutgoingTransactions(transactionInstance)
+				transactionInstance?.delete();
+			}
+		}
+	}
+
+
+	void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
+		shipmentInstance.removeFromEvents(eventInstance)
+		eventInstance?.delete()
+		shipmentInstance?.save()
+	}
    
-   
-   
-	public void rollbackLastEvent(Shipment shipmentInstance) { 
+	void rollbackLastEvent(Shipment shipmentInstance) {
 		
 		def eventInstance = shipmentInstance.mostRecentEvent
 		
@@ -1595,37 +1645,15 @@ class ShipmentService {
 		try {
 			
 			if (eventInstance?.eventType?.eventCode == EventCode.RECEIVED) {
-				if (shipmentInstance?.receipt) {
-					shipmentInstance?.receipt.delete()
-					shipmentInstance?.receipt = null
-				}
-				
-				def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
-				transactions.each { transactionInstance ->
-					if (transactionInstance) { 
-						shipmentInstance.removeFromIncomingTransactions(transactionInstance)
-						transactionInstance?.delete();					
-					}
-				}
-								
-				shipmentInstance.removeFromEvents(eventInstance)
-				eventInstance?.delete()
-				shipmentInstance?.save()				
+				deleteReceipt(shipmentInstance)
+				deleteInboundTransactions(shipmentInstance)
+				deleteEvent(shipmentInstance, eventInstance)
 			}
-			else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) { 
-				def transactions = Transaction.findAllByOutgoingShipment(shipmentInstance)
-				transactions.each { transactionInstance -> 
-					if (transactionInstance) {
-						shipmentInstance.removeFromOutgoingTransactions(transactionInstance)
-						transactionInstance?.delete();
-					}
-				}
-				
-				shipmentInstance.removeFromEvents(eventInstance)
-				eventInstance.delete()
-				shipmentInstance.save()				
+			else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) {
+				deleteReceipt(shipmentInstance)
+				deleteOutboundTransactions(shipmentInstance)
+				deleteEvent(shipmentInstance, eventInstance)
 			}
-			
 			
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)

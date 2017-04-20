@@ -52,18 +52,11 @@
                             <th><g:message code="inventoryItem.lotNumber.label"/></th>
                             <th><g:message code="inventoryItem.expirationDate.label"/></th>
                             <th class="center"><g:message code="default.qty.label"/></th>
-                            <th class="center border-right"><g:message code="default.uom.label"/></th>
-                            <th class="border-right" style="padding:0;margin:0">
-                                <table>
-                                    <td><g:message code="default.status.label" default="Status"/></th>
-                                    <td><g:message code="default.bin.label" default="Bin"/></th>
-                                    <td><g:message code="default.lot.label" default="Lot"/></th>
-                                    <td><g:message code="default.exp.label" default="Exp"/></th>
-                                    <td><g:message code="default.qty.label" default="Qty"/></th>
-                                    <td><g:message code="default.uom.label" default="UOM"/></th>
-                                </table>
+                            <th class="center"><g:message code="default.uom.label"/></th>
+                            <th class="border-right"><g:message code="default.actions.label"/></th>
+                            <th class="center" style="padding:0;margin:0">
+                                <g:message code="shipping.availableQuantity.label"/>
                             </th>
-                            <th><g:message code="default.actions.label"/></th>
                         </tr>
                         </thead>
                         <g:set var="previousContainer"/>
@@ -111,15 +104,33 @@
                                     <td class="top right">
                                         ${shipmentItem?.quantity }
                                     </td>
-                                    <td class="top left border-right">
+                                    <td class="top left ">
                                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
                                     </td>
+                                    <td class="top center border-right">
+                                        <a href="javascript:void(-1)" data-id="${shipmentItem?.id}" data-execution="${params.execution}"
+                                           class="btnPickItem button"><g:message code="shipping.pickShipmentItem.label"/></a>
+                                    </td>
                                     <td class="top border-right" style="padding: 0; margin: 0">
+
+
                                         <g:set var="binLocations" value="${quantityMap[shipmentItem?.inventoryItem?.product]}"/>
+
+                                        <g:if test="${!binLocations}">
+                                            <div class="empty center">
+                                                <g:message code="inventoryItem.notAvailable.message" args="[shipmentItem?.inventoryItem?.lotNumber, session.warehouse.name]"></g:message>
+                                            </div>
+                                        </g:if>
                                         <table>
                                             <g:if test="${status==0}">
                                                 <thead>
                                                     <tr>
+                                                        <th><g:message code="default.status.label" default="Status"/></th>
+                                                        <th><g:message code="default.bin.label" default="Bin"/></th>
+                                                        <th><g:message code="default.lot.label" default="Lot"/></th>
+                                                        <th><g:message code="default.exp.label" default="Exp"/></th>
+                                                        <th><g:message code="default.qty.label" default="Qty"/></th>
+                                                        <th><g:message code="default.uom.label" default="UOM"/></th>
 
                                                     </tr>
                                                 </thead>
@@ -139,6 +150,8 @@
                                                         <g:if test="${picked}">
                                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" title="${g.message(code:'picklist.picked.label')}">
                                                         </g:if>
+                                                        <g:else>
+                                                        </g:else>
 
                                                     </td>
                                                     <td class="left" width="20%">
@@ -186,10 +199,7 @@
                                         </table>
 
                                     </td>
-                                    <td>
-                                        <a href="javascript:void(-1)" data-id="${shipmentItem?.id}" data-execution="${params.execution}"
-                                           class="btnPickItem button"><g:message code="shipping.pickShipmentItem.label"/></a>
-                                    </td>
+
                                 </tr>
                                 <g:set var="previousContainer" value="${shipmentItem?.container }"/>
                             </g:each>
@@ -199,7 +209,7 @@
                         <tr>
                             <td>
                             </td>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <div class="left">
                                     <g:submitButton name="autoPickShipmentItems" value="${g.message(code:'shipping.autoPickItems.label')}" class="button"></g:submitButton>
                                 </div>

@@ -160,6 +160,15 @@
                     <warehouse:message code="shipping.downloadPackingList.label"/> <span class="fade">(.xls)</span>
                 </g:link>
             </div>
+
+            <div class="action-menu-item">
+                <g:link controller="shipment" action="downloadLabels" id="${shipmentInstance?.id}" target="_blank">
+                    <img src="${createLinkTo(dir: 'images/icons/', file: 'barcode.png')}"
+                         class="middle"/>&nbsp;
+                    <warehouse:message code="shipping.downloadBarcodeLabels.label"/>
+                </g:link>
+            </div>
+
         </div>
     </div>
 

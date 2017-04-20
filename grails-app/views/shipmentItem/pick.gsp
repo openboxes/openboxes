@@ -59,55 +59,61 @@
                             <label for="binLocation"><warehouse:message code="shipmentItem.binLocation.label" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'binLocation', 'errors')}">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th><g:message code="default.bin.label" default="Bin"/></th>
-                                        <th><g:message code="default.lot.label" default="Lot"/></th>
-                                        <th><g:message code="default.exp.label" default="Exp"/></th>
-                                        <th><g:message code="default.qty.label" default="Qty"/></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <g:radio name="binLocation.id" value="null" checked="${shipmentItemInstance?.binLocation==null}"/>
-                                        </td>
-                                        <td>
-                                            None
-                                        </td>
-                                        <td>
-                                        </td>
-                                        <td>
-                                        </td>
-                                        <td>
-                                        </td>
+                            <g:if test="${binLocations}">
 
-                                    </tr>
-                                    <g:each var="entry" in="${binLocations}">
-                                        <tr class="${entry.quantity>=shipmentItemInstance?.quantity?'success':'warning'}">
-                                            <td>
-                                                <g:radio name="binLocation.id" value="${entry?.binLocation?.id}"
-                                                         checked="${shipmentItemInstance?.binLocation?.id==entry?.binLocation?.id}"/>
-                                            </td>
-                                            <td>
-                                                ${entry?.binLocation?.name?:'Default'}
-                                            </td>
-                                            <td>
-                                                ${entry?.inventoryItem?.lotNumber}
-                                            </td>
-                                            <td>
-                                                <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
-                                            </td>
-                                            <td>
-                                                ${entry?.quantity}
-                                            </td>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th><g:message code="default.bin.label" default="Bin"/></th>
+                                            <th><g:message code="default.lot.label" default="Lot"/></th>
+                                            <th><g:message code="default.exp.label" default="Exp"/></th>
+                                            <th><g:message code="default.qty.label" default="Qty"/></th>
                                         </tr>
-                                    </g:each>
+                                    </thead>
+                                    <tbody>
+                                        <g:each var="entry" in="${binLocations}">
+                                            <tr class="${entry.quantity>=shipmentItemInstance?.quantity?'success':'warning'}">
+                                                <td>
+                                                    <g:radio name="binLocation.id" value="${entry?.binLocation?.id}"
+                                                             checked="${shipmentItemInstance?.binLocation?.id==entry?.binLocation?.id}"/>
+                                                </td>
+                                                <td>
+                                                    ${entry?.binLocation?.name?:g.message(code:'default.label')}
+                                                </td>
+                                                <td>
+                                                    ${entry?.inventoryItem?.lotNumber}
+                                                </td>
+                                                <td>
+                                                    <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
+                                                </td>
+                                                <td>
+                                                    ${entry?.quantity}
+                                                </td>
+                                            </tr>
+                                        </g:each>
+                                        <tr>
+                                            <td>
+                                                <g:radio name="binLocation.id" value="null" checked="${shipmentItemInstance?.binLocation==null}"/>
+                                            </td>
+                                            <td>
+                                                ${g.message(code:'default.none.label')}
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
 
-                                </tbody>
-                            </table>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </g:if>
+                            <g:else>
+                                <g:message code="${inventory.stockOut.message}"/>
+                            </g:else>
                         </td>
                     </tr>
                     <tr class="prop">

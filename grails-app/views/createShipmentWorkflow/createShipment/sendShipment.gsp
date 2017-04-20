@@ -63,20 +63,19 @@
 													args="[shipmentInstance?.name]"/>
 												</td>
 											</tr>
-											<g:if test="${shipmentInstance?.origin.isWarehouse()}">
-												<tr>
-													<td>
-														<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
-														&nbsp;
-														<span id="itemsInShipmentWillBeDebited">
-															<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
-														</span>
-														<span id="itemsInShipmentWillNotBeDebited" class="hidden">
-															<warehouse:message code="shipping.itemsInShipmentWillNotBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
-														</span>
-													</td>
-												</tr>
-											</g:if>
+											<tr>
+												<td>
+													<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+													&nbsp;
+													<g:if test="${shipmentInstance?.origin.isWarehouse()}">
+														<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
+													</g:if>
+													<g:else>
+														<warehouse:message code="shipping.itemsInShipmentWillNotBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
+													</g:else>
+												</td>
+											</tr>
+
 											<g:if test="${includeNotifications }">
 												<tr>
 													<td>
@@ -161,7 +160,7 @@
 								</tr>
 								--%>
 										
-								<g:if test="${shipmentInstance?.origin.isWarehouse()}">
+
 									<tr class="prop">
 										<td valign="top" class="name">
 											<label>
@@ -180,8 +179,14 @@
 												 --%>
 												
 												<div id="debitShipmentItems" class="${!command || command?.debitStockOnSend ? '' : 'hidden'  }">
-													<warehouse:message code="shipping.willBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
-													
+
+													<g:if test="${shipmentInstance?.origin.isWarehouse()}">
+														<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
+													</g:if>
+													<g:else>
+														<warehouse:message code="shipping.itemsInShipmentWillNotBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
+													</g:else>
+
 													<div style="overflow: auto; max-height: 300px; border: 1px solid lightgrey;">
 														<table>
 															<tr>
@@ -250,7 +255,7 @@
 											
 										</td>
 									</tr>
-								</g:if>
+
 
 								<tr class="prop">
 									<td valign="top" class="name">

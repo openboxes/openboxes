@@ -46,9 +46,9 @@ class ShipmentItem implements Comparable, Serializable {
 	
 	static belongsTo = [ shipment : Shipment ]
 	
-	static hasMany = [ orderShipments : OrderShipment ]
+	static hasMany = [ orderShipments : OrderShipment, receiptItems: ReceiptItem]
 	
-	static hasOne = [receiptItem: ReceiptItem]
+	//static hasOne = [receiptItem: ReceiptItem]
 	
 	
 	static mapping = {
@@ -56,7 +56,6 @@ class ShipmentItem implements Comparable, Serializable {
 		cache true
 	}
 	
-	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {
         binLocation(nullable:true)
 		container(nullable:true)
@@ -64,9 +63,8 @@ class ShipmentItem implements Comparable, Serializable {
 		lotNumber(nullable:true, maxSize: 255)
 		expirationDate(nullable:true)
 		quantity(min:0, range: 0..2147483646)
-		recipient(nullable:true)
+        recipient(nullable:true)
 		inventoryItem(nullable:true)
-		receiptItem(nullable:true)
 		donor(nullable:true)
 	}
     
@@ -128,12 +126,8 @@ class ShipmentItem implements Comparable, Serializable {
 	}
 	*/
 
-    def receiptItems() {
-        return ReceiptItem.findAllByShipmentItem(this)
-    }
 
     def quantityReceived() {
-        def receiptItems = receiptItems()
         return (receiptItems) ? receiptItems.sum { it.quantityReceived } : 0
     }
 
@@ -154,44 +148,6 @@ class ShipmentItem implements Comparable, Serializable {
 									quantity <=> obj?.quantity ?:
 										id <=> obj?.id
 		return sortOrder;
-		/*
-		if (!product?.name && obj?.product?.name) {
-			return -1
-		}
-		else if (!obj?.product?.name && product?.name) {
-			return 1
-		}
-		else {
-			if (product?.name <=> obj?.product?.name != 0) {
-				return product.name <=> obj.product.name
-			}
-			else {
-				if (!lotNumber && obj?.lotNumber) {
-					return -1
-				}
-				else if (!obj.lotNumber && lotNumber) {
-					return 1
-				}
-				else if (lotNumber <=> obj?.lotNumber != 0) {
-					return lotNumber <=> obj.lotNumber
-				}
-				else {
-					if (!quantity && obj?.quantity) {
-						return -1
-					}
-					else if (!obj.quantity && quantity) {
-						return 1
-					}
-					else if (quantity <=> obj?.quantity != 0) {
-						return quantity <=> obj.quantity
-					}
-					else {
-						return id <=> obj.id
-					}
-				}
-			}
-		}
-		*/
 	}
 	
 	ShipmentItem cloneShipmentItem() {

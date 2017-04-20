@@ -94,6 +94,8 @@
 												${shipmentItem?.quantity}
 											</td>
 											<g:if test="${shipmentInstance?.wasReceived()}">
+                                                ${shipmentItem?.quantityReceived() }
+												<%--
 												<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
 												<td style="white-space:nowrap;${shipmentItem?.receiptItem?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}">
 													${shipmentItem?.receiptItem?.quantityReceived }
@@ -105,6 +107,7 @@
 													</g:findAll> 
 													${totalQuantityReceived }
 												</td>
+												--%>
 											</g:if>														
 											<td>
 												${shipmentItem?.recipient?.name}
