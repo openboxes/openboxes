@@ -134,7 +134,7 @@
                                                                     <g:each var="warehouse" in="${entry.value.sort() }">
                                                                         <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
                                                                         <div class="left" style="margin: 2px; ">
-                                                                            <a class="button icon pin" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
+                                                                            <a class="button icon pin big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
                                                                                 ${warehouse.name}
                                                                             </a>
                                                                         </div>

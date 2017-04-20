@@ -69,11 +69,13 @@
                                                     <h4><g:message code="user.favoriteLocations.label"/></h4>
                                                 </td>
                                                 <td class="middle">
-                                                        <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button">
+                                                        <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button big">
                                                             <format:metadata obj="${session?.user?.warehouse}"/>
                                                         </a>
                                                     <span class="fade">
-                                                        <g:formatDate date="${session?.user?.lastLoginDate}" format="MMM dd, yyyy hh:mm a z"/>
+
+                                                        <g:message code="dashboard.youLastLoggednHereOn.message" args="[g.formatDate(date: session?.user?.lastLoginDate, format: 'MMM dd hh:mm:ss a z')]"
+                                                        <g:prettyDateFormat date="${session?.user?.lastLoginDate}"/>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -91,7 +93,7 @@
                                                     <g:set var="locationGroup" value="${entry.key }"/>
                                                     <g:each var="warehouse" in="${entry.value.sort() }" status="status">
                                                         <div class="left" style="margin: 2px;">
-                                                            <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button">
+                                                            <a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' class="button big">
                                                                 ${warehouse.name}
                                                             </a>
                                                         </div>
