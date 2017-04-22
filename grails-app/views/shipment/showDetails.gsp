@@ -273,7 +273,7 @@
                                                 code="shipping.comments.label" default="Documents"/></label>
                                     </td>
                                     <td valign="top" class="value" style="padding: 0; margin: 0">
-                                        <table style="width: 100%; >
+                                        <table style="width: 100%;" >
                                             <tbody>
                                             <tr class="odd">
                                                 <td>
@@ -313,6 +313,7 @@
 
                                                 </td>
                                             </tr>
+                                            <%--
                                             <tr class="even">
                                                 <td>
                                                     <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>
@@ -323,8 +324,9 @@
                                                     </g:link>
                                                 </td>
                                             </tr>
+                                            --%>
                                             <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
-                                                <tr id="document-${document.id}" class="${i%2==0?'odd':'even'}">
+                                                <tr id="document-${document.id}" class="${i%2==0?'even':'odd'}">
                                                     <td class="middle">
                                                         <g:set var="f" value="${document?.filename?.toLowerCase()}"/>
                                                         <g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
@@ -509,7 +511,7 @@
                                                 <g:if test="${shipmentInstance?.wasReceived()}">
                                                     <g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
                                                     <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
-                                                        <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
+                                                        <g:formatNumber number="${shipmentItem?.totalQuantityReceived()}" format="###,##0"/>
                                                     </td>
 
                                                 </g:if>
@@ -550,16 +552,6 @@
                                     <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" />
                                     <label><warehouse:message code="shipping.receipt.label"/></label>
                                 </h2>
-
-                                <div>
-                                    <label>Receipt</label>
-                                    ${shipmentInstance?.receipt}
-                                </div>
-                                <div>
-                                    <label>Backref to Shipment</label>
-                                    ${shipmentInstance?.receipt?.shipment}
-                                </div>
-
                                 <table>
                                     <tr>
                                         <th></th>
