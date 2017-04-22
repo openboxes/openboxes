@@ -6,7 +6,6 @@
 			<table>
 				<tr>
 					<td>
-						<g:hiddenField name="max" value="${params.max?:10 }"/>
                         <div>
                             <label>${warehouse.message(code:'default.searchTerms.label', default: "Search terms")}</label>
                         </div>
@@ -76,19 +75,18 @@
                         <g:if test="${incoming}">
                             <label>${warehouse.message(code: 'shipping.origin.label')}</label>
                             <div>
-                            <g:select name="origin" class="chzn-select-deselect"
-                                  from="${org.pih.warehouse.core.Location.list().sort()}"
-                                  optionKey="id" optionValue="name" value="${origin}"
-                                  noSelection="['null':warehouse.message(code:'default.all.label')]" />
+                                <g:selectLocation name="origin" class="chzn-select-deselect"
+                                                  optionKey="id" optionValue="name" value="${origin}"
+                                                  noSelection="['null':warehouse.message(code:'default.all.label')]" />
+
                             </div>
                         </g:if>
                         <g:else>
                             <label>${warehouse.message(code: 'shipping.destination.label')}</label>
                             <div>
-                                <g:select name="destination" class="chzn-select-deselect"
-                                      from="${org.pih.warehouse.core.Location.list().sort()}"
-                                      optionKey="id" optionValue="name" value="${destination}"
-                                      noSelection="['null':warehouse.message(code:'default.all.label')]" />
+                                <g:selectLocation name="origin" class="chzn-select-deselect"
+                                                  optionKey="id" optionValue="name" value="${origin}"
+                                                  noSelection="['null':warehouse.message(code:'default.all.label')]" />
                             </div>
                         </g:else>
                     </td>
@@ -110,7 +108,7 @@
                     </td>
                 </tr>
                 --%>
-
+                <%--
                 <tr class="prop">
                     <td class="left">
                         <label>${warehouse.message(code: 'default.updatedBetween.label', default: 'Last updated between')}</label>
@@ -125,6 +123,14 @@
                                                     value="${lastUpdatedTo}" format="MM/dd/yyyy" size="15"/>
                             </div>
                         </div>
+
+                    </td>
+                </tr>
+                --%>
+                <tr class="prop">
+                    <td class="left">
+                        <label>${warehouse.message(code: 'default.limit.label', default: 'Limit')}</label>
+                        <g:select name="max" from="[10,25,50,100,250,500,1000]" noSelection="['':'']" class="chzn-select-deselect" value="${params.max}"></g:select>
 
                     </td>
                 </tr>
