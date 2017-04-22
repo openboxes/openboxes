@@ -19,12 +19,6 @@ class DateTagLib {
 
 
 	def expirationDate = { attrs, body ->
-        log.info "Attrs " + attrs
-
-        log.info "attrs.date " + attrs.date
-//        if (attrs.date == null) {
-//            throwTagError('Tag ["expirationDate"] missing required attribute ["date"]')
-//        }
         out << g.render(template: '/taglib/expirationDate', model: [attrs:attrs])
 	}
 
