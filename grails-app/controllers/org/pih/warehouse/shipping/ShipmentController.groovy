@@ -73,12 +73,6 @@ class ShipmentController {
 		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination,
                 statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo, params.max)
 
-		// sort by event status, event date, and expecting shipping date
-		shipments = shipments.sort( { a, b ->
-			return b.lastUpdated <=> a.lastUpdated
-		} )
-
-
         println "List shipments: " + (System.currentTimeMillis() - startTime) + " ms"
 
 		[ 
@@ -550,41 +544,11 @@ class ShipmentController {
 				flash.message = "${g.message(code: 'shipping.mustBeLoggedIntoDestinationToReceive.message', args: [shipmentInstance?.destination])}"
 			}
 
-            // Existing receipt
-			if (shipmentInstance.receipt) {
-				receiptInstance = shipmentInstance.receipt
-			}
-			// No existing receipt, instantiate the model to be used
-			else {
-				receiptInstance = new Receipt(recipient:shipmentInstance?.recipient, shipment: shipmentInstance, actualDeliveryDate: new Date());
-                shipmentInstance.receipt = receiptInstance
+            receiptInstance = shipmentService.findOrCreateReceipt(shipmentInstance)
 
-				shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }					
-				shipmentItems.each { shipmentItem ->
-					
-					def inventoryItem = 
-						//inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
-						inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
-					
-					if (inventoryItem) { 
-						ReceiptItem receiptItem = new ReceiptItem(shipmentItem.properties);
-						receiptItem.quantityShipped = shipmentItem.quantity;
-						receiptItem.quantityReceived = shipmentItem.quantity;				
-						receiptItem.lotNumber = shipmentItem.lotNumber;
-                        receiptItem.product = inventoryItem.product
-						receiptItem.inventoryItem = inventoryItem
-						receiptItem.shipmentItem = shipmentItem
-						receiptInstance.addToReceiptItems(receiptItem);
-						
-					}
-					else { 
-						receiptInstance.errors.reject('inventoryItem', 'receipt.inventoryItem.invalid')
-					}
-
-				}	
-			}
 		}
-		render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
+
+        render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
 	}
 
 

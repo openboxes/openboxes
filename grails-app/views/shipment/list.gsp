@@ -12,7 +12,7 @@
             </g:if>
 
             <g:if test="${shipments?.size() == params.max}">
-                <div class="error">
+                <div class="message">
                     <ul>
                         <li>${g.message(code: 'shipment.limitHasBeenReached.message', args: [params.max])}</li>
                     </ul>

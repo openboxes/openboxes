@@ -453,13 +453,13 @@ class ShipmentService {
                             }
                         }
                     }
-                    else if (statusCode == ShipmentStatusCode.SHIPPED) {
+					else if (statusCode == ShipmentStatusCode.SHIPPED) {
                         events {
                             eventType {
                                 'in'("eventCode", [EventCode.SHIPPED])
                             }
                         }
-                    }
+					}
                     else if (statusCode == ShipmentStatusCode.RECEIVED) {
                         events {
                             eventType {
@@ -476,10 +476,10 @@ class ShipmentService {
         }
 
         log.info "Shipments: " + shipments.size()
-		
+
 
 		shipments = shipments.findAll() { (!statusStartDate || it.expectedShippingDate >= statusStartDate) && (!statusEndDate || it.expectedShippingDate <= statusEndDate) }
-			
+
 		return shipments
 	}
 	
@@ -1257,6 +1257,57 @@ class ShipmentService {
 		}
 
 	}
+
+
+	Receipt findOrCreateReceipt(Shipment shipmentInstance) {
+
+		Receipt receiptInstance
+
+		// Existing receipt
+		if (shipmentInstance.receipt) {
+			receiptInstance = shipmentInstance.receipt
+		}
+		// No existing receipt, instantiate the model to be used
+		else {
+			log.info "Receipt does not exists, please prepare one"
+			receiptInstance = new Receipt(recipient:shipmentInstance?.recipient, shipment: shipmentInstance, actualDeliveryDate: new Date());
+			shipmentInstance.receipt = receiptInstance
+
+			def shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }
+			shipmentItems.each { shipmentItem ->
+
+				def inventoryItem =
+						//inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+						inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
+
+				if (inventoryItem) {
+					log.info "Adding receipt item for inventory item " + inventoryItem
+
+					ReceiptItem receiptItem = new ReceiptItem();
+					receiptItem.binLocation = shipmentItem.binLocation
+					receiptItem.quantityShipped = shipmentItem.quantity;
+					receiptItem.quantityReceived = shipmentItem.quantity;
+					receiptItem.lotNumber = shipmentItem.lotNumber;
+					receiptItem.product = inventoryItem.product
+					receiptItem.inventoryItem = inventoryItem
+					receiptItem.shipmentItem = shipmentItem
+					receiptInstance.addToReceiptItems(receiptItem);
+					shipmentItem.addToReceiptItems(receiptItem)
+					receiptInstance.save(flush:true)
+				}
+				else {
+					receiptInstance.errors.reject('inventoryItem', 'receipt.inventoryItem.invalid')
+				}
+
+			}
+			shipmentInstance.save(flush:true)
+		}
+		return receiptInstance
+
+
+
+	}
+
 	
 	/**
 	 * 

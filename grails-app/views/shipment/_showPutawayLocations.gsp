@@ -10,7 +10,7 @@
     <tbody>
         <g:each var="entry" in="${binLocations}">
             <tr>
-                <td>${entry?.binLocation?.name}</td>
+                <td>${entry?.binLocation?.name?:g.message(code:'default.label')}</td>
                 <td>${entry?.inventoryItem?.lotNumber}</td>
                 <td><g:expirationDate date="${entry?.inventoryItem?.expirationDate}"/></td>
                 <td>${entry?.quantity} ${entry?.product?.unitOfMeasure?:"EA"}</td>

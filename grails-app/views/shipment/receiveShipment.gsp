@@ -36,10 +36,12 @@
                     <img src="${createLinkTo(dir: 'images/icons/silk', file: 'reload.png')}"/>
                     &nbsp;<g:message code="default.button.startOver.label" />
                 </g:link>
+                <%--
                 <g:link controller="shipment" action="validateReceipt" id="${receiptInstance?.id}" class="button">
                     <img src="${createLinkTo(dir: 'images/icons/silk', file: 'check_error.png')}"/>
                     &nbsp;<g:message code="default.button.validate.label" default="Validate"/>
                 </g:link>
+                --%>
             </div>
         </div>
 
@@ -64,14 +66,6 @@
 
                             <table>
                                 <tbody>
-                                <tr class="prop">
-                                    <td class="name middle">
-                                        <label><warehouse:message code="default.id.label" /></label>
-                                    </td>
-                                    <td class="value">
-                                        ${receiptInstance?.id}
-                                    </td>
-                                </tr>
 
                                 <tr class="prop">
                                     <td class="name middle">
@@ -140,6 +134,11 @@
                         </div>
                     </div>
                     <div id="tabs-details" class="ui-tabs-hide">
+
+                        <div class="message">
+                            ${g.message(code: 'receipt.saveAndContinue.message', default: 'NOTE: Please click Save & Contine to save any changesin  before using the Split / Delete Receipt Item buttons.')}
+                        </div>
+
                         <div class="box ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}">
                             <h2>
                                 <warehouse:message code="shipping.itemsToReceive.label" default="Items to be received"/>

@@ -474,12 +474,11 @@
                                                         <g:if test="${shipmentItem?.binLocation}">
                                                             ${shipmentItem?.binLocation?.name?:g.message(code:'default.label')}
                                                         </g:if>
-
                                                     </g:if>
                                                     <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
                                                         <g:if test="${shipmentItem?.receiptItems}">
                                                             <g:each var="receiptItem" in="${shipmentItem?.receiptItems}">
-                                                                <div>
+                                                                <div style="margin: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                                                     ${receiptItem?.binLocation?.name?:g.message(code:'default.label')}
                                                                 </div>
                                                             </g:each>
