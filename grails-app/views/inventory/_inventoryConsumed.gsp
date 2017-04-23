@@ -64,7 +64,7 @@
 									<th><warehouse:message code="product.lotNumber.label"/></th>
 									<th><warehouse:message code="default.expires.label"/></th>
 									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
-									<th><warehouse:message code="inventory.consumed.label"/></th>
+									<th><format:metadata obj="${command?.transactionInstance?.transactionType?.name}"/></th>
 									<th class="center middle">
 
                                         <img data-id="all" class="plus action" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
