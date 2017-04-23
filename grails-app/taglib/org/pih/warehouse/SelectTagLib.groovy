@@ -254,7 +254,7 @@ class SelectTagLib {
 
     def selectBinLocation = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = Location.findAllByParentLocation(currentLocation).sort { it?.name?.toLowerCase() };
+        attrs.from = Location.findAllByParentLocationAndActive(currentLocation, true).sort { it?.name?.toLowerCase() };
         attrs.optionKey = 'id'
         attrs.optionValue = 'name'
         out << g.select(attrs)
