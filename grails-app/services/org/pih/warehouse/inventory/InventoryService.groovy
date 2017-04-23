@@ -82,16 +82,23 @@ class InventoryService implements ApplicationContextAware {
 	 *
 	 * @param warehouse
 	 */
-	void saveLocation(Location warehouse) {
-		log.debug("saving warehouse " + warehouse)
-		log.debug("location type " + warehouse.locationType)
-		// make sure a warehouse has an inventory
-		if (!warehouse.inventory) {
-			addInventory(warehouse)
-		}
-		log.debug warehouse.locationType
+	void saveLocation(Location location) {
 
-		warehouse.save(failOnError: true)
+		// make sure a warehouse has an inventory
+		if (!location.inventory) {
+			addInventory(location)
+		}
+
+        // Should not allow user to disable a bin location that has items in it
+        if (!location.active && location.parentLocation) {
+            List binLocationEntries = getQuantityByBinLocation(location.parentLocation, location)
+            if (!binLocationEntries.isEmpty()) {
+                location.errors.reject("location.cannotDisableBinLocationWithStock.message")
+                throw new ValidationException("cannot save location", location.errors)
+            }
+        }
+
+        location.save()
 	}
 
 	/**
