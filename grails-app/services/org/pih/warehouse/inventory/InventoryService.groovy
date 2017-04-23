@@ -2435,6 +2435,7 @@ class InventoryService implements ApplicationContextAware {
 				def transactionEntry = new TransactionEntry();
 				transactionEntry.quantity = it.quantity;
 				transactionEntry.inventoryItem = inventoryItem;
+                transactionEntry.binLocation = it.binLocation
 				debitTransaction.addToTransactionEntries(transactionEntry);
 			}
 
