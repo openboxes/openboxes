@@ -61,7 +61,6 @@
 
                 <tr class="${rowClass}">
                     <td  class="middle">
-                        ${rowClass} ${stockHistoryEntry?.isSameTransaction}
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
                                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}"/>
