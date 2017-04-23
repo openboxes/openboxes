@@ -46,9 +46,22 @@
             </tr>
         </thead>
         <tbody>
+            <g:set var="count" value="${0}"/>
             <g:each var="stockHistoryEntry" in="${stockHistoryList}" status="status">
-                <tr class="${status%2?'odd':'even'} ${stockHistoryEntry?.showDetails?'':''} ${stockHistoryEntry?.isBaseline?'border-top':''}">
+                <g:set var="rowClass" value=""/>
+                <g:if test="${!stockHistoryEntry.isSameTransaction}">
+                    <g:set var="rowClass" value="${(count++%2==0)?'even':'odd' }"/>
+                    <g:if test='${stockHistoryEntry?.isBaseline}'>
+                        <g:set var="rowClass" value="${rowClass} border-top"/>
+                    </g:if>
+                </g:if>
+                <g:else>
+                    <g:set var="rowClass" value="${(count%2==0)?'odd':'even' }"/>
+                </g:else>
+
+                <tr class="${rowClass}">
                     <td  class="middle">
+                        ${rowClass} ${stockHistoryEntry?.isSameTransaction}
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
                                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}"/>
@@ -57,10 +70,10 @@
                                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" />
                             </g:elseif>
                             <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.INVENTORY}">
-                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'clipboard.png' )}" />
+                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'control_blank.png' )}" />
                             </g:elseif>
                             <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY}">
-                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'calculator.png' )}" />
+                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'control_blank_blue.png' )}" />
                             </g:elseif>
                         </g:if>
                     </td>

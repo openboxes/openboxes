@@ -192,8 +192,9 @@ class InventoryItemController {
                         balance: balance[index],
                         showDetails: (i==0),
                         isBaseline: isBaseline,
-                        isSameTransaction: previousTransaction?.id != transaction?.id
+                        isSameTransaction: (previousTransaction?.id == transaction?.id)
                 ]
+                previousTransaction = transaction
             }
 
             totalBalance = balance.values().sum()
