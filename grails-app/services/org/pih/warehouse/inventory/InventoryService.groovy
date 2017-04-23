@@ -1604,7 +1604,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @return current quantity of the given inventory item.
 	 */
-	Integer getQuantity(Location binLocation, InventoryItem inventoryItem) {
+	Integer getQuantityFromBinLocation(Location binLocation, InventoryItem inventoryItem) {
 		def startTime = System.currentTimeMillis()
 		def currentLocation = getCurrentLocation()
 		def quantity = getQuantity(currentLocation.inventory, binLocation, inventoryItem)
@@ -2312,7 +2312,10 @@ class InventoryService implements ApplicationContextAware {
 	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location binLocation, Location destination, Location source, Integer quantity) {
 		def transaction = new Transaction();
 
-        Integer quantityOnHand = getQuantity(binLocation, inventoryItem);
+        log.info "Bin location " + binLocation
+        log.info "Inventory item " + inventoryItem
+
+        Integer quantityOnHand = getQuantityFromBinLocation(binLocation, inventoryItem);
 
         log.info "Quantity on hand: " + quantityOnHand
 

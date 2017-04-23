@@ -789,7 +789,7 @@ class ShipmentService {
         // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
         // FIXME Please refactor this mess at a later date
         def quantityOnHand = shipmentItem.binLocation ?
-                inventoryService.getQuantity(shipmentItem.binLocation, shipmentItem.inventoryItem) :
+                inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
                 inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
 
 		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
