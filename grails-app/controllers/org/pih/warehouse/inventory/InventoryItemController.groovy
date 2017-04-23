@@ -403,18 +403,21 @@ class InventoryItemController {
         commandInstance.inventory = warehouseInstance?.inventory;
         commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
 
+
+        Product productInstance = commandInstance.product;
+        List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance]);
+
 		// Get the inventory warning level for the given product and inventory
         commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
-	//	def transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(cmd?.inventoryInstance, [cmd?.productInstance]);
-		
-	//	def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[cmd?.productInstance] ?: 0
+
+        commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
 		log.info "commandInstance.recordInventoryRows: "
         commandInstance?.recordInventoryRows.each {
 			log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
         }
 
-		render(view: "showRecordInventory", model: [ commandInstance : cmd ])
+		render(view: "showRecordInventory", model: [ commandInstance : commandInstance ])
 	}
 
 	def showTransactions = {
