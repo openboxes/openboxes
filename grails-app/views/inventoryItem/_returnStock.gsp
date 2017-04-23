@@ -32,7 +32,12 @@
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
                                 <td valign="top" class="value">
-                                    ${binLocation?.name}
+                                    <g:if test="${binLocation}">
+                                        ${binLocation?.name}
+                                    </g:if>
+                                    <g:else>
+                                        <g:message code="default.label"/>
+                                    </g:else>
 
                                 </td>
                             </tr>
@@ -78,7 +83,7 @@
 </div>		
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#dlgReturnStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
+		$("#dlgReturnStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800, height: 400 });
 		$("#btnReturnStock-${dialogId}").click(function() { $("#dlgReturnStock-${dialogId}").dialog('open'); });
 		$("#btnReturnClose-${dialogId}").click(function() { $("#dlgReturnStock-${dialogId}").dialog('close'); });
 	});

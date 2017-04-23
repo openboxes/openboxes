@@ -32,9 +32,12 @@
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
                                 <td valign="middle" class="value">
-                                    ${binLocation?.name}
-
-
+                                    <g:if test="${binLocation}">
+                                        ${binLocation?.name}
+                                    </g:if>
+                                    <g:else>
+                                        <g:message code="default.label"/>
+                                    </g:else>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -59,8 +62,8 @@
                             <tfoot>
                             <tr>
                                 <td colspan="2" class="center">
-                                    <button>
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.transferStock.label"/>
+                                    <button class="button icon approve">
+                                        <warehouse:message code="inventory.transferStock.label"/>
                                     </button>
                                     &nbsp;
                                     <a href="javascript:void(-1);" id="btnTransferClose-${dialogId }" class="middle">
@@ -79,7 +82,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#dlgTransferStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
+        $("#dlgTransferStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800, height: 400 });
         $("#btnTransferStock-${dialogId}").click(function() { $("#dlgTransferStock-${dialogId}").dialog('open'); });
         $("#btnTransferClose-${dialogId}").click(function() { $("#dlgTransferStock-${dialogId}").dialog('close'); });
     });
