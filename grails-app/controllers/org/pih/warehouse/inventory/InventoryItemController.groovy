@@ -10,12 +10,9 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Container
@@ -136,9 +133,81 @@ class InventoryItemController {
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
+        def stockHistoryList = []
+
+
+        int totalDebit = 0, totalCredit = 0, totalBalance = 0, totalCount = 0
+        def balance = [:]
+        def count = [:]
+        def transactionMap = commandInstance?.getTransactionLogMap(false)
+        def previousTransaction = null
+
+
+        transactionMap.each { Transaction transaction, List transactionEntries ->
+
+            // For PRODUCT INVENTORY transactions we just need to clear the balance completely and start over
+            if(transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
+                balance = [:]
+                count = [:]
+                totalCredit = 0
+                totalDebit = 0
+            }
+
+            transactionEntries.eachWithIndex { TransactionEntry transactionEntry, i ->
+
+                boolean isBaseline = false
+                String index = (transactionEntry.binLocation?.name ?: "DefaultBin") + "-" + (transactionEntry?.inventoryItem?.lotNumber ?: "DefaultLot")
+
+                if (!balance[index]) {
+                    balance[index] = 0;
+                    count[index] = 0;
+                }
+
+                if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.DEBIT) {
+                    balance[index] -= transactionEntry?.quantity
+                    totalDebit+= transactionEntry?.quantity
+                } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.CREDIT) {
+                    balance[index] += transactionEntry?.quantity
+                    totalCredit+= transactionEntry?.quantity
+                } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.INVENTORY) {
+                    balance[index] += transactionEntry?.quantity
+                    count[index] = transactionEntry?.quantity
+                } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
+                    balance[index] += transactionEntry?.quantity
+                    count[index] = transactionEntry?.quantity
+                }
+
+                if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY && i == 0) {
+                    isBaseline = true
+                }
+
+                stockHistoryList << [
+                        transactionDate: transaction.transactionDate,
+                        transaction: transaction,
+                        shipment: null,
+                        requisition: null,
+                        binLocation: transactionEntry.binLocation,
+                        inventoryItem: transactionEntry.inventoryItem,
+                        quantity: transactionEntry.quantity,
+                        balance: balance[index],
+                        showDetails: (i==0),
+                        isBaseline: isBaseline,
+                        isSameTransaction: previousTransaction?.id != transaction?.id
+                ]
+            }
+
+            totalBalance = balance.values().sum()
+            totalCount = count.values().sum()
+        }
+
+
+
+
+
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showStockHistory", model: [commandInstance:commandInstance])
+        render(template: "showStockHistory", model: [commandInstance:commandInstance, stockHistoryList: stockHistoryList,
+                                                     totalBalance:totalBalance, totalCount:totalCount, totalCredit:totalCredit, totalDebit:totalDebit])
     }
 
     def showPendingRequisitions = { StockCardCommand cmd ->
