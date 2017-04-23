@@ -585,6 +585,12 @@
                                         </tr>
                                     </g:each>
                                 </table>
+                                <g:unless test="${shipmentInstance?.receipt || shipmentInstance?.wasReceived()}">
+                                    <div class="empty fade center">
+                                        <g:message code="shipment.noReceipt.message" default="Shipment has not been received yet"/>
+                                    </div>
+                                </g:unless>
+
                             </div>
                         </div>
                         <div id="documents-tab">
