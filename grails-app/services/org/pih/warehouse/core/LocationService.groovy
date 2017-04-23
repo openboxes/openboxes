@@ -10,7 +10,13 @@
 package org.pih.warehouse.core
 
 import org.apache.commons.collections.comparators.NullComparator
-import util.ConfigHelper;
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import util.ConfigHelper
+
+import javax.xml.bind.ValidationException;
 
 // import java.text.DecimalFormat
 // import java.text.SimpleDateFormat
@@ -122,6 +128,106 @@ class LocationService {
 		return locations
 		
 	}
-	
-   
+
+	boolean importBinLocations(String locationId, InputStream inputStream) {
+		try {
+
+			Location location = Location.get(locationId)
+			if (!location) {
+				throw new ValidationException("location.cannotImportBinLocationsWithoutParentLocation.message")
+			}
+
+			LocationType defaultLocationType = LocationType.findByLocationTypeCode(LocationTypeCode.BIN_LOCATION)
+			if (!defaultLocationType) {
+				throw new ValidationException("locationType.noDefaultForBinLocation.message")
+			}
+
+			List binLocations = parseBinLocations(inputStream)
+			log.info "Bin locations " + binLocations
+			if (binLocations) {
+				binLocations.each {
+					Location binLocation = Location.findByNameAndParentLocation(it.name, location)
+					if (!binLocation) {
+						binLocation = new Location()
+						binLocation.name = it.name
+						binLocation.locationNumber = it.name
+						binLocation.parentLocation = location
+						binLocation.locationType = defaultLocationType
+						location.addToLocations(binLocation)
+					}
+					else {
+						log.info "Bin location ${it.name} already exists"
+					}
+				}
+				location.save()
+
+			} else {
+				throw new ValidationException("location.cannotImportEmptyBinLocations.message")
+			}
+		} catch (Exception e) {
+			log.error("Unable to bin locations due to exception: " + e.message, e)
+			throw new RuntimeException(e.message)
+		}
+		finally {
+			inputStream.close();
+		}
+
+		return true
+	}
+
+
+	List parseBinLocations(InputStream inputStream) {
+
+		List binLocations = []
+
+		HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+		HSSFSheet worksheet = workbook.getSheetAt(0);
+
+		Iterator<Row> rowIterator = worksheet.iterator();
+		int cellIndex = 0
+		Row row
+		while (rowIterator.hasNext()) {
+			row = rowIterator.next();
+
+			// Skip the first row
+			if (row.getRowNum() == 0) {
+				continue
+			}
+
+			try {
+				cellIndex = 0;
+				def name = getStringCellValue(row.getCell(cellIndex++))
+				binLocations << [name: name]
+			}
+			catch (IllegalStateException e) {
+				log.error("Error parsing XLS file " + e.message, e)
+				throw new RuntimeException("Error parsing XLS file at row " + (row.rowNum+1) + " column " + cellIndex + " caused by: " + e.message, e)
+			}
+			catch (Exception e) {
+				log.error("Error parsing XLS file " + e.message, e)
+				throw new RuntimeException("Error parsing XLS file at row " + (row.rowNum+1) + " column " + cellIndex + " caused by: " + e.message, e)
+
+			}
+
+
+		}
+		return binLocations
+	}
+
+	String getStringCellValue(Cell cell) {
+		String value = null
+		if (cell) {
+			try {
+				value = cell.getStringCellValue()
+			}
+			catch (IllegalStateException e) {
+				log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
+				value = Integer.valueOf((int) cell.getNumericCellValue())
+			}
+		}
+		return value?.trim()
+	}
+
+
+
 }

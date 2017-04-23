@@ -9,13 +9,13 @@
  **/
 package org.pih.warehouse.inventory
 
-import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
 import org.grails.plugins.csv.CSVWriter
-import org.hibernate.annotations.Cache
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.auth.AuthService
@@ -36,11 +36,9 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
-import util.InventoryUtil
 
 import java.sql.Timestamp
 import java.text.ParseException;
-import java.util.Random
 
 
 import java.text.SimpleDateFormat

@@ -343,17 +343,28 @@
                             </div>
                             <div id="location-binLocations-tab">
 
-
                                 <div class="box">
                                     <h2><warehouse:message code="binLocations.label" default="Bin Locations" /></h2>
                                     <div class="dialog">
                                         <table>
-                                            <tr>
+                                            <thead>
+                                            <tr class="prop odd">
+                                                <td colspan="4">
+                                                    <button class="btnAddBinLocation button">
+                                                        <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
+                                                    </button>
+                                                    <button class="btnImportBinLocations button">
+                                                        <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr class="prop">
                                                 <th width="1%"><g:message code="default.actions.label"/></th>
                                                 <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
                                                 <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
-                                                <th><g:message code="default.actions.label"></g:message></th>
+                                                <th class="right"><g:message code="default.actions.label"></g:message></th>
                                             </tr>
+                                            </thead>
 
                                             <g:each in="${locationInstance?.locations?.sort { it.name }}" var="binLocation" status="status">
                                                 <tr class="prop ${status%2?'even':'odd'}">
@@ -367,20 +378,19 @@
                                                                 <div class="action-menu-item">
                                                                     <a href="javascript:void(-1)" class="btnShowContents" data-id="${binLocation?.id}" fragment="location-details-tab">
                                                                         <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>&nbsp;
-                                                                        ${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'binLocation.label')])}
+                                                                        ${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'location.binLocation.label')])}
                                                                     </a>
                                                                 </div>
                                                                 <div class="action-menu-item">
                                                                     <g:link class="edit" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
                                                                         <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
-                                                                        ${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'binLocation.label')])}
+                                                                        ${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'location.binLocation.label')])}
                                                                     </g:link>
                                                                 </div>
                                                                 <div class="action-menu-item">
-                                                                    <g:link class="delete" action="delete" id="${binLocation?.id}"
-                                                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                                    <g:link class="delete" action="delete" id="${binLocation?.id}">
                                                                         <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
-                                                                        ${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'binLocation.label')])}
+                                                                        ${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'location.binLocation.label')])}
                                                                     </g:link>
                                                                 </div>
                                                             </div>
@@ -394,8 +404,24 @@
                                                             ${binLocation.name}
                                                         </g:link>
                                                     </td>
-                                                    <td>
-                                                        <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation.id}"><g:message code="default.show.label" args="['Contents']"/></a>
+                                                    <td class="right">
+                                                        <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation?.id}" fragment="location-details-tab">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
+                                                            ${g.message(code: 'default.button.show.label')}
+                                                        </a>
+
+                                                        <g:link class="button" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
+                                                            ${g.message(code: 'default.button.edit.label')}
+                                                        </g:link>
+
+                                                        <g:link class="button" action="delete" id="${binLocation?.id}">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
+                                                            ${g.message(code: 'default.button.delete.label')}
+
+                                                        </g:link>
+
+
                                                     </td>
                                                 </tr>
                                             </g:each>
@@ -414,6 +440,10 @@
                                                         <button class="btnAddBinLocation button">
                                                             <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
                                                         </button>
+                                                        <button class="btnImportBinLocations button">
+                                                            <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
+                                                        </button>
+
                                                     </td>
                                                 </tr>
                                             </tfoot>
@@ -478,6 +508,34 @@
         <!-- Contents loaded dynamically -->
     </div>
 
+    <div id="dlgImportBinLocations" title="${g.message(code: 'default.import.label', args: [g.message(code:'location.binLocation.label')])}">
+        <div class="dialog">
+            <g:uploadForm action="importBinLocations">
+                <g:hiddenField name="id" value="${locationInstance?.id}" />
+                <table>
+                    <tbody>
+                    <tr class="prop">
+                        <td valign="top" class="name"><label><warehouse:message
+                                code="document.selectFile.label" /></label>
+                        </td>
+                        <td valign="top" class="value">
+                            <input name="fileContents" type="file" />
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <g:submitButton name="importBinLocations" value="Import Bin Locations" class="button icon add"></g:submitButton>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </g:uploadForm>
+        </div>
+    </div>
+
 
     <script type="text/javascript">
 
@@ -514,14 +572,26 @@
 
             // Add Bin Location dialog
             $(".btnAddBinLocation").click(function(event) {
-                $("#dlgAddBinLocation").dialog('open');
                 event.preventDefault();
+                $("#dlgAddBinLocation").dialog('open');
             });
             $("#dlgAddBinLocation").dialog({ autoOpen: false, modal: true, width: 800 });
 
             $(".btnCloseDialog").click( function() {
                 $("#dlgAddBinLocation").dialog('close');
             });
+
+            // Import Bin Locations
+            $(".btnImportBinLocations").click(function(event){
+                event.preventDefault();
+                $("#dlgImportBinLocations").dialog('open');
+            });
+            $("#dlgImportBinLocations").dialog({
+                autoOpen: false,
+                modal: true,
+                width: 600
+            });
+
             /*
             $('#bgColor').colorpicker({
                 size: 20,
