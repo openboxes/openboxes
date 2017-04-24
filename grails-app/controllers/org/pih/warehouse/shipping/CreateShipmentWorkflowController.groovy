@@ -509,18 +509,27 @@ class CreateShipmentWorkflowController {
 
 			action {
 
-				Map quantityMap = [:]
-				Location location = Location.load(session.warehouse.id)
-//				List inventoryItems = flow?.shipmentInstance?.shipmentItems*.inventoryItem
-//				inventoryItems.each { inventoryItem ->
-//					quantityMap[inventoryItem] = inventoryService.getQuantityByBinLocation(location,inventoryItem)
-//				}
-                List products = flow?.shipmentInstance?.shipmentItems*.product
-                products.each { product ->
-                    quantityMap[product] = inventoryService.getQuantityByBinLocation(location,product)
-                }
+                Location location = Location.load(session.warehouse.id)
 
-				[quantityMap:quantityMap]
+                Map quantityMap = [:]
+
+                // We only need to pick items if the shipment is outbound from the current location
+                if (flow?.shipmentInstance?.origin == location) {
+
+                    // Only show stock for lot number selected
+                    //List inventoryItems = flow?.shipmentInstance?.shipmentItems*.inventoryItem
+                    //inventoryItems.each { inventoryItem ->
+                    //    quantityMap[inventoryItem] = inventoryService.getQuantityByBinLocation(location,inventoryItem)
+                    //}
+
+                    // Show stock for all lot numbers for the given products selected
+                    List products = flow?.shipmentInstance?.shipmentItems*.product
+                    products.each { product ->
+                        quantityMap[product] = inventoryService.getQuantityByBinLocation(location, product)
+                    }
+
+                }
+                [quantityMap: quantityMap]
 			}
 			on("error").to "showPicklistItems"
 			on(Exception).to "showPicklistItems"
