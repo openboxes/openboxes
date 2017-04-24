@@ -620,11 +620,11 @@ class JsonController {
                         localizedName = (it.product.productCode ?: " - ") + " " + localizedName
                         inventoryItems = inventoryItems.sort { it.expirationDate }
 
-                        if (quantity > 0) {
+                        if (quantity >= 0) {
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
-                                    label         : (localizedName + " [Lot: " + (it.lotNumber ?: "Default") + ", Exp: " + it.expirationDate.format("MM/yy")
+                                    label         : (localizedName + " [Lot: " + (it?.lotNumber ?: "NOLOT") + ", Exp: " + it?.expirationDate?.format("MM/yy")
                                             + ", QoH: " + quantity + " " + (it?.product?.unitOfMeasure ?: "EA") + "]"),
                                     valueText     : it.lotNumber,
                                     lotNumber     : it.lotNumber,

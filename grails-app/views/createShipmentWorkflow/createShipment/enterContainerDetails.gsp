@@ -311,7 +311,7 @@
 									<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
 									<g:hiddenField name="containerId" value="${selectedContainer?.id}"/>
 									<g:autoSuggest id="inventoryItem" name="inventoryItem" jsonUrl="${request.contextPath }/json/findInventoryItems"
-                                                   placeholder="Enter lot number or product code" styleClass="text" size="200" minLength="2" delay="500"/>
+                                                   placeholder="Enter lot number or product code" styleClass="text" width="500" minLength="2" delay="500"/>
 									<g:textField name="quantity" value="" class="text" placeholder="Quantity" size="5"/>
 									<g:submitButton name="addShipmentItem" value="Add item" class="button icon add"></g:submitButton>
 								</g:form>
@@ -348,10 +348,9 @@
 										</div>
 									</td>
 									<td class="middle left">
-
-											<div class="">
-												<g:render template="/container/summary" model="[container:selectedContainer]"/>
-											</div>
+										<div class="">
+											<g:render template="/container/summary" model="[container:selectedContainer]"/>
+										</div>
 									</td>
 								</tr>
 							</table>
@@ -451,7 +450,7 @@
 								</g:if>
 								<g:unless test="${shipmentItems }">
 									<tr class="none">
-										<td colspan="8">
+										<td colspan="10">
 											<div class="middle center fade empty">
 												<warehouse:message code="shipment.noShipmentItems.message"/>
 											</div>
