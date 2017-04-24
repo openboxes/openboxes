@@ -469,18 +469,11 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="locationType" action="list"
-                                class="locationType">
-                            <warehouse:message code="location.locationTypes.label" default="Location Types" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
                         <g:link controller="eventType" action="list"
                                 class="eventType">
                             <warehouse:message code="location.eventTypes.label" default="Event types" />
                         </g:link>
                     </div>
-                    <hr/>
                     <div class="megaButton">
                         <g:link controller="location" action="list" class="location">
                             <warehouse:message code="locations.label" />
@@ -489,6 +482,12 @@
                     <div class="megaButton">
                         <g:link controller="locationGroup" action="list" class="site">
                             <warehouse:message code="locationGroups.label" default="Location Groups" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="locationType" action="list"
+                                class="locationType">
+                            <warehouse:message code="location.locationTypes.label" default="Location Types" />
                         </g:link>
                     </div>
                     <div class="megaButton">
