@@ -346,18 +346,8 @@
                                 <div class="box">
                                     <h2><warehouse:message code="binLocations.label" default="Bin Locations" /></h2>
                                     <div class="dialog">
-                                        <table>
+                                        <table class="dataTable">
                                             <thead>
-                                            <tr class="prop odd">
-                                                <td colspan="4">
-                                                    <button class="btnAddBinLocation button">
-                                                        <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
-                                                    </button>
-                                                    <button class="btnImportBinLocations button">
-                                                        <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
-                                                    </button>
-                                                </td>
-                                            </tr>
                                             <tr class="prop">
                                                 <th width="1%"><g:message code="default.actions.label"/></th>
                                                 <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
@@ -434,22 +424,19 @@
                                                     </td>
                                                 </tr>
                                             </g:unless>
-                                            <tfoot>
-                                                <tr>
-                                                    <td colspan="4">
-                                                        <button class="btnAddBinLocation button">
-                                                            <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
-                                                        </button>
-                                                        <button class="btnImportBinLocations button">
-                                                            <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
-                                                        </button>
 
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
+                                <div class="buttons center">
+                                    <button class="btnAddBinLocation button">
+                                        <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
+                                    </button>
+                                    <button class="btnImportBinLocations button">
+                                        <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
+                                    </button>
+                                </div>
+
                             </div>
                         </g:if>
                     </div>

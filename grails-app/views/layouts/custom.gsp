@@ -430,7 +430,8 @@
         });
 
         $('.dataTable').dataTable({
-            "bJQueryUI": true
+            "bJQueryUI": true,
+            "sPaginationType": "two_button"
         });
     });
 </script>
