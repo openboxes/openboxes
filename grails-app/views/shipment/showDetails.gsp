@@ -472,8 +472,11 @@
                                                 <td>
                                                     <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
                                                         <g:if test="${shipmentItem?.binLocation}">
-                                                            ${shipmentItem?.binLocation?.name?:g.message(code:'default.label')}
+                                                            ${shipmentItem?.binLocation?.name}
                                                         </g:if>
+                                                        <g:else>
+                                                            ${g.message(code:'default.label')}
+                                                        </g:else>
                                                     </g:if>
                                                     <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
                                                         <g:if test="${shipmentItem?.receiptItems}">
