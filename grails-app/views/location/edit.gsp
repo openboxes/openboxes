@@ -346,86 +346,84 @@
                                 <div class="box">
                                     <h2><warehouse:message code="binLocations.label" default="Bin Locations" /></h2>
                                     <div class="dialog">
-                                        <table class="dataTable">
-                                            <thead>
-                                            <tr class="prop">
-                                                <th width="1%"><g:message code="default.actions.label"/></th>
-                                                <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
-                                                <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
-                                                <th class="right"><g:message code="default.actions.label"></g:message></th>
-                                            </tr>
-                                            </thead>
+                                        <g:if test="${locationInstance?.locations}">
+                                            <table class="dataTable">
+                                                <thead>
+                                                <tr class="prop">
+                                                    <th width="1%"><g:message code="default.actions.label"/></th>
+                                                    <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
+                                                    <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
+                                                    <th class="right"><g:message code="default.actions.label"></g:message></th>
+                                                </tr>
+                                                </thead>
 
-                                            <g:each in="${locationInstance?.locations?.sort { it.name }}" var="binLocation" status="status">
-                                                <tr class="prop ${status%2?'even':'odd'}">
-                                                    <td>
-                                                        <div class="action-menu">
-                                                            <button class="action-btn">
-                                                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
-                                                                     style="vertical-align: middle" />
-                                                            </button>
-                                                            <div class="actions">
-                                                                <div class="action-menu-item">
-                                                                    <a href="javascript:void(-1)" class="btnShowContents" data-id="${binLocation?.id}" fragment="location-details-tab">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>&nbsp;
-                                                                        ${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'location.binLocation.label')])}
-                                                                    </a>
-                                                                </div>
-                                                                <div class="action-menu-item">
-                                                                    <g:link class="edit" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
-                                                                        ${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'location.binLocation.label')])}
-                                                                    </g:link>
-                                                                </div>
-                                                                <div class="action-menu-item">
-                                                                    <g:link class="delete" action="delete" id="${binLocation?.id}">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
-                                                                        ${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'location.binLocation.label')])}
-                                                                    </g:link>
+                                                <g:each in="${locationInstance?.locations?.sort { it.name }}" var="binLocation" status="status">
+                                                    <tr class="prop ${status%2?'even':'odd'}">
+                                                        <td>
+                                                            <div class="action-menu">
+                                                                <button class="action-btn">
+                                                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
+                                                                         style="vertical-align: middle" />
+                                                                </button>
+                                                                <div class="actions">
+                                                                    <div class="action-menu-item">
+                                                                        <a href="javascript:void(-1)" class="btnShowContents" data-id="${binLocation?.id}" fragment="location-details-tab">
+                                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>&nbsp;
+                                                                            ${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'location.binLocation.label')])}
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="action-menu-item">
+                                                                        <g:link class="edit" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
+                                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
+                                                                            ${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'location.binLocation.label')])}
+                                                                        </g:link>
+                                                                    </div>
+                                                                    <div class="action-menu-item">
+                                                                        <g:link class="delete" action="delete" id="${binLocation?.id}">
+                                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
+                                                                            ${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'location.binLocation.label')])}
+                                                                        </g:link>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        ${binLocation.active}
-                                                    </td>
-                                                    <td>
-                                                        <g:link controller="location" action="edit" id="${binLocation.id}" fragment="location-details-tab">
-                                                            ${binLocation.name}
-                                                        </g:link>
-                                                    </td>
-                                                    <td class="right">
-                                                        <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation?.id}" fragment="location-details-tab">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
-                                                            ${g.message(code: 'default.button.show.label')}
-                                                        </a>
+                                                        </td>
+                                                        <td>
+                                                            ${binLocation.active}
+                                                        </td>
+                                                        <td>
+                                                            <g:link controller="location" action="edit" id="${binLocation.id}" fragment="location-details-tab">
+                                                                ${binLocation.name}
+                                                            </g:link>
+                                                        </td>
+                                                        <td class="right">
+                                                            <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation?.id}" fragment="location-details-tab">
+                                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
+                                                                ${g.message(code: 'default.button.show.label')}
+                                                            </a>
 
-                                                        <g:link class="button" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
-                                                            ${g.message(code: 'default.button.edit.label')}
-                                                        </g:link>
+                                                            <g:link class="button" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
+                                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
+                                                                ${g.message(code: 'default.button.edit.label')}
+                                                            </g:link>
 
-                                                        <g:link class="button" action="delete" id="${binLocation?.id}">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
-                                                            ${g.message(code: 'default.button.delete.label')}
+                                                            <g:link class="button" action="delete" id="${binLocation?.id}">
+                                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
+                                                                ${g.message(code: 'default.button.delete.label')}
 
-                                                        </g:link>
+                                                            </g:link>
 
 
-                                                    </td>
-                                                </tr>
-                                            </g:each>
-                                            <g:unless test="${locationInstance.locations}">
-                                                <tr>
-                                                    <td colspan="3">
-                                                        <div class="emtpty center fade">
-                                                            <g:message code="location.noBinLocations.label" default="No bin locations"/>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </g:unless>
+                                                        </td>
+                                                    </tr>
+                                                </g:each>
 
-                                        </table>
+                                            </table>
+                                        </g:if>
+                                        <g:unless test="${locationInstance.locations}">
+                                            <div class="empty center fade">
+                                                <g:message code="location.noBinLocations.label" default="No bin locations"/>
+                                            </div>
+                                        </g:unless>
                                     </div>
                                 </div>
                                 <div class="buttons center">
