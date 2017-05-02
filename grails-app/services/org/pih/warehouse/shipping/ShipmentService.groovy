@@ -440,42 +440,44 @@ class ShipmentService {
                 if (destination) { eq("destination", destination) }
                 if (lastUpdatedStart) { ge("lastUpdated", lastUpdatedStart)}
                 if (lastUpdatedEnd) { le("lastUpdated", lastUpdatedEnd)}
-                if (statusCode) {
-                    if (statusCode in [ShipmentStatusCode.PENDING, ShipmentStatusCode.CREATED]) {
-                        or {
-                            isEmpty('events')
-                            events {
-                                eventType {
-                                    not {
-                                        'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
-                                    }
-                                }
-                            }
-                        }
-                    }
-					else if (statusCode == ShipmentStatusCode.SHIPPED) {
-                        events {
-                            eventType {
-                                'in'("eventCode", [EventCode.SHIPPED])
-                            }
-                        }
-                        events {
-                            eventType {
-                                not {
-                                    'in'("eventCode", [EventCode.RECEIVED])
-                                }
-                            }
-
-                        }
-					}
-                    else if (statusCode == ShipmentStatusCode.RECEIVED) {
-                        events {
-                            eventType {
-                                'in'("eventCode", [EventCode.RECEIVED])
-                            }
-                        }
-                    }
-                }
+//                if (statusCode) {
+//                    if (statusCode in [ShipmentStatusCode.PENDING, ShipmentStatusCode.CREATED]) {
+//                        or {
+//                            isEmpty('events')
+//                            events {
+//                                eventType {
+//                                    not {
+//                                        'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//					else if (statusCode == ShipmentStatusCode.SHIPPED) {
+//                        and {
+//                            events {
+//                                eventType {
+//                                    'in'("eventCode", [EventCode.SHIPPED])
+//                                }
+//                            }
+//                            events {
+//                                eventType {
+//                                    not {
+//                                        'in'("eventCode", [EventCode.RECEIVED])
+//                                    }
+//                                }
+//
+//                            }
+//                        }
+//					}
+//                    else if (statusCode == ShipmentStatusCode.RECEIVED) {
+//                        events {
+//                            eventType {
+//                                'in'("eventCode", [EventCode.RECEIVED])
+//                            }
+//                        }
+//                    }
+//                }
                 order("lastUpdated", "desc")
                 order("dateCreated", "desc")
             }
@@ -484,6 +486,13 @@ class ShipmentService {
 
         log.info "Shipments: " + shipments.size()
 
+        // now filter by event code and eventdate
+        shipments = shipments.findAll( { def status = it.getStatus()
+            if (statusCode && status.code != statusCode) { return false }
+            //if (statusStartDate && status.date < statusStartDate) { return false }
+            //if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
+            return true
+        } )
 
 		shipments = shipments.findAll() { (!statusStartDate || it.expectedShippingDate >= statusStartDate) && (!statusEndDate || it.expectedShippingDate <= statusEndDate) }
 
