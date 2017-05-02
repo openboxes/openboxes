@@ -410,8 +410,8 @@ class ShipmentService {
 		
 		return shipments
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param shipmentType
@@ -459,6 +459,14 @@ class ShipmentService {
                                 'in'("eventCode", [EventCode.SHIPPED])
                             }
                         }
+                        events {
+                            eventType {
+                                not {
+                                    'in'("eventCode", [EventCode.RECEIVED])
+                                }
+                            }
+
+                        }
 					}
                     else if (statusCode == ShipmentStatusCode.RECEIVED) {
                         events {
@@ -472,7 +480,6 @@ class ShipmentService {
                 order("dateCreated", "desc")
             }
             maxResults(limit)
-
         }
 
         log.info "Shipments: " + shipments.size()
