@@ -81,7 +81,7 @@
 						</g:link>
 					</td>
 					<td class="middle center">
-						${shipmentInstance?.countShipmentItems()}
+						${shipmentInstance?.shipmentItemCount}
 					</td>
 					<td class="middle">
                         ${fieldValue(bean: shipmentInstance, field: "origin.name")}
