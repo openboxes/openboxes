@@ -13,10 +13,28 @@ package org.pih.warehouse
 // import java.util.Date;
 
 import com.ocpsoft.pretty.time.PrettyTime
-import groovy.time.TimeDuration;
+import groovy.time.TimeDuration
 
 class DateTagLib {
 
+    static namespace = "g"
+
+	def formatDate = { attrs, body ->
+        def formatTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib')
+
+        def today = new Date()
+        if (!attrs.format) {
+            if (attrs.date >= today - 1) {
+                attrs.format = "hh:mma z"
+            } else if (attrs.date >= today - 30) {
+                attrs.format = "MMM dd hh:mma z"
+            } else if (attrs.date >= today - 365) {
+                attrs.format = "MMM dd yyyy"
+            }
+        }
+        out << formatTagLib.formatDate.call(attrs)
+		//out << g.dateFormat([date:null])
+	}
 
 	def expirationDate = { attrs, body ->
         out << g.render(template: '/taglib/expirationDate', model: [attrs:attrs])
