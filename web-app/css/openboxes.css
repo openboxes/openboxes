@@ -2218,6 +2218,7 @@ img.photo_tiny {
 .lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
 .binLocation { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
 .barcode { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; letter-spacing: .1em; font-weight: normal; font-size: 11px; line-height: 20px}
+.barcode-data { text-align: center; }
 .genericName { text-transform: uppercase; }
 #more { background-color: #ddd; padding: 10px; }
 

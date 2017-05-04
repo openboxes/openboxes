@@ -25,17 +25,15 @@
 				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>
-	   	
-
 		<g:if test="${command?.shipment }">
 			<div>
 				<div class="dialog">
 		   			<g:set var="status" value="${0 }"/>
-			    	<g:set var="packingListByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>
-		   			<g:each var="packingListEntry" in="${packingListByContainer}">
+			    	<g:set var="pickListByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>
+		   			<g:each var="picklistItem" in="${pickListByContainer}">
 		   			
 		   				<div class="page" style="page-break-after: always;">
-                            <table id="packinglist-items" width="100%" class="fs-repeat-header">
+                            <table id="picklist-items" class="fs-repeat-header">
                                 <tr>
                                     <td colspan="9" class="center" >
                                         <table border="0">
@@ -46,7 +44,7 @@
                                                     </td>
                                                     <td class="left middle">
                                                         <div class="title">
-                                                            <warehouse:message code="report.shippingReport.title"/>
+                                                            <warehouse:message code="shipping.pickList.label" default="Pick List"/>
                                                         </div>
                                                         <div class="subtitle">
                                                             ${command?.shipment?.name?.encodeAsHTML() }
@@ -124,10 +122,7 @@
                                             <th class="center bottom">
                                                 <warehouse:message code="report.number.label"/>
                                             </th>
-                                            <th class="">
-
-                                            </th>
-                                            <th class="bottom">
+                                            <th class="center">
                                                 <warehouse:message code="product.productCode.label"/>
                                             </th>
                                             <th class="bottom">
@@ -140,56 +135,49 @@
                                                 <warehouse:message code="inventoryItem.expirationDate.label"/>
                                             </th>
                                             <th class="center bottom">
-                                                <warehouse:message code="shipping.recipient.label"/>
-                                            </th>
-
-                                            <th class="center">
-                                                <warehouse:message code="report.quantityPerBox.label"/>
+                                                <warehouse:message code="location.binLocations.label"/>
                                             </th>
                                             <th class="center">
-                                                <warehouse:message code="report.quantityTotal.label"/>
+                                                <warehouse:message code="default.quantity.label"/>
+                                            </th>
+                                            <th class="center">
+                                                <warehouse:message code="default.uom.label"/>
                                             </th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
-                                        <g:each var="checklistEntry" in="${packingListEntry?.value }" status="i">
+                                        <g:each var="entry" in="${picklistItem?.value }" status="i">
                                             <tr class="prop ${i % 2 ? 'even' : 'odd' }">
                                                 <td class="center">
                                                     ${i+1 }
                                                 </td>
                                                 <td>
-                                                    <g:displayBarcode data="${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}"
-                                                                       showData="${false}"/>
+                                                    <g:displayBarcode data="${entry?.shipmentItem?.inventoryItem?.product?.productCode?:entry?.shipmentItem?.product?.productCode}"
+                                                                       showData="${true}"/>
                                                 </td>
                                                 <td>
-                                                    ${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}
+                                                    <format:product product="${entry?.shipmentItem?.inventoryItem?.product?:entry?.shipmentItem?.product}"/>
                                                 </td>
                                                 <td>
-                                                    <format:product product="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}"/>
+                                                    ${entry?.shipmentItem?.inventoryItem?.lotNumber?:entry?.shipmentItem?.lotNumber  }
                                                 </td>
                                                 <td>
-                                                    ${checklistEntry?.shipmentItem?.inventoryItem?.lotNumber?:checklistEntry?.shipmentItem?.lotNumber  }
+                                                    <format:expirationDate obj="${entry?.shipmentItem?.inventoryItem?.expirationDate?:entry?.shipmentItem?.expirationDate }"/>
                                                 </td>
                                                 <td>
-                                                    <format:expirationDate obj="${checklistEntry?.shipmentItem?.inventoryItem?.expirationDate?:checklistEntry?.shipmentItem?.expirationDate }"/>
-                                                </td>
-                                                <td>
-                                                    <g:if test="${checklistEntry?.shipmentItem?.recipient }">
-                                                        ${checklistEntry?.shipmentItem?.recipient?.name?.encodeAsHTML()  }
-                                                    </g:if>
-                                                    <g:elseif test="${checklistEntry?.shipmentItem?.container?.recipient }">
-                                                        ${checklistEntry?.shipmentItem?.container?.recipient?.name?.encodeAsHTML()  }
-                                                    </g:elseif>
-                                                    <g:elseif test="${checklistEntry?.shipmentItem?.shipment?.recipient }">
-                                                        ${checklistEntry?.shipmentItem?.shipment?.recipient?.name?.encodeAsHTML()  }
-                                                    </g:elseif>
-                                                </td>
-                                                <td>
+                                                    <g:each var="binLocationEntry" in="${binLocations[entry?.shipmentItem?.inventoryItem]}">
+                                                        <div>
+                                                            <label>${binLocationEntry?.binLocation?.name?:g.message(code:'default.label')}:</label> ${binLocationEntry?.quantity}
+                                                        </div>
+                                                    </g:each>
 
                                                 </td>
                                                 <td class="center">
-                                                    ${checklistEntry?.shipmentItem?.quantity }
+                                                    ${entry?.shipmentItem?.quantity }
+                                                </td>
+                                                <td>
+                                                    ${entry?.shipmentItem?.inventoryItem?.product?.unitOfMeasure?:entry?.shipmentItem?.product?.unitOfMeasure}
                                                 </td>
                                             </tr>
                                         </g:each>

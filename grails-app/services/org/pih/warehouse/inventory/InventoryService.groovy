@@ -1364,6 +1364,16 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
+	def getBinLocations(Shipment shipmentInstance) {
+		Map binLocationMap = [:]
+		// Only show stock for inventory items added to shipment
+		List inventoryItems = shipmentInstance?.shipmentItems*.inventoryItem.unique()
+		inventoryItems.each { inventoryItem ->
+			binLocationMap[inventoryItem] = getItemQuantityByBinLocation(shipmentInstance?.origin,inventoryItem)
+		}
+		return binLocationMap
+	}
+
     List getQuantityByBinLocation(Location location, Location binLocation) {
         List transactionEntries = getTransactionEntriesByInventoryAndBinLocation(location?.inventory, binLocation)
         List binLocations = getQuantityByBinLocation(transactionEntries)

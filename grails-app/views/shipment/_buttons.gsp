@@ -138,6 +138,14 @@
         </div>
         <div class="actions">
             <div class="action-menu-item">
+                <g:link target="_blank" controller="report" action="printPickListReport"
+                        params="['shipment.id': shipmentInstance?.id]">
+                    <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
+                    <warehouse:message code="shipping.downloadPickList.label" default="Download Pick List"/>
+                    <span class="fade">(.pdf)</span>
+                </g:link>
+            </div>
+            <div class="action-menu-item">
                 <g:link target="_blank" controller="report" action="printShippingReport"
                         params="['shipment.id': shipmentInstance?.id]">
                     <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;

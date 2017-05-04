@@ -199,7 +199,19 @@ class ReportController {
 		}
 		[command : command]
 	}
-	
+
+	def printPickListReport = { ChecklistReportCommand command ->
+
+		Map binLocations
+		//command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) {
+			reportService.generateShippingReport(command);
+			binLocations = inventoryService.getBinLocations(command.shipment)
+		}
+		[command : command, binLocations: binLocations]
+	}
+
+
 	def printPaginatedPackingListReport = { ChecklistReportCommand command ->
 		try {
 			command.rootCategory = productService.getRootCategory();

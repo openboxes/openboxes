@@ -277,39 +277,43 @@
                                             <tbody>
                                             <tr class="odd">
                                                 <td>
-                                                    <img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" class="middle"/>
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_numbers.png')}" class="middle"/>
                                                 </td>
                                                 <td>
-                                                    <div>
-                                                        <g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]">
-                                                            <label><g:message code="shipping.packingList.label"/></label></g:link>
-                                                    </div>
+                                                    <g:link target="_blank" controller="report" action="printPickListReport" params="['shipment.id':shipmentInstance?.id]">
+                                                        <label><g:message code="shipping.picklist.label" default="Pick List"/></label></g:link>
 
                                                 </td>
                                             </tr>
                                             <tr class="even">
                                                 <td>
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>
+                                                    <img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" class="middle"/>
                                                 </td>
                                                 <td>
-                                                    <div>
-                                                        <g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]">
-                                                            <label><g:message code="shipping.paginatedPackingList.label" default="Packing List (paginated)"/></label>
-                                                        </g:link>
-                                                    </div>
+                                                    <g:link target="_blank" controller="report" action="printShippingReport" params="['shipment.id':shipmentInstance?.id]">
+                                                        <label><g:message code="shipping.packingList.label"/></label></g:link>
 
                                                 </td>
                                             </tr>
                                             <tr class="odd">
                                                 <td>
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_break.png')}" class="middle"/>
+                                                </td>
+                                                <td>
+                                                    <g:link target="_blank" controller="report" action="printPaginatedPackingListReport" params="['shipment.id':shipmentInstance?.id]">
+                                                        <label><g:message code="shipping.paginatedPackingList.label" default="Packing List (paginated)"/></label>
+                                                    </g:link>
+
+                                                </td>
+                                            </tr>
+                                            <tr class="even">
+                                                <td>
                                                     <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>
                                                 </td>
                                                 <td>
-                                                    <div>
-                                                        <g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
-                                                            <label><g:message code="shipping.goodsReceiptNote.label" default="Goods Receipt Note (Excel)"/></label>
-                                                        </g:link>
-                                                    </div>
+                                                    <g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
+                                                        <label><g:message code="shipping.goodsReceiptNote.label" default="Goods Receipt Note (Excel)"/></label>
+                                                    </g:link>
 
                                                 </td>
                                             </tr>
