@@ -71,7 +71,13 @@ class DashboardController {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
 			return;
 		}
-		
+
+		def inventoryItem = InventoryItem.findByLotNumber(params.searchTerms)
+		if (inventoryItem) {
+			redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
+			return;
+		}
+
 		def requisition = Requisition.findByRequestNumber(params.searchTerms)
 		if (requisition) {
 			redirect(controller: "requisition", action: "show", id: requisition.id)
