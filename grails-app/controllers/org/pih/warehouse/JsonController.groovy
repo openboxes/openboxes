@@ -643,8 +643,8 @@ class JsonController {
 			def message = "${warehouse.message(code:'inventory.noItemsFound.message', args: [params.term])}"
 			inventoryItems << [id: 'null', value: message]			
 		}
-		else { 
-			inventoryItems.sort { it.productName }
+		else {
+			inventoryItems = inventoryItems.sort { it.quantity }.reverse()
 		}
 		
 		render inventoryItems as JSON;
