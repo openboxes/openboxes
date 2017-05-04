@@ -1,14 +1,16 @@
-<g:if test="${location?.logo }">
+<g:if test="${attrs?.location?.logo }">
     <a href="${createLink(uri: '/dashboard/index')}">
-        <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:location?.id)}" class="middle" />
+        <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:attrs?.location?.id)}" class="middle" />
     </a>
 </g:if>
-<g:elseif test="${logo}">
+<g:elseif test="${attrs?.logo}">
     <a href="${createLink(uri: '/dashboard/index')}">
-        <g:if test="${logo.url}">
-            <img class="logo" src="${logo.url}" class="middle" />
+        <g:if test="${attrs?.logo.url}">
+            <img class="logo" src="${attrs?.logo.url}" class="middle" />
         </g:if>
-        <span class="middle">${logo.label}</span></a>
+        <g:if test="${attrs?.logo?.label && attrs.showLabel}">
+            <span class="middle">${attrs?.logo.label}</span>
+        </g:if>
     </a>
 </g:elseif>
 <g:else>
