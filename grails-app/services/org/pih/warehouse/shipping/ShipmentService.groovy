@@ -1163,36 +1163,30 @@ class ShipmentService {
 	 * @param eventCode
 	 * @param location
 	 */
-	void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) { 
-		boolean eventAlreadyExists = Boolean.FALSE;
-		
+	void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) {
+        log.info "Creating shipment event ${eventDate} ${eventCode}"
+
 		// Get the appropriate event type for the given event code
 		EventType eventType = EventType.findByEventCode(eventCode)
 		if (!eventType) {
-			throw new RuntimeException(message: "System could not find event type for event code '" + eventCode + "'")
+			throw new RuntimeException("Unable to find event type for event code '" + eventCode + "'")
 		}
-		
-		// If 'requested' event type already exists, return
-		log.info("exists " + eventAlreadyExists)
-		shipmentInstance?.events.each {
-			if (it.eventType == eventType)
-				eventAlreadyExists = Boolean.TRUE;
-		}
-		// Avoid duplicate events
-		if (!eventAlreadyExists) {
-			log.info ("Event does not exist")
-			
-			// enforce that we are only storing the date component here
-			//eventDate.clearTime()
-			
-			def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location);
-			if (!eventInstance.hasErrors() && eventInstance.save()) { 
-				shipmentInstance.addToEvents(eventInstance);
-			}
-			else { 
-				shipmentInstance.errors.reject("shipment.shipmentEvents.invalid");
-			}
-		}
+
+		// Prevent duplicate events
+        Event eventAlreadyExists = shipmentInstance?.events?.find { it.eventType?.eventCode == eventType?.eventCode }
+		if (eventAlreadyExists) {
+            shipmentInstance.errors.reject("shipment.eventAlreadyExists.message", "Event ${eventCode} already exists");
+            throw new ValidationException("Unable to create shipment event", shipmentInstance.errors)
+        }
+
+        // Attempt to add the event to the shipment
+        def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location);
+        if (!eventInstance.hasErrors()) {
+            shipmentInstance.addToEvents(eventInstance);
+        }
+        else {
+            throw new ValidationException("Unable to create shipment event", eventInstance.errors)
+        }
 
 	}
 
@@ -1339,109 +1333,92 @@ class ShipmentService {
 		Shipment shipmentInstance = Shipment.get(shipmentId)
 
 
-		//try {
+		if (shipmentInstance?.destination != location) {
+			throw new ShipmentException(message: "Shipment must be received by the destination location ${shipmentInstance?.destination?.name}", shipment: shipmentInstance)
 
-            if (shipmentInstance?.destination != location) {
-                throw new ShipmentException(message: "Shipment must be received by the destination location ${shipmentInstance?.destination?.name}", shipment: shipmentInstance)
+		}
+		if (!shipmentInstance.hasShipped()) {
+			throw new ShipmentException(message: "Shipment has not been shipped yet.", shipment: shipmentInstance)
+		}
 
-            }
-			if (!shipmentInstance.hasShipped()) { 
-				throw new ShipmentException(message: "Shipment has not been shipped yet.", shipment: shipmentInstance)
-			}
-			
-			if (shipmentInstance.wasReceived()) {
-				throw new ShipmentException(message: "Shipment has already been received.", shipment: shipmentInstance)
-			}
-			
-			if (shipmentInstance.receipt.getActualDeliveryDate() > new Date()) { 
-				throw new ReceiptException(
-					message: "Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today.", 
-					shipment: shipmentInstance,
-					receipt: shipmentInstance.receipt)
-			}
-			
-			
-			if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save(flush:true)) {
-				
-				// Add comment to shipment (as long as there's an actual comment
-				// after trimming off the extra spaces)
-				if (comment) {
-					shipmentInstance.addToComments(new Comment(comment: comment, sender: user));
-				}
+		if (shipmentInstance.wasReceived()) {
+			throw new ShipmentException(message: "Shipment has already been received.", shipment: shipmentInstance)
+		}
 
-				// Add a Received event to the shipment
-				createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventCode.RECEIVED, location);
-												
-				// Save updated shipment instance
-				shipmentInstance.save(flush:true);
-                shipmentInstance.receipt.save(flush:true)
-			
-				// only need to create a transaction if the destination is a warehouse
-				if (shipmentInstance.destination?.isWarehouse() && creditStockOnReceipt) {
-				
-					// Create a new transaction for incoming items
-					Transaction creditTransaction = new Transaction()
-					creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
-					creditTransaction.source = shipmentInstance?.origin
-					creditTransaction.destination = null
-					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
-					creditTransaction.transactionDate = shipmentInstance.getActualDeliveryDate()
-					
-					// 
-					shipmentInstance.receipt.receiptItems.each {
-						def inventoryItem = 
-							inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)							
-						
-						if (inventoryItem.hasErrors()) { 							
-							inventoryItem.errors.allErrors.each { error->
-								def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
-								shipmentInstance.errors.reject("inventoryItem.invalid",
-									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
-							}
-							throw new ShipmentException("Failed to receive shipment while saving inventory item ",
-								shipment: shipmentInstance)
+		if (shipmentInstance.receipt.actualDeliveryDate > new Date()) {
+            shipmentInstance.errors.reject("shipment.mustBeReceivedOnOrBeforeToday.message",
+                    "Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today.")
+
+            throw new ValidationException("Shipment is not valid", shipmentInstance.errors)
+
+		}
+
+
+		if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save(flush:true)) {
+
+			// Add comment to shipment (as long as there's an actual comment
+			// after trimming off the extra spaces)
+			if (comment) {
+				shipmentInstance.addToComments(new Comment(comment: comment, sender: user));
+			}
+
+			// Add a Received event to the shipment
+			createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventCode.RECEIVED, location);
+
+			// Save updated shipment instance
+			shipmentInstance.save(flush:true);
+			shipmentInstance.receipt.save(flush:true)
+
+			// only need to create a transaction if the destination is a warehouse
+			if (shipmentInstance.destination?.isWarehouse() && creditStockOnReceipt) {
+
+				// Create a new transaction for incoming items
+				Transaction creditTransaction = new Transaction()
+				creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+				creditTransaction.source = shipmentInstance?.origin
+				creditTransaction.destination = null
+				creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
+				creditTransaction.transactionDate = shipmentInstance.receipt.actualDeliveryDate
+
+				shipmentInstance.receipt.receiptItems.each {
+					def inventoryItem =
+						inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
+
+					if (inventoryItem.hasErrors()) {
+						inventoryItem.errors.allErrors.each { error->
+							def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
+							shipmentInstance.errors.reject("inventoryItem.invalid",
+								errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
 						}
-						
-						// Create a new transaction entry
-						TransactionEntry transactionEntry = new TransactionEntry();
-						transactionEntry.quantity = it.quantityReceived;
-						transactionEntry.binLocation = it.binLocation
-						transactionEntry.inventoryItem = inventoryItem;
-						creditTransaction.addToTransactionEntries(transactionEntry);
-						//creditTransaction.incomingShipment = shipmentInstance
-					}
-					
-					// TODO: had to comment out these flash.message because they were throwing a no-such
-					// property exception; can you use "flash" within a service method?
-					if (!creditTransaction.hasErrors() && creditTransaction.save()) { 
-						// saved successfully
-						//flash.message = "Transaction was created successfully"
-					}
-					else { 
-						// did not save successfully, display errors message
-						//flash.message = "Transaction has errors"
-						throw new TransactionException("Failed to receive shipment due to error while saving transaction", 
-							transaction: creditTransaction)
+						throw new ValidationException("Failed to receive shipment while saving inventory item ", shipmentInstance.errors)
 					}
 
-					// Associate the incoming transaction with the shipment					
-					shipmentInstance.addToIncomingTransactions(creditTransaction) 
-					shipmentInstance.save(flush:true);
-					
+					// Create a new transaction entry
+					TransactionEntry transactionEntry = new TransactionEntry();
+					transactionEntry.quantity = it.quantityReceived;
+					transactionEntry.binLocation = it.binLocation
+					transactionEntry.inventoryItem = inventoryItem;
+					creditTransaction.addToTransactionEntries(transactionEntry);
+					//creditTransaction.incomingShipment = shipmentInstance
 				}
+
+				if (!creditTransaction.hasErrors() && creditTransaction.save()) {
+					// saved successfully
+				}
+				else {
+					// did not save successfully, display errors message
+                    throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
+				}
+
+				// Associate the incoming transaction with the shipment
+				shipmentInstance.addToIncomingTransactions(creditTransaction)
+				shipmentInstance.save(flush:true);
+
 			}
-			else {
-				log.error (shipmentInstance.receipt.errors)
-				// TODO: make this a better error message
-				throw new ReceiptException(message: "Failed to receive shipment due to error while saving receipt", 
-					receipt: shipmentInstance.receipt)
-			}
-		//} catch (Exception e) {
-			// rollback all updates and throw an exception
-		//	log.error("Caught exception ", e);
-		//	throw new RuntimeException("Failed to receive shipment due to unknown error", e);
-			//shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);  // this didn't seem to be working properly
-		//}
+		}
+		else {
+            throw new ValidationException("Failed to receive shipment due to error while saving receipt", shipmentInstance?.receipt?.errors)
+		}
 	}
 
 	

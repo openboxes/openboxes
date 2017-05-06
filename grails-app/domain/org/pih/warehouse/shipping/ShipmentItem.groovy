@@ -47,7 +47,9 @@ class ShipmentItem implements Comparable, Serializable {
 	static belongsTo = [ shipment : Shipment ]
 	
 	static hasMany = [ orderShipments : OrderShipment, receiptItems: ReceiptItem]
-	
+
+	static transients = ["comments"]
+
 	//static hasOne = [receiptItem: ReceiptItem]
 	
 	
@@ -130,6 +132,15 @@ class ShipmentItem implements Comparable, Serializable {
     def quantityReceived() {
         return (receiptItems) ? receiptItems.sum { it.quantityReceived } : 0
     }
+
+
+	String [] getComments() {
+		def comments = []
+		if (receiptItems) {
+			comments = receiptItems?.comment?.findAll { it }
+		}
+		return comments
+	}
 
     /**
 	 * Sorts shipping items by associated product name, then lot number, then quantity,

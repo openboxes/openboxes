@@ -2451,8 +2451,8 @@ class InventoryService implements ApplicationContextAware {
 			}
 
 			if (!debitTransaction.save()) {
-				log.debug "debit transaction errors " + debitTransaction.errors
-				throw new TransactionException(message: "An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", transaction: debitTransaction);
+				log.info "debit transaction errors " + debitTransaction.errors
+				throw new ValidationException("An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", debitTransaction.errors);
 			}
 
 			// Associate the incoming transaction with the shipment

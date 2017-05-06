@@ -470,9 +470,6 @@ class ShipmentController {
         def userInstance = User.get(session.user.id)
 		def binLocations = Location.findAllByParentLocation(location)
 
-//		def products = shipmentInstance?.shipmentItems.collect { it?.inventoryItem?.product }
-//		def putawayBinLocations = inventoryService.getQuantityByBinLocation(location, products).groupBy { it.product }
-
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: 'incoming'])
@@ -493,7 +490,6 @@ class ShipmentController {
                 receiptInstance.properties = params
             }
 
-
 			// check for errors
 			if(receiptInstance.hasErrors() || !receiptInstance.validate()) {
 				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
@@ -507,21 +503,21 @@ class ShipmentController {
                 def creditStockOnReceipt = true
                 // actually process the receipt
                 try {
-                    shipmentService.receiveShipment(shipmentInstance?.id, params.comment, session?.user?.id, session.warehouse?.id, creditStockOnReceipt);
+                    shipmentService.receiveShipment(shipmentInstance.id, params.comment, session?.user?.id, session.warehouse?.id, creditStockOnReceipt);
                     // If there were no errors we can trigger shipment emails to be sent
                     if (!shipmentInstance.hasErrors()) {
                         def recipients = new HashSet()
                         triggerReceiveShipmentEmails(shipmentInstance, userInstance, recipients)
-                        flash.message = "${warehouse.message(code: 'default.received.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.shipmentNumber?:shipmentInstance?.id])}"
+                        flash.message = "${warehouse.message(code: 'default.received.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.shipmentNumber ?: shipmentInstance?.id])}"
                         redirect(action: "showDetails", id: shipmentInstance?.id)
+                        return
                     }
-
-                } catch (Exception e) {
-                    log.error("Error occurred while receiving shipment " + e.message, e)
-                    flash.message = e.message
-                    render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance: receiptInstance])
+                } catch (ValidationException e) {
+                    shipmentInstance = Shipment.read(params.id)
+                    receiptInstance.errors = e.errors
+                    render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
+                    return;
                 }
-                return
             }
             else {
 
@@ -585,7 +581,7 @@ class ShipmentController {
             def subject = "${warehouse.message(code:'shipment.hasBeenReceived.message',args:[shipmentType, shipmentName, shipmentDate])}"
             def body = g.render(template:"/email/shipmentReceived", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
             def toList = recipients?.collect { it?.email }?.unique()
-            log.info("Mailing shipment emails to ${toList} with body:\n" + body)
+            log.info("Mailing shipment emails to ${toList} with subject ${subject}")
 
             try {
                 mailService.sendHtmlMail(subject, body.toString(), toList)

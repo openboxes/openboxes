@@ -17,7 +17,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 // import java.util.Date
 
-class ReceiptItem implements Comparable, Serializable {
+class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 	
 	String id
 	Product product		    			// Specific product that we're tracking
@@ -65,13 +65,17 @@ class ReceiptItem implements Comparable, Serializable {
 	/**
 	* Sorts receipt items in the same order as shipment items.
 	*/
-   int compareTo(obj) {
-	   return shipmentItem <=> obj.shipmentItem
+   int compareTo(ReceiptItem other) {
+	   return inventoryItem?.product?.name <=> other?.inventoryItem?.product?.name ?:
+			   binLocation?.name <=> other?.binLocation?.name ?:
+					   inventoryItem?.lotNumber <=> other?.inventoryItem?.lotNumber ?:
+					   inventoryItem?.expirationDate <=> other?.inventoryItem?.expirationDate ?:
+							   quantityShipped <=> other?.quantityShipped ?:
+									   quantityReceived <=> other?.quantityReceived
 	}
 
     String toString() {
         return "${id}:${product.name}:${inventoryItem.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
     }
-
 	
 }
