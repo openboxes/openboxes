@@ -529,13 +529,19 @@
                                                     <g:if test="${shipmentItem?.recipient }">
                                                         <div title="${shipmentItem?.recipient?.email}">${shipmentItem?.recipient?.name}</div>
                                                     </g:if>
+                                                    <g:else>
+                                                        <div class="fade"><g:message code="default.none.label"/></div>
+                                                    </g:else>
                                                 </td>
                                                 <td class="left" >
-                                                    <%--
-                                                    <g:if test="${shipmentItem?.receiptItem?.comment }">
-                                                        ${shipmentItem?.receiptItem?.comment}
+                                                    <g:if test="${shipmentItem?.comments}">
+                                                        <div title="${shipmentItem?.comments.join("<br/>")}">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
+                                                        </div>
                                                     </g:if>
-                                                    --%>
+                                                    <g:else>
+                                                        <div class="fade"><g:message code="default.empty.label"/></div>
+                                                    </g:else>
                                                 </td>
                                             </tr>
                                             <g:set var="previousContainer" value="${shipmentItem.container }"/>
@@ -560,7 +566,7 @@
                                 </h2>
                                 <table>
                                     <tr>
-                                        <th></th>
+                                        <th><g:message code="product.productCode.label"/></th>
                                         <th><g:message code="product.label"/></th>
                                         <th><g:message code="location.binLocation.label"/></th>
                                         <th><g:message code="inventoryItem.lotNumber.label"/></th>
@@ -568,14 +574,13 @@
                                         <th><g:message code="default.quantity.label"/></th>
                                     </tr>
 
-                                    <g:each var="receiptItem" in="${shipmentInstance?.receipt?.receiptItems}">
-                                        <tr>
+                                    <g:each var="receiptItem" in="${shipmentInstance?.receipt?.receiptItems?.sort()}" status="status">
+                                        <tr class="prop ${status%2?'even':'odd'}">
                                             <td>
-                                                ${receiptItem?.id}
-
+                                                ${receiptItem?.product.productCode}
                                             </td>
                                             <td>
-                                                ${receiptItem?.product}
+                                                <format:product product="${receiptItem?.product}"/>
                                             </td>
                                             <td>
                                                 ${receiptItem?.binLocation?.name}

@@ -41,6 +41,14 @@
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                             ${warehouse.message(code: 'dashboard.chooseLocation.label')}
                         </h2>
+                        <div class="prop" style="background-color: #eee; text-align: center">
+                            <g:message code="dashboard.loggedInAs.message" args="[session?.user?.name]"/>.
+                            <g:message code="dashboard.youLastLoggednHereOn.message"
+                                       args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'hh:mm:ss a z')]"/>
+                            <g:link class="button icon unlock" controller="auth" action="logout">
+                                <warehouse:message code="default.logout.label"/>
+                            </g:link>
+                        </div>
                         <%--
                         <div style="padding: 50px;">
                             <div>
@@ -61,6 +69,7 @@
                         --%>
                         <g:if test="${session.loginLocationsMap && !session.loginLocationsMap.isEmpty() }">
                             <div id="chooseLocationSelect">
+
                                 <table>
                                     <tbody>
                                         <g:if test="${session.user.warehouse}">
@@ -69,14 +78,9 @@
                                                     <h4><g:message code="user.favoriteLocations.label"/></h4>
                                                 </td>
                                                 <td class="middle">
-                                                        <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button big">
-                                                            <format:metadata obj="${session?.user?.warehouse}"/>
-                                                        </a>
-                                                    <span class="fade">
-
-                                                        <g:message code="dashboard.youLastLoggednHereOn.message" args="[g.formatDate(date: session?.user?.lastLoginDate, format: 'MMM dd hh:mm:ss a z')]"
-                                                        <g:prettyDateFormat date="${session?.user?.lastLoginDate}"/>
-                                                    </span>
+                                                    <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button big">
+                                                        <format:metadata obj="${session?.user?.warehouse}"/>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         </g:if>
@@ -126,13 +130,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="prop" style="background-color: #eee; text-align: center">
-                                <warehouse:message code="dashboard.loggedInAs.message" args="[session?.user?.name]"/>
-                                &nbsp;
-                                <g:link class="button icon unlock" controller="auth" action="logout">
-                                    <warehouse:message code="default.logout.label"/>
-                                </g:link>
-                            </div>
+
                         </g:if>
 
                         <g:unless test="${session.loginLocations }">

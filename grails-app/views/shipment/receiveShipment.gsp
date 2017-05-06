@@ -21,9 +21,19 @@
                 ${flash.message}
             </div>
         </g:if>
+        <div class="message">
+            ${g.message(code: 'receipt.saveAndContinue.message')}
+        </div>
+
+
         <g:hasErrors bean="${receiptInstance}">
             <div class="errors">
                 <g:renderErrors bean="${receiptInstance}" as="list" />
+            </div>
+        </g:hasErrors>
+        <g:hasErrors bean="${shipmentInstance}">
+            <div class="errors">
+                <g:renderErrors bean="${shipmentInstance}" as="list" />
             </div>
         </g:hasErrors>
 
@@ -134,10 +144,6 @@
                         </div>
                     </div>
                     <div id="tabs-details" class="ui-tabs-hide">
-
-                        <div class="message">
-                            ${g.message(code: 'receipt.saveAndContinue.message', default: 'NOTE: Please click Save & Contine to save any changesin  before using the Split / Delete Receipt Item buttons.')}
-                        </div>
 
                         <div class="box ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}">
                             <h2>
