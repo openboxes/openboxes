@@ -20,7 +20,6 @@ import groovy.transform.EqualsAndHashCode
  * status of a Shipment from Supplier to final destination, whereas ShipmentEvent is
  * meant to represent a particular Event which occurs during the course of Shipment.
  */
-@EqualsAndHashCode(includes='eventCode,name')
 class EventType implements Comparable<EventType>, Serializable {
 
 	String id
