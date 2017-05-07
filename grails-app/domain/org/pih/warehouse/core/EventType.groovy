@@ -9,8 +9,6 @@
 **/ 
 package org.pih.warehouse.core
 
-import groovy.transform.EqualsAndHashCode
-
 // import java.util.Date
 
 /**
