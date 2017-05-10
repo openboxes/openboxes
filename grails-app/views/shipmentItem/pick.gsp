@@ -8,11 +8,6 @@
 
 <body>
 <div class="dialog">
-
-    <div class="success">
-        <g:message code="binLocation.recommended.label" default="Denotes recommended bin location(s)"/>
-    </div>
-
     <g:form controller="createShipmentWorkflow" action="createShipment" params="[execution:params.execution]">
         <fieldset>
             <g:hiddenField name="id" value="${shipmentItemInstance?.shipment?.id}" />
@@ -35,7 +30,7 @@
                             <label for="lotNumber"><warehouse:message code="inventoryItem.lotNumber.label" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'lotNumber', 'errors')}">
-                            ${shipmentItemInstance?.inventoryItem?.lotNumber}
+                            <div id="lotNumber">${shipmentItemInstance?.inventoryItem?.lotNumber}</div>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -43,7 +38,7 @@
                             <label for="expirationDate"><warehouse:message code="inventoryItem.expirationDate.label" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'inventoryItem', 'errors')}">
-                            <g:formatDate date="${shipmentItemInstance?.inventoryItem?.expirationDate}"/>
+                            <g:expirationDate id="expirationDate" date="${shipmentItemInstance?.inventoryItem?.expirationDate}"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -51,7 +46,8 @@
                             <label for="quantity"><warehouse:message code="shipmentItem.quantity.label" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'quantity', 'errors')}">
-                            <g:textField name="quantity" value="${shipmentItemInstance?.quantity}" class="text"/>
+                            <g:hiddenField name="quantity" value="${shipmentItemInstance?.quantity}" />
+                            ${shipmentItemInstance?.quantity}
                         </td>
                     </tr>
                     <tr class="prop">
@@ -60,7 +56,6 @@
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'binLocation', 'errors')}">
                             <g:if test="${binLocations}">
-
                                 <table>
                                     <thead>
                                         <tr>
@@ -69,50 +64,43 @@
                                             <th><g:message code="default.lot.label" default="Lot"/></th>
                                             <th><g:message code="default.exp.label" default="Exp"/></th>
                                             <th><g:message code="default.qty.label" default="Qty"/></th>
+                                            <th><g:message code="default.qtyPicked.label" default="Qty Picked"/></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <g:each var="entry" in="${binLocations}">
-                                            <tr class="${entry.quantity>=shipmentItemInstance?.quantity?'success':'warning'}">
-                                                <td>
-                                                    <g:radio name="binLocation.id" value="${entry?.binLocation?.id}"
-                                                             checked="${shipmentItemInstance?.binLocation?.id==entry?.binLocation?.id}"/>
+                                        <g:each var="entry" in="${binLocations}" status="status">
+                                            <g:set var="statusClass" value="${entry.quantity>=shipmentItemInstance?.quantity?'':'error'}"/>
+                                            <g:set var="selected" value="${entry?.binLocation?.id == shipmentItemInstance?.binLocation?.id &&
+                                                    entry?.inventoryItem?.id == shipmentItemInstance?.inventoryItem?.id}"/>
+                                            <tr class="${statusClass}">
+                                                <td class="middle">
+                                                    <g:radio name="binLocationAndInventoryItem" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}"
+                                                             checked="${selected}"/>
                                                 </td>
-                                                <td>
+                                                <td class="middle">
                                                     ${entry?.binLocation?.name?:g.message(code:'default.label')}
                                                 </td>
-                                                <td>
+                                                <td class="middle">
                                                     ${entry?.inventoryItem?.lotNumber}
                                                 </td>
-                                                <td>
+                                                <td class="middle">
                                                     <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
                                                 </td>
-                                                <td>
+                                                <td class="middle">
                                                     ${entry?.quantity}
+                                                </td>
+                                                <td class="middle">
+                                                    <g:if test="${selected}">
+                                                        ${shipmentItemInstance?.quantity}
+                                                    </g:if>
                                                 </td>
                                             </tr>
                                         </g:each>
-                                        <tr>
-                                            <td>
-                                                <g:radio name="binLocation.id" value="null" checked="${shipmentItemInstance?.binLocation==null}"/>
-                                            </td>
-                                            <td>
-                                                ${g.message(code:'default.none.label')}
-                                            </td>
-                                            <td>
-                                            </td>
-                                            <td>
-                                            </td>
-                                            <td>
-                                            </td>
-
-                                        </tr>
-
                                     </tbody>
                                 </table>
                             </g:if>
                             <g:else>
-                                <g:message code="${inventory.stockOut.message}"/>
+                                <g:message code="default.empty.label"/>
                             </g:else>
                         </td>
                     </tr>
@@ -123,7 +111,16 @@
                                 <button name="_eventId_pickShipmentItem" class="button">
                                     <warehouse:message code="default.button.save.label"/>
                                 </button>
+                                <button class="btnCloseDialog button">${g.message(code:'default.button.close.label')}</button>
                             </div>
+                            <%--
+                            <div class="right">
+                                <span class="success">
+                                    <g:message code="binLocation.recommended.label" default="Recommended bin location(s)"/>
+                                </span>
+                            </div>
+                            --%>
+
                         </td>
                     </tr>
                     </tbody>
@@ -134,7 +131,14 @@
         </fieldset>
     </g:form>
 </div>
-
+<script>
+    $(function() {
+        $(".btnCloseDialog").click(function (event) {
+            event.preventDefault();
+            $('#dlgPickItem').dialog("close");
+        });
+    });
+</script>
 
 </body>
 </html>

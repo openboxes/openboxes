@@ -167,6 +167,7 @@ class ShipmentItem implements Comparable, Serializable {
 			expirationDate: this.expirationDate,			
 			product: this.product,
 			inventoryItem: this.inventoryItem,
+			binLocation: this.binLocation,
 			quantity: this.quantity,				
 			recipient: this.recipient,
 			donor: this.donor,

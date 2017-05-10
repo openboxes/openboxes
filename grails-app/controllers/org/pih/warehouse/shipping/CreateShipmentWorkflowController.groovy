@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.ValidationException
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -566,23 +567,110 @@ class CreateShipmentWorkflowController {
 			}.to("pickShipmentItems")
 
 
+            on("deleteShipmentItem") {
+                log.info "Delete shipment item " + params
+                def shipmentItem = ShipmentItem.load(params.id)
+                if (shipmentItem) {
+                    shipmentService.deleteShipmentItem(shipmentItem)
+                }
+                flash.message = "Successfully deleted item ${params.id}"
+
+            }.to("pickShipmentItems")
+
             on("pickShipmentItem") {
                 log.info "Pick shipment item " + params
 
                 try {
                     def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
-                    shipmentItemInstance.properties = params
-                    if (shipmentItemInstance.save(flush:true)) {
-                        flash.message = "Successfully picked shipment item. "
 
-                    } else {
-                        flash.message = "Failed to pick shipment item due to an unknown error."
+					String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
+					String binLocationId = binLocationAndInventoryItem[0]
+					String inventoryItemId = binLocationAndInventoryItem[1]
+
+
+                    log.info "binLocationId: " + binLocationId
+
+                    Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
+
+                    log.info "inventoryItemId: " + inventoryItemId
+
+                    InventoryItem inventoryItem = (inventoryItemId) ? InventoryItem.load(inventoryItemId) : null
+
+                    if (!inventoryItem) {
+                        shipmentItemInstance.errors.reject("shipmentItem.inventoryItem.required.message", "Inventory item is a required field")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
                     }
-                } catch (ShipmentItemException e) {
-                    [itemInstance: e.shipmentItem]
+                    else {
+                        shipmentItemInstance.inventoryItem = inventoryItem
+                    }
+
+                    log.info "Bin location: " + binLocation
+
+                    if (binLocation) {
+                        shipmentItemInstance.binLocation = binLocation
+                    }
+
+                    if (shipmentItemInstance.save(flush:true)) {
+                        flash.message = "Successfully picked shipment item. " + params
+                    } else {
+                        flash.message = "Failed to edit pick list due to an unknown error."
+                    }
                 } catch (Exception e) {
-                    log.error("Failed to import packing list due to the following error: " + e.message, e)
-                    flash.message = "Failed to import packing list due to the following error: " + e.message
+                    log.error("Failed to edit pick list due to the following error: " + e.message, e)
+                    flash.message = "Failed to edit pick list due to the following error: " + e.message
+                }
+
+            }.to("pickShipmentItems")
+
+            on("splitShipmentItem") {
+                log.info "Split shipment item " + params
+
+                try {
+                    def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+
+                    def currentQuantity = shipmentItemInstance.quantity
+                    def splitQuantity = params.splitQuantity as int
+                    def newQuantity = currentQuantity - splitQuantity
+
+                    // Make sure there's no funny business (i.e. entering a split quantity greater than the original quantity)
+                    if (newQuantity <= 0 || newQuantity > currentQuantity) {
+                        shipmentItemInstance.errors.reject("shipmentItem.invalidQuantity.message", "Quantity is invalid")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                    }
+
+                    String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
+                    String binLocationId = binLocationAndInventoryItem[0]
+                    String inventoryItemId = binLocationAndInventoryItem[1]
+
+                    Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
+                    InventoryItem inventoryItem = (inventoryItemId) ? InventoryItem.load(inventoryItemId) : null
+
+
+                    if (!inventoryItem) {
+                        shipmentItemInstance.errors.reject("shipmentItem.inventoryItem.required.message", "Inventory item is a required field")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                    }
+
+                    // Update the old shipment item with the new quantity
+                    shipmentItemInstance.quantity = newQuantity
+
+                    // Create a new shipment item and update with selected bin location and split quantity
+                    def splitItemInstance = shipmentItemInstance.cloneShipmentItem()
+                    splitItemInstance.inventoryItem = inventoryItem
+                    splitItemInstance.binLocation = binLocation
+                    splitItemInstance.quantity = splitQuantity
+                    shipmentItemInstance.shipment.addToShipmentItems(splitItemInstance)
+
+
+                    boolean success = shipmentItemInstance.shipment.save(flush:true)
+                    if (success) {
+                        flash.message = "Successfully split shipment item. "
+                    } else {
+                        flash.message = "Failed to edit pick list due to an unknown error."
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to edit pick list due to the following error: " + e.message, e)
+                    flash.message = "Failed to edit pick list due to the following error: " + e.message
                 }
 
             }.to("pickShipmentItems")
