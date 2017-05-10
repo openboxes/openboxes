@@ -56,8 +56,8 @@
                                                 </tr>
                                             </thead>
                                         </table>
-                                        <div class="center">
-                                            <table class="center">
+                                        <div class="left" style="width:50%">
+                                            <table>
                                                 <tr class="prop">
                                                     <td>
                                                         <label><warehouse:message code="shipping.shipmentNumber.label"/></label>
@@ -104,7 +104,40 @@
                                                 </tr>
                                             </table>
                                         </div>
-
+                                        <div class="right" style="width:50%">
+                                            <table>
+                                                <tr class="prop">
+                                                    <td>
+                                                        <label><warehouse:message code="shipping.pickedBy.label" default="Picked by"/></label>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td>
+                                                        <label><warehouse:message code="shipping.verifiedBy.label" default="Verified by"/></label>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td>
+                                                        <label><warehouse:message code="shipping.printedBy.label" default="Printed by"/></label>
+                                                    </td>
+                                                    <td>
+                                                        ${session?.user?.name}
+                                                    </td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td>
+                                                        <label><warehouse:message code="shipping.printedOn.label" default="Printed on"/></label>
+                                                    </td>
+                                                    <td>
+                                                        <g:formatDate date="${new Date()}" format="MMM dd hh:mma z"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
 
                                     </td>
                                 </tr>
@@ -129,6 +162,9 @@
                                                 <warehouse:message code="product.description.label"/>
                                             </th>
                                             <th class="center middle">
+                                                <warehouse:message code="default.bin.label" default="Bin"/>
+                                            </th>
+                                            <th class="center middle">
                                                 <warehouse:message code="default.lotNumber.label" default="Lot"/>
                                             </th>
                                             <th class="center middle">
@@ -143,13 +179,13 @@
                                             <th class="center middle">
                                                 <warehouse:message code="default.bins.label" default="Bins"/>
                                             </th>
-                                            <th>
+                                            <th class="center">
                                                 <g:message code="shipmentItem.binLocationPicked.label" default="Bin Picked"/>
                                             </th>
-                                            <th>
+                                            <th class="center">
                                                 <g:message code="shipmentItem.lotNumberPicked.label" default="Lot Picked"/>
                                             </th>
-                                            <th>
+                                            <th class="center">
                                                 <g:message code="shipmentItem.quantityPicked.label" default="Qty Picked"/>
                                             </th>
                                         </tr>
@@ -167,6 +203,14 @@
                                                 </td>
                                                 <td>
                                                     <format:product product="${entry?.shipmentItem?.inventoryItem?.product?:entry?.shipmentItem?.product}"/>
+
+                                                    <g:if test="${entry?.shipmentItem?.inventoryItem?.product?.coldChain }">
+                                                            <img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}"
+                                                                 alt="" title="${warehouse.message(code:'product.coldChain.message') }" class="middle"/>
+                                                    </g:if>
+                                                </td>
+                                                <td>
+                                                    ${entry?.shipmentItem?.binLocation?.name?:g.message(code:'default.label')}
                                                 </td>
                                                 <td>
                                                     ${entry?.shipmentItem?.inventoryItem?.lotNumber?:entry?.shipmentItem?.lotNumber  }
@@ -180,21 +224,27 @@
                                                 <td class="border-right">
                                                     ${entry?.shipmentItem?.inventoryItem?.product?.unitOfMeasure?:entry?.shipmentItem?.product?.unitOfMeasure}
                                                 </td>
-                                                <td class="border-right">
-                                                    <g:each var="binLocationEntry" in="${binLocations[entry?.shipmentItem?.inventoryItem]}">
-                                                        <div>
-                                                            <label>${binLocationEntry?.binLocation?.name?:g.message(code:'default.label')}:</label> ${binLocationEntry?.quantity}
-                                                        </div>
-                                                    </g:each>
+                                                <td class="border-right" style="padding:0;margin:0">
+                                                    <table>
+                                                        <g:each var="binLocationEntry" in="${binLocations[entry?.shipmentItem?.inventoryItem]}">
+                                                            <tr>
+                                                                <td>
+                                                                    <label>${binLocationEntry?.binLocation?.name?:g.message(code:'default.label')}:</label>
+                                                                </td>
+                                                                <td>
+                                                                    ${binLocationEntry?.quantity}
+                                                                </td>
+                                                            </tr>
+                                                        </g:each>
+                                                    </table>
+                                                </td>
+                                                <td class="border-right" width="10%">
 
                                                 </td>
-                                                <td class="border-right">
+                                                <td class="border-right" width="10%">
 
                                                 </td>
-                                                <td class="border-right">
-
-                                                </td>
-                                                <td class="border-right">
+                                                <td class="border-right" width="10%">
 
                                                 </td>
                                             </tr>
