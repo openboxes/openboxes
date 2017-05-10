@@ -119,29 +119,38 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="center bottom">
+                                            <th class="center middle">
                                                 <warehouse:message code="report.number.label"/>
                                             </th>
                                             <th class="center">
                                                 <warehouse:message code="product.productCode.label"/>
                                             </th>
-                                            <th class="bottom">
+                                            <th class="middle">
                                                 <warehouse:message code="product.description.label"/>
                                             </th>
-                                            <th class="center bottom">
-                                                <warehouse:message code="inventoryItem.lotNumber.label"/>
+                                            <th class="center middle">
+                                                <warehouse:message code="default.lotNumber.label" default="Lot"/>
                                             </th>
-                                            <th class="center bottom">
-                                                <warehouse:message code="inventoryItem.expirationDate.label"/>
+                                            <th class="center middle">
+                                                <warehouse:message code="default.expDate.label" default="Exp Date"/>
                                             </th>
-                                            <th class="center bottom">
-                                                <warehouse:message code="location.binLocations.label"/>
+                                            <th class="center middle">
+                                                <warehouse:message code="default.qty.label"/>
                                             </th>
-                                            <th class="center">
-                                                <warehouse:message code="default.quantity.label"/>
-                                            </th>
-                                            <th class="center">
+                                            <th class="center middle">
                                                 <warehouse:message code="default.uom.label"/>
+                                            </th>
+                                            <th class="center middle">
+                                                <warehouse:message code="default.bins.label" default="Bins"/>
+                                            </th>
+                                            <th>
+                                                <g:message code="shipmentItem.binLocationPicked.label" default="Bin Picked"/>
+                                            </th>
+                                            <th>
+                                                <g:message code="shipmentItem.lotNumberPicked.label" default="Lot Picked"/>
+                                            </th>
+                                            <th>
+                                                <g:message code="shipmentItem.quantityPicked.label" default="Qty Picked"/>
                                             </th>
                                         </tr>
                                     </thead>
@@ -165,7 +174,13 @@
                                                 <td>
                                                     <format:expirationDate obj="${entry?.shipmentItem?.inventoryItem?.expirationDate?:entry?.shipmentItem?.expirationDate }"/>
                                                 </td>
-                                                <td>
+                                                <td class="center">
+                                                    ${entry?.shipmentItem?.quantity }
+                                                </td>
+                                                <td class="border-right">
+                                                    ${entry?.shipmentItem?.inventoryItem?.product?.unitOfMeasure?:entry?.shipmentItem?.product?.unitOfMeasure}
+                                                </td>
+                                                <td class="border-right">
                                                     <g:each var="binLocationEntry" in="${binLocations[entry?.shipmentItem?.inventoryItem]}">
                                                         <div>
                                                             <label>${binLocationEntry?.binLocation?.name?:g.message(code:'default.label')}:</label> ${binLocationEntry?.quantity}
@@ -173,11 +188,14 @@
                                                     </g:each>
 
                                                 </td>
-                                                <td class="center">
-                                                    ${entry?.shipmentItem?.quantity }
+                                                <td class="border-right">
+
                                                 </td>
-                                                <td>
-                                                    ${entry?.shipmentItem?.inventoryItem?.product?.unitOfMeasure?:entry?.shipmentItem?.product?.unitOfMeasure}
+                                                <td class="border-right">
+
+                                                </td>
+                                                <td class="border-right">
+
                                                 </td>
                                             </tr>
                                         </g:each>

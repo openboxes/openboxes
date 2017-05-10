@@ -100,16 +100,20 @@
                      class="middle"/>&nbsp;<warehouse:message code="shipping.addComment.label" default="Add comment"/></g:link>
         </div>
         --%>
-        <div class="action-menu-item">
-            <hr/>
-        </div>
+        <hr/>
 
+        <div class="action-menu-item">
+            <g:link target="_blank" controller="report" action="printPickListReport"
+                    params="['shipment.id': shipmentInstance?.id]">
+                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_side_list.png')}" class="middle"/>&nbsp;
+                <warehouse:message code="shipping.printPickList.label" default="Print Pick List"/>
+            </g:link>
+        </div>
         <div class="action-menu-item">
             <g:link target="_blank" controller="report" action="printShippingReport"
                     params="['shipment.id': shipmentInstance?.id]">
                 <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-                <warehouse:message code="shipping.downloadPackingList.label"/>
-                <span class="fade">(.pdf)</span>
+                <warehouse:message code="shipping.printPackingList.label" default="Print Packing List"/>
             </g:link>
         </div>
 
