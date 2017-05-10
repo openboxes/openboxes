@@ -500,6 +500,9 @@ openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
 
+// Disable feature during development
+openboxes.shipping.splitPickItems.enabled = false
+
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""

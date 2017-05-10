@@ -59,7 +59,6 @@
                                 <th><g:message code="inventoryItem.lotNumber.label"/></th>
                                 <th><g:message code="inventoryItem.expirationDate.label"/></th>
                                 <th><g:message code="location.binLocation.label"/></th>
-                                <th class="center"><g:message code="default.binQty.label" default="Bin Qty"/></th>
                                 <th class="center"><g:message code="default.qty.label"/></th>
                                 <th class="center"><g:message code="default.uom.label"/></th>
                                 <th class="border-right"><g:message code="default.actions.label"/></th>
@@ -138,9 +137,6 @@
                                             </div>
                                         </td>
                                         <td class="top center">
-                                            ${totalQtyByBin?:0}
-                                        </td>
-                                        <td class="top center">
                                             ${shipmentItem?.quantity }
                                         </td>
                                         <td class="top center">
@@ -154,23 +150,20 @@
                                                     <img src="${createLinkTo(dir:'images/icons/silk',file:'wand.png')}"/>
                                                     <g:message code="shipping.button.pickItem.label"/></a>
 
-                                                <a href="javascript:void(-1)" data-id="${shipmentItem?.id}" data-execution="${params.execution}"
-                                                   class="btnSplitItem button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_divide.png')}"/>
-                                                    <g:message code="shipping.button.splitItem.label"/></a>
 
-                                                <g:link action="createShipment" event="deleteShipmentItem" id="${shipmentItem?.id}"
-                                                        onclick="return confirm('Are you sure you want to delete this item? NOTE: If this is a split item, quantity will not be returned to the original item.')" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete Item"/>&nbsp;
-                                                    <warehouse:message code="shipping.button.deleteItem.label"/>
-                                                </g:link>
+                                                <g:if test="${grailsApplication.config.openboxes.shipping.splitPickItems.enabled}">
+                                                    <a href="javascript:void(-1)" data-id="${shipmentItem?.id}" data-execution="${params.execution}"
+                                                       class="btnSplitItem button">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_divide.png')}"/>
+                                                        <g:message code="shipping.button.splitItem.label"/></a>
 
-                                                <%--
-                                                <a href="javascript:void(-1)" data-id="${shipmentItem?.id}" data-execution="${params.execution}"
-                                                   class="btnDeleteItem button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"/>
-                                                    <g:message code="shipping.button.deleteItem.label"/></a>
-                                                --%>
+                                                    <g:link action="createShipment" event="deleteShipmentItem" id="${shipmentItem?.id}"
+                                                            onclick="return confirm('Are you sure you want to delete this item? NOTE: If this is a split item, quantity will not be returned to the original item.')" class="button">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete Item"/>&nbsp;
+                                                        <warehouse:message code="shipping.button.deleteItem.label"/>
+                                                    </g:link>
+
+                                                </g:if>
                                             </div>
 
 
