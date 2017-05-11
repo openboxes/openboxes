@@ -104,7 +104,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#dlgAdjustStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 600 });
+        $("#dlgAdjustStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800 });
         $("#btnAdjustStock-${dialogId}").click(function() { $("#dlgAdjustStock-${dialogId}").dialog('open'); });
         $("#btnAdjustClose-${dialogId}").click(function() { $("#dlgAdjustStock-${dialogId}").dialog('close'); });
         $(".binLocation").livequery(function() {
