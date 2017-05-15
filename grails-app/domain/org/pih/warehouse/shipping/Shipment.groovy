@@ -47,7 +47,9 @@ class Shipment implements Comparable, Serializable {
 	String additionalInformation	// any additional information about the shipment (e.g., comments)
 	Float weight											// weight of container
 	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
-	
+
+    Long shipmentItemCount
+
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
@@ -70,14 +72,16 @@ class Shipment implements Comparable, Serializable {
 	List referenceNumbers;
 	
 	static transients = [ 
-		"allShipmentItems",
-		"unpackedShipmentItems",
-		"containersByType", 
-		"mostRecentEvent", 
-		"status",
-		"actualShippingDate",
-		"actualDeliveryDate",
-        "recipients"
+			"allShipmentItems",
+			"unpackedShipmentItems",
+			"containersByType",
+			"mostRecentEvent",
+			"status",
+			"actualShippingDate",
+			"actualDeliveryDate",
+			"recipients",
+			"consignorAddress",
+			"consigneeAddress"
     ]
 	
 	static mappedBy = [outgoingTransactions: 'outgoingShipment',
@@ -111,6 +115,7 @@ class Shipment implements Comparable, Serializable {
 		//containers cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		//shipmentItems cascade: "all-delete-orphan"
+        shipmentItemCount(formula: '(select count(shipment_item.id) from shipment_item where (shipment_item.shipment_id = id))')
 		shipmentMethod cascade: "all-delete-orphan"
 		referenceNumbers cascade: "all-delete-orphan"
 		receipt cascade: "all-delete-orphan"
@@ -166,7 +171,7 @@ class Shipment implements Comparable, Serializable {
 	int compareTo(obj) { 
 		obj.name <=> name 
 	}
-	
+
 	/** 
 	 * Transient method that gets all shipment items two-levels deep.
 	 * 
@@ -364,6 +369,13 @@ class Shipment implements Comparable, Serializable {
         return recipients?.unique()
     }
 
+    String getConsigneeAddress() {
+        return destination.address.description?:destination?.locationGroup.address?.description
+    }
+
+    String getConsignorAddress() {
+        return origin.address.description?:origin?.locationGroup.address?.description
+    }
 
 	/**
 	 * Clones the specified container

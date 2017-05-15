@@ -681,7 +681,10 @@ class DocumentService {
 		row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
 		row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
 
-		def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
+        row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'shipping.recipient.label'));
+        row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+        def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
 		shipmentInstance.shipmentItems.sort(). each { itemInstance ->
 
 			CELL_INDEX = 0
@@ -728,7 +731,10 @@ class DocumentService {
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
-			row.setHeightInPoints(30.0)
+            row.createCell(CELL_INDEX).setCellValue(itemInstance?.recipient?.email);
+            row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+            row.setHeightInPoints(30.0)
 			previousContainer = itemInstance?.container?.name
 		}
 

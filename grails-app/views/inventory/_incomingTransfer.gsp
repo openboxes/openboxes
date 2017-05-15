@@ -5,27 +5,26 @@
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
-
-
 		<table>
+			<tr class="prop">
+				<td class="name">
+					<label><warehouse:message code="transaction.type.label"/></label>
+				</td>
+				<td class="value">
+                    <format:metadata obj="${command?.transactionInstance?.transactionType?.name }"/>
+				</td>
+			</tr>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
-
-                    <%--
-					<span class="transactionDate">
-						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
-							value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>
-				    --%>
                     <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	
 			<tr class="prop">
 				<td class="name">
-					<label><warehouse:message code="default.from.label"/></label>
+					<label><g:message code="transaction.source.label"/></label>
 				</td>
 				<td class="value">			
 
@@ -37,11 +36,20 @@
 			</tr>
 			<tr class="prop">
 				<td class="name">
+					<label><g:message code="transaction.destination.label"/></label>
+				</td>
+				<td class="value">
+
+					${session.warehouse?.name}
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
 					<label><warehouse:message code="transaction.comment.label"/></label>
 				</td>
 				<td class="value">
 					<span class="comment">
-						<g:textArea cols="120" rows="5" name="transactionInstance.comment"
+						<g:textArea cols="120" rows="5" name="transactionInstance.comment" style="width:100%"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
 					</span>								
@@ -49,9 +57,7 @@
 			</tr>				
 			<tr class="prop">
 				<td class="name">
-					<%-- 
-					<label><warehouse:message code="transaction.transactionEntries.label"/></label>
-					--%>
+					<label><g:message code="transaction.transactionEntries.label"/></label>
 				</td>
 				<td style="padding: 0px;">
 					<div class="transactionEntries">
@@ -59,14 +65,17 @@
 							<thead>
 								<tr class="odd">
 									<th class="left">
-										<warehouse:message code="product.label"/>
+										<g:message code="product.label"/>
 									</th>
+                                    <th>
+                                        <g:message code="location.binLocation.label"/>
+                                    </th>
 									<th>
-										<warehouse:message code="product.lotNumber.label"/> / 
-										<warehouse:message code="default.expires.label"/>
+										<g:message code="product.lotNumber.label"/> /
+										<g:message code="default.expires.label"/>
 									</th>
-									<th><warehouse:message code="default.qty.label"/></th>
-									<th><warehouse:message code="default.actions.label"/></th>
+									<th><g:message code="default.qty.label"/></th>
+									<th><g:message code="default.actions.label"/></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -81,10 +90,17 @@
 												<span class="productName">
 													<format:product product="${transactionEntry?.product}"/>
 												</span>
-												<g:hiddenField name="transactionEntries[${i }].product.id" 
+												<g:hiddenField name="transactionEntries[${i }].product.id"
 													value="${transactionEntry?.product?.id}"/>
 											</td>
-											<td width="50%">
+
+                                            <td>
+                                                <g:selectBinLocation name="transactionEntries[${i }].binLocation.id"
+                                                                     value="${command?.transactionEntries[i]?.binLocation?.id}"
+                                                                     noSelection="['':'']" class="chzn-select-deselect"/>
+                                            </td>
+
+											<td>
 												<g:set var="displayLotNumberEditor" value="${!transactionEntry?.inventoryItem && !transactionEntry?.lotNumber}"/>
 												<g:set var="displayLotNumberReadonly" value="${!displayLotNumberEditor}"/>
 
@@ -106,7 +122,7 @@
 												</span>
 
 												<span class="lotNumberEditor" style="${!displayLotNumberEditor?'display:none;':'' }">
-													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
+													<g:textField class="text" name="transactionEntries[${i }].lotNumber"
 														value="${transactionEntry?.lotNumber }"/>
 														
 													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
@@ -139,7 +155,7 @@
 												</span>	
 											</td>
 											<td>
-												<g:textField name="transactionEntries[${i }].quantity" size="5" class="text medium" autocomplete="off" value="${transactionEntry?.quantity }"/>
+												<g:textField name="transactionEntries[${i }].quantity" size="10" class="text" autocomplete="off" value="${transactionEntry?.quantity }"/>
 											</td>
 											<td>
 												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
@@ -161,22 +177,28 @@
 									<g:each var="product" in="${command?.productInventoryItems?.keySet() }" status="i">
 										<%-- Hidden field used to keep track of the products that were selected --%>
 										<g:hiddenField name="product.id" value="${product?.id }"/>
-										
+                                        <g:hiddenField name="transactionEntries[${i }].product.id" value="${product?.id }"/>
+
 										<%-- initial product rows --%>
 										<tr class="prop row">
 											<td class="left">
-												<span class="productName">
+                                                <g:link controller="inventoryItem" action="showStockCard" id="${product.id}">
                                                     ${product?.productCode}
-													<format:product product="${product }"/>
-												</span>
-												<g:hiddenField name="transactionEntries[${i }].product.id" value="${product?.id }"/>
+                                                    <format:product product="${product }"/>
+                                                </g:link>
 											</td>
-											<td>										
+                                            <td>
+                                                <g:selectBinLocation name="transactionEntries[${i }].binLocation.id"
+                                                                     value="${command?.transactionEntries[i]?.binLocation?.id}"
+                                                                     noSelection="['':'']" class="chzn-select-deselect"/>
+                                            </td>
+
+                                            <td>
 												<g:set var="displayLotNumberEditor" value="${!command?.transactionEntries[i]?.inventoryItem && command?.transactionEntries[i]?.lotNumber}"/>
 												<g:set var="displayLotNumberReadonly" value="${command?.transactionEntries[i]?.inventoryItem}"/>
 												
 												<span class="lotNumberSelector" style="${displayLotNumberReadonly || displayLotNumberEditor?'display:none;':''}">
-													<select class="inventoryItem" name="transactionEntries[${i }].inventoryItem.id">
+													<select class="inventoryItem chzn-select-deselect" name="transactionEntries[${i }].inventoryItem.id">
 														<option value="-1"></option>
 														<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">
 															<g:set var="selected" value="${command?.transactionEntries[i]?.inventoryItem==inventoryItem}"/>
@@ -193,7 +215,7 @@
 												</span>
 												
 												<span class="lotNumberEditor" style="${!displayLotNumberEditor?'display:none;':'' }">
-													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
+													<g:textField class="text" name="transactionEntries[${i }].lotNumber"
 														value="${command?.transactionEntries[i]?.lotNumber }"/>
 														
 													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
@@ -216,7 +238,7 @@
 												</span>	
 											</td>
 											<td>
-												<g:textField name="transactionEntries[${i }].quantity" size="5" class="text medium" autocomplete="off" value="${command?.transactionEntries[i]?.quantity }"/>
+												<g:textField name="transactionEntries[${i }].quantity" size="10" class="text" autocomplete="off" value="${command?.transactionEntries[i]?.quantity }"/>
 											</td>
 											<td>
 												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
@@ -231,8 +253,9 @@
 				</td>
 			</tr>		
 			<tr class="prop">
-				<td colspan="7">
-					<div class="center">
+                <td></td>
+				<td colspan="6">
+					<div class="left">
 						<button type="submit" name="save" class="button icon approve">
 							<warehouse:message code="default.button.save.label"/>
 						</button>
@@ -277,7 +300,7 @@
 			// Rename all of the fields 
 			renameRowFields($table);
 			//newTableRow.appendTo($table.find("tbody"));
-		}	
+		};
 
 		/**
 		 * Initialize all lot number fields 

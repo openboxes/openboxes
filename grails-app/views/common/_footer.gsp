@@ -2,15 +2,16 @@
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
 		&copy; 2017 <a href="https://openboxes.com">Powered by OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
-        <warehouse:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
-        <warehouse:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-		<warehouse:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
+        <g:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
+        <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+		<g:message code="application.branchName.label"/>: <b><g:meta name="app.branchName"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+        <g:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+		<g:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
+		<g:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
     </div>
     <div class="center" style="line-height: 2em;">
 		<%-- <warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;--%>
-		<warehouse:message code="default.locale.label"/>: &nbsp;  	
+		<g:message code="default.locale.label"/>: &nbsp;
 		<!-- show all supported locales -->
 		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 		<g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
@@ -26,23 +27,23 @@
 			&nbsp;&nbsp; | &nbsp;&nbsp;
 			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', 
 				params: ['locale':'debug','targetUri':targetUri])}">
-				<warehouse:message code="admin.debug.label"/>:
+				<g:message code="admin.debug.label"/>:
 			</a>
 			<b>${session.useDebugLocale?"on":"off" }</b>
 		</g:isUserInRole>
         &nbsp;&nbsp; | &nbsp;&nbsp;
         <span>
-            <warehouse:message code="default.ipAddress.label" default="IP Address"/>: &nbsp;
+            <g:message code="default.ipAddress.label" default="IP Address"/>: &nbsp;
             <b>${request.getRemoteAddr()}</b>
 		</span>
         &nbsp;&nbsp; | &nbsp;&nbsp;
         <span>
-            <warehouse:message code="default.hostname.label" default="Hostname"/>: &nbsp;
+            <g:message code="default.hostname.label" default="Hostname"/>: &nbsp;
             <b>${session.hostname?:"Unknown"}</b>
         </span>
         &nbsp;&nbsp; | &nbsp;&nbsp;
         <span>
-            <warehouse:message code="default.timezone.label" default="Timezone"/>: &nbsp;
+            <g:message code="default.timezone.label" default="Timezone"/>: &nbsp;
             <b>${session?.timezone?.ID}</b>
         </span>
         <g:if test="${session.warehouse && session.user && session._showTime}">
@@ -56,11 +57,6 @@
                 Page load:
                 <b>${(request?.viewDuration?:0)/1000}s</b>
             </span>
-            <%--
-            <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
-                (disable)
-            </g:link>
-            --%>
         </g:if>
 
     <%--

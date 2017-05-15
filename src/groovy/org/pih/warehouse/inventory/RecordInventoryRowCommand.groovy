@@ -9,12 +9,16 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.codehaus.groovy.grails.validation.Validateable;
+import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product;
 
 @Validateable
 class RecordInventoryRowCommand {
 	String id
 	String lotNumber
+	Location binLocation
+	InventoryItem inventoryItem
 	Date expirationDate
 	String description;
 	Integer oldQuantity;
@@ -23,6 +27,8 @@ class RecordInventoryRowCommand {
 	static constraints = {
 		id(nullable:true)
 		expirationDate(nullable:true)
+		binLocation(nullable:true)
+		inventoryItem(nullable:true)
 		lotNumber(nullable:true)
 		description(nullable:true)
 		oldQuantity(nullable:false)

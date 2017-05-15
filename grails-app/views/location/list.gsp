@@ -51,7 +51,7 @@
                                 <div>
                                     <div class="filter-list-item">
                                             <label class="clear"><warehouse:message code="location.name.label"/></label>
-                                            <g:textField name="q" value="${params.q }" class="text" />
+                                            <g:textField name="q" value="${params.q }" class="text" style="width:100%"/>
                                     </div>
                                     <div class="filter-list-item">
                                             <label class="clear"><warehouse:message code="location.locationType.label"/></label>

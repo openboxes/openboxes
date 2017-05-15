@@ -6,15 +6,14 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="\${warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
             <g:if test="\${flash.message}">
 	            <div class="message">\${flash.message}</div>
             </g:if>
-            <div class="dialog">
+            <div class="box">
+                <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
                 <table>
                     <tbody>
                     <%  excludedProps = Event.allEvents.toList() << 'version'
@@ -48,7 +47,7 @@
 						<tr class="prop">
                         	<td valign="top"></td>
                         	<td valign="top">                         
-					            <div class="buttons">
+					            <div class="buttons left">
 					                <g:form>
 					                    <g:hiddenField name="id" value="\${${propertyName}?.id}" />
 					                    <g:actionSubmit class="edit" action="edit" value="\${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />

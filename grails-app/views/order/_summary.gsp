@@ -70,11 +70,10 @@
                     </td>
 					<td>
                         <div class="title">
+                            <small>${orderInstance?.orderNumber}</small>
                             <g:link controller="order" action="show" id="${orderInstance?.id}">
-                                <small>${orderInstance?.orderNumber}</small>
                                 ${orderInstance?.description}</g:link>
 						</div>
-
                     </td>
                     <td class="top right" width="1%">
                         <div class="tag tag-alert">
@@ -82,67 +81,10 @@
                         </div>
                     </td>
                 </tr>
-                <tr class=" prop">
-                    <td></td>
-                    <td>
-                        <div>
-                            <table>
-                                <tr>
-                                    <td>
-                                        <div class="order-number">
-                                            <label><warehouse:message code="order.orderNumber.label"/></label>
-                                            ${orderInstance?.orderNumber}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="ordered-date">
-                                            <label><warehouse:message code="order.dateOrdered.label"/></label>
-                                            <format:date obj="${orderInstance?.dateOrdered}"/>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <g:if test="${orderInstance?.orderedBy }">
-                                            <div class="ordered-by">
-                                                <label><warehouse:message code="order.orderedBy.label"/></label>
-                                                ${orderInstance?.orderedBy?.name }
-                                            </div>
-                                        </g:if>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="total-price">
-                                            <label><warehouse:message code="order.totalPrice.label"/></label>
-                                            <g:formatNumber number="${orderInstance?.totalPrice()?:0 }"/>
-                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <g:if test="${orderInstance?.destination }">
-                                            <div class="destination">
-                                                <label><warehouse:message code="order.destination.label"/></label>
-                                                ${orderInstance?.destination?.name }
-                                            </div>
-                                        </g:if>
 
-                                    </td>
-                                    <td>
-                                        <div class="origin">
-                                            <label><warehouse:message code="order.origin.label"/></label>
-                                            ${orderInstance?.origin?.name }
-                                        </div>
-
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </td>
-                    <td></td>
-                </tr>
 			</tbody>
 		</table>
 	</g:if>
-
 	<g:else>
 		<table>
 			<tbody>			

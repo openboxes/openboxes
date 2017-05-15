@@ -36,7 +36,7 @@ eventAllTestsStart = {
     }
 }
 
-private determineGitRevisionNumber = {
+def determineGitRevisionNumber = {
     String revisionNumber = 'dev'
     try {
         revisionNumber = 'git describe --match v* --always'.execute().text.trim()
@@ -46,6 +46,26 @@ private determineGitRevisionNumber = {
     log.info("Setting git revision number " + revisionNumber)
     return revisionNumber
 }
+
+def determineGitBranchName = {
+    String branchName = 'default'
+    try {
+        def command = "git branch | grep \\* | cut -d \' \'"
+        def process = 'git branch'.execute() | 'grep \\*'.execute()
+        log.info "Executing command " + command
+        process.waitFor()
+        branchName = process.text
+        if (branchName) {
+            branchName = branchName.replaceFirst("\\*", "").trim()
+        }
+        log.info "Done executing command:" + branchName
+    } catch (Exception e) {
+        log.error 'Error executing git status ', e
+    }
+    log.info("Setting git branch to " + branchName)
+    return branchName
+}
+
 
 eventWarStart = {
 	//log.info "Copying liquibase changelogs ..."
@@ -58,12 +78,13 @@ eventWarStart = {
 eventRunAppStart = {
 	log.info "Setting build date, build number, and revision number ..."
   	def revisionNumber = determineGitRevisionNumber()
-	
+    def branchName = determineGitBranchName()
+
 	def buildNumber = metadata.'app.buildNumber'
 	if (!buildNumber) buildNumber = 1
 
-
 	metadata.'app.revisionNumber' = revisionNumber
+    metadata.'app.branchName' = branchName
 	metadata.'app.buildDate' = new java.text.SimpleDateFormat("d MMM yyyy hh:mm:ss a").format(new java.util.Date());
 	metadata.'app.buildNumber' = buildNumber.toString()
 	//metadata.persist()
@@ -77,6 +98,7 @@ eventCreateWarStart = { warName, stagingDir ->
 
 	log.info "Setting build date, build number, and revision number ..."
 	def revisionNumber = determineGitRevisionNumber()
+    def branchName = determineGitBranchName()
 	def buildNumber = System.getProperty("build.number", metadata.'app.buildNumber')
 	
 	log.info("Setting BUILD_NUMBER to " + buildNumber)
@@ -85,6 +107,7 @@ eventCreateWarStart = { warName, stagingDir ->
 	log.info "Setting build properties ${stagingDir}/WEB-INF/classes/application.properties"
     ant.propertyfile(file:"${stagingDir}/WEB-INF/classes/application.properties") {
 		entry(key:"app.buildNumber", value:buildNumber)
+        entry(key:"app.branchName", value:branchName)
 		entry(key:"app.revisionNumber", value:revisionNumber)
 		entry(key:"app.buildDate", value:new java.text.SimpleDateFormat("d MMM yyyy hh:mm:ss a").format(new java.util.Date()))
 	}

@@ -11,18 +11,14 @@ package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
+import org.krysalis.barcode4j.impl.code128.Code128Bean
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem;
-
-// import java.io.Serializable;
-// import java.sql.ResultSet;
-// import java.text.SimpleDateFormat;
 import au.com.bytecode.opencsv.CSVWriter
-//import com.ocpsoft.pretty.time.PrettyTime;
-
 
 class ShipmentController {
 	
@@ -32,6 +28,8 @@ class ShipmentController {
 	def reportService;
 	def inventoryService;
 	MailService mailService
+
+    def barcode4jService
 	
 	def dataSource
 	def sessionFactory
@@ -48,6 +46,9 @@ class ShipmentController {
 	def list = {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
+
+        params.max = Math.min(params.max ? params.int('max') : 100, 1000)
+
         Calendar calendar = Calendar.instance
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
         int firstDayOfMonth = calendar.getActualMinimum(Calendar.DAY_OF_MONTH)
@@ -70,13 +71,7 @@ class ShipmentController {
         println "lastUpdatedFrom = " + lastUpdatedFrom + " lastUpdatedTo = " + lastUpdatedTo
 
 		def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination,
-                statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo)
-		
-		// sort by event status, event date, and expecting shipping date
-		shipments = shipments.sort( { a, b ->
-			return b.lastUpdated <=> a.lastUpdated
-		} )
-
+                statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo, params.max)
 
         println "List shipments: " + (System.currentTimeMillis() - startTime) + " ms"
 
@@ -369,101 +364,187 @@ class ShipmentController {
 		}
 		redirect(action: "list", params:[type:params.type, status: params.status])
 	}
-	
-	
-	def receiveShipment = { ReceiveShipmentCommand command -> 
+
+    def downloadLabels = {
+
+        Shipment shipmentInstance = Shipment.get(params.id)
+        response.contentType = 'application/pdf'
+        response.setHeader("Content-disposition", "attachment; filename=\"barcodes.pdf\"")
+        def generator = new Code128Bean()
+        generator.height = 10
+        generator.fontSize = 3
+
+        def shipmentItems = []
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        barcode4jService.render(generator, shipmentInstance?.shipmentNumber?.toString(), baos, "image/png")
+
+        shipmentInstance?.shipmentItems.each { shipmentItem ->
+            ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            barcode4jService.render(generator, shipmentItem?.inventoryItem?.lotNumber.toString(), baos1, "image/png")
+            barcode4jService.render(generator, shipmentItem?.inventoryItem?.product?.productCode.toString(), baos2, "image/png")
+            shipmentItems << [
+                    productCode:shipmentItem?.inventoryItem?.product?.productCode,
+                    productName:shipmentItem?.inventoryItem?.product?.name,
+                    lotNumber:shipmentItem?.inventoryItem?.lotNumber,
+                    lotNumberBytes:baos1.toByteArray(),
+                    productCodeBytes:baos2.toByteArray()]
+        }
+        renderPdf (template:'barcodeLabel', model:[shipmentInstance:shipmentInstance, shipmentItems:shipmentItems, shipmentNumberBytes: baos.toByteArray()])
+    }
+
+    def showPutawayLocations = {
+        def location = Location.get(session.warehouse.id)
+        ReceiptItem receiptItem = ReceiptItem.load(params.id)
+
+        Product productInstance = receiptItem.inventoryItem?.product // Product.load(params.id)
+        def binLocations = inventoryService.getQuantityByBinLocation(location, productInstance)
+
+        render template: "showPutawayLocations", model: [product: productInstance, binLocations: binLocations]
+    }
+
+
+    def splitReceiptItem = {
+        ReceiptItem receiptItem1 = ReceiptItem.load(params.id)
+        ReceiptItem receiptItem2 = new ReceiptItem(receiptItem1.properties)
+        receiptItem2.quantityReceived = 0
+        receiptItem1.receipt.addToReceiptItems(receiptItem2)
+
+        Shipment shipment = receiptItem1?.receipt?.shipment
+        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipment.id])}"
+        redirect(controller:"shipment", action : "receiveShipment", id: shipment?.id)
+    }
+
+    def deleteReceiptItem = {
+        ReceiptItem receiptItem = ReceiptItem.load(params.id)
+        Shipment shipmentInstance = receiptItem?.receipt?.shipment
+
+        if (receiptItem) {
+            // FIXME Prevent delete of the last receipt item for a shipment item (kind of a hack). There should be a
+            // way to represent one receipt item as the primary so we don't even show the delete button in the UI.
+            if (receiptItem.shipmentItem.receiptItems.size() <= 1) {
+                shipmentInstance?.receipt?.errors?.reject("shipping.mustHaveAtLeastOneReceiptItemPerShimentItem")
+                render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance: shipmentInstance.receipt])
+                return
+            } else {
+                shipmentInstance?.receipt.removeFromReceiptItems(receiptItem)
+                receiptItem.shipmentItem.removeFromReceiptItems(receiptItem)
+                receiptItem.delete()
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'receiptItem.label', default: 'Receipt Item'), params.id])}"
+        }
+        redirect(controller:"shipment", action : "receiveShipment", id: shipmentInstance?.id)
+    }
+
+    def deleteReceipt = {
+        Receipt receiptInstance = Receipt.get(params.id)
+        Shipment shipmentInstance = receiptInstance?.shipment
+        if (shipmentInstance) {
+            shipmentInstance.receipt = null // FIXME This seems absurd
+        }
+        receiptInstance.delete()
+        redirect(controller:"shipment", action : "showDetails", id: shipmentInstance?.id)
+    }
+
+    def validateReceipt = {
+        Receipt receiptInstance = Receipt.get(params.id)
+        Shipment shipmentInstance = receiptInstance?.shipment
+        if (shipmentService.validateReceipt(receiptInstance)) {
+            flash.message = "Receipt is valid"
+        }
+
+        redirect(controller:"shipment", action : "receiveShipment", id: shipmentInstance?.id)
+    }
+
+
+	def receiveShipment = { ReceiveShipmentCommand command ->
 		log.info "params: " + params
 		def receiptInstance
+		def shipmentItems
+		def location = Location.get(session.warehouse.id)
 		def shipmentInstance = Shipment.get(params.id)
         def userInstance = User.get(session.user.id)
-		def shipmentItems = []
-		
-		
+		def binLocations = Location.findAllByParentLocation(location)
+
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: 'incoming'])
 			return
 		}
-				
-			
-		// Process receive shipment form	
-		if ("POST".equalsIgnoreCase(request.getMethod())) {			
-			receiptInstance = new Receipt(params)
-			
-			// associate the receipt with the shipment
-			shipmentInstance.receipt = receiptInstance
-			receiptInstance.shipment = shipmentInstance
 
+        // Process receive shipment form
+		if ("POST".equalsIgnoreCase(request.method)) {
+
+            // FIXME Somewhat unreadable code here ... need to clean it up a bit, but basically we're just checking
+            // to see if there's already a receipt on the shipment. If not we create one
+            receiptInstance = shipmentInstance.receipt
+            if (!receiptInstance) {
+                receiptInstance = new Receipt(params)
+                shipmentInstance.receipt = receiptInstance
+            }
+            else {
+                receiptInstance.properties = params
+            }
 
 			// check for errors
 			if(receiptInstance.hasErrors() || !receiptInstance.validate()) {
 				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
 				return
 			}
-			
-			// For now, we'll always credit stock on receipt of shipment
-			//def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
-			def creditStockOnReceipt = true
-			// actually process the receipt
-			try {
-				shipmentService.receiveShipment(shipmentInstance?.id, params.comment, session?.user?.id, session.warehouse?.id, creditStockOnReceipt);
 
-			} catch (Exception e) {
-				log.error ("Error occurred while receiving shipment " + e.message, e)
-				flash.message = e.message
-				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
-				return
-			}
 
-			if (!shipmentInstance.hasErrors() ) {
-                def recipients = new HashSet()
-                triggerReceiveShipmentEmails(shipmentInstance, userInstance, recipients)
+            if (params.saveButton == 'receiveShipment') {
+                // For now, we'll always credit stock on receipt of shipment
+                //def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
+                def creditStockOnReceipt = true
+                // actually process the receipt
+                try {
+                    shipmentService.receiveShipment(shipmentInstance.id, params.comment, session?.user?.id, session.warehouse?.id, creditStockOnReceipt);
+                    // If there were no errors we can trigger shipment emails to be sent
+                    if (!shipmentInstance.hasErrors()) {
+                        def recipients = new HashSet()
+                        triggerReceiveShipmentEmails(shipmentInstance, userInstance, recipients)
+                        flash.message = "${warehouse.message(code: 'default.received.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.shipmentNumber ?: shipmentInstance?.id])}"
+                        redirect(action: "showDetails", id: shipmentInstance?.id)
+                        return
+                    }
+                } catch (ValidationException e) {
+                    shipmentInstance = Shipment.read(params.id)
+                    receiptInstance.errors = e.errors
+                    render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
+                    return;
+                }
+            }
+            else {
 
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-				redirect(action: "showDetails", id: shipmentInstance?.id)
-				return
-			}
-			redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.shipmentNumber?:shipmentInstance?.id])}"
+                if (params.saveButton == 'saveAndExit') {
+                    redirect(controller:"shipment", action : "showDetails", id: shipmentInstance?.id)
+                }
+                else {
+                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id)
+                }
+                return
+
+            }
 		}
 		
 		// Display form 
-		else { 
+		else {
 
-			if (shipmentInstance.receipt) {
-				receiptInstance = shipmentInstance.receipt
+			if (shipmentInstance?.destination != location) {
+				flash.message = "${g.message(code: 'shipping.mustBeLoggedIntoDestinationToReceive.message', args: [shipmentInstance?.destination])}"
 			}
-			// If no existing receipt, instantiate the model class to be used 
-			else {
-				receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
-				receiptInstance.receiptItems = new HashSet()
-			
-				shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }					
-				shipmentItems.each { shipmentItem ->
-					
-					def inventoryItem = 
-						//inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
-						inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
-					
-					if (inventoryItem) { 
-						ReceiptItem receiptItem = new ReceiptItem(shipmentItem.properties);
-						receiptItem.quantityShipped = shipmentItem.quantity;
-						receiptItem.quantityReceived = shipmentItem.quantity;				
-						receiptItem.lotNumber = shipmentItem.lotNumber;
-						receiptItem.inventoryItem = inventoryItem
-						receiptItem.shipmentItem = shipmentItem
-						// use basic "add" method to avoid GORM because we don't want to persist yet
-						receiptInstance.receiptItems.add(receiptItem);           
-						
-					}
-					else { 
-						receiptInstance.errors.reject('inventoryItem', 'receipt.inventoryItem.invalid')
-					}
 
-				}	
-			}
+            receiptInstance = shipmentService.findOrCreateReceipt(shipmentInstance)
+
 		}
-		render(view: "receiveShipment", model: [
-			shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
+
+        render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
 	}
 
 
@@ -500,7 +581,7 @@ class ShipmentController {
             def subject = "${warehouse.message(code:'shipment.hasBeenReceived.message',args:[shipmentType, shipmentName, shipmentDate])}"
             def body = g.render(template:"/email/shipmentReceived", model:[shipmentInstance:shipmentInstance, userInstance:userInstance])
             def toList = recipients?.collect { it?.email }?.unique()
-            log.info("Mailing shipment emails to ${toList} with body:\n" + body)
+            log.info("Mailing shipment emails to ${toList} with subject ${subject}")
 
             try {
                 mailService.sendHtmlMail(subject, body.toString(), toList)
@@ -725,8 +806,6 @@ class ShipmentController {
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
-
-
 
 	def editDocument = {
 		def shipmentInstance = Shipment.get(params?.shipmentId);

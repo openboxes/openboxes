@@ -168,11 +168,8 @@
                 </td>
                 <td class="value">
                     <span class="">
-                        <g:set var="status" value="${productInstance.getStatus(session.warehouse.id, totalQuantity?:0)}"/>
+                        <g:set var="status" value="${productInstance?.getStatus(session.warehouse.id, totalQuantity?:0)}"/>
                         ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
-                        <%--
-                        <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity,latestInventoryDate:latestInventoryDate]"/>
-                        --%>
                     </span>
                 </td>
             </tr>
@@ -183,9 +180,8 @@
                 <td class="value">
                     <span class="">
                         <g:if test="${latestInventoryDate}">
-                            <g:prettyDateFormat date="${latestInventoryDate}"/>
-                            <div class="fade">
-                                ${g.formatDate(date: latestInventoryDate, format: 'MMM dd hh:mm a') }<br/>
+                            <div title="${g.prettyDateFormat(date: latestInventoryDate)}">
+                                ${g.formatDate(date: latestInventoryDate, format: 'MMM dd hh:mm a') }
                             </div>
 
                         </g:if>
@@ -208,14 +204,7 @@
                     </g:else>
                 </td>
             </tr>
-            <tr class="prop">
-                <td class="label">
-                    <label><warehouse:message code="inventoryLevel.preferred.label"/></label>
-                </td>
-                <td class="value">
-                    ${inventoryLevelInstance?.preferred?:'false' }
-                </td>
-            </tr>
+
 
             <tr class="prop">
                 <td class="label">
@@ -305,7 +294,14 @@
                         </p>
                     </td>
                 </tr>
-
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="inventoryLevel.preferred.label"/></label>
+                    </td>
+                    <td class="value">
+                        ${inventoryLevelInstance?.preferred?:'false' }
+                    </td>
+                </tr>
 			</tbody>
 		</table>			
 	</div>

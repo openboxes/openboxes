@@ -1,6 +1,10 @@
 <div class="wizard-box">
 	<div class="wizard-steps">
-        <g:set var="wizardSteps" value="${['Details':'enterShipmentDetails', 'Tracking':'enterTrackingDetails', 'Pack':'enterContainerDetails', 'Send':'sendShipment']}"/>
+        <g:set var="wizardSteps" value="${['Details':'enterShipmentDetails',
+                                           'Tracking':'enterTrackingDetails',
+                                           'Packing':'enterContainerDetails',
+                                           'Picking':'pickShipmentItems',
+                                           'Sending':'sendShipment']}"/>
 
         <g:each var="wizardStep" in="${wizardSteps}" status="status">
 
@@ -31,4 +35,15 @@
             </div>
         </g:each>
     </div>
+    <div class="right">
+        <g:if test="${currentState=='Picking'}">
+            <g:link target="_blank" controller="report" action="printPickListReport" class="button"
+                    params="['shipment.id': shipmentInstance?.id]">
+                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_list.png')}" class="middle"/>&nbsp;
+                <warehouse:message code="shipping.printPicklist.label" default="Print Pick List"/>
+            </g:link>
+        </g:if>
+    </div>
+
+
 </div>

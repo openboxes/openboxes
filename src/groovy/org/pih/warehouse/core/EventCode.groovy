@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.core;
 
-public enum EventCode {
+enum EventCode {
 
 	SCHEDULED,
 	PICKED,
@@ -28,6 +28,14 @@ public enum EventCode {
  
 	static list() {
 		[ SCHEDULED, SHIPPED, IN_TRANSIT, CUSTOMS_ENTRY, CUSTOMS_HOLD, CUSTOMS_RELEASE, DELIVERED, RECEIVED, CANCELLED ]
+	}
+
+	static listInTransit() {
+		[ SHIPPED, IN_TRANSIT, CUSTOMS_ENTRY, CUSTOMS_HOLD, CUSTOMS_RELEASE ]
+	}
+
+	static listPending() {
+		[ SCHEDULED ]
 	}
 	
 }

@@ -94,7 +94,7 @@
         <div id="megamenu">
             <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
             <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                Loading...
+                ${g.message(code: 'default.loading.label')}
             </div>
 
         </div>
@@ -328,9 +328,9 @@
         //$(".chzn-select").live('load',function(){
         //    $(this).chosen();
         //});
-        //$(".chzn-select-deselect").live('load',function(){
-        //    $(this).chosen({allow_single_deselect:true});
-        //});
+        $(".chzn-select-deselect").livequery(function(){
+            $(this).chosen({allow_single_deselect:true, width:'100%'});
+        });
 
 
         $(".warehouse-switch").click(function() {
@@ -351,7 +351,7 @@
             $(this).children(".actions").hide();
         }
 
-        /* This is used to remove the action menu when the */
+        /* This is used to remove the action menu when the cursor is no longer over the menu */
         $(".action-menu").hoverIntent({
             sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
             interval: 5,   // number = milliseconds for onMouseOver polling interval
@@ -359,6 +359,18 @@
             timeout: 100,   // number = milliseconds delay before onMouseOut
             out: hideActions       // function = onMouseOut callback (required)
         });
+
+        // Added to fix bug with the now dynamically load Current Stock tab on the stock card page
+        $(".action-menu").livequery(function() {
+            $(this).hoverIntent({
+                sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+                interval: 5,   // number = milliseconds for onMouseOver polling interval
+                over: showActions,     // function = onMouseOver callback (required)
+                timeout: 100,   // number = milliseconds delay before onMouseOut
+                out: hideActions       // function = onMouseOut callback (required)
+            });
+        });
+
 
         // Create an action button that toggles the action menu on click
         //button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
@@ -419,7 +431,8 @@
         });
 
         $('.dataTable').dataTable({
-            "bJQueryUI": true
+            "bJQueryUI": false,
+            "sPaginationType": "full_numbers"
         });
     });
 </script>

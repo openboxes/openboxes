@@ -10,6 +10,15 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
+
+            <g:if test="${shipments?.size() == params.max}">
+                <div class="message">
+                    <ul>
+                        <li>${g.message(code: 'shipment.limitHasBeenReached.message', args: [params.max])}</li>
+                    </ul>
+                </div>
+            </g:if>
+
             <div class="yui-gf">
                 <div class="yui-u first">
                     <g:render template="filters" model="[]"/>
@@ -125,10 +134,12 @@
                     $("#listForm").submit();
                 });
 
+//                $(':checkbox.all').change(function(){
+//                    $(':checkbox.item').prop('checked', this.checked);
+//                });
 
-                $(".checkAll").change(function () {
-                    var status = $(this).data("status");
-                    $("input:checkbox." + status).prop('checked', $(this).prop("checked"));
+                $(":checkbox.checkAll").change(function () {
+                    $(":checkbox.shipment-item").prop('checked', $(this).prop("checked"));
                 });
 
 			});

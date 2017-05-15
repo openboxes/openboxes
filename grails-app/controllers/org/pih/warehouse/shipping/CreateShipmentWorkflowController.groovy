@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.validation.ValidationException
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -52,6 +53,8 @@ class CreateShipmentWorkflowController {
 						return enterShipmentDetails()
 					else if (params.skipTo == 'Tracking')
 						return enterTrackingDetails()
+                    else if (params.skipTo == 'Picking')
+                        return pickShipmentItems()
 					else if (params.skipTo == 'Sending')
 						return sendShipment()
 				}
@@ -61,6 +64,7 @@ class CreateShipmentWorkflowController {
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
     	}
@@ -120,6 +124,7 @@ class CreateShipmentWorkflowController {
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
@@ -189,6 +194,7 @@ class CreateShipmentWorkflowController {
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
@@ -222,7 +228,7 @@ class CreateShipmentWorkflowController {
 
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
-			}.to("sendShipment")	// formerly showDetails
+			}.to("pickShipmentItems")
 			
 			on("save") {
 				try {
@@ -492,20 +498,204 @@ class CreateShipmentWorkflowController {
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("prepareShipmentItems").to("prepareShipmentItems")
+			on("pickShipmentItems").to("pickShipmentItems")
 			//on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
     	}
 
+		pickShipmentItems {
 
+			action {
+
+                Location location = Location.load(session.warehouse.id)
+
+                Map quantityMap = [:]
+
+                // We only need to pick items if the shipment is outbound from the current location
+                if (flow?.shipmentInstance?.origin == location) {
+
+                    // Only show stock for lot number selected
+                    //List inventoryItems = flow?.shipmentInstance?.shipmentItems*.inventoryItem
+                    //inventoryItems.each { inventoryItem ->
+                    //    quantityMap[inventoryItem] = inventoryService.getQuantityByBinLocation(location,inventoryItem)
+                    //}
+
+                    // Show stock for all lot numbers for the given products selected
+                    List products = flow?.shipmentInstance?.shipmentItems*.product
+                    products.each { product ->
+                        quantityMap[product] = inventoryService.getQuantityByBinLocation(location, product)
+                    }
+
+                }
+                [quantityMap: quantityMap]
+			}
+			on("error").to "showPicklistItems"
+			on(Exception).to "showPicklistItems"
+			on("success").to "showPicklistItems"
+		}
+
+        showPicklistItems {
+
+			// Needed to add an action state above to
+			render(view: "pickShipmentItems")
+
+			on("back").to("enterContainerDetails")
+
+			on("next").to("sendShipmentAction")
+
+			on("save") {
+				shipmentService.saveShipment(flow.shipmentInstance)
+			}.to("finish")
+
+
+			on("autoPickShipmentItems") {
+				try {
+					log.info "AutoPick: " + params
+
+					//shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
+					//flash.message = "System has automatically picked items"
+                    flash.message = "Psych! This feature has not been implemented yet. But imagine how great life will be when it's finished."
+				} catch (ShipmentItemException e) {
+					flash.message = e.message
+				} catch (Exception e) {
+					flash.message = e.message
+				}
+
+			}.to("pickShipmentItems")
+
+
+            on("deleteShipmentItem") {
+                log.info "Delete shipment item " + params
+                def shipmentItem = ShipmentItem.load(params.id)
+                if (shipmentItem) {
+                    shipmentService.deleteShipmentItem(shipmentItem)
+                }
+                flash.message = "Successfully deleted item ${params.id}"
+
+            }.to("pickShipmentItems")
+
+            on("pickShipmentItem") {
+                log.info "Pick shipment item " + params
+
+                try {
+                    def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+
+					String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
+					String binLocationId = binLocationAndInventoryItem[0]
+					String inventoryItemId = binLocationAndInventoryItem[1]
+
+
+                    log.info "binLocationId: " + binLocationId
+
+                    Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
+
+                    log.info "inventoryItemId: " + inventoryItemId
+
+                    InventoryItem inventoryItem = (inventoryItemId) ? InventoryItem.load(inventoryItemId) : null
+
+                    if (!inventoryItem) {
+                        shipmentItemInstance.errors.reject("shipmentItem.inventoryItem.required.message", "Inventory item is a required field")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                    }
+                    else {
+                        shipmentItemInstance.inventoryItem = inventoryItem
+                    }
+
+                    log.info "Bin location: " + binLocation
+
+                    if (binLocation) {
+                        shipmentItemInstance.binLocation = binLocation
+                    }
+
+                    if (shipmentItemInstance.save(flush:true)) {
+                        flash.message = "Successfully picked shipment item. " + params
+                    } else {
+                        flash.message = "Failed to edit pick list due to an unknown error."
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to edit pick list due to the following error: " + e.message, e)
+                    flash.message = "Failed to edit pick list due to the following error: " + e.message
+                }
+
+            }.to("pickShipmentItems")
+
+            on("splitShipmentItem") {
+                log.info "Split shipment item " + params
+
+                try {
+                    def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+
+                    def currentQuantity = shipmentItemInstance.quantity
+                    def splitQuantity = params.splitQuantity as int
+                    def newQuantity = currentQuantity - splitQuantity
+
+                    // Make sure there's no funny business (i.e. entering a split quantity greater than the original quantity)
+                    if (newQuantity <= 0 || newQuantity > currentQuantity) {
+                        shipmentItemInstance.errors.reject("shipmentItem.invalidQuantity.message", "Quantity is invalid")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                    }
+
+                    String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
+                    String binLocationId = binLocationAndInventoryItem[0]
+                    String inventoryItemId = binLocationAndInventoryItem[1]
+
+                    Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
+                    InventoryItem inventoryItem = (inventoryItemId) ? InventoryItem.load(inventoryItemId) : null
+
+
+                    if (!inventoryItem) {
+                        shipmentItemInstance.errors.reject("shipmentItem.inventoryItem.required.message", "Inventory item is a required field")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                    }
+
+                    // Update the old shipment item with the new quantity
+                    shipmentItemInstance.quantity = newQuantity
+
+                    // Create a new shipment item and update with selected bin location and split quantity
+                    def splitItemInstance = shipmentItemInstance.cloneShipmentItem()
+                    splitItemInstance.inventoryItem = inventoryItem
+                    splitItemInstance.binLocation = binLocation
+                    splitItemInstance.quantity = splitQuantity
+                    shipmentItemInstance.shipment.addToShipmentItems(splitItemInstance)
+
+
+                    boolean success = shipmentItemInstance.shipment.save(flush:true)
+                    if (success) {
+                        flash.message = "Successfully split shipment item. "
+                    } else {
+                        flash.message = "Failed to edit pick list due to an unknown error."
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to edit pick list due to the following error: " + e.message, e)
+                    flash.message = "Failed to edit pick list due to the following error: " + e.message
+                }
+
+            }.to("pickShipmentItems")
+
+
+			on("cancel").to("finish")
+			on("success").to("finish")
+
+			// Top-level navigation transitions
+			on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+            on("pickShipmentItems").to("pickShipmentItems")
+			on("sendShipment").to("sendShipment")
+			on("showDetails").to("showDetails")
+
+
+		}
 
 		sendShipment {
 						
 			// All transition buttons on the bottom of the page
 			on("back") {
 
-			}.to("enterContainerDetails")
+			}.to("pickShipmentItems")
 			
 			on("next").to("sendShipmentAction")
 				
@@ -520,6 +710,7 @@ class CreateShipmentWorkflowController {
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("pickShipmentItems").to("pickShipmentItems")
 			on("sendShipment").to("sendShipment")
 			on("showDetails").to("showDetails")
 			
@@ -598,7 +789,6 @@ class CreateShipmentWorkflowController {
 							
 						}
 						else {
-                            log.info "test 4"
 							return error();
 						}
 					}

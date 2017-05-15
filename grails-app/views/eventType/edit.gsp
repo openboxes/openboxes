@@ -63,24 +63,7 @@
 	                                </td>
 	                            </tr>
 	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="activityType"><warehouse:message code="eventType.activityType.label" default="Activity Type" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'activityType', 'errors')}">
-	                                    <g:select name="activityType" from="${org.pih.warehouse.core.ActivityType?.values()}" value="${eventTypeInstance?.activityType}" noSelection="['': '']" />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="eventType"><warehouse:message code="eventType.eventType.label" default="Event Type" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventType', 'errors')}">
-	                                    <g:select name="eventType" from="${org.pih.warehouse.core.EventTypes?.values()}" value="${eventTypeInstance?.eventType}"  />
-	                                </td>
-	                            </tr>
-	                        	                        
+
                             	<tr class="prop">
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	

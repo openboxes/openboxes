@@ -142,7 +142,7 @@
             </td>
         </tr>
 
-		<g:if test="${transactionInstance?.localTransfer }">
+        <g:if test="${transactionInstance?.localTransfer }">
 
 
 			<tr class="prop">

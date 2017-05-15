@@ -22,16 +22,23 @@ class DocumentType implements Serializable {
 	Integer sortOrder = 0;
 	Date dateCreated;
 	Date lastUpdated;
+
+    DocumentCode documentCode
 			
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)
+        documentCode(nullable:true)
 	}
 	
 	static mapping = {
 		id generator: 'uuid'
 		sort "sortOrder"
+	}
+
+	String toString() {
+		return name
 	}
 
 	

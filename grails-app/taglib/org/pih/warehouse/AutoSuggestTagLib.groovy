@@ -119,10 +119,10 @@ class AutoSuggestTagLib {
 							},
 							select: function(event, ui) {
 								if (ui.item) {
-									console.log(ui.item);
+									console.log("selected: ", ui.item);
 									\$("#${id}-id").val(ui.item.id).trigger("change");
-									\$(this).prev().val(ui.item.value).trigger("change");;
-									\$(this).val(ui.item.valueText);
+									\$(this).prev().val(ui.item.label).trigger("change");;
+									\$(this).val(ui.item.label);
 								}
 								\$("#${id}-suggest").trigger("selected");
 								return false;

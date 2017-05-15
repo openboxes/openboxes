@@ -18,7 +18,7 @@ package org.pih.warehouse.core
  * status of a Shipment from Supplier to final destination, whereas ShipmentEvent is
  * meant to represent a particular Event which occurs during the course of Shipment.
  */
-class EventType implements Comparable, Serializable {
+class EventType implements Comparable<EventType>, Serializable {
 
 	String id
 	String name
@@ -51,11 +51,9 @@ class EventType implements Comparable, Serializable {
 	
 	
 	String toString() { return "$name"; }	
-	
-	int compareTo(obj) {
-		if (obj?.sortOrder && sortOrder) {
-			return sortOrder <=> obj.sortOrder 
-		}		
-		return id <=> obj.id;
-	}	
+
+
+	int compareTo(EventType other) {
+        return sortOrder <=> other?.sortOrder ?: eventCode <=> other?.eventCode ?: name <=> other?.name
+    }
 }

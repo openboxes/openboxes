@@ -59,13 +59,32 @@ beans = {
     inventorySnapshotCache(EhCacheFactoryBean) { bean ->
         cacheManager = ref("springcacheCacheManager")
         cacheName = "inventorySnapshotCache"
-        // these are just examples of properties you could set
         eternal = false
         diskPersistent = false
         memoryStoreEvictionPolicy = "LRU"
         timeToLive = 86400       // 1 day = 60 * 60 * 24
         timeToIdle = 43200        // 12 hours = 60 * 60 * 12
     }
+    inventoryBrowserCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "inventoryBrowserCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour
+        timeToIdle = 500        // 5 minutes
+    }
+
+    fastMoversCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "fastMoversCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 86400       // 1 day = 60 * 60 * 24
+        timeToIdle = 43200        // 12 hours = 60 * 60 * 12
+    }
+
 
     quantityOnHandCache(EhCacheFactoryBean) { bean ->
         cacheManager = ref("springcacheCacheManager")
@@ -81,7 +100,6 @@ beans = {
     megamenuCache(EhCacheFactoryBean) { bean ->
         cacheManager = ref("springcacheCacheManager")
         cacheName = "megamenuCache"
-        // these are just examples of properties you could set
         eternal = false
         diskPersistent = false
         memoryStoreEvictionPolicy = "LRU"
@@ -89,8 +107,36 @@ beans = {
         timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
     }
 
+    selectTagCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "selectTagCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+    }
 
-	/**
+    selectTagsCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "selectTagsCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+    }
+    selectCategoryCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "selectCategoryCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+    }
+
+    /**
 	 * c3P0 pooled data source that allows 'DB keepalive' queries
 	 * to prevent stale/closed DB connections
 	 * Still using the JDBC configuration settings from DataSource.groovy

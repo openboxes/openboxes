@@ -315,7 +315,6 @@ th a:link, th a:visited, th a:hover {
     display: block;
     font-size: 10px;
     text-decoration: none;
-    width: 100%;
 }
 th.asc a, th.desc a {
     background-position: right;
@@ -1224,15 +1223,16 @@ a:hover {
 }
 
 #chooseLocation {
-    width: 700px;
+    width: 800px;
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -350px;
+    margin-left: -400px;
 }
 #chooseLocationSelect {
     max-height: 400px;
     overflow: auto;
+    margin-bottom: 5px
 }
 
 #loginForm {
@@ -2218,6 +2218,7 @@ img.photo_tiny {
 .lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
 .binLocation { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
 .barcode { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; letter-spacing: .1em; font-weight: normal; font-size: 11px; line-height: 20px}
+.barcode-data { text-align: center; }
 .genericName { text-transform: uppercase; }
 #more { background-color: #ddd; padding: 10px; }
 
@@ -3050,4 +3051,33 @@ input {
 
 .childContainer .tag {
     margin-left: 25px;
+}
+
+.new-container {
+    border-top: 2px solid #ddd;
+}
+
+.packing-unit {
+   background-color: #f7f7f7;
+
+}
+
+.dont-break-out {
+
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+
 }

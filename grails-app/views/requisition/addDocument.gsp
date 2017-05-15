@@ -25,7 +25,7 @@
 			<g:render template="summary" />
 			<div>
 				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
-				<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
+				<g:uploadForm controller="document" action="${documentInstance?.id ? 'saveDocument' : 'uploadDocument'}">
 					<g:hiddenField name="requestId" value="${requestInstance?.id}" />
 					<g:hiddenField name="documentId" value="${documentInstance?.id}" />					
 					<table>
@@ -59,8 +59,10 @@
 									code="document.type.label"/></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" 
-													noSelection="['0': warehouse.message(code:'document.chooseDocumentType.label')]" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
+												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list().sort{it.name}}"
+														  value="${documentInstance?.documentType?.id}"
+													noSelection="['': warehouse.message(code:'document.chooseDocumentType.label')]"
+														  optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -72,21 +74,24 @@
 									<g:textField name="documentNumber" value="${documentInstance?.documentNumber}" />
 								</td>
 							</tr>
+
+						</tbody>
+						<tfoot>
 							<tr class="prop">
 								<td valign="top" class="name"></td>
 								<td valign="top" class="value">
-									<div class="buttons">
+									<div class="buttons left">
 										<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 										<button type="submit" class="positive">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}
 										</button>
 										<g:link controller="requisition" action="show" id="${requestInstance?.id}" class="negative">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> <warehouse:message
-									code="default.button.cancel.label" /> </g:link>
-									</div>				
+												code="default.button.cancel.label" /> </g:link>
+									</div>
 								</td>
 							</tr>
-						</tbody>
+						</tfoot>
 					</table>
 				</g:uploadForm>
 			</div>

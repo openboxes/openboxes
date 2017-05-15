@@ -5,7 +5,7 @@
 	<div class="actions">
 		<div class="action-menu-item">
 			<g:link controller="inventory" action="browse" params="['resetSearch':'true']">
-				<img src="${resource(dir: 'images/icons', file: 'indent.gif')}"/>&nbsp;
+				<img src="${resource(dir: 'images/icons/silk', file: 'text_list_numbers.png')}"/>&nbsp;
 				<warehouse:message code="inventory.browse.label"/>
 			</g:link>
 		</div>
@@ -40,21 +40,24 @@
 			<hr />
 		</div>
 		<div class="action-menu-item">
-			<g:link name="recordInventoryLink" controller="inventoryItem" action="showRecordInventory" params="['productInstance.id': productInstance?.id,'inventoryInstance.id':inventoryInstance?.id]">
+			<g:link name="recordInventoryLink" controller="inventoryItem" action="showRecordInventory"
+					params="['product.id': productInstance?.id,'inventory.id':inventoryInstance?.id]">
 				<img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
 				<warehouse:message code="inventory.record.label"/>
 			</g:link>
 		</div>
 		<g:isUserManager>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="inventoryAdjustedBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'book_edit.png')}"
-					alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
-						code="inventory.inventoryAdjusted.label" />
-				</a>
-			</div>
+			<g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+				<div class="action-menu-item">
+					<a href="javascript:void(0);" class="actionButton"
+						id="inventoryAdjustedBtn"> <img
+						src="${createLinkTo(dir:'images/icons/silk',file:'book_edit.png')}"
+						alt="${g.message(code: 'inventory.adjustStock.label') }"
+						style="vertical-align: middle" /> &nbsp;<g:message
+							code="inventory.adjustStock.label" />
+					</a>
+				</div>
+			</g:supports>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="incomingTransferBtn"> <img

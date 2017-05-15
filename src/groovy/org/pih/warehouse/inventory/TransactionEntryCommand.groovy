@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 @Validateable
@@ -20,6 +21,7 @@ class TransactionEntryCommand {
 	InventoryItem inventoryItem
 	String comment
 	String lotNumber
+	Location binLocation
 	Product product
 	Date expirationDate
 	Integer quantity

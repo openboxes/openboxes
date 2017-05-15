@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />        
-        <title><warehouse:message code="inventory.expiredStock.label"/></title>    
+        <title><warehouse:message code="inventory.expiredStock.label"/></title>
     </head>    
 
 	<body>
@@ -13,15 +13,27 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
             
-           
-            <h3><warehouse:message code="inventory.expiredStock.label"/></h3>
-            
-            
+           	<div class="summary">
+				<h3 class="title"><warehouse:message code="inventory.expiredStock.label"/></h3>
+			</div>
+
+            <div class="buttons" style="text-align: left">
+                <g:link controller="dashboard" action="index" class="button">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
+                    &nbsp;<warehouse:message code="dashboard.label"/>
+                </g:link>
+
+                <g:link controller="inventory" action="browse" class="button">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
+                    &nbsp;<warehouse:message code="inventory.browse.label"/>
+                </g:link>
+            </div>
+
             <div class="yui-gf">
+
 				<div class="yui-u first">
-				
-			
-		            <g:form action="listExpiredStock" method="get">
+
+                    <g:form action="listExpiredStock" method="get">
 						<div class="box">
 
                             <div class="right middle">
@@ -48,107 +60,98 @@
 		            </g:form>
 				</div>
 				<div class="yui-u">
+
 		            <div class="box">
-                        <div class="right middle">
-                            <g:link params="[format:'csv',category:params.category]" controller="${controllerName}" action="${actionName}"
-                                    class="button">Download as CSV</g:link>
+                        <h2>
+                            <warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
+                        </h2>
+                        <div class="buttons" style="text-align: left">
+                            <g:render template="./actionsExpiredStock" />
 
                         </div>
-                        <h2>
-							<warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
-                        </h2>
-						<table>
-							<tr>					
-								<td>
-									<div class="">
-							            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
-											<table>
-							                    <thead>
-							                        <tr class="odd">   
-							                        	<th class="center">
-							                        		<input type="checkbox" id="toggleCheckbox"/>
-							                        	</th>
-                                                        <th><warehouse:message code="product.productCode.label"/></th>
-                                                        <th><warehouse:message code="product.label"/></th>
-                                                        <th><warehouse:message code="category.label"/></th>
-                                                        <th><warehouse:message code="inventory.lotNumber.label"/></th>
-														<th class="center"><warehouse:message code="inventory.expires.label"/></th>
-														<th class="center"><warehouse:message code="default.qty.label"/></th>
-														<th class="center"><warehouse:message code="product.uom.label"/></th>
-							                        </tr>
-							                    </thead>
-							       	           	<tbody>			
-							       	     			<g:set var="counter" value="${0 }" />
-							       	     			<g:set var="anyExpiredStock" value="${false }"/>
-													<g:each var="inventoryItem" in="${inventoryItems}" status="i">           
-														<g:set var="quantity" value="${quantityMap[inventoryItem] }"/>
-														<g:set var="anyExpiredStock" value="${true }"/>
-														<tr class="${(counter++ % 2) == 0 ? 'even' : 'odd'}">            
-															<td class="center">
-																<g:checkBox id="${inventoryItem?.id }" name="inventoryItem.id" 
-																	class="checkbox" style="top:0em;" checked="${false }" 
-																		value="${inventoryItem?.id }" />
-															
-															</td>
-                                                            <td class="checkable">
-                                                                <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-                                                                    ${inventoryItem?.product?.productCode}
-                                                                </g:link>
 
-                                                            </td>
-															<td class="checkable">
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-																	<format:product product="${inventoryItem?.product}"/> 
-																</g:link>
-																
-															</td>
-                                                            <td class="checkable">
-                                                                <span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
-                                                            </td>
-                                                            <td class="checkable">
-																<span class="lotNumber">
-																	${inventoryItem?.lotNumber }
-																</span>
-															</td>
-															<td class="checkable center">
-																<span class="fade">
-																	<g:formatDate date="${inventoryItem?.expirationDate}" format="d MMM yyyy"/>
-																</span>													
-															</td>
-															<td class="center checkable">
-																${quantity }
-															</td>
-															<td class="center checkable">
-																${inventoryItem?.product?.unitOfMeasure?:"EA" }
-																
-															</td>									
-														</tr>						
-													</g:each>
-													<g:unless test="${inventoryItems}">
-														<tr>
-															<td colspan="8">
-																<div class="padded center fade">
-																	<warehouse:message code="inventory.noExpiredStock.label" />
-																</div>
-															</td>
-														</tr>
-													</g:unless>
-												</tbody>
-												<tfoot>
-													<tr style="border-top: 1px solid lightgrey">
-														<td colspan="8">
-															<div>
-																<g:render template="./actionsExpiredStock" />
-                                                            </div>
-														</td>
-													</tr>									
-												</tfoot>
-											</table>		
-										</form>		
-									</div>
-								</td>
-							</tr>			
-						</table>
+
+                        <div class="dialog">
+							<form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
+                                <table>
+									<thead>
+										<tr class="odd">
+											<th class="center">
+												<input type="checkbox" class="toggleCheckbox"/>
+											</th>
+                                            <th><warehouse:message code="product.productCode.label"/></th>
+											<th><warehouse:message code="product.label"/></th>
+											<th><warehouse:message code="category.label"/></th>
+											<th><warehouse:message code="inventory.lotNumber.label"/></th>
+											<th class="center"><warehouse:message code="inventory.expires.label"/></th>
+											<th class="center"><warehouse:message code="default.quantity.label"/></th>
+											<th class="center"><warehouse:message code="product.uom.label"/></th>
+										</tr>
+									</thead>
+									<tbody>
+										<g:set var="counter" value="${0 }" />
+										<g:set var="anyExpiredStock" value="${false }"/>
+										<g:each var="inventoryItem" in="${inventoryItems}" status="i">
+											<g:set var="quantity" value="${quantityMap[inventoryItem] }"/>
+											<g:set var="anyExpiredStock" value="${true }"/>
+											<tr class="${(counter++ % 2) == 0 ? 'even' : 'odd'}">
+												<td class="center">
+													<g:checkBox id="${inventoryItem?.id }" name="inventoryItem.id"
+														class="checkbox" checked="${false }"
+															value="${inventoryItem?.id }" />
+
+												</td>
+												<td class="checkable">
+													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+														${inventoryItem?.product?.productCode}
+													</g:link>
+
+												</td>
+												<td class="checkable">
+                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+                                                        <format:product product="${inventoryItem?.product}"/>
+                                                    </g:link>
+												</td>
+												<td class="checkable">
+													<span class="fade dont-break-out"><format:category category="${inventoryItem?.product?.category}"/> </span>
+												</td>
+												<td class="checkable">
+													<span class="lotNumber">
+														${inventoryItem?.lotNumber }
+													</span>
+												</td>
+												<td class="checkable center">
+                                                    <g:expirationDate date="${inventoryItem?.expirationDate}"/>
+												</td>
+												<td class="right checkable">
+													${quantity }
+												</td>
+												<td class="left checkable">
+													${inventoryItem?.product?.unitOfMeasure?:"EA" }
+
+												</td>
+											</tr>
+										</g:each>
+										<g:unless test="${inventoryItems}">
+											<tr>
+												<td colspan="8">
+													<div class="padded center fade">
+														<warehouse:message code="inventory.noExpiredStock.label" />
+													</div>
+												</td>
+											</tr>
+										</g:unless>
+									</tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="8">
+
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+								</table>
+							</form>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -161,19 +164,17 @@
 				$('.checkable').toggle(
 					function(event) {
 						$(this).parent().find('input').click();
-						//$(this).parent().addClass('checked');
 						return false;
 					},
 					function(event) {
 						$(this).parent().find('input').click();
-						//$(this).parent().removeClass('checked');
 						return false;
 					}
 				);
 				
-				$("#toggleCheckbox").click(function(event) {
-					$(".checkbox").attr("checked", $(this).attr("checked"));
-				});	
+				$(".toggleCheckbox").click(function(event) {
+                    $(':checkbox').not(this).prop('checked', this.checked);
+				});
 			});	
 		</script>	
 	</body>

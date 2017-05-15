@@ -6,6 +6,7 @@
             <tr class="odd">
                 <th></th>
                 <th><warehouse:message code="product.label"/></th>
+                <th style="text-align: center"><warehouse:message code="location.binLocation.label"/></th>
                 <th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
                 <th style="text-align: center"><warehouse:message code="product.expirationDate.label"/></th>
                 <th style="text-align: center"><warehouse:message code="default.qty.label"/></th>
@@ -46,6 +47,9 @@
                                 ${transactionEntry?.inventoryItem?.product?.productCode}
                                 <format:product product="${transactionEntry?.inventoryItem?.product}"/>
                             </g:link>
+                        </td>
+                        <td class="center">
+                            ${transactionEntry?.binLocation?.name }
                         </td>
                         <td class="center">
                             ${transactionEntry?.inventoryItem?.lotNumber }

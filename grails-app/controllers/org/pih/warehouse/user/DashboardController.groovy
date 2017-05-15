@@ -73,7 +73,13 @@ class DashboardController {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
 			return;
 		}
-		
+
+		def inventoryItem = InventoryItem.findByLotNumber(params.searchTerms)
+		if (inventoryItem) {
+			redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
+			return;
+		}
+
 		def requisition = Requisition.findByRequestNumber(params.searchTerms)
 		if (requisition) {
 			redirect(controller: "requisition", action: "show", id: requisition.id)
@@ -333,15 +339,18 @@ class DashboardController {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
-      //   def startTime = System.currentTimeMillis()
+		//def startTime = System.currentTimeMillis()
 
-        // Shipments
+        // Inbound Shipments
 		def incomingShipments = Shipment.findAllByDestination(location).groupBy{it.status.code}.sort()
         def incomingShipmentsCount = Shipment.countByDestination(location)
 
+
+		// Outbound Shipments
 		def outgoingShipments = Shipment.findAllByOrigin(location).groupBy{it.status.code}.sort();
         def outgoingShipmentsCount = Shipment.countByOrigin(location)
-        // Orders
+
+		// Orders
 		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
 
         // Requisitions
@@ -392,9 +401,9 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-    @CacheFlush(["dashboardCache", "megamenuCache"])
+    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache", "quantityOnHandCache", "selectTagCache", "selectTagsCache", "selectCategoryCache"])
     def flushCache = {
-        flash.message = "Cache has been flushed"
+        flash.message = "Caches have been flushed"
         CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
         redirect(action: "index")
     }
@@ -428,11 +437,9 @@ class DashboardController {
 			// Save the warehouse selection for "last logged into" information
 			if (session.user) {
 				def userInstance = User.get(session.user.id);
-				userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
+				//userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
 				userInstance.lastLoginDate = new Date();
-				if (userInstance.rememberLastLocation) { 
-					userInstance.warehouse = warehouse 
-				}
+				userInstance.warehouse = warehouse
 				userInstance.save(flush:true);
 				session.user = userInstance;
 			}			

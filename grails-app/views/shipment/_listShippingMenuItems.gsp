@@ -105,12 +105,14 @@
 		</g:link>
 	</div>
 </g:each>
+<%--
 <div class="action-menu-item">
 	<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"
 			alt="Download Certificate of Donation" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.downloadCertificateOfDonation.label"/> (.docx)
 	</g:link>
 </div>
+--%>
 <div class="action-menu-item">
 	<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"

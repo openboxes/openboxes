@@ -62,25 +62,24 @@
 
                                                 </td>
                                             </tr>
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                    <label for="unitOfMeasure"><warehouse:message code="product.unitOfMeasure.label" default="Unit of measure" /></label>
-                                                </td>
-                                                <td valign="top" class="value">
-                                                    <span id="unitOfMeasure">
-                                                        ${transactionEntryInstance?.inventoryItem?.product?.unitOfMeasure}
-                                                    </span>
+											<tr class="prop">
+												<td valign="top" class="name">
+													<label for="product"><warehouse:message code="location.binLocation.label" default="Bin Location" /></label>
+												</td>
+												<td valign="top" class="value">
+													<g:selectBinLocation name="binLocation.id" value="${transactionEntryInstance?.binLocation?.id}" noSelection="['':'']" class="chzn-select-deselect"/>
+												</td>
+											</tr>
 
-                                                </td>
-                                            </tr>
+
 				                            <tr class="prop">
 				                                <td valign="top" class="name">
 				                                  <label for="inventoryItem.id"><warehouse:message code="transactionEntry.inventoryItem.label" default="Inventory Item" /></label>
 				                                </td>
 				                                <td valign="top" class="value ${hasErrors(bean: transactionEntryInstance, field: 'inventoryItem', 'errors')}">
-				                                    <g:select name="inventoryItem.id" from="${org.pih.warehouse.inventory.InventoryItem.findAllByProduct(transactionEntryInstance?.inventoryItem?.product)}" 
-				                                    	optionKey="${{ it.id }}" optionValue="${{ it.lotNumber }}"
-				                                    	value="${transactionEntryInstance?.inventoryItem?.id}"  />
+				                                    <g:select name="inventoryItem.id" class="chzn-select-deselect" from="${org.pih.warehouse.inventory.InventoryItem.findAllByProduct(transactionEntryInstance?.inventoryItem?.product)}"
+															optionKey="${{ it.id }}" optionValue="${{ it.lotNumber }}"
+															value="${transactionEntryInstance?.inventoryItem?.id}"  />
 				                                </td>
 				                            </tr>
 				                        
@@ -92,13 +91,24 @@
 				                                    <g:textField name="quantity" value="${transactionEntryInstance?.quantity }" size="10" class="text"/>	                                    
 				                                </td>
 				                            </tr>
-				                        
+											<tr class="prop">
+												<td valign="top" class="name">
+													<label for="unitOfMeasure"><warehouse:message code="product.unitOfMeasure.label" default="Unit of measure" /></label>
+												</td>
+												<td valign="top" class="value">
+													<span id="unitOfMeasure">
+														${transactionEntryInstance?.inventoryItem?.product?.unitOfMeasure}
+													</span>
+
+												</td>
+											</tr>
+
 				                            <tr class="prop">
 				                                <td valign="top" class="name">
 				                                  <label for="comments"><warehouse:message code="transactionEntry.comments.label" default="Comments" /></label>
 				                                </td>
 				                                <td valign="top" class="value ${hasErrors(bean: transactionEntryInstance, field: 'comments', 'errors')}">
-				                                    <g:textArea name="comments" cols="40" rows="5" value="${transactionEntryInstance?.comments}" />
+				                                    <g:textArea name="comments" cols="100" rows="5" value="${transactionEntryInstance?.comments}" />
 				                                </td>
 				                            </tr>
 				                        

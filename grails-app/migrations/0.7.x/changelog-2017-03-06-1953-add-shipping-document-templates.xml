@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1488850801102-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shipment_workflow_document"/>
+            </not>
+        </preConditions>
+        <createTable tableName="shipment_workflow_document">
+            <column name="shipment_workflow_id" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="document_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1488850801102-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="document_type" columnName="document_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="document_type">
+            <column name="document_code" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1488850801102-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location_group" columnName="address_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="location_group">
+            <column name="address_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1488850801102-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7A19D7561ED379F"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="location_group" constraintName="FK7A19D7561ED379F" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="address"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1488850801102-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK9A945A36C800AA15"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="document_id" baseTableName="shipment_workflow_document" constraintName="FK9A945A36C800AA15" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1488850801102-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK9A945A36EC587CFB"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="shipment_workflow_id" baseTableName="shipment_workflow_document" constraintName="FK9A945A36EC587CFB" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_workflow"/>
+    </changeSet>
+</databaseChangeLog>

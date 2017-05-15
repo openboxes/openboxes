@@ -28,25 +28,25 @@
         out << renderOneToMany(domainClass, property)
 
     private renderEnumEditor(domainClass, property) {
-        return "<g:select name=\"${property.name}\" from=\"\${${property.type.name}?.values()}\" value=\"\${${domainInstance}?.${property.name}}\" ${renderNoSelection(property)} />"
+        return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${property.type.name}?.values()}\" value=\"\${${domainInstance}?.${property.name}}\" ${renderNoSelection(property)} />"
     }
 
     private renderStringEditor(domainClass, property) {
         if (!cp) {
-            return "<g:textField name=\"${property.name}\" value=\"\${${domainInstance}?.${property.name}}\" />"
+            return "<g:textField class=\"text\" name=\"${property.name}\" value=\"\${${domainInstance}?.${property.name}}\" />"
         }
         else {
-            if ("textarea" == cp.widget || (cp.maxSize > 250 && !cp.password && !cp.inList)) {
-                return "<g:textArea name=\"${property.name}\" cols=\"40\" rows=\"5\" value=\"\${${domainInstance}?.${property.name}}\" />"
+            if ("textarea" == cp.widget || (cp.maxSize >= 300 && !cp.password && !cp.inList)) {
+                return "<g:textArea name=\"${property.name}\" cols=\"60\" rows=\"5\" value=\"\${${domainInstance}?.${property.name}}\" />"
             }
             else {
                 if (cp.inList) {
-                    return "<g:select name=\"${property.name}\" from=\"\${${domainInstance}.constraints.${property.name}.inList}\" value=\"\${${domainInstance}?.${property.name}}\" valueMessagePrefix=\"${domainClass.propertyName}.${property?.name}\" ${renderNoSelection(property)} />"
+                    return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${domainInstance}.constraints.${property.name}.inList}\" value=\"\${${domainInstance}?.${property.name}}\" valueMessagePrefix=\"${domainClass.propertyName}.${property?.name}\" ${renderNoSelection(property)} />"
                 }
                 else {
                     def sb = new StringBuffer("<g:")
                     cp.password ? sb << "passwordField " : sb << "textField "
-                    sb << "name=\"${property.name}\" "
+                    sb << "class=\"text\" size=\"80\" name=\"${property.name}\" "
                     if (cp.maxSize) sb << "maxlength=\"${cp.maxSize}\" "
                     if (!cp.editable) sb << "readonly=\"readonly\" "
                     sb << "value=\"\${${domainInstance}?.${property.name}}\" />"
@@ -62,12 +62,12 @@
 
     private renderManyToOne(domainClass,property) {
         if (property.association) {
-            return "<g:select name=\"${property.name}.id\" from=\"\${${property.type.name}.list()}\" optionKey=\"id\" value=\"\${${domainInstance}?.${property.name}?.id}\" ${renderNoSelection(property)} />"
+            return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}.id\" from=\"\${${property.type.name}.list()}\" optionKey=\"id\" value=\"\${${domainInstance}?.${property.name}?.id}\" ${renderNoSelection(property)} />"
         }
     }
 
     private renderManyToMany(domainClass, property) {
-        return "<g:select name=\"${property.name}\" from=\"\${${property.referencedDomainClass.fullName}.list()}\" multiple=\"yes\" optionKey=\"id\" size=\"5\" value=\"\${${domainInstance}?.${property.name}}\" />"
+        return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${property.referencedDomainClass.fullName}.list()}\" multiple=\"yes\" optionKey=\"id\" size=\"5\" value=\"\${${domainInstance}?.${property.name}}\" />"
     }
 
     private renderOneToMany(domainClass, property) {
@@ -89,18 +89,18 @@
                 return "<g:select name=\"${property.name}\" from=\"\${-128..127}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" />"
             }
             else {
-                return "<g:textField name=\"${property.name}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" />"
+                return "<g:textField class=\"text\" name=\"${property.name}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" />"
             }
         }
         else {
             if (cp.range) {
-                return "<g:select name=\"${property.name}\" from=\"\${${cp.range.from}..${cp.range.to}}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" ${renderNoSelection(property)} />"
+                return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${cp.range.from}..${cp.range.to}}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" ${renderNoSelection(property)} />"
             }
             else if (cp.inList) {
-                return "<g:select name=\"${property.name}\" from=\"\${${domainClass.propertyName}.constraints.${property.name}.inList}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" valueMessagePrefix=\"${domainClass.propertyName}.${property?.name}\" ${renderNoSelection(property)} />"
+                return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${domainClass.propertyName}.constraints.${property.name}.inList}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" valueMessagePrefix=\"${domainClass.propertyName}.${property?.name}\" ${renderNoSelection(property)} />"
             }            
             else {
-                return "<g:textField name=\"${property.name}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" />"
+                return "<g:textField class=\"text\" name=\"${property.name}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" />"
             }
         }
      }

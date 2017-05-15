@@ -35,11 +35,11 @@
 				
     </head>
     <body>
-    
-	 	<%--
-	 		Hack used to refresh the shipment containers when sorting (because we're using AJAX)
-	 		${shipmentInstance?.refresh() }
-	 	--%>
+
+    <%--
+        Hack used to refresh the shipment containers when sorting (because we're using AJAX)
+        ${shipmentInstance?.refresh() }
+    --%>
 
 		<div class="body">
 			<g:if test="${message}">
@@ -57,9 +57,8 @@
 			</g:hasErrors> 			         
 			<div>
 				<g:render template="../shipment/summary" />	
- 				<g:render template="flowHeader" model="['currentState':'Pack']"/>	
-					
-		 		
+ 				<g:render template="flowHeader" model="['currentState':'Packing']"/>
+
 		 		<!-- figure out what dialog box, if any, we need to render -->
 		 		<g:if test="${containerToEdit || containerTypeToAdd}">
 		 			<g:render template="editContainer" model="['container':containerToEdit, 'containerTypeToAdd':containerTypeToAdd]"/>
@@ -305,14 +304,18 @@
 					<div class="yui-u">
 
 
-						<div class="box-slim">
-							<g:form action="createShipment">
-								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
-								<g:hiddenField name="containerId" value="${selectedContainer?.id}"/>
-								<g:autoSuggest id="inventoryItem" name="inventoryItem" jsonUrl="${request.contextPath }/json/findInventoryItems" placeholder="Enter lot number or product code" styleClass="text" size="60"/>
-								<g:textField name="quantity" value="" class="text" placeholder="Quantity" size="5"/>
-								<g:submitButton name="addShipmentItem" value="Add item" class="button icon add"></g:submitButton>
-							</g:form>
+						<div class="box">
+							<h2><g:message code="shipping.addItems.label"/></h2>
+							<div style="margin: 10px">
+								<g:form action="createShipment">
+									<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
+									<g:hiddenField name="containerId" value="${selectedContainer?.id}"/>
+									<g:autoSuggest id="inventoryItem" name="inventoryItem" jsonUrl="${request.contextPath }/json/findInventoryItems"
+                                                   placeholder="Enter lot number or product code" styleClass="text" width="500" minLength="2" delay="500"/>
+									<g:textField name="quantity" value="" class="text" placeholder="Quantity" size="5"/>
+									<g:submitButton name="addShipmentItem" value="Add item" class="button icon add"></g:submitButton>
+								</g:form>
+							</div>
 						</div>
 
 						<%-- Display the contents of the currently selected container --%>
@@ -345,10 +348,9 @@
 										</div>
 									</td>
 									<td class="middle left">
-
-											<div class="">
-												<g:render template="/container/summary" model="[container:selectedContainer]"/>
-											</div>
+										<div class="">
+											<g:render template="/container/summary" model="[container:selectedContainer]"/>
+										</div>
 									</td>
 								</tr>
 							</table>
@@ -360,9 +362,11 @@
 									<th class="middle"></th>
 									<th class="middle center"><warehouse:message code="product.productCode.label"/></th>
 									<th class="middle"><warehouse:message code="product.label"/></th>
-									<th class="middle"><warehouse:message code="default.lotSerialNo.label"/></th>
+									<th class="middle"><warehouse:message code="location.binLocation.label"/></th>
+									<th class="middle"><warehouse:message code="inventoryItem.lotNumber.label"/></th>
 									<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
 									<th class="left middle"><warehouse:message code="default.qty.label"/></th>
+									<th class="left middle"><warehouse:message code="default.uom.label"/></th>
 									<th class="middle"><warehouse:message code="shipping.recipients.label"/></th>
 								</tr>
 								</thead>
@@ -412,6 +416,16 @@
 												</div>
 											</td>
 											<td class="middle">
+												<div class="binLocation">
+													<g:if test="${shipmentItem?.binLocation}">
+														${shipmentItem?.binLocation?.name}
+													</g:if>
+													<g:else>
+														<g:message code="default.label"/>
+													</g:else>
+												</div>
+											</td>
+											<td class="middle">
 												<div class="lotNumber">
 													${shipmentItem?.inventoryItem?.lotNumber}
 												</div>
@@ -421,18 +435,22 @@
 											</td>
 											<td class="left middle">
 												${shipmentItem?.quantity}
+											</td>
+											<td class="left middle">
 												${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
 											</td>
 
 											<td class="left middle">
-												${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}
+												<div title="${shipmentItem?.recipient?.email}">
+													${shipmentItem?.recipient?.name?:warehouse.message(code:'default.none.label')}
+												</div>
 											</td>
 										</tr>
 									</g:each>
 								</g:if>
 								<g:unless test="${shipmentItems }">
 									<tr class="none">
-										<td colspan="8">
+										<td colspan="10">
 											<div class="middle center fade empty">
 												<warehouse:message code="shipment.noShipmentItems.message"/>
 											</div>
@@ -606,10 +624,7 @@
         <g:render template="/createShipmentWorkflow/moveDraggableItem"/>
 		--%>        
 		<script>
-
-
 			$(document).ready(function() {
-				
 				var sortable = $(".sortable tbody").sortable({
 				    handle : '.sorthandle', 
 				    axis : "y",
@@ -626,7 +641,6 @@
 						//$.post(updateUrl, sortOrder);
 						//$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd")
 						//	.filter(":even").addClass("even");
-
 
 						//var sortOrder = $(this).sortable('serialize');
 						//console.log(sortOrder);

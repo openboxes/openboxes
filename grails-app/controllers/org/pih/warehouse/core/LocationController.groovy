@@ -14,10 +14,13 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItemException
+import org.springframework.web.multipart.MultipartFile
 
 class LocationController {
 	
 	def inventoryService
+	def locationService
 	
 	/**
 	 * Controllers for managing other locations (besides warehouses)
@@ -115,7 +118,13 @@ class LocationController {
 				}
 
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
-				redirect(action: "list", id: locationInstance.id)
+
+				if (locationInstance.parentLocation) {
+					redirect(action: "edit", id: locationInstance.parentLocation.id)
+				}
+				else {
+					redirect(action: "edit", id: locationInstance.id)
+				}
 			}
 			else {
 				render(view: "edit", model: [locationInstance: locationInstance])
@@ -134,7 +143,13 @@ class LocationController {
 				locationInstance.delete(flush: true)
 
 				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-				redirect(action: "list")
+
+				if (locationInstance.parentLocation) {
+					redirect(action: "edit", id: locationInstance.parentLocation.id)
+				}
+				else {
+					redirect(action: "list")
+				}
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
@@ -146,8 +161,22 @@ class LocationController {
 			redirect(action: "edit", id: params.id)
 		}
 	}
-		
-		
+
+    def showContents = {
+        def binLocation = Location.get(params.id);
+        if (!binLocation) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+
+        }
+        else {
+            List contents = inventoryService.getQuantityByBinLocation(binLocation.parentLocation, binLocation)
+            return [binLocation: binLocation, contents:contents]
+        }
+
+
+    }
+
+
 	/**
 	 * Render location logo
 	 */
@@ -266,6 +295,28 @@ class LocationController {
 		user.delete();
 		flash.message = "User deleted"
 		redirect(action: "show", id: params.location.id);
+	}
+
+
+	def importBinLocations = {
+		try {
+			MultipartFile multipartFile = request.getFile('fileContents')
+			if (multipartFile.empty) {
+				flash.message = "File cannot be empty."
+				return
+			}
+
+			if (locationService.importBinLocations(params.id, multipartFile.inputStream)) {
+				flash.message = "Successfully imported all bin locations."
+
+			} else {
+				flash.message = "Failed to import bin locations due to an unknown error."
+			}
+		} catch (Exception e) {
+			log.error("Failed to import bin locations due to the following error: " + e.message, e)
+			flash.message = "Failed to import bin locations due to the following error: " + e.message
+		}
+		redirect(action: "edit", id: params.id);
 	}
 
 

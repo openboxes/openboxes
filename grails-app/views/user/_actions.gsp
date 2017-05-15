@@ -37,16 +37,36 @@
 				<warehouse:message code="user.changePhoto.label" />
 			</g:link>
 		</div>
-			<%-- 
-			<div class="action-menu-item">
-				<g:link controller="user" action="cropPhoto"
-					id="${userInstance?.id }">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'photo_edit.png')}" class="middle"/>&nbsp;
-					<warehouse:message code="user.cropPhoto.label" />
-				</g:link>
-			</div>
-			--%>
+		<%--
+        <div class="action-menu-item">
+            <g:link controller="user" action="cropPhoto"
+                id="${userInstance?.id }">
+                <img src="${createLinkTo(dir:'images/icons/silk',file:'photo_edit.png')}" class="middle"/>&nbsp;
+                <warehouse:message code="user.cropPhoto.label" />
+            </g:link>
+        </div>
+        --%>
+		<div class="action-menu-item">
+			<g:link action="toggleActivation" id="${userInstance?.id}">
+				<g:if test="${userInstance?.active}">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;
+					${warehouse.message(code: 'user.deactivate.label')}
+				</g:if>
+				<g:else>
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" class="middle"/>&nbsp;
+					${warehouse.message(code: 'user.activate.label')}
+				</g:else>
+			</g:link>
+		</div>
+		<div class="action-menu-item">
+			<g:link class="delete" action="delete" id="${userInstance?.id}"
+					onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
+				${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'user.label')])}
+			</g:link>
+		</div>
 		<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
+			<hr/>
 			<div class="action-menu-item">
 				<g:link action="sendTestEmail" id="${userInstance?.id }">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" class="middle"/>&nbsp;
@@ -63,27 +83,6 @@
                     <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
                     <warehouse:message code="user.accountConfirmed.label" default="Account confirmed email"/></g:link>
             </div>
-
-
         </g:isUserInRole>
-		<div class="action-menu-item">
-			<g:link action="toggleActivation" id="${userInstance?.id}">
-				<g:if test="${userInstance?.active}">
-                    <img src="${createLinkTo(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;
-					${warehouse.message(code: 'user.deactivate.label')}
-				</g:if>
-				<g:else>
-                    <img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" class="middle"/>&nbsp;
-					${warehouse.message(code: 'user.activate.label')}
-				</g:else>
-			</g:link>
-		</div>
-		<div class="action-menu-item">
-			<g:link class="delete" action="delete" id="${userInstance?.id}"
-				onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
-				${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'user.label')])}
-			</g:link>
-		</div>
 	</div>
 </span>

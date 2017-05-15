@@ -603,19 +603,14 @@ class ProductController {
 
             Document documentInstance
             try {
-                println "URL: " + params.url
                 def filename = params.url.tokenize("/")[-1]
-                println "Filename: " + filename
                 def fileOutputStream = new FileOutputStream(filename)
-                println "FileOutputStream: " + fileOutputStream
                 def out = new BufferedOutputStream(fileOutputStream)
                 out << new URL(params.url).openStream()
                 out.close()
 
                 File file = new File(filename)
-                println "Path: " + file.absolutePath
                 def contentType = new MimetypesFileTypeMap().getContentType(file)
-                println "ContentType: " + contentType
 
                 documentInstance = new Document(
                     size: file.size(),
@@ -648,10 +643,6 @@ class ProductController {
 		}
 		else { 
 			def file = command.fileContents;
-			println "File: " + file
-			log.info "multipart class: " + file?.class?.name
-			log.info "multipart file: " + file?.originalFilename + " " + file?.contentType + " " + file?.size + " "
-			log.info "product " + command.product
 			// file must not be empty and must be less than 10MB
 			// FIXME The size limit needs to go somewhere
 			if (!file || file?.isEmpty()) {

@@ -16,14 +16,16 @@
             </g:if>
             <div>
             
-				<div class="buttonBar">
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+				<div class="button-bar">
+                    <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label')]"/></g:link>
 	            	<g:isUserAdmin>
-                        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
+                        <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label')]"/></g:link>
 	                </g:isUserAdmin>
-            	</div>
+                    <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button">
+                        ${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}
+                    </g:link>
 
-
+                </div>
 
                 <div class="yui-gf">
                     <div class="yui-u first">
@@ -100,81 +102,69 @@
                         <div class="box">
                             <h2>
                                 Showing ${productInstanceTotal > params.max ? params.max : productInstanceTotal} of ${productInstanceTotal} ${warehouse.message(code:'products.label')}
-                                <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button icon arrowdown">${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}</g:link>
-
                             </h2>
 
+                            <div class="dialog">
 
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <%--
-                                        <th></th>
-                                        --%>
-                                        <th>${warehouse.message(code:'product.productCode.label')}</th>
-                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" params="${params}"/>
-                                        <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" params="${params}"/>
-                                        <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" params="${params}"/>
-                                        <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" params="${params}" />
-                                        <g:sortableColumn property="vendor" title="${warehouse.message(code: 'product.vendor.label')}" params="${params}"/>
-                                        <g:sortableColumn property="vendorCode" title="${warehouse.message(code: 'product.vendorCode.label')}" params="${params}"/>
-                                        <g:sortableColumn property="createdBy" title="${warehouse.message(code: 'default.createdBy.label')}" params="${params}"/>
-                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'default.dateCreated.label')}" params="${params}"/>
-                                        <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" params="${params}"/>
-                                        <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" params="${params}"/>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <g:each in="${productInstanceList}" status="i" var="productInstance">
-                                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                                <table>
+                                    <thead>
+                                        <tr>
                                             <%--
-                                            <td align="center">
-                                                <span title="${productInstance?.description }">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'information.png')}" class="middle" alt="Information" />
-                                                </span>
-                                            </td>
+                                            <th></th>
                                             --%>
-                                            <td align="center">
-                                                <g:link action="edit" id="${productInstance.id}">
-                                                    ${productInstance.productCode}
-                                                </g:link>
-                                            </td>
-                                            <td align="center">
-                                                <g:link action="edit" id="${productInstance.id}">
-                                                    <format:product product="${productInstance}"/>
-                                                </g:link>
-                                            </td>
-                                            <td align="center">
-                                                <format:category category="${productInstance?.category }"/>
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.manufacturer }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.manufacturerCode }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.vendor }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.vendorCode }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.createdBy }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.dateCreated }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.updatedBy }
-                                            </td>
-                                            <td align="center">
-                                                ${productInstance?.lastUpdated }
-                                            </td>
+                                            <th>${warehouse.message(code:'product.productCode.label')}</th>
+                                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" params="${params}"/>
+                                            <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" params="${params}"/>
+                                            <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" params="${params}"/>
+                                            <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" params="${params}" />
+                                            <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" params="${params}"/>
+                                            <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" params="${params}"/>
                                         </tr>
-                                    </g:each>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <g:each in="${productInstanceList}" status="i" var="productInstance">
+                                            <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                                                <%--
+                                                <td align="center">
+                                                    <span title="${productInstance?.description }">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'information.png')}" class="middle" alt="Information" />
+                                                    </span>
+                                                </td>
+                                                --%>
+                                                <td align="center">
+                                                    <g:link action="edit" id="${productInstance.id}">
+                                                        ${productInstance.productCode}
+                                                    </g:link>
+                                                </td>
+                                                <td align="center">
+                                                    <g:link action="edit" id="${productInstance.id}">
+                                                        <format:product product="${productInstance}"/>
+                                                    </g:link>
+                                                </td>
+                                                <td align="center">
+                                                    <format:category category="${productInstance?.category }"/>
+                                                </td>
+                                                <td align="center">
+                                                    ${productInstance?.manufacturer }
+                                                </td>
+                                                <td align="center">
+                                                    ${productInstance?.manufacturerCode }
+                                                </td>
+                                                <td align="center">
+                                                    ${productInstance?.updatedBy }
+                                                </td>
+                                                <td align="center">
+                                                    <div title="<g:formatDate date="${productInstance?.lastUpdated }"/>">
+                                                        <g:prettyDateFormat date="${productInstance?.lastUpdated}"/>
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                        </g:each>
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                         <div class="paginateButtons">
                             <g:paginate total="${productInstanceTotal}" params="${params }" />

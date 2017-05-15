@@ -15,7 +15,15 @@ import org.pih.warehouse.core.User
 class AuthTagLib {
    	
 	def userService
-	
+
+	def supports = { attrs, body ->
+		def location = Location.load(session.warehouse.id)
+		if (location && location.supports(attrs.activityCode)) {
+			out << body()
+		}
+	}
+
+
 	def isUserAdmin = { attrs, body ->		
 		if (userService.isUserAdmin(session?.user))
 			out << body()
