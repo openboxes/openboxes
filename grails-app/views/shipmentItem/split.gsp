@@ -224,23 +224,32 @@
             $('#dlgPickItem').dialog("close");
         });
 
-        $("#splitQuantity").change(function(){
+        $("#splitQuantity").change(function(event) {
+            $("#oldQuantity").effect("highlight", {}, 3000);
+            $("#splitQuantity").effect("highlight", {}, 3000);
+        })
+
+        $("#splitQuantity").keyup(function(event){
+            console.log(event);
             $("#errorMessage").html("");
             var originalQuantity = $("#originalQuantity").val();
             var oldQuantity = $("#oldQuantity").val();
-            var splitQuantity = $(this).val();
+            var splitQuantity = $("#splitQuantity").val();
+
+            console.log("oldQuantity", oldQuantity);
+            console.log("splitQuantity", splitQuantity);
+
+
             var newQuantity = originalQuantity - splitQuantity;
             if (splitQuantity > 0 && newQuantity > 0) {
                 $("#oldQuantity").val(newQuantity);
             }
             else {
                 $("#errorMessage").html("You must split the original quantity between bin locations so that the new quantities add up to the original quantity (" + oldQuantity + " + " + splitQuantity + " != " + originalQuantity +")");
-                $("#splitQuantity").val(0);
+                $("#splitQuantity").val('');
                 $("#oldQuantity").val(originalQuantity);
                 $(this).focus();
             }
-            $("#oldQuantity").effect("highlight", {}, 3000);
-            $(this).effect("highlight", {}, 3000);
         });
     });
 </script>
