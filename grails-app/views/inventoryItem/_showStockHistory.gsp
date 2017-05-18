@@ -93,7 +93,7 @@
                     </td>
                     <td class="middle">
                         <g:if test="${stockHistoryEntry?.showDetails}">
-                            <g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
+                            <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
                                 <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
                                 <g:if test="${stockHistoryEntry?.transaction?.source }">
                                     ${g.message(code:'default.from.label')}

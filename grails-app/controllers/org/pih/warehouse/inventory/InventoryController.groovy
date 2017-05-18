@@ -1202,17 +1202,7 @@ class InventoryController {
 			transactionInstance = new Transaction();
 		}
 		
-		def localTransfer = LocalTransfer.findBySourceTransactionOrDestinationTransaction(transactionInstance, transactionInstance)
-		
-		def model = [
-			transactionInstance : transactionInstance,
-			localTransfer: localTransfer,
-			//productInstanceMap: Product.list().groupBy { it.category },
-			//transactionTypeList: TransactionType.list(),
-			//locationInstanceList: Location.list(),
-			//warehouseInstance: Location.get(session?.warehouse?.id)
-		];
-		
+		def model = [transactionInstance : transactionInstance ]
 		render(view: "showTransaction", model: model);
 	}
 	
