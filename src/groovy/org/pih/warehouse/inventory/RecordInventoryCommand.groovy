@@ -21,6 +21,7 @@ class RecordInventoryCommand {
 	InventoryLevel inventoryLevel
 	Integer totalQuantity
 	Date transactionDate = new Date()
+	String comment
 	RecordInventoryRowCommand recordInventoryRow;
 	List<RecordInventoryRowCommand> recordInventoryRows =
 		LazyList.decorate(new ArrayList(),FactoryUtils.instantiateFactory(RecordInventoryRowCommand.class));
@@ -30,7 +31,8 @@ class RecordInventoryCommand {
 		inventory(nullable:true)
 		inventoryLevel(nullable:true)
 		totalQuantity(nullable:true)
-		transactionDate(nullable:false)		
+		transactionDate(nullable:false)
+		comment(nullable:true)
 		recordInventoryRows(validator: { val, obj, errors -> 
 			def errorsFound = false;
 			val.each{ row ->

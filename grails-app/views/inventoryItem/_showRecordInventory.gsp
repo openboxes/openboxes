@@ -26,7 +26,15 @@
 					</tr>
 					<tr class="prop">
 						<td class="name">
-							<label><warehouse:message code="inventory.inventoryDate.label"/></label>
+							<label><warehouse:message code="default.createdBy.label"/></label>
+						</td>
+						<td class="value">
+							${session.user.name }
+						</td>
+					</tr>
+					<tr class="prop">
+						<td class="name">
+							<label><warehouse:message code="transaction.transactionDate.label"/></label>
 						</td>
 						<td class="value">
 							<g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
@@ -34,10 +42,10 @@
 					</tr>
 					<tr class="prop">
 						<td class="name">
-							<label><warehouse:message code="user.label"/></label>
+							<label><warehouse:message code="default.comments.label"/></label>
 						</td>
 						<td class="value">
-							${session.user.name }
+							<g:textArea name="comment" placeholder="" style="width:100%" rows="3"></g:textArea>
 						</td>
 					</tr>
 				</table>
