@@ -33,6 +33,11 @@
             <g:render template="../shipment/summary" />
             <g:render template="flowHeader" model="['currentState':'Picking']"/>
 
+            <g:set var="shipmentItemsSorted" value="${shipmentInstance?.shipmentItems?.sort()}"/>
+            <g:if test="${!shipmentItemSelected}">
+                <g:set var="shipmentItemSelected" value="${shipmentItemsSorted?.iterator().next()}"></g:set>
+            </g:if>
+
             <div class="yui-gc">
                 <div class="yui-u first">
                     <g:form action="createShipment" method="post">
@@ -70,7 +75,7 @@
                                     </thead>
                                     <g:set var="previousContainer"/>
                                     <tbody>
-                                    <g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
+                                    <g:each var="shipmentItem" in="${shipmentItemsSorted}" status="status">
                                         <g:set var="binLocations" value="${quantityMap[shipmentItem?.inventoryItem?.product]}"/>
                                         <g:set var="binLocationSelected" value="${binLocations.findAll{it.binLocation == shipmentItem.binLocation && it.inventoryItem==shipmentItem?.inventoryItem}}"/>
 
@@ -281,16 +286,18 @@
                                         </g:each>
                                         </tbody>
                                     </table>
+                                    <div class="buttons center">
+                                        <button name="_eventId_pickShipmentItem" class="button">
+                                            <warehouse:message code="default.button.save.label"/>
+                                        </button>
+                                        <button class="btnCloseDialog button">${g.message(code:'default.button.close.label')}</button>
+                                    </div>
                                 </g:if>
                                 <g:else>
-                                    <g:message code="default.empty.label"/>
+                                    <div class="center fade empty">
+                                        <g:message code="default.empty.label"/>
+                                    </div>
                                 </g:else>
-                                <div class="buttons center">
-                                    <button name="_eventId_pickShipmentItem" class="button">
-                                        <warehouse:message code="default.button.save.label"/>
-                                    </button>
-                                    <button class="btnCloseDialog button">${g.message(code:'default.button.close.label')}</button>
-                                </div>
                             </g:form>
                         </div>
                     </div>
