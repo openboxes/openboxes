@@ -566,7 +566,6 @@ class CreateShipmentWorkflowController {
 
 			}.to("pickShipmentItems")
 
-
             on("deleteShipmentItem") {
                 log.info "Delete shipment item " + params
                 def shipmentItem = ShipmentItem.load(params.id)
@@ -576,6 +575,33 @@ class CreateShipmentWorkflowController {
                 flash.message = "Successfully deleted item ${params.id}"
 
             }.to("pickShipmentItems")
+
+
+			on("splitShipmentItem2") {
+				log.info "Split shipment item " + params
+				def shipmentItem = ShipmentItem.load(params.id)
+				if (shipmentItem) {
+					ShipmentItem shipmentItemClone = shipmentItem.cloneShipmentItem()
+					shipmentItemClone.quantity = 0
+					shipmentItem.shipment.addToShipmentItems(shipmentItemClone)
+
+				}
+				flash.message = "Successfully deleted item ${params.id}"
+
+			}.to("pickShipmentItems")
+
+			on("pickShipmentItem2") {
+				log.info "Pick shipment item " + params
+
+				def shipmentItem = ShipmentItem.load(params.id)
+                Location location = Location.load(session.warehouse.id)
+                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
+
+
+				[shipmentItemSelected:shipmentItem, binLocations:binLocations]
+
+			}.to("pickShipmentItems")
+
 
             on("pickShipmentItem") {
                 log.info "Pick shipment item " + params
@@ -610,8 +636,9 @@ class CreateShipmentWorkflowController {
                         shipmentItemInstance.binLocation = binLocation
                     }
 
+                    shipmentItemInstance.quantity = Integer.parseInt(params.quantity)
                     if (shipmentItemInstance.save(flush:true)) {
-                        flash.message = "Successfully picked shipment item. " + params
+                        flash.message = "Successfully picked shipment item. "
                     } else {
                         flash.message = "Failed to edit pick list due to an unknown error."
                     }
