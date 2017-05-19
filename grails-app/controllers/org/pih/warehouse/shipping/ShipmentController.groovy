@@ -328,7 +328,7 @@ class ShipmentController {
 		[shipmentInstance:shipmentInstance]
 	}
 	
-	def markAsReceived = { 		
+	def markAsReceived = {
 		def shipmentInstance = Shipment.get(params.id)
 		
 		// actually process the receipt
@@ -344,6 +344,23 @@ class ShipmentController {
 		def shipmentIds = params.list("shipment.id")
 		try {
 			shipmentService.receiveShipments(shipmentIds, null, session.user.id, session.warehouse.id, true)
+			flash.message = "Successfully received shipments"
+
+		} catch (Exception e) {
+			flash.message = "Error occurred while bulk receiving shipments: " + e.message
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
+
+
+	def bulkMarkAsReceived = {
+		def shipmentIds = params.list("shipment.id")
+		Location location = Location.load(session.warehouse.id)
+		try {
+			shipmentIds.each { shipmentId ->
+				Shipment shipment = Shipment.load(shipmentId)
+				shipmentService.markAsReceived(shipment, location)
+			}
 			flash.message = "Successfully received shipments"
 
 		} catch (Exception e) {

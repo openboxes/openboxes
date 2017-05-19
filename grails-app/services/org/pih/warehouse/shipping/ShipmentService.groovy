@@ -1207,7 +1207,7 @@ class ShipmentService {
         }
         shipmentIds.each { shipmentId ->
             Shipment.withNewSession {
-                Shipment shipment = Shipment.get(shipmentId)
+                Shipment shipment = Shipment.load(shipmentId)
                 rollbackLastEvent(shipment)
             }
         }
@@ -1236,7 +1236,7 @@ class ShipmentService {
 			shipment.save();
 			
 		} catch (Exception e) { 
-			throw new ShipmentException();
+			throw new ShipmentException(message: e.message);
 		}
 	}
 	
