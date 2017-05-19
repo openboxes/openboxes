@@ -1,4 +1,4 @@
-<div class="list box">
+<div class="box">
     <h2>${warehouse.message(code:'shipments.label')}</h2>
 	<table class="dataTable">
 		<thead>
@@ -78,7 +78,7 @@
         </thead>
 		<tbody>
 			<g:each var="shipmentInstance" in="${shipments}" status="i">
-				<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+				<tr >
                     <%--
 					<td>
 						<div class="action-menu">
