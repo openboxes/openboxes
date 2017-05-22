@@ -595,6 +595,13 @@ class CreateShipmentWorkflowController {
                 if (shipmentItem) {
                     shipmentService.deleteShipmentItem(shipmentItem)
                 }
+
+                //flow.shipmentInstance.refresh()
+
+                // Remove the selected item if it's the same as the one deleted
+                if (flow.shipmentItemSelected.id == params.id) {
+                    flow.shipmentItemSelected = null
+                }
                 flash.message = "Successfully deleted item ${params.id}"
 
                 return nextShipmentItem()

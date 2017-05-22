@@ -203,6 +203,28 @@ class Shipment implements Comparable, Serializable {
 	Collection<ShipmentItem> getUnpackedShipmentItems() { 
 		return shipmentItems.findAll { !it.container }  
 	}
+
+	/**
+	 * Invoking the default sort() method from a GSP on the shipment items association does not seem to work reliably,
+	 * so we're going to try to perform the sort operation within the shipment.
+	 *
+	 * @return
+	 */
+	List sortShipmentItems() {
+		def shipmentItemComparator = { a, b ->
+			def sortOrder =
+					a?.container?.parentContainer?.sortOrder <=> b?.container?.parentContainer?.sortOrder ?:
+							a?.container?.sortOrder <=> b?.container?.sortOrder ?:
+									a?.inventoryItem?.product?.name <=> b?.inventoryItem?.product?.name ?:
+											a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber ?:
+													a?.product?.name <=> b?.product?.name ?:
+															a?.lotNumber <=> b?.lotNumber ?:
+																	b?.quantity <=> a?.quantity
+			return sortOrder
+		}
+
+		return shipmentItems?.sort(shipmentItemComparator)
+	}
 	
 	//String getShipmentNumber() {
 	//	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
