@@ -303,6 +303,7 @@ class Shipment implements Comparable, Serializable {
 		return null;
 		
 	}
+
 	
 	Date getActualShippingDate() { 
 		for (event in events) { 
@@ -442,6 +443,24 @@ class Shipment implements Comparable, Serializable {
 		}
 		return pallet
 	}
+
+	ShipmentItem getNextShipmentItem(String currentShipmentItemId) {
+		def nextIndex
+		def shipmentItems = sortShipmentItems()
+		def shipmentItemIndex = shipmentItems.findIndexOf { it.id == currentShipmentItemId }
+		def shipmentItemCount = shipmentItems.size()
+
+		// Wrap if we hit the end of the list
+		if (shipmentItemIndex >= shipmentItemCount-1) {
+			nextIndex = 0
+		}
+		else {
+			nextIndex = shipmentItemIndex + 1
+		}
+
+		return shipmentItems.get(nextIndex)
+	}
+
 
 	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container) {
         ShipmentItem shipmentItem = ShipmentItem.withCriteria(uniqueResult: true) {

@@ -531,33 +531,18 @@ class CreateShipmentWorkflowController {
 			}.to("finish")
 
             on("nextShipmentItem") {
-                log.info "Redirect to next shipment item params " + params
-
-                def nextIndex = 0
-                def currentShipmentItemId = params.currentShipmentItemId?:params.id
-
-                def shipmentItems = flow?.shipmentInstance?.shipmentItems?.sort()
-                def shipmentItemIndex = shipmentItems.findIndexOf { it.id == currentShipmentItemId }
-                def shipmentItemCount = shipmentItems.size()
-
-                if (shipmentItemIndex >= shipmentItemCount) {
-                    nextIndex = 0
-                }
-                else {
-                    nextIndex = shipmentItemIndex + 1
-                }
-
-                ShipmentItem shipmentItem = shipmentItems.get(nextIndex)
-
+                log.info "Next shipment item: " + params
                 Location location = Location.load(session.warehouse.id)
-                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
+                def currentShipmentItemId = params.currentShipmentItemId?:params.id
+                ShipmentItem shipmentItem = flow.shipmentInstance?.getNextShipmentItem(currentShipmentItemId)
+                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem?.product)
                 log.info "binLocations: " + binLocations
                 [shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
             }.to("pickShipmentItems")
 
 
-            on("checkPickStatus") {
+            on("validatePicklist") {
                 log.info "Check pick status " + params
                 Location location = Location.get(session.warehouse.id)
                 if (flow?.shipmentInstance?.origin == location) {
@@ -566,12 +551,7 @@ class CreateShipmentWorkflowController {
                     List binLocations = inventoryService.getQuantityByBinLocation(location, products)
                     //def quantityMap = binLocations.groupBy { it?.inventoryItem?.product }
                     log.info "Done calcuating quantity for products in shipment"
-                    //[quantityMap: quantityMap]
                 }
-            }.to("pickShipmentItems")
-
-            on("disablePickStatus") {
-                [quantityMap: [:]]
             }.to("pickShipmentItems")
 
 			on("autoPickShipmentItems") {
@@ -623,6 +603,7 @@ class CreateShipmentWorkflowController {
 
 			}.to("pickShipmentItems")
 
+
 			on("pickShipmentItem2") {
 				log.info "Pick shipment item " + params
 				def shipmentItem = ShipmentItem.load(params.id)
@@ -632,6 +613,7 @@ class CreateShipmentWorkflowController {
 				[shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
 			}.to("pickShipmentItems")
+
 
             on("pickShipmentItem") {
                 log.info "Save shipment item pick " + params
@@ -687,9 +669,12 @@ class CreateShipmentWorkflowController {
 
                 // FIXME Does not seem to be working as expected
                 log.info "Going to next shipment item"
-                return nextShipmentItem()
+                return next()
 
             }.to("pickShipmentItems")
+
+            on("next").to("nextShipmentItem")
+
 
             on("splitShipmentItem") {
                 log.info "Split shipment item " + params
