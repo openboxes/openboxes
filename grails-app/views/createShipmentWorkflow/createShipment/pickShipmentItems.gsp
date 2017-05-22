@@ -96,7 +96,7 @@
                                         <tr class="prop ${isActive?'active':''} ${status % 2 ? 'even' : 'odd' } ${!isSameAsPreviousContainer ? 'top-border':'' } ${!isSameAsPreviousProduct ? 'different-product':'' }">
 
                                             <td class="top right-border">
-                                                <a name="shipmentItem-${shipmentItem?.id}"
+                                                <a name="shipmentItem-${shipmentItem?.id}"></a>
                                                 <g:if test="${!isSameAsPreviousContainer }">
                                                     <g:if test="${shipmentItem?.container}">
                                                         ${shipmentItem?.container?.name }
