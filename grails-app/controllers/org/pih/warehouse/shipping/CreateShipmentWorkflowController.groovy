@@ -509,28 +509,8 @@ class CreateShipmentWorkflowController {
 		pickShipmentItems {
 
 			action {
+                log.info "Pick list items"
 
-                Location location = Location.load(session.warehouse.id)
-
-                Map quantityMap = [:]
-
-                // We only need to pick items if the shipment is outbound from the current location
-                if (flow?.shipmentInstance?.origin == location) {
-
-                    // Only show stock for lot number selected
-                    //List inventoryItems = flow?.shipmentInstance?.shipmentItems*.inventoryItem
-                    //inventoryItems.each { inventoryItem ->
-                    //    quantityMap[inventoryItem] = inventoryService.getQuantityByBinLocation(location,inventoryItem)
-                    //}
-
-                    // Show stock for all lot numbers for the given products selected
-                    List products = flow?.shipmentInstance?.shipmentItems*.product
-                    products.each { product ->
-                        quantityMap[product] = inventoryService.getQuantityByBinLocation(location, product)
-                    }
-
-                }
-                [quantityMap: quantityMap]
 			}
 			on("error").to "showPicklistItems"
 			on(Exception).to "showPicklistItems"
@@ -550,6 +530,49 @@ class CreateShipmentWorkflowController {
 				shipmentService.saveShipment(flow.shipmentInstance)
 			}.to("finish")
 
+            on("nextShipmentItem") {
+                log.info "Redirect to next shipment item params " + params
+
+                def nextIndex = 0
+                def currentShipmentItemId = params.currentShipmentItemId?:params.id
+
+                def shipmentItems = flow?.shipmentInstance?.shipmentItems?.sort()
+                def shipmentItemIndex = shipmentItems.findIndexOf { it.id == currentShipmentItemId }
+                def shipmentItemCount = shipmentItems.size()
+
+                if (shipmentItemIndex >= shipmentItemCount) {
+                    nextIndex = 0
+                }
+                else {
+                    nextIndex = shipmentItemIndex + 1
+                }
+
+                ShipmentItem shipmentItem = shipmentItems.get(nextIndex)
+
+                Location location = Location.load(session.warehouse.id)
+                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
+                log.info "binLocations: " + binLocations
+                [shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
+
+            }.to("pickShipmentItems")
+
+
+            on("checkPickStatus") {
+                log.info "Check pick status " + params
+                Location location = Location.get(session.warehouse.id)
+                if (flow?.shipmentInstance?.origin == location) {
+                    log.info "Calcuating quantity for products in shipment"
+                    List products = flow?.shipmentInstance?.shipmentItems*.product
+                    List binLocations = inventoryService.getQuantityByBinLocation(location, products)
+                    //def quantityMap = binLocations.groupBy { it?.inventoryItem?.product }
+                    log.info "Done calcuating quantity for products in shipment"
+                    //[quantityMap: quantityMap]
+                }
+            }.to("pickShipmentItems")
+
+            on("disablePickStatus") {
+                [quantityMap: [:]]
+            }.to("pickShipmentItems")
 
 			on("autoPickShipmentItems") {
 				try {
@@ -574,6 +597,8 @@ class CreateShipmentWorkflowController {
                 }
                 flash.message = "Successfully deleted item ${params.id}"
 
+                return nextShipmentItem()
+
             }.to("pickShipmentItems")
 
 
@@ -584,30 +609,33 @@ class CreateShipmentWorkflowController {
 					ShipmentItem shipmentItemClone = shipmentItem.cloneShipmentItem()
 					shipmentItemClone.quantity = 0
 					shipmentItem.shipment.addToShipmentItems(shipmentItemClone)
-
 				}
-				flash.message = "Successfully deleted item ${params.id}"
+				flash.message = "Successfully split item ${params.id}"
+
+                return pickShipmentItem2()
 
 			}.to("pickShipmentItems")
 
 			on("pickShipmentItem2") {
 				log.info "Pick shipment item " + params
-
 				def shipmentItem = ShipmentItem.load(params.id)
                 Location location = Location.load(session.warehouse.id)
                 List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
-
-
-				[shipmentItemSelected:shipmentItem, binLocations:binLocations]
+                log.info "binLocations: " + binLocations
+				[shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
 			}.to("pickShipmentItems")
 
-
             on("pickShipmentItem") {
-                log.info "Pick shipment item " + params
+                log.info "Save shipment item pick " + params
 
                 try {
                     def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+
+                    if (!params.binLocationAndInventoryItem) {
+                        flash.message = "${g.message(code: 'shipping.mustPickBinLocation.message', default: 'Please choose a bin location from the list')}"
+                        return error()
+                    }
 
 					String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
 					String binLocationId = binLocationAndInventoryItem[0]
@@ -642,10 +670,17 @@ class CreateShipmentWorkflowController {
                     } else {
                         flash.message = "Failed to edit pick list due to an unknown error."
                     }
+                    //[shipmentItemSelected:null]
+
+
                 } catch (Exception e) {
                     log.error("Failed to edit pick list due to the following error: " + e.message, e)
                     flash.message = "Failed to edit pick list due to the following error: " + e.message
                 }
+
+                // FIXME Does not seem to be working as expected
+                log.info "Going to next shipment item"
+                return nextShipmentItem()
 
             }.to("pickShipmentItems")
 
