@@ -9,8 +9,9 @@
          	.right-border { border-right: 2px solid lightgrey; }
              .active { background-color: #b2d1ff;  }
              .active td { color: #666; }
-             .same-lot-number { font-weight: bold }
+             .same-lot-number td { font-weight: bold }
              .different-product { border-top: 3px solid lightgrey; }
+
          </style>
     </head>
     <body>
@@ -272,7 +273,9 @@
                                                             <g:set var="statusClass" value="${entry.quantity>=shipmentItemSelected?.quantity?'':''}"/>
                                                             <g:set var="selected" value="${entry?.binLocation?.id == shipmentItemSelected?.binLocation?.id &&
                                                                     entry?.inventoryItem?.id == shipmentItemSelected?.inventoryItem?.id}"/>
-                                                            <tr class="${selected?'active':''} ${statusClass}">
+                                                            <g:set var="isSameLotNumber" value="${entry?.inventoryItem?.id==shipmentItemSelected?.inventoryItem?.id}"/>
+
+                                                            <tr class="${selected?'active':''} ${statusClass} ${isSameLotNumber?'same-lot-number':''}">
                                                                 <td class="middle">
                                                                     <g:radio name="binLocationAndInventoryItem" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}"
                                                                              checked="${selected}"/>
