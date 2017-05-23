@@ -533,7 +533,7 @@ class CreateShipmentWorkflowController {
             on("nextShipmentItem") {
                 log.info "Next shipment item: " + params
                 Location location = Location.load(session.warehouse.id)
-                def currentShipmentItemId = params.currentShipmentItemId?:params.id
+                def currentShipmentItemId = params.currentShipmentItemId
                 ShipmentItem shipmentItem = flow.shipmentInstance?.getNextShipmentItem(currentShipmentItemId)
                 List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem?.product)
                 log.info "binLocations: " + binLocations
@@ -571,34 +571,30 @@ class CreateShipmentWorkflowController {
 
             on("deleteShipmentItem") {
                 log.info "Delete shipment item " + params
-                def shipmentItem = ShipmentItem.load(params.id)
+                ShipmentItem nextShipmentItem
+                def shipmentItem = ShipmentItem.load(params?.shipmentItem?.id)
                 if (shipmentItem) {
+                    nextShipmentItem = shipmentItem.shipment.getNextShipmentItem(shipmentItem?.id)
                     shipmentService.deleteShipmentItem(shipmentItem)
                 }
+                flash.message = "Successfully deleted item ${params?.shipmentItem?.id}"
 
-                //flow.shipmentInstance.refresh()
-
-                // Remove the selected item if it's the same as the one deleted
-                if (flow.shipmentItemSelected.id == params.id) {
-                    flow.shipmentItemSelected = null
-                }
-                flash.message = "Successfully deleted item ${params.id}"
-
-                return nextShipmentItem()
+                [currentShipmentItemId:nextShipmentItem?.id]
 
             }.to("pickShipmentItems")
 
 
 			on("splitShipmentItem2") {
 				log.info "Split shipment item " + params
-				def shipmentItem = ShipmentItem.load(params.id)
+                ShipmentItem shipmentItemClone
+				def shipmentItem = ShipmentItem.load(params?.shipmentItem?.id)
 				if (shipmentItem) {
-					ShipmentItem shipmentItemClone = shipmentItem.cloneShipmentItem()
+                    shipmentItemClone = shipmentItem.cloneShipmentItem()
 					shipmentItemClone.quantity = 0
 					shipmentItem.shipment.addToShipmentItems(shipmentItemClone)
 				}
-				flash.message = "Successfully split item ${params.id}"
-
+				flash.message = "Successfully split item ${params?.shipmentItem?.id}"
+                [currentShipmentItemId:shipmentItemClone?.id]
                 return pickShipmentItem2()
 
 			}.to("pickShipmentItems")
@@ -606,7 +602,7 @@ class CreateShipmentWorkflowController {
 
 			on("pickShipmentItem2") {
 				log.info "Pick shipment item " + params
-				def shipmentItem = ShipmentItem.load(params.id)
+				def shipmentItem = ShipmentItem.load(params?.shipmentItem?.id)
                 Location location = Location.load(session.warehouse.id)
                 List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
                 log.info "binLocations: " + binLocations
@@ -661,19 +657,16 @@ class CreateShipmentWorkflowController {
                     }
                     //[shipmentItemSelected:null]
 
+                    ShipmentItem nextShipmentItem = shipmentItemInstance.shipment.getNextShipmentItem(shipmentItemInstance?.id)
 
+                    [currentShipmentItemId:nextShipmentItem?.id]
                 } catch (Exception e) {
                     log.error("Failed to edit pick list due to the following error: " + e.message, e)
                     flash.message = "Failed to edit pick list due to the following error: " + e.message
                 }
 
-                // FIXME Does not seem to be working as expected
-                log.info "Going to next shipment item"
-                return next()
 
             }.to("pickShipmentItems")
-
-            on("next").to("nextShipmentItem")
 
 
             on("splitShipmentItem") {
@@ -722,6 +715,9 @@ class CreateShipmentWorkflowController {
                     } else {
                         flash.message = "Failed to edit pick list due to an unknown error."
                     }
+
+                    [currentShipmentItemId:splitItemInstance.id]
+
                 } catch (Exception e) {
                     log.error("Failed to edit pick list due to the following error: " + e.message, e)
                     flash.message = "Failed to edit pick list due to the following error: " + e.message

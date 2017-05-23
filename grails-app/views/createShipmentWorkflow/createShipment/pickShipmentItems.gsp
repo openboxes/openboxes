@@ -46,12 +46,13 @@
             </g:if>
             --%>
 
+
             <div class="yui-gc">
                 <div class="yui-u first">
                     <g:form action="createShipment" method="post">
                         <g:hiddenField name="id" value="${shipmentInstance?.id}"/>
                         <g:hiddenField name="shipment.id" value="${shipmentInstance?.id}"/>
-
+                        <g:hiddenField name="currentShipmentItemId" value="${currentShipmentItemId}"/>
                         <div id="picklistItemsBox" class="dialog box">
                             <h2>
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"/>
@@ -60,7 +61,7 @@
 
                             <g:if test="${session.warehouse == shipmentInstance?.origin}">
 
-                                <table>
+                                <table id="picklistItemTable" class="table">
                                     <thead>
 
                                     <tr>
@@ -91,13 +92,17 @@
                                         <g:set var="isSameAsPreviousContainer" value="${shipmentItem?.container == previousContainer}"/>
                                         <g:set var="isSameAsPreviousProduct" value="${shipmentItem?.product == previousProduct}"/>
                                         <g:set var="isActive" value="${shipmentItem == shipmentItemSelected}"/>
-                                        <g:set var="href" value="${g.createLink(action:'createShipment', event:'pickShipmentItem2', id:shipmentItem?.id)}"/>
 
-                                        <tr data-href="${href}"
+                                        <%--
+                                        <g:set var="href" value="${g.createLink(action:'createShipment', event:'pickShipmentItem2', id:shipmentInstance?.id, params: ['shipmentItem.id':shipmentItem?.id])}"/>
+                                        --%>
+                                        <g:set var="href" value="${g.createLink(controller: 'shipmentItem', action:'pick', id:shipmentItem?.id)}"/>
+
+                                        <tr id="picklist-item-${shipmentItem?.id}" data-href="${href}" data-execution="${params.execution}"
                                             class="clickable-row ${isActive?'active':''} ${status % 2 ? 'even' : 'odd' } ${!isSameAsPreviousContainer ? 'top-border':'' } ${!isSameAsPreviousProduct ? 'different-product':'' }">
 
                                             <td class="top right-border">
-                                                <a name="shipmentItem-${shipmentItem?.id}"></a>
+                                                <a name="picklist-item-${shipmentItem?.id}"></a>
                                                 <g:if test="${!isSameAsPreviousContainer }">
                                                     <g:if test="${shipmentItem?.container}">
                                                         ${shipmentItem?.container?.name }
@@ -183,8 +188,28 @@
                 </div>
                 <div class="yui-u">
 
-                    <g:set var="binLocationSelected" value="${binLocationsSelected.findAll{it?.binLocation == shipmentItemSelected?.binLocation && it.inventoryItem==shipmentItemSelected?.inventoryItem}}"/>
+                    <div id="pickShipmentItemBox" style="position: absolute; width: 30%;">
+                        <div class="box">
 
+                        <h2>
+                            <img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}"
+                                 title="${g.message(code:'picklist.picked.label')}">
+                            <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/></h2>
+
+
+
+                        <div class="empty fade center">
+                            <g:message code="shipping.pickShipmentItems.message" default="Select an item from the picklist"/>
+                            <button class="button next-picklist-item">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
+                                <g:message code="default.button.next.label" default="Next"/>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <%--
+                    <g:set var="binLocationSelected" value="${binLocationsSelected.findAll{it?.binLocation == shipmentItemSelected?.binLocation && it.inventoryItem==shipmentItemSelected?.inventoryItem}}"/>
                     <div class="box" id="pickShipmentItemBox" style="position: absolute; width: 30%">
                         <h2>
                             <img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}"
@@ -206,8 +231,6 @@
                                             <g:message code="default.button.next.label" default="Next"/>
                                         </g:link>
                                     </div>
-
-
                                 </g:if>
                                 <g:else>
                                     <table>
@@ -359,6 +382,7 @@
 
                             </g:form>
                         </div>
+                        --%>
                     </div>
                 </div>
             </div>
@@ -368,6 +392,8 @@
         </div>
 
 		<script type="text/javascript">
+
+            var currentPicklistItem
 
             function onCompleteHandler(response, status, xhr ) {
                 if ( status == "error" ) {
@@ -386,19 +412,59 @@
                 }
             }
 
+            function showPicklistItem(picklistItem) {
+                currentPicklistItem = picklistItem;
+                var url = picklistItem.data("href");
+                var executionKey = picklistItem.data("execution")
+
+                // Submit request to server
+                var data = {};
+                $("#pickShipmentItemBox").load(url,data,function(){});
+
+                // Repaint table active rows
+                $('tr').removeClass('active');
+                picklistItem.addClass("active");
+
+                console.log("anchor: ", picklistItem.attr("id"));
+                scrollToAnchor(picklistItem.attr("id"))
+
+            }
+
+            function nextPicklistItem(picklistItem) {
+                var nextPicklistItem = picklistItem
+                var firstPicklistItem = $("#picklistItemTable tbody tr:first");
+                var lastPicklistItem = $("#picklistItemTable tbody tr:last");
+                var isLast = picklistItem.attr("id") == lastPicklistItem.attr("id");
+                if (isLast) {
+                    nextPicklistItem = firstPicklistItem;
+                }
+                else {
+                    nextPicklistItem = picklistItem.next('tr');
+                }
+                showPicklistItem(nextPicklistItem)
+            }
+
+            function previousPicklistItem(picklistItem) {
+                var previousPicklistItem = picklistItem;
+                var firstPicklistItem = $("#picklistItemTable tbody tr:first");
+                var lastPicklistItem = $("#picklistItemTable tbody tr:last");
+                var isFirst = picklistItem.attr("id") == firstPicklistItem.attr("id");
+                if (isFirst) {
+                    previousPicklistItem = lastPicklistItem;
+                }
+                else {
+                    previousPicklistItem = picklistItem.prev('tr');
+                }
+                showPicklistItem(previousPicklistItem);
+            }
 
 
-			$(function() {
+            $(function() {
 
-
+			    // Handles interaction when user clicks picklist row
                 $(".clickable-row").click(function() {
-                    window.location = $(this).data("href");
+                    showPicklistItem($(this));
                 });
-
-
-                $('#tableBinLocations tr').click(function() {
-                    $(this).find('td input:radio').prop('checked', true);
-                })
 
                 $(":checkbox.checkAll").change(function () {
                     $(":checkbox.shipment-item").prop('checked', $(this).prop("checked"));
@@ -443,21 +509,46 @@
 
                     var dialogTop = (documentTop) + "px";
 
-                    //console.log("offset: ", $("#picklistItemsBox").offset());
-                    //console.log("scroll: ", $("#picklistItemsBox").scroll());
-                    //console.log("scrollTop: ", $("#picklistItemsBox").scrollTop());
-
                     //this is the jQuery animate function to fixed the div position after scrolling.
                     $('#pickShipmentItemBox').animate({top:dialogTop},{duration:500,queue:false});
                 });
 
                 var id = $("#currentShipmentItemId").val();
-                console.log(id);
                 if (id) {
                     scrollToAnchor("shipmentItem-" + id);
                 }
 
-                $("#quantity").focus().select();
+                $("#quantity").livequery(function() {
+                    $(this).focus().select();
+                });
+
+                $(".next-picklist-item").livequery('click', function(event) {
+                    event.preventDefault();
+                    nextPicklistItem(currentPicklistItem);
+                });
+
+                $(".previous-picklist-item").livequery('click', function(event) {
+                    event.preventDefault();
+                    previousPicklistItem(currentPicklistItem);
+                });
+
+
+
+                $('#tableBinLocations tr').livequery('click', function() {
+                    $(this).find('td input:radio').prop('checked', true);
+                });
+
+                // Show the first picklist item on page load (or the picklist item that was in focus before a server event)
+                var picklistItem;
+                var currentShipmentItemId = $("#currentShipmentItemId").val();
+                if (currentShipmentItemId) {
+                    picklistItem = $("#picklist-item-" + currentShipmentItemId);
+                }
+                else {
+                    picklistItem = $("#picklistItemTable tbody tr:first")
+                }
+
+                showPicklistItem(picklistItem);
 
             });
 		</script>
