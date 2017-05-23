@@ -16,23 +16,12 @@
     </head>
     <body>
         <div class="body">
-            ${flash.message}
         	<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
             <g:if test="${message}">
                 <div class="message">${message}</div>
             </g:if>
-            <g:hasErrors bean="${command}">
-				<div class="errors">
-					<g:renderErrors bean="${command}" as="list" />
-				</div>
-			</g:hasErrors>
-			<g:hasErrors bean="${shipmentInstance}">
-				<div class="errors">
-					<g:renderErrors bean="${shipmentInstance}" as="list" />
-				</div>
-			</g:hasErrors>
 
             <g:render template="../shipment/summary" />
             <g:render template="flowHeader" model="['currentState':'Picking']"/>
@@ -46,6 +35,16 @@
             </g:if>
             --%>
 
+            <g:hasErrors bean="${command}">
+                <div class="errors">
+                    <g:renderErrors bean="${command}" as="list" />
+                </div>
+            </g:hasErrors>
+            <g:hasErrors bean="${shipmentInstance}">
+                <div class="errors">
+                    <g:renderErrors bean="${shipmentInstance}" as="list" />
+                </div>
+            </g:hasErrors>
 
             <div class="yui-gc">
                 <div class="yui-u first">

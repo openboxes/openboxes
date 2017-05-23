@@ -592,10 +592,10 @@ class CreateShipmentWorkflowController {
                     shipmentItemClone = shipmentItem.cloneShipmentItem()
 					shipmentItemClone.quantity = 0
 					shipmentItem.shipment.addToShipmentItems(shipmentItemClone)
+                    shipmentItem.shipment.save(flush:true)
 				}
 				flash.message = "Successfully split item ${params?.shipmentItem?.id}"
                 [currentShipmentItemId:shipmentItemClone?.id]
-                return pickShipmentItem2()
 
 			}.to("pickShipmentItems")
 
@@ -613,28 +613,24 @@ class CreateShipmentWorkflowController {
 
             on("pickShipmentItem") {
                 log.info "Save shipment item pick " + params
-
+                ShipmentItem shipmentItemInstance
                 try {
-                    def shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+
+                    shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
 
                     if (!params.binLocationAndInventoryItem) {
                         flash.message = "${g.message(code: 'shipping.mustPickBinLocation.message', default: 'Please choose a bin location from the list')}"
                         return error()
                     }
 
+                    // Parse the data into bin location and inventory item components
 					String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
 					String binLocationId = binLocationAndInventoryItem[0]
 					String inventoryItemId = binLocationAndInventoryItem[1]
 
-
-                    log.info "binLocationId: " + binLocationId
-
-                    Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
-
+                    // Set inventory item
                     log.info "inventoryItemId: " + inventoryItemId
-
                     InventoryItem inventoryItem = (inventoryItemId) ? InventoryItem.load(inventoryItemId) : null
-
                     if (!inventoryItem) {
                         shipmentItemInstance.errors.reject("shipmentItem.inventoryItem.required.message", "Inventory item is a required field")
                         throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
@@ -643,26 +639,53 @@ class CreateShipmentWorkflowController {
                         shipmentItemInstance.inventoryItem = inventoryItem
                     }
 
-                    log.info "Bin location: " + binLocation
-
+                    // Set bin location
+                    log.info "binLocationId: " + binLocationId
+                    Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
                     if (binLocation) {
                         shipmentItemInstance.binLocation = binLocation
                     }
 
-                    shipmentItemInstance.quantity = Integer.parseInt(params.quantity)
+                    // Validate quantity
+                    Integer quantity = Integer.parseInt(params.quantity)
+                    def location = Location.load(session.warehouse.id)
+                    List entries = inventoryService.getItemQuantityByBinLocation(location, inventoryItem)
+                    Integer totalQuantityAvailable = entries.sum { it.quantity }
+
+
+                    def otherShipmentItems = shipmentItemInstance.shipment.shipmentItems.findAll { it?.inventoryItem?.id == inventoryItem?.id && it.id != shipmentItemInstance?.id }
+                    log.info "shipmentItems " + otherShipmentItems
+                    Integer totalQuantityPicked = otherShipmentItems.sum { it.quantity } ?: 0
+                    totalQuantityPicked += quantity
+
+                    log.info("totalQuantityPicked ${totalQuantityPicked} == totalQuantityAvailable ${totalQuantityAvailable}")
+
+                    if (totalQuantityPicked > totalQuantityAvailable) {
+                        shipmentItemInstance.errors.reject("shipmentItem.quantityCannotExceedQuantityAvailable.message", "Total quantity picked [${totalQuantityPicked}] cannot exceed total quantity available [${totalQuantityAvailable}].")
+                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                    }
+
+                    // Set quantity
+                    shipmentItemInstance.quantity = quantity
+
+
                     if (shipmentItemInstance.save(flush:true)) {
                         flash.message = "Successfully picked shipment item. "
                     } else {
                         flash.message = "Failed to edit pick list due to an unknown error."
                     }
-                    //[shipmentItemSelected:null]
 
+                    // Get the next shipment item
                     ShipmentItem nextShipmentItem = shipmentItemInstance.shipment.getNextShipmentItem(shipmentItemInstance?.id)
-
                     [currentShipmentItemId:nextShipmentItem?.id]
-                } catch (Exception e) {
+
+                } catch (ValidationException e) {
                     log.error("Failed to edit pick list due to the following error: " + e.message, e)
-                    flash.message = "Failed to edit pick list due to the following error: " + e.message
+                    //flash.message = "Failed to edit pick list due to the following error: " + e.message
+                    [errors:e.errors]
+                    def shipmentInstance = Shipment.read(params.id)
+                    shipmentInstance.errors = e.errors
+                    [shipmentInstance:shipmentInstance, currentShipmentItemId:shipmentItemInstance?.id]
                 }
 
 
