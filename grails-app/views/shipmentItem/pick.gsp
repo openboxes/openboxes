@@ -1,6 +1,6 @@
 <g:set var="binLocationSelected" value="${binLocations.findAll{it?.binLocation == shipmentItem?.binLocation && it.inventoryItem==shipmentItem?.inventoryItem}}"/>
 <div class="box">
-    <h2><img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}" title="${g.message(code:'picklist.picked.label')}">
+    <h2>
         <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/>
     </h2>
 
@@ -14,7 +14,8 @@
 
             <table>
                 <tr class="prop">
-                    <td class="left">
+                    <td class="name">
+
                     </td>
                     <td class="value">
                         <div class="button-group">

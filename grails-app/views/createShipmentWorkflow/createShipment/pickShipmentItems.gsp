@@ -196,8 +196,6 @@
                                  title="${g.message(code:'picklist.picked.label')}">
                             <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/></h2>
 
-
-
                         <div class="empty fade center">
                             <g:message code="shipping.pickShipmentItems.message" default="Select an item from the picklist"/>
                             <button class="button next-picklist-item">
@@ -205,184 +203,6 @@
                                 <g:message code="default.button.next.label" default="Next"/>
                             </button>
                         </div>
-
-                    </div>
-
-                    <%--
-                    <g:set var="binLocationSelected" value="${binLocationsSelected.findAll{it?.binLocation == shipmentItemSelected?.binLocation && it.inventoryItem==shipmentItemSelected?.inventoryItem}}"/>
-                    <div class="box" id="pickShipmentItemBox" style="position: absolute; width: 30%">
-                        <h2>
-                            <img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}"
-                                 title="${g.message(code:'picklist.picked.label')}">
-                            <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/></h2>
-
-                        <div class="dialog">
-                            <g:form controller="createShipmentWorkflow" action="createShipment" params="[execution:params.execution]" autocomplete="off">
-                                <g:hiddenField name="id" value="${shipmentItemSelected?.shipment?.id}" />
-                                <g:hiddenField name="shipmentItem.id" value="${shipmentItemSelected?.id}" />
-                                <g:hiddenField name="version" value="${shipmentItemSelected?.version}" />
-                                <g:hiddenField name="currentShipmentItemId" value="${shipmentItemSelected?.id}"/>
-
-                                <g:if test="${!shipmentItemSelected}">
-                                    <div class="empty fade center">
-                                        <g:message code="shipping.pickShipmentItems.message" default="Select an item from the picklist"/>
-                                        <g:link action="createShipment" event="nextShipmentItem" id="${shipmentItemSelected?.id}" class="button" fragment="shipmentItem-${shipmentItemSelected?.id}">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
-                                            <g:message code="default.button.next.label" default="Next"/>
-                                        </g:link>
-                                    </div>
-                                </g:if>
-                                <g:else>
-                                    <table>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><g:message code="default.status.label"/></label>
-                                            </td>
-                                            <td class="value">
-
-                                                <g:if test="${binLocationsSelected}">
-                                                    <g:set var="totalQtyByProduct" value="${binLocationsSelected.sum { it.quantity }}"/>
-                                                </g:if>
-                                                <g:set var="totalQtyByBin" value="${binLocationSelected.sum { it.quantity }}"/>
-                                                <g:set var="availableInBin" value="${totalQtyByBin >= shipmentItemSelected?.quantity}"/>
-                                                <g:set var="availableInProduct" value="${totalQtyByProduct >= shipmentItemSelected?.quantity}"/>
-                                                <g:if test="${availableInBin}">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
-                                                         title="${g.message(code:'picklist.picked.label')}">
-                                                    ${g.message(code:'picklist.picked.message', default: 'Item has been picked')}
-                                                </g:if>
-                                                <g:elseif test="${availableInProduct}">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
-                                                         title="${g.message(code:'picklist.notPicked.label', default: 'Not Picked')}">
-                                                    ${g.message(code:'picklist.notAvailable.message', default: 'Item has not been picked')}
-                                                </g:elseif>
-                                                <g:else>
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
-                                                         title="${g.message(code:'picklist.notAvailable.label', default: 'Not Available')}">
-                                                    ${g.message(code:'picklist.notAvailable.message', default: 'Insufficient quantity available for item')}
-                                                </g:else>
-
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><g:message code="product.label"/></label>
-                                            </td>
-                                            <td class="value">
-                                                ${shipmentItemSelected?.inventoryItem?.product?.name}
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><g:message code="location.binLocation.label"/></label>
-                                            </td>
-                                            <td class="value">
-
-                                                <g:if test="${binLocationsSelected}">
-
-                                                    <table id="tableBinLocations">
-                                                        <thead>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th><g:message code="product.productCode.label" default="Code"/></th>
-                                                            <th><g:message code="default.bin.label" default="Bin"/></th>
-                                                            <th><g:message code="default.lot.label" default="Lot"/></th>
-                                                            <th><g:message code="default.exp.label" default="Exp"/></th>
-                                                            <th><g:message code="default.qty.label" default="Qty"/></th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <g:each var="entry" in="${binLocationsSelected}" status="status">
-                                                            <g:set var="statusClass" value="${entry.quantity>=shipmentItemSelected?.quantity?'':''}"/>
-                                                            <g:set var="selected" value="${entry?.binLocation?.id == shipmentItemSelected?.binLocation?.id &&
-                                                                    entry?.inventoryItem?.id == shipmentItemSelected?.inventoryItem?.id}"/>
-                                                            <g:set var="isSameLotNumber" value="${entry?.inventoryItem?.id==shipmentItemSelected?.inventoryItem?.id}"/>
-
-                                                            <tr class="${selected?'active':''} ${statusClass} ${isSameLotNumber?'same-lot-number':''}">
-                                                                <td class="middle">
-                                                                    <g:radio name="binLocationAndInventoryItem" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}"
-                                                                             checked="${selected}"/>
-                                                                </td>
-                                                                <td>
-                                                                    ${entry?.inventoryItem?.product?.productCode}
-                                                                </td>
-                                                                <td class="middle">
-                                                                    ${entry?.binLocation?.name?:g.message(code:'default.label')}
-                                                                </td>
-                                                                <td class="middle">
-                                                                    ${entry?.inventoryItem?.lotNumber}
-                                                                </td>
-                                                                <td class="middle">
-                                                                    <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
-                                                                </td>
-                                                                <td class="middle">
-                                                                    ${entry?.quantity}
-                                                                </td>
-                                                            </tr>
-                                                        </g:each>
-                                                        </tbody>
-                                                        <tfoot>
-                                                            <tr class="prop">
-                                                                <th colspan="5">
-                                                                    <g:message code="default.total.label"/>
-                                                                </th>
-                                                                <th class="center">
-                                                                    ${totalQtyByProduct?:0}
-                                                                </th>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-                                                </g:if>
-                                                <g:else>
-                                                    <div class="fade">
-                                                        <g:message code="shipping.noBinLocation.label" default="There are no bin locations for item {0}"
-                                                                   args="[shipmentItemSelected?.inventoryItem?.lotNumber]"/>
-
-                                                    </div>
-                                                </g:else>
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><g:message code="default.quantity.label"/></label>
-                                            </td>
-                                            <td class="value">
-                                                <g:textField id="quantity" name="quantity" value="${shipmentItemSelected?.quantity}" class="text"/>
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-
-                                            </td>
-                                            <td class="value">
-                                                <button name="_eventId_pickShipmentItem" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Save Item"/>&nbsp;
-                                                    <g:message code="default.button.save.label"/>
-                                                </button>
-
-                                                <g:link action="createShipment" event="splitShipmentItem2" id="${shipmentItemSelected?.id}" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_divide.png')}" alt="Split Item"/>&nbsp;
-                                                    <warehouse:message code="shipping.button.splitItem.label"/>
-                                                </g:link>
-
-                                                <g:link action="createShipment" event="deleteShipmentItem" id="${shipmentItemSelected?.id}"
-                                                        onclick="return confirm('Are you sure you want to delete this item? NOTE: If this is a split item, quantity will not be returned to the original item.')" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete Item"/>&nbsp;
-                                                    <g:message code="shipping.button.deleteItem.label"/>
-                                                </g:link>
-
-                                                <g:link action="createShipment" event="nextShipmentItem" id="${shipmentItemSelected?.id}" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
-                                                    <g:message code="default.button.next.label" default="Next"/>
-                                                </g:link>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </g:else>
-
-                            </g:form>
-                        </div>
-                        --%>
                     </div>
                 </div>
             </div>
@@ -413,20 +233,34 @@
             }
 
             function showPicklistItem(picklistItem) {
-                currentPicklistItem = picklistItem;
-                var url = picklistItem.data("href");
-                var executionKey = picklistItem.data("execution")
 
-                // Submit request to server
-                var data = {};
-                $("#pickShipmentItemBox").load(url,data,function(){});
+                console.log("show picklist item", picklistItem)
 
                 // Repaint table active rows
                 $('tr').removeClass('active');
-                picklistItem.addClass("active");
 
-                console.log("anchor: ", picklistItem.attr("id"));
-                scrollToAnchor(picklistItem.attr("id"))
+                currentPicklistItem = picklistItem;
+
+                if (!picklistItem) {
+                    $("#pickShipmentItemBox").html("<div class='box'><h2>Edit Picklist Item</h2><div class='center fade empty'>Please select a picklist item</div></div>");
+                }
+                else {
+                    var url = picklistItem.data("href");
+                    var executionKey = picklistItem.data("execution")
+
+                    // Submit request to server
+                    var data = {};
+                    $("#pickShipmentItemBox").load(url, data, function () {
+                        // callback method
+                    });
+                    picklistItem.addClass("active");
+
+                    console.log("anchor: ", picklistItem.attr("id"));
+                    scrollToAnchor(picklistItem.attr("id"))
+
+                }
+
+
 
             }
 
@@ -463,7 +297,13 @@
 
 			    // Handles interaction when user clicks picklist row
                 $(".clickable-row").click(function() {
-                    showPicklistItem($(this));
+
+                    if (currentPicklistItem && $(this).attr("id") == currentPicklistItem.attr("id")) {
+                        showPicklistItem(null);
+                    }
+                    else {
+                        showPicklistItem($(this));
+                    }
                 });
 
                 $(":checkbox.checkAll").change(function () {
