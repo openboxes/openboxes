@@ -968,39 +968,19 @@ class InventoryService implements ApplicationContextAware {
 	 * @param categories
 	 * @return
 	 */
-	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResult, offset) {
+	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResults, offset) {
 		def startTime = System.currentTimeMillis()
-		//def products = Product.executeQuery("select
-		//"select inventory_item.lot_number from product left join inventory_item on inventory_item.product_id = product.id where product.name like '%lactomer%'"
-//		def unsupportedProducts = []
-//		if(!showHidden) {
-//			currentInventory?.configuredProducts?.each {
-//				if(it.status != InventoryStatus.SUPPORTED) {
-//					unsupportedProducts.add(it.product)
-//				}
-//			}
-//		}
-        log.info "Get supported products: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        startTime = System.currentTimeMillis()
-		def products = Product.createCriteria().list(max: maxResult, offset: offset) {
-			if (terms) {
-				createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
-                //createAlias("inventoryLevels", "inventoryLevels", CriteriaSpecification.LEFT_JOIN)
-			}
-			if(categories) {
-				inList("category", categories)
+        def products = Product.createCriteria().list(max: maxResults, offset: offset) {
+            if(categories) {
+                inList("category", categories)
             }
-//			if (!showHidden) {
-//				not {
-//					inList("id", (unsupportedProducts.collect { it.id })?: [""])
-//				}
-//			}
-			if (terms) {
-				and {
+            if (terms) {
+                and {
                     terms.each { term ->
                         or {
-                            ilike('inventoryItems.lotNumber', "%" + term + "%")
+                            //inventoryItems {
+                            //    ilike('lotNumber', "%" + term + "%")
+                            //}
                             //ilike('inventoryLevels.binLocation', "%" + term + "%")
                             ilike("name", "%" + term + "%")
                             ilike("description", "%" + term + "%")
@@ -1017,13 +997,13 @@ class InventoryService implements ApplicationContextAware {
                             ilike("productCode", "%" + term + "%")
                         }
                     }
-				}
-			}
+                }
+            }
             order("name", "asc")
         }
         log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		return products;	
+		return products;
 	}
 
     /**

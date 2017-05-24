@@ -1,4 +1,4 @@
-<div class="list box">
+<div class="box">
     <h2>${warehouse.message(code:'shipments.label')}</h2>
 	<table class="dataTable">
 		<thead>
@@ -9,7 +9,9 @@
 				</th>
 				--%>
 				<th>
+                <%--
                     <g:checkBox class="checkAll" data-status="${statusCode}" name="checkAll"/>
+                    --%>
 				</th>
 				<th>
 				</th>
@@ -42,11 +44,41 @@
 					${warehouse.message(code: 'default.lastUpdated.label')}
 				</th>
 			</tr>
+        <tr>
+            <td colspan="10">
 
-		</thead>
+                <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
+                    <div class="button-group">
+                        <button type="submit" class="button icon approve bulkReceive">
+                            <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
+                        </button>
+                        <button type="submit" class="button icon tag bulkMarkAsReceived">
+                            <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
+                        </button>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="button icon approve bulkRollback">
+                            <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                        </button>
+                    </div>
+                </g:if>
+                <g:elseif test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+                    <div class="button-group">
+                        <button type="submit" class="button icon approve bulkRollback">
+                            <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                        </button>
+                    </div>
+                </g:elseif>
+
+
+            </td>
+        </tr>
+
+
+        </thead>
 		<tbody>
 			<g:each var="shipmentInstance" in="${shipments}" status="i">
-				<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+				<tr >
                     <%--
 					<td>
 						<div class="action-menu">

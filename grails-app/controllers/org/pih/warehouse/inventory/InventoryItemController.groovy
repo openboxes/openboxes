@@ -165,16 +165,16 @@ class InventoryItemController {
 
                 if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.DEBIT) {
                     balance[index] -= transactionEntry?.quantity
-                    totalDebit+= transactionEntry?.quantity
+                    totalDebit += transactionEntry?.quantity
                 } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.CREDIT) {
                     balance[index] += transactionEntry?.quantity
-                    totalCredit+= transactionEntry?.quantity
+                    totalCredit += transactionEntry?.quantity
                 } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.INVENTORY) {
-                    balance[index] = transactionEntry?.quantity
-                    count[index] = transactionEntry?.quantity
+                    balance[index] += transactionEntry?.quantity
+                    count[index] += transactionEntry?.quantity
                 } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
-                    balance[index] = transactionEntry?.quantity
-                    count[index] = transactionEntry?.quantity
+                    balance[index] += transactionEntry?.quantity
+                    count[index] += transactionEntry?.quantity
                 }
 
                 if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY && i == 0) {
@@ -189,7 +189,7 @@ class InventoryItemController {
                         binLocation: transactionEntry.binLocation,
                         inventoryItem: transactionEntry.inventoryItem,
                         quantity: transactionEntry.quantity,
-                        balance: balance[index],
+                        balance: balance.values().sum(),
                         showDetails: (i==0),
                         isBaseline: isBaseline,
                         isSameTransaction: (previousTransaction?.id == transaction?.id)

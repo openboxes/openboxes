@@ -124,7 +124,7 @@ class ShipmentItemController {
             List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItemInstance.product)
 
 
-            [shipmentItemInstance: shipmentItemInstance, binLocations: binLocations]
+            [shipmentItem: shipmentItemInstance, binLocations: binLocations]
         }
     }
 

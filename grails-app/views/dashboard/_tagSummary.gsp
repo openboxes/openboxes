@@ -72,7 +72,7 @@
                     <div id="tagcloud">
                         <g:each in="${tags }" var="tag">
                             <g:if test="${tag?.products?.size() > 1}">
-                                <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
+                                <g:link controller="inventory" action="browse" params="['tags':tag.id]" rel="${tag?.products?.size() }">
                                     ${tag.tag?:"Empty tag" } (${tag?.products?.size() })</g:link>
                             </g:if>
                         </g:each>
