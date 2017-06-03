@@ -620,7 +620,7 @@ class JsonController {
                         localizedName = (it.product.productCode ?: " - ") + " " + localizedName
                         inventoryItems = inventoryItems.sort { it.expirationDate }
 
-                        if (quantity >= 0) {
+                        if (quantity > 0) {
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
