@@ -11,7 +11,7 @@
              .active td { color: #666; }
              .same-lot-number td { font-weight: bold }
              .different-product { border-top: 3px solid lightgrey; }
-
+             .body { min-height: 800px; }
          </style>
     </head>
     <body>

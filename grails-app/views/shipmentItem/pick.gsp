@@ -72,11 +72,12 @@
                     <td class="name">
                         <label><g:message code="location.binLocation.label"/></label>
                     </td>
-                    <td class="value">
+                    <td class="value" style="padding:0;margin:0;">
 
                         <g:if test="${binLocations}">
 
-                            <table id="tableBinLocations">
+                            <div style="overflow-y: auto; max-height: 400px;">
+                            <table id="tableBinLocations" >
                                 <thead>
                                 <tr>
                                     <th></th>
@@ -128,6 +129,7 @@
                                 </tr>
                                 </tfoot>
                             </table>
+                            </div>
                         </g:if>
                         <g:else>
                             <div class="fade">
