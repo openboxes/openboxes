@@ -31,8 +31,7 @@ class LocationController {
 	}
 	
 	def list = {
-		println params
-		
+
 		def locations = []
 		def locationsTotal = 0;
 		def locationType = LocationType.get(params["locationType.id"])
@@ -105,10 +104,10 @@ class LocationController {
 
 			locationInstance.properties = params
 
-			if (!locationInstance.hasErrors()) {
+			if (locationInstance.validate() && !locationInstance.hasErrors()) {
 				try {
-					inventoryService.saveLocation(locationInstance)
-					if (locationInstance?.id == session?.warehouse?.id) {
+                    inventoryService.saveLocation(locationInstance)
+                    if (locationInstance?.id == session?.warehouse?.id) {
 						session.warehouse = locationInstance
 					}
 					
@@ -117,15 +116,15 @@ class LocationController {
 					return
 				}
 
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 
-				if (locationInstance.parentLocation) {
+                if (locationInstance.parentLocation) {
 					redirect(action: "edit", id: locationInstance.parentLocation.id)
 				}
 				else {
 					redirect(action: "edit", id: locationInstance.id)
 				}
-			}
+            }
 			else {
 				render(view: "edit", model: [locationInstance: locationInstance])
 			}
@@ -296,6 +295,18 @@ class LocationController {
 		flash.message = "User deleted"
 		redirect(action: "show", id: params.location.id);
 	}
+
+    def showBinLocations = {
+
+        def locationInstance = Location.get(params.id)
+        if (!locationInstance) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+        }
+        else {
+            def binLocations = Location.findAllByParentLocation(locationInstance)
+            [locationInstance: locationInstance, binLocations: binLocations]
+        }
+    }
 
 
 	def importBinLocations = {
