@@ -1294,7 +1294,6 @@ class ShipmentService {
 					log.info "Adding receipt item for inventory item " + inventoryItem
 
 					ReceiptItem receiptItem = new ReceiptItem();
-					receiptItem.binLocation = shipmentItem.binLocation
 					receiptItem.quantityShipped = shipmentItem.quantity;
 					receiptItem.quantityReceived = shipmentItem.quantity;
 					receiptItem.lotNumber = shipmentItem.lotNumber;
