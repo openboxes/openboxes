@@ -127,7 +127,7 @@
                         </td>
                         <td class="value">
                             <g:textField name="summary" class="text" size="80"
-                                value="" placeholder="${warehouse.message(code:'error.summary.message') }"/>
+                                value="${exception?.message}" placeholder="${warehouse.message(code:'error.summary.message') }"/>
                             <br/>
                         </td>
                     </tr>
