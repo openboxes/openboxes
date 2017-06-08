@@ -598,12 +598,12 @@ class JsonController {
 
 			if (tempItems) {
 
-                //if (tempItems.size() > 100) {
-                    //includeQuantity = false
-                //    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
-                //    inventoryItems << [id: 'null', value: message]
-                //}
-                //else {
+                if (tempItems.size() > 500) {
+                    includeQuantity = false
+                    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
+                    inventoryItems << [id: 'null', value: message]
+                }
+                else {
                     def quantitiesByInventoryItem = [:]
                     if (includeQuantity) {
                         tempItems.each { inventoryItem ->
@@ -611,6 +611,7 @@ class JsonController {
                             quantitiesByInventoryItem[inventoryItem] = quantity ?: 0
                         }
                     }
+
 
                     tempItems.each {
                         def quantity = quantitiesByInventoryItem[it]
@@ -636,7 +637,11 @@ class JsonController {
                             ]
                         }
                     }
-                //}
+
+                    def count = inventoryItems.size()
+                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items"])
+
+                }
 			}
 		}
 		if (inventoryItems.size() == 0) {
