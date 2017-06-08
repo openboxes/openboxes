@@ -588,6 +588,7 @@ class JsonController {
 	 */
 	def findInventoryItems = {
 		log.info params
+        long startTime = System.currentTimeMillis()
 		def inventoryItems = []
 		def location = Location.get(session.warehouse.id);
 		if (params.term) {
@@ -639,7 +640,8 @@ class JsonController {
                     }
 
                     def count = inventoryItems.size()
-                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items"])
+                    def responseTime = System.currentTimeMillis() - startTime
+                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items in ${responseTime} ms"])
 
                 }
 			}
