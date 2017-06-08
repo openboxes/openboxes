@@ -598,12 +598,12 @@ class JsonController {
 
 			if (tempItems) {
 
-                if (tempItems.size() > 100) {
+                //if (tempItems.size() > 100) {
                     //includeQuantity = false
-                    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
-                    inventoryItems << [id: 'null', value: message]
-                }
-                else {
+                //    def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
+                //    inventoryItems << [id: 'null', value: message]
+                //}
+                //else {
                     def quantitiesByInventoryItem = [:]
                     if (includeQuantity) {
                         tempItems.each { inventoryItem ->
@@ -636,7 +636,7 @@ class JsonController {
                             ]
                         }
                     }
-                }
+                //}
 			}
 		}
 		if (inventoryItems.size() == 0) {
@@ -644,7 +644,7 @@ class JsonController {
 			inventoryItems << [id: 'null', value: message]			
 		}
 		else {
-			inventoryItems = inventoryItems.sort { it.quantity }.reverse()
+			inventoryItems = inventoryItems.sort { it.expirationDate }
 		}
 		
 		render inventoryItems as JSON;
