@@ -71,7 +71,7 @@
                 <tr class="prop">
                     <td class="name">
                         <label for="comments"><warehouse:message
-                                code="default.comments.label" default="Comments" />${params.comments}</label>
+                                code="default.comments.label" default="Comments" /></label>
                     </td>
                     <td valign="top">
                         ${params?.comments}
