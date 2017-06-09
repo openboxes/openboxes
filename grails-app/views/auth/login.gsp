@@ -6,6 +6,9 @@
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
+	<style>
+		input, button { width: 100%; font-size: 2em; text-align: center; }
+	</style>
 </head>
 <body>
 	<div class="body">
@@ -42,12 +45,12 @@
                                 </tr>
 								<tr>
 									<td class="center middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="text" id="username" name="username" value="${userInstance?.username?:params.username}" style="font-size:2em" />
+										<g:textField class="text" id="username" name="username" value="${userInstance?.username?:params.username}" />
 									</td>
 								</tr>
 								<tr>
 									<td class="center middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password?:params.password}" style="font-size:2em" />
+										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password?:params.password}" />
 									</td>
 								</tr>
 
@@ -67,7 +70,7 @@
                                 --%>
 								<tr>
 									<td class="middle center">
-										<button type="submit" class="button icon lock big" id="loginButton">
+										<button type="submit" class="button big" id="loginButton">
 											<g:message code="auth.login.label"/>
 										</button> 
 										<%-- 

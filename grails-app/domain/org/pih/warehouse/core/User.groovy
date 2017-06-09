@@ -19,6 +19,7 @@ class User extends Person {
     String password;            // encrypted password
     String passwordConfirm;        // password confirm used on signup and password reset
     Locale locale;                // the user's locale
+    String timezone
 
     Date lastLoginDate;            // keep track of the user's last login
     Location warehouse;        // keep track of the user's last warehouse
@@ -38,7 +39,7 @@ class User extends Person {
     static transients = ["passwordConfirm"]
     static constraints = {
         active(nullable: true)
-        username(blank: false, unique: true, maxSize: 255)
+        username(blank: true, unique: true, maxSize: 255)
         password(blank: false, minSize: 6, maxSize: 255, validator: { password, obj ->
             def passwordConfirm = obj.properties['passwordConfirm']
             if (passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
@@ -46,6 +47,7 @@ class User extends Person {
         })
         passwordConfirm(blank: false)
         locale(nullable: true)
+        timezone(nullable:true)
         lastLoginDate(nullable: true)
         //useSavedLocation(nullable:true)
         warehouse(nullable: true)

@@ -64,11 +64,18 @@ class AuthController {
 		if (userInstance) {
 
             // FIXME Handle setting timezone based on configuration
-            TimeZone userTimezone = TimeZone.getTimeZone("America/New_York")
-            String browserTimezone = request.getParameter("browserTimezone")
-            if (browserTimezone != null) {
-                userTimezone = TimeZone.getTimeZone(browserTimezone)
-            }
+			TimeZone userTimezone = TimeZone.getTimeZone("America/New_York")
+			// Check for user's preferred timezone
+			if (userInstance.timezone) {
+				userTimezone = TimeZone.getTimeZone(userInstance.timezone)
+			}
+			// If there's no user preference timezone, use the browser timezone (login page sets parameter)
+			else {
+				String browserTimezone = request.getParameter("browserTimezone")
+				if (browserTimezone != null) {
+					userTimezone = TimeZone.getTimeZone(browserTimezone)
+				}
+			}
             session.timezone = userTimezone;
 
             // Check if user is active -- redirect back to login page
@@ -153,7 +160,10 @@ class AuthController {
 				userInstance.passwordConfirm = params.passwordConfirm.encodeAsPassword();
 			}
 			userInstance.active = Boolean.FALSE;
-			
+
+			// Set the email as username for backwards compatibility since we're no longer including username on signup
+			userInstance.username = params.email
+
 			// Create account 
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {				
 				session.user = userInstance;

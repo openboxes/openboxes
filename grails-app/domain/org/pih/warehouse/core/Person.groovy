@@ -33,7 +33,7 @@ class Person implements Comparable, Serializable {
 		firstName(blank:false, maxSize: 255)
 		lastName(blank:false, maxSize: 255)	
 		phoneNumber(nullable:true, maxSize: 255)
-		email(nullable:true, email: true, maxSize: 255)
+		email(blank:false, unique: true, email: true, maxSize: 255)
 	}
 	
 	int compareTo(Object obj) {
