@@ -30,11 +30,15 @@
                 <div class="dialog">
                     <div id="location-tabs" class="tabs">
                         <ul>
-                            <li><a href="#location-details-tab"><warehouse:message code="location.label"/></a></li>
-                            <li><a href="#location-status-tab"><warehouse:message code="location.status.label" default="Status"/></a></li>
+                            <li><a href="#location-details-tab"><g:message code="location.label"/></a></li>
+                            <li><a href="#location-status-tab"><g:message code="location.status.label" default="Status"/></a></li>
                             <g:if test="${locationInstance?.locationType?.locationTypeCode != LocationTypeCode.BIN_LOCATION}">
-                                <li><a href="#location-address-tab"><warehouse:message code="location.address.label" default="Address"/></a></li>
-                                <li><a href="#location-binLocations-tab"><warehouse:message code="location.binLocations.label" default="Bin Locations"/></a></li>
+                                <li><a href="#location-address-tab"><g:message code="location.address.label" default="Address"/></a></li>
+                                <%--<li><a href="#location-binLocations-tab"><g:message code="location.binLocations.label" default="Bin Locations"/></a></li>--%>
+                                <li><a href="${request.contextPath}/location/showBinLocations/${locationInstance?.id}" id="location-binLocations-tab">
+                                    <g:message code="location.binLocations.label" default="Bin Locations"/></a>
+                                </li>
+
                             </g:if>
                             <g:else>
                                 <li><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message code="binLocation.contents.label" default="Contents"/></a></li>
@@ -341,101 +345,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div id="location-binLocations-tab">
 
-                                <div class="box">
-                                    <h2><warehouse:message code="binLocations.label" default="Bin Locations" /></h2>
-                                    <div class="dialog">
-                                        <g:if test="${locationInstance?.locations}">
-                                            <table class="dataTable">
-                                                <thead>
-                                                <tr class="prop">
-                                                    <th width="1%"><g:message code="default.actions.label"/></th>
-                                                    <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
-                                                    <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
-                                                    <th class="right"><g:message code="default.actions.label"></g:message></th>
-                                                </tr>
-                                                </thead>
-
-                                                <g:each in="${locationInstance?.locations?.sort { it.name }}" var="binLocation" status="status">
-                                                    <tr class="prop ${status%2?'even':'odd'}">
-                                                        <td>
-                                                            <div class="action-menu">
-                                                                <button class="action-btn">
-                                                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
-                                                                         style="vertical-align: middle" />
-                                                                </button>
-                                                                <div class="actions">
-                                                                    <div class="action-menu-item">
-                                                                        <a href="javascript:void(-1)" class="btnShowContents" data-id="${binLocation?.id}" fragment="location-details-tab">
-                                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>&nbsp;
-                                                                            ${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'location.binLocation.label')])}
-                                                                        </a>
-                                                                    </div>
-                                                                    <div class="action-menu-item">
-                                                                        <g:link class="edit" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
-                                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
-                                                                            ${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'location.binLocation.label')])}
-                                                                        </g:link>
-                                                                    </div>
-                                                                    <div class="action-menu-item">
-                                                                        <g:link class="delete" action="delete" id="${binLocation?.id}">
-                                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
-                                                                            ${warehouse.message(code: 'default.delete.label', args: [warehouse.message(code:'location.binLocation.label')])}
-                                                                        </g:link>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            ${binLocation.active}
-                                                        </td>
-                                                        <td>
-                                                            <g:link controller="location" action="edit" id="${binLocation.id}" fragment="location-details-tab">
-                                                                ${binLocation.name}
-                                                            </g:link>
-                                                        </td>
-                                                        <td class="right">
-                                                            <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation?.id}" fragment="location-details-tab">
-                                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
-                                                                ${g.message(code: 'default.button.show.label')}
-                                                            </a>
-
-                                                            <g:link class="button" action="edit" id="${binLocation?.id}" fragment="location-details-tab">
-                                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
-                                                                ${g.message(code: 'default.button.edit.label')}
-                                                            </g:link>
-
-                                                            <g:link class="button" action="delete" id="${binLocation?.id}">
-                                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" class="middle"/>&nbsp;
-                                                                ${g.message(code: 'default.button.delete.label')}
-
-                                                            </g:link>
-
-
-                                                        </td>
-                                                    </tr>
-                                                </g:each>
-
-                                            </table>
-                                        </g:if>
-                                        <g:unless test="${locationInstance.locations}">
-                                            <div class="empty center fade">
-                                                <g:message code="location.noBinLocations.label" default="No bin locations"/>
-                                            </div>
-                                        </g:unless>
-                                    </div>
-                                </div>
-                                <div class="buttons center">
-                                    <button class="btnAddBinLocation button">
-                                        <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
-                                    </button>
-                                    <button class="btnImportBinLocations button">
-                                        <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
-                                    </button>
-                                </div>
-
-                            </div>
                         </g:if>
                     </div>
                 </div>
@@ -543,9 +453,12 @@
 
             $(".tabs").tabs({cookie:{expires:1}});
 
-            // Show Contents dialog
+            // Define all dialog windows
             $("#dlgShowContents").dialog({ autoOpen: false, modal: true, width: 800 });
-            $(".btnShowContents").click(function(event) {
+            $("#dlgAddBinLocation").dialog({ autoOpen: false, modal: true, width: 800 });
+            $("#dlgImportBinLocations").dialog({autoOpen: false, modal: true, width: 800 });
+
+            $(".btnShowContents").livequery("click", function(event) {
                 var id = $(this).data("id");
                 var url = "${request.contextPath}/location/showContents/" + id;
                 //var url = "/openboxes/dashboard/index";
@@ -554,27 +467,21 @@
                 event.preventDefault();
             });
 
-
-            // Add Bin Location dialog
-            $(".btnAddBinLocation").click(function(event) {
+            // Add event handlers for buttons
+            $(".btnAddBinLocation").livequery("click", function(event) {
                 event.preventDefault();
                 $("#dlgAddBinLocation").dialog('open');
             });
-            $("#dlgAddBinLocation").dialog({ autoOpen: false, modal: true, width: 800 });
 
-            $(".btnCloseDialog").click( function() {
+            $(".btnCloseDialog").livequery("click", function() {
+                event.preventDefault();
                 $("#dlgAddBinLocation").dialog('close');
             });
 
             // Import Bin Locations
-            $(".btnImportBinLocations").click(function(event){
+            $(".btnImportBinLocations").livequery("click", function(event){
                 event.preventDefault();
                 $("#dlgImportBinLocations").dialog('open');
-            });
-            $("#dlgImportBinLocations").dialog({
-                autoOpen: false,
-                modal: true,
-                width: 600
             });
 
             /*

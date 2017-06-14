@@ -223,7 +223,7 @@
                                                         </td>
                                                         <td class="middle center">
                                                             <g:selectBinLocation name="receiptItems[${i}].binLocation.id"
-                                                                                 class="chzn-select-deselect" noSelection="['':'']" value="${receiptItem?.binLocation?.id}"/>
+                                                                                 class="chzn-select-deselect" noSelection="['null':'']" value="${receiptItem?.binLocation?.id}"/>
                                                         </td>
                                                         <td class="middle left">
                                                             <a href="javascript:void(-1)" data-id="${receiptItem?.id}" class="btnShowPutaways">

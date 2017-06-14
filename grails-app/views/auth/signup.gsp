@@ -6,6 +6,8 @@
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<style>
 		#hd { display: none; }
+        input, select { width: 100%; }
+        .required { color: red}
 	</style>
 
 		
@@ -27,27 +29,14 @@
 					</g:hasErrors>		
 								
 					<div id="loginBox" class="box">
-
 						<h2>
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
 						</h2>
-						<table>
+                        <table>
 							<tbody>
-								<tr class="">
-									<td>
-
-									</td>
-								</tr>
-								<tr class="">
-									<td class="name middle right">
-										<label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
-									</td>
-									<td class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
-										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
-									</td>
-								</tr>
-					            <tr class="">
-					                <td class="name middle right" width="35%">
+					            <tr class="prop">
+					                <td class="name middle right">
+                                        <span class="required">*</span>
 					                    <label for="firstName"><warehouse:message code="user.firstName.label" default="First Name" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
@@ -55,8 +44,9 @@
 					                </td>
 					            </tr>
 	
-					            <tr class="">
+					            <tr class="prop">
 					                <td class="name middle right">
+                                        <span class="required">*</span>
 					                    <label for="lastName"><warehouse:message code="user.lastName.label" default="Last Name" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
@@ -64,30 +54,29 @@
 					                </td>
 					            </tr>
 
-						    <tr class="">
-						        <td class="middle right">
-						          <label for="locale"><warehouse:message code="default.locale.label"/></label>
-						        </td>
-						        <td class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-									<div style="width: 235px">
-										<g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
-												  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
-									</div>
-						        </td>
-						    </tr>	
-						
-					            <tr class="">
-					                <td class="middle right">
+								<tr class="prop">
+									<td class="name middle right">
+                                        <span class="required">*</span>
+										<label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
+									</td>
+									<td class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
+									</td>
+								</tr>
+								<%--
+					            <tr class="prop">
+					                <td class="name middle right">
 					                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
 					                </td>
 					                <td class="${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 					                    <g:textField name="username" value="${userInstance?.username}" class="text"  size="40" />
 					                </td>
 					            </tr>
-
+								--%>
 	
-					            <tr class="">
+					            <tr class="prop">
 					                <td class="name middle right">
+                                        <span class="required">*</span>
 					                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
@@ -95,23 +84,72 @@
 					                </td>
 					            </tr>
 						    
-					            <tr class="">
-					                <td class="middle right">
-					                  <label for="passwordConfirm"><warehouse:message code="user.confirmPassword.label" default="Confirm Password" /></label>
+					            <tr class="prop">
+					                <td class="name middle right">
+                                        <span class="required">*</span>
+                                        <label for="passwordConfirm"><warehouse:message code="user.confirmPassword.label" default="Confirm Password" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
 					                    <g:passwordField name="passwordConfirm" value="${userInstance?.passwordConfirm}" class="text" size="40" />
 					                </td>
-					            </tr>	
-								<tr class="">	
-									<td class="middle right"></td>					
+					            </tr>
+								<tr class="prop">
+									<td class="name middle right">
+										<label for="locale"><warehouse:message code="default.locale.label"/></label>
+									</td>
+									<td class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
+										<div style="width: 235px">
+											<g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
+													  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
+										</div>
+									</td>
+								</tr>
+								<g:if test="${TimeZone?.getAvailableIDs()}">
+									<tr class="prop">
+										<td valign="top" class="name">
+											<label for="locale"><warehouse:message
+													code="default.timezone.label" default="Timezone" /></label></td>
+										<td valign="top" class="value">
+											<g:select id="timezone" name="timezone" from="${TimeZone?.getAvailableIDs()?.sort()}"
+													  noSelection="['':'']" value="${userInstance?.timezone}" class="chzn-select-deselect"/>
+										</td>
+									</tr>
+								</g:if>
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label for="interest"><warehouse:message code="user.interest.label" default="Interest" /></label>
+                                    </td>
+                                    <td class="value">
+                                        <select id="interest" name="interest" class="chzn-select-deselect" value="${params.interest}">
+                                            <option value="none"></option>
+                                            <option value="looking">I'm just poking around - don't mind me</option>
+                                            <option value="personal">I'm evaluating OpenBoxes for personal use</option>
+                                            <option value="company">I'm evaluating OpenBoxes for my company</option>
+                                            <option value="contribute">I'd like to contribute to OpenBoxes</option>
+                                            <option value="contact">I have no idea what I'm doing, please contact me</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+									<td class="name">
+                                        <label for="comments"><warehouse:message
+                                                code="default.comments.label" default="Comments" /></label>
+                                    </td>
+									<td valign="top">
+                                        <g:textArea name="comments" style="width: 100%;" rows="5"
+                                                    placeholder="What features are important to you? Do you need help getting started?">${params?.comments}</g:textArea>
+
+									</td>
+								</tr>
+
+
+								<tr class="prop">
+									<td class="name middle right"></td>
 									<td valign="top">
 										<button type="submit" class="button icon approve">
 											<warehouse:message code="auth.signup.label"/>
-										</button>					   
-										
-										
-										
+										</button>
 									</td>
 								</tr>
 								<tr class="prop">
@@ -120,10 +158,15 @@
 										<g:link class="list" controller="auth" action="login">
 											<warehouse:message code="auth.login.label" default="Login"/>
 										</g:link>
+                                        <div class="right">
+
+                                            <span class="required">*</span> denotes required fields
+                                        </div>
+
 									</td>
 								
 								</tr>
-							</tbody>	
+							</tbody>
 						</table>						
 					</div>
 					

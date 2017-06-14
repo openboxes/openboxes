@@ -1236,11 +1236,11 @@ a:hover {
 }
 
 #loginForm {
-    width:400px;
+    width:500px;
     position: absolute;
     top: 20%;
     left: 50%;
-    margin-left: -225px;
+    margin-left: -250px;
 }
 
 #loginContainer {
@@ -1259,11 +1259,11 @@ a:hover {
 }
 
 #signupForm {
-    width:500px;
+    width:700px;
     position: absolute;
-    top: 15%;
+    top: 5%;
     left: 50%;
-    margin-left: -250px;
+    margin-left: -350px;
 }
 
 

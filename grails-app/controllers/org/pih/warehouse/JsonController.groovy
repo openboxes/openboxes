@@ -588,6 +588,7 @@ class JsonController {
 	 */
 	def findInventoryItems = {
 		log.info params
+        long startTime = System.currentTimeMillis()
 		def inventoryItems = []
 		def location = Location.get(session.warehouse.id);
 		if (params.term) {
@@ -598,8 +599,8 @@ class JsonController {
 
 			if (tempItems) {
 
-                if (tempItems.size() > 100) {
-                    //includeQuantity = false
+                if (tempItems.size() > 500) {
+                    includeQuantity = false
                     def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
                     inventoryItems << [id: 'null', value: message]
                 }
@@ -612,6 +613,7 @@ class JsonController {
                         }
                     }
 
+
                     tempItems.each {
                         def quantity = quantitiesByInventoryItem[it]
                         quantity = (quantity) ?: 0
@@ -620,7 +622,7 @@ class JsonController {
                         localizedName = (it.product.productCode ?: " - ") + " " + localizedName
                         inventoryItems = inventoryItems.sort { it.expirationDate }
 
-                        if (quantity >= 0) {
+                        if (quantity > 0) {
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
@@ -636,6 +638,11 @@ class JsonController {
                             ]
                         }
                     }
+
+                    def count = inventoryItems.size()
+                    def responseTime = System.currentTimeMillis() - startTime
+                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items in ${responseTime} ms"])
+
                 }
 			}
 		}
@@ -644,7 +651,7 @@ class JsonController {
 			inventoryItems << [id: 'null', value: message]			
 		}
 		else {
-			inventoryItems = inventoryItems.sort { it.quantity }.reverse()
+			inventoryItems = inventoryItems.sort { it.expirationDate }
 		}
 		
 		render inventoryItems as JSON;
