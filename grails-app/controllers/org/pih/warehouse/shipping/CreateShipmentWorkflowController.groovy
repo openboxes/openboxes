@@ -524,7 +524,7 @@ class CreateShipmentWorkflowController {
 
 			on("back").to("enterContainerDetails")
 
-			on("next").to("sendShipmentAction")
+			on("next").to("sendShipment")
 
 			on("save") {
 				shipmentService.saveShipment(flow.shipmentInstance)
@@ -797,7 +797,7 @@ class CreateShipmentWorkflowController {
 				flow.command = command
 				
 				if (!command.validate()) {
-					log.info command.errors
+					log.info "Errors: " + command.errors
 					return error();
 				}
 
