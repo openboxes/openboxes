@@ -543,7 +543,7 @@ class ShipmentController {
                     redirect(controller:"shipment", action : "showDetails", id: shipmentInstance?.id)
                 }
                 else {
-                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id)
+                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id, fragment: "tabs-details")
                 }
                 return
 
