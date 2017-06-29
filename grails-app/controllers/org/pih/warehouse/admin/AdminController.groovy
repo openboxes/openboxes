@@ -12,6 +12,7 @@ package org.pih.warehouse.admin
 import grails.util.GrailsUtil
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.MailService
+import org.pih.warehouse.jobs.DataCleaningJob
 import org.springframework.web.multipart.MultipartFile
 import util.ClickstreamUtil
 
@@ -32,7 +33,7 @@ class AdminController {
 	MailService mailService;
 	def grailsApplication
 	def config = ConfigurationHolder.config
-
+    def quartzScheduler
 
 
 	def index = { }
@@ -214,8 +215,9 @@ class AdminController {
 				log.warn("Properties file not found: " + e.message)
 			}
 		}
-			
-		[
+
+        [
+            quartzScheduler:quartzScheduler,
 			externalConfigProperties: externalConfigProperties,
 			systemProperties : System.properties,
 			env: GrailsUtil.environment,

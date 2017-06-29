@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.quartz.impl.matchers.GroupMatcher; org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.core.User" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
 <html>
@@ -27,6 +27,9 @@
                         </li>
                         <li>
                             <a href="#tabs-4" id="system-properties-tab"><warehouse:message code="admin.systemProperties.header"/></a>
+                        </li>
+                        <li>
+                            <a href="#tabs-5" id="background-jobs-tab"><warehouse:message code="admin.backgroundJobs.header"/></a>
                         </li>
                     </ul>
                     <div id="tabs-1">
@@ -207,6 +210,20 @@
                                 </tr>
                             </g:each>
                         </table>
+                    </div>
+                    <div id="tabs-5">
+                        <div class="box">
+
+                        <h2> ${quartzScheduler.schedulerName} ${quartzScheduler.schedulerInstanceId}</h2>
+                            <div class="message">
+                                <pre>${quartzScheduler.metaData}</pre>
+                            </div>
+
+                            <div class="buttons">
+                                <g:link controller="jobs" action="index" class="button">${g.message(code:'backgroundJobs.label', default: 'Background Jobs')}</g:link>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>

@@ -10,10 +10,9 @@
         <div class="message">${flash.message}</div>
     </g:if>
 
-
     <div class="buttonBar">
-        <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
-        <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
+        <g:link class="button icon settings" controller="admin" action="showSettings" fragment="tab-5">${g.message(code:'admin.backTo.label', default: 'Back to Admin')}</g:link>
+        <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[g.message(code:'jobKeys.label', default: 'Background Jobs')]"/></g:link>
     </div>
 
     <div class="yui-gf">
