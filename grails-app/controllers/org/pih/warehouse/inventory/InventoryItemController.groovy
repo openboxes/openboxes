@@ -211,7 +211,33 @@ class InventoryItemController {
                                                      totalBalance:totalBalance, totalCount:totalCount, totalCredit:totalCredit, totalDebit:totalDebit])
     }
 
-    def showPendingRequisitions = { StockCardCommand cmd ->
+	def showSuppliers = {
+		def startTime = System.currentTimeMillis()
+
+		def location = Location.get(session.warehouse.id)
+		//def productSuppliers = productService.getProductSuppliers(params.id)
+		def product = Product.get(params.id)
+		def productSuppliers = ShipmentItem.createCriteria().list {
+			shipment {
+				origin {
+                    eq("locationType.id", "4")
+				}
+                destination {
+                    eq("id", location.id)
+                }
+			}
+			inventoryItem {
+				eq("product.id", params.id)
+			}
+		}
+
+
+		render(template: "showSuppliers", model: [productSuppliers:productSuppliers])
+	}
+
+
+
+	def showPendingRequisitions = { StockCardCommand cmd ->
         def startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
