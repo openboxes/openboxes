@@ -330,7 +330,7 @@ class InventoryService implements ApplicationContextAware {
 
 	InventoryItemCommand getInventoryItemCommand(ProductGroup productGroup, Inventory inventory, Boolean showOutOfStockProducts) {
 		InventoryItemCommand inventoryItemCommand = new InventoryItemCommand();
-		inventoryItemCommand.description = productGroup.description
+		inventoryItemCommand.description = productGroup.name
 		inventoryItemCommand.productGroup = productGroup
 		inventoryItemCommand.category = productGroup.category
 		//inventoryItemCommand.quantityOnHand = 1
@@ -359,7 +359,7 @@ class InventoryService implements ApplicationContextAware {
 		def productGroups = getProductGroups(inventoryCommand?.warehouseInstance, searchTerms, categoryFilters,
 				inventoryCommand?.showHiddenProducts);
 
-		productGroups = productGroups?.sort() { it?.description };
+		productGroups = productGroups?.sort() { it?.name };
 		return productGroups;
 	}
 
@@ -3327,7 +3327,7 @@ class InventoryService implements ApplicationContextAware {
                 'Product code': product.productCode?:'',
                 'Product': product.name,
                 'UOM': product.unitOfMeasure,
-                'Generic product': product?.genericProduct?.description?:"",
+                'Generic product': product?.genericProduct?.name?:"",
                 'Category': product?.category?.name,
                 'Manufacturer': product?.manufacturer?:"",
                 'Manufacturer code': product?.manufacturerCode?:"",
@@ -4138,7 +4138,7 @@ class InventoryService implements ApplicationContextAware {
         } ) { map, entry ->
             def product = entry?.product
             def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
-            def nameKey = entry?.genericProduct?.description?:entry?.product?.name
+            def nameKey = entry?.genericProduct?.name?:entry?.product?.name
             map[nameKey].name = nameKey
 
             if (entry?.genericProduct) {
@@ -4199,7 +4199,7 @@ class InventoryService implements ApplicationContextAware {
             map[nameKey].products << [
                     product:entry.product?.name,
                     productCode: entry?.product?.productCode,
-                    genericProduct: entry?.genericProduct?.description,
+                    genericProduct: entry?.genericProduct?.name,
                     status: inventoryLevel?.statusMessage(entry.currentQuantity?:0),
                     minQuantity:inventoryLevel?.minQuantity?:0,
                     reorderQuantity:inventoryLevel?.reorderQuantity?:0,

@@ -167,7 +167,7 @@
                                                                                                        <td>
                                                                                                            <span style="text-transform:uppercase;" class="fade">
                                                                                                                <format:category category="${inventoryItem?.product?.category }"/> &rsaquo;
-                                                                                                               ${inventoryItem?.product?.productGroups?.sort()?.first()?.description}
+                                                                                                               ${inventoryItem?.product?.productGroups?.sort()?.first()?.name}
                                                                                                            </span>
                                                                                                        </td>
                                                                                                    </tr>

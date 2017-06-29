@@ -12,7 +12,7 @@
                 <tr>
                     <td class="top">
                         <g:link controller="productGroup" action="show" id="${productGroup.id}">
-                            ${productGroup.description}
+                            ${productGroup.name}
                         </g:link>
                     </td>
                     <td class="middle">

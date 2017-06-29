@@ -37,8 +37,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		product4 = DbHelper.createProductWithGroups("abc tellon",["Hoo moodiccina"])
 		product5 = DbHelper.createProductWithGroups("goomoon",["Boo floweree"])
 		product6 = DbHelper.createProductWithGroups("buhoo floweree root",[])
-		group1 = ProductGroup.findByDescription("Hoo moodiccina")
-		group2 = ProductGroup.findByDescription("Boo floweree")
+		group1 = ProductGroup.findByName("Hoo moodiccina")
+		group2 = ProductGroup.findByName("Boo floweree")
 
         // Create new root category if it doesn't exist
         def rootCategory = Category.findByName("ROOT")

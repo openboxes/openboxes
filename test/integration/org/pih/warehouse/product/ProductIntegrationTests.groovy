@@ -30,7 +30,7 @@ class ProductIntegrationTests extends GroovyTestCase{
     void testSaveProductProductGroup(){
         def suppliers = Category.findByName("Supplies")
         def name = "Test" + UUID.randomUUID().toString()[0..5]
-        def group = new ProductGroup(description: name + "group", category: suppliers)
+        def group = new ProductGroup(name: name + "group", category: suppliers)
         assert group.save(flush:true, failOnError:true)
         def product = new Product(name: name, category: suppliers)
         product.addToProductGroups(group)
@@ -47,7 +47,7 @@ class ProductIntegrationTests extends GroovyTestCase{
 
     @Test
     void testGetProductFromGroup(){
-       def group = ProductGroup.findByDescription("PainKiller")
+       def group = ProductGroup.findByName("PainKiller")
         def products = group.products
         assert products.any{p -> p.name == "Advil 200mg"}
         assert products.any{p -> p.name == "Tylenol 325mg"}
@@ -58,7 +58,7 @@ class ProductIntegrationTests extends GroovyTestCase{
     void testGetProductGroup(){
         def product = Product.findByName("MacBook Pro 8G")
         def groups = product.productGroups
-        assert groups.any{g -> g.description == "Laptop"}
+        assert groups.any{g -> g.name == "Laptop"}
     }
 
     @Test

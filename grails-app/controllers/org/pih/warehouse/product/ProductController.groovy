@@ -1055,9 +1055,9 @@ class ProductController {
         println "addProductGroupToProduct() " + params
         def product = Product.get(params.id)
         if (product) {
-            def productGroup = ProductGroup.findByDescription(params.productGroup)
+            def productGroup = ProductGroup.findByName(params.productGroup)
             if (!productGroup) {
-                productGroup = new ProductGroup(description: params.productGroup, category: product.category)
+                productGroup = new ProductGroup(name: params.productGroup, category: product.category)
             }
             product.addToProductGroups(productGroup)
             product.save(failOnError: true)

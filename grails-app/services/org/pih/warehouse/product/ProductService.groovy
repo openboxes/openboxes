@@ -701,7 +701,7 @@ class ProductService {
             // Create a new generic product
 //            log.info "Old productGroups: " + product.productGroups
 //            if(!product.productGroups) {
-//                ProductGroup productGroup = ProductGroup.findByDescription(productProperties.name)
+//                ProductGroup productGroup = ProductGroup.findByName(productProperties.name)
 //                if (!productGroup) {
 //                    log.info "Creating new product group " + productProperties.name
 //                    productGroup = new ProductGroup(name: productProperties.name, description: productProperties.name, category: productProperties.category)

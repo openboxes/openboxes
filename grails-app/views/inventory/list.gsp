@@ -121,7 +121,7 @@
                                         </g:link>
                                     </td>
                                     <td>
-                                        ${entry.key?.genericProduct?.description?:""}
+                                        ${entry.key?.genericProduct?.name?:""}
                                     </td>
                                     <td>
                                         ${entry.key?.category?.name}

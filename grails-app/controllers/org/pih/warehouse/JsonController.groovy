@@ -434,11 +434,11 @@ class JsonController {
         def c = ProductGroup.createCriteria()
         def results = c.list {
             projections {
-                property "description"
+                property "name"
             }
             and {
                 searchTerms.each { searchTerm ->
-                    ilike("description", "%" + searchTerm + "%" )
+                    ilike("name", "%" + searchTerm + "%" )
                 }
             }
         }
@@ -866,9 +866,9 @@ class JsonController {
 			items.addAll(products)
 
 			def productGroups = ProductGroup.withCriteria {
-				ilike("description", "%" + params.term + "%")
+				ilike("name", "%" + params.term + "%")
 			}
-			productGroups.each { items << [id: it.id, name: it.description, class: it.class] }
+			productGroups.each { items << [id: it.id, name: it.name, class: it.class] }
 			//items.addAll(productGroups)
 
 			
@@ -1086,7 +1086,7 @@ class JsonController {
                     name: product.name,
                     status: status,
                     productCode: product.productCode,
-                    genericProduct:product?.genericProduct?.description?:"Empty",
+                    genericProduct:product?.genericProduct?.name?:"Empty",
                     //inventoryLevel: inventoryLevel,
                     minQuantity: inventoryLevel?.minQuantity?:0,
                     maxQuantity: inventoryLevel?.maxQuantity?:0,
@@ -1148,7 +1148,7 @@ class JsonController {
                     name: product.name,
                     status: status,
                     productCode: product.productCode,
-                    genericProduct:product?.genericProduct?.description?:"Empty",
+                    genericProduct:product?.genericProduct?.name?:"Empty",
                     inventoryLevel: inventoryLevel,
                     minQuantity: inventoryLevel?.minQuantity?:0,
                     maxQuantity: inventoryLevel?.maxQuantity?:0,

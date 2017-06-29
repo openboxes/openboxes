@@ -197,6 +197,9 @@ shouldSubstitute=${shouldSubstitute}
                 <g:else>
                     ${warehouse.message(code:'default.none.label')}
                 </g:else>
+
+
+
             </td>
         </tr>
         <tr class="prop">
@@ -536,6 +539,19 @@ shouldSubstitute=${shouldSubstitute}
                         ${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}
                     </td>
                 </tr>
+
+
+                <tr class="prop">
+                    <td class="middle right name">
+                        <label><g:message code="productGroup.description.label" default="Description"/></label>
+                    </td>
+                    <td class="middle">
+                        ${requisitionItem?.product?.genericProduct?.description}
+                    </td>
+                </tr>
+
+
+
                 <tr class="prop">
                     <td class="top right name">
                         <label><warehouse:message code="requisitionItem.substitution.label" default="Substitution"/></label>

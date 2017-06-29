@@ -51,19 +51,6 @@
 							<li><a href="#tabs-packages"><warehouse:message code="packages.label"/></a></li>
 							<li><a href="#tabs-documents"><warehouse:message code="product.documents.label"/></a></li>
                             <li><a href="#tabs-attributes"><warehouse:message code="product.attributes.label" default="Attributes"/></a></li>
-
-                            <g:if test="${productInstance?.id }">
-                                <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
-                                    ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                                </g:link>
-                            </g:if>
-                            <g:else>
-                                <g:link controller="inventory" action="browse" class="button icon remove">
-                                    ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                                </g:link>
-                            </g:else>
-
-
                         </g:if>
 					</ul>	
 					<div id="tabs-details" style="padding: 10px;" class="ui-tabs-hide">
