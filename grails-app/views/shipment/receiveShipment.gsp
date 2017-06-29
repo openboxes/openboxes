@@ -21,10 +21,6 @@
                 ${flash.message}
             </div>
         </g:if>
-        <div class="message">
-            ${g.message(code: 'receipt.saveAndContinue.message')}
-        </div>
-
 
         <g:hasErrors bean="${receiptInstance}">
             <div class="errors">
@@ -156,6 +152,11 @@
                                     </div>
                                 </g:if>
                                 <g:else>
+
+                                    <div class="message">
+                                        ${g.message(code: 'receipt.saveAndContinue.message')}
+                                    </div>
+
                                     <table>
                                         <thead>
                                             <tr>
