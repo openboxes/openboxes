@@ -412,6 +412,23 @@ class ShipmentService {
 	}
 
 
+    boolean bulkUpdateShipments() {
+        boolean success = false
+        try {
+            def shipments = Shipment.findAllByCurrentStatusIsNullAndEventsIsNotNull([max:1000])
+            shipments.each {
+                it.currentStatus = it.status.code
+                it.currentEvent = it.mostRecentEvent
+                it.save(flush: true)
+            }
+            success = true
+        } catch (Exception e) {
+            log.error("Unable to bulk update all shipments" + e.message, e)
+        }
+        return success
+
+    }
+
 	/**
 	 * 
 	 * @param shipmentType
@@ -440,46 +457,10 @@ class ShipmentService {
                 if (destination) { eq("destination", destination) }
                 if (lastUpdatedStart) { ge("lastUpdated", lastUpdatedStart)}
                 if (lastUpdatedEnd) { le("lastUpdated", lastUpdatedEnd)}
-//                if (statusCode) {
-//                    if (statusCode in [ShipmentStatusCode.PENDING, ShipmentStatusCode.CREATED]) {
-//                        or {
-//                            isEmpty('events')
-//                            events {
-//                                eventType {
-//                                    not {
-//                                        'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//					else if (statusCode == ShipmentStatusCode.SHIPPED) {
-//                        and {
-//                            events {
-//                                eventType {
-//                                    'in'("eventCode", [EventCode.SHIPPED])
-//                                }
-//                            }
-//                            events {
-//                                eventType {
-//                                    not {
-//                                        'in'("eventCode", [EventCode.RECEIVED])
-//                                    }
-//                                }
-//
-//                            }
-//                        }
-//					}
-//                    else if (statusCode == ShipmentStatusCode.RECEIVED) {
-//                        events {
-//                            eventType {
-//                                'in'("eventCode", [EventCode.RECEIVED])
-//                            }
-//                        }
-//                    }
-//                }
-                order("lastUpdated", "desc")
+                if (statusCode) { eq("currentStatus", statusCode)}
+
                 order("dateCreated", "desc")
+                order("lastUpdated", "desc")
             }
             maxResults(limit)
         }

@@ -463,7 +463,8 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 openboxes.scannerDetection.enabled = false
 
 // Background jobs
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"  // daily at midnight
+openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
 
 // LDAP configuration
 openboxes.ldap.enabled = false
@@ -513,9 +514,10 @@ grails.doc.footer = ""
 
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {
+    id generator:'uuid'
 	cache true
-	id generator:'uuid'
-	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
+    dynamicUpdate true
+    "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTime, class: org.joda.time.DateTime
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTimeZoneAsString, class: org.joda.time.DateTimeZone
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDurationAsString, class: org.joda.time.Duration

@@ -48,6 +48,7 @@
 								</td>
 								<td valign="top" id="shipmentStatus" class="value">
 									<format:metadata obj="${shipmentInstance?.status?.code}"/>
+                                    ${shipmentInstance?.currentStatus}
 									<%--
 									<span>
 										<g:if test="${shipmentInstance?.status?.location}">
