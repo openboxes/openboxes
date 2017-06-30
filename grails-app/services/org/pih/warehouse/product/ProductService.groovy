@@ -679,10 +679,19 @@ class ProductService {
     def importProducts(products, tags) {
         log.info ("Importing products " + products + " tags: " + tags)
 
+		// Create all tags that don't already exist
+        tags.each { tagName ->
+			Tag tag = Tag.findByTag(tagName)
+			if (!tag) {
+				log.info "Tag ${tagName} does not exist so creating it"
+				tag = new Tag(tag: tagName)
+				tag.save(flush:true)
+			}
+        }
 
         products.each { productProperties ->
 
-            log.info "Import product " + productProperties.productCode + " " + productProperties.name
+            log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
             // Update existing
             def product = Product.findByIdOrProductCode(productProperties.id, productProperties.productCode)
             if (product) {
@@ -692,25 +701,13 @@ class ProductService {
             else {
                 product = new Product(productProperties)
             }
-            log.info "Product properties " + productProperties
-            log.info "Old tags " + product.tags
-            log.info "New tags: " + tags + ", " + productProperties.tags
+
+            if (!product.validate()) {
+                throw new ValidationException("Product is invalid", product.errors)
+            }
+
             addTagsToProduct(product, tags)
             addTagsToProduct(product, productProperties.tags)
-
-            // Create a new generic product
-//            log.info "Old productGroups: " + product.productGroups
-//            if(!product.productGroups) {
-//                ProductGroup productGroup = ProductGroup.findByName(productProperties.name)
-//                if (!productGroup) {
-//                    log.info "Creating new product group " + productProperties.name
-//                    productGroup = new ProductGroup(name: productProperties.name, description: productProperties.name, category: productProperties.category)
-//                    if (!productGroup.save()) {
-//                        throw new ValidationException("Could not create generic product '" + product.name + "'", productGroup.errors)
-//                    }
-//                }
-//                product.addToProductGroups(productGroup)
-//            }
 
             if (!product.save(flush:true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
@@ -923,13 +920,7 @@ class ProductService {
                 tag = new Tag(tag: tagName)
                 tag.save(flush:true)
             }
-            log.info "Product " + product.properties
             product.addToTags(tag)
-            if (product.id) {
-                log.info "Before merge " + product.properties
-                product = product.merge()
-                log.info "After merge " + product.properties
-            }
             product.save(flush:true)
         }
         else {
