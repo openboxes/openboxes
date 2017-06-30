@@ -43,7 +43,7 @@
                         </h2>
                         <div class="message">
                             <g:message code="dashboard.youLastLoggednHereOn.message"
-                                       args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'hh:mm:ss a z')]"/>
+                                       args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'MMM dd yyyy hh:mm:ss a z')]"/>
                         </div>
 
                         <%--
