@@ -27,14 +27,12 @@
 		</g:hasErrors>
 
         <div class="summary">
-            <h1 class="title">${productGroupInstance.category.name} &rsaquo; ${productGroupInstance.name}</h1>
-
+            <p class="title">${productGroupInstance.category.name} &rsaquo; ${productGroupInstance.name}</p>
         </div>
 
-
 		<div class="buttonBar">            	
-            <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-            <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroups.label')]"/></g:link>
+            <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label')]"/></g:link>
 		</div>
             <g:form method="post" action="update">
 				<g:hiddenField name="id" value="${productGroupInstance?.id}" />
@@ -49,7 +47,7 @@
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: productGroupInstance, field: 'name', 'errors')}">
-									<g:textField name="name" class="text large"
+									<g:textField name="name" class="text large" size="100"
 										value="${productGroupInstance?.name}" />
 								</td>
 							</tr>
@@ -74,24 +72,7 @@
 								</td>
 							</tr>
 
-							<%--
-							<tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="dateCreated"><warehouse:message code="productGroup.dateCreated.label" default="Date Created" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'dateCreated', 'errors')}">
-                                   <div id="dateCreated">${productGroupInstance?.dateCreated}</div>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="lastUpdated"><warehouse:message code="productGroup.lastUpdated.label" default="Last Updated" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'lastUpdated', 'errors')}">
-                                    <div id="lastUpdated">${productGroupInstance?.lastUpdated}</div>
-                                </td>
-                            </tr>
-                            --%>
+
 							<tr class="prop">
 								<td valign="top" colspan="2">
 									<div class="buttons">

@@ -51,7 +51,7 @@
                                 ${product?.genericProduct?.name}
                             </g:link>
                             <g:if test="${product?.genericProduct?.description}">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${product?.genericProduct?.description}"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" class="middle" title="${product?.genericProduct?.description}"/>
                             </g:if>
                         </td>
                         <td>

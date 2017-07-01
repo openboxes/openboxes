@@ -659,74 +659,24 @@ shouldSubstitute=${shouldSubstitute}
 
                     </td>
                 </tr>
-                <%--
-                <tr class="prop">
-                    <td class="top right name">
-                        <label><warehouse:message code="requisitionItem.availability.label" default="Availability"/></label>
-                    </td>
-                    <td class="middle">
-                        <table style="width:auto;" class="box">
-                            <tr>
-                                <th><warehouse:message code="product.productCode.label"/></th>
-                                <th><warehouse:message code="product.label"/></th>
-                                <th><warehouse:message code="product.productPackages.label" default="Package sizes"/></th>
-                                <th><warehouse:message code="inventoryItem.quantityOnHand.label"/></th>
-                                <th><warehouse:message code="inventoryItem.status.label" default="Status"/></th>
-                            </tr>
-                            <g:set var='count' value='${0 }'/>
-                            <g:each var="product" in="${quantityOnHandMap.keySet()}">
-                                <g:set var="quantityOnHand" value="${quantityOnHandMap[product]?:0}"/>
-                                <g:set var="isAvailable" value="${(quantityOnHand > 0) && (quantityOnHand >= requisitionItem?.totalQuantity()) }"/>
 
-
-                                <g:set var="rowStyle" value=""/>
-                                <g:if test="${product == requisitionItem.product}">
-                                    <g:set var="rowStyle" value="highlight"/>
-                                </g:if>
-                                <tr class="${count++%2?'even':'odd'} ${rowStyle}">
-                                    <td>
-                                        ${product?.productCode}
-                                    </td>
-                                    <td>
-                                        <g:link controller="inventoryItem" action="showStockCard" id="${product?.id }" target="_blank" >
-                                            ${product?.name}
-                                        </g:link>
-                                    </td>
-                                    <td>
-                                        <ul>
-                                            <g:if test='${product.packages}'>
-                                                <g:each var="productPackage" in="${product.packages}">
-                                                    <li>${productPackage?.name} ${productPackage?.uom?.code}/${productPackage?.quantity}</li>
-                                                </g:each>
-                                            </g:if>
-                                            <g:else>
-                                                <li>EA/1</li>
-                                            </g:else>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        ${quantityOnHandMap[product]?:0} EA/1
-                                    </td>
-                                    <td>
-                                        <span class="box-status ${isAvailable?'success':'error'}">
-                                            ${isAvailable?"Available":"Unavailable"}
-                                        </span>
-                                    </td>
-
-                                </tr>
-
-                            </g:each>
-                        </table>
-                    </td>
-                </tr>
-                --%>
                 <tr class="prop">
                     <td></td>
                     <td class="middle left">
                         <div class="button-container">
-                            <button class="button icon approve">
-                                ${warehouse.message(code:'default.button.save.label') }
-                            </button>
+
+
+                            <g:if test="${requisitionItem?.product?.genericProduct?.description}">
+                                <g:set var="confirmRestrictions" value="${g.message(code:'productGroup.confirmRestrictions.message')}"/>
+                                <button class="button icon approve" onclick="return confirm('${confirmRestrictions}')">
+                                    ${warehouse.message(code:'default.button.save.label') }
+                                </button>
+                            </g:if>
+                            <g:else>
+                                <button class="button icon approve">
+                                    ${warehouse.message(code:'default.button.save.label') }
+                                </button>
+                            </g:else>
 
                             <g:remoteLink controller="requisition" action="editRequisitionItem" id="${requisitionItem?.requisition?.id }"
                                           class="button icon trash"
