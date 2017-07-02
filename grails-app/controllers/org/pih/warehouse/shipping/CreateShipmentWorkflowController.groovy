@@ -316,8 +316,10 @@ class CreateShipmentWorkflowController {
 				flash.itemToMove = ShipmentItem.get(params.itemToMoveId)
 			}.to("enterContainerDetails")
 
+            // FIXME Refactor/remove - seems to be used when adding items to an outgoing shipment
 			on("saveItem").to("saveItemAction")
-			
+
+            // FIXME Refactor/remove - seems to be used when editing items on an inbound shipment
 			on("updateItem").to("updateItemAction")
 			
 			on("deleteItem"){
@@ -377,13 +379,33 @@ class CreateShipmentWorkflowController {
 					shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
 					flash.message = "Added shipment item"
 				} catch (ShipmentItemException e) {
-					flash.message = e.message
 					[itemInstance: e.shipmentItem]
 				} catch (Exception e) {
 					flash.message = e.message
 				}
 
 			}.to("enterContainerDetails")
+
+
+            on("updateShipmentItem") {
+
+                log.info "params: " + params
+                try {
+                    def shipmentItem = ShipmentItem.get(params.item?.id)
+                    bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+                    shipmentService.saveShipmentItem(shipmentItem)
+                    flash.message = "Updated shipment item"
+
+                } catch (ValidationException e) {
+                    flow.shipmentInstance.errors = e.errors
+                    return error()
+
+                } catch (Exception e) {
+                    flash.message = e.message
+                    return error()
+                }
+
+            }.to("enterContainerDetails")
 
 			on("deleteContainers") {
 				log.info "Delete containers from shipment " + params
@@ -1267,16 +1289,16 @@ class CreateShipmentWorkflowController {
 				
     	updateItemAction {
     		action {
-				try { 
+				try {
 					log.info "update existing item: " + params
 
-	    			// Updating an existing shipment item 
+	    			// Updating an existing shipment item
 					def shipmentItem = ShipmentItem.get(params.item?.id)
 
 					// Bind the parameters to the item instance
 					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
-						
-					// Update the inventory item associated with this shipment item										
+
+					// Update the inventory item associated with this shipment item
 					def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
 					if (!inventoryItem) {
 						inventoryItem = new InventoryItem(params)
@@ -1284,20 +1306,20 @@ class CreateShipmentWorkflowController {
 					}
 					shipmentItem.inventoryItem = inventoryItem
 
-					
+
 					// In case there are errors, we use this flow-scoped variable to display errors to user
 					flow.itemInstance = shipmentItem;
-					
+
 					// Validate shipment item
 					shipmentItem.shipment = flow.shipmentInstance;
 					if (flow?.shipmentInstance?.destination?.id == session?.warehouse?.id || shipmentService.validateShipmentItem(shipmentItem)) {
-						if (!shipmentItem.id) { 
+						if (!shipmentItem.id) {
 							log.info ("saving new shipment item")
 							// Need to validate shipment item before adding it to the shipment
 							flow.shipmentInstance.addToShipmentItems(shipmentItem);
 							shipmentService.saveShipment(flow.shipmentInstance)
 						}
-						else { 					
+						else {
 							log.info ("saving existing shipment item")
 							shipmentService.saveShipmentItem(shipmentItem)
 						}
@@ -1312,7 +1334,7 @@ class CreateShipmentWorkflowController {
 				}
 				invalid();
     		}
-    		
+
     		on("valid").to("enterContainerDetails")
     		on("invalid").to("enterContainerDetails")
     	}

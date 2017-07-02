@@ -708,14 +708,12 @@ class ShipmentService {
 	 * 
 	 * @param item
 	 */
-	void saveShipmentItem(ShipmentItem shipmentItem) {
-		/*
-		if (!item.recipient) { 
-			item.recipient = (item?.container?.recipient)?:(item?.shipment?.recipient);
-		}*/
-		shipmentItem.save()
+	boolean saveShipmentItem(ShipmentItem shipmentItem) {
+        if (validateShipmentItem(shipmentItem)) {
+            return shipmentItem.save()
+        }
+        return false
 	}
-	
 	
 	
 	/**
@@ -772,9 +770,9 @@ class ShipmentService {
 
 	}
 
-	
+
 	/**
-	 * Validate the shipment item 	
+	 * Validate the shipment item
 	 * 
 	 * @param shipmentItem
 	 * @return

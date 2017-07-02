@@ -54,7 +54,12 @@
 				<div class="errors">
 					<g:renderErrors bean="${itemInstance}" as="list" />
 				</div>				
-			</g:hasErrors> 			         
+			</g:hasErrors>
+			<g:hasErrors bean="${shipmentInstance}">
+				<div class="errors">
+					<g:renderErrors bean="${shipmentInstance}" as="list" />
+				</div>
+			</g:hasErrors>
 			<div>
 				<g:render template="../shipment/summary" />	
  				<g:render template="flowHeader" model="['currentState':'Packing']"/>
