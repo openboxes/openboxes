@@ -47,7 +47,7 @@ class ShipmentController {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
 
-        params.max = Math.min(params.max ? params.int('max') : 100, 1000)
+        params.max = Math.min(params.max ? params.int('max') : 100, 10000)
 
         Calendar calendar = Calendar.instance
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)

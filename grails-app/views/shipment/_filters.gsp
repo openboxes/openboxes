@@ -130,7 +130,7 @@
                 <tr class="prop">
                     <td class="left">
                         <label>${warehouse.message(code: 'default.limit.label', default: 'Limit')}</label>
-                        <g:select name="max" from="[10,25,50,100,250,500,1000]" noSelection="['':'']" class="chzn-select-deselect" value="${params.max}"></g:select>
+                        <g:select name="max" from="[10,25,50,100,250,500,1000,2000,5000,10000]" noSelection="['':'']" class="chzn-select-deselect" value="${params.max}"></g:select>
 
                     </td>
                 </tr>
@@ -155,7 +155,7 @@
 								<warehouse:message code="default.search.label"/>
 							</button>
                             <g:link controller="shipment" action="list" class="button icon reload">
-                                <warehouse:message code="default.button.cancel.label"/>
+                                <warehouse:message code="default.button.reset.label" default="Reset"/>
                             </g:link>
 						</div>
 					</td>
