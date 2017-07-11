@@ -780,33 +780,35 @@ class ShipmentService {
 	}
 
 
-	/**
-	 * Validate the shipment item
-	 *
-	 * @param shipmentItem
-	 * @return
-	 */
-	boolean validateShipmentItem(ShipmentItem shipmentItem) {
-		def location = Location.get(shipmentItem?.shipment?.origin?.id);
-		log.info("Validating shipment item at " + location?.name + " for product " + shipmentItem.product + " and lot number " + shipmentItem.inventoryItem)
+    /**
+     * Validate the shipment item when it's being added to the shipment.
+     *
+     * @param shipmentItem
+     * @return
+     */
+    boolean validateShipmentItem(ShipmentItem shipmentItem) {
+        def location = Location.get(shipmentItem?.shipment?.origin?.id);
+        log.info("Validating shipment item at " + location?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
 
-        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
         // FIXME Please refactor this mess at a later date
+        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
         def quantityOnHand = shipmentItem.binLocation ?
                 inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
                 inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
 
-		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
-		if (!shipmentItem.validate()) {
-			throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
-		}
+        log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
+        if (!shipmentItem.validate()) {
+            throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
+        }
 
-		if (shipmentItem.quantity > quantityOnHand) {
-			shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
-			throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
-		}
-		return true;
-	}
+        if (shipmentItem.quantity > quantityOnHand) {
+            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
+            //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
+            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+        }
+        return true;
+    }
+
 
 	
 	/**
