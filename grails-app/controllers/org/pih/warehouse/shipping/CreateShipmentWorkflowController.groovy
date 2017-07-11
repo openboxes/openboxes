@@ -378,6 +378,10 @@ class CreateShipmentWorkflowController {
 				try {
 					shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
 					flash.message = "Added shipment item"
+
+                } catch (ValidationException e) {
+                    flow.shipmentInstance.errors = e.errors
+                    return error()
 				} catch (ShipmentItemException e) {
 					[itemInstance: e.shipmentItem]
 				} catch (Exception e) {
