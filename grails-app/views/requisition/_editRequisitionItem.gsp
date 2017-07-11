@@ -540,15 +540,18 @@ shouldSubstitute=${shouldSubstitute}
                     </td>
                 </tr>
 
-
-                <tr class="prop">
-                    <td class="middle right name">
-                        <label><g:message code="productGroup.description.label" default="Description"/></label>
-                    </td>
-                    <td class="middle">
-                        ${requisitionItem?.product?.genericProduct?.description}
-                    </td>
-                </tr>
+                <g:if test="${requisitionItem?.product?.genericProduct?.description}">
+                    <tr class="prop">
+                        <td class="top right name">
+                            <label><g:message code="productGroup.description.label" default="Description"/></label>
+                        </td>
+                        <td class="middle">
+                            <h1 class="error">
+                                ${requisitionItem?.product?.genericProduct?.description}
+                            </h1>
+                        </td>
+                    </tr>
+                </g:if>
 
 
 
@@ -664,8 +667,6 @@ shouldSubstitute=${shouldSubstitute}
                     <td></td>
                     <td class="middle left">
                         <div class="button-container">
-
-
                             <g:if test="${requisitionItem?.product?.genericProduct?.description}">
                                 <g:set var="confirmRestrictions" value="${g.message(code:'productGroup.confirmRestrictions.message')}"/>
                                 <button class="button icon approve" onclick="return confirm('${confirmRestrictions}')">
@@ -803,7 +804,7 @@ shouldSubstitute=${shouldSubstitute}
 </g:if>
 <script type="text/javascript">
 $(document).ready(function() {
-$(".remote-chzn-select").chosen();
-$(".remote-chzn-select-deselect").chosen({allow_single_deselect:true});
+    $(".remote-chzn-select").chosen();
+    $(".remote-chzn-select-deselect").chosen({allow_single_deselect:true});
 });
 </script>
