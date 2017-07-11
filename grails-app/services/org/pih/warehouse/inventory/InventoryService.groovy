@@ -1140,13 +1140,11 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	Integer getQuantity(Location location, Product product, String lotNumber) {
 
-		log.debug("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
+		log.info("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
 		if (!location) {
 			throw new RuntimeException("Must specify location in order to calculate quantity on hand");
 		}
-		else {
-			location = Location.get(location?.id)
-		}
+
 		def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
 		if (!inventoryItem) {
 			throw new RuntimeException("There's no inventory item for product " + product?.name + " lot number " + lotNumber)
@@ -1360,13 +1358,13 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
-    List getQuantityByBinLocation(Location location, Product product) {
+    List getProductQuantityByBinLocation(Location location, Product product) {
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, [product])
         List binLocations = getQuantityByBinLocation(transactionEntries)
         return binLocations
     }
 
-    List getQuantityByBinLocation(Location location, List<Product> products) {
+    List getProductQuantityByBinLocation(Location location, List<Product> products) {
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, products)
         List binLocations = getQuantityByBinLocation(transactionEntries)
         return binLocations
@@ -2191,7 +2189,9 @@ class InventoryService implements ApplicationContextAware {
     List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
         def criteria = TransactionEntry.createCriteria();
         def transactionEntries = criteria.list {
-            eq("binLocation", binLocation)
+			if (binLocation) {
+				eq("binLocation", binLocation)
+			}
             transaction {
                 eq("inventory", inventory)
                 order("transactionDate", "asc")
@@ -3229,8 +3229,6 @@ class InventoryService implements ApplicationContextAware {
     def getInventorySampling(Location location, Integer n) {
         def inventoryItems = []
         Map<InventoryItem, Integer> inventoryItemMap = getQuantityForInventory(location.inventory);
-
-        log.info inventoryItemMap
 
         List inventoryItemKeys = inventoryItemMap.keySet().asList()
         Integer maxSize = inventoryItemKeys.size()

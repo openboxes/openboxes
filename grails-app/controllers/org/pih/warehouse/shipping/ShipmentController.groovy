@@ -416,7 +416,7 @@ class ShipmentController {
         ReceiptItem receiptItem = ReceiptItem.load(params.id)
 
         Product productInstance = receiptItem.inventoryItem?.product // Product.load(params.id)
-        def binLocations = inventoryService.getQuantityByBinLocation(location, productInstance)
+        def binLocations = inventoryService.getProductQuantityByBinLocation(location, productInstance)
 
         render template: "showPutawayLocations", model: [product: productInstance, binLocations: binLocations]
     }

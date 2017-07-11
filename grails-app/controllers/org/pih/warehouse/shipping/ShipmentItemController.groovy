@@ -121,7 +121,7 @@ class ShipmentItemController {
         else {
             Location location = Location.load(session.warehouse.id)
             //List binLocations = inventoryService.getItemQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
-            List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItemInstance.product)
+            List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItemInstance.product)
 
 
             [shipmentItem: shipmentItemInstance, binLocations: binLocations]
@@ -137,7 +137,7 @@ class ShipmentItemController {
         else {
             Location location = Location.load(session.warehouse.id)
             //List binLocations = inventoryService.getItemQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
-            List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItemInstance.product)
+            List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItemInstance.product)
 
             [shipmentItemInstance: shipmentItemInstance, binLocations: binLocations]
         }

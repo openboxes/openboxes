@@ -557,7 +557,7 @@ class CreateShipmentWorkflowController {
                 Location location = Location.load(session.warehouse.id)
                 def currentShipmentItemId = params.currentShipmentItemId
                 ShipmentItem shipmentItem = flow.shipmentInstance?.getNextShipmentItem(currentShipmentItemId)
-                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem?.product)
+                List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItem?.product)
                 log.info "binLocations: " + binLocations
                 [shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
@@ -570,7 +570,7 @@ class CreateShipmentWorkflowController {
                 if (flow?.shipmentInstance?.origin == location) {
                     log.info "Calcuating quantity for products in shipment"
                     List products = flow?.shipmentInstance?.shipmentItems*.product
-                    List binLocations = inventoryService.getQuantityByBinLocation(location, products)
+                    List binLocations = inventoryService.getProductQuantityByBinLocation(location, products)
                     //def quantityMap = binLocations.groupBy { it?.inventoryItem?.product }
                     log.info "Done calcuating quantity for products in shipment"
                 }
@@ -626,7 +626,7 @@ class CreateShipmentWorkflowController {
 				log.info "Pick shipment item " + params
 				def shipmentItem = ShipmentItem.load(params?.shipmentItem?.id)
                 Location location = Location.load(session.warehouse.id)
-                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
+                List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItem.product)
                 log.info "binLocations: " + binLocations
 				[shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
