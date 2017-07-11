@@ -1409,9 +1409,8 @@ class InventoryService implements ApplicationContextAware {
             }
 
         }
-        //binLocations = binLocations.sort { it?.binLocation?.name }
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { it?.inventoryItem?.expirationDate?:it?.binLocation?.name }
+        binLocations = binLocations.sort { a,b -> a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name }
 
         return binLocations
     }
