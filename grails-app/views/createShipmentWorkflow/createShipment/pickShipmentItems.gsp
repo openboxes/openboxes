@@ -9,7 +9,8 @@
          	.right-border { border-right: 2px solid lightgrey; }
              .active { background-color: #b2d1ff;  }
              .active td { color: #666; }
-             .same-lot-number td { font-weight: bold }
+             .same-lot-number { font-weight: bold }
+             .different-lot-number { color: #666; }
              .different-product { border-top: 3px solid lightgrey; }
              .body { min-height: 800px; }
          </style>
