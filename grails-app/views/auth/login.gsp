@@ -7,7 +7,7 @@
 	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
 	<style>
-		input, button { width: 100%; font-size: 2em; text-align: left; padding: 10px; }
+		input, button { width: 100%; font-size: 2em; text-align: center; padding: 10px; }
 	</style>
 </head>
 <body>
