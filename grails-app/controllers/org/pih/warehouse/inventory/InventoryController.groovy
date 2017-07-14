@@ -750,7 +750,7 @@ class InventoryController {
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name?:"") + ","
-            csv += StringEscapeUtils.escapeCsv(product?.genericProduct?.description?:"") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.genericProduct?.name?:"") + ","
             csv += '"' + (inventoryItem?.lotNumber?:"")  + '"' + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy')  + '"' + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
@@ -808,7 +808,7 @@ class InventoryController {
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
-            csv += '"' + (product?.genericProduct?.description?:"")  + '"' + ","
+            csv += '"' + (product?.genericProduct?.name?:"")  + '"' + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
             csv += '"' + (product?.manufacturer?:"")  + '"' + ","
@@ -1217,17 +1217,7 @@ class InventoryController {
 			transactionInstance = new Transaction();
 		}
 		
-		def localTransfer = LocalTransfer.findBySourceTransactionOrDestinationTransaction(transactionInstance, transactionInstance)
-		
-		def model = [
-			transactionInstance : transactionInstance,
-			localTransfer: localTransfer,
-			//productInstanceMap: Product.list().groupBy { it.category },
-			//transactionTypeList: TransactionType.list(),
-			//locationInstanceList: Location.list(),
-			//warehouseInstance: Location.get(session?.warehouse?.id)
-		];
-		
+		def model = [transactionInstance : transactionInstance ]
 		render(view: "showTransaction", model: model);
 	}
 	
@@ -1293,7 +1283,7 @@ class InventoryController {
                 products = Product.getAll(productIds)
                 command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds);
 
-                command.binLocations = inventoryService.getQuantityByBinLocation(warehouseInstance, products)
+                command.binLocations = inventoryService.getProductQuantityByBinLocation(warehouseInstance, products)
             }
 		}
 		// If given a list of inventory items, we just return those inventory items
@@ -1385,7 +1375,7 @@ class InventoryController {
 				def productIds = params.list('product.id')
 				def products = productIds.collect { String.valueOf(it); }
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
-                command.binLocations = inventoryService.getQuantityByBinLocation(warehouseInstance, products)
+                command.binLocations = inventoryService.getProductQuantityByBinLocation(warehouseInstance, products)
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
@@ -1464,7 +1454,7 @@ class InventoryController {
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds);
-                command.binLocations = inventoryService.getQuantityByBinLocation(warehouseInstance, products)
+                command.binLocations = inventoryService.getProductQuantityByBinLocation(warehouseInstance, products)
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {

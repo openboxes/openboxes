@@ -367,7 +367,7 @@ class ReportService implements ApplicationContextAware {
                     status: status,
                     productCode: product.productCode,
                     genericProductId:product?.genericProduct?.id,
-                    genericProduct:product?.genericProduct?.description?:product.name,
+                    genericProduct:product?.genericProduct?.name?:product.name,
                     hasProductGroup: (product?.genericProduct?.id!=null),
                     unitOfMeasure: product.unitOfMeasure,
                     imageUrl: imageUrl,

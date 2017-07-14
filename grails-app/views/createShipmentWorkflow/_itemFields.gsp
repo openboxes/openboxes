@@ -32,7 +32,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="5" class="text" /> 
+						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="10" class="text" />
 					</td>
 				</tr>  	        
 				<tr class="prop">
@@ -47,7 +47,7 @@
 					<td>
 						<div class="left">
 							<g:if test="${itemToEdit}">
-								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>
+								<g:submitButton name="updateShipmentItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>
 							</g:if>
 							<g:else>
 								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}" class="button"></g:submitButton>

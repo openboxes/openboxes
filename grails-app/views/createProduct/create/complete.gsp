@@ -53,7 +53,7 @@
 									<td>
 										<g:each var="productGroup" in="${product?.productGroups }">
 											<g:link controller="productGroup" action="edit" id="${productGroup.id }">
-											${productGroup?.description }
+											${productGroup?.name }
 											</g:link>
 										</g:each>			
 									</td>

@@ -109,7 +109,7 @@ class UserService {
             if (params.status) {
                 eq("active", Boolean.valueOf(params.status))
             }
-
+            // Disabled to allow the user to choose sorting mechanism (should probably add this as the default)
             //order("lastName", "desc")
         }
 

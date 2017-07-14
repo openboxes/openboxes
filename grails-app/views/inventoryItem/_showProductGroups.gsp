@@ -48,8 +48,11 @@
                         </td>
                         <td>
                             <g:link controller="productGroup" action="show" id="${product?.genericProduct?.id}">
-                                ${product?.genericProduct?.description}
+                                ${product?.genericProduct?.name}
                             </g:link>
+                            <g:if test="${product?.genericProduct?.description}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" class="middle" title="${product?.genericProduct?.description}"/>
+                            </g:if>
                         </td>
                         <td>
                             ${product.manufacturer}

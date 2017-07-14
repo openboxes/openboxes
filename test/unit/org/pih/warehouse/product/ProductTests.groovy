@@ -33,9 +33,9 @@ class ProductTests extends GrailsUnitTestCase {
 
         product1.inventoryItems = [item1, item2, item3, item4]
 
-        ProductGroup productGroup1 = new ProductGroup(description: "productGroup1")
+        ProductGroup productGroup1 = new ProductGroup(name: "productGroup1")
 
-        ProductGroup productGroup2 = new ProductGroup(description: "productGroup2")
+        ProductGroup productGroup2 = new ProductGroup(name: "productGroup2")
 
         mockDomain(Product, [product1,product2,product3,product4])
         mockDomain(InventoryItem, [item1, item2, item3, item4])
@@ -92,10 +92,10 @@ class ProductTests extends GrailsUnitTestCase {
         def product3 = Product.findByName("product3")
         def product4 = Product.findByName("product4")
 
-        def productGroup1 = ProductGroup.findByDescription("productGroup1")
+        def productGroup1 = ProductGroup.findByName("productGroup1")
         assert productGroup1.products.size() == 3
 
-        def productGroup2 = ProductGroup.findByDescription("productGroup2")
+        def productGroup2 = ProductGroup.findByName("productGroup2")
         assert productGroup2.products.size() == 3
 
         assert product1.alternativeProducts().size() == 3

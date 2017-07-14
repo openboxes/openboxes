@@ -73,7 +73,7 @@
 
                                                     </td>
                                                     <td>
-                                                        <g:formatDate date="${command?.shipment?.expectedShippingDate }"/>
+                                                        <g:formatDate date="${command?.shipment?.expectedShippingDate }" format="MMM dd, yyyy hh:mma z"/>
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
@@ -82,7 +82,7 @@
 
                                                     </td>
                                                     <td>
-                                                        <g:formatDate date="${command?.shipment?.expectedDeliveryDate }"/>
+                                                        <g:formatDate date="${command?.shipment?.expectedDeliveryDate }" format="MMM dd, yyyy hh:mma z"/>
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
@@ -133,7 +133,7 @@
                                                         <label><warehouse:message code="shipping.printedOn.label" default="Printed on"/></label>
                                                     </td>
                                                     <td>
-                                                        <g:formatDate date="${new Date()}" format="MMM dd hh:mma z"/>
+                                                        <g:formatDate date="${new Date()}" format="MMM dd, yyyy hh:mma z"/>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -161,9 +161,11 @@
                                             <th class="middle">
                                                 <warehouse:message code="product.description.label"/>
                                             </th>
+                                            <%--
                                             <th class="center middle">
                                                 <warehouse:message code="default.bin.label" default="Bin"/>
                                             </th>
+                                            --%>
                                             <th class="center middle">
                                                 <warehouse:message code="default.lotNumber.label" default="Lot"/>
                                             </th>
@@ -209,9 +211,12 @@
                                                                  alt="" title="${warehouse.message(code:'product.coldChain.message') }" class="middle"/>
                                                     </g:if>
                                                 </td>
+                                                <%--
                                                 <td>
                                                     ${entry?.shipmentItem?.binLocation?.name?:g.message(code:'default.label')}
                                                 </td>
+                                                --%>
+
                                                 <td>
                                                     ${entry?.shipmentItem?.inventoryItem?.lotNumber?:entry?.shipmentItem?.lotNumber  }
                                                 </td>
@@ -239,7 +244,9 @@
                                                     </table>
                                                 </td>
                                                 <td class="border-right" width="10%">
-
+                                                    <g:if test="${entry?.shipmentItem?.binLocation}">
+                                                        ${entry?.shipmentItem?.binLocation?.name}
+                                                    </g:if>
                                                 </td>
                                                 <td class="border-right" width="10%">
 

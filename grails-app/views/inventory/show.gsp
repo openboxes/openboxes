@@ -139,7 +139,7 @@
                                 </td>
                                 <td>
                                     <g:link controller="productGroup" action="edit" id="${product?.genericProduct?.id}">
-                                        ${product?.genericProduct?.description?:""}
+                                        ${product?.genericProduct?.name?:""}
                                     </g:link>
                                 </td>
                                 <td>

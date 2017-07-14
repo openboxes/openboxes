@@ -222,9 +222,9 @@ class BootStrap {
     private def addProductAndInventoryItemIfNotExist(Map<String, Object> inventoryItemInfo) {
         def productGroup = null
         if (inventoryItemInfo.productGroup) {
-            productGroup = ProductGroup.findByDescription(inventoryItemInfo.productGroup)
+            productGroup = ProductGroup.findByName(inventoryItemInfo.productGroup)
             if (!productGroup) {
-                productGroup = new ProductGroup(description: inventoryItemInfo.productGroup)
+                productGroup = new ProductGroup(name: inventoryItemInfo.productGroup)
                 productGroup.category = inventoryItemInfo.product.category
                 productGroup.save(failOnError: true, flush: true)
             }

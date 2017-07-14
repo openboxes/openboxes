@@ -317,6 +317,9 @@
 			<div class="megaButton">
 				<g:link controller="inventory" action="listReorderStock" class="report-reorder"><warehouse:message code="inventory.reorderStock.label"/></g:link>
 			</div>
+            <div class="megaButton">
+                <g:link controller="report" action="exportBinLocation" params="[downloadFormat:'csv']" class=""><warehouse:message code="report.exportBinLocations.label" default="Export bin locations"/></g:link>
+            </div>
             <hr/>
             <div class="megaButton">
                 <g:link controller="product" action="exportAsCsv" class="list"><warehouse:message code="product.exportAsCsv.label"/></g:link>

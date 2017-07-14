@@ -14,6 +14,7 @@ package org.pih.warehouse
 
 import com.ocpsoft.pretty.time.PrettyTime
 import groovy.time.TimeDuration
+import org.pih.warehouse.core.Constants
 
 class DateTagLib {
 
@@ -24,16 +25,10 @@ class DateTagLib {
 
         def today = new Date()
         if (!attrs.format) {
-            if (attrs.date >= today - 1) {
-                attrs.format = "hh:mma z"
-            } else if (attrs.date >= today - 30) {
-                attrs.format = "MMM dd hh:mma z"
-            } else if (attrs.date >= today - 365) {
-                attrs.format = "MMM dd yyyy"
-            }
+			attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
         }
+
         out << formatTagLib.formatDate.call(attrs)
-		//out << g.dateFormat([date:null])
 	}
 
 	def expirationDate = { attrs, body ->
@@ -91,14 +86,7 @@ class DateTagLib {
 	def prettyDateFormat = { attrs, body ->
 		def date = (attrs.date)?:new Date();
 		def p = new PrettyTime();
-		
-		def now = new Date() 
-		if (now - date < 1) { 
-			out << "${g.message(code:'default.today.label')}"
-		}
-		else { 
-			out << 	p.format(date);
-		}
+		out << p.format(date)
 	}
 		
 }

@@ -17,7 +17,7 @@ class CalculateQuantityJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'cronTrigger', cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
     def execute(JobExecutionContext context) {

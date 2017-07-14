@@ -148,20 +148,20 @@
                                             </g:else>
                                             ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
 
-                                        </td>
-                                        <td>
-                                            ${entry.key.productCode}
-                                        </td>
-                                        <td>
-                                            <g:link controller="inventoryItem" action="showStockCard" id="${entry.key.id}">
-                                                ${entry?.key?.name}
-                                            </g:link>
-                                        </td>
-                                        <td>
-                                            ${entry.key?.genericProduct?.description?:""}
-                                        </td>
-                                        <td>
-                                            ${entry.key?.category?.name}
+                                    </td>
+                                    <td>
+                                        ${entry.key.productCode}
+                                    </td>
+                                    <td>
+                                        <g:link controller="inventoryItem" action="showStockCard" id="${entry.key.id}">
+                                            ${entry?.key?.name}
+                                        </g:link>
+                                    </td>
+                                    <td>
+                                        ${entry.key?.genericProduct?.name?:""}
+                                    </td>
+                                    <td>
+                                        ${entry.key?.category?.name}
 
                                         </td>
                                         <td>

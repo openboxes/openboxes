@@ -123,7 +123,7 @@
                                             </g:link>
                                         </td>
                                         <td>
-                                            ${requisitionItemInstance?.product?.genericProduct?.description?:""}
+                                            ${requisitionItemInstance?.product?.genericProduct?.name?:""}
 
                                         </td>
 

@@ -47,7 +47,7 @@ class ShipmentController {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
 
-        params.max = Math.min(params.max ? params.int('max') : 100, 1000)
+        params.max = Math.min(params.max ? params.int('max') : 100, 10000)
 
         Calendar calendar = Calendar.instance
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
@@ -328,7 +328,7 @@ class ShipmentController {
 		[shipmentInstance:shipmentInstance]
 	}
 	
-	def markAsReceived = { 		
+	def markAsReceived = {
 		def shipmentInstance = Shipment.get(params.id)
 		
 		// actually process the receipt
@@ -344,6 +344,23 @@ class ShipmentController {
 		def shipmentIds = params.list("shipment.id")
 		try {
 			shipmentService.receiveShipments(shipmentIds, null, session.user.id, session.warehouse.id, true)
+			flash.message = "Successfully received shipments"
+
+		} catch (Exception e) {
+			flash.message = "Error occurred while bulk receiving shipments: " + e.message
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
+
+
+	def bulkMarkAsReceived = {
+		def shipmentIds = params.list("shipment.id")
+		Location location = Location.load(session.warehouse.id)
+		try {
+			shipmentIds.each { shipmentId ->
+				Shipment shipment = Shipment.load(shipmentId)
+				shipmentService.markAsReceived(shipment, location)
+			}
 			flash.message = "Successfully received shipments"
 
 		} catch (Exception e) {
@@ -399,7 +416,7 @@ class ShipmentController {
         ReceiptItem receiptItem = ReceiptItem.load(params.id)
 
         Product productInstance = receiptItem.inventoryItem?.product // Product.load(params.id)
-        def binLocations = inventoryService.getQuantityByBinLocation(location, productInstance)
+        def binLocations = inventoryService.getProductQuantityByBinLocation(location, productInstance)
 
         render template: "showPutawayLocations", model: [product: productInstance, binLocations: binLocations]
     }
@@ -526,7 +543,7 @@ class ShipmentController {
                     redirect(controller:"shipment", action : "showDetails", id: shipmentInstance?.id)
                 }
                 else {
-                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id)
+                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id, fragment: "tabs-details")
                 }
                 return
 

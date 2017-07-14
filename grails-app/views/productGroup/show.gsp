@@ -27,9 +27,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="productGroup.description.label" default="Description" /></td>
+                            <td valign="top" class="name"><warehouse:message code="productGroup.name.label" default="Name" /></td>
                             
-                            <td valign="top" class="value">${fieldValue(bean: productGroupInstance, field: "description")}</td>
+                            <td valign="top" class="value">${fieldValue(bean: productGroupInstance, field: "name")}</td>
                             
                         </tr>
                     

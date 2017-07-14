@@ -180,13 +180,13 @@
                 <td class="value">
                     <span class="">
                         <g:if test="${latestInventoryDate}">
-                            <div title="${g.prettyDateFormat(date: latestInventoryDate)}">
-                                ${g.formatDate(date: latestInventoryDate, format: 'MMM dd hh:mm a') }
-                            </div>
+                            <p title="${g.formatDate(date: latestInventoryDate, format: 'dd MMMMM yyyy hh:mm a') }">
+                                ${g.prettyDateFormat(date: latestInventoryDate)}
+                            </p>
 
                         </g:if>
                         <g:else>
-                            <span class="fade"><warehouse:message code="default.never.label" /></span>
+                            <p class="fade"><warehouse:message code="default.never.label" /></p>
                         </g:else>
                     </span>
                 </td>
@@ -368,7 +368,7 @@
                     <g:if test="${productInstance?.productGroups }">
                         <g:each var="productGroup" in="${productInstance?.productGroups }">
                             <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
-                                ${productGroup?.description }
+                                ${productGroup?.name }
                             </g:link>
                         </g:each>
                     </g:if>

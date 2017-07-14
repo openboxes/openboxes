@@ -160,7 +160,10 @@ class AuthController {
 				userInstance.passwordConfirm = params.passwordConfirm.encodeAsPassword();
 			}
 			userInstance.active = Boolean.FALSE;
-			
+
+			// Set the email as username for backwards compatibility since we're no longer including username on signup
+			userInstance.username = params.email
+
 			// Create account 
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {				
 				session.user = userInstance;

@@ -331,7 +331,7 @@ class InventoryService implements ApplicationContextAware {
 
 	InventoryItemCommand getInventoryItemCommand(ProductGroup productGroup, Inventory inventory, Boolean showOutOfStockProducts) {
 		InventoryItemCommand inventoryItemCommand = new InventoryItemCommand();
-		inventoryItemCommand.description = productGroup.description
+		inventoryItemCommand.description = productGroup.name
 		inventoryItemCommand.productGroup = productGroup
 		inventoryItemCommand.category = productGroup.category
 		//inventoryItemCommand.quantityOnHand = 1
@@ -360,7 +360,7 @@ class InventoryService implements ApplicationContextAware {
 		def productGroups = getProductGroups(inventoryCommand?.warehouseInstance, searchTerms, categoryFilters,
 				inventoryCommand?.showHiddenProducts);
 
-		productGroups = productGroups?.sort() { it?.description };
+		productGroups = productGroups?.sort() { it?.name };
 		return productGroups;
 	}
 
@@ -1000,39 +1000,19 @@ class InventoryService implements ApplicationContextAware {
 	 * @param categories
 	 * @return
 	 */
-	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResult, offset) {
+	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResults, offset) {
 		def startTime = System.currentTimeMillis()
-		//def products = Product.executeQuery("select
-		//"select inventory_item.lot_number from product left join inventory_item on inventory_item.product_id = product.id where product.name like '%lactomer%'"
-//		def unsupportedProducts = []
-//		if(!showHidden) {
-//			currentInventory?.configuredProducts?.each {
-//				if(it.status != InventoryStatus.SUPPORTED) {
-//					unsupportedProducts.add(it.product)
-//				}
-//			}
-//		}
-        log.info "Get supported products: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        startTime = System.currentTimeMillis()
-		def products = Product.createCriteria().list(max: maxResult, offset: offset) {
-			if (terms) {
-				createAlias("inventoryItems", "inventoryItems", CriteriaSpecification.LEFT_JOIN)
-                //createAlias("inventoryLevels", "inventoryLevels", CriteriaSpecification.LEFT_JOIN)
-			}
-			if(categories) {
-				inList("category", categories)
+        def products = Product.createCriteria().list(max: maxResults, offset: offset) {
+            if(categories) {
+                inList("category", categories)
             }
-//			if (!showHidden) {
-//				not {
-//					inList("id", (unsupportedProducts.collect { it.id })?: [""])
-//				}
-//			}
-			if (terms) {
-				and {
+            if (terms) {
+                and {
                     terms.each { term ->
                         or {
-                            ilike('inventoryItems.lotNumber', "%" + term + "%")
+                            //inventoryItems {
+                            //    ilike('lotNumber', "%" + term + "%")
+                            //}
                             //ilike('inventoryLevels.binLocation', "%" + term + "%")
                             ilike("name", "%" + term + "%")
                             ilike("description", "%" + term + "%")
@@ -1049,13 +1029,13 @@ class InventoryService implements ApplicationContextAware {
                             ilike("productCode", "%" + term + "%")
                         }
                     }
-				}
-			}
+                }
+            }
             order("name", "asc")
         }
         log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		return products;	
+		return products;
 	}
 
 
@@ -1199,13 +1179,11 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	Integer getQuantity(Location location, Product product, String lotNumber) {
 
-		log.debug("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
+		log.info("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
 		if (!location) {
 			throw new RuntimeException("Must specify location in order to calculate quantity on hand");
 		}
-		else {
-			location = Location.get(location?.id)
-		}
+
 		def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
 		if (!inventoryItem) {
 			throw new RuntimeException("There's no inventory item for product " + product?.name + " lot number " + lotNumber)
@@ -1420,13 +1398,13 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
-    List getQuantityByBinLocation(Location location, Product product) {
+    List getProductQuantityByBinLocation(Location location, Product product) {
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, [product])
         List binLocations = getQuantityByBinLocation(transactionEntries)
         return binLocations
     }
 
-    List getQuantityByBinLocation(Location location, List<Product> products) {
+    List getProductQuantityByBinLocation(Location location, List<Product> products) {
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, products)
         List binLocations = getQuantityByBinLocation(transactionEntries)
         return binLocations
@@ -1471,9 +1449,8 @@ class InventoryService implements ApplicationContextAware {
             }
 
         }
-        //binLocations = binLocations.sort { it?.binLocation?.name }
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { it?.inventoryItem?.expirationDate?:it?.binLocation?.name }
+        binLocations = binLocations.sort { a,b -> a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name }
 
         return binLocations
     }
@@ -2377,7 +2354,9 @@ class InventoryService implements ApplicationContextAware {
     List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
         def criteria = TransactionEntry.createCriteria();
         def transactionEntries = criteria.list {
-            eq("binLocation", binLocation)
+			if (binLocation) {
+				eq("binLocation", binLocation)
+			}
             transaction {
                 eq("inventory", inventory)
                 order("transactionDate", "asc")
@@ -3416,8 +3395,6 @@ class InventoryService implements ApplicationContextAware {
         def inventoryItems = []
         Map<InventoryItem, Integer> inventoryItemMap = getQuantityOnHandByInventoryItem(location);
 
-        log.info inventoryItemMap
-
         List inventoryItemKeys = inventoryItemMap.keySet().asList()
         Integer maxSize = inventoryItemKeys.size()
 
@@ -3546,7 +3523,7 @@ class InventoryService implements ApplicationContextAware {
                 'Product code': product.productCode?:'',
                 'Product': product.name,
                 'UOM': product.unitOfMeasure,
-                'Generic product': product?.genericProduct?.description?:"",
+                'Generic product': product?.genericProduct?.name?:"",
                 'Category': product?.category?.name,
                 'Manufacturer': product?.manufacturer?:"",
                 'Manufacturer code': product?.manufacturerCode?:"",
@@ -4413,7 +4390,7 @@ class InventoryService implements ApplicationContextAware {
         } ) { map, entry ->
             def product = entry?.product
             def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
-            def nameKey = entry?.genericProduct?.description?:entry?.product?.name
+            def nameKey = entry?.genericProduct?.name?:entry?.product?.name
             map[nameKey].name = nameKey
 
             if (entry?.genericProduct) {
@@ -4474,7 +4451,7 @@ class InventoryService implements ApplicationContextAware {
             map[nameKey].products << [
                     product:entry.product?.name,
                     productCode: entry?.product?.productCode,
-                    genericProduct: entry?.genericProduct?.description,
+                    genericProduct: entry?.genericProduct?.name,
                     status: inventoryLevel?.statusMessage(entry.currentQuantity?:0),
                     minQuantity:inventoryLevel?.minQuantity?:0,
                     reorderQuantity:inventoryLevel?.reorderQuantity?:0,

@@ -516,11 +516,11 @@ class JsonController {
         def c = ProductGroup.createCriteria()
         def results = c.list {
             projections {
-                property "description"
+                property "name"
             }
             and {
                 searchTerms.each { searchTerm ->
-                    ilike("description", "%" + searchTerm + "%" )
+                    ilike("name", "%" + searchTerm + "%" )
                 }
             }
         }
@@ -670,6 +670,7 @@ class JsonController {
 	 */
 	def findInventoryItems = {
 		log.info params
+        long startTime = System.currentTimeMillis()
 		def inventoryItems = []
 		def location = Location.get(session.warehouse.id);
 		if (params.term) {
@@ -680,8 +681,8 @@ class JsonController {
 
 			if (tempItems) {
 
-                if (tempItems.size() > 100) {
-                    //includeQuantity = false
+                if (tempItems.size() > 500) {
+                    includeQuantity = false
                     def message = "${warehouse.message(code:'inventory.tooManyItemsFound.message', default: 'Found {1} items for term "{0}". Too many items so disabling QoH. Try searching by product code.', args: [params.term, tempItems.size()])}"
                     inventoryItems << [id: 'null', value: message]
                 }
@@ -694,6 +695,7 @@ class JsonController {
                         }
                     }
 
+
                     tempItems.each {
                         def quantity = quantitiesByInventoryItem[it]
                         quantity = (quantity) ?: 0
@@ -702,7 +704,7 @@ class JsonController {
                         localizedName = (it.product.productCode ?: " - ") + " " + localizedName
                         inventoryItems = inventoryItems.sort { it.expirationDate }
 
-                        if (quantity >= 0) {
+                        if (quantity > 0) {
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
@@ -718,6 +720,11 @@ class JsonController {
                             ]
                         }
                     }
+
+                    def count = inventoryItems.size()
+                    def responseTime = System.currentTimeMillis() - startTime
+                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items in ${responseTime} ms"])
+
                 }
 			}
 		}
@@ -726,7 +733,7 @@ class JsonController {
 			inventoryItems << [id: 'null', value: message]			
 		}
 		else {
-			inventoryItems = inventoryItems.sort { it.quantity }.reverse()
+			inventoryItems = inventoryItems.sort { it.expirationDate }
 		}
 		
 		render inventoryItems as JSON;
@@ -941,9 +948,9 @@ class JsonController {
 			items.addAll(products)
 
 			def productGroups = ProductGroup.withCriteria {
-				ilike("description", "%" + params.term + "%")
+				ilike("name", "%" + params.term + "%")
 			}
-			productGroups.each { items << [id: it.id, name: it.description, class: it.class] }
+			productGroups.each { items << [id: it.id, name: it.name, class: it.class] }
 			//items.addAll(productGroups)
 
 			
@@ -1161,7 +1168,7 @@ class JsonController {
                     name: product.name,
                     status: status,
                     productCode: product.productCode,
-                    genericProduct:product?.genericProduct?.description?:"Empty",
+                    genericProduct:product?.genericProduct?.name?:"Empty",
                     //inventoryLevel: inventoryLevel,
                     minQuantity: inventoryLevel?.minQuantity?:0,
                     maxQuantity: inventoryLevel?.maxQuantity?:0,
@@ -1223,7 +1230,7 @@ class JsonController {
                     name: product.name,
                     status: status,
                     productCode: product.productCode,
-                    genericProduct:product?.genericProduct?.description?:"Empty",
+                    genericProduct:product?.genericProduct?.name?:"Empty",
                     inventoryLevel: inventoryLevel,
                     minQuantity: inventoryLevel?.minQuantity?:0,
                     maxQuantity: inventoryLevel?.maxQuantity?:0,

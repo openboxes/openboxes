@@ -48,6 +48,7 @@
 								</td>
 								<td valign="top" id="shipmentStatus" class="value">
 									<format:metadata obj="${shipmentInstance?.status?.code}"/>
+                                    ${shipmentInstance?.currentStatus}
 									<%--
 									<span>
 										<g:if test="${shipmentInstance?.status?.location}">
@@ -455,8 +456,7 @@
                                     <g:if test="${shipmentInstance.shipmentItems}">
                                         <g:set var="count" value="${0 }"/>
                                         <g:set var="previousContainer"/>
-                                        <g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort()}"/>
-                                        <g:each var="shipmentItem" in="${shipmentItems}" status="i">
+                                        <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItems()}" status="i">
                                             <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                                             <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
                                             <tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} shipmentItem">

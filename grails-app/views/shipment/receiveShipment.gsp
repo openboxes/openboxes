@@ -21,10 +21,6 @@
                 ${flash.message}
             </div>
         </g:if>
-        <div class="message">
-            ${g.message(code: 'receipt.saveAndContinue.message')}
-        </div>
-
 
         <g:hasErrors bean="${receiptInstance}">
             <div class="errors">
@@ -156,6 +152,11 @@
                                     </div>
                                 </g:if>
                                 <g:else>
+
+                                    <div class="message">
+                                        ${g.message(code: 'receipt.saveAndContinue.message')}
+                                    </div>
+
                                     <table>
                                         <thead>
                                             <tr>
@@ -223,7 +224,7 @@
                                                         </td>
                                                         <td class="middle center">
                                                             <g:selectBinLocation name="receiptItems[${i}].binLocation.id"
-                                                                                 class="chzn-select-deselect" noSelection="['':'']" value="${receiptItem?.binLocation?.id}"/>
+                                                                                 class="chzn-select-deselect" noSelection="['null':'']" value="${receiptItem?.binLocation?.id}"/>
                                                         </td>
                                                         <td class="middle left">
                                                             <a href="javascript:void(-1)" data-id="${receiptItem?.id}" class="btnShowPutaways">

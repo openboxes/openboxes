@@ -9,5 +9,7 @@
     <include file="0.7.x/changelog-2017-03-06-1953-add-shipping-document-templates.xml"/>
     <include file="0.7.x/changelog-2017-04-02-0025-bin-locations.xml"/>
     <include file="0.7.x/changelog-2017-04-17-1437-adjust-inventory-supported-activity.xml"/>
+    <include file="0.7.x/changelog-2017-06-28-1250-refactor-product-group.xml"/>
+    <include file="0.7.x/changelog-2017-06-28-2135-add-column-shipment-current-status.xml"/>
 
 </databaseChangeLog>
