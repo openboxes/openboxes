@@ -534,7 +534,7 @@ grails.doc.footer = ""
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {
     id generator:'uuid'
-	cache true
+	//cache true
     dynamicUpdate true
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTime, class: org.joda.time.DateTime

@@ -27,8 +27,8 @@ class DateTagLib {
         if (!attrs.format) {
 			attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
         }
+
         out << formatTagLib.formatDate.call(attrs)
-		//out << g.dateFormat([date:null])
 	}
 
 	def expirationDate = { attrs, body ->
@@ -86,14 +86,7 @@ class DateTagLib {
 	def prettyDateFormat = { attrs, body ->
 		def date = (attrs.date)?:new Date();
 		def p = new PrettyTime();
-		
-		def now = new Date() 
-		if (now - date < 1) { 
-			out << "${g.message(code:'default.today.label')}"
-		}
-		else { 
-			out << 	p.format(date);
-		}
+		out << p.format(date)
 	}
 		
 }
