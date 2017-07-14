@@ -9,12 +9,12 @@
 				</th>
 				--%>
 				<th>
-                <%--
-                    <g:checkBox class="checkAll" data-status="${statusCode}" name="checkAll"/>
-                    --%>
 				</th>
 				<th>
 				</th>
+                <th>
+                    ${warehouse.message(code: 'default.status.label')}
+                </th>
 				<th class="center">
 					${warehouse.message(code: 'shipping.shipmentNumber.label')}
 				</th>
@@ -25,58 +25,31 @@
 					${warehouse.message(code: 'shipping.shipmentItems.label', default: "Items")}
 				</th>
 				<th>
-                    <label class="block"><warehouse:message
-								code="default.origin.label" /></label>
+                    <warehouse:message code="default.origin.label" />
 				</th>
                 <th>
-                    <label class="block"><warehouse:message
-								code="default.destination.label" /></label>
+                    <warehouse:message code="default.destination.label" />
 			    </th>
-				<%--
-                    	<th>
-                    		<label class="block">${warehouse.message(code: 'shipping.expectedShippingDate.label')}</label>
-                    	</th>
-                    	--%>
-				<th><label class="block">
-						${warehouse.message(code: 'default.status.label')}
-				</label></th>
+                <th>
+                    ${warehouse.message(code: 'shipping.shippingDate.label', default: 'Shipped')}
+                </th>
+                <th>
+                    ${warehouse.message(code: 'shipping.receivingDate.label', default: 'Received')}
+                </th>
+                <th>
+                    ${warehouse.message(code: 'default.dateCreated.label')}
+                </th>
 				<th>
 					${warehouse.message(code: 'default.lastUpdated.label')}
 				</th>
 			</tr>
-        <tr>
-            <td colspan="10">
+        </thead>
 
-                <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
-                    <div class="button-group">
-                        <button type="submit" class="button icon approve bulkReceive">
-                            <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
-                        </button>
-                        <button type="submit" class="button icon tag bulkMarkAsReceived">
-                            <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
-                        </button>
-                    </div>
-                    <div class="button-group">
-                        <button type="submit" class="button icon approve bulkRollback">
-                            <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
-                        </button>
-                    </div>
-                </g:if>
-                <g:elseif test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
-                    <div class="button-group">
-                        <button type="submit" class="button icon approve bulkRollback">
-                            <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
-                        </button>
-                    </div>
-                </g:elseif>
-
-
-            </td>
-        </tr>
 
 
         </thead>
 		<tbody>
+
 			<g:each var="shipmentInstance" in="${shipments}" status="i">
 				<tr >
                     <%--
@@ -94,13 +67,16 @@
 					</td>
 					--%>
                     <td>
-                        <g:checkBox class="${shipmentInstance?.status.code}" name="shipment.id" value="${shipmentInstance.id}" checked="${params['shipment.id']}" />
+                        <g:checkBox class="shipment-item ${shipmentInstance?.status.code}" name="shipment.id" value="${shipmentInstance.id}" checked="${params['shipment.id']}" />
                     </td>
 					<td class="center middle"><img
 						src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 						alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
 						style="vertical-align: middle; width: 24px; height: 24px;" />
 					</td>
+                    <td class="middle">
+                        <format:metadata obj="${shipmentInstance?.currentStatus}" />
+                    </td>
 					<td class="middle center">
 						<g:link action="showDetails" id="${shipmentInstance.id}">
 							${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
@@ -124,34 +100,58 @@
 
 					<td class="middle">
                         <g:set var="today" value="${new Date() }" />
-                        <format:metadata obj="${shipmentInstance?.status.code}" />
-                        <g:if test="${shipmentInstance?.status.date}">
-                            <div title="${g.formatDate(date: shipmentInstance?.status?.date)}">
-                                <g:if test="${shipmentInstance?.status?.date?.equals(today) }">
+                        <g:if test="${shipmentInstance?.actualShippingDate}">
+                            <div title="${g.formatDate(date: shipmentInstance?.actualShippingDate)}">
+                                <g:if test="${shipmentInstance?.actualShippingDate?.equals(today) }">
                                     <warehouse:message code="default.today.label" />
                                 </g:if>
                                 <g:else>
-                                    <g:prettyDateFormat date="${shipmentInstance?.status?.date}" />
+                                    <g:prettyDateFormat date="${shipmentInstance?.actualShippingDate}" />
                                 </g:else>
                             </div>
-							<%--
-						        <format:date obj="${shipmentInstance?.status.date}"/>
-    						--%>
 						</g:if>
                         <g:else>
-						- Expected to ship
-                            <%--
-                                <format:date obj="${shipmentInstance?.expectedShippingDate}"/>
-                            --%>
-							<g:if
-								test="${shipmentInstance?.expectedShippingDate?.equals(today) }">
-								<warehouse:message code="default.today.label" />
-							</g:if>
-							<g:else>
-								<g:prettyDateFormat
-									date="${shipmentInstance?.expectedShippingDate}" />
-							</g:else>
+                            <div title="${g.formatDate(date: shipmentInstance?.expectedShippingDate)}">
+                                Expected
+                                <g:if
+                                    test="${shipmentInstance?.expectedShippingDate?.equals(today) }">
+                                    <warehouse:message code="default.today.label" />
+                                </g:if>
+                                <g:else>
+                                    <g:prettyDateFormat
+                                        date="${shipmentInstance?.expectedShippingDate}" />
+                                </g:else>
+                            </div>
 						</g:else>
+                    </td>
+                    <td class="middle">
+                        <g:set var="today" value="${new Date() }" />
+                        <g:if test="${shipmentInstance?.actualDeliveryDate}">
+                            <div title="${g.formatDate(date: shipmentInstance?.actualDeliveryDate)}">
+                                <g:if test="${shipmentInstance?.actualDeliveryDate?.equals(today) }">
+                                    <warehouse:message code="default.today.label" />
+                                </g:if>
+                                <g:else>
+                                    <g:prettyDateFormat date="${shipmentInstance?.actualDeliveryDate}" />
+                                </g:else>
+                        </g:if>
+                        <g:else>
+                            <div title="${g.formatDate(date: shipmentInstance?.expectedDeliveryDate)}">
+                                Expected
+                                <g:if test="${shipmentInstance?.expectedDeliveryDate?.equals(today) }">
+                                    <warehouse:message code="default.today.label" />
+                                </g:if>
+                                <g:else>
+                                    <g:prettyDateFormat
+                                            date="${shipmentInstance?.expectedDeliveryDate}" />
+                                </g:else>
+                            </div>
+                        </g:else>
+                    </td>
+                    <td class="middle center">
+                        <div title="${g.formatDate(date: shipmentInstance?.dateCreated)}">
+                            ${g.formatDate(date: shipmentInstance?.dateCreated)}
+                        </div>
                     </td>
 					<td class="middle center">
                         <div title="${g.formatDate(date: shipmentInstance?.lastUpdated)}">
@@ -161,5 +161,39 @@
 				</tr>
 			</g:each>
 		</tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <input type="checkbox" class="checkAll"/>
+                </td>
+                <td colspan="11">
+
+                    <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
+                        <div class="button-group">
+                            <button type="submit" class="button icon approve bulkReceive">
+                                <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
+                            </button>
+                            <button type="submit" class="button icon tag bulkMarkAsReceived">
+                                <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="button icon approve bulkRollback">
+                                <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                            </button>
+                        </div>
+                    </g:if>
+                    <g:elseif test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+                        <div class="button-group">
+                            <button type="submit" class="button icon approve bulkRollback">
+                                <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                            </button>
+                        </div>
+                    </g:elseif>
+
+
+                </td>
+            </tr>
+        </tfoot>
 	</table>
 </div>

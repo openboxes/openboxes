@@ -316,8 +316,10 @@ class CreateShipmentWorkflowController {
 				flash.itemToMove = ShipmentItem.get(params.itemToMoveId)
 			}.to("enterContainerDetails")
 
+            // FIXME Refactor/remove - seems to be used when adding items to an outgoing shipment
 			on("saveItem").to("saveItemAction")
-			
+
+            // FIXME Refactor/remove - seems to be used when editing items on an inbound shipment
 			on("updateItem").to("updateItemAction")
 			
 			on("deleteItem"){
@@ -376,14 +378,38 @@ class CreateShipmentWorkflowController {
 				try {
 					shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
 					flash.message = "Added shipment item"
+
+                } catch (ValidationException e) {
+                    flow.shipmentInstance.errors = e.errors
+                    return error()
 				} catch (ShipmentItemException e) {
-					flash.message = e.message
 					[itemInstance: e.shipmentItem]
 				} catch (Exception e) {
 					flash.message = e.message
 				}
 
 			}.to("enterContainerDetails")
+
+
+            on("updateShipmentItem") {
+
+                log.info "params: " + params
+                try {
+                    def shipmentItem = ShipmentItem.get(params.item?.id)
+                    bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+                    shipmentService.saveShipmentItem(shipmentItem)
+                    flash.message = "Updated shipment item"
+
+                } catch (ValidationException e) {
+                    flow.shipmentInstance.errors = e.errors
+                    return error()
+
+                } catch (Exception e) {
+                    flash.message = e.message
+                    return error()
+                }
+
+            }.to("enterContainerDetails")
 
 			on("deleteContainers") {
 				log.info "Delete containers from shipment " + params
@@ -524,7 +550,7 @@ class CreateShipmentWorkflowController {
 
 			on("back").to("enterContainerDetails")
 
-			on("next").to("sendShipmentAction")
+			on("next").to("sendShipment")
 
 			on("save") {
 				shipmentService.saveShipment(flow.shipmentInstance)
@@ -535,7 +561,7 @@ class CreateShipmentWorkflowController {
                 Location location = Location.load(session.warehouse.id)
                 def currentShipmentItemId = params.currentShipmentItemId
                 ShipmentItem shipmentItem = flow.shipmentInstance?.getNextShipmentItem(currentShipmentItemId)
-                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem?.product)
+                List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItem?.product)
                 log.info "binLocations: " + binLocations
                 [shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
@@ -548,7 +574,7 @@ class CreateShipmentWorkflowController {
                 if (flow?.shipmentInstance?.origin == location) {
                     log.info "Calcuating quantity for products in shipment"
                     List products = flow?.shipmentInstance?.shipmentItems*.product
-                    List binLocations = inventoryService.getQuantityByBinLocation(location, products)
+                    List binLocations = inventoryService.getProductQuantityByBinLocation(location, products)
                     //def quantityMap = binLocations.groupBy { it?.inventoryItem?.product }
                     log.info "Done calcuating quantity for products in shipment"
                 }
@@ -604,7 +630,7 @@ class CreateShipmentWorkflowController {
 				log.info "Pick shipment item " + params
 				def shipmentItem = ShipmentItem.load(params?.shipmentItem?.id)
                 Location location = Location.load(session.warehouse.id)
-                List binLocations = inventoryService.getQuantityByBinLocation(location, shipmentItem.product)
+                List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItem.product)
                 log.info "binLocations: " + binLocations
 				[shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
 
@@ -797,7 +823,7 @@ class CreateShipmentWorkflowController {
 				flow.command = command
 				
 				if (!command.validate()) {
-					log.info command.errors
+					log.info "Errors: " + command.errors
 					return error();
 				}
 
@@ -1267,16 +1293,16 @@ class CreateShipmentWorkflowController {
 				
     	updateItemAction {
     		action {
-				try { 
+				try {
 					log.info "update existing item: " + params
 
-	    			// Updating an existing shipment item 
+	    			// Updating an existing shipment item
 					def shipmentItem = ShipmentItem.get(params.item?.id)
 
 					// Bind the parameters to the item instance
 					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
-						
-					// Update the inventory item associated with this shipment item										
+
+					// Update the inventory item associated with this shipment item
 					def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
 					if (!inventoryItem) {
 						inventoryItem = new InventoryItem(params)
@@ -1284,20 +1310,20 @@ class CreateShipmentWorkflowController {
 					}
 					shipmentItem.inventoryItem = inventoryItem
 
-					
+
 					// In case there are errors, we use this flow-scoped variable to display errors to user
 					flow.itemInstance = shipmentItem;
-					
+
 					// Validate shipment item
 					shipmentItem.shipment = flow.shipmentInstance;
 					if (flow?.shipmentInstance?.destination?.id == session?.warehouse?.id || shipmentService.validateShipmentItem(shipmentItem)) {
-						if (!shipmentItem.id) { 
+						if (!shipmentItem.id) {
 							log.info ("saving new shipment item")
 							// Need to validate shipment item before adding it to the shipment
 							flow.shipmentInstance.addToShipmentItems(shipmentItem);
 							shipmentService.saveShipment(flow.shipmentInstance)
 						}
-						else { 					
+						else {
 							log.info ("saving existing shipment item")
 							shipmentService.saveShipmentItem(shipmentItem)
 						}
@@ -1312,7 +1338,7 @@ class CreateShipmentWorkflowController {
 				}
 				invalid();
     		}
-    		
+
     		on("valid").to("enterContainerDetails")
     		on("invalid").to("enterContainerDetails")
     	}

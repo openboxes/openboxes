@@ -81,7 +81,6 @@
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <th><g:message code="product.productCode.label" default="Code"/></th>
                                     <th><g:message code="default.bin.label" default="Bin"/></th>
                                     <th><g:message code="default.lot.label" default="Lot"/></th>
                                     <th><g:message code="default.exp.label" default="Exp"/></th>
@@ -95,19 +94,18 @@
                                             entry?.inventoryItem?.id == shipmentItem?.inventoryItem?.id}"/>
                                     <g:set var="isSameLotNumber" value="${entry?.inventoryItem?.id==shipmentItem?.inventoryItem?.id}"/>
 
-                                    <tr class="${selected?'active':''} ${statusClass} ${isSameLotNumber?'same-lot-number':''}">
+                                    <tr class="${selected?'active':''} ${statusClass}">
                                         <td class="top">
                                             <g:radio name="binLocationAndInventoryItem" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}"
                                                      checked="${selected}"/>
-                                        </td>
-                                        <td>
-                                            ${entry?.inventoryItem?.product?.productCode}
                                         </td>
                                         <td class="middle">
                                             ${entry?.binLocation?.name?:g.message(code:'default.label')}
                                         </td>
                                         <td class="middle">
-                                            ${entry?.inventoryItem?.lotNumber}
+                                            <p class="${isSameLotNumber?'same-lot-number':'different-lot-number'}">
+                                                ${entry?.inventoryItem?.lotNumber}
+                                            </p>
                                         </td>
                                         <td class="middle">
                                             <g:formatDate date="${entry?.inventoryItem?.expirationDate}" format="MMM/yyyy"/>
@@ -120,7 +118,7 @@
                                 </tbody>
                                 <tfoot>
                                 <tr class="prop">
-                                    <th colspan="5">
+                                    <th colspan="4">
                                         <g:message code="default.total.label"/>
                                     </th>
                                     <th class="center">
@@ -146,6 +144,10 @@
                     </td>
                     <td class="value">
                         <g:textField id="quantity" name="quantity" value="${shipmentItem?.quantity}" class="text"/>
+                        <button name="_eventId_pickShipmentItem" class="button">
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Save Item"/>&nbsp;
+                        <g:message code="default.button.save.label"/>
+                        </button>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -153,10 +155,6 @@
 
                     </td>
                     <td class="value">
-                        <button name="_eventId_pickShipmentItem" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Save Item"/>&nbsp;
-                            <g:message code="default.button.save.label"/>
-                        </button>
 
                         <g:link controller="createShipmentWorkflow" action="createShipment" event="splitShipmentItem2" class="button"
                                 id="${shipmentInstance?.id}" params="[execution:params.execution, 'shipmentItem.id': shipmentItem?.id]">

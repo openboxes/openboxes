@@ -57,9 +57,9 @@ class DbHelper {
             product.save(failOnError: true, flush: true)
         }
         groupNames.each { groupName ->
-            def productGroup = ProductGroup.findByDescription(groupName)
+            def productGroup = ProductGroup.findByName(groupName)
             if (!productGroup) {
-                productGroup = new ProductGroup(description: groupName)
+                productGroup = new ProductGroup(name: groupName)
                 productGroup.category = createCategoryIfNotExists("Integration")
                 productGroup.save(failOnError: true, flush: true)
             }

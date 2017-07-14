@@ -26,8 +26,8 @@ class ProductGroupController {
         def productGroups = []
 
         if (params.q) {
-            productGroups = ProductGroup.findAllByDescriptionLike("%" + params.q + "%", params)
-            productGroupTotal = ProductGroup.countByDescriptionLike("%" + params.q + "%")
+            productGroups = ProductGroup.findAllByNameLike("%" + params.q + "%", params)
+            productGroupTotal = ProductGroup.countByNameLike("%" + params.q + "%")
         }
         else {
             productGroups = ProductGroup.list(params)
@@ -278,9 +278,9 @@ class ProductGroupController {
                 productGroup.addToProducts(product)
                 productGroup.save()
             }
-            //def productGroup = ProductGroup.findByDescription(params.productGroup)
+            //def productGroup = ProductGroup.findByName(params.productGroup)
             //if (!productGroup) {
-            //    productGroup = new ProductGroup(description: params.productGroup, category: product.category)
+            //    productGroup = new ProductGroup(name: params.productGroup, category: product.category)
             //}
             //product.addToProductGroups(productGroup)
             //product.save(failOnError: true)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1498672238798-1">
+        <sql>
+            UPDATE product_group SET name = description, description = NULL;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda" id="1498672238798-2">
+        <comment>Move name column to make it easier to read.</comment>
+        <sql>
+            ALTER TABLE product_group MODIFY name varchar(255) AFTER id;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

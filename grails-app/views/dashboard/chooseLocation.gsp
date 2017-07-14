@@ -41,14 +41,11 @@
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                             ${warehouse.message(code: 'dashboard.chooseLocation.label')}
                         </h2>
-                        <div class="prop" style="background-color: #eee; text-align: center">
-                            <g:message code="dashboard.loggedInAs.message" args="[session?.user?.name]"/>.
+                        <div class="message">
                             <g:message code="dashboard.youLastLoggednHereOn.message"
-                                       args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'hh:mm:ss a z')]"/>
-                            <g:link class="button icon unlock" controller="auth" action="logout">
-                                <warehouse:message code="default.logout.label"/>
-                            </g:link>
+                                       args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'MMM dd yyyy hh:mm:ss a z')]"/>
                         </div>
+
                         <%--
                         <div style="padding: 50px;">
                             <div>
@@ -144,7 +141,12 @@
                                 </div>
                             </div>
                         </g:unless>
-
+                        <div class="prop" style="background-color: #eee; text-align: center">
+                            <g:message code="dashboard.loggedInAs.message" args="[session?.user?.name]"/>.
+                            <g:link class="button icon unlock" controller="auth" action="logout">
+                                <warehouse:message code="default.logout.label"/>
+                            </g:link>
+                        </div>
 						<%--
 						<table>
 							<tr>

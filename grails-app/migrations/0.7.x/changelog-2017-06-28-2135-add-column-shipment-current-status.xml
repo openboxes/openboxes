@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1498703764478-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment" columnName="current_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment">
+            <column name="current_status" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1498703764478-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment" columnName="current_event_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment">
+            <column name="current_event_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1462422439127-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKE139719AD95ACF25"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="current_event_id" baseTableName="shipment"
+                                 constraintName="FKE139719AD95ACF25" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="event"/>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1498703764478-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment" columnName="created_by_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment">
+            <column name="created_by_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1498703764478-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKE139719A217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="shipment"
+                                 constraintName="FKE139719A217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1498703764478-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment" columnName="updated_by_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment">
+            <column name="updated_by_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1498703764478-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKE139719A426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="shipment"
+                                 constraintName="FKE139719A426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+
+
+</databaseChangeLog>

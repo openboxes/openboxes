@@ -411,6 +411,32 @@ class ShipmentService {
 		return shipments
 	}
 
+    /**
+     * Used to perform a bulk update on shipments that do not have their current status set.
+     *
+     * @return
+     */
+    boolean bulkUpdateShipments() {
+        long startTime = System.currentTimeMillis()
+        boolean success = false
+        try {
+            def shipments = Shipment.findAllByCurrentStatusIsNullAndEventsIsNotNull([max:1000])
+            if (shipments) {
+                shipments.each {
+                    it.currentStatus = it.status.code
+                    it.currentEvent = it.mostRecentEvent
+                    it.save(flush: true)
+                }
+                long elapsedTime = System.currentTimeMillis() - startTime
+                log.info "Successfully bulk updated ${shipments?.size() ?: 0} shipments in ${elapsedTime} ms"
+            }
+            success = true
+        } catch (Exception e) {
+            log.error("Unable to bulk update all shipments" + e.message, e)
+        }
+        return success
+
+    }
 
 	/**
 	 * 
@@ -440,46 +466,10 @@ class ShipmentService {
                 if (destination) { eq("destination", destination) }
                 if (lastUpdatedStart) { ge("lastUpdated", lastUpdatedStart)}
                 if (lastUpdatedEnd) { le("lastUpdated", lastUpdatedEnd)}
-//                if (statusCode) {
-//                    if (statusCode in [ShipmentStatusCode.PENDING, ShipmentStatusCode.CREATED]) {
-//                        or {
-//                            isEmpty('events')
-//                            events {
-//                                eventType {
-//                                    not {
-//                                        'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//					else if (statusCode == ShipmentStatusCode.SHIPPED) {
-//                        and {
-//                            events {
-//                                eventType {
-//                                    'in'("eventCode", [EventCode.SHIPPED])
-//                                }
-//                            }
-//                            events {
-//                                eventType {
-//                                    not {
-//                                        'in'("eventCode", [EventCode.RECEIVED])
-//                                    }
-//                                }
-//
-//                            }
-//                        }
-//					}
-//                    else if (statusCode == ShipmentStatusCode.RECEIVED) {
-//                        events {
-//                            eventType {
-//                                'in'("eventCode", [EventCode.RECEIVED])
-//                            }
-//                        }
-//                    }
-//                }
-                order("lastUpdated", "desc")
+                if (statusCode) { eq("currentStatus", statusCode)}
+
                 order("dateCreated", "desc")
+                order("lastUpdated", "desc")
             }
             maxResults(limit)
         }
@@ -727,14 +717,12 @@ class ShipmentService {
 	 * 
 	 * @param item
 	 */
-	void saveShipmentItem(ShipmentItem shipmentItem) {
-		/*
-		if (!item.recipient) { 
-			item.recipient = (item?.container?.recipient)?:(item?.shipment?.recipient);
-		}*/
-		shipmentItem.save()
+	boolean saveShipmentItem(ShipmentItem shipmentItem) {
+        if (validateShipmentItem(shipmentItem)) {
+            return shipmentItem.save()
+        }
+        return false
 	}
-	
 	
 	
 	/**
@@ -791,35 +779,37 @@ class ShipmentService {
 
 	}
 
-	
-	/**
-	 * Validate the shipment item 	
-	 * 
-	 * @param shipmentItem
-	 * @return
-	 */
-	boolean validateShipmentItem(ShipmentItem shipmentItem) { 
-		def location = Location.get(shipmentItem?.shipment?.origin?.id);
-		log.info("Validating shipment item at " + location?.name + " for product " + shipmentItem.product + " and lot number " + shipmentItem.inventoryItem)
 
-        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
+    /**
+     * Validate the shipment item when it's being added to the shipment.
+     *
+     * @param shipmentItem
+     * @return
+     */
+    boolean validateShipmentItem(ShipmentItem shipmentItem) {
+        def location = Location.get(shipmentItem?.shipment?.origin?.id);
+        log.info("Validating shipment item at " + location?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
+
         // FIXME Please refactor this mess at a later date
+        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
         def quantityOnHand = shipmentItem.binLocation ?
                 inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
                 inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
 
-		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
-		if (!shipmentItem.validate()) { 
-			throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
-		}
-		
-		if (shipmentItem.quantity > quantityOnHand) {
-			shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
-			throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
-		}
-		return true;
-	}
-	
+        log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
+        if (!shipmentItem.validate()) {
+            throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
+        }
+
+        if (shipmentItem.quantity > quantityOnHand) {
+            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
+            //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
+            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+        }
+        return true;
+    }
+
+
 	
 	/**
 	 * Deletes a shipment and all of its related objects

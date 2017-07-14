@@ -432,6 +432,25 @@ jqueryValidationUi {
 openboxes.logo.url = ""
 openboxes.logo.label = "OpenBoxes"
 
+// Dashboard configuration to indicate whether widgets are enabled/disabled
+openboxes.dashboard.requisitionItemSummary.enabled=true
+openboxes.dashboard.requisitionSummary.enabled=true
+openboxes.dashboard.receiptSummary.enabled=true
+openboxes.dashboard.shipmentSummary.enabled=true
+openboxes.dashboard.indicatorSummary.enabled=false
+openboxes.dashboard.valueSummary.enabled=false
+openboxes.dashboard.productSummary.enabled=false
+openboxes.dashboard.genericProductSummary.enabled=false
+openboxes.dashboard.expiringSummary.enabled=false
+openboxes.dashboard.activitySummary.enabled=true
+openboxes.dashboard.tagSummary.enabled=true
+
+// Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
+openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
+openboxes.dashboard.column2.widgets=["valueSummary","productSummary","expiringSummary"]
+openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
+
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
@@ -463,7 +482,8 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 openboxes.scannerDetection.enabled = false
 
 // Background jobs
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"  // daily at midnight
+openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
 
 // LDAP configuration
 openboxes.ldap.enabled = false
@@ -513,9 +533,10 @@ grails.doc.footer = ""
 
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {
-	cache true
-	id generator:'uuid'
-	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
+    id generator:'uuid'
+	//cache true
+    dynamicUpdate true
+    "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTime, class: org.joda.time.DateTime
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTimeZoneAsString, class: org.joda.time.DateTimeZone
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDurationAsString, class: org.joda.time.Duration

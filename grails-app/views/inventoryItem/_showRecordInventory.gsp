@@ -124,8 +124,17 @@
 					<tfoot>
 					<tr>
 						<td colspan="6">
-							<div class="">
-                                <div class="left">
+							<div class="left">
+								<button id="addRow" class="button icon add" >
+									<warehouse:message code="inventory.addInventoryItem.label"/>
+								</button>
+							</div>
+
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6">
+                                <div>
                                     <button name="save" type="submit" class="button icon approve primary" id="saveInventoryItem">
                                         <warehouse:message code="default.button.save.label"/>&nbsp;
                                     </button>
@@ -134,11 +143,6 @@
                                         <warehouse:message code="default.button.discard.label" default="Discard"/>
                                     </g:link>
 
-                                </div>
-                                <div class="right">
-                                    <button id="addRow" class="button icon add" >
-                                        <warehouse:message code="inventory.addInventoryItem.label"/>
-                                    </button>
                                 </div>
 							</div>
 						</td>

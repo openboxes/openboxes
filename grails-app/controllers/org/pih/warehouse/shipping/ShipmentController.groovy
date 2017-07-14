@@ -47,7 +47,7 @@ class ShipmentController {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
 
-        params.max = Math.min(params.max ? params.int('max') : 100, 1000)
+        params.max = Math.min(params.max ? params.int('max') : 100, 10000)
 
         Calendar calendar = Calendar.instance
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
@@ -416,7 +416,7 @@ class ShipmentController {
         ReceiptItem receiptItem = ReceiptItem.load(params.id)
 
         Product productInstance = receiptItem.inventoryItem?.product // Product.load(params.id)
-        def binLocations = inventoryService.getQuantityByBinLocation(location, productInstance)
+        def binLocations = inventoryService.getProductQuantityByBinLocation(location, productInstance)
 
         render template: "showPutawayLocations", model: [product: productInstance, binLocations: binLocations]
     }
@@ -543,7 +543,7 @@ class ShipmentController {
                     redirect(controller:"shipment", action : "showDetails", id: shipmentInstance?.id)
                 }
                 else {
-                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id)
+                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id, fragment: "tabs-details")
                 }
                 return
 

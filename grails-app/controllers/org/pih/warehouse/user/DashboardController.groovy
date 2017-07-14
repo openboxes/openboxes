@@ -340,12 +340,14 @@ class DashboardController {
 		//def startTime = System.currentTimeMillis()
 
         // Inbound Shipments
-		def incomingShipments = Shipment.findAllByDestination(location).groupBy{it.status.code}.sort()
+		def incomingShipments = Shipment.findAllByDestinationAndCurrentStatusIsNotNull(location);
+        incomingShipments = incomingShipments?.groupBy{ it?.currentStatus }?.sort()
         def incomingShipmentsCount = Shipment.countByDestination(location)
 
 
 		// Outbound Shipments
-		def outgoingShipments = Shipment.findAllByOrigin(location).groupBy{it.status.code}.sort();
+		def outgoingShipments = Shipment.findAllByOriginAndCurrentStatusIsNotNull(location)
+        outgoingShipments = outgoingShipments?.groupBy{it?.currentStatus}?.sort()
         def outgoingShipmentsCount = Shipment.countByOrigin(location)
 
 		// Orders

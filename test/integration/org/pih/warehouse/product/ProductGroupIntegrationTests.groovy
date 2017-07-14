@@ -32,7 +32,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		def product = new Product(name: "Ibuprofen, 200 mg, tablet", category: category)
 		product.save(failOnError:true)
 		
-		def productGroup = new ProductGroup(description:"Ibuprofen", category: category)
+		def productGroup = new ProductGroup(name:"Ibuprofen", category: category)
 		productGroup.save(flush:true)
 		
 		product.addToProductGroups(productGroup)
@@ -41,7 +41,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		def product2 = new Product(name: "Tylenol, 325 mg, tablet", category: category)
 		product2.save(failOnError:true)
 				
-		def productGroup2 = new ProductGroup(description:"Tylenol", category: category)
+		def productGroup2 = new ProductGroup(name:"Tylenol", category: category)
 		productGroup2.save(flush:true)
 
 		productGroup2.addToProducts(product2)
@@ -58,7 +58,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 	void testProductGroupHasManyProducts() {
 		
 			
-		def productGroup = ProductGroup.findByDescription("Ibuprofen")
+		def productGroup = ProductGroup.findByName("Ibuprofen")
 		println productGroup
 		assertNotNull productGroup
 		assertNotNull productGroup.products
@@ -73,7 +73,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		println product
 		assertNotNull product
 		
-		def productGroup = ProductGroup.findByDescription("Ibuprofen")
+		def productGroup = ProductGroup.findByName("Ibuprofen")
 		println productGroup
 		assertNotNull productGroup
 
@@ -82,7 +82,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		assertNotNull product.productGroups
 		assertTrue product.productGroups.contains(productGroup)
 		
-		assertEquals "Ibuprofen", productGroup.description
+		assertEquals "Ibuprofen", productGroup.name
 		assertNotNull productGroup.products
 		assertTrue productGroup.products.contains(product)
 	}
@@ -93,7 +93,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
 		assertNotNull product
 		
-		def productGroup = ProductGroup.findByDescription("Ibuprofen")
+		def productGroup = ProductGroup.findByName("Ibuprofen")
 		assertNotNull productGroup
 
 		def message = shouldFail(Exception) { 
@@ -116,7 +116,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
         println product.category
         println product.category.categories
 
-		def productGroup = ProductGroup.findByDescription("Ibuprofen")
+		def productGroup = ProductGroup.findByName("Ibuprofen")
 		assertNotNull productGroup
 
 		product.removeFromProductGroups(productGroup)		
@@ -132,7 +132,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		def product = Product.findByName("Tylenol, 325 mg, tablet")
 		assertNotNull product
 				
-		def productGroup = ProductGroup.findByDescription("Tylenol")
+		def productGroup = ProductGroup.findByName("Tylenol")
 		assertNotNull productGroup
 		assertNotNull productGroup.products
 		assertEquals 1, productGroup.products.size()

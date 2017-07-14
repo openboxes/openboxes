@@ -23,18 +23,22 @@ import org.pih.warehouse.receiving.Receipt
 class Shipment implements Comparable, Serializable {
 
     def beforeInsert = {
-        //def currentUser = AuthService.currentUser.get()
-        //if (currentUser) {
-        //    createdBy = currentUser
-        //    updatedBy = currentUser
-        //}
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            createdBy = currentUser
+            updatedBy = currentUser
+        }
+        currentEvent = mostRecentEvent
+        currentStatus = status.code
 
     }
     def beforeUpdate = {
-        //def currentUser = AuthService.currentUser.get()
-        //if (currentUser) {
-        // updatedBy = currentUser
-        //}
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            updatedBy = currentUser
+        }
+        currentEvent = mostRecentEvent
+        currentStatus = status.code
     }
 
     String id
@@ -63,10 +67,15 @@ class Shipment implements Comparable, Serializable {
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
-	
+
 	// One-to-many associations
 	SortedSet events;
-	
+
+    Event currentEvent
+    ShipmentStatusCode currentStatus
+    User createdBy
+    User updatedBy
+
 	List documents;
 	List comments;
 	List referenceNumbers;
@@ -124,12 +133,13 @@ class Shipment implements Comparable, Serializable {
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
         //outgoingTransactions cascade: "all-delete-orphan"
         //incomingTransactions cascade: "all-delete-orphan"
+
 	}
 
 	// Constraints
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
-		shipmentNumber(nullable:true, maxSize: 255)	
+		shipmentNumber(nullable:true, maxSize: 255)
 		origin(nullable:false, 
 			validator: { value, obj -> !value.equals(obj.destination)})
 		destination(nullable:false)		
@@ -159,7 +169,12 @@ class Shipment implements Comparable, Serializable {
 		events ( validator: { events ->
         	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()        
 		} )
-	}
+
+        currentStatus(nullable:true)
+        currentEvent(nullable:true)
+        createdBy(nullable:true)
+        updatedBy(nullable:true)
+    }
 
 	String toString() { return "$name"; }
 	

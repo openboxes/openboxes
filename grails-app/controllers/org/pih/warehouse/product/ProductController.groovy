@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import com.google.zxing.BarcodeFormat
 import com.mysql.jdbc.MysqlDataTruncation
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.pih.warehouse.core.MailService
 
 import javax.activation.MimetypesFileTypeMap
@@ -1013,33 +1014,26 @@ class ProductController {
 		def columns = []
 
 		if (params.importNow && session.localFile) {
-			println "import now"
-			def csv = session.localFile.getText()
+			try {
+				def csv = session.localFile.getText()
 
-            // Get columns
-			columns = productService.getColumns(csv)
+				// Get columns
+				columns = productService.getColumns(csv)
 
-			//println existingProductsMap
-			tags = params?.tagsToBeAdded?.split(",") as List
-			//println "\n\nTAGS " + tags + " " + tags.class
+				// Split tags
+				tags = params?.tagsToBeAdded?.split(",") as List
 
-            // Import products
-            command.products = productService.validateProducts(csv)
+				// Import products
+				command.products = productService.validateProducts(csv)
 
-//            try {
-                productService.importProducts(command.products, tags)
-                flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
-                redirect(controller:"product", action:"importAsCsv",params:[tag:tags[0]])
-//            }
-//            catch (MysqlDataTruncation e) {
-//                flash.message = "MySQL Data truncation error: " + e.message
-//            }
-//            catch (SQLException e) {
-//                flash.message = "SQL Error: " + e.message + " " + e.cause?.message?.encodeAsHTML()
-//            }
-//            catch (Exception e) {
-//                flash.message = "Exception: " + e.message + " " + e.cause?.message?.encodeAsHTML()
-//            }
+
+				productService.importProducts(command.products, tags)
+				flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
+				redirect(controller: "product", action: "importAsCsv", params: [tag: tags[0]])
+			} catch (ValidationException e) {
+				command.errors = e.errors
+			}
+
 		}
 		render(view: 'importAsCsv', model: [command:command, tags: tags, columns:columns, productsHaveBeenImported: true])
 		
@@ -1055,9 +1049,9 @@ class ProductController {
         println "addProductGroupToProduct() " + params
         def product = Product.get(params.id)
         if (product) {
-            def productGroup = ProductGroup.findByDescription(params.productGroup)
+            def productGroup = ProductGroup.findByName(params.productGroup)
             if (!productGroup) {
-                productGroup = new ProductGroup(description: params.productGroup, category: product.category)
+                productGroup = new ProductGroup(name: params.productGroup, category: product.category)
             }
             product.addToProductGroups(productGroup)
             product.save(failOnError: true)
