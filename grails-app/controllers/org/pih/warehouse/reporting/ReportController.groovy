@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.reporting
 
+import grails.converters.JSON
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
@@ -55,6 +56,56 @@ class ReportController {
 
         return csv;
     }
+
+    def getCsvForListOfMapEntries(List binLocations) {
+        def csv = ""
+        if (binLocations) {
+            binLocations[0].eachWithIndex { k, v, index ->
+                csv += StringEscapeUtils.escapeCsv(k) + ","
+            }
+            csv+= "\n"
+
+            binLocations.each { row ->
+                row.eachWithIndex { k, v, index ->
+                    csv += StringEscapeUtils.escapeCsv(v ? v.toString() : "") + ","
+                }
+                csv += "\n"
+            }
+        }
+        return csv
+    }
+
+	def exportBinLocation = {
+        long startTime = System.currentTimeMillis()
+        log.info "Export by bin location " + params
+		Location location = Location.get(session.warehouse.id)
+        Location binLocation = (params.binLocation) ? Location.findByParentLocationAndNameLike(location, "%" + params.binLocation + "%") : null
+
+
+
+		List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
+
+        def products = binLocations.collect { it.product.productCode }.unique()
+        binLocations = binLocations.collect { [productCode: it.product.productCode,
+                                               productName: it.product.name,
+                                               lotNumber: it.inventoryItem.lotNumber,
+                                               expirationDate: it.inventoryItem.expirationDate,
+                                               binLocation: it?.binLocation?.name?:"Default Bin",
+                                               quantity: it.quantity]}
+
+        long elapsedTime = System.currentTimeMillis() - startTime
+
+        if (params.downloadFormat == "csv") {
+            String csv = getCsvForListOfMapEntries(binLocations)
+            String binLocationName = binLocation ? binLocation?.name : "All Bins"
+            def filename = "Bin location report - " + location.name + " - " + binLocationName + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            render(contentType: "text/csv", text: csv)
+            return
+        }
+
+		render([elapsedTime: elapsedTime, binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
+	}
 
 
     def exportInventoryReport = {
@@ -199,7 +250,19 @@ class ReportController {
 		}
 		[command : command]
 	}
-	
+
+	def printPickListReport = { ChecklistReportCommand command ->
+
+		Map binLocations
+		//command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) {
+			reportService.generateShippingReport(command);
+			binLocations = inventoryService.getBinLocations(command.shipment)
+		}
+		[command : command, binLocations: binLocations]
+	}
+
+
 	def printPaginatedPackingListReport = { ChecklistReportCommand command ->
 		try {
 			command.rootCategory = productService.getRootCategory();

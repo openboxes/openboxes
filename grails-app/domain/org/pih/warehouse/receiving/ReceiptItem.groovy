@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.receiving
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
@@ -16,7 +17,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 // import java.util.Date
 
-class ReceiptItem implements Comparable, Serializable {
+class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 	
 	String id
 	Product product		    			// Specific product that we're tracking
@@ -34,6 +35,7 @@ class ReceiptItem implements Comparable, Serializable {
 	
 	ShipmentItem shipmentItem
 	InventoryItem inventoryItem
+	Location binLocation
 		
 	Person recipient 					// Recipient of an item	
 	
@@ -41,7 +43,7 @@ class ReceiptItem implements Comparable, Serializable {
 	Date lastUpdated;
 	
 	static mapping = {
-		id generator: 'uuid'
+		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
 	static belongsTo = [ receipt : Receipt ]
@@ -51,6 +53,7 @@ class ReceiptItem implements Comparable, Serializable {
 		expirationDate(nullable:true)
 		shipmentItem(nullable:true)
 		inventoryItem(nullable:true)
+		binLocation(nullable:true)
 		quantityShipped(range: 0..2147483646, nullable:false)
 		quantityReceived(range: 0..2147483646, nullable:false)		
 		recipient(nullable:true)
@@ -62,13 +65,17 @@ class ReceiptItem implements Comparable, Serializable {
 	/**
 	* Sorts receipt items in the same order as shipment items.
 	*/
-   int compareTo(obj) {
-	   return shipmentItem <=> obj.shipmentItem
+   int compareTo(ReceiptItem other) {
+	   return inventoryItem?.product?.name <=> other?.inventoryItem?.product?.name ?:
+			   binLocation?.name <=> other?.binLocation?.name ?:
+					   inventoryItem?.lotNumber <=> other?.inventoryItem?.lotNumber ?:
+					   inventoryItem?.expirationDate <=> other?.inventoryItem?.expirationDate ?:
+							   quantityShipped <=> other?.quantityShipped ?:
+									   quantityReceived <=> other?.quantityReceived
 	}
 
     String toString() {
         return "${id}:${product.name}:${inventoryItem.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
     }
-
 	
 }

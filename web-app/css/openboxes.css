@@ -315,7 +315,6 @@ th a:link, th a:visited, th a:hover {
     display: block;
     font-size: 10px;
     text-decoration: none;
-    width: 100%;
 }
 th.asc a, th.desc a {
     background-position: right;
@@ -610,7 +609,7 @@ th.desc a {
 -------------------------------------------------------------- */
 
 
-label       { font-weight: normal; }
+label       { font-weight: normal; white-space: nowrap; }
 fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
 legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
@@ -1245,23 +1244,24 @@ a:hover {
 }
 
 #chooseLocation {
-    width: 700px;
+    width: 800px;
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -350px;
+    margin-left: -400px;
 }
 #chooseLocationSelect {
     max-height: 400px;
     overflow: auto;
+    margin-bottom: 5px
 }
 
 #loginForm {
-    width:400px;
+    width:500px;
     position: absolute;
     top: 20%;
     left: 50%;
-    margin-left: -225px;
+    margin-left: -250px;
 }
 
 #loginContainer {
@@ -1280,11 +1280,11 @@ a:hover {
 }
 
 #signupForm {
-    width:500px;
+    width:700px;
     position: absolute;
-    top: 15%;
+    top: 5%;
     left: 50%;
-    margin-left: -250px;
+    margin-left: -350px;
 }
 
 
@@ -2239,6 +2239,7 @@ img.photo_tiny {
 .lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
 .binLocation { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
 .barcode { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; letter-spacing: .1em; font-weight: normal; font-size: 11px; line-height: 20px}
+.barcode-data { text-align: center; }
 .genericName { text-transform: uppercase; }
 #more { background-color: #ddd; padding: 10px; }
 
@@ -2990,18 +2991,12 @@ select {
    Filter list
    ========================================================================== */
 
-.filters {
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-right: 1px solid lightgrey;
-    min-height: 100%;
-}
 
 ul.filter-list {
     list-style: none;
     padding: 0;
 }
-.filter-list-item, .filter { margin: 5px 0 5px 0;  }
+.filter-list-item, .filter { margin: 10px;  }
 .filter-list-item {
     padding: 0 5px 0 0;
 }
@@ -3010,11 +3005,6 @@ ul.filter-list {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
-.filter-list-item label {
-    display: inline;
-}
-
 
 
 /* =============================================================================
@@ -3141,4 +3131,13 @@ textarea {
 .column .placeholder {
     background: #f0f0f0;
     border:2px dashed #883533;
+}
+
+.new-container {
+    border-top: 2px solid #ddd;
+}
+
+.packing-unit {
+   background-color: #f7f7f7;
+
 }

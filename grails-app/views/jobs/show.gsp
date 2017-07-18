@@ -13,8 +13,8 @@
 
 
     <div class="buttonBar">
-        <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'jobKeys.label').toLowerCase()]"/></g:link>
-        <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'jobKey.label').toLowerCase()]"/></g:link>
+        <g:link class="button icon settings" controller="admin" action="showSettings" fragment="tab-5">${g.message(code:'admin.backToSettings.label', default: 'Back to Settings')}</g:link>
+        <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[g.message(code:'jobKeys.label', default: 'Background Jobs')]"/></g:link>
     </div>
 
     <div class="yui-ga">

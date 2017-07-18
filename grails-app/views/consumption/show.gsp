@@ -25,12 +25,11 @@
             </div>
             <div class="yui-u">
 
-
                 <div class="box" id="parameters-box" style="display: none;">
                     <h2><warehouse:message code="consumption.parameters.label" default="Parameters"/></h2>
                     <g:if test="${command?.toDate && command?.fromDate && command.fromLocations}">
                         <div class="left" style="width:50%">
-                            <table border="1">
+                            <table>
                                 <tr>
                                     <td class="right" width="33%">
                                         <label><warehouse:message code="consumption.reportingPeriod.label" default="Reporting period"/></label>
@@ -159,6 +158,14 @@
                                         ${command.includeLocationBreakdown?'yes':'no'}
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label><warehouse:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown"/></label>
+                                    </td>
+                                    <td>
+                                        ${command.includeMonthlyBreakdown?'yes':'no'}
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                         <div class="clear"></div>
@@ -182,7 +189,7 @@
                         Returned ${command.rows?.keySet()?.size()} results
                     </h2>
 
-                    <div>
+                    <div class="dialog">
                         <table>
                             <thead>
 
@@ -215,8 +222,8 @@
                                     <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
                                     <th class="center border-right"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
 
-                                    <th class="center"><warehouse:message code="inventory.qoh.label" default="QoH"/></th>
-                                    <th class="center border-right"><warehouse:message code="consumption.monthsLeft.label" default="Months left"/></th>
+                                    <th class="center"><warehouse:message code="consumption.qoh.label" default="QoH"/></th>
+                                    <th class="center border-right"><warehouse:message code="consumption.months.label" default="Months"/></th>
                                     <%--
                                     <g:each var="property" in="${command.selectedProperties}">
                                         <th>${property}</th>

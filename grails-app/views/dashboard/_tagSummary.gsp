@@ -33,7 +33,7 @@
     </h2>
 
 	<div class="widget-content" style="padding:0px; margin:0">
-        <div id="tag-summary" style="max-height:250px;overflow:auto;">
+        <div id="tag-summary" style="max-height:300px;overflow:auto;">
             <g:if test="${params.editTags}">
                 <g:isUserAdmin>
                     <table>
@@ -72,7 +72,7 @@
                     <div id="tagcloud" style="margin: 10px">
                         <g:each in="${tags }" var="tag">
                             <g:if test="${tag?.products?.size() > 1}">
-                                <g:link controller="inventory" action="browse" params="['tag':tag.tag]" rel="${tag?.products?.size() }">
+                                <g:link controller="inventory" action="browse" params="['tags':tag.id]" rel="${tag?.products?.size() }">
                                     ${tag.tag?:"Empty tag" } (${tag?.products?.size() })</g:link>
                             </g:if>
                         </g:each>
@@ -129,8 +129,8 @@
     $(window).load(function(){
         $("#tagcloud a").tagcloud({
             size: {
-                start:1.2,
-                end: 1.5,
+                start:1.0,
+                end: 2.0,
                 unit: 'em'
             },
             color: {

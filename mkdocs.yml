@@ -6,25 +6,37 @@ repo_url: https://github.com/openboxes/openboxes
 include_search: true
 #use_absolute_urls: true
 use_directory_urls: true
-copyright: Copyright &copy; 2015, OpenBoxes
+copyright: Copyright &copy; 2017, OpenBoxes
 google_analytics: ['UA-37396941-2', 'OpenBoxes']
 
 pages:
 
 # About:
-- ['index.md', 'About', 'OpenBoxes']
+- ['index.md', 'About', 'Introduction']
+- ['benefits.md', 'About', 'Benefits']
+- ['considerations.md', 'About', 'Considerations']
 
 # Installation
 - ['installation/index.md', 'Installation',  'Overview']
 - ['installation/ubuntu.md', 'Installation', 'Ubuntu']
-#- ['installation/mac.md', 'Installation', 'Mac OS X']
-#- ['installation/windows.md', 'Installation', 'Windows']
+- ['installation/macos.md', 'Installation', 'Mac OS']
+- ['installation/windows.md', 'Installation', 'Windows']
 
 # Configuration
-- ['configuration.md', 'Configuration', 'Configuration']
+- ['configuration.md', 'Configuration Guide', 'Configuration']
 
 # Developer Guide
+- ['developer-guide/index.md', 'Developer Guide', 'Introduction']
+- ['developer-guide/getting-started.md', 'Developer Guide', 'Getting Started']
+- ['developer-guide/contributing.md', 'Developer Guide', 'Contributing']
+- ['developer-guide/syncing-a-fork.md', 'Developer Guide', 'Syncing a Fork']
 - ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
+
+# Support - add a page like https://readthedocs.org/support/
+- ['support/index.md', 'Support', 'Introduction']
+
+# User Guide
+- ['user-guide/index.md', 'User Guide', 'Introduction']
 
 # Continuous Integration
 # User Guide

@@ -9,20 +9,28 @@
 **/ 
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
+
 class TransactionEntry implements Comparable, Serializable {
 	
 	String id
-    Integer quantity				
+    Integer quantity
+    Product product
 	InventoryItem inventoryItem		// The inventory item being tracked
-	String comments					// 
+	Location binLocation			// Bin location of inventory item
+
+	String comments					//
 	
     static belongsTo = [ transaction : Transaction ]
 
 	static mapping = { 
 		id generator: 'uuid'		
 	}
-    static constraints = {		
-		inventoryItem(nullable:false)		
+    static constraints = {
+        product(nullable:true)
+		inventoryItem(nullable:false)
+		binLocation(nullable:true)
 		quantity(nullable:false, range: 0..2147483646)
 		comments(nullable:true, maxSize: 255)	
     }

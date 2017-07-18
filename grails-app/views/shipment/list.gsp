@@ -10,13 +10,23 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
+
+            <g:if test="${shipments?.size() == params.max}">
+                <div class="message">
+                    <ul>
+                        <li>${g.message(code: 'shipment.limitHasBeenReached.message', args: [params.max])}</li>
+                    </ul>
+                </div>
+            </g:if>
+
             <div class="yui-gf">
                 <div class="yui-u first">
                     <g:render template="filters" model="[]"/>
                 </div>
                 <div class="yui-u">
 
-                    <g:form name="listForm" action="bulkReceiveShipments" method="post">
+
+                    <g:form id="listForm" name="listForm" method="post">
                         <g:if test="${incoming}">
                             <g:hiddenField name="type" value="incoming"/>
                         </g:if>
@@ -105,28 +115,34 @@
 		    	$('.tabs').tabs({selected: index});
 
 
-                $("#bulkReceive").click(function(event){
+                $(".bulkReceive").click(function(event){
+
                     event.preventDefault();
-                    $("#listForm").attr("action", "bulkReceiveShipments")
+                    $("#listForm").attr("action", "bulkReceiveShipments");
+                    $("#listForm").submit();
+                    console.log(event);
+                    console.log($("#listForm"));
+
+                });
+
+                $(".bulkRollback").click(function(event){
+                    event.preventDefault();
+                    $("#listForm").attr("action", "bulkRollbackShipments");
                     $("#listForm").submit();
                 });
 
-                $("#bulkRollback").click(function(event){
+                $(".bulkMarkAsReceived").click(function(event){
                     event.preventDefault();
-                    $("#listForm").attr("action", "bulkRollbackShipments")
+                    $("#listForm").attr("action", "bulkMarkAsReceived");
                     $("#listForm").submit();
                 });
 
-                $("#bulkMarkAsReceived").click(function(event){
-                    event.preventDefault();
-                    $("#listForm").attr("action", "markShipmentsAsReceived")
-                    $("#listForm").submit();
-                });
+//                $(':checkbox.all').change(function(){
+//                    $(':checkbox.item').prop('checked', this.checked);
+//                });
 
-
-                $(".checkAll").change(function () {
-                    var status = $(this).data("status");
-                    $("input:checkbox." + status).prop('checked', $(this).prop("checked"));
+                $(":checkbox.checkAll").change(function () {
+                    $(":checkbox.shipment-item").prop('checked', $(this).prop("checked"));
                 });
 
 			});

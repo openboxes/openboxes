@@ -37,17 +37,17 @@ class ProductGroup implements Comparable, Serializable {
 		
 	
 	static constraints = {
-		name(nullable:true)
-		description(nullable:false, blank: false, maxSize: 255)
+		name(nullable:false, blank: false, maxSize: 255)
+		description(nullable:true)
 		//products validator: { products, productGroup ->
 		//	return products.every {  productGroup.category == it.category }
 		//}
 	}
 
-	String toString() { return "$description"; }
+	String toString() { return "$name"; }
 
 	int compareTo(obj) {
-		this.description <=> obj.description
+		this.name <=> obj.name
 	}
 
     @Override

@@ -28,54 +28,66 @@
 					</g:link>
 				</span>
 			</div>
-			<table>
-				<thead>
-					<tr>
 
-						<g:sortableColumn property="id"
-							title="${warehouse.message(code: 'default.id.label')}" />
 
-						<g:sortableColumn property="name"
-							title="${warehouse.message(code: 'default.name.label')}" />
+			<div class="box">
+				<h2><warehouse:message code="default.list.label"
+									   args="[entityName]" /></h2>
+				<table>
+					<thead>
+						<tr>
 
-						<g:sortableColumn property="description"
-							title="${warehouse.message(code: 'default.description.label')}" />
+							<g:sortableColumn property="id"
+								title="${warehouse.message(code: 'default.id.label')}" />
 
-						<g:sortableColumn property="sortOrder"
-							title="${warehouse.message(code: 'default.sortOrder.label')}" />
+							<g:sortableColumn property="name"
+								title="${warehouse.message(code: 'default.name.label')}" />
 
-						<g:sortableColumn property="dateCreated"
-							title="${warehouse.message(code: 'default.dateCreated.label')}" />
+							<g:sortableColumn property="locationTypeCode"
+											  title="${warehouse.message(code: 'locationType.locationTypeCode.label', default: 'Location Type Code')}" />
 
-					</tr>
-				</thead>
-				<tbody>
-					<g:each in="${locationTypeInstanceList}" status="i"
-						var="locationTypeInstance">
-						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+							<g:sortableColumn property="description"
+								title="${warehouse.message(code: 'default.description.label')}" />
 
-							<td>
-								<g:link action="edit" id="${locationTypeInstance.id}">
-									${fieldValue(bean: locationTypeInstance, field: "id")}
-								</g:link>
-							</td>
-							<td>
-								<g:link action="edit" id="${locationTypeInstance.id}">
-									${fieldValue(bean: locationTypeInstance, field: "name")}
-								</g:link>
-							</td>
-							<td>
-								${fieldValue(bean: locationTypeInstance, field: "description")}
-							</td>
-							<td>
-								${fieldValue(bean: locationTypeInstance, field: "sortOrder")}
-							</td>
-							<td><format:date obj="${locationTypeInstance.dateCreated}" /></td>
+							<g:sortableColumn property="sortOrder"
+								title="${warehouse.message(code: 'default.sortOrder.label')}" />
+
+							<g:sortableColumn property="dateCreated"
+								title="${warehouse.message(code: 'default.dateCreated.label')}" />
 
 						</tr>
-					</g:each>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<g:each in="${locationTypeInstanceList}" status="i"
+							var="locationTypeInstance">
+							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+
+								<td>
+									<g:link action="edit" id="${locationTypeInstance.id}">
+										${fieldValue(bean: locationTypeInstance, field: "id")}
+									</g:link>
+								</td>
+								<td>
+									<g:link action="edit" id="${locationTypeInstance.id}">
+										${fieldValue(bean: locationTypeInstance, field: "name")}
+									</g:link>
+								</td>
+								<td>
+									${fieldValue(bean: locationTypeInstance, field: "locationTypeCode")}
+								</td>
+								<td>
+									${fieldValue(bean: locationTypeInstance, field: "description")}
+								</td>
+								<td>
+									${fieldValue(bean: locationTypeInstance, field: "sortOrder")}
+								</td>
+								<td><format:date obj="${locationTypeInstance.dateCreated}" /></td>
+
+							</tr>
+						</g:each>
+					</tbody>
+				</table>
+			</div>
 		</div>
 		<div class="paginateButtons">
 			<g:paginate total="${locationTypeInstanceTotal}" />

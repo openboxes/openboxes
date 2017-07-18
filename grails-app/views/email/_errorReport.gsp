@@ -5,32 +5,40 @@
 <body>
 
 <h1>OpenBoxes Bug Report</h1>
-<h2>Stacktrace</h2>
+<h3>Stacktrace</h3>
 <pre>
     ${stacktrace}
 </pre>
 
 <h3>Clickstream</h3>
-<pre>${clickstream}</pre>
+<pre>
+    ${clickstream}
+</pre>
 
 <h3>Properties</h3>
-<dl>
-    <dt>Session</dt>
-    <dd>${session?.id}</dd>
-
-    <dt>Clickstream</dt>
-    <dd>${clickstreamUrl}</dd>
-
-    <dt>User</dt>
-    <dd>${session?.user?.name} ${session?.user?.email} (${session?.user?.username})</dd>
-
-    <dt>Location</dt>
-    <dd>${session?.warehouse?.name} (${session?.warehouse?.id})</dd>
-
+<table>
+    <tr>
+        <th>session</th>
+        <td>${session?.id}</td>
+    </tr>
+    <tr>
+        <th>clickstream</th>
+        <td>${clickstreamUrl}</td>
+    </tr>
+    <tr>
+        <th>user</th>
+        <td>${session?.user?.name} ${session?.user?.email} (${session?.user?.username})</td>
+    </tr>
+    <tr>
+        <th>location</th>
+        <td>${session?.warehouse?.name} (${session?.warehouse?.id})</td>
+    </tr>
     <g:each var="entry" in="${params }">
-        <dt>${entry.key }</dt>
-        <dd>${entry.value ?: warehouse.message(code: 'default.none.label') }</dd>
+        <tr>
+            <th>${entry.key }</th>
+            <td>${entry.value ?: warehouse.message(code: 'default.none.label') }</td>
+        </tr>
     </g:each>
-</dl>
+</table>
 </body>
 </html>

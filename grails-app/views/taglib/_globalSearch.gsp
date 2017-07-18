@@ -10,69 +10,46 @@
 		<g:hiddenField name="showOutOfStockProducts" value="on"/>			
 	</g:form>
 </span>
-	
-	
-	<script>
-		$(document).ready(function() {
-	      	$("#${attrs.id}").autocomplete( {
-                minLength: 1,
-                delay: 300,
-	      		source: function(req, resp) {
-			  		$.getJSON('${attrs.jsonUrl}', req, function(data) {
-						var suggestions = [];
-						$.each(data, function(i, item) {
-							suggestions.push(item);
-						});
-						resp(suggestions);
-					});
-	      		},
-	      		select: function(event, ui) {
-		      		window.location = ui.item.url;
-		      		return false;
-			  	},
-                focus: function(event, ui) {
-                    //$( "#${attrs.id}" ).val( ui.item.label );
-                    //return false;
-
-                    this.value = ui.item.label;
-                    event.preventDefault(); // Prevent the default focus behavior.
-                }
-      		});
-            /*
-            $("#${attrs.id}").width(500);
-            $("#${attrs.id}").focus(function() {
-                $(this).animate({"width": "500px"}, "fast");
-                //$(this).width(400);
-            });
-            $("#${attrs.id}").blur(function() {
-                $(this).val('');
-                $(this).animate({"width": "300px"}, "fast");
-            });
-            */
-
-
-
-        });
-
-        /*
-        $( "#project" ).autocomplete({
-            source: projects,
-            select: function( event, ui ) {
-                $( "#project" ).val( ui.item.label );
-                $( "#project-id" ).val( ui.item.value );
-                $( "#project-description" ).html( ui.item.desc );
-                $( "#project-icon" ).attr( "src", "images/" + ui.item.icon );
-
+<script>
+    $(document).ready(function() {
+        $("#${attrs.id}").autocomplete( {
+            minLength: 1,
+            delay: 300,
+            source: function(req, resp) {
+                $.getJSON('${attrs.jsonUrl}', req, function(data) {
+                    var suggestions = [];
+                    $.each(data, function(i, item) {
+                        suggestions.push(item);
+                    });
+                    resp(suggestions);
+                });
+            },
+            select: function(event, ui) {
+                window.location = ui.item.url;
                 return false;
+            },
+            focus: function(event, ui) {
+                //$( "#${attrs.id}" ).val( ui.item.label );
+                //return false;
+
+                this.value = ui.item.label;
+                event.preventDefault(); // Prevent the default focus behavior.
             }
-        })
-                .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-            return $( "<li>" )
-                    .append( "<a>" + item.label + "<br>" + item.desc + "</a>" )
-                    .appendTo( ul );
-        };
+        });
+        /*
+        $("#${attrs.id}").width(500);
+        $("#${attrs.id}").focus(function() {
+            $(this).animate({"width": "500px"}, "fast");
+            //$(this).width(400);
+        });
+        $("#${attrs.id}").blur(function() {
+            $(this).val('');
+            $(this).animate({"width": "300px"}, "fast");
+        });
         */
 
 
-	</script>
+
+    });
+</script>
 </span>		

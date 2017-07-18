@@ -9,19 +9,60 @@
  **/
 package org.pih.warehouse
 
+import com.google.zxing.BarcodeFormat
 import org.pih.warehouse.core.Location
 
 class ImageTagLib {
 
+    def grailsApplication
+
     def displayLogo = { attrs, body ->
 
         Location location = Location.get(attrs.location)
+        def logo = [
+                url: grailsApplication.config.openboxes.logo.url,
+                label: grailsApplication.config.openboxes.logo.label
+        ]
 
-        out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs,location:location]);
+        attrs.location = location
+        attrs.logo = logo
+        attrs.showLabel = (attrs.showLabel!=null)?attrs.showLabel:true
+
+        out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs]);
     }
 
 
     def displayBarcode = { attrs, body ->
+
+        def defaultFormat = grailsApplication.config.openboxes.identifier.barcode.format
+        if (!attrs.format && defaultFormat) {
+            try {
+                attrs.format = BarcodeFormat.valueOf(defaultFormat)
+            } catch (Exception e) {
+                println ("Unable to locate default barcode format ${defaultFormat}")
+            }
+        }
+
+        def defaultHeight = grailsApplication.config.openboxes.identifier.barcode.height
+        if (!attrs.height && defaultHeight) {
+            try {
+                attrs.height = Integer.parseInt(defaultHeight)
+            } catch (Exception e) {
+                println ("Unable to parse default barcode height ${defaultHeight}")
+            }
+        }
+
+        def defaultWidth = grailsApplication.config.openboxes.identifier.barcode.width
+        if (!attrs.width && defaultWidth) {
+            try {
+                attrs.width = Integer.parseInt(defaultWidth)
+            } catch (Exception e) {
+                println ("Unable to parse default barcode width ${defaultWidth}")
+            }
+        }
+
+        attrs.showData = (attrs.showData!=null)?attrs.showData:true
+
 
         out << g.render(template: '/taglib/displayBarcode', model: [attrs:attrs])
 

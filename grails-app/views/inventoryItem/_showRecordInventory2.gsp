@@ -1,8 +1,8 @@
 <div id="inventoryForm">
     <g:form action="saveRecordInventory2" autocomplete="off">
 
-        <g:hiddenField name="productInstance.id" value="${commandInstance.productInstance?.id}"/>
-        <g:hiddenField name="inventoryInstance.id" value="${commandInstance?.inventoryInstance?.id}"/>
+        <g:hiddenField name="productInstance.id" value="${commandInstance.product?.id}"/>
+        <g:hiddenField name="inventoryInstance.id" value="${commandInstance?.inventory?.id}"/>
 
 		<div id="debug"></div>
         <div class="form-content box">
@@ -67,7 +67,7 @@
             </button>
             &nbsp;
             <g:link controller="inventoryItem" action="showStockCard"
-                    params="['product.id':commandInstance.productInstance?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
+                    params="['product.id':commandInstance.product?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
 
         </div>
 

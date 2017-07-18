@@ -168,11 +168,8 @@
                 </td>
                 <td class="value">
                     <span class="">
-                        <g:set var="status" value="${productInstance.getStatus(session.warehouse.id, totalQuantity?:0)}"/>
+                        <g:set var="status" value="${productInstance?.getStatus(session.warehouse.id, totalQuantity?:0)}"/>
                         ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
-                        <%--
-                        <g:render template="../product/status" model="[product:productInstance,totalQuantity:totalQuantity,latestInventoryDate:latestInventoryDate]"/>
-                        --%>
                     </span>
                 </td>
             </tr>
@@ -183,14 +180,13 @@
                 <td class="value">
                     <span class="">
                         <g:if test="${latestInventoryDate}">
-                            <g:prettyDateFormat date="${latestInventoryDate}"/>
-                            <div class="fade">
-                                ${g.formatDate(date: latestInventoryDate, format: 'MMM dd hh:mm a') }<br/>
-                            </div>
+                            <p title="${g.formatDate(date: latestInventoryDate, format: 'dd MMMMM yyyy hh:mm a') }">
+                                ${g.prettyDateFormat(date: latestInventoryDate)}
+                            </p>
 
                         </g:if>
                         <g:else>
-                            <span class="fade"><warehouse:message code="default.never.label" /></span>
+                            <p class="fade"><warehouse:message code="default.never.label" /></p>
                         </g:else>
                     </span>
                 </td>
@@ -208,14 +204,7 @@
                     </g:else>
                 </td>
             </tr>
-            <tr class="prop">
-                <td class="label">
-                    <label><warehouse:message code="inventoryLevel.preferred.label"/></label>
-                </td>
-                <td class="value">
-                    ${inventoryLevelInstance?.preferred?:'false' }
-                </td>
-            </tr>
+
 
             <tr class="prop">
                 <td class="label">
@@ -305,7 +294,14 @@
                         </p>
                     </td>
                 </tr>
-
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="inventoryLevel.preferred.label"/></label>
+                    </td>
+                    <td class="value">
+                        ${inventoryLevelInstance?.preferred?:'false' }
+                    </td>
+                </tr>
 			</tbody>
 		</table>			
 	</div>
@@ -372,7 +368,7 @@
                     <g:if test="${productInstance?.productGroups }">
                         <g:each var="productGroup" in="${productInstance?.productGroups }">
                             <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
-                                ${productGroup?.description }
+                                ${productGroup?.name }
                             </g:link>
                         </g:each>
                     </g:if>

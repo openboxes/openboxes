@@ -11,49 +11,84 @@
 	            <div class="message">${flash.message}</div>
             </g:if>		
 	    	<div id="dashboard">
-                <div id="column1" class="column">
-                    <div id="requisitionItemSummary" class="dragbox">
-                        <g:render template="requisitionItemSummary"/>
-                    </div>
-                    <div id="requisitionSummary" class="dragbox">
-                        <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
-                    </div>
-                    <div id="receiptSummary" class="dragbox">
-                        <g:render template="receiptSummary"/>
-                    </div>
-                    <div id="shipmentSummary" class="dragbox">
-                        <g:render template="shipmentSummary"/>
-                    </div>
-                    <div id="indicatorSummary" class="dragbox">
-                        <g:render template="indicatorSummary"/>
-                    </div>
+	    		<table>
+					<tr>
+						<td width="33%">
+                            <g:if test="${grailsApplication.config.openboxes.dashboard.column1.widgets}">
+                                <div id="column1" class="column">
+                                    <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column1.widgets}">
+                                        <div id="${widgetName}" class="dragbox">
+                                            <g:render template="${widgetName}"/>
+                                        </div>
+                                    </g:each>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.requisitionItemSummary.enabled}">
+                                    <g:render template="requisitionItemSummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.requisitionSummary.enabled}">
+                                    <g:render template="requisitionSummary" model="[requisitions:requisitions]"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.receiptSummary.enabled}">
+                                    <g:render template="receiptSummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.shipmentSummary.enabled}">
+                                    <g:render template="shipmentSummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.indicatorSummary.enabled}">
+                                    <g:render template="indicatorSummary"/>
+                                </g:if>
+                            </g:else>
 
-                </div>
-                <div id="column2" class="column">
-                    <%--<g:render template="valueSummary"/>--%>
-                    <div id="orderSummary" class="dragbox">
-                        <g:render template="orderSummary"/>
-                    </div>
-                    <div id="productSummary" class="dragbox">
-                        <g:render template="productSummary"/>
-                    </div>
-                    <div id="expiringSummary" class="dragbox">
-                        <g:render template="expiringSummary"/>
-                    </div>
-
-                </div>
-                <div id="column3" class="column">
-                    <div id="activitySummary" class="dragbox">
-                        <g:render template="activitySummary"/>
-                    </div>
-                    <div id="genericProductSummary" class="dragbox">
-                        <g:render template="genericProductSummary"/>
-                    </div>
-
-                    <div id="tagSummary" class="dragbox">
-                        <g:render template="tagSummary" model="[tags:tags]"/>
-                    </div>
-                </div>
+						</td>
+                        <td width="33%">
+                            <g:if test="${grailsApplication.config.openboxes.dashboard.column2.widgets}">
+                                <div id="column2" class="column">
+                                    <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column2.widgets}">
+                                        <div id="${widgetName}" class="dragbox">
+                                            <g:render template="${widgetName}"/>
+                                        </div>
+                                    </g:each>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.valueSummary.enabled}">
+                                    <g:render template="valueSummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.productSummary.enabled}">
+                                    <g:render template="productSummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.genericProductSummary.enabled}">
+                                    <g:render template="genericProductSummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.expiringSummary.enabled}">
+                                    <g:render template="expiringSummary"/>
+                                </g:if>
+                            </g:else>
+                        </td>
+						<td width="33%">
+                            <g:if test="${grailsApplication.config.openboxes.dashboard.column3.widgets}">
+                                <div id="column3" class="column">
+                                    <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column3.widgets}">
+                                        <div id="${widgetName}" class="dragbox">
+                                            <g:render template="${widgetName}"/>
+                                        </div>
+                                    </g:each>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.activitySummary.enabled}">
+                                    <g:render template="activitySummary"/>
+                                </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.tagSummary.enabled}">
+                                    <g:render template="tagSummary" model="[tags:tags]"/>
+                                </g:if>
+                            </g:else>
+						</td>
+					
+					</tr>
+				</table>
 	    	</div>
 		</div>
         <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>

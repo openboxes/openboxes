@@ -16,7 +16,7 @@
 					<g:if test="${!commandInstance?.lotNumberList}">
 						<tr class="even" style="min-height: 100px;">
 							<td colspan="5" style="text-align: center; vertical-align: middle">
-								<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
+								<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.product)]"/>
 							</td>
 						</tr>
 					</g:if>
@@ -43,7 +43,7 @@
 									<div class="actions left">
 
 										<div class="action-menu-item">
-											<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
+											<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.product?.id,'inventoryItem.id':itemInstance?.id]">
 												<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
 												<warehouse:message code="inventoryItem.show.label"/>
 											</g:link>
@@ -99,7 +99,7 @@
 							<td class="top">
 								<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
 								</g:link>
-								<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
+								<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.product?.id,'inventoryItem.id':itemInstance?.id]">
 									<span class="lotNumber">
 									   ${itemInstance?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.message"/></span>' }
 									</span>
@@ -114,7 +114,7 @@
 								</g:else>
 							</td>
 							<td class="top center">
-								${itemQuantity?:"N/A" }
+								${itemQuantity }
 															
 							</td>
                             <td>
@@ -143,7 +143,7 @@
 									
 								</td>
 								<td>
-									<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+									<g:hiddenField name="product.id" value="${commandInstance?.product?.id }"/>
 									<g:textField name="lotNumber" class="text lotNumber" placeholder="Enter lot number"/>
 								</td>
 								<td>
@@ -153,11 +153,10 @@
 										years="${yearStart..yearEnd }"/>						
 								</td>
                                 <td class="center">
-                                    N/A
                                 </td>
 								<td class="center">
 									<button class="button icon add">
-										<warehouse:message code="default.button.add.label"/>
+										<warehouse:message code="default.button.save.label"/>
 									</button>						
 								</td>
 							</tr>

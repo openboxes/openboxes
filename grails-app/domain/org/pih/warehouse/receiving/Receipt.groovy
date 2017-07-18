@@ -29,6 +29,7 @@ class Receipt implements Serializable {
 	
 	static mapping = {
 		id generator: 'uuid'
+		receiptItems cascade: "all-delete-orphan"
 	}
 
 	// Constraints

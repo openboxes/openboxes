@@ -6,21 +6,23 @@
 	</button>
 	<div class="actions left">
 		<g:isUserManager>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="inventoryAdjustedBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'book_edit.png')}"
-					alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
-						code="inventory.inventoryAdjusted.label" />
-				</a>
-			</div>
+			<g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+				<div class="action-menu-item">
+					<a href="javascript:void(0);" class="actionButton"
+						id="inventoryAdjustedBtn"> <img
+						src="${createLinkTo(dir:'images/icons/silk',file:'book_edit.png')}"
+						alt="${g.message(code: 'inventory.adjustStock.label') }"
+						style="vertical-align: middle" /> &nbsp;<g:message
+							code="inventory.adjustStock.label" />
+					</a>
+				</div>
+			</g:supports>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="incomingTransferBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'package_in.png')}"
 					alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.incomingTransfer.label" />
 				</a>
 			</div>
@@ -29,39 +31,16 @@
 					id="outgoingTransferBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}"
 					alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.outgoingTransfer.label" />
 				</a>
-			</div>
-			<div class="action-menu-item">
-				<hr />
-			</div>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="addToShipmentBtn"> <img
-					src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"
-					alt="${warehouse.message(code: 'inventory.addToShipment.label') }" />
-					&nbsp;<warehouse:message code="inventory.addToShipment.label" />
-				</a>
-			</div>
-			<div class="action-menu-item">
-				<a href="javascript:void(0);" class="actionButton"
-					id="addToProductGroupBtn"> <img
-					src="${createLinkTo(dir:'images/icons/silk',file:'link_add.png')}"
-					alt="${warehouse.message(code: 'productGroup.addProducts.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
-						code="productGroup.addProducts.label" />
-				</a>
-			</div>
-			<div class="action-menu-item">
-				<hr />
 			</div>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="inventoryConsumedBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.inventoryConsumed.label" />
 				</a>
 			</div>
@@ -70,7 +49,7 @@
 					id="inventoryDamagedBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'exclamation.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryDamaged.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.inventoryDamaged.label" />
 				</a>
 			</div>
@@ -79,19 +58,39 @@
 					id="inventoryExpiredBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'clock_red.png')}"
 					alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.inventoryExpired.label" />
 				</a>
 			</div>
-			<div class="action-menu-item">
-				<hr />
-			</div>
+            <div class="action-menu-item">
+                <hr />
+            </div>
+            <div class="action-menu-item">
+                <a href="javascript:void(0);" class="actionButton"
+                   id="addToShipmentBtn"> <img
+                        src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"
+                        alt="${warehouse.message(code: 'inventory.addToShipment.label') }" />
+                    &nbsp;<g:message code="inventory.addToShipment.label" />
+                </a>
+            </div>
+            <div class="action-menu-item">
+                <a href="javascript:void(0);" class="actionButton"
+                   id="addToProductGroupBtn"> <img
+                        src="${createLinkTo(dir:'images/icons/silk',file:'link_add.png')}"
+                        alt="${warehouse.message(code: 'productGroup.addProducts.label') }"
+                        style="vertical-align: middle" /> &nbsp;<g:message
+                        code="productGroup.addProducts.label" />
+                </a>
+            </div>
+            <div class="action-menu-item">
+                <hr />
+            </div>
 			<div class="action-menu-item">
 				<a href="javascript:void(0);" class="actionButton"
 					id="markAsSupported"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
 					alt="${warehouse.message(code: 'inventory.markAsSupported.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.markAsSupported.label" />
 				</a>
 			</div>
@@ -101,7 +100,7 @@
 					id="markAsNonInventoried"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}"
 					alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.markAsNonInventoried.label" />
 				</a>
 			</div>
@@ -111,7 +110,7 @@
 					id="markAsNotSupported"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
 					alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="inventory.markAsNotSupported.label" />
 				</a>
 			</div>
@@ -123,7 +122,7 @@
 					id="exportProductsBtn"> <img
 					src="${createLinkTo(dir:'images/icons/silk',file:'table_save.png')}"
 					alt="${warehouse.message(code: 'product.exportAsCsv.label') }"
-					style="vertical-align: middle" /> &nbsp;<warehouse:message
+					style="vertical-align: middle" /> &nbsp;<g:message
 						code="product.exportAsCsv.label" />
 				</a>
 			</div>
@@ -132,7 +131,7 @@
                    id="deleteProductsBtn"> <img
                         src="${createLinkTo(dir:'images/icons/silk',file:'table_delete.png')}"
                         alt="${warehouse.message(code: 'products.delete.label', default: 'Delete selected products') }"
-                        style="vertical-align: middle" /> &nbsp;<warehouse:message code="products.button.delete.label" default="Delete selected products" />
+                        style="vertical-align: middle" /> &nbsp;<g:message code="products.button.delete.label" default="Delete selected products" />
                 </a>
             </div>
 
@@ -146,7 +145,7 @@
 															
 				<a href="javascript:void(0);" class="actionButton" id="transactionReportBtn">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" alt="${warehouse.message(code: 'report.showTransactionReport.label') }" style="vertical-align: middle"/>
-					&nbsp;<warehouse:message code="report.showTransactionReport.label"/>
+					&nbsp;<g:message code="report.showTransactionReport.label"/>
 				</a>
 			</div>		
 		--%>
@@ -156,7 +155,7 @@
 					src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"
 					alt="${warehouse.message(code: 'inventory.listTransactions.label') }"
 					style="vertical-align: middle" />
-				&nbsp;<warehouse:message code="inventory.listTransactions.label" />
+				&nbsp;<g:message code="inventory.listTransactions.label" />
 			</g:link>
 		</div>
 	</div>

@@ -15,8 +15,6 @@
 				<div class="message">${flash.message}</div>
             </g:if>
             <div>
-            
-
 
                 <div class="yui-gf">
                     <div class="yui-u first">
@@ -102,6 +100,7 @@
 
                             </h2>
 
+                            <div class="dialog">
 
                             <table>
                                 <thead>
@@ -167,15 +166,17 @@
                                                 ${productInstance?.updatedBy }
                                             </td>
                                             <td align="center">
-                                                ${productInstance?.lastUpdated }
+                                                <div title="<g:formatDate date="${productInstance?.lastUpdated }"/>">
+                                                    <g:prettyDateFormat date="${productInstance?.lastUpdated}"/>
+                                                </div>
                                             </td>
                                         </tr>
                                     </g:each>
                                 </tbody>
                             </table>
-                            <div class="paginateButtons">
-                                <g:paginate total="${productInstanceTotal}" params="${params }" />
-                            </div>
+                        </div>
+                        <div class="paginateButtons">
+                            <g:paginate total="${productInstanceTotal}" params="${params }" />
                         </div>
 
                     </div>

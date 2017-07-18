@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <!-- Only allow the originating warehouse to edit the shipment -->
-<div id="shipment-action-menu" class="action-menu">
+<span id="shipment-action-menu" class="action-menu">
     <button class="action-btn">
         <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
     </button>
@@ -9,7 +9,7 @@
         <g:if test="${shipmentInstance?.destination?.id == session.warehouse.id}">
             <div class="action-menu-item">
                 <g:link controller="shipment" action="list" params="[type: 'incoming']">
-                    <img src="${createLinkTo(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>&nbsp;
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'lorry.png')}" class="middle"/>&nbsp;
                     <warehouse:message code="shipping.listIncoming.label"/>
                 </g:link>
             </div>
@@ -17,7 +17,7 @@
         <g:else>
             <div class="action-menu-item">
                 <g:link controller="shipment" action="list">
-                    <img src="${createLinkTo(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>&nbsp;
+                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'lorry.png')}" class="middle"/>&nbsp;
                     <warehouse:message code="shipping.listOutgoing.label"/>
                 </g:link>
             </div>
@@ -87,6 +87,7 @@
                 </div>
             </g:if>
         </g:if>
+        <%--
         <div class="action-menu-item">
             <g:link controller="shipment" action="addDocument" id="${shipmentInstance.id}">
                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_add.png')}"
@@ -98,17 +99,21 @@
                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'comment_add.png')}"
                      class="middle"/>&nbsp;<warehouse:message code="shipping.addComment.label" default="Add comment"/></g:link>
         </div>
+        --%>
+        <hr/>
 
         <div class="action-menu-item">
-            <hr/>
+            <g:link target="_blank" controller="report" action="printPickListReport"
+                    params="['shipment.id': shipmentInstance?.id]">
+                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_side_list.png')}" class="middle"/>&nbsp;
+                <warehouse:message code="shipping.printPickList.label" default="Print Pick List"/>
+            </g:link>
         </div>
-
         <div class="action-menu-item">
             <g:link target="_blank" controller="report" action="printShippingReport"
                     params="['shipment.id': shipmentInstance?.id]">
                 <img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-                <warehouse:message code="shipping.downloadPackingList.label"/>
-                <span class="fade">(.pdf)</span>
+                <warehouse:message code="shipping.printPackingList.label" default="Print Packing List"/>
             </g:link>
         </div>
 
@@ -211,6 +216,7 @@
                              alt="Rollback Last Event" class="middle"/>&nbsp;
                         <warehouse:message code="shipping.rollbackLastEvent.label"/></g:link>
                 </div>
+                <hr/>
                 <div class="action-menu-item">
                     <g:link controller="shipment" action="renderShippedEmail" id="${shipmentInstance?.id}">
                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'email.png')}" class="middle"/>&nbsp;
@@ -235,4 +241,4 @@
             </div>
         </g:if>
     </div>
-</div>
+</span>

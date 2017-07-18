@@ -27,6 +27,10 @@ hibernate {
     cache.provider_class='org.hibernate.cache.EhCacheProvider'
 	jdbc.batch_size=50
     //default_batch_fetch_size = 16
+    //jdbc.batch_size = 10
+	//order_inserts = true
+	//order_updates = true
+	//jdbc.batch_versioned_data = true
     //max_fetch_depth = 5
 }
 
@@ -43,7 +47,7 @@ environments {
 	}
 	test {
 		dataSource {
-			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull"
 		}
 	}
 	production {

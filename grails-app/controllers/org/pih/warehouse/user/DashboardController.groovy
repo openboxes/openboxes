@@ -76,7 +76,13 @@ class DashboardController {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
 			return;
 		}
-		
+
+		def inventoryItem = InventoryItem.findByLotNumber(params.searchTerms)
+		if (inventoryItem) {
+			redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
+			return;
+		}
+
 		def requisition = Requisition.findByRequestNumber(params.searchTerms)
 		if (requisition) {
 			redirect(controller: "requisition", action: "show", id: requisition.id)
@@ -275,15 +281,52 @@ class DashboardController {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
-        def requisitionStatistics = [:] //requisitionService.getRequisitionStatistics(location,null,user)
+		//def startTime = System.currentTimeMillis()
 
-		def category = productService.getRootCategory()
-		def categories = category.categories
+        // Inbound Shipments
+		def incomingShipments = Shipment.findAllByDestinationAndCurrentStatusIsNotNull(location);
+        incomingShipments = incomingShipments?.groupBy{ it?.currentStatus }?.sort()
+        def incomingShipmentsCount = Shipment.countByDestination(location)
+
+
+		// Outbound Shipments
+		def outgoingShipments = Shipment.findAllByOriginAndCurrentStatusIsNotNull(location)
+        outgoingShipments = outgoingShipments?.groupBy{it?.currentStatus}?.sort()
+        def outgoingShipmentsCount = Shipment.countByOrigin(location)
+
+		// Orders
+		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
+
+        // Requisitions
+        //def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
+		//def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
+        //def incomingRequests = [:] //requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
+        //def outgoingRequests = []
+        //def requisitionTemplates = [] //requisitionService.getAllRequisitionTemplates(session.warehouse)
+        //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
+        //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
+        def requisitionStatistics = requisitionService.getRequisitionStatistics(location,null,user)
+
+        def categories = []
+		def category = productService.getRootCategory()		
+		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
+
+        //println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
+
 		[
 			categories: categories,
+			incomingShipments: incomingShipments,
+            incomingShipmentsCount: incomingShipmentsCount,
+            outgoingShipments: outgoingShipments,
+			outgoingShipmentsCount: outgoingShipmentsCount,
+			incomingOrders: incomingOrders,
+            requisitionStatistics: requisitionStatistics,
+			//incomingRequests: incomingRequests,
+			//outgoingRequests: outgoingRequests,
+            //requisitionTemplates: requisitionTemplates,
+            //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
-            requisitionStatistics:requisitionStatistics,
 			tags:productService.getAllTags()
 		]
 	}
@@ -304,9 +347,9 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-    @CacheFlush(["dashboardCache", "megamenuCache"])
+    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache", "quantityOnHandCache", "selectTagCache", "selectTagsCache", "selectCategoryCache"])
     def flushCache = {
-        flash.message = "Cache has been flushed"
+        flash.message = "Caches have been flushed"
         redirect(action: "index")
     }
 
@@ -339,12 +382,10 @@ class DashboardController {
 			// Save the warehouse selection for "last logged into" information
 			if (session.user) {
 				def userInstance = User.get(session.user.id);
-				userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
+				//userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
 				userInstance.lastLoginDate = new Date();
-				if (userInstance.rememberLastLocation) { 
-					userInstance.warehouse = warehouse 
-				}
 				userInstance.save(flush:true);
+                userInstance.warehouse = warehouse
 				session.user = userInstance;
 			}			
 			
@@ -364,8 +405,8 @@ class DashboardController {
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
-			//List warehouses = Location.findAllWhere("active":true)
-			render(view: "chooseLocation")
+			List warehouses = Location.findAllWhere("active":true)
+			render(view: "chooseLocation", model: [warehouses: warehouses])
 		}
 		
 	}

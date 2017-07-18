@@ -19,7 +19,8 @@ class TransactionCommand {
 	
 	Date transactionDate
 	TransactionType transactionType
-	
+
+	List binLocations
 	Map productInventoryItems
 	Map quantityMap
 	List transactionTypeList 

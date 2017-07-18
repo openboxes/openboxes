@@ -127,7 +127,7 @@
                         </td>
                         <td class="value">
                             <g:textField name="summary" class="text" size="80"
-                                value="" placeholder="${warehouse.message(code:'error.summary.message') }"/>
+                                value="${exception?.message}" placeholder="${warehouse.message(code:'error.summary.message') }"/>
                             <br/>
                         </td>
                     </tr>
@@ -206,9 +206,9 @@
 	        return false;
 		});
 		$(".open-dialog").click(function() {
-			var dom = document.getElementsByTagName('html')[0].innerHTML;
-			dom = "<html>" + dom + "</html>"
-			$("#dom").val(dom);
+			//var dom = document.getElementsByTagName('html')[0].innerHTML;
+			//dom = "<html>" + dom + "</html>"
+			//$("#dom").val(dom);
 			
 			$("#error-dialog").dialog({ 
 				autoOpen: true, 

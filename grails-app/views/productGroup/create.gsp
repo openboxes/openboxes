@@ -61,22 +61,22 @@
 
 
 							<tr class="prop">
-								<td valign="middle" class="name"><label for="description"><warehouse:message
+								<td valign="middle" class="name"><label for="name"><warehouse:message
 											code="productGroup.name.label" default="Generic product" /></label>
 								</td>
 								<td valign="middle"
-									class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">
+									class="value ${hasErrors(bean: productGroupInstance, field: 'name', 'errors')}">
 									
 									<g:if test="${productGroups }">	
 										<div>										
 											<g:select name="id" from="${productGroups }" 
-												optionKey="id" optionValue="description" value="${productGroupInstance?.id }" noSelection="['null':'']"/>
+												optionKey="id" optionValue="name" value="${productGroupInstance?.id }" noSelection="['null':'']"/>
 										</div>
 									</g:if>
 									<g:else>
 										<div>
-											<g:textField name="description" class="text"
-												value="${productGroupInstance?.description}" size="60" />
+											<g:textField name="name" class="text large"
+												value="${productGroupInstance?.name}" />
 										</div>
 									</g:else>
 										
@@ -104,7 +104,17 @@
 
                                 </td>
                             </tr>
-							
+							<tr class="prop">
+								<td valign="top" class="name"><label for="description"><warehouse:message
+										code="productGroup.description.label" default="Description" /></label>
+								</td>
+								<td valign="top"
+									class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">
+									<g:textArea name="description" class="text" style="width: 100%" rows="5">${productGroupInstance?.description}</g:textArea>
+								</td>
+							</tr>
+
+
 							<g:if test="${productGroupInstance?.products }">
 								<tr class="prop">
 									<td valign="top" class="name">
@@ -123,7 +133,7 @@
 													</td>
 													<td class="checkable middle">			
 														<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory" style="z-index: 999">
-															<span title="${product?.description }">				
+															<span title="${product?.name }">
 																<g:if test="${product?.name?.trim()}">
 																	${product?.name}
 																</g:if>

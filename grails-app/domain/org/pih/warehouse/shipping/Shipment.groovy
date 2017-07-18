@@ -23,18 +23,22 @@ import org.pih.warehouse.receiving.Receipt
 class Shipment implements Comparable, Serializable {
 
     def beforeInsert = {
-        //def currentUser = AuthService.currentUser.get()
-        //if (currentUser) {
-        //    createdBy = currentUser
-        //    updatedBy = currentUser
-        //}
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            createdBy = currentUser
+            updatedBy = currentUser
+        }
+        currentEvent = mostRecentEvent
+        currentStatus = status.code
 
     }
     def beforeUpdate = {
-        //def currentUser = AuthService.currentUser.get()
-        //if (currentUser) {
-        // updatedBy = currentUser
-        //}
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            updatedBy = currentUser
+        }
+        currentEvent = mostRecentEvent
+        currentStatus = status.code
     }
 
     String id
@@ -47,7 +51,9 @@ class Shipment implements Comparable, Serializable {
 	String additionalInformation	// any additional information about the shipment (e.g., comments)
 	Float weight											// weight of container
 	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
-	
+
+    Long shipmentItemCount
+
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
@@ -61,23 +67,30 @@ class Shipment implements Comparable, Serializable {
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
-	
+
 	// One-to-many associations
 	SortedSet events;
-	
+
+    Event currentEvent
+    ShipmentStatusCode currentStatus
+    User createdBy
+    User updatedBy
+
 	List documents;
 	List comments;
 	List referenceNumbers;
 	
 	static transients = [ 
-		"allShipmentItems",
-		"unpackedShipmentItems",
-		"containersByType", 
-		"mostRecentEvent", 
-		"status",
-		"actualShippingDate",
-		"actualDeliveryDate",
-        "recipients"
+			"allShipmentItems",
+			"unpackedShipmentItems",
+			"containersByType",
+			"mostRecentEvent",
+			"status",
+			"actualShippingDate",
+			"actualDeliveryDate",
+			"recipients",
+			"consignorAddress",
+			"consigneeAddress"
     ]
 	
 	static mappedBy = [outgoingTransactions: 'outgoingShipment',
@@ -111,6 +124,7 @@ class Shipment implements Comparable, Serializable {
 		//containers cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		//shipmentItems cascade: "all-delete-orphan"
+        shipmentItemCount(formula: '(select count(shipment_item.id) from shipment_item where (shipment_item.shipment_id = id))')
 		shipmentMethod cascade: "all-delete-orphan"
 		referenceNumbers cascade: "all-delete-orphan"
 		receipt cascade: "all-delete-orphan"
@@ -119,12 +133,13 @@ class Shipment implements Comparable, Serializable {
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
         //outgoingTransactions cascade: "all-delete-orphan"
         //incomingTransactions cascade: "all-delete-orphan"
+
 	}
 
 	// Constraints
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
-		shipmentNumber(nullable:true, maxSize: 255)	
+		shipmentNumber(nullable:true, maxSize: 255)
 		origin(nullable:false, 
 			validator: { value, obj -> !value.equals(obj.destination)})
 		destination(nullable:false)		
@@ -154,7 +169,12 @@ class Shipment implements Comparable, Serializable {
 		events ( validator: { events ->
         	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()        
 		} )
-	}
+
+        currentStatus(nullable:true)
+        currentEvent(nullable:true)
+        createdBy(nullable:true)
+        updatedBy(nullable:true)
+    }
 
 	String toString() { return "$name"; }
 	
@@ -166,7 +186,7 @@ class Shipment implements Comparable, Serializable {
 	int compareTo(obj) { 
 		obj.name <=> name 
 	}
-	
+
 	/** 
 	 * Transient method that gets all shipment items two-levels deep.
 	 * 
@@ -197,6 +217,28 @@ class Shipment implements Comparable, Serializable {
 	
 	Collection<ShipmentItem> getUnpackedShipmentItems() { 
 		return shipmentItems.findAll { !it.container }  
+	}
+
+	/**
+	 * Invoking the default sort() method from a GSP on the shipment items association does not seem to work reliably,
+	 * so we're going to try to perform the sort operation within the shipment.
+	 *
+	 * @return
+	 */
+	List sortShipmentItems() {
+		def shipmentItemComparator = { a, b ->
+			def sortOrder =
+					a?.container?.parentContainer?.sortOrder <=> b?.container?.parentContainer?.sortOrder ?:
+							a?.container?.sortOrder <=> b?.container?.sortOrder ?:
+									a?.inventoryItem?.product?.name <=> b?.inventoryItem?.product?.name ?:
+											a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber ?:
+													a?.product?.name <=> b?.product?.name ?:
+															a?.lotNumber <=> b?.lotNumber ?:
+																	b?.quantity <=> a?.quantity
+			return sortOrder
+		}
+
+		return shipmentItems?.sort(shipmentItemComparator)
 	}
 	
 	//String getShipmentNumber() {
@@ -276,6 +318,7 @@ class Shipment implements Comparable, Serializable {
 		return null;
 		
 	}
+
 	
 	Date getActualShippingDate() { 
 		for (event in events) { 
@@ -364,6 +407,13 @@ class Shipment implements Comparable, Serializable {
         return recipients?.unique()
     }
 
+    String getConsigneeAddress() {
+        return destination.address.description?:destination?.locationGroup.address?.description
+    }
+
+    String getConsignorAddress() {
+        return origin.address.description?:origin?.locationGroup.address?.description
+    }
 
 	/**
 	 * Clones the specified container
@@ -408,6 +458,24 @@ class Shipment implements Comparable, Serializable {
 		}
 		return pallet
 	}
+
+	ShipmentItem getNextShipmentItem(String currentShipmentItemId) {
+		def nextIndex
+		def shipmentItems = sortShipmentItems()
+		def shipmentItemIndex = shipmentItems.findIndexOf { it.id == currentShipmentItemId }
+		def shipmentItemCount = shipmentItems.size()
+
+		// Wrap if we hit the end of the list
+		if (shipmentItemIndex >= shipmentItemCount-1) {
+			nextIndex = 0
+		}
+		else {
+			nextIndex = shipmentItemIndex + 1
+		}
+
+		return shipmentItems.get(nextIndex)
+	}
+
 
 	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container) {
         ShipmentItem shipmentItem = ShipmentItem.withCriteria(uniqueResult: true) {

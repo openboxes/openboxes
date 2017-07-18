@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.core.LocationType" %>
+<%@ page import="org.pih.warehouse.core.LocationTypeCode; org.pih.warehouse.core.LocationType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -20,7 +20,8 @@
 	            </div>
             </g:hasErrors>
             <g:form method="post" >
-            	<fieldset>
+            	<div class="box">
+					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 	                <g:hiddenField name="id" value="${locationTypeInstance?.id}" />
 	                <g:hiddenField name="version" value="${locationTypeInstance?.version}" />
 	                <div class="dialog">
@@ -32,16 +33,28 @@
 	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${locationTypeInstance?.name}" />
+	                                    <g:textField name="name" value="${locationTypeInstance?.name}" class="text"/>
 	                                </td>
 	                            </tr>
-	                        	                        
+
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="locationTypeCode"><warehouse:message code="locationTypeCode.label" default="Location Type Code" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
+										<g:select name="locationTypeCode" class="chzn-select-deselect" from="${org.pih.warehouse.core.LocationTypeCode.list()}"
+                                            noSelection="['':'']"
+											value="${locationTypeInstance?.locationTypeCode}"/>
+									</td>
+								</tr>
+
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="description"><warehouse:message code="default.description.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
-	                                    <g:textField name="description" value="${locationTypeInstance?.description}" />
+	                                    <g:textArea name="description" value="${locationTypeInstance?.description}" cols="80" rows="5"/>
 	                                </td>
 	                            </tr>
 	                        
@@ -50,7 +63,7 @@
 	                                  <label for="sortOrder"><warehouse:message code="default.sortOrder.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
-	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" />
+	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" class="text"/>
 	                                </td>
 	                            </tr>
 	                        
@@ -69,8 +82,8 @@
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	
 						                <div class="buttons left">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+						                    <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+						                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
 		    						</td>                    	
 	                        	</tr>	                        

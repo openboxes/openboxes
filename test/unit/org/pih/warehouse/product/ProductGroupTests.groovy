@@ -51,7 +51,7 @@ class ProductGroupTests extends GrailsUnitTestCase {
 	void testProductGroupHasManyProducts() { 
 		def category = new Category(id:"1", name: "Medicines")
 		def product = new Product(id:"1", name: "Ibuprofen", category: category)
-		def productGroup = new ProductGroup(id:"1", description:"Ibuprofen", category: category)
+		def productGroup = new ProductGroup(id:"1", name:"Ibuprofen", category: category)
 		mockDomain(Category, [category])
 		mockDomain(ProductGroup, [productGroup])
 		mockDomain(Product, [product])		

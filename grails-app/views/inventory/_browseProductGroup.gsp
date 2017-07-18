@@ -44,7 +44,7 @@
 	</td>
 	<td class="middle">
 		<span id="${inventoryItem?.productGroup?.id }" class="expandable">
-			${inventoryItem?.productGroup?.description } (${inventoryItem?.productGroup?.products?.size() } ${warehouse.message(code:'products.label') })		
+			${inventoryItem?.productGroup?.name } (${inventoryItem?.productGroup?.products?.size() } ${warehouse.message(code:'products.label') })
 		</span>
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" 
 			id="${inventoryItem?.productGroup?.id }" class="expandable" alt="" class="middle"/>

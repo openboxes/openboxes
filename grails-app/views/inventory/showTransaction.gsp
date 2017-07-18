@@ -27,7 +27,8 @@
 
     <body>
         <div class="body">
-     
+
+            <g:render template="../transaction/summary"/>
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
@@ -38,7 +39,6 @@
             </g:hasErrors>    
 
 			<div class="dialog">
-				<g:render template="../transaction/summary"/>
 				<div class="yui-gf">
 					<div class="yui-u first">
 						<g:render template="../transaction/details" model="[transactionInstance:transactionInstance]"/>

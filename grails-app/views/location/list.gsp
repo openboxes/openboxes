@@ -42,26 +42,30 @@
                         <div class="dialog filters">
                             <h3><g:message code="default.filters.label"/></h3>
                             <g:form action="list" method="get">
-                                <label class="clear"><warehouse:message code="location.name.label"/></label>
-                                <div class="filter-list-item">
-                                    <g:textField name="q" value="${params.q }" class="text" />
-                                </div>
-                                <label class="clear"><warehouse:message code="location.locationType.label"/></label>
-                                <div class="filter-list-item">
-                                    <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
-                                              optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                              value="${params?.locationType?.id}" noSelection="['null':'']" />
-                                </div>
-                                <label class="clear"><warehouse:message code="location.locationGroup.label"/></label>
-                                <div class="filter-list-item">
-                                    <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
-                                              optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                              value="${params?.locationGroup?.id}" noSelection="['null':'']" />
-                                </div>
-                                <div class="buttons">
-                                        <button type="submit" class="button icon search">
-                                            ${warehouse.message(code: 'default.button.find.label')}
-                                        </button>
+                                <div>
+                                    <div class="filter-list-item">
+                                            <label class="clear"><warehouse:message code="location.name.label"/></label>
+                                            <g:textField name="q" value="${params.q }" class="text" />
+                                    </div>
+                                    <div class="filter-list-item">
+                                            <label class="clear"><warehouse:message code="location.locationType.label"/></label>
+                                            <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
+                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                                      value="${params?.locationType?.id}" noSelection="['null':'']" />
+                                    </div>
+                                    <div class="filter-list-item">
+
+                                            <label class="clear"><warehouse:message code="location.locationGroup.label"/></label>
+                                            <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
+                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                                      value="${params?.locationGroup?.id}" noSelection="['null':'']" />
+                                    </div>
+                                    <hr/>
+                                    <div class="filter-list-item center">
+                                            <button type="submit" class="button icon search">
+                                                ${warehouse.message(code: 'default.button.find.label')}
+                                            </button>
+                                    </div>
                                 </div>
                             </g:form>
                         </div>

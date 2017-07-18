@@ -3,7 +3,7 @@
 <div>							
 	<div>
 		<g:form method="GET" action="showTransactionLog">
-			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+			<g:hiddenField name="product.id" value="${commandInstance?.product?.id }"/>
 
 				<!--  Filter -->
 			
@@ -94,7 +94,7 @@
 												</td>
 												<td>
 													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-														<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
+														<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.product?.id]">
 															<format:metadata obj="${transaction?.transactionType}"/>
 														</g:link>
 													</span>
@@ -127,7 +127,7 @@
 												<td style="text-align: center">
 													<g:set var="quantityChange" value="${0 }"/>
 													<g:each var="transactionEntry" in="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())?.get(transaction) }" status="status2">
-														<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it?.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
+														<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it?.inventoryItem?.product == commandInstance?.product}.quantity?.sum() }"/>
 													</g:each>
 													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 														${quantityChange }
@@ -161,7 +161,7 @@
 	transactions
 	<g:if test="${commandInstance?.allTransactionLogMap?.keySet()?.size() > transactionMap?.keySet()?.size()}">
 		&nbsp;|&nbsp;
-		<g:link controller="inventoryItem" action="showTransactionLog" id="${commandInstance?.productInstance?.id }" params="[disableFilter: true]">
+		<g:link controller="inventoryItem" action="showTransactionLog" id="${commandInstance?.product?.id }" params="[disableFilter: true]">
 			<warehouse:message code="transactionLog.showAll.label"/>
 		</g:link>
 	</g:if>

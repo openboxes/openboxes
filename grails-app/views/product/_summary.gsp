@@ -59,9 +59,8 @@
 
         			</div>
         		</td>
-				<td class="right" width="5%">
+				<td class="right" width="1%">
         			<div id="product-status" class="title">
-
 						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 							<g:if test="${totalQuantity <= 0}">
 								<span class="tag tag-danger"><warehouse:message code="product.noStock.label"/></span>
@@ -80,14 +79,15 @@
 							</g:else>
 						</g:if>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-							<span class="tag tag-danger"><warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/></span>
+							<span class="tag tag-warning">
+								<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
+							</span>
 						</g:elseif>
 						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-							<span class="tag tag-danger"><warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/></span>
+							<span class="tag tag-warning">
+								<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
+							</span>
 						</g:elseif>
-						<g:else>
-							none
-						</g:else>
         			</div>
 			
 				</td>
@@ -103,22 +103,28 @@
             </td>
             <td>
                 <div class="button-container">
-                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
-						${warehouse.message(code: 'product.button.show.label', default: 'Show stock')}
-                    </g:link>
-                    <g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                        ${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
-                    </g:link>
-                    <g:link controller='inventoryItem' action='showRecordInventory' params="['productInstance.id':productInstance?.id]" class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
-						${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
-                    </g:link>
-                    <g:link controller='inventory' action='browse' class="button">
+					<g:link controller='inventory' action='browse' class="button">
 						<img src="${resource(dir: 'images/icons/silk', file: 'application_form_magnify.png')}" />&nbsp;
 						${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
-                    </g:link>
+					</g:link>
+					<div class="button-group">
+						<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
+							${warehouse.message(code: 'inventory.showStockCard.label', default: 'Show stock')}
+						</g:link>
+						<g:link controller='inventoryItem' action='showRecordInventory' params="['product.id':productInstance?.id]" class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
+							${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
+						</g:link>
+						<g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+							${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
+						</g:link>
+						<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]" class="button">
+							<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
+							<warehouse:message code="inventory.showLotNumbers.label"/>
+						</g:link>
+					</div>
                 </div>
             </td>
         </tr>

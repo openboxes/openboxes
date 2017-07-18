@@ -1,38 +1,38 @@
-<div class="action-menu" style="padding: 1px;">
-	<button class="action-btn">
-		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/> <warehouse:message code="default.actions.label" default="Actions"/>
-	</button>
-	<div class="actions">
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryExpiredBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="inventoryConsumedBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
-			</a>
-		</div>	
-		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="outgoingTransferBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
-			</a>
-		</div>	
-		
-		<div class="action-menu-item">
-			<hr/>
-		</div>
-		<div class="action-menu-item">														
-			<g:link controller="inventory" action="browse">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.browse.label"/>
-			</g:link>
-		</div>		
+<div class="button-container">
+
+	<g:link controller="inventory" action="browse" class="button">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" style="vertical-align: middle"/>
+		&nbsp;<warehouse:message code="inventory.browse.label"/>
+	</g:link>
+
+	<div class="button-group">
+
+		<a href="javascript:void(0);" class="button" id="inventoryExpiredBtn">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
+			&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
+		</a>
+
+		<a href="javascript:void(0);" class="button" id="inventoryConsumedBtn">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
+			&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
+		</a>
+
+		<a href="javascript:void(0);" class="button" id="outgoingTransferBtn">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
+			&nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
+		</a>
+
 	</div>
+
+	<g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
+			class="button">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" />
+		&nbsp;<g:message code="default.button.download.label"/></g:link>
+
 </div>
+
+
+
 
 <script>
 	$(document).ready(function() {

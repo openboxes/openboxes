@@ -97,19 +97,16 @@
                                                               optionValue="displayName" value="${userInstance?.locale}" noSelection="['null':'']" class="chzn-select-deselect"/>
                                                 </td>
                                             </tr>
-                                        <%--
                                             <tr class="prop">
-                                                <td valign="top" class="name"><warehouse:message
-                                                        code="default.timezone.label" default="Timezone" /></td>
+                                                <td valign="top" class="name">
+                                                    <label for="locale"><warehouse:message
+                                                        code="default.timezone.label" default="Timezone" /></label></td>
                                                 <td valign="top" class="value">
-                                                    ${session?.timezone?.ID}
-                                                    ${session?.timezone?.displayName}
-
-                                                    <g:timeZoneSelect name="myTimeZone" value="" />
+                                                    <g:select id="timezone" name="timezone" from="${TimeZone.getAvailableIDs().sort()}"
+                                                        noSelection="['':'']"
+                                                              value="${userInstance?.timezone}" class="chzn-select-deselect"/>
                                                 </td>
                                             </tr>
-                                        --%>
-
                                         </tbody>
                                     </table>
                                 </div>

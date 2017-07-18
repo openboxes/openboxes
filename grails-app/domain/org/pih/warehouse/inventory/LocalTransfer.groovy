@@ -29,7 +29,7 @@ import org.pih.warehouse.core.Constants;
  * These methods make sure the two linked transactions stay in sync. See docs on these methods for more information.
  * 	
  */
-class LocalTransfer {
+class LocalTransfer implements Serializable {
 
 	String id	
 	

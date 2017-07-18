@@ -23,6 +23,20 @@ grails.config.locations = [
 	"file:${userHome}/.grails/${appName}-config.properties",
 	"file:${userHome}/.grails/${appName}-config.groovy"
 ]
+
+// Allow admin to override the config location using command line argument
+configLocation = System.properties["${appName}.config.location"]
+if (configLocation) {
+	grails.config.locations << "file:" + configLocation
+}
+
+// Allow admin to override the config location using environment variable
+configLocation = System.env["${appName.toString().toUpperCase()}_CONFIG_LOCATION"]
+if (configLocation) {
+    grails.config.locations << "file:" + configLocation
+}
+
+
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
 
 //grails.plugins.reloadConfig.files = []
@@ -415,6 +429,29 @@ jqueryValidationUi {
 }
 
 
+// Allow users to customize logo image url as well as labale
+openboxes.logo.url = ""
+openboxes.logo.label = "OpenBoxes"
+
+// Dashboard configuration to indicate whether widgets are enabled/disabled
+openboxes.dashboard.requisitionItemSummary.enabled=true
+openboxes.dashboard.requisitionSummary.enabled=true
+openboxes.dashboard.receiptSummary.enabled=true
+openboxes.dashboard.shipmentSummary.enabled=true
+openboxes.dashboard.indicatorSummary.enabled=false
+openboxes.dashboard.valueSummary.enabled=false
+openboxes.dashboard.productSummary.enabled=false
+openboxes.dashboard.genericProductSummary.enabled=false
+openboxes.dashboard.expiringSummary.enabled=false
+openboxes.dashboard.activitySummary.enabled=true
+openboxes.dashboard.tagSummary.enabled=true
+
+// Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
+openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
+openboxes.dashboard.column2.widgets=["valueSummary","productSummary","expiringSummary"]
+openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
+
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
@@ -448,7 +485,9 @@ openboxes.scannerDetection.enabled = false
 // Job that calculates quantity on hand every day. Occurs at midnight every day.
 // NOTE: This job should only run once a day for now (that is fixed in the development branch).
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?"  // daily at midnight
+openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
+
 
 // Job that builds summary table (i.e. QoH, consumption, shipping). Occurs every ten minutes
 openboxes.jobs.buildSummaryTablesJob.enabled = true
@@ -489,6 +528,9 @@ openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
 
+// Disable feature during development
+openboxes.shipping.splitPickItems.enabled = true
+
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""
@@ -499,7 +541,10 @@ grails.doc.footer = ""
 
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {
-	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
+    id generator:'uuid'
+	//cache true
+    dynamicUpdate true
+    "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTime, class: org.joda.time.DateTime
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTimeZoneAsString, class: org.joda.time.DateTimeZone
 	"user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDurationAsString, class: org.joda.time.Duration

@@ -31,7 +31,7 @@
 			</div>
 		</g:hasErrors>
 	   	<g:if test="${!params.print}">
-			<div class="form box" >
+			<div class="dialog box" >
 				<g:form controller="report" action="showShippingReport" method="GET">
 					<%-- 
 					<span class="filter">
@@ -94,7 +94,7 @@
 		</g:else>
 
 		<g:if test="${command?.shipment }">
-			<div>
+			<div class="dialog">
 				<table border="0">
 					<tr>
 						<td class="left">
@@ -122,7 +122,7 @@
 				
 				<hr/>
 				
-				<%-- 
+				<%--
 				<table>
 					<tr>				
 						<td class="label">
@@ -170,7 +170,7 @@
 					</tr>
 				</table>
 				--%>
-				<div class="list">
+				<div class="dialog">
 		   			<g:set var="status" value="${0 }"/>
 			    	<g:set var="packingListByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>
 		   			<g:each var="packingListEntry" in="${packingListByContainer}">
