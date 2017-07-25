@@ -430,7 +430,7 @@
                                                                                                 <g:hiddenField name="picklistItems[${status}].id" value="${picklistItem?.id}"/>
                                                                                                 <g:hiddenField name="picklistItems[${status}].requisitionItem.id" value="${picklistItem?.requisitionItem?.id?:requisitionItem?.id}"/>
                                                                                                 <g:hiddenField name="picklistItems[${status}].inventoryItem.id" value="${picklistItem?.inventoryItem?.id?:inventoryItem?.id}"/>
-                                                                                                <input id="quantity-${status}" name="picklistItems[${status}].quantity" value="${quantityPicked}" size="5" type="text" class="quantity text"/>
+                                                                                                <input id="quantity-${requisitionItem?.id}-${status}" name="picklistItems[${status}].quantity" value="${quantityPicked}" size="5" type="text" class="quantity text"/>
                                                                                             </td>
                                                                                             <td class="middle center">
                                                                                                 ${inventoryItem?.product?.unitOfMeasure ?: "EA"}
@@ -446,10 +446,10 @@
                                                                                                     </g:link>
                                                                                                 </g:if>
 
-                                                                                                <button class="pick-action" data-action="add" data-id="#quantity-${status}">+</button>
-                                                                                                <button class="pick-action" data-action="subtract" data-id="#quantity-${status}">-</button>
-                                                                                                <button class="pick-action" data-action="zero" data-id="#quantity-${status}">0</button>
-                                                                                                <button class="pick-action" data-action="all" data-quantity="${requisitionItem?.quantity}" data-id="#quantity-${status}">*</button>
+                                                                                                <button class="pick-action" data-action="add" data-id="#quantity-${requisitionItem?.id}-${status}">+</button>
+                                                                                                <button class="pick-action" data-action="subtract" data-id="#quantity-${requisitionItem?.id}-${status}">-</button>
+                                                                                                <button class="pick-action" data-action="zero" data-id="#quantity-${requisitionItem?.id}-${status}">0</button>
+                                                                                                <button class="pick-action" data-action="all" data-quantity="${requisitionItem?.quantity}" data-id="#quantity-${requisitionItem?.id}-${status}">*</button>
 
                                                                                             </td>
                                                                                         </tr>
