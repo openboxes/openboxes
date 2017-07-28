@@ -983,13 +983,13 @@ button.action-btn, button.previous, button.next {
     border-left: 3px solid lightgrey;
 }
 .border-right {
-    border-right: 3px solid lightgrey;
+    border-right: 1px solid lightgrey;
 }
 .border-left {
-    border-left: 3px solid lightgrey;
+    border-left: 1px solid lightgrey;
 }
 .border-top {
-    border-top: 3px solid lightgrey;
+    border-top: 1px solid lightgrey;
 }
 
 .credit { color: green; }

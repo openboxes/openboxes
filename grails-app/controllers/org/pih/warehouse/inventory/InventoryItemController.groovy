@@ -188,6 +188,7 @@ class InventoryItemController {
                         requisition: null,
                         binLocation: transactionEntry.binLocation,
                         inventoryItem: transactionEntry.inventoryItem,
+						comments: transactionEntry.comments,
                         quantity: transactionEntry.quantity,
                         balance: balance.values().sum(),
                         showDetails: (i==0),

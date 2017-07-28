@@ -1868,6 +1868,7 @@ class InventoryService implements ApplicationContextAware {
                     transactionEntry.product = inventoryItem?.product
                     transactionEntry.inventoryItem = inventoryItem
                     transactionEntry.binLocation = row.binLocation
+					transactionEntry.comments = row.comment
                     transaction.addToTransactionEntries(transactionEntry)
                 }
             }
