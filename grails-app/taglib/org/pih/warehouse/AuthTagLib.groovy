@@ -23,7 +23,10 @@ class AuthTagLib {
 		}
 	}
 
-
+	def isSuperuser = { attrs, body ->
+		if (userService.isSuperuser(session?.user))
+			out << body()
+	}
 	def isUserAdmin = { attrs, body ->		
 		if (userService.isUserAdmin(session?.user))
 			out << body()

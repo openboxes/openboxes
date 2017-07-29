@@ -47,10 +47,19 @@ class UserService {
         return User.get(id)
     }
 
+    Boolean isSuperuser(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roles = [RoleType.ROLE_SUPERUSER]
+            return effectRoles(user).any { roles.contains(it.roleType) }
+        }
+        return false;
+    }
+
     Boolean isUserAdmin(User u) {
         if (u) {
             def user = User.get(u.id)
-            def roles = [RoleType.ROLE_ADMIN]
+            def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
             return effectRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
@@ -59,7 +68,7 @@ class UserService {
     Boolean isUserManager(User u) {
         if (u) {
             def user = User.get(u.id)
-            def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
+            def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
             return effectRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
@@ -68,7 +77,7 @@ class UserService {
     Boolean canUserBrowse(User u) {
         if (u) {
             def user = User.get(u.id)
-            def roles = [RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
+            def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
             return effectRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
