@@ -320,7 +320,52 @@ class CreateShipmentWorkflowController {
 			on("saveItem").to("saveItemAction")
 
             // FIXME Refactor/remove - seems to be used when editing items on an inbound shipment
-			on("updateItem").to("updateItemAction")
+			on("updateItem") {
+
+                try {
+                    log.info "update existing item: " + params
+
+                    // Updating an existing shipment item
+                    def shipmentItem = ShipmentItem.get(params.item?.id)
+
+                    // Bind the parameters to the item instance
+                    bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+
+                    shipmentItem.quantity = params.int("quantity")
+
+                    // Update the inventory item associated with this shipment item if the inventory item doesn't exist or the lot number has changed
+                    def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
+                    if (!inventoryItem || inventoryItem.lotNumber != params.lotNumber) {
+                        inventoryItem = new InventoryItem(params)
+                        inventoryItem = inventoryService.findOrCreateInventoryItem(inventoryItem)
+                    }
+
+                    // Update the expiration date if the user has changed it
+                    Date expirationDate = params.expirationDate ? Date.parse("MM/dd/yyyy", params.expirationDate) : null
+                    if (inventoryItem.expirationDate != expirationDate) {
+                        inventoryItem.expirationDate = expirationDate
+                    }
+
+                    shipmentItem.inventoryItem = inventoryItem
+
+                    if(shipmentService.validateShipmentItem(shipmentItem)) {
+                        shipmentService.saveShipmentItem(shipmentItem)
+                    }
+                }
+                catch (ValidationException e) {
+                    log.error "Validation exception: " + e.message, e
+                    flow.shipmentInstance.errors = e.errors
+                    return error()
+                }
+
+                catch (RuntimeException e) {
+                    log.error("Error saving shipment item ", e)
+                    def shipmentInstance = Shipment.read(flow.shipmentInstance.id)
+                    flow.shipmentInstance.errors.reject(e.message)
+                    return error();
+                }
+
+            }.to("enterContainerDetails")
 			
 			on("deleteItem"){
 				try {
@@ -375,6 +420,7 @@ class CreateShipmentWorkflowController {
 			}.to("enterContainerDetails")
 
 			on("addShipmentItem") {
+                log.info "add shipment item " + params
 				try {
 					shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
 					flash.message = "Added shipment item"
@@ -393,19 +439,22 @@ class CreateShipmentWorkflowController {
 
             on("updateShipmentItem") {
 
-                log.info "params: " + params
+                log.info "update shipment item: " + params
                 try {
                     def shipmentItem = ShipmentItem.get(params.item?.id)
                     bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
-                    shipmentService.saveShipmentItem(shipmentItem)
+                    if(shipmentService.validateShipmentItem(shipmentItem)) {
+                        shipmentService.saveShipmentItem(shipmentItem)
+                    }
                     flash.message = "Updated shipment item"
 
                 } catch (ValidationException e) {
                     flow.shipmentInstance.errors = e.errors
                     return error()
 
-                } catch (Exception e) {
-                    flash.message = e.message
+                } catch (RuntimeException e) {
+                    flow.shipmentInstance.errors.reject(e.message)
+                    //flash.message = e.message
                     return error()
                 }
 
@@ -1290,59 +1339,7 @@ class CreateShipmentWorkflowController {
 			on("valid").to("enterContainerDetails")
 			on("invalid").to("enterContainerDetails")
 		}
-				
-    	updateItemAction {
-    		action {
-				try {
-					log.info "update existing item: " + params
 
-	    			// Updating an existing shipment item
-					def shipmentItem = ShipmentItem.get(params.item?.id)
-
-					// Bind the parameters to the item instance
-					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
-
-					// Update the inventory item associated with this shipment item
-					def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
-					if (!inventoryItem) {
-						inventoryItem = new InventoryItem(params)
-						inventoryItem = inventoryService.findOrCreateInventoryItem(inventoryItem)
-					}
-					shipmentItem.inventoryItem = inventoryItem
-
-
-					// In case there are errors, we use this flow-scoped variable to display errors to user
-					flow.itemInstance = shipmentItem;
-
-					// Validate shipment item
-					shipmentItem.shipment = flow.shipmentInstance;
-					if (flow?.shipmentInstance?.destination?.id == session?.warehouse?.id || shipmentService.validateShipmentItem(shipmentItem)) {
-						if (!shipmentItem.id) {
-							log.info ("saving new shipment item")
-							// Need to validate shipment item before adding it to the shipment
-							flow.shipmentInstance.addToShipmentItems(shipmentItem);
-							shipmentService.saveShipment(flow.shipmentInstance)
-						}
-						else {
-							log.info ("saving existing shipment item")
-							shipmentService.saveShipmentItem(shipmentItem)
-						}
-						valid()
-					}
-
-				} catch (RuntimeException e) {
-					log.error("Error saving shipment item ", e)
-					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
-					if (!flow.itemInstance) flow.itemInstance = new ShipmentItem();
-					flow.itemInstance.errors.reject(e.getMessage())
-				}
-				invalid();
-    		}
-
-    		on("valid").to("enterContainerDetails")
-    		on("invalid").to("enterContainerDetails")
-    	}
-    	
     	showDetails {
     		redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])
     	}

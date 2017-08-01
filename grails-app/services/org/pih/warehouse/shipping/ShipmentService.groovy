@@ -718,15 +718,12 @@ class ShipmentService {
 	 * @param item
 	 */
 	boolean saveShipmentItem(ShipmentItem shipmentItem) {
-        if (validateShipmentItem(shipmentItem)) {
-            return shipmentItem.save()
-        }
-        return false
+        return shipmentItem.save()
 	}
 	
 	
 	/**
-	 * Saves an item
+	 * Add a shipment item to a shipment.
 	 * 
 	 * @param shipmentItem
 	 * @param shipment
@@ -748,11 +745,13 @@ class ShipmentService {
 	}
 
 	boolean addToShipmentItems(String shipmentId, String containerId, String inventoryItemId, Integer quantity) {
+
 		Shipment shipment = Shipment.get(shipmentId)
 		Container container = Container.get(containerId)
 		InventoryItem inventoryItem = InventoryItem.get(inventoryItemId)
 		if (!inventoryItem) {
-			throw new ShipmentItemException(message: "Could not locate inventory item with ID " + inventoryItemId)
+            shipment.errors.reject("shipmentItem.inventoryItem.required")
+			throw new ValidationException("Cannot add shipment item without valid inventory item", shipment.errors)
 		}
 		ShipmentItem shipmentItem = new ShipmentItem();
 		shipmentItem.inventoryItem = inventoryItem
@@ -762,7 +761,8 @@ class ShipmentService {
 		shipmentItem.quantity = quantity
 		shipmentItem.container = container
 		shipmentItem.shipment =  shipment
-		addToShipmentItems(shipmentItem, shipment)
+
+        addToShipmentItems(shipmentItem, shipment)
 	}
 
 
@@ -790,21 +790,28 @@ class ShipmentService {
         def location = Location.get(shipmentItem?.shipment?.origin?.id);
         log.info("Validating shipment item at " + location?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
 
-        // FIXME Please refactor this mess at a later date
-        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
-        def quantityOnHand = shipmentItem.binLocation ?
-                inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
-                inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
+        log.info "location = id:${location.id} name:${location.name} code:${location.locationNumber} local:${location.local}"
 
-        log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
-        if (!shipmentItem.validate()) {
-            throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
-        }
+        // Location must be locally managed and
+        if (location?.local && location.isWarehouse()) {
 
-        if (shipmentItem.quantity > quantityOnHand) {
-            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
-            //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
-            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            // FIXME Please refactor this mess at a later date
+            // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
+            def quantityOnHand = shipmentItem.binLocation ?
+                    inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
+                    inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
+
+            if (!shipmentItem.validate()) {
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
+
+            log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
+            if (shipmentItem.quantity > quantityOnHand) {
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
+                        [shipmentItem.quantity, quantityOnHand, shipmentItem?.product?.productCode, location.name].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
+                //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
         }
         return true;
     }

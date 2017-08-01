@@ -11,9 +11,9 @@
 	 		.draggable { cursor: move; } 
 	 		.droppable { /*padding: 10px; border: 0px dashed lightgrey;*/ } 
 	 		.sortable { }
-	 		.ui-state-highlight { font-weight: bold; color: black; }  
+	 		/*.ui-state-highlight { font-weight: bold; color: black; }*/
 	 		.strikethrough { color: lightgrey; }
-			.ui-state-highlight { height: 2.5em; line-height: 2.2em; }
+			/*.ui-state-highlight { height: 2.5em; line-height: 2.2em; }*/
 			 #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
 			 #sortable tr { margin: 0 5px 5px 5px; padding: 5px; font-size: 1.2em; height: 1.5em; }
 			 html>body #sortable tr { height: 1.5em; line-height: 1.2em; }
@@ -45,21 +45,24 @@
 			<g:if test="${message}">
 				<div class="message">${message}</div>
 			</g:if>
-			<g:hasErrors bean="${containerInstance}">
-				<div class="errors">
-					<g:renderErrors bean="${containerInstance}" as="list" />
-				</div>				
-			</g:hasErrors> 
-			<g:hasErrors bean="${itemInstance}">
-				<div class="errors">
-					<g:renderErrors bean="${itemInstance}" as="list" />
-				</div>				
-			</g:hasErrors>
-			<g:hasErrors bean="${shipmentInstance}">
+
+			<g:if test="${shipmentInstance?.hasErrors()}">
 				<div class="errors">
 					<g:renderErrors bean="${shipmentInstance}" as="list" />
 				</div>
-			</g:hasErrors>
+
+			</g:if>
+			<g:elseif test="${itemInstance?.hasErrors()}">
+				<div class="errors">
+					<g:renderErrors bean="${itemInstance}" as="list" />
+				</div>
+			</g:elseif>
+			<g:elseif test="${containerInstance?.hasErrors()}">
+				<div class="errors">
+					<g:renderErrors bean="${containerInstance}" as="list" />
+				</div>
+			</g:elseif>
+
 			<div>
 				<g:render template="../shipment/summary" />	
  				<g:render template="flowHeader" model="['currentState':'Packing']"/>
@@ -277,7 +280,7 @@
 										</g:if>
 										<tr class="droppable fade not-selected" container="trash" style="height: 44px;">
 											<td colspan="5" class="center middle">
-												<div >
+												<div class="center">
 													<img src="${resource(dir: 'images/icons/silk', file: 'bin_empty.png')}"/>
 													<warehouse:message code="shipment.trash.label" default="Drop here to remove from shipment"/>
 
@@ -436,7 +439,7 @@
 												</div>
 											</td>
 											<td class="center middle">
-												<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
+												<format:date obj="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
 											</td>
 											<td class="left middle">
 												${shipmentItem?.quantity}
@@ -452,7 +455,17 @@
 											</td>
 										</tr>
 									</g:each>
-								</g:if>
+                                    <tr class="droppable fade not-selected" container="trash" style="height: 44px;">
+                                        <td colspan="10" class="center middle">
+                                            <div class="center">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'bin_empty.png')}"/>
+                                                <warehouse:message code="shipment.trash.label" default="Drop here to remove from shipment"/>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+
+                                </g:if>
 								<g:unless test="${shipmentItems }">
 									<tr class="none">
 										<td colspan="10">
@@ -847,7 +860,14 @@
 						%{--}, 'json');--}%
 			}
 
-		</script> 				
+		</script>
+		<script>
+            $(document).ready(function() {
+//                $("#inventoryItem-suggest").livequery(function () {
+//                    this.focus();
+//                });
+            });
+		</script>
         
         
     </body>

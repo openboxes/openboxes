@@ -2,6 +2,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
+                        ${item?.product?.productCode}
 						<format:product product="${item?.product}"/>
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
 					</td>

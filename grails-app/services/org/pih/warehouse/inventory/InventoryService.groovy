@@ -1270,7 +1270,7 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }
-        log.info " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1299,7 +1299,7 @@ class InventoryService implements ApplicationContextAware {
 			quantityMapByProductAndInventoryItem[product].values().each { quantityMap[product] += it }
 		}
 
-        log.info "getQuantityByProductMap(transactionEntries): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getQuantityByProductMap(transactionEntries): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1336,7 +1336,7 @@ class InventoryService implements ApplicationContextAware {
 				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
 		}
-        log.info " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
         //log.info "quantityMap: " + quantityMap
 		return quantityMap
 	}
@@ -1444,7 +1444,7 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		def quantityMap = getQuantityByProductMap(transactionEntries)
 
-        log.info "getQuantityByProductMap(inventory): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getQuantityByProductMap(inventory): " + (System.currentTimeMillis() - startTime) + " ms"
 		
 		return quantityMap
 	}
@@ -1490,7 +1490,7 @@ class InventoryService implements ApplicationContextAware {
             }
         }
 
-        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1612,12 +1612,9 @@ class InventoryService implements ApplicationContextAware {
 	Integer getQuantity(Inventory inventory, Location binLocation, InventoryItem inventoryItem) {
 
 		if (!inventory) {
-			def currentLocation = AuthService?.currentLocation?.get()
-			if (!currentLocation?.inventory)
-				throw new Exception("Inventory not found")
-
-			inventory = currentLocation.inventory
+            throw new RuntimeException("Inventory does not exist")
 		}
+
 		def transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(inventory, inventoryItem)
         if (binLocation) {
             List binLocations = getQuantityByBinLocation(transactionEntries)
@@ -2042,7 +2039,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return a single inventory item
 	 */
 	InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber) {
-		log.debug("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'")
+		log.info("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'")
 		def inventoryItems = InventoryItem.createCriteria().list() {
 			and {
 				eq("product.id", product?.id)
@@ -2095,7 +2092,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.lotNumber = lotNumber
 			inventoryItem.expirationDate = expirationDate;
 			inventoryItem.product = product
-			inventoryItem.save(flush:true)
+			inventoryItem.save()
 		}
 		return inventoryItem
 
