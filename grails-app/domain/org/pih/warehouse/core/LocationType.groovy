@@ -27,11 +27,12 @@ class LocationType implements Comparable, Serializable {
 	LocationTypeCode locationTypeCode
 			
 	static hasMany = [ supportedActivities : String]
-	
+
 	static mapping = {
 		id generator: 'uuid'
 		// Needs to be eagerly fetched because of Location.supportsActivity() method
 		supportedActivities lazy: false
+		cache true
 	}
 	
 	static constraints = { 
@@ -64,13 +65,49 @@ class LocationType implements Comparable, Serializable {
    }
 	
 	
-	String toString() { return "$name"; }
+	String toString() {
+        return "${name}"
+    }
 
-  
-		
-	
 	int compareTo(obj) {
 		return description <=> obj?.description
 	}
-	
+
+    Boolean isDepot() {
+        return locationTypeCode == LocationTypeCode.DEPOT
+    }
+
+    Boolean isWard() {
+        return locationTypeCode == LocationTypeCode.WARD
+    }
+
+    Boolean isDispensary() {
+        return locationTypeCode == LocationTypeCode.DISPENSARY
+    }
+
+    Boolean isBinLocation() {
+        return locationTypeCode == LocationTypeCode.BIN_LOCATION
+    }
+
+    Boolean isSupplier() {
+        return locationTypeCode == LocationTypeCode.SUPPLIER
+    }
+
+    Boolean isDonor() {
+        return locationTypeCode == LocationTypeCode.DONOR
+    }
+
+    Boolean isVirtual() {
+        return locationTypeCode == LocationTypeCode.VIRTUAL
+    }
+
+    Boolean isWardOrPharmacy() {
+        return (locationTypeCode in [LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
+    }
+
+    Boolean isDepotWardOrPharmacy(){
+        return  (locationTypeCode in [LocationTypeCode.DEPOT, LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
+    }
+
+
 }
