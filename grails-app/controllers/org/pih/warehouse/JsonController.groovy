@@ -623,11 +623,17 @@ class JsonController {
                         inventoryItems = inventoryItems.sort { it.expirationDate }
 
                         if (quantity > 0) {
+
+                            String description = (it?.lotNumber ?: "${g.message(code:'default.noLotNumber.label')}") +
+                                    " - ${g.message(code:'default.expires.label')} " + (it?.expirationDate?.format("MMM yyyy")?:"${g.message(code:'default.never.label')}") +
+                                    " - " + (quantity + " " + (it?.product?.unitOfMeasure ?: "EA"))
+
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
-                                    label         : (localizedName + " [Lot: " + (it?.lotNumber ?: "NOLOT") + ", Exp: " + it?.expirationDate?.format("MM/yy")
-                                            + ", QoH: " + quantity + " " + (it?.product?.unitOfMeasure ?: "EA") + "]"),
+                                    imageUrl      : "${resource(dir: 'images', file: 'default-product.png')}",
+                                    label         : localizedName,
+                                    description   : description,
                                     valueText     : it.lotNumber,
                                     lotNumber     : it.lotNumber,
                                     product       : it.product.id,
@@ -641,7 +647,7 @@ class JsonController {
 
                     def count = inventoryItems.size()
                     def responseTime = System.currentTimeMillis() - startTime
-                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items in ${responseTime} ms"])
+                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}'", description: "Returned ${count} items in ${responseTime} ms"])
 
                 }
 			}
@@ -723,7 +729,8 @@ class JsonController {
 						
 						[
                             id: it.id,
-                            label:  it.name + " (" +  it.email + ") ",
+                            label:  it.name,
+                            description: it?.email,
                             value: it.id,
 							valueText: it.name,
 							desc: (it?.email) ? it.email : "",
@@ -738,7 +745,7 @@ class JsonController {
                     */
 					def item =  [
 						value: "null",
-						valueText : params.term,						
+						valueText : params.term,
 						label: "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}",
 						desc: params.term,
 						icon: ""
