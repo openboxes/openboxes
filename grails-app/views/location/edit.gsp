@@ -56,22 +56,20 @@
                                     <tbody>
                                         <tr class="prop">
                                             <td valign="top" class="name">
-                                                <label for="name"><warehouse:message code="default.name.label" /></label>
+                                                <label for="name"><warehouse:message code="location.name.label" default="Location name"/></label>
                                             </td>
                                             <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
                                                 <g:textField name="name" value="${locationInstance?.name}" class="text" size="80"/>
                                             </td>
                                         </tr>
-                                        <%--
                                         <tr class="prop">
                                             <td valign="top" class="name">
-                                                <label for="locationNumber"><warehouse:message code="location.locationNumber.label" default="Short Code"/></label>
+                                                <label for="locationNumber"><warehouse:message code="location.locationNumber.label" default="Location code"/></label>
                                             </td>
                                             <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'locationNumber', 'errors')}">
                                                 <g:textField name="locationNumber" value="${locationInstance?.locationNumber}" class="text" size="80"/>
                                             </td>
                                         </tr>
-                                        --%>
                                         <g:if test="${locationInstance?.locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION}">
                                             <tr class="prop">
                                                 <td valign="top" class="name">
@@ -211,9 +209,10 @@
                                             <label for="local"><warehouse:message code="warehouse.local.label" /></label>
                                         </td>
                                         <td valign="top" class="value${hasErrors(bean: locationInstance, field: 'active', 'errors')}">
-                                            <g:checkBox name="local" value="${locationInstance?.local}" />
+                                            <g:checkBox name="local" value="${locationInstance?.local}" title="${g.message(code:'warehouse.local.message')}"/>
                                         </td>
                                     </tr>
+
 
 
                                     <tr class="prop">
@@ -222,7 +221,7 @@
                                         </td>
                                         <td valign="top" class="value">
                                             <g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-                                            <g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px"
+                                            <g:select name="supportedActivities" multiple="true" class="chzn-select-deselect" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px"
                                                       optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}"
                                                       noSelection="['':warehouse.message(code:'location.useDefaultActivities.label')]" />
 

@@ -47,8 +47,8 @@
 									<label><warehouse:message code="default.status.label" /></label>
 								</td>
 								<td valign="top" id="shipmentStatus" class="value">
-									<format:metadata obj="${shipmentInstance?.status?.code}"/>
-                                    ${shipmentInstance?.currentStatus}
+									<format:metadata obj="${shipmentInstance?.currentStatus}"/>
+
 									<%--
 									<span>
 										<g:if test="${shipmentInstance?.status?.location}">
@@ -252,6 +252,9 @@
                                                 code="shipping.comments.label" default="Comments"/></label>
                                     </td>
                                     <td valign="top" class="value">
+                                        <g:if test="${!shipmentInstance?.comments}">
+                                            <div class="fade"><g:message code="default.noComments.label"/></div>
+                                        </g:if>
                                         <g:each var="comment" in="${shipmentInstance?.comments}">
                                             <div class="comment">
                                                 <b>${comment?.sender?.name}</b> ·
