@@ -147,42 +147,50 @@ class RequisitionController {
 
 
     def saveNonStock = {
-        def requisition = new Requisition(params)
-        // Need to handle commodity class since it is an enum
-        if (params.commodityClass) {
-            requisition.commodityClass = params.commodityClass as CommodityClass
-        }
-        requisition.name = getName(requisition)
-        requisition = requisitionService.saveRequisition(requisition)
-        if (!requisition.hasErrors()) {
-            redirect(controller: "requisition", action: "edit", id: requisition?.id)
-        }
-        else {
-            render(view: "createNonStock", model: [requisition:requisition])
+        log.info "Save non stock requisition " + params
+        withForm {
+            def requisition = new Requisition(params)
+            // Need to handle commodity class since it is an enum
+            if (params.commodityClass) {
+                requisition.commodityClass = params.commodityClass as CommodityClass
+            }
+            requisition.name = getName(requisition)
+            requisition = requisitionService.saveRequisition(requisition)
+            if (!requisition.hasErrors()) {
+                redirect(controller: "requisition", action: "edit", id: requisition?.id)
+            } else {
+                render(view: "createNonStock", model: [requisition: requisition])
+            }
+        }.invalidToken {
+            flash.message = "${g.message(code: 'requisition.invalid.duplicate.message')}"
+            def requisition = Requisition.findByRequestNumber(params.requestNumber)
+            redirect(action: "show", id: requisition?.id)
         }
     }
 
     def saveStock = {
 
-        println "Save stock requisition " + params
+        log.info "Save stock requisition " + params
+        withForm {
+            def requisition = new Requisition(params)
 
-        def requisition = new Requisition(params)
+            // Need to handle commodity class since it is an enum
+            if (params.commodityClass) {
+                requisition.commodityClass = params.commodityClass as CommodityClass
+            }
+            requisition.name = getName(requisition)
+            def value = requisitionService.saveRequisition(requisition)
+            println "Value = " + value
 
-
-        // Need to handle commodity class since it is an enum
-        if (params.commodityClass) {
-            requisition.commodityClass = params.commodityClass as CommodityClass
-        }
-        requisition.name = getName(requisition)
-        def value = requisitionService.saveRequisition(requisition)
-        println "Value = " + value
-
-        if (value.hasErrors()) {
-            println "There are errors " + requisition.errors
-            render(view: "createStock", model: [requisition:requisition])
-        }
-        else {
-            redirect(controller: "requisition", action: "show", id: requisition?.id)
+            if (value.hasErrors()) {
+                println "There are errors " + requisition.errors
+                render(view: "createStock", model: [requisition: requisition])
+            } else {
+                redirect(controller: "requisition", action: "show", id: requisition?.id)
+            }
+        }.invalidToken {
+            flash.message = "${g.message(code: 'requisition.invalid.duplicate.message')}"
+            redirect(action: "list")
         }
 
     }
@@ -297,34 +305,34 @@ class RequisitionController {
 
     def save = {
         def jsonResponse = []
-        def requisition = new Requisition()
-		try {
-            def jsonRequest = request.JSON
-            println "Save requisition: " + jsonRequest
-            requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
-            if (!requisition.hasErrors()) {
-                jsonResponse = [success: true, data: requisition.toJson()]
+            def requisition = new Requisition()
+            try {
+                def jsonRequest = request.JSON
+                println "Save requisition: " + jsonRequest
+                requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
+                if (!requisition.hasErrors()) {
+                    jsonResponse = [success: true, data: requisition.toJson()]
             }
             else {
-                jsonResponse = [success: false, errors: requisition.errors]
+                    jsonResponse = [success: false, errors: requisition.errors]
+                }
+                log.info(jsonResponse as JSON)
+
+            } catch (HibernateException e) {
+                println "hibernate exception " + e.message
+                jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+
+            } catch (HibernateSystemException e) {
+                println "hibernate system exception " + e.message
+                jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+
+            } catch (Exception e) {
+                log.error("Error saving requisition: " + e.message, e)
+                log.info("Errors: " + requisition.errors)
+                log.info("Message: " + e.message)
+                jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
             }
-            log.info(jsonResponse as JSON)
-
-        } catch (HibernateException e) {
-            println "hibernate exception " + e.message
-            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
-
-        } catch (HibernateSystemException e) {
-            println "hibernate system exception " + e.message
-            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
-
-        } catch (Exception e) {
-            log.error("Error saving requisition: " + e.message, e)
-            log.info ("Errors: " + requisition.errors)
-            log.info("Message: " + e.message)
-            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
-        }
-        render jsonResponse as JSON
+            render jsonResponse as JSON
     }
 
 
