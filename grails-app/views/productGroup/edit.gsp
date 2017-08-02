@@ -27,7 +27,7 @@
 		</g:hasErrors>
 
         <div class="summary">
-            <p class="title">${productGroupInstance.category.name} &rsaquo; ${productGroupInstance.name}</p>
+            <p class="title">${productGroupInstance?.category?.name} &rsaquo; ${productGroupInstance.name}</p>
         </div>
 
 		<div class="buttonBar">            	
