@@ -668,8 +668,34 @@ shouldSubstitute=${shouldSubstitute}
                     <td class="middle left">
                         <div class="button-container">
                             <g:if test="${requisitionItem?.product?.genericProduct?.description}">
+                                <div id="confirmRestrictions" title="Confirmation Required">
+                                    <div class="message">${g.message(code:'productGroup.confirmRestrictions.message')}</div>
+                                    <div class="error">${requisitionItem?.product?.genericProduct?.description}</div>
+                                </div>
+                                <script type="text/javascript">
+                                    $(document).ready(function() {
+                                        $("#confirmRestrictions").dialog({autoOpen: false, modal: true, width: 600});
+                                        $("#confirmRestrictionsButton").click(function(event) {
+                                            event.preventDefault();
+                                            var targetUrl = $(this).attr("href");
+
+                                            $("#confirmRestrictions").dialog({
+                                                buttons: {
+                                                    "Confirm": function () {
+                                                        $("#substitutionForm").submit();
+                                                    },
+                                                    "Cancel": function () {
+                                                        $(this).dialog("close");
+                                                    }
+                                                }
+                                            });
+
+                                            $("#confirmRestrictions").dialog("open");
+                                        });
+                                    });
+                                </script>
                                 <g:set var="confirmRestrictions" value="${g.message(code:'productGroup.confirmRestrictions.message')}"/>
-                                <button class="button icon approve" onclick="return confirm('${confirmRestrictions}')">
+                                <button class="button icon approve" id="confirmRestrictionsButton">
                                     ${warehouse.message(code:'default.button.save.label') }
                                 </button>
                             </g:if>
