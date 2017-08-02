@@ -110,6 +110,9 @@
                                     &rsaquo; ${stockHistoryEntry?.transaction?.transactionNumber }
                                 </g:if>
                             </g:link>
+                            <g:if test="${stockHistoryEntry?.transaction?.comment}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${stockHistoryEntry?.transaction?.comment}"/>
+                            </g:if>
                         </g:if>
                     </td>
 

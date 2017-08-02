@@ -1825,6 +1825,7 @@ class InventoryService implements ApplicationContextAware {
             // Create a new transaction
             def transaction = new Transaction(cmd.properties)
             transaction.inventory = cmd.inventory
+            transaction.comment = cmd.comment
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
             // Process each row added to the record inventory page
