@@ -1862,8 +1862,8 @@ class ShipmentService {
 			item.product = product
 
 
-            log.info ("item pallet " + item.pallet)
-            log.info ("item box " + item.box)
+            log.info ("item pallet " + item.palletName)
+            log.info ("item box " + item.boxName)
 
 
             // there's a pallet
@@ -1954,7 +1954,7 @@ class ShipmentService {
                         recipient = findOrCreatePerson(item.recipient)
                     }
 					// Check to see if a shipment item already exists within the given container
-					ShipmentItem shipmentItem = shipment?.findShipmentItem(inventoryItem, container)
+					ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
 					// Create a new shipment item if not found
 					if (!shipmentItem) {
 						shipmentItem = new ShipmentItem(
