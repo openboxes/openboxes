@@ -1421,8 +1421,7 @@ class CreateShipmentWorkflowController {
 		def adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
 		adminList.each { adminUser -> 
 			if (adminUser?.email) {
-				log.info("Adding email " + adminUser?.email)
-				recipients.add(adminUser);	
+				recipients.add(adminUser);
 			}
 		}
 		

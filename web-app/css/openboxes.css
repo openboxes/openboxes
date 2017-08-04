@@ -901,6 +901,9 @@ button.action-btn, button.previous, button.next {
 .capitalize {
     text-transform: capitalize;
 }
+.uppercase {
+    text-transform: uppercase;
+}
 
 .red {
     background-color: red;

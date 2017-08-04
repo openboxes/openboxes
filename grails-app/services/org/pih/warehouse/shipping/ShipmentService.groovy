@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellRangeAddress
+import org.hibernate.FetchMode
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
@@ -475,16 +476,6 @@ class ShipmentService {
         }
 
         log.info "Shipments: " + shipments.size()
-
-        // now filter by event code and eventdate
-        shipments = shipments.findAll( { def status = it.getStatus()
-            if (statusCode && status.code != statusCode) { return false }
-            //if (statusStartDate && status.date < statusStartDate) { return false }
-            //if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
-            return true
-        } )
-
-		shipments = shipments.findAll() { (!statusStartDate || it.expectedShippingDate >= statusStartDate) && (!statusEndDate || it.expectedShippingDate <= statusEndDate) }
 
 		return shipments
 	}
@@ -1670,8 +1661,10 @@ class ShipmentService {
 
 	void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
 		shipmentInstance.removeFromEvents(eventInstance)
-		eventInstance?.delete()
-		shipmentInstance?.save()
+		eventInstance.delete()
+        shipmentInstance.currentEvent = null
+        shipmentInstance.currentStatus = null
+		shipmentInstance.save()
 	}
    
 	void rollbackLastEvent(Shipment shipmentInstance) {

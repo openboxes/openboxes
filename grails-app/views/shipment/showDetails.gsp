@@ -961,7 +961,10 @@
                                 </table>
                             </div>
                             <div class="box">
-                                <h2>Add Event</h2>
+                                <h2>
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="event" style="vertical-align: middle"/>
+                                    <label><warehouse:message code="shipping.addEvent.label" default="Add Event"/></label>
+                                </h2>
                                 <g:form controller="shipment" action="saveEvent" method="POST">
                                     <g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
                                     <g:hiddenField name="eventId" value="${eventInstance?.id}" />
@@ -988,7 +991,7 @@
                                             <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
                                                 <g:select id="eventLocation.id" name='eventLocation.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
                                                           from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
-                                                          value="${eventInstance?.eventLocation?.id}" class="chzn-select-deselect">
+                                                          value="${eventInstance?.eventLocation?.id?:session?.warehouse?.id}" class="chzn-select-deselect">
                                                 </g:select>
                                             </td>
                                         </tr>
@@ -999,11 +1002,14 @@
                                                 <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
                                                 --%>
                                                 <g:datePicker name="eventDate" value="${eventInstance?.eventDate}" precision="minute"/>
-
-                                                <button type="submit" class="button icon add">
-                                                    <warehouse:message code="default.button.add.label"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td class="name"></td>
+                                            <td class="value">
+                                                <button type="submit" class="button">
+                                                    <warehouse:message code="default.button.save.label"/>
                                                 </button>
-
                                             </td>
                                         </tr>
                                         </tbody>

@@ -37,6 +37,9 @@ class Shipment implements Comparable, Serializable {
         if (currentUser) {
             updatedBy = currentUser
         }
+    }
+
+    def afterUpdate = {
         currentEvent = mostRecentEvent
         currentStatus = status.code
     }

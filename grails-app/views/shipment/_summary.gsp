@@ -29,12 +29,12 @@
                             <small>${shipmentInstance?.shipmentNumber}</small>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
 								${shipmentInstance?.name}</g:link>
-                            <small class="fade">
+                            <small class="fade uppercase">
                                 <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id}">
-                                    <g:message code="shipment.outbound.label" default="Outbound"/>
+                                    <g:message code="shipment.outbound.label" default="outbound"/>
                                 </g:if>
                                 <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
-                                    <g:message code="shipment.inbound.label" default="Inbound"/>
+                                    <g:message code="shipment.inbound.label" default="inbound"/>
                                 </g:elseif>
                             </small>
 
