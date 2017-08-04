@@ -1666,6 +1666,14 @@ class ShipmentService {
         shipmentInstance.currentStatus = null
 		shipmentInstance.save()
 	}
+
+
+    void refreshCurrentStatus(String id) {
+        def shipment = Shipment.get(id)
+        shipment.lastUpdated = new Date()
+        shipment.save()
+    }
+
    
 	void rollbackLastEvent(Shipment shipmentInstance) {
 		

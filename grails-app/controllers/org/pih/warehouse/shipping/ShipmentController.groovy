@@ -293,7 +293,10 @@ class ShipmentController {
 		}
 	}
 	
-	
+	def refreshCurrentStatus = {
+		shipmentService.refreshCurrentStatus(params.id)
+		redirect(action: "showDetails", id: params?.id)
+	}
 
 	
 	def rollbackLastEvent = {
