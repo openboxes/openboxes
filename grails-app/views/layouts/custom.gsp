@@ -429,10 +429,6 @@
             event.preventDefault();
         });
 
-        $('.dataTable').dataTable({
-            "bJQueryUI": false,
-            "sPaginationType": "full_numbers"
-        });
     });
 </script>
 

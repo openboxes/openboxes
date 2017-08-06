@@ -74,9 +74,9 @@
             "iDisplayLength": 5,
             "bSearch": false,
             "bScrollCollapse": true,
-            "bJQueryUI": false,
+            "bJQueryUI": true,
             "bAutoWidth": true,
-            "sPaginationType": "two_button",
+            "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getFastMovers",
             "fnServerParams": function ( data ) {
                 //console.log("server data " + data);
