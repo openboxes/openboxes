@@ -279,8 +279,13 @@
             </div>
             --%>
             <div class="megaButton">
+                <g:link controller="report" action="showBinLocationReport">
+                    <warehouse:message code="report.binLocationReport.label" default="Bin Location Report"/>
+                </g:link>
+            </div>
+            <div class="megaButton">
                 <g:link controller="inventory" action="show">
-                    <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH report"/>
+                    <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH Report"/>
                 </g:link>
             </div>
 

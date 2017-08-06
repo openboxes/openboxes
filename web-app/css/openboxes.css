@@ -1205,8 +1205,7 @@ body {
 .widget-large { border: 1px solid lightgrey; margin: 5px; }
 .widget-small { border: 1px solid lightgrey;  margin: 5px; }
 .widget-header { background-color: #FFF; margin: 1px; font-weight: bold; font-size: 110%;}
-.widget-content { margin: 10px; }
-
+.widget-content { margin: 5px; }
 .widget-content tr { height: 30px; }
 .widget-content td,th { vertical-align: middle; }
 img {
@@ -2235,6 +2234,14 @@ div.right{
 div.clear {
     clear: both;
 }
+
+/* =============================================================================
+    jquery ui customization
+   ========================================================================== */
+
+.ui-buttonset { margin: 7px; }
+.ui-buttonset .ui-button { margin-left: 1px; margin-right: -.3px; padding-left: 5px; padding-right: 5px; }
+
 
 /* =============================================================================
    requisition.css

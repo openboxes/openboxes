@@ -14,6 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
+import org.hibernate.FetchMode
 import org.hibernate.annotations.Cache
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
@@ -32,6 +33,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.springframework.transaction.annotation.Transactional
 import util.InventoryUtil
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -1449,6 +1451,81 @@ class JsonController {
         def shipments = shipmentService.getPendingShipments(location)
         render ([count: shipments.size(), shipments:shipments] as JSON)
     }
+
+    @Cacheable("binLocationSummaryCache")
+    def getBinLocationSummary = {
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+        def binLocationReport = inventoryService.getBinLocationReport(location)
+
+        render(binLocationReport["summary"] as JSON)
+    }
+
+    @Cacheable("binLocationReportCache")
+    def getBinLocationReport = {
+        log.info "binLocationReport: " + params
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+        def binLocationReport = inventoryService.getBinLocationReport(location)
+
+
+        def data = binLocationReport["data"]
+
+        log.info "data " + data.size()
+
+        if (params.status) {
+            data = data.findAll { it.status == params.status }
+        }
+
+        log.info "data " + data.size()
+
+        // Flatten the data to make it easier to display
+        data = data.collect {
+            [
+                    id: it.product?.id,
+                    status: it.status,
+                    productCode: it.product?.productCode,
+                    productName: it?.product?.name,
+                    productGroup: it?.product?.genericProduct?.name,
+                    category: it?.product?.category?.name,
+                    lotNumber: it?.inventoryItem?.lotNumber,
+                    expirationDate: g.formatDate(date: it?.inventoryItem?.expirationDate, format: "MMM yyyy"),
+                    unitOfMeasure: it?.product?.unitOfMeasure,
+                    binLocation: it?.binLocation?.name,
+                    quantity: it?.quantity
+            ]
+        }
+        log.info "data: " + data
+
+        render(["aaData":data] as JSON)
+
+    }
+
+
+    def problematicShipments = {
+        def shipments = getProblematicShipments()
+        render ([count: shipments.size(), shipments:shipments] as JSON)
+
+    }
+
+
+
+    List getProblematicShipments() {
+
+        def shipments = Shipment.withCriteria {
+            eq("id", "cab2b4f35d824667015d98df1a2b729e")
+            //isNotNull("currentStatus")
+            //isNotNull("currentEvent")
+            fetchMode 'events', FetchMode.JOIN
+            fetchMode 'containers', FetchMode.JOIN
+            fetchMode 'documents', FetchMode.JOIN
+            fetchMode 'referenceNumbers', FetchMode.JOIN
+        }
+
+        shipments = shipments.findAll { it.status != it.currentStatus || it.mostRecentEvent != it.currentEvent}
+        return shipments
+    }
+
 
 
 }
