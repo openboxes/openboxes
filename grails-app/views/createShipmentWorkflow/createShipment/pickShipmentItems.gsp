@@ -63,16 +63,15 @@
 
                                 <table id="picklistItemTable" class="table">
                                     <thead>
-
-                                    <tr>
-                                        <th class="right-border"><g:message code="container.label"/></th>
-                                        <th><g:message code="product.label"/></th>
-                                        <th><g:message code="inventoryItem.lotNumber.label"/></th>
-                                        <th><g:message code="inventoryItem.expirationDate.label"/></th>
-                                        <th><g:message code="location.binLocation.label"/></th>
-                                        <th class="center"><g:message code="default.qty.label"/></th>
-                                        <th class="center"><g:message code="default.uom.label"/></th>
-                                    </tr>
+                                        <tr>
+                                            <th class="right-border"><g:message code="container.label"/></th>
+                                            <th><g:message code="product.label"/></th>
+                                            <th><g:message code="inventoryItem.lotNumber.label"/></th>
+                                            <th><g:message code="inventoryItem.expirationDate.label"/></th>
+                                            <th><g:message code="location.binLocation.label"/></th>
+                                            <th class="center"><g:message code="default.qty.label"/></th>
+                                            <th class="center"><g:message code="default.uom.label"/></th>
+                                        </tr>
                                     </thead>
                                     <g:set var="previousContainer"/>
                                     <g:set var="previousProduct"/>
@@ -158,12 +157,32 @@
                                     <tfoot>
 
                                     <tr>
-                                        <td>
-                                        </td>
-                                        <td colspan="11" class="left">
+                                        <td colspan="11" class="right">
+                                            <div class="button-container">
+
                                             <%--
                                                 <g:submitButton name="autoPickShipmentItems" value="${g.message(code:'shipping.autoPickItems.label')}" class="button"></g:submitButton>
                                             --%>
+
+                                                <button name="_eventId_validatePicklist" class="button">
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" alt="Previous Item"/>&nbsp;
+                                                    <warehouse:message code="shipping.validatePicklist.label" default="Validate picklist"/>
+                                                </button>
+
+                                                <div class="button-group">
+
+
+                                                    <a href="#" class="previous-picklist-item button">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_up.png')}" alt="Previous Item"/>&nbsp;
+                                                        <g:message code="default.button.back.label" default="Back"/>
+                                                    </a>
+                                                    <a href="#" class="next-picklist-item button">
+                                                        <g:message code="default.button.next.label" default="Next"/>
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" alt="Next Item"/>&nbsp;
+                                                    </a>
+                                                </div>
+                                            </div>
+
                                         </td>
                                     </tr>
                                     </tfoot>

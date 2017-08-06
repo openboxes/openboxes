@@ -1600,10 +1600,9 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @return current quantity of the given inventory item.
 	 */
-	Integer getQuantityFromBinLocation(Location binLocation, InventoryItem inventoryItem) {
+	Integer getQuantityFromBinLocation(Location location, Location binLocation, InventoryItem inventoryItem) {
 		def startTime = System.currentTimeMillis()
-		def currentLocation = getCurrentLocation()
-		def quantity = getQuantity(currentLocation.inventory, binLocation, inventoryItem)
+		def quantity = getQuantity(location.inventory, binLocation, inventoryItem)
         log.info "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantity
 	}
@@ -2312,7 +2311,9 @@ class InventoryService implements ApplicationContextAware {
         log.info "Bin location " + binLocation
         log.info "Inventory item " + inventoryItem
 
-        Integer quantityOnHand = getQuantityFromBinLocation(binLocation, inventoryItem);
+		Location location = Location.findByInventory(inventory)
+
+        Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem);
 
         log.info "Quantity on hand: " + quantityOnHand
 

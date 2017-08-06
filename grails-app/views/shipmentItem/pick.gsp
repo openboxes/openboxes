@@ -15,27 +15,9 @@
             <table>
                 <tr class="prop">
                     <td class="name">
-
-                    </td>
-                    <td class="value">
-                        <div class="button-group">
-                            <a href="#" class="previous-picklist-item button">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'previous-green.png')}" alt="Previous Item"/>&nbsp;
-                                <g:message code="default.button.back.label" default="Back"/>
-                            </a>
-                            <a href="#" class="next-picklist-item button">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'next-green.png')}" alt="Next Item"/>&nbsp;
-                                <g:message code="default.button.next.label" default="Next"/>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
                         <label><g:message code="default.status.label"/></label>
                     </td>
                     <td class="value">
-
                         <g:if test="${binLocations}">
                             <g:set var="totalQtyByProduct" value="${binLocations.sum { it.quantity }}"/>
                         </g:if>
@@ -94,9 +76,9 @@
                                             entry?.inventoryItem?.id == shipmentItem?.inventoryItem?.id}"/>
                                     <g:set var="isSameLotNumber" value="${entry?.inventoryItem?.id==shipmentItem?.inventoryItem?.id}"/>
 
-                                    <tr class="${selected?'active':''} ${statusClass}">
-                                        <td class="top">
-                                            <g:radio name="binLocationAndInventoryItem" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}"
+                                    <tr class="${selected?'active':''} ${statusClass} prop ${status%2?'odd':'event'}">
+                                        <td class="middle">
+                                            <g:radio name="selection" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}"
                                                      checked="${selected}"/>
                                         </td>
                                         <td class="middle">
@@ -144,10 +126,6 @@
                     </td>
                     <td class="value">
                         <g:textField id="quantity" name="quantity" value="${shipmentItem?.quantity}" class="text"/>
-                        <button name="_eventId_pickShipmentItem" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Save Item"/>&nbsp;
-                        <g:message code="default.button.save.label"/>
-                        </button>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -155,6 +133,11 @@
 
                     </td>
                     <td class="value">
+
+                        <button name="_eventId_pickShipmentItem" class="button">
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Pick Item Item"/>&nbsp;
+                            <g:message code="shipping.button.pickItem.label"/>
+                        </button>
 
                         <g:link controller="createShipmentWorkflow" action="createShipment" event="splitShipmentItem2" class="button"
                                 id="${shipmentInstance?.id}" params="[execution:params.execution, 'shipmentItem.id': shipmentItem?.id]">

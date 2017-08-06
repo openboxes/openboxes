@@ -770,6 +770,14 @@ class ShipmentService {
 
 	}
 
+	boolean validatePicklist(Shipment shipment) {
+		log.info "Validate picked items "
+		shipment.shipmentItems.each { shipmentItem ->
+			validateShipmentItem(shipmentItem)
+		}
+		return true
+	}
+
 
     /**
      * Validate the shipment item when it's being added to the shipment.
@@ -786,15 +794,12 @@ class ShipmentService {
         // Location must be locally managed and
         if (location?.local && location.isWarehouse()) {
 
-            // FIXME Please refactor this mess at a later date
-            // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
-            def quantityOnHand = shipmentItem.binLocation ?
-                    inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
-                    inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
-
             if (!shipmentItem.validate()) {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
+
+            //Check whether there's any stock in the bin location for the given inventory item
+            def quantityOnHand = getQuantityOnHand(location, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
             log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
             if (shipmentItem.quantity > quantityOnHand) {
@@ -807,6 +812,45 @@ class ShipmentService {
         return true;
     }
 
+    /**
+     * Get quantity on hand for the given bin location and inventory item stored at the given location.
+     *
+     * @param location
+     * @param binLocation
+     * @param inventoryItem
+     * @return
+     */
+    Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem) {
+        List transactionEntries = getTransactionEntries(location, binLocation, inventoryItem)
+        List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
+        return binLocations.sum { it.quantity }
+    }
+
+
+    /**
+     * Get all transaction entries for the given bin location and inventory item.
+     *
+     * @param inventoryInstance
+     * @return
+     */
+    List getTransactionEntries(Location location, Location binLocation, InventoryItem inventoryItem) {
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = criteria.list {
+            eq("inventoryItem", inventoryItem)
+            if (binLocation) {
+                eq("binLocation", binLocation)
+            }
+            else {
+                isNull("binLocation")
+            }
+            transaction {
+                eq("inventory", location.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        }
+        return transactionEntries;
+    }
 
 	
 	/**

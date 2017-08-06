@@ -594,12 +594,28 @@ class CreateShipmentWorkflowController {
 
         showPicklistItems {
 
-			// Needed to add an action state above to
+			// Needed to add an action state above
 			render(view: "pickShipmentItems")
 
 			on("back").to("enterContainerDetails")
 
-			on("next").to("sendShipment")
+			on("next"){
+
+                try {
+                    shipmentService.validatePicklist(flow?.shipmentInstance)
+                } catch (ValidationException e) {
+                    log.error("error: " + e.message, e);
+                    flow.shipmentInstance.errors = e.errors
+                    error()
+
+                } catch (Exception e) {
+                    log.error("error: " + e.message, e);
+                    flow.shipmentInstance.errors.reject(e.message)
+                    error()
+                }
+
+
+            }.to("sendShipment")
 
 			on("save") {
 				shipmentService.saveShipment(flow.shipmentInstance)
@@ -618,15 +634,23 @@ class CreateShipmentWorkflowController {
 
 
             on("validatePicklist") {
-                log.info "Check pick status " + params
-                Location location = Location.get(session.warehouse.id)
-                if (flow?.shipmentInstance?.origin == location) {
-                    log.info "Calcuating quantity for products in shipment"
-                    List products = flow?.shipmentInstance?.shipmentItems*.product
-                    List binLocations = inventoryService.getProductQuantityByBinLocation(location, products)
-                    //def quantityMap = binLocations.groupBy { it?.inventoryItem?.product }
-                    log.info "Done calcuating quantity for products in shipment"
-                }
+				log.info "Validate picklist " + params
+				try {
+					if (shipmentService.validatePicklist(flow?.shipmentInstance)) {
+						log.info ("picklist items are all valid")
+                        flash.message = "All picklist items are valid"
+					}
+
+				} catch (ValidationException e) {
+                    log.error("error: " + e.message, e);
+
+					flow.shipmentInstance.errors = e.errors
+
+				} catch (Exception e) {
+					log.error("error: " + e.message, e);
+                    flow.shipmentInstance.errors.reject(e.message)
+				}
+
             }.to("pickShipmentItems")
 
 			on("autoPickShipmentItems") {
@@ -691,17 +715,18 @@ class CreateShipmentWorkflowController {
                 ShipmentItem shipmentItemInstance
                 try {
 
-                    shipmentItemInstance = ShipmentItem.load(params.shipmentItem.id)
+                    shipmentItemInstance = flow.shipmentInstance.shipmentItems.find { it.id = params?.shipmentItem?.id}
+                    //ShipmentItem.get(params.shipmentItem.id)
 
-                    if (!params.binLocationAndInventoryItem) {
+                    if (!params.selection) {
                         flash.message = "${g.message(code: 'shipping.mustPickBinLocation.message', default: 'Please choose a bin location from the list')}"
                         return error()
                     }
 
                     // Parse the data into bin location and inventory item components
-					String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
-					String binLocationId = binLocationAndInventoryItem[0]
-					String inventoryItemId = binLocationAndInventoryItem[1]
+					String [] selection = params.selection.split(":")
+					String binLocationId = selection[0]
+					String inventoryItemId = selection[1]
 
                     // Set inventory item
                     log.info "inventoryItemId: " + inventoryItemId
@@ -711,6 +736,7 @@ class CreateShipmentWorkflowController {
                         throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
                     }
                     else {
+                        log.info "Setting inventoryItem " + inventoryItem
                         shipmentItemInstance.inventoryItem = inventoryItem
                     }
 
@@ -718,7 +744,11 @@ class CreateShipmentWorkflowController {
                     log.info "binLocationId: " + binLocationId
                     Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
                     if (binLocation) {
+                        log.info "Setting bin location " + binLocation
                         shipmentItemInstance.binLocation = binLocation
+                    }
+                    else {
+                        shipmentItemInstance.binLocation = null
                     }
 
                     // Validate quantity
@@ -736,13 +766,12 @@ class CreateShipmentWorkflowController {
                     log.info("totalQuantityPicked ${totalQuantityPicked} == totalQuantityAvailable ${totalQuantityAvailable}")
 
                     if (totalQuantityPicked > totalQuantityAvailable) {
-                        shipmentItemInstance.errors.reject("shipmentItem.quantityCannotExceedQuantityAvailable.message", "Total quantity picked [${totalQuantityPicked}] cannot exceed total quantity available [${totalQuantityAvailable}].")
-                        throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
+                        flow.shipmentInstance.errors.reject("shipmentItem.quantityCannotExceedQuantityAvailable.message", "Total quantity picked [${totalQuantityPicked}] cannot exceed total quantity available [${totalQuantityAvailable}].")
+                        throw new ValidationException("Unable to update pick list item", flow.shipmentInstance.errors)
                     }
 
                     // Set quantity
                     shipmentItemInstance.quantity = quantity
-
 
                     if (shipmentItemInstance.save(flush:true)) {
                         flash.message = "Successfully picked shipment item. "
@@ -783,9 +812,9 @@ class CreateShipmentWorkflowController {
                         throw new ValidationException("Unable to update pick list item", shipmentItemInstance.errors)
                     }
 
-                    String [] binLocationAndInventoryItem = params.binLocationAndInventoryItem.split(":")
-                    String binLocationId = binLocationAndInventoryItem[0]
-                    String inventoryItemId = binLocationAndInventoryItem[1]
+                    String [] selection = params.selection.split(":")
+                    String binLocationId = selection[0]
+                    String inventoryItemId = selection[1]
 
                     Location binLocation = (binLocationId && !binLocationId.equals("null")) ? Location.load(binLocationId) : null
                     InventoryItem inventoryItem = (inventoryItemId) ? InventoryItem.load(inventoryItemId) : null
@@ -876,6 +905,15 @@ class CreateShipmentWorkflowController {
 					return error();
 				}
 
+                try {
+                    shipmentService.validatePicklist(flow?.shipmentInstance)
+                } catch (ValidationException e) {
+                    flow.shipmentInstance.errors = e.errors
+                    error()
+                } catch (Exception e) {
+                    flow.shipmentInstance.errors.reject(e.message)
+                    error()
+                }
 				
 				Transaction transactionInstance
 				User userInstance = User.get(session.user.id)
@@ -902,12 +940,19 @@ class CreateShipmentWorkflowController {
 						}
 										
 						try {
+
+                            // validate the picklist
+                            shipmentService.validatePicklist(flow?.shipmentInstance)
+
 							// send the shipment
 							shipmentService.sendShipment(shipmentInstance, command.comments, session.user, session.warehouse,
 															command.actualShippingDate, command.debitStockOnSend);
 							triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 							
-						}
+                        } catch (ValidationException e) {
+                            flow.shipmentInstance.errors = e.errors
+                            return error()
+                        }
 						catch (ShipmentException e) {
                             flash.message = e.message
                             flow.shipmentInstance = Shipment.get(params.id)
@@ -926,9 +971,13 @@ class CreateShipmentWorkflowController {
                             flow.shipmentInstance = Shipment.get(params.id)
                             flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
                             return error()
+                        } catch (Exception e) {
+                            flow.shipmentInstance.errors.reject(e.message)
+                            return error()
                         }
-										
-						if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
+
+
+                        if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
 							//flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 							//redirect(controller: 'shipment', action: "showDetails", id: shipmentInstance?.id)
 							command.shipment = shipmentInstance
