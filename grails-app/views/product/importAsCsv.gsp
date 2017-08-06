@@ -32,10 +32,6 @@
                     <li><a href="#import-data-tab">
                         <warehouse:message code="product.import.step2.label" default="Step 3"/>.
                         <warehouse:message code="product.import.save.label" default="Import products"/></a></li>
-                    <div class="button-group">
-                        <a class="prev button icon arrowleft" href="#">Previous</a>
-                        <a class="next button icon arrowright">Next</a>
-                    </div>
                 </ul>
                 <div id="upload-data-tab" class="ui-tabs-hide">
                     <div class="box">
@@ -305,6 +301,16 @@
                     </div>
                 </div>
             </div>
+
+            <div class="buttons">
+                <div class="left">
+                    <a class="prev button icon arrowleft" href="#"><g:message code="default.button.previous.label"/></a>
+                </div>
+                <div class="right">
+                    <a class="next button icon arrowright"><g:message code="default.button.next.label"/></a>
+                </div>
+            </div>
+
         </div>
 			
 		<script type="text/javascript">
@@ -340,10 +346,10 @@
                 var dataTable = $('.importDataTable').dataTable( {
                     "bProcessing": true,
                     "sServerMethod": "GET",
-                    "iDisplayLength": 10,
+                    "iDisplayLength": 25,
                     "bSearch": false,
                     "bScrollCollapse": true,
-                    "bJQueryUI": false,
+                    "bJQueryUI": true,
                     "bAutoWidth": true,
                     "sPaginationType": "full_numbers",
                     "aLengthMenu": [
