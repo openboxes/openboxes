@@ -44,10 +44,6 @@
 				</th>
 			</tr>
         </thead>
-
-
-
-        </thead>
 		<tbody>
 
 			<g:each var="shipmentInstance" in="${shipments}" status="i">

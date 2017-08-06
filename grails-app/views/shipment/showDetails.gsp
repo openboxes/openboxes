@@ -48,20 +48,6 @@
 								</td>
 								<td valign="top" id="shipmentStatus" class="value">
 									<format:metadata obj="${shipmentInstance?.currentStatus}"/>
-
-									<%--
-									<span>
-										<g:if test="${shipmentInstance?.status?.location}">
-											<span>-</span>
-											<span class="fade"><warehouse:message code="default.from.label"/></span>
-											<span>${shipmentInstance?.status.location}</span>
-										</g:if>
-										<g:if test="${shipmentInstance?.status?.date}">
-											<span class="fade"><warehouse:message code="default.on.label"/></span>
-											<span><format:date obj="${shipmentInstance?.status.date}"/></span>
-										</g:if>
-									</span>
-									--%>
 								</td>
 							</tr>
 							<tr class="prop">
