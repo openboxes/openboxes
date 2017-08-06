@@ -448,7 +448,7 @@ openboxes.dashboard.tagSummary.enabled=true
 
 // Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
 openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
-openboxes.dashboard.column2.widgets=["valueSummary","productSummary","genericProductSummary","expiringSummary","binLocationSummary"]
+openboxes.dashboard.column2.widgets=["binLocationSummary","valueSummary","productSummary","genericProductSummary","expiringSummary"]
 openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
 
 

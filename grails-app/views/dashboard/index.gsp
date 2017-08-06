@@ -49,6 +49,9 @@
                                 </g:each>
                             </g:if>
                             <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.binLocationSummary.enabled}">
+                                    <g:render template="binLocationSummary"/>
+                                </g:if>
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.valueSummary.enabled}">
                                     <g:render template="valueSummary"/>
                                 </g:if>
@@ -60,9 +63,6 @@
                                 </g:if>
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.expiringSummary.enabled}">
                                     <g:render template="expiringSummary"/>
-                                </g:if>
-                                <g:if test="${grailsApplication.config.openboxes.dashboard.binLocationSummary.enabled}">
-                                    <g:render template="binLocationSummary"/>
                                 </g:if>
                             </g:else>
                         </td>
