@@ -16,7 +16,9 @@
 						<td width="33%">
                             <g:if test="${grailsApplication.config.openboxes.dashboard.column1.widgets}">
                                 <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column1.widgets}">
-                                    <g:render template="${widgetName}"/>
+                                    <g:if test='${grailsApplication.config.openboxes.dashboard."$widgetName".enabled}'>
+                                        <g:render template="${widgetName}"/>
+                                    </g:if>
                                 </g:each>
                             </g:if>
                             <g:else>
@@ -41,7 +43,9 @@
                         <td width="33%">
                             <g:if test="${grailsApplication.config.openboxes.dashboard.column2.widgets}">
                                 <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column2.widgets}">
-                                    <g:render template="${widgetName}"/>
+                                    <g:if test='${grailsApplication.config.openboxes.dashboard."$widgetName".enabled}'>
+                                        <g:render template="${widgetName}"/>
+                                    </g:if>
                                 </g:each>
                             </g:if>
                             <g:else>
@@ -57,12 +61,17 @@
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.expiringSummary.enabled}">
                                     <g:render template="expiringSummary"/>
                                 </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.binLocationSummary.enabled}">
+                                    <g:render template="binLocationSummary"/>
+                                </g:if>
                             </g:else>
                         </td>
 						<td width="33%">
                             <g:if test="${grailsApplication.config.openboxes.dashboard.column3.widgets}">
                                 <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column3.widgets}">
-                                    <g:render template="${widgetName}"/>
+                                    <g:if test='${grailsApplication.config.openboxes.dashboard."$widgetName".enabled}'>
+                                        <g:render template="${widgetName}"/>
+                                    </g:if>
                                 </g:each>
                             </g:if>
                             <g:else>
