@@ -45,9 +45,7 @@
         </span>
         --%>
     </h2>
-
-
-	<div class="widget-content" style="padding:0px;; margin:0">
+	<div class="widget-content" style="padding:0px; margin:0">
         <table id="dataTable">
             <thead>
                 <th>Rank</th>
@@ -62,7 +60,6 @@
             </tbody>
         </table>
 	</div>
-    <br/><br/>
 </div>
 <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
@@ -71,7 +68,7 @@
         var dataTable = $('#dataTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 5,
+            "iDisplayLength": 10,
             "bSearch": false,
             "bScrollCollapse": true,
             "bJQueryUI": true,
