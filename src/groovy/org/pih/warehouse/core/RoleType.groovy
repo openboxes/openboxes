@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.core;
 
-public enum RoleType {
+enum RoleType {
 
 	ROLE_SUPERUSER('Superuser', 0),
     ROLE_ADMIN('Admin', 1),
@@ -24,6 +24,18 @@ public enum RoleType {
     RoleType(String name, Integer sortOrder) {
 		this.name = name
         this.sortOrder = sortOrder
+	}
+
+    static expand(Collection roleTypes) {
+        Set<RoleType> expandedRoleTypes = new HashSet<RoleType>()
+        roleTypes.each { RoleType roleType ->
+            expandedRoleTypes.addAll(expand(roleType))
+        }
+        return expandedRoleTypes
+    }
+
+	static expand(RoleType roleType) {
+		return list().findAll { it.sortOrder <= roleType.sortOrder }
 	}
 
 	static list() {
