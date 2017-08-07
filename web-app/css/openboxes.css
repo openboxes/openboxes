@@ -2115,7 +2115,7 @@ img.photo_tiny {
     background: transparent;
     border: none;
 }
-#transactionLogTabs .ui-widget-header {
+#transactionLogTabs > .ui-widget-header {
     background: transparent;
     border: none;
     border-bottom: 1px solid #c0c0c0;
@@ -2146,7 +2146,7 @@ img.photo_tiny {
 }
 
 
-.tabs .ui-widget-header {
+.tabs > .ui-widget-header {
     background: transparent;
     border: none;
     border-bottom: 1px solid #c0c0c0;
@@ -2154,6 +2154,8 @@ img.photo_tiny {
     -webkit-border-radius: 0px;
     border-radius: 0px;
 }
+
+
 /*
 .tabs .ui-state-default {
 	background: transparent;
