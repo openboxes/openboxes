@@ -36,9 +36,6 @@
                 <th>
                     ${warehouse.message(code: 'shipping.receivingDate.label', default: 'Received')}
                 </th>
-                <th>
-                    ${warehouse.message(code: 'default.dateCreated.label')}
-                </th>
 				<th>
 					${warehouse.message(code: 'default.lastUpdated.label')}
 				</th>
@@ -144,14 +141,9 @@
                             </div>
                         </g:else>
                     </td>
-                    <td class="middle center">
-                        <div title="${g.formatDate(date: shipmentInstance?.dateCreated)}">
-                            ${g.formatDate(date: shipmentInstance?.dateCreated)}
-                        </div>
-                    </td>
 					<td class="middle center">
-                        <div title="${g.formatDate(date: shipmentInstance?.lastUpdated)}">
-                            ${g.formatDate(date: shipmentInstance?.lastUpdated)}
+                        <div title="<g:formatDate date="${shipmentInstance?.lastUpdated }"/>">
+                            <g:prettyDateFormat date="${shipmentInstance?.lastUpdated}"/>
                         </div>
                     </td>
 				</tr>
