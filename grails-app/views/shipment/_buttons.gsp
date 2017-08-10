@@ -127,6 +127,16 @@
     </div>
 </g:isUserManager>
 
+<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_SUPERUSER]">
+    <g:if test="${shipmentInstance?.hasShipped()}">
+        <g:link controller="shipment" action="rollbackLastEvent" id="${shipmentInstance?.id}" class="button">
+            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_undo.png')}"
+                 alt="Rollback Last Event" class="middle"/>&nbsp;
+            <warehouse:message code="shipping.rollbackLastEvent.label"/></g:link>
+    </g:if>
+</g:isUserInRole>
+
+
 <div class="right">
 
     <div class="action-menu">
