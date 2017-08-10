@@ -262,7 +262,8 @@ shouldSubstitute=${shouldSubstitute}
             </td>
         </tr>
         <tr class="prop">
-            <td>
+            <td class="name">
+                <label><g:message code="requisition.verifyAction.label" default="Choose an Action"/></label>
             </td>
             <td class="middle left">
 
@@ -278,7 +279,7 @@ shouldSubstitute=${shouldSubstitute}
                         </div>
                     </g:if>
                     <g:else>
-                        <div class="button-group">
+                        <div class="">
                             <g:remoteLink controller="requisition" action="approveQuantity" id="${requisitionItem?.requisition?.id }"
                                           onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
                                           params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon add ${requisitionItem.canApproveQuantity()?'':'disabled'} ${shouldApprove?'primary':''}">
@@ -301,6 +302,10 @@ shouldSubstitute=${shouldSubstitute}
                             </g:remoteLink>
                         </div>
                     </g:else>
+                </div>
+
+                <%--
+                <div class="button-container">
                     <div class="button-group">
                         <g:remoteLink controller="requisition" action="previousRequisitionItem" id="${requisitionItem?.requisition?.id }"
                                       onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
@@ -314,7 +319,7 @@ shouldSubstitute=${shouldSubstitute}
                         </g:remoteLink>
                     </div>
                 </div>
-
+                --%>
 
             </td>
         </tr>
@@ -683,6 +688,7 @@ shouldSubstitute=${shouldSubstitute}
                                                 buttons: {
                                                     "Confirm": function () {
                                                         $("#substitutionForm").submit();
+                                                        $(this).dialog("close");
                                                     },
                                                     "Cancel": function () {
                                                         $(this).dialog("close");
