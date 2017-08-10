@@ -1433,7 +1433,6 @@ class JsonController {
             date.clearTime()
         }
         def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-
         def data = inventoryService.getFastMovers(location, date, params.max as int)
 
         render ([aaData: data?.results?:[]] as JSON)
@@ -1502,28 +1501,14 @@ class JsonController {
     }
 
 
-    def problematicShipments = {
-        def shipments = getProblematicShipments()
+    def getShipmentsWithInvalidStatus = {
+        def shipments = shipmentService.shipmentsWithInvalidStatus
         render ([count: shipments.size(), shipments:shipments] as JSON)
-
     }
 
-
-
-    List getProblematicShipments() {
-
-        def shipments = Shipment.withCriteria {
-            eq("id", "cab2b4f35d824667015d98df1a2b729e")
-            //isNotNull("currentStatus")
-            //isNotNull("currentEvent")
-            fetchMode 'events', FetchMode.JOIN
-            fetchMode 'containers', FetchMode.JOIN
-            fetchMode 'documents', FetchMode.JOIN
-            fetchMode 'referenceNumbers', FetchMode.JOIN
-        }
-
-        shipments = shipments.findAll { it.status != it.currentStatus || it.mostRecentEvent != it.currentEvent}
-        return shipments
+    def fixShipmentsWithInvalidStatus = {
+        def count = shipmentService.fixShipmentsWithInvalidStatus()
+        render ([count: count] as JSON)
     }
 
 

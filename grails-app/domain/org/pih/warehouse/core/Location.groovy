@@ -123,6 +123,15 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
 	}
 
+	/**
+	 * Indicates whether this location requires outbound quantity validation.
+	 *
+	 * @return
+	 */
+	Boolean requiresOutboundQuantityValidation() {
+		return active && local && isWarehouse()
+	}
+
     /**
      * @return true if location is a warehouse (depot)
      *

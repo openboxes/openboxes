@@ -1,4 +1,3 @@
-<g:set var="binLocationSelected" value="${binLocations.findAll{it?.binLocation == shipmentItem?.binLocation && it.inventoryItem==shipmentItem?.inventoryItem}}"/>
 <div class="box">
     <h2>
         <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/>

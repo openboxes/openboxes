@@ -633,6 +633,21 @@ class CreateShipmentWorkflowController {
             }.to("pickShipmentItems")
 
 
+            on("clearPicklist") {
+
+                try {
+                    log.info "clear picklist: " + params
+                    shipmentService.clearPicklist(flow.shipmentInstance)
+                    flash.message = "Successfully cleared picklist for shipment ${flow?.shipmentInstance?.shipmentNumber}"
+                } catch (ValidationException e) {
+                    flow.shipmentInstance?.errors = e.errors
+                } catch (Exception e) {
+                    flow.shipmentInstance.errors.reject(e.message)
+                }
+
+            }.to("pickShipmentItems")
+
+
             on("validatePicklist") {
 				log.info "Validate picklist " + params
 				try {
@@ -652,6 +667,7 @@ class CreateShipmentWorkflowController {
 				}
 
             }.to("pickShipmentItems")
+
 
 			on("autoPickShipmentItems") {
 				try {
@@ -715,8 +731,8 @@ class CreateShipmentWorkflowController {
                 ShipmentItem shipmentItemInstance
                 try {
 
-                    shipmentItemInstance = flow.shipmentInstance.shipmentItems.find { it.id = params?.shipmentItem?.id}
-                    //ShipmentItem.get(params.shipmentItem.id)
+                    //shipmentItemInstance = flow.shipmentInstance.shipmentItems.find { it.id = params?.shipmentItem?.id}
+                    shipmentItemInstance = ShipmentItem.get(params.shipmentItem.id)
 
                     if (!params.selection) {
                         flash.message = "${g.message(code: 'shipping.mustPickBinLocation.message', default: 'Please choose a bin location from the list')}"
@@ -751,27 +767,13 @@ class CreateShipmentWorkflowController {
                         shipmentItemInstance.binLocation = null
                     }
 
-                    // Validate quantity
-                    Integer quantity = Integer.parseInt(params.quantity)
-                    def location = Location.load(session.warehouse.id)
-                    List entries = inventoryService.getItemQuantityByBinLocation(location, inventoryItem)
-                    Integer totalQuantityAvailable = entries.sum { it.quantity }
-
-
-                    def otherShipmentItems = shipmentItemInstance.shipment.shipmentItems.findAll { it?.inventoryItem?.id == inventoryItem?.id && it.id != shipmentItemInstance?.id }
-                    log.info "shipmentItems " + otherShipmentItems
-                    Integer totalQuantityPicked = otherShipmentItems.sum { it.quantity } ?: 0
-                    totalQuantityPicked += quantity
-
-                    log.info("totalQuantityPicked ${totalQuantityPicked} == totalQuantityAvailable ${totalQuantityAvailable}")
-
-                    if (totalQuantityPicked > totalQuantityAvailable) {
-                        flow.shipmentInstance.errors.reject("shipmentItem.quantityCannotExceedQuantityAvailable.message", "Total quantity picked [${totalQuantityPicked}] cannot exceed total quantity available [${totalQuantityAvailable}].")
-                        throw new ValidationException("Unable to update pick list item", flow.shipmentInstance.errors)
-                    }
-
                     // Set quantity
+                    Integer quantity = Integer.parseInt(params.quantity)
                     shipmentItemInstance.quantity = quantity
+
+                    shipmentService.validateShipmentItem(shipmentItemInstance)
+
+
 
                     if (shipmentItemInstance.save(flush:true)) {
                         flash.message = "Successfully picked shipment item. "
@@ -786,10 +788,12 @@ class CreateShipmentWorkflowController {
                 } catch (ValidationException e) {
                     log.error("Failed to edit pick list due to the following error: " + e.message, e)
                     //flash.message = "Failed to edit pick list due to the following error: " + e.message
-                    [errors:e.errors]
-                    def shipmentInstance = Shipment.read(params.id)
-                    shipmentInstance.errors = e.errors
-                    [shipmentInstance:shipmentInstance, currentShipmentItemId:shipmentItemInstance?.id]
+                    //[errors:e.errors]
+                    //def shipmentInstance = Shipment.read(params.id)
+                    flow.shipmentInstance.refresh()
+                    flow.shipmentInstance.errors = e.errors
+                    [currentShipmentItemId:shipmentItemInstance?.id]
+                    error()
                 }
 
 

@@ -421,15 +421,20 @@ class ShipmentService {
         long startTime = System.currentTimeMillis()
         boolean success = false
         try {
+            int count = 0
             def shipments = Shipment.findAllByCurrentStatusIsNullAndEventsIsNotNull([max:1000])
             if (shipments) {
                 shipments.each {
                     it.currentStatus = it.status.code
                     it.currentEvent = it.mostRecentEvent
-                    it.save(flush: true)
+                    if(it.save(flush: true)) {
+                        count++
+                    }
                 }
-                long elapsedTime = System.currentTimeMillis() - startTime
-                log.info "Successfully bulk updated ${shipments?.size() ?: 0} shipments in ${elapsedTime} ms"
+                if (count > 0) {
+                    long elapsedTime = System.currentTimeMillis() - startTime
+                    log.info "Successfully bulk updated ${count ?: 0} shipments in ${elapsedTime} ms"
+                }
             }
             success = true
         } catch (Exception e) {
@@ -779,6 +784,16 @@ class ShipmentService {
 	}
 
 
+    boolean clearPicklist(Shipment shipment) {
+        log.info "Clear out picked items for ${shipment}"
+        shipment.shipmentItems.each { shipmentItem ->
+            shipmentItem.binLocation = null
+        }
+        return shipment.save()
+
+    }
+
+
     /**
      * Validate the shipment item when it's being added to the shipment.
      *
@@ -786,25 +801,26 @@ class ShipmentService {
      * @return
      */
     boolean validateShipmentItem(ShipmentItem shipmentItem) {
-        def location = Location.get(shipmentItem?.shipment?.origin?.id);
-        log.info("Validating shipment item at " + location?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
+        def origin = Location.get(shipmentItem?.shipment?.origin?.id);
+        log.info("Validating shipment item at " + origin?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
 
-        log.info "location = id:${location.id} name:${location.name} code:${location.locationNumber} local:${location.local}"
+        log.info "location = id:${origin.id} name:${origin.name} code:${origin.locationNumber} local:${origin.local}"
 
         // Location must be locally managed and
-        if (location?.local && location.isWarehouse()) {
+        if (origin.requiresOutboundQuantityValidation()) {
 
             if (!shipmentItem.validate()) {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
             //Check whether there's any stock in the bin location for the given inventory item
-            def quantityOnHand = getQuantityOnHand(location, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
-            log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
+            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
             if (shipmentItem.quantity > quantityOnHand) {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
-                        [shipmentItem.quantity, quantityOnHand, shipmentItem?.product?.productCode, location.name].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
+                        [shipmentItem.quantity, quantityOnHand, shipmentItem?.product?.productCode, origin.name].toArray(),
+                        "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
                 //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
@@ -834,15 +850,11 @@ class ShipmentService {
      * @return
      */
     List getTransactionEntries(Location location, Location binLocation, InventoryItem inventoryItem) {
+        log.info "Location ${location}, binLocation ${binLocation}, inventoryItem ${inventoryItem}"
         def criteria = TransactionEntry.createCriteria();
         def transactionEntries = criteria.list {
             eq("inventoryItem", inventoryItem)
-            if (binLocation) {
-                eq("binLocation", binLocation)
-            }
-            else {
-                isNull("binLocation")
-            }
+            eq("binLocation", binLocation)
             transaction {
                 eq("inventory", location.inventory)
                 order("transactionDate", "asc")
@@ -2046,5 +2058,50 @@ class ShipmentService {
 
 		return true
 	}
+
+
+    List getShipmentsWithInvalidStatus() {
+        //log.info "getShipmentsWithInvalidStatus"
+        long startTime = System.currentTimeMillis()
+        def shipments = Shipment.withCriteria {
+            fetchMode 'events', FetchMode.JOIN
+        }
+        //log.info "Query: " + (System.currentTimeMillis() - startTime) + "ms"
+        startTime = System.currentTimeMillis()
+        shipments = shipments.collect { [
+                id: it.id,
+                name: it.name,
+                shipmentNumber: it.shipmentNumber,
+                currentStatus: it?.currentStatus?.name(),
+                currentEvent: it?.currentEvent?.eventDate,
+                calculatedStatus: it?.status?.code?.name(),
+                calculatedEvent: it?.mostRecentEvent?.eventDate
+        ]
+        }
+        //log.info "Convert: " + (System.currentTimeMillis() - startTime) + "ms"
+        shipments = shipments.findAll {
+            it.calculatedStatus != it.currentStatus || it.calculatedEvent != it.currentEvent
+        }
+        startTime = System.currentTimeMillis()
+        //log.info "Filter: " + (System.currentTimeMillis() - startTime) + "ms"
+        return shipments
+    }
+
+
+    Integer fixShipmentsWithInvalidStatus() {
+        Integer count = 0
+        def shipments = shipmentsWithInvalidStatus
+        shipments.each {
+            Shipment shipment = Shipment.load(it.id)
+            shipment.version++
+            if (shipment.save(flush:true)) {
+                count++
+            }
+            else {
+                log.info "Shipment ${shipment.shipmentNumber}: ${shipment.errors}"
+            }
+        }
+        return count
+    }
 
 }

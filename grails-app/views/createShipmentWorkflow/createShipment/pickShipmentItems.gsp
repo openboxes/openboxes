@@ -7,10 +7,10 @@
          <style>
          	.top-border { border-top: 2px solid lightgrey; }
          	.right-border { border-right: 2px solid lightgrey; }
-             .active { background-color: #b2d1ff;  }
+             .active { background-color: #f3f8fc;  }
              .active td { color: #666; }
              .same-lot-number { font-weight: bold }
-             .different-lot-number { color: #666; }
+             .different-lot-number { color: #000; }
              .different-product { border-top: 3px solid lightgrey; }
              .body { min-height: 800px; }
          </style>
@@ -80,7 +80,6 @@
                                         <g:set var="binLocations" value="${quantityMap ? quantityMap[shipmentItem?.inventoryItem?.product] : []}"/>
                                         <g:set var="binLocationSelected" value="${binLocations.findAll{it.binLocation == shipmentItem.binLocation && it.inventoryItem==shipmentItem?.inventoryItem}}"/>
 
-
                                         <g:if test="${binLocations}">
                                             <g:set var="totalQtyByProduct" value="${binLocations.sum { it.quantity }}"/>
                                         </g:if>
@@ -101,6 +100,9 @@
                                             class="clickable-row ${isActive?'active':''} ${status % 2 ? 'even' : 'odd' } ${!isSameAsPreviousContainer ? 'top-border':'' } ${!isSameAsPreviousProduct ? 'different-product':'' }">
 
                                             <td class="top right-border">
+
+
+                                                ${shipmentItem?.id}
                                                 <a name="picklist-item-${shipmentItem?.id}"></a>
                                                 <g:if test="${!isSameAsPreviousContainer }">
                                                     <g:if test="${shipmentItem?.container}">
@@ -164,8 +166,13 @@
                                                 <g:submitButton name="autoPickShipmentItems" value="${g.message(code:'shipping.autoPickItems.label')}" class="button"></g:submitButton>
                                             --%>
 
+                                                <button name="_eventId_clearPicklist" class="button">
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_remove.png')}" />&nbsp;
+                                                <warehouse:message code="shipping.clearPicklist.label" default="Clear picklist"/>
+                                                </button>
+
                                                 <button name="_eventId_validatePicklist" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" alt="Previous Item"/>&nbsp;
+                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" />&nbsp;
                                                     <warehouse:message code="shipping.validatePicklist.label" default="Validate picklist"/>
                                                 </button>
 

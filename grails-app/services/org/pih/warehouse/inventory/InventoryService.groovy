@@ -1392,8 +1392,8 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    List getQuantityByBinLocation(List<TransactionEntry> entries) {
-        def startTime = System.currentTimeMillis()
+    List getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
+
         def binLocations = []
 
         def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
@@ -1405,26 +1405,45 @@ class InventoryService implements ApplicationContextAware {
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
                     def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber?:"") + ", Qty: " + quantity
-                    binLocations << [
-                            id: binLocation?.id,
-                            status: status(quantity),
-                            value: value,
-                            category: product.category,
-                            genericProduct: product.genericProduct,
-                            product: product,
-                            inventoryItem: inventoryItem,
-                            binLocation: binLocation,
-                            quantity: quantity
-                    ]
+
+                    // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
+                    if (quantity != 0 || includeOutOfStock) {
+                        binLocations << [
+                                id            : binLocation?.id,
+                                status        : status(quantity),
+                                value         : value,
+                                category      : product.category,
+                                genericProduct: product.genericProduct,
+                                product       : product,
+                                inventoryItem : inventoryItem,
+                                binLocation   : binLocation,
+                                quantity      : quantity
+                        ]
+                    }
                 }
             }
 
         }
+
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { a,b -> a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name }
+        binLocations = binLocations.sort { a,b ->
+            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
+        }
 
         return binLocations
     }
+
+
+    /**
+     * Get quantity by bin location given a list transaction entries.
+     *
+     * @param transaction entries used to calculate bin quantities
+     * @return all bin locations including out of stock items
+     */
+    List getQuantityByBinLocation(List<TransactionEntry> entries) {
+        return getQuantityByBinLocation(entries, false)
+    }
+
 
 
     def getQuantityByProductGroup(Location location) {
@@ -1763,8 +1782,10 @@ class InventoryService implements ApplicationContextAware {
 		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
 		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
 
-		// create the quantity map for this product
+		// Used in the show lot numbers tab
 		cmd.quantityByInventoryItemMap = getQuantityByInventoryItemMap(cmd.transactionEntryList)
+
+        // Used in the current stock tab
         cmd.quantityByBinLocation = getQuantityByBinLocation(cmd.transactionEntryList)
 
 		return cmd
@@ -4359,7 +4380,7 @@ class InventoryService implements ApplicationContextAware {
         Map binLocationReport = [:]
 
         final List transactionEntries = getTransactionEntriesWithAssociations(location)
-        List binLocations = getQuantityByBinLocation(transactionEntries)
+        List binLocations = getQuantityByBinLocation(transactionEntries, true)
 
         binLocationReport.data = binLocations
         binLocationReport.summary = getBinLocationSummary(binLocations)
