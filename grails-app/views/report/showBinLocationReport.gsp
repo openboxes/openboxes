@@ -32,7 +32,7 @@
                             <div class="filter-list-item">
                                 <label>${warehouse.message(code:'location.label')}</label>
                                 <g:selectLocation id="location" name="location.id" class="chzn-select-deselect"
-                                                  value="${params?.location?.id}" noSelection="['':'']" data-placeholder=" " />
+                                                  value="${params?.location?.id?:session?.warehouse?.id}" noSelection="['':'']" data-placeholder=" " />
                             </div>
                             <div class="filter-list-item">
                                 <label>${warehouse.message(code:'default.status.label')}</label>
