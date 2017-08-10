@@ -107,6 +107,7 @@
 									<td class="middle center">
 										<g:textField id="comment-${status }" class="text"
 													  name="recordInventoryRows[${status }].comment"
+                                                      placeholder="${g.message(code:'transactionEntry.comment.message')}"
 													  value="${recordInventoryRow?.comment }" style="width:100%;"/>
 									</td>
                                     <td class="middle left">
@@ -398,6 +399,7 @@
 
 <script id="newRowTemplate" type="x-jquery-tmpl">
 <tr id="row-{{= getIndex()}}" class="{{= getClass()}}">
+
 	<td>
 		<g:selectBinLocation  id="binLocation-{{= getIndex()}}" class="binLocation" name="recordInventoryRows[{{= getIndex()}}].binLocation.id"
                              value="{{= BinLocation}}" noSelection="['':'']"/>
@@ -437,7 +439,9 @@
 			{{= UnitOfMeasure}}
 	</td>
 	<td class="center middle">
-	    <g:textField id="comment-{{= getIndex()}}" class="text" name="recordInventoryRows[{{= getIndex()}}].comment" style="width:100%;" value="" />
+	    <g:textField id="comment-{{= getIndex()}}" class="text"
+                     placeholder="${g.message(code:'transactionEntry.comment.message')}"
+                     name="recordInventoryRows[{{= getIndex()}}].comment" style="width:100%;" value="" />
 	</td>
 	<td class="center">
 		<button onclick="removeRow({{= getIndex()}});" class="button icon trash" tabIndex="-1">
