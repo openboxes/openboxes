@@ -1,6 +1,6 @@
 <div class="box">
     <h2>
-        <warehouse:message code="inventory.binLocationSummary.label" default="Bin Location Summary"/>
+        <warehouse:message code="dashboard.binLocationSummary.label" />
         <img id="binLocationSummary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
     </h2>
     <div class="widget-content" style="padding:0; margin:0">

@@ -1,5 +1,5 @@
 <div class="box">
-	<h2><warehouse:message code="inventory.expiring.label" default="Expiring inventory"/></h2>
+	<h2><warehouse:message code="dashboard.expirationSummary.label" /></h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="alertSummary">	
 

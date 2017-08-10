@@ -27,8 +27,7 @@
             </div>
         </div>
 
-        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast moving items (last 30 days)"/>
-        <span class="beta">Beta</span>
+        <warehouse:message code="dashboard.fastMovers.label" default="Fast Movers"/>
         <%--
         <span class="action-menu">
             <button class="action-btn">
@@ -76,11 +75,8 @@
             "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getFastMovers",
             "fnServerParams": function ( data ) {
-                //console.log("server data " + data);
-                //var locationId = $("#locationId").val();
-                //var date = $("#date").val();
-                //data.push({ name: "location.id", value: locationId });
-                //data.push({ name: "date", value: date })
+                var locationId = $("#currentLocationId").val();
+                data.push({ name: "location.id", value: locationId });
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {

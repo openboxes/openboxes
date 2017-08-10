@@ -1,7 +1,6 @@
 <div class="box">
     <h2>
-        <warehouse:message code="inventory.genericProductSummary.label" default="Inventory status by generic product"/>
-        <span class="beta">Beta</span>
+        <g:message code="dashboard.genericProductSummary.label"/>
     </h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="alertSummary">

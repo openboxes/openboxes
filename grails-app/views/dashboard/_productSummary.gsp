@@ -1,5 +1,5 @@
 <div class="box">
-    <h2><warehouse:message code="inventory.productSummary.label" default="Inventory status by product"/></h2>
+    <h2><warehouse:message code="dashboard.productSummary.label" /></h2>
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="alertSummary" class="list">
 
