@@ -82,6 +82,7 @@
                                         <th><g:message code="default.lot.label" default="Lot"/></th>
                                         <th><g:message code="default.exp.label" default="Exp"/></th>
                                         <th><g:message code="default.qty.label" default="Qty"/></th>
+                                        <th></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -116,6 +117,16 @@
                                                 <td class="middle">
                                                     ${entry?.quantity}
                                                 </td>
+                                                <td>
+                                                    <g:if test="${sufficientQuantity}">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+                                                            title="${g.message(code:'default.quantitySufficient.label', default: 'Quantity Sufficient')}"/>
+                                                    </g:if>
+                                                    <g:else>
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
+                                                             title="${g.message(code:'default.quantitySufficient.label', default: 'Quantity Insufficient')}"/>
+                                                    </g:else>
+                                                </td>
                                             </tr>
                                         </g:each>
                                     </tbody>
@@ -140,11 +151,20 @@
                         ${shipmentItem?.product?.unitOfMeasure}
                     </td>
                 </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label><g:message code="default.quantityNeeded.label" default="Quantity Needed"/></label>
+                    </td>
+                    <td class="value">
+                        ${shipmentItem?.quantity}
+                        ${shipmentItem?.product?.unitOfMeasure}
+                    </td>
+                </tr>
 
 
                 <tr class="prop">
                     <td class="name">
-                        <label><g:message code="default.quantity.label"/></label>
+                        <label><g:message code="default.quantityPicked.label" default="Quantity Picked"/></label>
                     </td>
                     <td class="value">
                         <g:textField id="quantity" name="quantity" value="${shipmentItem?.quantity}" class="text large" style="width:100%"/>

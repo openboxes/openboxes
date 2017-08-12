@@ -873,12 +873,12 @@ class ShipmentService {
         List transactionEntries = getTransactionEntries(location, binLocation, inventoryItem, binLocationRequired)
         List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
 
+        // Bin location validation is required when picking to ensure that we don't
+        // pick from the Default bin if it doesn't have any stock
         if (binLocationRequired) {
             binLocations = binLocations.findAll { it.binLocation == binLocation }
         }
-        binLocations.each {
-            log.info " - bin:${it?.binLocation?.name} qty:${it?.quantity}"
-        }
+
         def quantityOnHand = binLocations.sum { it.quantity }
         quantityOnHand = quantityOnHand?:0
         return quantityOnHand
