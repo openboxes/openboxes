@@ -628,13 +628,19 @@ class JsonController {
 
                             String description = (it?.lotNumber ?: "${g.message(code:'default.noLotNumber.label')}") +
                                     " - ${g.message(code:'default.expires.label')} " + (it?.expirationDate?.format("MMM yyyy")?:"${g.message(code:'default.never.label')}") +
-                                    " - " + (quantity + " " + (it?.product?.unitOfMeasure ?: "EA"))
+                                    " - ${quantity} ${it?.product?.unitOfMeasure ?: 'EA'}"
+
+                            String label = "${localizedName} x ${quantity?:0} ${it?.product?.unitOfMeasure?:'EA'}"
+
+                            String expirationDate = it?.expirationDate ?
+                                    g.formatDate(date: it.expirationDate, format: "MMM yyyy") :
+                                    g.message(code:'default.never.label')
 
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
                                     imageUrl      : "${resource(dir: 'images', file: 'default-product.png')}",
-                                    label         : localizedName,
+                                    label         : label,
                                     description   : description,
                                     valueText     : it.lotNumber,
                                     lotNumber     : it.lotNumber,
@@ -642,7 +648,7 @@ class JsonController {
                                     productId     : it.product.id,
                                     productName   : localizedName,
                                     quantity      : quantity,
-                                    expirationDate: it.expirationDate
+                                    expirationDate: expirationDate
                             ]
                         }
                     }

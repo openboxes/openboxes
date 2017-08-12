@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import com.sun.xml.internal.ws.developer.MemberSubmissionAddressing.Validation
 import grails.validation.ValidationException
 import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -27,6 +28,9 @@ import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 
 import javax.mail.internet.InternetAddress
 
@@ -776,11 +780,24 @@ class ShipmentService {
 	}
 
 	boolean validatePicklist(Shipment shipment) {
-		log.info "Validate picked items "
-		shipment.shipmentItems.each { shipmentItem ->
-			validateShipmentItem(shipmentItem)
+        Errors errors
+        shipment.shipmentItems.each { shipmentItem ->
+            // FIXME this seems a little expensive so we should rework validateShipmentItem to not throw an exception
+            try {
+                validateShipmentItem(shipmentItem, true)
+            } catch (ValidationException e) {
+                log.warn("Validation error " + e.message)
+                if (!errors) {
+                    errors = new BeanPropertyBindingResult(shipment, e.errors.objectName);
+                }
+                errors.addAllErrors(e.errors)
+            }
 		}
-		return true
+
+        if (errors?.hasErrors())
+            throw new ValidationException("Shipment is invalid", errors)
+
+        return true
 	}
 
 
@@ -793,18 +810,26 @@ class ShipmentService {
 
     }
 
+	/**
+	 *
+	 * @param shipmentItem
+	 * @return
+	 */
+	boolean validateShipmentItem(ShipmentItem shipmentItem) {
+        boolean binLocationRequired = (shipmentItem.binLocation?:false)
+        return validateShipmentItem(shipmentItem, binLocationRequired)
+	}
 
     /**
      * Validate the shipment item when it's being added to the shipment.
      *
-     * @param shipmentItem
+     * @param shipmentItem shipment item to validate
+	 * @param binLocationRequired if shipment item has a bin location we validate quantity only against that bin
      * @return
      */
-    boolean validateShipmentItem(ShipmentItem shipmentItem) {
+    boolean validateShipmentItem(ShipmentItem shipmentItem, boolean binLocationRequired) {
         def origin = Location.get(shipmentItem?.shipment?.origin?.id);
-        log.info("Validating shipment item at " + origin?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
-
-        log.info "location = id:${origin.id} name:${origin.name} code:${origin.locationNumber} local:${origin.local}"
+        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequest=${binLocationRequired}")
 
         // Location must be locally managed and
         if (origin.requiresOutboundQuantityValidation()) {
@@ -813,13 +838,21 @@ class ShipmentService {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
-            //Check whether there's any stock in the bin location for the given inventory item
-            def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            // Check whether there's any stock in the bin location for the given inventory item
+            def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
 
-            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
+            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity +
+                    "] vs onhand quantity [" + quantityOnHand + "]");
             if (shipmentItem.quantity > quantityOnHand) {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
-                        [shipmentItem.quantity, quantityOnHand, shipmentItem?.product?.productCode, origin.name].toArray(),
+                        [
+                            shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                            shipmentItem?.product?.productCode,
+                            shipmentItem?.inventoryItem?.lotNumber,
+                            origin.name,
+                            shipmentItem?.binLocation?.name?:'Default'
+                        ].toArray(),
                         "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
                 //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
@@ -836,10 +869,19 @@ class ShipmentService {
      * @param inventoryItem
      * @return
      */
-    Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem) {
-        List transactionEntries = getTransactionEntries(location, binLocation, inventoryItem)
+    Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
+        List transactionEntries = getTransactionEntries(location, binLocation, inventoryItem, binLocationRequired)
         List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
-        return binLocations.sum { it.quantity }
+
+        if (binLocationRequired) {
+            binLocations = binLocations.findAll { it.binLocation == binLocation }
+        }
+        binLocations.each {
+            log.info " - bin:${it?.binLocation?.name} qty:${it?.quantity}"
+        }
+        def quantityOnHand = binLocations.sum { it.quantity }
+        quantityOnHand = quantityOnHand?:0
+        return quantityOnHand
     }
 
 
@@ -849,12 +891,19 @@ class ShipmentService {
      * @param inventoryInstance
      * @return
      */
-    List getTransactionEntries(Location location, Location binLocation, InventoryItem inventoryItem) {
-        log.info "Location ${location}, binLocation ${binLocation}, inventoryItem ${inventoryItem}"
+    List getTransactionEntries(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
+        log.info "Get transaction entries by location=${location}, binLocation=${binLocation}, inventoryItem=${inventoryItem}"
         def criteria = TransactionEntry.createCriteria();
         def transactionEntries = criteria.list {
             eq("inventoryItem", inventoryItem)
-            eq("binLocation", binLocation)
+//            if (binLocationRequired) {
+//                if (binLocation) {
+//                    eq("binLocation", binLocation)
+//                }
+//                else {
+//                    isNull("binLocation")
+//                }
+//            }
             transaction {
                 eq("inventory", location.inventory)
                 order("transactionDate", "asc")

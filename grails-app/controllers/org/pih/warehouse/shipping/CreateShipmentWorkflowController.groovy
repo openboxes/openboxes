@@ -202,15 +202,16 @@ class CreateShipmentWorkflowController {
     	
     	enterContainerDetails {
 
-    		on("back") {
+            on("back") {
     			// TODO: figure out why this isn't working
     			// flow.shipmentInstance.properties = params
     			
     			// don't need to do validation if just going back
     		}.to("enterTrackingDetails")
     		
-			on("enterContainerDetails") { 
-				log.info ("Enter container details " + params)
+			on("enterContainerDetails") {
+
+                log.info ("Enter container details " + params)
 				def selectedContainer = Container.get(params?.containerId)
 				if (params.direction) { 
 					def containerList = new ArrayList(flow.shipmentInstance.containers)
@@ -428,10 +429,10 @@ class CreateShipmentWorkflowController {
                 } catch (ValidationException e) {
                     flow.shipmentInstance.errors = e.errors
                     return error()
-				} catch (ShipmentItemException e) {
-					[itemInstance: e.shipmentItem]
 				} catch (Exception e) {
-					flash.message = e.message
+					log.warn("Error while adding shipment item to shipment: " + e.message, e)
+					flow.shipmentInstance.errors.reject(e.message)
+					return error()
 				}
 
 			}.to("enterContainerDetails")
@@ -582,10 +583,9 @@ class CreateShipmentWorkflowController {
     	}
 
 		pickShipmentItems {
-
 			action {
                 log.info "Pick list items"
-
+                flow?.shipmentInstance?.refresh()
 			}
 			on("error").to "showPicklistItems"
 			on(Exception).to "showPicklistItems"
@@ -602,14 +602,16 @@ class CreateShipmentWorkflowController {
 			on("next"){
 
                 try {
-                    shipmentService.validatePicklist(flow?.shipmentInstance)
+                    if(shipmentService.validatePicklist(flow?.shipmentInstance)) {
+                        flash.message = "${g.message(code: 'shipping.picklistValidated.message')}"
+                    }
                 } catch (ValidationException e) {
-                    log.error("error: " + e.message, e);
+                    log.warn("Validation error: " + e.message, e);
                     flow.shipmentInstance.errors = e.errors
                     error()
 
                 } catch (Exception e) {
-                    log.error("error: " + e.message, e);
+                    log.warn("Unexpected error: " + e.message, e);
                     flow.shipmentInstance.errors.reject(e.message)
                     error()
                 }
@@ -651,16 +653,12 @@ class CreateShipmentWorkflowController {
             on("validatePicklist") {
 				log.info "Validate picklist " + params
 				try {
-					if (shipmentService.validatePicklist(flow?.shipmentInstance)) {
-						log.info ("picklist items are all valid")
-                        flash.message = "All picklist items are valid"
-					}
-
+                    if(shipmentService.validatePicklist(flow?.shipmentInstance)) {
+                        flash.message = "${g.message(code: 'shipping.picklistValidated.message')}"
+                    }
 				} catch (ValidationException e) {
                     log.error("error: " + e.message, e);
-
 					flow.shipmentInstance.errors = e.errors
-
 				} catch (Exception e) {
 					log.error("error: " + e.message, e);
                     flow.shipmentInstance.errors.reject(e.message)
@@ -669,7 +667,7 @@ class CreateShipmentWorkflowController {
             }.to("pickShipmentItems")
 
 
-			on("autoPickShipmentItems") {
+            on("autoPickShipmentItems") {
 				try {
 					log.info "AutoPick: " + params
 
@@ -715,22 +713,12 @@ class CreateShipmentWorkflowController {
 			}.to("pickShipmentItems")
 
 
-			on("pickShipmentItem2") {
-				log.info "Pick shipment item " + params
-				def shipmentItem = ShipmentItem.load(params?.shipmentItem?.id)
-                Location location = Location.load(session.warehouse.id)
-                List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItem.product)
-                log.info "binLocations: " + binLocations
-				[shipmentItemSelected:shipmentItem, binLocationsSelected:binLocations]
-
-			}.to("pickShipmentItems")
-
-
             on("pickShipmentItem") {
                 log.info "Save shipment item pick " + params
                 ShipmentItem shipmentItemInstance
                 try {
 
+                    //flow?.shipmentInstance?.refresh()
                     //shipmentItemInstance = flow.shipmentInstance.shipmentItems.find { it.id = params?.shipmentItem?.id}
                     shipmentItemInstance = ShipmentItem.get(params.shipmentItem.id)
 
@@ -780,6 +768,8 @@ class CreateShipmentWorkflowController {
                     } else {
                         flash.message = "Failed to edit pick list due to an unknown error."
                     }
+
+                    //flow?.shipmentInstance?.refresh()
 
                     // Get the next shipment item
                     ShipmentItem nextShipmentItem = shipmentItemInstance.shipment.getNextShipmentItem(shipmentItemInstance?.id)

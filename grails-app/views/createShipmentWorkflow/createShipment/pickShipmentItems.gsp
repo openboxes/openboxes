@@ -9,8 +9,7 @@
          	.right-border { border-right: 2px solid lightgrey; }
              .active { background-color: #f3f8fc;  }
              .active td { color: #666; }
-             .same-lot-number { font-weight: bold }
-             .different-lot-number { color: #000; }
+             .same-lot-number { font-weight: bolder; color: #000 }
              .different-product { border-top: 3px solid lightgrey; }
              .body { min-height: 800px; }
          </style>
@@ -60,7 +59,6 @@
                             </h2>
 
                             <g:if test="${session.warehouse == shipmentInstance?.origin}">
-
                                 <table id="picklistItemTable" class="table">
                                     <thead>
                                         <tr>
@@ -75,125 +73,148 @@
                                     </thead>
                                     <g:set var="previousContainer"/>
                                     <g:set var="previousProduct"/>
+
                                     <tbody>
-                                    <g:each var="shipmentItem" in="${shipmentItemsSorted}" status="status">
-                                        <g:set var="binLocations" value="${quantityMap ? quantityMap[shipmentItem?.inventoryItem?.product] : []}"/>
-                                        <g:set var="binLocationSelected" value="${binLocations.findAll{it.binLocation == shipmentItem.binLocation && it.inventoryItem==shipmentItem?.inventoryItem}}"/>
+                                        <g:each var="shipmentItem" in="${shipmentItemsSorted}" status="status">
+                                            <g:set var="errors" value="${null}"/>
+                                            <g:if test="${errorsMap}">
+                                                <g:set var="errors" value="${errorsMap[shipmentItem?.id]}"/>
+                                            </g:if>
+                                            <g:set var="binLocations" value="${quantityMap ? quantityMap[shipmentItem?.inventoryItem?.product] : []}"/>
+                                            <g:set var="binLocationSelected" value="${binLocations.findAll{it.binLocation == shipmentItem.binLocation && it.inventoryItem==shipmentItem?.inventoryItem}}"/>
 
-                                        <g:if test="${binLocations}">
-                                            <g:set var="totalQtyByProduct" value="${binLocations.sum { it.quantity }}"/>
-                                        </g:if>
-                                        <g:set var="totalQtyByBin" value="${binLocationSelected.sum { it.quantity }}"/>
-                                        <g:set var="availableInBin" value="${totalQtyByBin >= shipmentItem?.quantity}"/>
-                                        <g:set var="availableInProduct" value="${totalQtyByProduct >= shipmentItem?.quantity}"/>
+                                            <g:if test="${binLocations}">
+                                                <g:set var="totalQtyByProduct" value="${binLocations.sum { it.quantity }}"/>
+                                            </g:if>
+                                            <g:set var="totalQtyByBin" value="${binLocationSelected.sum { it.quantity }}"/>
+                                            <g:set var="availableInBin" value="${totalQtyByBin >= shipmentItem?.quantity}"/>
+                                            <g:set var="availableInProduct" value="${totalQtyByProduct >= shipmentItem?.quantity}"/>
 
-                                        <g:set var="isSameAsPreviousContainer" value="${shipmentItem?.container == previousContainer}"/>
-                                        <g:set var="isSameAsPreviousProduct" value="${shipmentItem?.product == previousProduct}"/>
-                                        <g:set var="isActive" value="${shipmentItem == shipmentItemSelected}"/>
+                                            <g:set var="isSameAsPreviousContainer" value="${shipmentItem?.container == previousContainer}"/>
+                                            <g:set var="isSameAsPreviousProduct" value="${shipmentItem?.product == previousProduct}"/>
+                                            <g:set var="isActive" value="${shipmentItem == shipmentItemSelected}"/>
 
-                                        <%--
-                                        <g:set var="href" value="${g.createLink(action:'createShipment', event:'pickShipmentItem2', id:shipmentInstance?.id, params: ['shipmentItem.id':shipmentItem?.id])}"/>
-                                        --%>
-                                        <g:set var="href" value="${g.createLink(controller: 'shipmentItem', action:'pick', id:shipmentItem?.id)}"/>
+                                            <g:set var="href" value="${g.createLink(controller: 'shipmentItem', action:'pick', id:shipmentItem?.id)}"/>
 
-                                        <tr id="picklist-item-${shipmentItem?.id}" data-href="${href}" data-execution="${params.execution}"
-                                            class="clickable-row ${isActive?'active':''} ${status % 2 ? 'even' : 'odd' } ${!isSameAsPreviousContainer ? 'top-border':'' } ${!isSameAsPreviousProduct ? 'different-product':'' }">
-
-                                            <td class="top right-border">
+                                            <tr id="picklist-item-${shipmentItem?.id}" data-href="${href}" data-execution="${params.execution}"
+                                                class="clickable-row ${isActive?'active':''} ${status % 2 ? 'even' : 'odd' } ${!isSameAsPreviousContainer ? 'top-border':'' } ${!isSameAsPreviousProduct ? 'different-product':'' }">
 
 
-                                                ${shipmentItem?.id}
-                                                <a name="picklist-item-${shipmentItem?.id}"></a>
-                                                <g:if test="${!isSameAsPreviousContainer }">
-                                                    <g:if test="${shipmentItem?.container}">
-                                                        ${shipmentItem?.container?.name }
+                                                <td class="top right-border">
+                                                    <a name="picklist-item-${shipmentItem?.id}"></a>
+                                                    <g:if test="${!isSameAsPreviousContainer }">
+                                                        <g:if test="${shipmentItem?.container}">
+                                                            ${shipmentItem?.container?.name }
+                                                        </g:if>
+                                                        <g:else>
+                                                            <g:message code="default.label"/>
+                                                        </g:else>
+                                                    </g:if>
+
+                                                </td>
+                                                <td class="top">
+
+                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
+                                                        ${shipmentItem?.inventoryItem?.product?.productCode}
+                                                        <format:product product="${shipmentItem?.inventoryItem?.product}"/>
+                                                    </g:link>
+                                                </td>
+                                                <td class="top">
+                                                    <span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>
+                                                </td>
+                                                <td class="top">
+                                                    <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
+                                                        <span class="expirationDate">
+                                                            <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="d MMMMM yyyy"/>
+                                                        </span>
                                                     </g:if>
                                                     <g:else>
-                                                        <g:message code="default.label"/>
+                                                        <span class="fade">
+                                                            ${warehouse.message(code: 'default.never.label')}
+                                                        </span>
                                                     </g:else>
-                                                </g:if>
-                                            </td>
-                                            <td class="top">
-                                                <g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
-                                                    ${shipmentItem?.inventoryItem?.product?.productCode}
-                                                    <format:product product="${shipmentItem?.inventoryItem?.product}"/>
-                                                </g:link>
-                                            </td>
-                                            <td class="top">
-                                                <span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>
-                                            </td>
-                                            <td class="top">
-                                                <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
-                                                    <span class="expirationDate">
-                                                        <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="d MMMMM yyyy"/>
-                                                    </span>
-                                                </g:if>
-                                                <g:else>
-                                                    <span class="fade">
-                                                        ${warehouse.message(code: 'default.never.label')}
-                                                    </span>
-                                                </g:else>
-                                            </td>
-                                            <td class="top">
-                                                <div class="binLocation">
-                                                    <g:if test="${shipmentItem?.binLocation}">
-                                                        ${shipmentItem?.binLocation?.name}
-                                                    </g:if>
-                                                    <g:else>
-                                                        ${g.message(code: 'default.label')}
-                                                    </g:else>
-                                                </div>
-                                            </td>
-                                            <td class="top center">
-                                                ${shipmentItem?.quantity }
-                                            </td>
-                                            <td class="top center">
-                                                ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
-                                            </td>
+                                                </td>
+                                                <td class="top">
+                                                    <div class="binLocation">
+                                                        <g:if test="${shipmentItem?.binLocation}">
+                                                            ${shipmentItem?.binLocation?.name}
+                                                        </g:if>
+                                                        <g:else>
+                                                            ${g.message(code: 'default.label')}
+                                                        </g:else>
+                                                    </div>
+                                                </td>
+                                                <td class="top center">
 
-                                        </tr>
-                                        <g:set var="previousContainer" value="${shipmentItem?.container }"/>
-                                        <g:set var="previousProduct" value="${shipmentItem?.product }"/>
-                                    </g:each>
+                                                    ${shipmentItem?.quantity }
+
+                                                    <g:if test="${errors}">
+                                                        <span title="${errors}">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'exclamation.png')}" />
+                                                        </span>
+                                                    </g:if>
+                                                </td>
+                                                <td class="top center">
+                                                    ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+                                                </td>
+
+                                            </tr>
+                                            <g:set var="previousContainer" value="${shipmentItem?.container }"/>
+                                            <g:set var="previousProduct" value="${shipmentItem?.product }"/>
+                                        </g:each>
                                     </tbody>
                                     <tfoot>
+                                        <g:hasErrors bean="${shipmentInstance}" field="quantity">
+                                            <tr>
+                                                <td colspan="12">
+                                                    <div class="errors">
+                                                        <g:renderErrors bean="${shipmentInstance}" as="list" />
+                                                    </div>
 
-                                    <tr>
-                                        <td colspan="11" class="right">
-                                            <div class="button-container">
-
-                                            <%--
+                                                </td>
+                                            </tr>
+                                        </g:hasErrors>
+                                        <tr>
+                                            <td colspan="11" class="right">
+                                                <div class="button-container">
+                                                <%--
                                                 <g:submitButton name="autoPickShipmentItems" value="${g.message(code:'shipping.autoPickItems.label')}" class="button"></g:submitButton>
-                                            --%>
+                                                --%>
+                                                    ${hasErrors(bean: shipmentInstance, field: 'quantity')}
+                                                    <g:if test="${hasErrors(bean: shipmentInstance, field: 'quantity')}">
+                                                        <g:eachError bean="${shipmentInstance}" field="quantity" var="error">
+                                                            ${error}
+                                                        </g:eachError>
+                                                    </g:if>
 
-                                                <button name="_eventId_clearPicklist" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_remove.png')}" />&nbsp;
-                                                <warehouse:message code="shipping.clearPicklist.label" default="Clear picklist"/>
-                                                </button>
+                                                    <g:isSuperuser>
+                                                        <button name="_eventId_clearPicklist" class="button">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_remove.png')}" />&nbsp;
+                                                            <warehouse:message code="shipping.clearPicklist.label" default="Clear picklist"/>
+                                                        </button>
+                                                    </g:isSuperuser>
 
-                                                <button name="_eventId_validatePicklist" class="button">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" />&nbsp;
-                                                    <warehouse:message code="shipping.validatePicklist.label" default="Validate picklist"/>
-                                                </button>
+                                                    <button name="_eventId_validatePicklist" class="button">
+                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" />&nbsp;
+                                                        <warehouse:message code="shipping.validatePicklist.label" default="Validate picklist"/>
+                                                    </button>
 
-                                                <div class="button-group">
-
-
-                                                    <a href="#" class="previous-picklist-item button">
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_up.png')}" alt="Previous Item"/>&nbsp;
+                                                    <div class="button-group">
+                                                        <a href="#" class="previous-picklist-item button">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'resultset_previous.png')}" alt="Previous Item"/>&nbsp;
                                                         <g:message code="default.button.back.label" default="Back"/>
-                                                    </a>
-                                                    <a href="#" class="next-picklist-item button">
-                                                        <g:message code="default.button.next.label" default="Next"/>
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" alt="Next Item"/>&nbsp;
-                                                    </a>
+                                                        </a>
+                                                        <a href="#" class="next-picklist-item button">
+                                                            <g:message code="default.button.next.label" default="Next"/>
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'resultset_next.png')}" alt="Next Item"/>&nbsp;
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                        </td>
-                                    </tr>
+
+                                            </td>
+                                        </tr>
                                     </tfoot>
-
                                 </table>
                             </g:if>
                             <g:else>
@@ -216,19 +237,22 @@
 
                     <div id="pickShipmentItemBox" style="position: absolute; width: 30%;">
                         <div class="box">
+                            <h2>
+                                <img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}"
+                                     title="${g.message(code:'picklist.picked.label')}">
+                                <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/>
+                            </h2>
 
-                        <h2>
-                            <img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}"
-                                 title="${g.message(code:'picklist.picked.label')}">
-                            <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/></h2>
-
-                        <div class="empty fade center">
-                            <g:message code="shipping.pickShipmentItems.message" default="Select an item from the picklist"/>
-                            <button class="button next-picklist-item">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
-                                <g:message code="default.button.next.label" default="Next"/>
-                            </button>
+                            <div class="empty fade center">
+                                <g:message code="shipping.pickShipmentItems.message" default="Select an item from the picklist"/>
+                                <button class="button next-picklist-item">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
+                                    <g:message code="default.button.next.label" default="Next"/>
+                                </button>
+                            </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>
