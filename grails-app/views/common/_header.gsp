@@ -14,7 +14,7 @@
 		    	<div id="loggedIn">
 					<ul>
                         <li>
-                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
+                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms" size="600"
                                             jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
                         </li>
 					    <g:if test="${session.user}">

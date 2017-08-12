@@ -48,10 +48,20 @@
             select: function(event, ui) {
                 console.log("selected: ", ui.item);
                 if (ui.item) {
+                    // Set the id of the item selected
                     $("#${attrs.id}-id").val(ui.item.id).trigger("change");
+
+                    // Set a hidden value that is passed back to the server
                     $(this).prev().val(ui.item.label).trigger("change");
-                    $(this).val(ui.item.label);
+
+                    // Sets the text value displayed to the user
+                    $(this).val(ui.item.label).trigger("change");
                 }
+
+                // Set focus on the next field
+                $(this).focusNextInputField();
+
+                // Trigger the select
                 $("#${attrs.id}-suggest").trigger("selected");
                 return false;
             }
@@ -63,4 +73,16 @@
             return $( "<li></li>" ).data( "item.autocomplete", item).append("<a>" + text + "</a>").appendTo( ul );
         };
     });
+
+
+    $.fn.focusNextInputField = function() {
+        return this.each(function() {
+            var fields = $(this).parents('form:eq(0),body').find('button,input,textarea,select');
+            var index = fields.index( this );
+            if ( index > -1 && ( index + 1 ) < fields.length ) {
+                fields.eq( index + 1 ).focus();
+            }
+            return false;
+        });
+    };
 </script>

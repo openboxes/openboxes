@@ -736,23 +736,10 @@ class InventoryItemController {
 		def product = Product.get( params.id )
 		render warehouse.message(code: 'inventoryItem.productAddedToInventory.message', args: [product.name])
 		//return product as XML		
-	}	
+	}
 	/**
-	 * shipment.name:1, 
-	 * shipment:[name:1, id:1], 
-	 * inventory.id:1, 
-	 * inventory:[id:1], 
-	 * recipient.name:3, 
-	 * recipient:[name:3, id:3], 
-	 * product.id:8, product:[id:8], 
-	 * quantity:1, 
-	 * recipient.id:3, addItem:, 
-	 * shipment.id:1, 
-	 * inventoryItem.id:1, 
-	 * inventoryItem:[id:1], 
-	 * action:addToShipment, 
-	 * controller:inventoryItem]
-	*/
+	 * Add a shipment item to a shipment
+	 */
 	def addToShipment = {
 		log.info "params" + params
 		def shipmentInstance = null;
@@ -784,6 +771,7 @@ class InventoryItemController {
 			container: containerInstance);
 		
 		try {
+
 			shipmentService.validateShipmentItem(shipmentItem)
 					
 			if(shipmentItem.hasErrors() || !shipmentItem.validate()) {
