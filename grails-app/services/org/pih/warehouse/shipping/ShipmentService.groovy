@@ -498,7 +498,7 @@ class ShipmentService {
 		if (!shipment.shipmentNumber) { 
 			shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
 		}
-		shipment.save(flush:true, failOnError:true)
+		shipment.save()
 	}
 	
 	/**
@@ -1242,7 +1242,7 @@ class ShipmentService {
 
 		// Shipment has errors or it has already shipped or ship date is
 		else {
-			log.error("Failed to send shipment due to errors")
+			log.warn("Failed to send shipment due to errors: " + shipmentInstance?.errors)
 			// TODO: make this a better error message
 			throw new ShipmentException(message: "Failed to send shipment", shipment: shipmentInstance)
 		}

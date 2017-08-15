@@ -226,9 +226,14 @@ class CreateShipmentWorkflowController {
 			}.to("enterContainerDetails")
 
 
-
     		on("next") {
-				shipmentService.saveShipment(flow.shipmentInstance)	
+				try {
+					shipmentService.saveShipment(flow.shipmentInstance)
+				} catch(Exception e) {
+                    log.error("Error saving shipment: " + e.message, e)
+					flow.shipmentInstance.errors.reject("${g.message(code:'default.error.message', args: [e.message])}")
+                    error()
+				}
 			}.to("pickShipmentItems")
 			
 			on("save") {
@@ -427,12 +432,13 @@ class CreateShipmentWorkflowController {
 					flash.message = "Added shipment item"
 
                 } catch (ValidationException e) {
+                    flow.shipmentInstance = Shipment.read(flow?.shipmentInstance?.id)
                     flow.shipmentInstance.errors = e.errors
-                    return error()
+                    error()
 				} catch (Exception e) {
 					log.warn("Error while adding shipment item to shipment: " + e.message, e)
 					flow.shipmentInstance.errors.reject(e.message)
-					return error()
+					error()
 				}
 
 			}.to("enterContainerDetails")
@@ -761,15 +767,11 @@ class CreateShipmentWorkflowController {
 
                     shipmentService.validateShipmentItem(shipmentItemInstance)
 
-
-
                     if (shipmentItemInstance.save(flush:true)) {
                         flash.message = "Successfully picked shipment item. "
                     } else {
                         flash.message = "Failed to edit pick list due to an unknown error."
                     }
-
-                    //flow?.shipmentInstance?.refresh()
 
                     // Get the next shipment item
                     ShipmentItem nextShipmentItem = shipmentItemInstance.shipment.getNextShipmentItem(shipmentItemInstance?.id)
@@ -777,10 +779,7 @@ class CreateShipmentWorkflowController {
 
                 } catch (ValidationException e) {
                     log.error("Failed to edit pick list due to the following error: " + e.message, e)
-                    //flash.message = "Failed to edit pick list due to the following error: " + e.message
-                    //[errors:e.errors]
-                    //def shipmentInstance = Shipment.read(params.id)
-                    flow.shipmentInstance.refresh()
+                    flow.shipmentInstance = Shipment.read(flow?.shipmentInstance?.id)
                     flow.shipmentInstance.errors = e.errors
                     [currentShipmentItemId:shipmentItemInstance?.id]
                     error()

@@ -36,11 +36,6 @@
 </head>
 <body>
 
-<%--
-    Hack used to refresh the shipment containers when sorting (because we're using AJAX)
-    ${shipmentInstance?.refresh() }
---%>
-
 <div class="body">
     <g:if test="${message}">
         <div class="message">${message}</div>
@@ -865,9 +860,10 @@
 </script>
 <script>
     $(document).ready(function() {
-//                $("#inventoryItem-suggest").livequery(function () {
-//                    this.focus();
-//                });
+        $("#inventoryItem-suggest").livequery(function () {
+            console.log($(this));
+            $(this).focus();
+        });
     });
 </script>
 
