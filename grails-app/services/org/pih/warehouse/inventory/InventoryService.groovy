@@ -4267,12 +4267,7 @@ class InventoryService implements ApplicationContextAware {
         def statusMessage = ""
         if (inventoryStatus == InventoryStatus.SUPPORTED  || !inventoryStatus) {
             if (currentQuantity <= 0) {
-                if (maxQuantity == 0 && minQuantity == 0 && reorderQuantity == 0) {
-                    statusMessage = "STOCK_OUT_OBSOLETE"
-                }
-                else {
-                    statusMessage = "STOCK_OUT"
-                }
+                statusMessage = "STOCK_OUT"
             }
             else {
                 if (minQuantity && minQuantity > 0 && currentQuantity <= minQuantity ) {
@@ -4285,13 +4280,8 @@ class InventoryService implements ApplicationContextAware {
                     statusMessage = "OVERSTOCK"
                 }
                 else if (currentQuantity > 0) {
-                    if (maxQuantity == 0 && minQuantity == 0 && reorderQuantity == 0) {
-                        statusMessage = "IN_STOCK_OBSOLETE"
-                    }
-                    else {
-                        statusMessage = "IN_STOCK"
-                    }
-                }
+					statusMessage = "IN_STOCK"
+				}
                 else {
                     statusMessage = "OBSOLETE"
                 }

@@ -1,7 +1,7 @@
 <div class="box">
 	<h2><warehouse:message code="dashboard.expirationSummary.label" /></h2>
 	<div class="widget-content" style="padding:0; margin:0">
-		<div id="alertSummary">	
+		<div id="expirationSummary">
 
     		<table class="zebra">
     			<tbody>
@@ -84,6 +84,15 @@
 </div>
 <script>
     $(window).load(function(){
+
+        // Sort the rows in reverse
+        $("#expirationSummary table tbody").each(function(elem,index){
+            var arr = $.makeArray($("tr",this).detach());
+            arr.reverse();
+            $(this).append(arr);
+        });
+
+        // Pull the data from the server
         $.ajax({
             dataType: "json",
             timeout: 120000,

@@ -260,6 +260,10 @@ class JsonController {
         def location = Location.get(session?.warehouse?.id)
         def genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
 
+        // Convert from map of objects to map of statistics
+        genericProductByStatusMap.each { k, v ->
+            genericProductByStatusMap[k] = v?.size()?:0
+        }
 
         render ([elapsedTime: (System.currentTimeMillis()-startTime),
                 totalCount:genericProductByStatusMap.values().size(),

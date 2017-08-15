@@ -476,6 +476,14 @@ class DashboardController {
         def genericProductSummary = inventoryService.getGenericProductSummary(location)
         def data = (params.status == "ALL") ? genericProductSummary.values().flatten() : genericProductSummary[params.status]
 
+		// Rename columns and filter out debugging columns
+		data = data.collect { ["Status":it.status,
+							   "Generic Product":it.name,
+							   "Minimum Qty":it.minQuantity,
+							   "Reorder Qty":it.reorderQuantity,
+							   "Maximum Qty":it.maxQuantity,
+							   "Available Qty":it.maxQuantity]}
+
         def sw = new StringWriter()
         if (data) {
             def columns = data[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
