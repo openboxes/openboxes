@@ -1,10 +1,9 @@
 <div class="box">
     <h2>
-        <warehouse:message code="inventory.genericProductSummary.label" default="Inventory status by generic product"/>
-        <span class="beta">Beta</span>
+        <g:message code="dashboard.genericProductSummary.label"/>
     </h2>
 	<div class="widget-content" style="padding:0; margin:0">
-		<div id="alertSummary">
+		<div id="genericProductSummary">
     		<table class="zebra">
     			<tbody>
                 <tr>
@@ -19,20 +18,6 @@
                     </td>
                     <td class="right">
                         <div id="STOCK_OUT" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'STOCK_OUT_OBSOLETE']">
-                            <warehouse:message code="inventory.listOutOfStockObsolete.label" default="Stocked out, but obsolete"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="STOCK_OUT_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
@@ -95,23 +80,6 @@
 
                     </td>
                 </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"Information")}'/>
-                    </td>
-                    <td>
-                        <g:link controller="dashboard" action="downloadGenericProductSummaryAsCsv" params="[status:'IN_STOCK_OBSOLETE']">
-                            <warehouse:message code="inventory.listInStockObsolete.label" default="In stock, but obsolete"/>
-                        </g:link>
-                    </td>
-                    <td class="right">
-                        <div id="IN_STOCK_OBSOLETE" class="indicator"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                    </td>
-                </tr>
-
-
-
 
 				</tbody>
                 <tfoot>
@@ -138,6 +106,14 @@
 <script>
     $(window).load(function(){
 
+        // Sort the rows in reverse
+        $("#genericProductSummary table tbody").each(function(elem,index){
+            var arr = $.makeArray($("tr",this).detach());
+            arr.reverse();
+            $(this).append(arr);
+        });
+
+        // Pull the data from the server
         $.ajax({
             dataType: "json",
             timeout: 120000,
@@ -147,7 +123,7 @@
                 var totalCount =0
                 $(".indicator").each(function( index ) {
                     var status = this.id;
-                    var count = (data.genericProductByStatusMap[status])?data.genericProductByStatusMap[status].length:0;
+                    var count = (data.genericProductByStatusMap[status])?data.genericProductByStatusMap[status]:0;
                     totalCount += count;
                     var countLink =
 

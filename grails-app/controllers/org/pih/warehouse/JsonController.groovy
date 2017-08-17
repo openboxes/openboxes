@@ -14,6 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
+import org.hibernate.FetchMode
 import org.hibernate.annotations.Cache
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
@@ -32,6 +33,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.springframework.transaction.annotation.Transactional
 import util.InventoryUtil
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -258,6 +260,10 @@ class JsonController {
         def location = Location.get(session?.warehouse?.id)
         def genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
 
+        // Convert from map of objects to map of statistics
+        genericProductByStatusMap.each { k, v ->
+            genericProductByStatusMap[k] = v?.size()?:0
+        }
 
         render ([elapsedTime: (System.currentTimeMillis()-startTime),
                 totalCount:genericProductByStatusMap.values().size(),
@@ -623,25 +629,37 @@ class JsonController {
                         inventoryItems = inventoryItems.sort { it.expirationDate }
 
                         if (quantity > 0) {
+
+                            String description = (it?.lotNumber ?: "${g.message(code:'default.noLotNumber.label')}") +
+                                    " - ${g.message(code:'default.expires.label')} " + (it?.expirationDate?.format("MMM yyyy")?:"${g.message(code:'default.never.label')}") +
+                                    " - ${quantity} ${it?.product?.unitOfMeasure ?: 'EA'}"
+
+                            String label = "${localizedName} x ${quantity?:0} ${it?.product?.unitOfMeasure?:'EA'}"
+
+                            String expirationDate = it?.expirationDate ?
+                                    g.formatDate(date: it.expirationDate, format: "MMM yyyy") :
+                                    g.message(code:'default.never.label')
+
                             inventoryItems << [
                                     id            : it.id,
                                     value         : it.lotNumber,
-                                    label         : (localizedName + " [Lot: " + (it?.lotNumber ?: "NOLOT") + ", Exp: " + it?.expirationDate?.format("MM/yy")
-                                            + ", QoH: " + quantity + " " + (it?.product?.unitOfMeasure ?: "EA") + "]"),
+                                    imageUrl      : "${resource(dir: 'images', file: 'default-product.png')}",
+                                    label         : label,
+                                    description   : description,
                                     valueText     : it.lotNumber,
                                     lotNumber     : it.lotNumber,
                                     product       : it.product.id,
                                     productId     : it.product.id,
                                     productName   : localizedName,
                                     quantity      : quantity,
-                                    expirationDate: it.expirationDate
+                                    expirationDate: expirationDate
                             ]
                         }
                     }
 
                     def count = inventoryItems.size()
                     def responseTime = System.currentTimeMillis() - startTime
-                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}' returned ${count} items in ${responseTime} ms"])
+                    inventoryItems.add(0, [id: 'null', value: "Searching for '${params.term}'", description: "Returned ${count} items in ${responseTime} ms"])
 
                 }
 			}
@@ -723,7 +741,8 @@ class JsonController {
 						
 						[
                             id: it.id,
-                            label:  it.name + " (" +  it.email + ") ",
+                            label:  it.name,
+                            description: it?.email,
                             value: it.id,
 							valueText: it.name,
 							desc: (it?.email) ? it.email : "",
@@ -738,7 +757,7 @@ class JsonController {
                     */
 					def item =  [
 						value: "null",
-						valueText : params.term,						
+						valueText : params.term,
 						label: "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}",
 						desc: params.term,
 						icon: ""
@@ -1424,7 +1443,6 @@ class JsonController {
             date.clearTime()
         }
         def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-
         def data = inventoryService.getFastMovers(location, date, params.max as int)
 
         render ([aaData: data?.results?:[]] as JSON)
@@ -1442,6 +1460,67 @@ class JsonController {
         def shipments = shipmentService.getPendingShipments(location)
         render ([count: shipments.size(), shipments:shipments] as JSON)
     }
+
+    @Cacheable("binLocationSummaryCache")
+    def getBinLocationSummary = {
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+        def binLocationReport = inventoryService.getBinLocationReport(location)
+
+        render(binLocationReport["summary"] as JSON)
+    }
+
+    @Cacheable("binLocationReportCache")
+    def getBinLocationReport = {
+        log.info "binLocationReport: " + params
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+        def binLocationReport = inventoryService.getBinLocationReport(location)
+
+
+        def data = binLocationReport["data"]
+
+        log.info "data " + data.size()
+
+        if (params.status) {
+            data = data.findAll { it.status == params.status }
+        }
+
+        log.info "data " + data.size()
+
+        // Flatten the data to make it easier to display
+        data = data.collect {
+            [
+                    id: it.product?.id,
+                    status: it.status,
+                    productCode: it.product?.productCode,
+                    productName: it?.product?.name,
+                    productGroup: it?.product?.genericProduct?.name,
+                    category: it?.product?.category?.name,
+                    lotNumber: it?.inventoryItem?.lotNumber,
+                    expirationDate: g.formatDate(date: it?.inventoryItem?.expirationDate, format: "MMM yyyy"),
+                    unitOfMeasure: it?.product?.unitOfMeasure,
+                    binLocation: it?.binLocation?.name,
+                    quantity: it?.quantity
+            ]
+        }
+        log.info "data: " + data
+
+        render(["aaData":data] as JSON)
+
+    }
+
+
+    def getShipmentsWithInvalidStatus = {
+        def shipments = shipmentService.shipmentsWithInvalidStatus
+        render ([count: shipments.size(), shipments:shipments] as JSON)
+    }
+
+    def fixShipmentsWithInvalidStatus = {
+        def count = shipmentService.fixShipmentsWithInvalidStatus()
+        render ([count: count] as JSON)
+    }
+
 
 
 }

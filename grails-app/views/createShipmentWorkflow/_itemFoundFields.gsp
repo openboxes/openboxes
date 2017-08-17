@@ -40,7 +40,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="" size="10" class="text"/>
+						<g:textField id="dialog-quantity" name="quantity" value="" size="10" class="text"/>
 					</td>
 				</tr>  	        
 				<tr class="prop">
@@ -82,7 +82,7 @@
 						});
 
 
-						$("#quantity").livequery(function(){
+						$("#dialog-quantity").livequery(function(){
 							$(this).blur(function(event) {					
 								if (!validateQuantity()) { 
 									alert("Please enter a valid quantity");
@@ -95,7 +95,7 @@
 						$("#lotNumber-suggest").livequery(function(){
 							$(this).bind( "autocompletechange", function(event, ui) {
 								updateQuantityOnHand();
-								$("#quantity").focus();
+								$("#dialog-quantity").focus();
 							});
 						});
 					});
@@ -103,7 +103,7 @@
 
 					function validateQuantity() { 
 						updateQuantityOnHand();
-						var quantityEntered = $("#quantity").val()
+						var quantityEntered = $("#dialog-quantity").val();
 						var quantityOnHand = $("#quantity-on-hand").html();
 						if (quantityEntered > parseInt(quantityOnHand)) {
 							return false;

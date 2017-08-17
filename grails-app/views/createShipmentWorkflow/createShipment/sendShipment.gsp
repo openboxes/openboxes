@@ -109,8 +109,10 @@
 										</label>
                                     </td>
                                     <td class="value">
-										<format:date obj="${shipmentInstance?.expectedShippingDate}"
-													 format="dd/MMM/yyyy"/>
+                                        <div title="${format.date(obj:shipmentInstance?.expectedShippingDate, format: "dd/MMM/yyyy hh:mma z")}">
+                                            <g:prettyDateFormat date="${shipmentInstance?.expectedShippingDate}"/>
+                                        </div>
+
 									</td>
 								</tr>
 								<tr class="prop">

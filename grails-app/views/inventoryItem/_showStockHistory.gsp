@@ -24,6 +24,9 @@
                     ${warehouse.message(code: 'shipment.label')} /
                     ${warehouse.message(code: 'requisition.label')}
                 </th>
+                <th class="border-right middle center">
+                    ${warehouse.message(code: 'default.comments.label')}
+                </th>
                 <th class="border-right">
                     ${warehouse.message(code: 'inventoryItem.binLocation.label')}
                 </th>
@@ -107,6 +110,9 @@
                                     &rsaquo; ${stockHistoryEntry?.transaction?.transactionNumber }
                                 </g:if>
                             </g:link>
+                            <g:if test="${stockHistoryEntry?.transaction?.comment}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${stockHistoryEntry?.transaction?.comment}"/>
+                            </g:if>
                         </g:if>
                     </td>
 
@@ -155,6 +161,13 @@
                             </div>
                         </g:if>
                     </td>
+                    <td class="border-right middle center">
+                        <g:if test="${stockHistoryEntry?.comments}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${stockHistoryEntry.comments}"/>
+                        </g:if>
+                    </td>
+
+
                     <td class="border-right center middle">
                         <g:if test="${stockHistoryEntry?.binLocation}">
                             ${stockHistoryEntry?.binLocation?.name}
@@ -210,7 +223,7 @@
         </tbody>
         <tfoot>
             <tr class="odd">
-                <th colspan="6" class="left border-right">
+                <th colspan="7" class="left border-right">
                     <warehouse:message code="stockCard.totals.label" default="Totals"/>
                 </th>
                 <th class="center border-right">

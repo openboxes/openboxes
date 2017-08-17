@@ -61,6 +61,7 @@
 						<th><warehouse:message code="default.expires.label"/></th>
 						<th class="center"><warehouse:message code="inventory.oldQty.label"/></th>
 						<th class="center"><warehouse:message code="inventory.newQty.label"/></th>
+						<th class="center"><warehouse:message code="default.comments.label"/></th>
 						<th class="center"><warehouse:message code="default.actions.label"/></th>
 					</tr>
 					</thead>
@@ -103,6 +104,12 @@
 
                                         ${commandInstance?.product?.unitOfMeasure?:"EA" }
                                     </td>
+									<td class="middle center">
+										<g:textField id="comment-${status }" class="text"
+													  name="recordInventoryRows[${status }].comment"
+                                                      placeholder="${g.message(code:'transactionEntry.comment.message')}"
+													  value="${recordInventoryRow?.comment }" style="width:100%;"/>
+									</td>
                                     <td class="middle left">
                                     </td>
                                 </tr>
@@ -123,7 +130,7 @@
 					</tbody>
 					<tfoot>
 					<tr>
-						<td colspan="6">
+						<td colspan="7">
 							<div class="left">
 								<button id="addRow" class="button icon add" >
 									<warehouse:message code="inventory.addInventoryItem.label"/>
@@ -133,7 +140,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td colspan="6">
+						<td colspan="7">
                                 <div>
                                     <button name="save" type="submit" class="button icon approve primary" id="saveInventoryItem">
                                         <warehouse:message code="default.button.save.label"/>&nbsp;
@@ -194,13 +201,13 @@
 		event.preventDefault();
 		var accelerator = (event.ctrlKey) ? 100 : (event.shiftKey) ? 10 : 1;
 		changeQuantity($(this).parent().parent().find('.newQuantity'), +1 * accelerator);
-	}
+	};
 
 	var buttonDownMouseHandler = function(event, data) {
 		event.preventDefault();
 		var accelerator = (event.ctrlKey) ? 100 : (event.shiftKey) ? 10 : 1;
 		changeQuantity($(this).parent().parent().find('.newQuantity'), -1 * accelerator);
-	}
+	};
 
 	function changeQuantity(textField, delta){
 		textField.val(parseInt(textField.val()) + delta);
@@ -392,6 +399,7 @@
 
 <script id="newRowTemplate" type="x-jquery-tmpl">
 <tr id="row-{{= getIndex()}}" class="{{= getClass()}}">
+
 	<td>
 		<g:selectBinLocation  id="binLocation-{{= getIndex()}}" class="binLocation" name="recordInventoryRows[{{= getIndex()}}].binLocation.id"
                              value="{{= BinLocation}}" noSelection="['':'']"/>
@@ -429,6 +437,11 @@
 			id="newQuantity-{{= getIndex()}}" class="newQuantity text" name="recordInventoryRows[{{= getIndex()}}].newQuantity"
 				size="8" value="{{= Qty}}" />
 			{{= UnitOfMeasure}}
+	</td>
+	<td class="center middle">
+	    <g:textField id="comment-{{= getIndex()}}" class="text"
+                     placeholder="${g.message(code:'transactionEntry.comment.message')}"
+                     name="recordInventoryRows[{{= getIndex()}}].comment" style="width:100%;" value="" />
 	</td>
 	<td class="center">
 		<button onclick="removeRow({{= getIndex()}});" class="button icon trash" tabIndex="-1">

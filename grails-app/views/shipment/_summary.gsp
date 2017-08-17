@@ -26,10 +26,18 @@
 							New Shipment
 						</g:if>
 						<g:else>
+                            <small>${shipmentInstance?.shipmentNumber}</small>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">
-								<small>${shipmentInstance?.shipmentNumber}</small>
-								${shipmentInstance?.name}
-							</g:link>
+								${shipmentInstance?.name}</g:link>
+                            <small class="fade uppercase">
+                                <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id}">
+                                    <g:message code="shipment.outbound.label" default="outbound"/>
+                                </g:if>
+                                <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
+                                    <g:message code="shipment.inbound.label" default="inbound"/>
+                                </g:elseif>
+                            </small>
+
 						</g:else>
 					</div>
 

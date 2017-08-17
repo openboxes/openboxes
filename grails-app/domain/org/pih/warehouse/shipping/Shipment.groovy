@@ -37,6 +37,9 @@ class Shipment implements Comparable, Serializable {
         if (currentUser) {
             updatedBy = currentUser
         }
+    }
+
+    def afterUpdate = {
         currentEvent = mostRecentEvent
         currentStatus = status.code
     }
@@ -477,7 +480,7 @@ class Shipment implements Comparable, Serializable {
 	}
 
 
-	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container) {
+	ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container, Person recipient) {
         ShipmentItem shipmentItem = ShipmentItem.withCriteria(uniqueResult: true) {
             eq('shipment', this)
             if (container) {
@@ -487,6 +490,10 @@ class Shipment implements Comparable, Serializable {
                 isNull('container')
             }
             eq('inventoryItem', inventoryItem)
+
+			if (recipient) {
+				eq("recipient", recipient)
+			}
         }
         return shipmentItem
     }

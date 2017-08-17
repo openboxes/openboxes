@@ -18,12 +18,11 @@
 		</div>
 	</g:hasErrors>
 
-
     <g:render template="summary" model="[requisition:requisition]"/>
 
     <div class="yui-ga">
 		<div class="yui-u first">
-			<g:form name="requisitionForm" method="post" action="saveNonStock">
+			<g:form name="requisitionForm" method="post" action="saveNonStock" useToken="true">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
 
 				<div id="requisition-template-details" class="dialog ui-validation box">
@@ -123,7 +122,7 @@
                                         </label>
                                     </td>
                                     <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                        <g:selectDepot name="origin.id" value="${requisition?.origin?.id}"
+                                        <g:selectDepot name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
                                                        noSelection="['null':'']"/>
                                     </td>
                                 </tr>

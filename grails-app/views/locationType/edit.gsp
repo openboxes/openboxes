@@ -19,7 +19,14 @@
 	                <g:renderErrors bean="${locationTypeInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form method="post" >
+
+			<div class="button-bar">
+				<g:link class="button icon search" action="list" controller="locationType">
+					<warehouse:message code="default.list.label" args="[g.message(code: 'locationTypes.label')]" />
+				</g:link>
+			</div>
+
+			<g:form method="post" >
             	<div class="box">
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 	                <g:hiddenField name="id" value="${locationTypeInstance?.id}" />
@@ -27,26 +34,26 @@
 	                <div class="dialog">
 	                    <table>
 	                        <tbody>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${locationTypeInstance?.name}" class="text"/>
-	                                </td>
-	                            </tr>
-
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label for="locationTypeCode"><warehouse:message code="locationTypeCode.label" default="Location Type Code" /></label>
 									</td>
 									<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
 										<g:select name="locationTypeCode" class="chzn-select-deselect" from="${org.pih.warehouse.core.LocationTypeCode.list()}"
-                                            noSelection="['':'']"
-											value="${locationTypeInstance?.locationTypeCode}"/>
+												  noSelection="['':'']"
+												  value="${locationTypeInstance?.locationTypeCode}"/>
 									</td>
 								</tr>
+
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
+	                                    <g:textField name="name" value="${locationTypeInstance?.name}" class="text" style="width:100%"/>
+	                                </td>
+	                            </tr>
+
 
 
 	                            <tr class="prop">
@@ -54,30 +61,31 @@
 	                                  <label for="description"><warehouse:message code="default.description.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
-	                                    <g:textArea name="description" value="${locationTypeInstance?.description}" cols="80" rows="5"/>
+	                                    <g:textArea name="description" value="${locationTypeInstance?.description}" cols="80" rows="5" style="width:100%"/>
 	                                </td>
 	                            </tr>
 	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="sortOrder"><warehouse:message code="default.sortOrder.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
-	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" class="text"/>
-	                                </td>
-	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 										<label for="supportedActivities"><warehouse:message code="locationType.supportedActivities.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'supportedActivities', 'errors')}">
 	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size() }" style="width: 300px" 
+	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }"
+												  size="${activityList.size() }" style="width: 100%"
 	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationTypeInstance?.supportedActivities}" />
 	                                </td>
-	                            </tr>	                            
-	                        	                        
+	                            </tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="sortOrder"><warehouse:message code="default.sortOrder.label" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
+										<g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" class="text" style="width:100%"/>
+									</td>
+								</tr>
+
                             	<tr class="prop">
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	

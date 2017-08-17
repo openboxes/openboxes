@@ -26,43 +26,24 @@
                 </div>
             </div>
         </div>
-
-        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast moving items (last 30 days)"/>
-        <span class="beta">Beta</span>
-        <%--
-        <span class="action-menu">
-            <button class="action-btn">
-                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-            </button>
-            <div class="actions">
-                <div class="action-menu-item">
-                    <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                        Show all requisitions
-                    </g:link>
-                </div>
-            </div>
-        </span>
-        --%>
+        <warehouse:message code="dashboard.fastMovers.label" default="Fast Movers"/>
     </h2>
-
-
-	<div class="widget-content" style="padding:0px;; margin:0">
+	<div class="widget-content" style="padding:0px; margin:0">
         <table id="dataTable">
             <thead>
+                <th>ID</th>
                 <th>Rank</th>
                 <th>Code</th>
                 <th>Product</th>
-                <th># Requisitions</th>
-                <th>Quantity Requested</th>
-                <th>Quantity On Hand</th>
+                <th>Count</th>
+                <th>Requested</th>
+                <th>On Hand</th>
             </thead>
             <tbody>
 
             </tbody>
         </table>
 	</div>
-    <br/><br/>
 </div>
 <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
@@ -74,16 +55,13 @@
             "iDisplayLength": 5,
             "bSearch": false,
             "bScrollCollapse": true,
-            "bJQueryUI": false,
+            "bJQueryUI": true,
             "bAutoWidth": true,
-            "sPaginationType": "two_button",
+            "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getFastMovers",
             "fnServerParams": function ( data ) {
-                //console.log("server data " + data);
-                //var locationId = $("#locationId").val();
-                //var date = $("#date").val();
-                //data.push({ name: "location.id", value: locationId });
-                //data.push({ name: "date", value: date })
+                var locationId = $("#currentLocationId").val();
+                data.push({ name: "location.id", value: locationId });
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
@@ -114,25 +92,20 @@
             ],
             "aoColumns": [
 
-                //{ "mData": "id", "bVisible":false }, // 0
+                { "mData": "id", "bVisible":false }, // 0
                 { "mData": "rank", "sWidth": "1%" }, // 1
-                { "mData": "productCode", "sWidth": "1%" }, // 2
+                { "mData": "productCode", "bVisible":false }, // 2
                 { "mData": "name" }, // 3
                 { "mData": "requisitionCount", "sWidth": "5%"  }, // 4
                 { "mData": "quantityRequested", "sWidth": "5%"  }, // 5
                 { "mData": "quantityOnHand", "sWidth": "5%"  } // 5
-                //
 
             ],
             "bUseRendered": false,
-            "aaSorting": [[ 3, "desc" ], [4, "desc"]],
+            "aaSorting": [[ 4, "desc" ], [5, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                //console.log(nRow);
-                //console.log(aData);
-                //console.log(iDisplayIndex);
-
-                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
-                        aData["name"] + '</a>');
+                $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
+                        aData["productCode"] + " " + aData["name"] + '</a>');
                 return nRow;
             }
 

@@ -32,7 +32,7 @@
         <warehouse:message code="tags.label" default="Tags"/>
     </h2>
 
-	<div class="widget-content" style="max-height: 300px; overflow: auto; padding: 0; margin: 0" >
+	<div class="widget-content" style="max-height: 300px; overflow: auto;" >
         <div id="tag-summary" >
             <g:if test="${params.editTags}">
                 <g:isUserAdmin>
