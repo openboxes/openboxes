@@ -16,14 +16,24 @@ pages:
 - ['benefits.md', 'About', 'Benefits']
 - ['considerations.md', 'About', 'Considerations']
 
-# Installation
-- ['installation/index.md', 'Installation',  'Overview']
-- ['installation/ubuntu.md', 'Installation', 'Ubuntu']
-- ['installation/macos.md', 'Installation', 'Mac OS']
-- ['installation/windows.md', 'Installation', 'Windows']
+# Deployment
+- ['installation/index.md', 'Deployment Guide',  'Installation']
+- ['installation/ubuntu.md', 'Deployment Guide', 'Install on Ubuntu 14.04']
+- ['installation/macos.md', 'Deployment Guide', 'Install on Mac OS']
+- ['installation/windows.md', 'Deployment Guide', 'Install on Windows']
+
+# Upgrade
+- ['upgrading/index.md', 'Deployment Guide', 'Upgrading']
+
 
 # Configuration
-- ['configuration.md', 'Configuration Guide', 'Configuration']
+- ['configuration/configuration.md', 'Configuration Guide', 'General']
+- ['configuration/database.md', 'Configuration Guide', 'Database']
+- ['configuration/email.md', 'Configuration Guide', 'Email']
+- ['configuration/application.md', 'Configuration Guide', 'Application']
+- ['configuration/example.md', 'Configuration Guide', 'Example']
+
+
 
 # Developer Guide
 - ['developer-guide/index.md', 'Developer Guide', 'Introduction']
