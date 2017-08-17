@@ -21,8 +21,9 @@
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
 	</g:hasErrors>
-
-
+	<g:if test="${flash.invalidToken}">
+		Don't click the button twice!
+	</g:if>
 
 	<g:render template="summary" model="[requisition:requisition]"/>
 	
@@ -30,10 +31,7 @@
 	<div class="yui-ga">
 		<div class="yui-u first">
 
-
-			<g:form name="requisitionForm" method="post" action="save">
-
-
+			<g:form name="requisitionForm" method="post" action="save" useToken="true">
 				<g:if test="${requisition?.id }">
 					<div class="box">
 						<a class="toggle" href="javascript:void(0);">

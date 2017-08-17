@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionItemType" %>
-<div id="requisition-summary" class="summary">
-	<g:if test="${requisition?.id}">
+<g:if test="${requisition?.id}">
+    <div id="requisition-summary" class="summary">
 		<table>
 			<tbody>			
 				<tr>
@@ -152,14 +152,8 @@
             </tfoot>
             --%>
         </table>
-	</g:if>
-</div>
-<div id="flow-header" class="buttonBar">
-    <%--
-    <g:render template="/requisition/flowHeader" model="[requisition:requisition]"/>
-    --%>
-    <g:if test="${requisition?.id}">
-
+    </div>
+    <div id="flow-header" class="buttonBar">
         <div class="wizard-box">
             <div class="wizard-steps">
                 <g:set var="currentState" value="${actionName}"/>
@@ -245,9 +239,9 @@
             </div>
 
         </div>
-    </g:if>
 
-</div>
+    </div>
+</g:if>
 
 <g:if test="${requisition?.destination?.id && requisition?.destination?.id != session?.warehouse?.id}">
     <div class="error">

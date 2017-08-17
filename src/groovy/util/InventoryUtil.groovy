@@ -19,7 +19,6 @@ class InventoryUtil {
 	static String getStatusMessage(inventoryStatus, minQuantity, reorderQuantity, maxQuantity, currentQuantity) {
         def statusMessage = ""
         if (inventoryStatus == InventoryStatus.SUPPORTED  || !inventoryStatus) {
-
             if (currentQuantity <= 0) {
                 statusMessage = "STOCK_OUT"
             }

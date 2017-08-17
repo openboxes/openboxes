@@ -16,7 +16,11 @@ class MessageService {
 
 	def grailsApplication
 
-	public getMessage(String messageCode, Object [] args, String defaultMessage, Locale locale) {
+	String getMessage(String messageCode) {
+		return getMessage(messageCode, null, messageCode, null)
+	}
+
+	String getMessage(String messageCode, Object [] args, String defaultMessage, Locale locale) {
 		return grailsApplication.getMainContext().getMessage(messageCode, args, defaultMessage, locale)
 	}
 }

@@ -4,6 +4,7 @@
         <tr class="">
             <th><warehouse:message code="product.productCode.label"/></th>
             <th><warehouse:message code="product.label"/></th>
+            <th><warehouse:message code="category.label"/></th>
             <th><warehouse:message code="product.unitOfMeasure.label"/></th>
             <th><warehouse:message code="product.manufacturer.label"/></th>
             <th><warehouse:message code="product.vendor.label"/></th>
@@ -20,6 +21,9 @@
                     <g:link controller="inventoryItem" action="showStockCard" id="${product.id}">
                         ${product.name }
                     </g:link>
+                </td>
+                <td class="middle">
+                    <format:category category="${product?.category}"/>
                 </td>
                 <td class="middle">
                     ${product.unitOfMeasure }

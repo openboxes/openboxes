@@ -106,23 +106,26 @@ class LocationController {
 
 			if (locationInstance.validate() && !locationInstance.hasErrors()) {
 				try {
+					if (locationInstance?.address?.validate() && !locationInstance?.address?.hasErrors()) {
+						locationInstance.address.save()
+					}
                     inventoryService.saveLocation(locationInstance)
                     if (locationInstance?.id == session?.warehouse?.id) {
 						session.warehouse = locationInstance
 					}
-					
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
+
 				} catch (ValidationException e) {
+					flash.message = e.message
+					log.error("error: " + e.message, e)
 					render(view: "edit", model: [locationInstance: locationInstance])
 					return
-				}
 
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
-
-                if (locationInstance.parentLocation) {
-					redirect(action: "edit", id: locationInstance.parentLocation.id)
-				}
-				else {
-					redirect(action: "edit", id: locationInstance.id)
+				} catch(Exception e) {
+					flash.message = e.message
+					log.error("error: " + e.message, e)
+					render(view: "edit", model: [locationInstance: locationInstance])
+					return
 				}
             }
 			else {
@@ -133,6 +136,15 @@ class LocationController {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		}
+
+		if (locationInstance.parentLocation) {
+			redirect(action: "edit", id: locationInstance.parentLocation.id)
+		}
+		else {
+			redirect(action: "edit", id: locationInstance.id)
+		}
+
+
 	}
 	
 	def delete = {

@@ -1,9 +1,9 @@
 <div class="box">
     <h2>
-        <warehouse:message code="inventory.genericProductSummary.label" default="Generic Product Summary"/>
+        <g:message code="dashboard.genericProductSummary.label"/>
     </h2>
 	<div class="widget-content" style="padding:0; margin:0">
-		<div id="alertSummary">
+		<div id="genericProductSummary">
     		<table class="zebra">
     			<tbody>
                 <tr>
@@ -103,6 +103,14 @@
 <script>
     $(window).load(function(){
 
+        // Sort the rows in reverse
+//        $("#genericProductSummary table tbody").each(function(elem,index){
+//            var arr = $.makeArray($("tr",this).detach());
+//            arr.reverse();
+//            $(this).append(arr);
+//        });
+
+        // Pull the data from the server
         $.ajax({
             dataType: "json",
             timeout: 120000,
@@ -112,7 +120,7 @@
                 var totalCount =0
                 $(".indicator").each(function( index ) {
                     var status = this.id;
-                    var count = (data.genericProductByStatusMap[status])?data.genericProductByStatusMap[status].length:0;
+                    var count = (data.genericProductByStatusMap[status])?data.genericProductByStatusMap[status]:0;
                     totalCount += count;
                     var countLink =
 

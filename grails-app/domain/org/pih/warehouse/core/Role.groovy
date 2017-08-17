@@ -28,6 +28,10 @@ class Role implements Serializable, Comparable<Role> {
 
     String toString() { return "${roleType.name}"; }
 
+    static Role superuser() {
+        Role.findByRoleType(RoleType.ROLE_SUPERUSER)
+    }
+
     static Role admin() {
         Role.findByRoleType(RoleType.ROLE_ADMIN)
     }

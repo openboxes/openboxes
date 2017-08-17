@@ -14,7 +14,7 @@
 		    	<div id="loggedIn">
 					<ul>
                         <li>
-                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
+                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms" size="600"
                                             jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
                         </li>
 					    <g:if test="${session.user}">
@@ -112,9 +112,15 @@
                                             </g:link>
                                         </li>
                                         <li class="action-menu-item">
+                                            <g:link controller="dashboard" action="flushMegamenu" style="color: #666">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
+                                                ${warehouse.message(code:'cache.flush.label', default: 'Refresh megamenu')}
+                                            </g:link>
+                                        </li>
+                                        <li class="action-menu-item">
                                             <g:link controller="dashboard" action="flushCache" style="color: #666">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
-                                                ${warehouse.message(code:'cache.flush.label', default: 'Flush cache')}
+                                                ${warehouse.message(code:'cache.flush.label', default: 'Refresh all data caches')}
                                             </g:link>
                                         </li>
                                         <g:if test="${session?.warehouse}">

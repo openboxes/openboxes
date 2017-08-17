@@ -17,9 +17,7 @@
         <g:render template="summary" />
 
         <g:if test="${flash.message}">
-            <div class="message">
-                ${flash.message}
-            </div>
+            <div class="message">${flash.message}</div>
         </g:if>
 
         <g:hasErrors bean="${receiptInstance}">
@@ -56,6 +54,11 @@
 			<g:form action="receiveShipment" method="POST">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 
+                <div class="right clearfix">
+                    <div class="tag tag-warning">
+                        ${g.message(code: 'receipt.saveAndContinue.message')}
+                    </div>
+                </div>
 
                 <div class="tabs tabs-ui">
                     <ul>
@@ -153,10 +156,6 @@
                                 </g:if>
                                 <g:else>
 
-                                    <div class="message">
-                                        ${g.message(code: 'receipt.saveAndContinue.message')}
-                                    </div>
-
                                     <table>
                                         <thead>
                                             <tr>
@@ -252,16 +251,10 @@
                                                             </div>
                                                         </td>
                                                     </tr>
-
                                                     <g:set var="lastContainer" value="${receiptItem?.shipmentItem?.container }"/>
                                                     <g:set var="i" value="${i+1}"/>
-
                                                 </g:each>
-
                                             </g:each>
-
-
-
                                         </tbody>
                                     </table>
                                 </g:else>
@@ -284,9 +277,8 @@
                             &nbsp;<g:message code="shipping.receiveShipment.label" />
                         </button>
                     </div>
-
                 </div>
-			</g:form>
+            </g:form>
         </div>
     </div>
 

@@ -8,8 +8,8 @@
 </style>
 
 <div class="box">
-    <h2 id="productSummaryTitle" title="">
-        <warehouse:message code="inventory.productSummary.label" default="Product Summary"/>
+    <h2>
+        <warehouse:message code="dashboard.productSummary.label" default="Product Summary"/>
         <img id="product-summary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
 
         <div class="right" style="padding: 5px;">

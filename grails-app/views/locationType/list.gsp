@@ -21,12 +21,10 @@
 		</g:if>
 		<div class="list">
 
-			<div>
-				<span class="linkButton"> <g:link class="new" action="create" controller="locationType">
-						<warehouse:message code="default.add.label"
-							args="[warehouse.message(code: 'locationType.label')]" />
-					</g:link>
-				</span>
+			<div class="button-bar">
+				<g:link class="button icon add" action="create" controller="locationType">
+					<warehouse:message code="default.add.label" args="[warehouse.message(code: 'locationType.label')]" />
+				</g:link>
 			</div>
 
 

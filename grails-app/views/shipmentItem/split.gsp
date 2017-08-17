@@ -164,7 +164,7 @@
                                                         entry?.inventoryItem?.id == shipmentItemInstance?.inventoryItem?.id}"/>
                                                 <tr class="${statusClass}">
                                                     <td class="middle">
-                                                        <g:radio name="binLocationAndInventoryItem" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}" checked="${selected}"/>
+                                                        <g:radio name="selection" value="${entry?.binLocation?.id}:${entry?.inventoryItem?.id}" checked="${selected}"/>
                                                     </td>
                                                     <td class="middle">
                                                         ${entry?.binLocation?.name?:g.message(code:'default.label')}

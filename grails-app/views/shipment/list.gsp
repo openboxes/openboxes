@@ -145,7 +145,12 @@
                     $(":checkbox.shipment-item").prop('checked', $(this).prop("checked"));
                 });
 
-			});
+                $('.dataTable').dataTable({
+                    "bJQueryUI": true,
+                    "sPaginationType": "full_numbers"
+                });
+
+            });
 
         </script>
         

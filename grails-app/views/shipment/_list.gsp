@@ -36,17 +36,10 @@
                 <th>
                     ${warehouse.message(code: 'shipping.receivingDate.label', default: 'Received')}
                 </th>
-                <th>
-                    ${warehouse.message(code: 'default.dateCreated.label')}
-                </th>
 				<th>
 					${warehouse.message(code: 'default.lastUpdated.label')}
 				</th>
 			</tr>
-        </thead>
-
-
-
         </thead>
 		<tbody>
 
@@ -148,52 +141,52 @@
                             </div>
                         </g:else>
                     </td>
-                    <td class="middle center">
-                        <div title="${g.formatDate(date: shipmentInstance?.dateCreated)}">
-                            ${g.formatDate(date: shipmentInstance?.dateCreated)}
-                        </div>
-                    </td>
 					<td class="middle center">
-                        <div title="${g.formatDate(date: shipmentInstance?.lastUpdated)}">
-                            ${g.formatDate(date: shipmentInstance?.lastUpdated)}
+                        <div title="<g:formatDate date="${shipmentInstance?.lastUpdated }"/>">
+                            <g:prettyDateFormat date="${shipmentInstance?.lastUpdated}"/>
                         </div>
                     </td>
 				</tr>
 			</g:each>
 		</tbody>
-        <tfoot>
-            <tr>
-                <td>
-                    <input type="checkbox" class="checkAll"/>
-                </td>
-                <td colspan="11">
-
-                    <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
-                        <div class="button-group">
-                            <button type="submit" class="button icon approve bulkReceive">
-                                <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
-                            </button>
-                            <button type="submit" class="button icon tag bulkMarkAsReceived">
-                                <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
-                            </button>
-                        </div>
-                        <div class="button-group">
-                            <button type="submit" class="button icon approve bulkRollback">
-                                <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
-                            </button>
-                        </div>
-                    </g:if>
-                    <g:elseif test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
-                        <div class="button-group">
-                            <button type="submit" class="button icon approve bulkRollback">
-                                <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
-                            </button>
-                        </div>
-                    </g:elseif>
 
 
-                </td>
-            </tr>
-        </tfoot>
+        <g:isSuperuser>
+            <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED || statusCode == org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+                <tfoot>
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="checkAll"/>
+                        </td>
+                        <td colspan="11">
+                            <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
+                                <div class="button-group">
+                                    <button type="submit" class="button icon approve bulkReceive">
+                                        <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
+                                    </button>
+                                    <button type="submit" class="button icon tag bulkMarkAsReceived">
+                                        <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
+                                    </button>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="button icon approve bulkRollback">
+                                        <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                                    </button>
+                                </div>
+                            </g:if>
+                            <g:elseif test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+                                <div class="button-group">
+                                    <button type="submit" class="button icon approve bulkRollback">
+                                        <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
+                                    </button>
+                                </div>
+                            </g:elseif>
+
+
+                        </td>
+                    </tr>
+                </tfoot>
+            </g:if>
+        </g:isSuperuser>
 	</table>
 </div>

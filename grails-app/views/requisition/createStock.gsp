@@ -28,7 +28,7 @@
 		<div class="yui-u first">
 
 
-			<g:form name="requisitionForm" method="post" action="saveStock">
+			<g:form name="requisitionForm" method="post" action="saveStock" useToken="true">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
 
 				<div id="requisition-template-details" class="dialog ui-validation box">

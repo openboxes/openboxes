@@ -281,8 +281,11 @@
                                             <td class="middle">
                                                 ${requisition.requestedBy?:warehouse.message(code:'default.none.label')}
                                             </td>
-                                            <td class="middle center">
-                                                <format:date obj="${requisition.dateRequested}"/>
+                                            <td class="middle">
+                                                <div title="<g:formatDate date="${requisition.dateRequested }"/>">
+                                                    <g:prettyDateFormat date="${requisition.dateRequested}"/>
+                                                </div>
+
                                             </td>
                                             <%--
                                             <td class="middle center">${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>

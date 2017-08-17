@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import groovy.time.TimeCategory
@@ -55,6 +56,8 @@ class InventoryService implements ApplicationContextAware {
 	def productService
 	def identifierService
     def dataSource
+    def messageService
+	//def authService
 
 	ApplicationContext applicationContext
 
@@ -1268,7 +1271,7 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }
-        log.info " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * getQuantityByProductAndInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1297,7 +1300,7 @@ class InventoryService implements ApplicationContextAware {
 			quantityMapByProductAndInventoryItem[product].values().each { quantityMap[product] += it }
 		}
 
-        log.info "getQuantityByProductMap(transactionEntries): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getQuantityByProductMap(transactionEntries): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1334,7 +1337,7 @@ class InventoryService implements ApplicationContextAware {
 				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
 		}
-        log.info " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
         //log.info "quantityMap: " + quantityMap
 		return quantityMap
 	}
@@ -1387,9 +1390,11 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    List getQuantityByBinLocation(List<TransactionEntry> entries) {
-        def startTime = System.currentTimeMillis()
+    List getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
+
         def binLocations = []
+
+        def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
 
         // first get the quantity and inventory item map
         Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
@@ -1397,21 +1402,46 @@ class InventoryService implements ApplicationContextAware {
             quantityBinLocationMap[product].keySet().each { inventoryItem ->
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
-                    if (quantity != 0) {
+                    def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber?:"") + ", Qty: " + quantity
 
-						def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber?:"") + ", Qty: " + quantity
-                        binLocations << [id: binLocation?.id, value: value,
-                                         product: product, inventoryItem: inventoryItem, binLocation: binLocation, quantity: quantity]
+                    // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
+                    if (quantity != 0 || includeOutOfStock) {
+                        binLocations << [
+                                id            : binLocation?.id,
+                                status        : status(quantity),
+                                value         : value,
+                                category      : product.category,
+                                genericProduct: product.genericProduct,
+                                product       : product,
+                                inventoryItem : inventoryItem,
+                                binLocation   : binLocation,
+                                quantity      : quantity
+                        ]
                     }
                 }
             }
 
         }
+
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { a,b -> a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name }
+        binLocations = binLocations.sort { a,b ->
+            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
+        }
 
         return binLocations
     }
+
+
+    /**
+     * Get quantity by bin location given a list transaction entries.
+     *
+     * @param transaction entries used to calculate bin quantities
+     * @return all bin locations including out of stock items
+     */
+    List getQuantityByBinLocation(List<TransactionEntry> entries) {
+        return getQuantityByBinLocation(entries, false)
+    }
+
 
 
     def getQuantityByProductGroup(Location location) {
@@ -1500,7 +1530,7 @@ class InventoryService implements ApplicationContextAware {
             }
         }
 
-        log.info "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
+        log.debug "getQuantityByProductMap(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return quantityMap
 	}
@@ -1599,10 +1629,9 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @return current quantity of the given inventory item.
 	 */
-	Integer getQuantityFromBinLocation(Location binLocation, InventoryItem inventoryItem) {
+	Integer getQuantityFromBinLocation(Location location, Location binLocation, InventoryItem inventoryItem) {
 		def startTime = System.currentTimeMillis()
-		def currentLocation = getCurrentLocation()
-		def quantity = getQuantity(currentLocation.inventory, binLocation, inventoryItem)
+		def quantity = getQuantity(location.inventory, binLocation, inventoryItem)
         log.info "getQuantity(): " + (System.currentTimeMillis() - startTime) + " ms"
 		return quantity
 	}
@@ -1622,12 +1651,9 @@ class InventoryService implements ApplicationContextAware {
 	Integer getQuantity(Inventory inventory, Location binLocation, InventoryItem inventoryItem) {
 
 		if (!inventory) {
-			def currentLocation = AuthService?.currentLocation?.get()
-			if (!currentLocation?.inventory)
-				throw new Exception("Inventory not found")
-
-			inventory = currentLocation.inventory
+            throw new RuntimeException("Inventory does not exist")
 		}
+
 		def transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(inventory, inventoryItem)
         if (binLocation) {
             List binLocations = getQuantityByBinLocation(transactionEntries)
@@ -1841,8 +1867,10 @@ class InventoryService implements ApplicationContextAware {
 		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
 		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
 
-		// create the quantity map for this product
+		// Used in the show lot numbers tab
 		cmd.quantityByInventoryItemMap = getQuantityByInventoryItemMap(cmd.transactionEntryList)
+
+        // Used in the current stock tab
         cmd.quantityByBinLocation = getQuantityByBinLocation(cmd.transactionEntryList)
 
 		return cmd
@@ -1913,6 +1941,7 @@ class InventoryService implements ApplicationContextAware {
             // Create a new transaction
             def transaction = new Transaction(cmd.properties)
             transaction.inventory = cmd.inventory
+            transaction.comment = cmd.comment
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
             // Process each row added to the record inventory page
@@ -1953,6 +1982,7 @@ class InventoryService implements ApplicationContextAware {
                     transactionEntry.product = inventoryItem?.product
                     transactionEntry.inventoryItem = inventoryItem
                     transactionEntry.binLocation = row.binLocation
+					transactionEntry.comments = row.comment
                     transaction.addToTransactionEntries(transactionEntry)
                 }
             }
@@ -2126,7 +2156,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return a single inventory item
 	 */
 	InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber) {
-		log.debug("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'")
+		log.info("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'")
 		def inventoryItems = InventoryItem.createCriteria().list() {
 			and {
 				eq("product.id", product?.id)
@@ -2179,7 +2209,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.lotNumber = lotNumber
 			inventoryItem.expirationDate = expirationDate;
 			inventoryItem.product = product
-			inventoryItem.save(flush:true)
+			inventoryItem.save()
 		}
 		return inventoryItem
 
@@ -2388,7 +2418,9 @@ class InventoryService implements ApplicationContextAware {
         log.info "Bin location " + binLocation
         log.info "Inventory item " + inventoryItem
 
-        Integer quantityOnHand = getQuantityFromBinLocation(binLocation, inventoryItem);
+		Location location = Location.findByInventory(inventory)
+
+        Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem);
 
         log.info "Quantity on hand: " + quantityOnHand
 
@@ -4469,7 +4501,72 @@ class InventoryService implements ApplicationContextAware {
 
 
 
+    @Transactional(readOnly=true)
+    Map getBinLocationReport(Location location) {
 
+        Map binLocationReport = [:]
+
+        final List transactionEntries = getTransactionEntriesWithAssociations(location)
+        List binLocations = getQuantityByBinLocation(transactionEntries, true)
+
+        binLocationReport.data = binLocations
+        binLocationReport.summary = getBinLocationSummary(binLocations)
+
+        return binLocationReport
+    }
+
+
+    @Transactional(readOnly=true)
+    List getBinLocationSummary(List binLocations) {
+
+        List results = []
+        List defaultStatuses = ["inStock", "outOfStock"]
+
+        def byStatus = { binLocation -> binLocation.quantity > 0 ? "inStock" : "outOfStock" }
+        def binLocationsByStatus = binLocations.groupBy(byStatus)
+
+        defaultStatuses.each { status ->
+            def list = binLocationsByStatus[status]
+            String messageCode = "binLocationSummary.${status}.label"
+            String label = messageService.getMessage(messageCode)
+            if (!list) {
+                results << [status:status, label: label, count: 0]
+            }
+            else {
+                results << [status: status, label: label, count: list.size()]
+            }
+        }
+        return results
+    }
+
+
+    @Transactional(readOnly=true)
+    List getTransactionEntriesWithAssociations(Location location) {
+        def startTime = System.currentTimeMillis()
+
+        if (!location?.inventory) {
+            throw new RuntimeException("Location must have an inventory")
+        }
+
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = criteria.list {
+            // eager fetch transaction and transaction type
+			fetchMode("transaction", org.hibernate.FetchMode.JOIN)
+            fetchMode("transaction.transactionType", org.hibernate.FetchMode.JOIN)
+
+            transaction {
+                eq("inventory", location.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        }
+
+		log.info "transactionEntries " + transactionEntries.size()
+
+        log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
+
+        return transactionEntries;
+    }
 
 
 }

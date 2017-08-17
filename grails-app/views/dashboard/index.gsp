@@ -18,7 +18,9 @@
                                 <div id="column1" class="column">
                                     <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column1.widgets}">
                                         <div id="${widgetName}" class="dragbox">
-                                            <g:render template="${widgetName}"/>
+                                            <g:if test='${grailsApplication.config.openboxes.dashboard."$widgetName".enabled}'>
+                                                <g:render template="${widgetName}"/>
+                                            </g:if>
                                         </div>
                                     </g:each>
                                 </div>
@@ -46,13 +48,18 @@
                             <g:if test="${grailsApplication.config.openboxes.dashboard.column2.widgets}">
                                 <div id="column2" class="column">
                                     <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column2.widgets}">
-                                        <div id="${widgetName}" class="dragbox">
-                                            <g:render template="${widgetName}"/>
-                                        </div>
+                                        <g:if test='${grailsApplication.config.openboxes.dashboard."$widgetName".enabled}'>
+                                            <div id="${widgetName}" class="dragbox">
+                                                <g:render template="${widgetName}"/>
+                                            </div>
+                                        </g:if>
                                     </g:each>
                                 </div>
                             </g:if>
                             <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.binLocationSummary.enabled}">
+                                    <g:render template="binLocationSummary"/>
+                                </g:if>
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.valueSummary.enabled}">
                                     <g:render template="valueSummary"/>
                                 </g:if>
@@ -71,9 +78,11 @@
                             <g:if test="${grailsApplication.config.openboxes.dashboard.column3.widgets}">
                                 <div id="column3" class="column">
                                     <g:each var="widgetName" in="${grailsApplication.config.openboxes.dashboard.column3.widgets}">
-                                        <div id="${widgetName}" class="dragbox">
-                                            <g:render template="${widgetName}"/>
-                                        </div>
+                                        <g:if test='${grailsApplication.config.openboxes.dashboard."$widgetName".enabled}'>
+                                            <div id="${widgetName}" class="dragbox">
+                                                <g:render template="${widgetName}"/>
+                                            </div>
+                                        </g:if>
                                     </g:each>
                                 </div>
                             </g:if>

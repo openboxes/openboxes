@@ -347,9 +347,18 @@ class DashboardController {
 			quickCategories:productService.getQuickCategories()]
 	}
 
-    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache", "quantityOnHandCache", "selectTagCache", "selectTagsCache", "selectCategoryCache"])
+    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
+			"binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
+			"selectTagsCache", "selectCategoryCache"])
     def flushCache = {
-        flash.message = "Caches have been flushed"
+        flash.message = "All data caches have been flushed"
+        redirect(action: "index")
+    }
+
+
+    @CacheFlush(["megamenuCache"])
+    def flushMegamenu = {
+        flash.message = "${g.message(code:'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"
         redirect(action: "index")
     }
 
@@ -415,6 +424,14 @@ class DashboardController {
         def location = Location.get(session?.warehouse?.id)
         def genericProductSummary = inventoryService.getGenericProductSummary(location)
         def data = (params.status == "ALL") ? genericProductSummary.values().flatten() : genericProductSummary[params.status]
+
+		// Rename columns and filter out debugging columns
+		data = data.collect { ["Status":it.status,
+							   "Generic Product":it.name,
+							   "Minimum Qty":it.minQuantity,
+							   "Reorder Qty":it.reorderQuantity,
+							   "Maximum Qty":it.maxQuantity,
+							   "Available Qty":it.maxQuantity]}
 
         def sw = new StringWriter()
         if (data) {
