@@ -441,34 +441,28 @@
                     <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
                         <div class="megaButton">
                             <g:link controller="admin" action="showSettings" class="list">
-                                <warehouse:message code="default.show.label"
-                                                   args="[warehouse.message(code:'default.settings.label')]" />
+                                <g:message code="default.settings.label"/>
                             </g:link>
                         </div>
                     </g:authorize>
                     <div class="megaButton">
                         <g:link controller="console" action="index" class="list">
-                            <warehouse:message code="default.console.label" default="Show console" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="admin" action="manage" class="list">
-                            <warehouse:message code="default.appinfo.label" default="Show app-info" />
+                            <g:message code="default.console.label" default="Console" />
                         </g:link>
                     </div>
                     <div class="megaButton">
                         <g:link controller="admin" action="cache" class="list">
-                            <warehouse:message code="default.cache.label" default="Show cache" />
+                            <g:message code="default.cache.label" default="Cache" />
                         </g:link>
                     </div>
                     <div class="megaButton">
                         <g:link controller="admin" action="clickstream" class="list">
-                            <warehouse:message code="default.clickstream.label" default="Show clickstream" />
+                            <g:message code="default.clickstream.label" default="Clickstream" />
                         </g:link>
                     </div>
                     <div class="megaButton">
                         <g:link controller="admin" action="sendMail" class="list">
-                            <warehouse:message code="config.sendMail.label" default="Send mail"/>
+                            <g:message code="config.sendMail.label" default="Send Email"/>
                         </g:link>
                     </div>
                     <hr/>

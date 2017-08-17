@@ -409,7 +409,14 @@ class DashboardController {
 			"binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
 			"selectTagsCache", "selectCategoryCache"])
     def flushCache = {
-        flash.message = "Caches have been flushed"
+        flash.message = "All data caches have been flushed"
+        redirect(action: "index")
+    }
+
+
+    @CacheFlush(["megamenuCache"])
+    def flushMegamenu = {
+        flash.message = "${g.message(code:'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"
         redirect(action: "index")
     }
 
