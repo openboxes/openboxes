@@ -25,15 +25,12 @@ pages:
 # Upgrade
 - ['upgrading/index.md', 'Deployment Guide', 'Upgrading']
 
-
 # Configuration
 - ['configuration/configuration.md', 'Configuration Guide', 'General']
 - ['configuration/database.md', 'Configuration Guide', 'Database']
 - ['configuration/email.md', 'Configuration Guide', 'Email']
 - ['configuration/application.md', 'Configuration Guide', 'Application']
 - ['configuration/example.md', 'Configuration Guide', 'Example']
-
-
 
 # Developer Guide
 - ['developer-guide/index.md', 'Developer Guide', 'Introduction']

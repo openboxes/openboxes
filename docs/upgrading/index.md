@@ -21,8 +21,7 @@
     sudo tail -f /var/logs/tomcat7/catalina.out
     ```
 
-## Using Tomcat Manager
-This is the easiest way to upgrade, but you need to make sure you 
+## Using Tomcat Manager 
 1. Install Tomcat manager
     ```
     sudo apt-get install tomcat-admin
