@@ -114,18 +114,20 @@ class ShipmentItemController {
     }
 
     def pick = {
-        def shipmentItemInstance = ShipmentItem.get(params.id)
-        if (!shipmentItemInstance) {
+        def shipmentItem = ShipmentItem.get(params.id)
+        if (!shipmentItem) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), params.id])}"
         }
         else {
             Location location = Location.load(session.warehouse.id)
             //List binLocations = inventoryService.getItemQuantityByBinLocation(location, shipmentItemInstance.inventoryItem)
-            List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItemInstance.product)
-
-
-            [shipmentItem: shipmentItemInstance, binLocations: binLocations]
+            List binLocations = inventoryService.getProductQuantityByBinLocation(location, shipmentItem.product)
+            List binLocationSelected = binLocations.findAll{
+                it?.binLocation == shipmentItem?.binLocation && it.inventoryItem == shipmentItem?.inventoryItem
+            }
+            [shipmentItem: shipmentItem, binLocations: binLocations, binLocationSelected: binLocationSelected]
         }
+
     }
 
     def split = {

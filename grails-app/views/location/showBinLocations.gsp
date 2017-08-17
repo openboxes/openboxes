@@ -1,8 +1,3 @@
-<style>
-    .ui-buttonset { margin: 7px; }
-    .ui-buttonset .ui-button { margin-left: 1px; margin-right: -.3px; padding-left: 5px; padding-right: 5px; }
-
-</style>
 <div class="buttonBar">
     <button class="btnAddBinLocation button">
         <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>

@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import com.sun.xml.internal.ws.developer.MemberSubmissionAddressing.Validation
 import grails.validation.ValidationException
 import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -21,11 +22,15 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellRangeAddress
+import org.hibernate.FetchMode
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 
 import javax.mail.internet.InternetAddress
 
@@ -420,15 +425,20 @@ class ShipmentService {
         long startTime = System.currentTimeMillis()
         boolean success = false
         try {
+            int count = 0
             def shipments = Shipment.findAllByCurrentStatusIsNullAndEventsIsNotNull([max:1000])
             if (shipments) {
                 shipments.each {
                     it.currentStatus = it.status.code
                     it.currentEvent = it.mostRecentEvent
-                    it.save(flush: true)
+                    if(it.save(flush: true)) {
+                        count++
+                    }
                 }
-                long elapsedTime = System.currentTimeMillis() - startTime
-                log.info "Successfully bulk updated ${shipments?.size() ?: 0} shipments in ${elapsedTime} ms"
+                if (count > 0) {
+                    long elapsedTime = System.currentTimeMillis() - startTime
+                    log.info "Successfully bulk updated ${count ?: 0} shipments in ${elapsedTime} ms"
+                }
             }
             success = true
         } catch (Exception e) {
@@ -476,16 +486,6 @@ class ShipmentService {
 
         log.info "Shipments: " + shipments.size()
 
-        // now filter by event code and eventdate
-        shipments = shipments.findAll( { def status = it.getStatus()
-            if (statusCode && status.code != statusCode) { return false }
-            //if (statusStartDate && status.date < statusStartDate) { return false }
-            //if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
-            return true
-        } )
-
-		shipments = shipments.findAll() { (!statusStartDate || it.expectedShippingDate >= statusStartDate) && (!statusEndDate || it.expectedShippingDate <= statusEndDate) }
-
 		return shipments
 	}
 	
@@ -498,7 +498,7 @@ class ShipmentService {
 		if (!shipment.shipmentNumber) { 
 			shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
 		}
-		shipment.save(flush:true, failOnError:true)
+		shipment.save()
 	}
 	
 	/**
@@ -718,15 +718,12 @@ class ShipmentService {
 	 * @param item
 	 */
 	boolean saveShipmentItem(ShipmentItem shipmentItem) {
-        if (validateShipmentItem(shipmentItem)) {
-            return shipmentItem.save()
-        }
-        return false
+        return shipmentItem.save()
 	}
 	
 	
 	/**
-	 * Saves an item
+	 * Add a shipment item to a shipment.
 	 * 
 	 * @param shipmentItem
 	 * @param shipment
@@ -748,11 +745,13 @@ class ShipmentService {
 	}
 
 	boolean addToShipmentItems(String shipmentId, String containerId, String inventoryItemId, Integer quantity) {
+
 		Shipment shipment = Shipment.get(shipmentId)
 		Container container = Container.get(containerId)
 		InventoryItem inventoryItem = InventoryItem.get(inventoryItemId)
 		if (!inventoryItem) {
-			throw new ShipmentItemException(message: "Could not locate inventory item with ID " + inventoryItemId)
+            shipment.errors.reject("shipmentItem.inventoryItem.required")
+			throw new ValidationException("Cannot add shipment item without valid inventory item", shipment.errors)
 		}
 		ShipmentItem shipmentItem = new ShipmentItem();
 		shipmentItem.inventoryItem = inventoryItem
@@ -762,7 +761,8 @@ class ShipmentService {
 		shipmentItem.quantity = quantity
 		shipmentItem.container = container
 		shipmentItem.shipment =  shipment
-		addToShipmentItems(shipmentItem, shipment)
+
+        addToShipmentItems(shipmentItem, shipment)
 	}
 
 
@@ -779,36 +779,139 @@ class ShipmentService {
 
 	}
 
+	boolean validatePicklist(Shipment shipment) {
+        Errors errors
+        shipment.shipmentItems.each { shipmentItem ->
+            // FIXME this seems a little expensive so we should rework validateShipmentItem to not throw an exception
+            try {
+                validateShipmentItem(shipmentItem, true)
+            } catch (ValidationException e) {
+                log.warn("Validation error " + e.message)
+                if (!errors) {
+                    errors = new BeanPropertyBindingResult(shipment, e.errors.objectName);
+                }
+                errors.addAllErrors(e.errors)
+            }
+		}
+
+        if (errors?.hasErrors())
+            throw new ValidationException("Shipment is invalid", errors)
+
+        return true
+	}
+
+
+    boolean clearPicklist(Shipment shipment) {
+        log.info "Clear out picked items for ${shipment}"
+        shipment.shipmentItems.each { shipmentItem ->
+            shipmentItem.binLocation = null
+        }
+        return shipment.save()
+
+    }
+
+	/**
+	 *
+	 * @param shipmentItem
+	 * @return
+	 */
+	boolean validateShipmentItem(ShipmentItem shipmentItem) {
+        boolean binLocationRequired = (shipmentItem.binLocation?:false)
+        return validateShipmentItem(shipmentItem, binLocationRequired)
+	}
 
     /**
      * Validate the shipment item when it's being added to the shipment.
      *
-     * @param shipmentItem
+     * @param shipmentItem shipment item to validate
+	 * @param binLocationRequired if shipment item has a bin location we validate quantity only against that bin
      * @return
      */
-    boolean validateShipmentItem(ShipmentItem shipmentItem) {
-        def location = Location.get(shipmentItem?.shipment?.origin?.id);
-        log.info("Validating shipment item at " + location?.name + " for product=" + shipmentItem.product + ", lotNumber=" + shipmentItem.inventoryItem + ", binLocation=" + shipmentItem.binLocation)
+    boolean validateShipmentItem(ShipmentItem shipmentItem, boolean binLocationRequired) {
+        def origin = Location.get(shipmentItem?.shipment?.origin?.id);
+        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequest=${binLocationRequired}")
 
-        // FIXME Please refactor this mess at a later date
-        // If bin location is provided, check whether there's any stock in the bin location, then check against the lot number
-        def quantityOnHand = shipmentItem.binLocation ?
-                inventoryService.getQuantityFromBinLocation(shipmentItem.binLocation, shipmentItem.inventoryItem) :
-                inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
+        // Location must be locally managed and
+        if (origin.requiresOutboundQuantityValidation()) {
 
-        log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + quantityOnHand + "]");
-        if (!shipmentItem.validate()) {
-            throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
-        }
+            if (!shipmentItem.validate()) {
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
 
-        if (shipmentItem.quantity > quantityOnHand) {
-            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity", [shipmentItem?.product?.productCode].toArray(), "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
-            //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
-            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            // Check whether there's any stock in the bin location for the given inventory item
+            def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
+
+            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity +
+                    "] vs onhand quantity [" + quantityOnHand + "]");
+            if (shipmentItem.quantity > quantityOnHand) {
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
+                        [
+                            shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                            shipmentItem?.product?.productCode,
+                            shipmentItem?.inventoryItem?.lotNumber,
+                            origin.name,
+                            shipmentItem?.binLocation?.name?:'Default'
+                        ].toArray(),
+                        "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
+                //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
         }
         return true;
     }
 
+    /**
+     * Get quantity on hand for the given bin location and inventory item stored at the given location.
+     *
+     * @param location
+     * @param binLocation
+     * @param inventoryItem
+     * @return
+     */
+    Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
+        List transactionEntries = getTransactionEntries(location, binLocation, inventoryItem, binLocationRequired)
+        List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
+
+        // Bin location validation is required when picking to ensure that we don't
+        // pick from the Default bin if it doesn't have any stock
+        if (binLocationRequired) {
+            binLocations = binLocations.findAll { it.binLocation == binLocation }
+        }
+
+        def quantityOnHand = binLocations.sum { it.quantity }
+        quantityOnHand = quantityOnHand?:0
+        return quantityOnHand
+    }
+
+
+    /**
+     * Get all transaction entries for the given bin location and inventory item.
+     *
+     * @param inventoryInstance
+     * @return
+     */
+    List getTransactionEntries(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
+        log.info "Get transaction entries by location=${location}, binLocation=${binLocation}, inventoryItem=${inventoryItem}"
+        def criteria = TransactionEntry.createCriteria();
+        def transactionEntries = criteria.list {
+            eq("inventoryItem", inventoryItem)
+//            if (binLocationRequired) {
+//                if (binLocation) {
+//                    eq("binLocation", binLocation)
+//                }
+//                else {
+//                    isNull("binLocation")
+//                }
+//            }
+            transaction {
+                eq("inventory", location.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        }
+        return transactionEntries;
+    }
 
 	
 	/**
@@ -1139,7 +1242,7 @@ class ShipmentService {
 
 		// Shipment has errors or it has already shipped or ship date is
 		else {
-			log.error("Failed to send shipment due to errors")
+			log.warn("Failed to send shipment due to errors: " + shipmentInstance?.errors)
 			// TODO: make this a better error message
 			throw new ShipmentException(message: "Failed to send shipment", shipment: shipmentInstance)
 		}
@@ -1663,9 +1766,19 @@ class ShipmentService {
 
 	void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
 		shipmentInstance.removeFromEvents(eventInstance)
-		eventInstance?.delete()
-		shipmentInstance?.save()
+		eventInstance.delete()
+        shipmentInstance.currentEvent = null
+        shipmentInstance.currentStatus = null
+		shipmentInstance.save()
 	}
+
+
+    void refreshCurrentStatus(String id) {
+        def shipment = Shipment.get(id)
+        shipment.lastUpdated = new Date()
+        shipment.save()
+    }
+
    
 	void rollbackLastEvent(Shipment shipmentInstance) {
 		
@@ -1855,8 +1968,8 @@ class ShipmentService {
 			item.product = product
 
 
-            log.info ("item pallet " + item.pallet)
-            log.info ("item box " + item.box)
+            log.info ("item pallet " + item.palletName)
+            log.info ("item box " + item.boxName)
 
 
             // there's a pallet
@@ -1947,7 +2060,7 @@ class ShipmentService {
                         recipient = findOrCreatePerson(item.recipient)
                     }
 					// Check to see if a shipment item already exists within the given container
-					ShipmentItem shipmentItem = shipment?.findShipmentItem(inventoryItem, container)
+					ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
 					// Create a new shipment item if not found
 					if (!shipmentItem) {
 						shipmentItem = new ShipmentItem(
@@ -1994,5 +2107,50 @@ class ShipmentService {
 
 		return true
 	}
+
+
+    List getShipmentsWithInvalidStatus() {
+        //log.info "getShipmentsWithInvalidStatus"
+        long startTime = System.currentTimeMillis()
+        def shipments = Shipment.withCriteria {
+            fetchMode 'events', FetchMode.JOIN
+        }
+        //log.info "Query: " + (System.currentTimeMillis() - startTime) + "ms"
+        startTime = System.currentTimeMillis()
+        shipments = shipments.collect { [
+                id: it.id,
+                name: it.name,
+                shipmentNumber: it.shipmentNumber,
+                currentStatus: it?.currentStatus?.name(),
+                currentEvent: it?.currentEvent?.eventDate,
+                calculatedStatus: it?.status?.code?.name(),
+                calculatedEvent: it?.mostRecentEvent?.eventDate
+        ]
+        }
+        //log.info "Convert: " + (System.currentTimeMillis() - startTime) + "ms"
+        shipments = shipments.findAll {
+            it.calculatedStatus != it.currentStatus || it.calculatedEvent != it.currentEvent
+        }
+        startTime = System.currentTimeMillis()
+        //log.info "Filter: " + (System.currentTimeMillis() - startTime) + "ms"
+        return shipments
+    }
+
+
+    Integer fixShipmentsWithInvalidStatus() {
+        Integer count = 0
+        def shipments = shipmentsWithInvalidStatus
+        shipments.each {
+            Shipment shipment = Shipment.load(it.id)
+            shipment.version++
+            if (shipment.save(flush:true)) {
+                count++
+            }
+            else {
+                log.info "Shipment ${shipment.shipmentNumber}: ${shipment.errors}"
+            }
+        }
+        return count
+    }
 
 }

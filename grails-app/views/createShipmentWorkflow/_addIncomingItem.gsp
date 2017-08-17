@@ -1,12 +1,11 @@
 <div id="dlgAddIncomingItem" title="${warehouse.message(code:'shipping.addIncomingItem.label')}" style="display: none;" >
-
-	<div id="searchItemForm" style="display: ${item?'none':''};">
+	<div id="searchItemForm" style="display: ${item?'none':''}; overflow: auto; max-height: 400px;">
 		<g:form name="searchItem" action="createShipment">	
 			<table>
 				<tbody>
 					<tr>
 						<td class="center">
-							<g:textField name="productSearch" class="text autocomplete" style="width: 600px" autocomplete="off"/>
+							<g:textField name="productSearch" class="text autocomplete" style="width: 100%" autocomplete="off"/>
 						</td>
 					</tr>
 				</tbody>
@@ -45,11 +44,7 @@
 	<div id="editItemForm" style="display: ${item?'':'none'};">
 		<div style="margin: 5px; padding: 5px;" class="title">
 			<g:if test="${item?.product}">
-				<span class="fade">
-					<format:category category="${item?.product?.category }"/>
-					&rsaquo;
-				</span>
-				<format:product product="${item.product }"/>
+				<span class="fade">${item?.product?.productCode}</span> <format:product product="${item.product }"/>
 			</g:if>
 			<g:else>
 				<span id="displayProduct"></span>
@@ -62,6 +57,7 @@
 				<g:hiddenField name="item.id" value="${item.id}" />
 				<g:hiddenField name="container.id" value="${item?.container?.id }"/>
 				<g:hiddenField name="product.id" value="${item?.product?.id }"/>
+				<g:hiddenField name="inventoryItem.id" value="${item?.inventoryItem?.id }"/>
 			</g:if>
 			<g:else>
 				<g:hiddenField id="containerId" name="container.id" value="${addItemToContainerId?:'' }" />
@@ -75,7 +71,7 @@
 							<label><warehouse:message code="default.lotSerialNo.label" /></label>
 						</td>                            
 						<td valign="top" class="value">
-							<g:textField name="lotNumber" class="text" value="${item?.lotNumber }"/>
+							<g:textField name="lotNumber" class="text lotNumber" value="${item?.lotNumber }" size="60"/>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -86,8 +82,7 @@
 							<g:jqueryDatePicker id="expirationDate" name="expirationDate" 
 								value="${item?.expirationDate }" 
 								format="MM/dd/yyyy"
-                                size="15"
-								readOnly="true"
+                                size="60"
 								cssClass="text"/>
 						</td>
 					</tr>
@@ -96,7 +91,7 @@
 							<label><warehouse:message code="default.quantity.label" /></label>
 						</td>                            
 						<td valign="top" class="value">
-							<g:textField name="quantity" value="${item?.quantity }" size="10" class="text" />
+							<g:textField name="quantity" value="${item?.quantity }" size="60" class="text" />
                             ${item?.product?.unitOfMeasure}
 						</td>
 					</tr>  	        
@@ -106,7 +101,7 @@
 						</td>                            
 						<td valign="top" class="value">
 							<g:autoSuggest name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-								width="200" valueId="${item?.recipient?.id }" valueName="${item?.recipient?.name }" styleClass="text"/>	
+								 size="60" valueId="${item?.recipient?.id }" valueName="${item?.recipient?.name }" styleClass="text"/>
 						</td>
 					</tr>					
 					<tr>
@@ -117,14 +112,19 @@
 									<g:submitButton class="button" name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
 								</g:if>
 								<g:else>
-									<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
+									<g:submitButton name="saveItem" class="button" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
 									<g:if test="${addItemToContainerId}">									
 										<g:submitButton class="button" name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"/>
 									</g:if>
 								</g:else>
 								<button name="cancelDialog" type="reset" onclick="$('#dlgAddIncomingItem').dialog('close');" class="button" >
-									<warehouse:message code="default.button.cancel.label"/>
+									<warehouse:message code="default.button.close.label"/>
 								</button>
+
+								<g:if test="${!item }">
+									<a href="javascript:void(0);" class="button back"><warehouse:message code="default.button.back.label"/></a>
+								</g:if>
+
 							</div>
 						</td>
 					</tr>
@@ -133,11 +133,7 @@
 		</g:form>		
 		
 		
-		<g:if test="${!item }">
-			<hr/>
-			<a href="javascript:void(0);" class="button">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></a>
-		</g:if>
-	</div>		
+	</div>
 </div>	
 		     
 <script>
@@ -156,9 +152,8 @@
 		$("#dlgAddIncomingItem").dialog({ 
 			autoOpen: true, 
 			modal: true, 
-			width: 800,
-			height: 500
-		});	
+			width: 800
+		});
 
 		$("#searchItemForm input.autocomplete").keyup(function(event, ui) {
             var searchable = $(this);

@@ -8,29 +8,6 @@
 <body>
     <div class="body">
 
-
-
-
-        <%--
-                    <h1>${location}</h1>
-                    ${quantityMap.keySet().size()} results (${elapsedTime/1000} seconds)
-                    --%>
-        <%--
-        <div class="action-menu">
-            <button class="action-btn">
-                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
-                     style="vertical-align: middle" />
-            </button>
-            <div class="actions left">
-                <div class="action-menu-item">
-                    <g:link controller="inventory" action="show" params="['format':'csv']"><img
-                            src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}"
-                    /> &nbsp;<warehouse:message code="default.export.label" args="['CSV']"/>
-                    </g:link>
-                </div>
-            </div>
-        </div>
-        --%>
         <div class="yui-gf">
             <div class="yui-u first">
 

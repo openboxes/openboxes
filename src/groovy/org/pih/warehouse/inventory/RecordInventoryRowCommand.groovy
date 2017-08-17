@@ -23,7 +23,8 @@ class RecordInventoryRowCommand {
 	String description;
 	Integer oldQuantity;
 	Integer newQuantity;
-	
+	String comment
+
 	static constraints = {
 		id(nullable:true)
 		expirationDate(nullable:true)
@@ -33,6 +34,7 @@ class RecordInventoryRowCommand {
 		description(nullable:true)
 		oldQuantity(nullable:false)
 		newQuantity(nullable:false)
+		comment(nullable:true)
 	}
 	
 }

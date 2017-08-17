@@ -739,8 +739,8 @@ class ProductService {
 		def sw = new StringWriter()
 		
 		def csvWriter = new CSVWriter(sw, {
-			"ID" { it.id }
-			"SKU" { it.productCode }
+			"Product ID" { it.id }
+			"Product Code" { it.productCode }
 			"Name" { it.name }
 			"Category" { it.category }
 			"Description" { it.description }

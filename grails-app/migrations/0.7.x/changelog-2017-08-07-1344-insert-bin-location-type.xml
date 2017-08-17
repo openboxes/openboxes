@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1502131549077-1" failOnError="false">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from location_type where location_type_code = "BIN_LOCATION";
+            </sqlCheck>
+        </preConditions>
+        <comment>Creating default location type for Bin Location in case one has not been created.</comment>
+        <insert tableName="location_type">
+            <column name="id" value="cab2b4f35ba2d867015ba2e17e390001"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Bin Location"/>
+            <column name="description" value="Default bin location type"/>
+            <column name="location_type_code" value="BIN_LOCATION"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="date_created" valueDate="2017-08-07 00:00:00"/>
+            <column name="last_updated" valueDate="2017-08-07 00:00:00"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

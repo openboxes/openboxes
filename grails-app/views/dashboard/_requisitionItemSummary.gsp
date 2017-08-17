@@ -1,9 +1,13 @@
-<style>
-    #dataTable_filter { margin: 5px;}
-    #dataTable_length { margin: 5px; }
-    #dataTable_info { margin: 5px; }
-    #dataTable_paginate { margin: 0px; }
-</style>
+<head>
+    <link rel="stylesheet" type="text/css" href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+    <style>
+        #dataTable_filter { margin: 5px;}
+        #dataTable_length { margin: 5px; }
+        #dataTable_info { margin: 5px; }
+        #dataTable_paginate { margin: 0px; }
+
+    </style>
+</head>
 
 <div class="box">
     <h2>
@@ -15,55 +19,37 @@
             <div class="actions">
                 <div class="action-menu-item">
                     <g:link controller="dashboard" action="downloadFastMoversAsCsv">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="Download Fast Movers as CSV" style="vertical-align: middle" />
-                        <warehouse:message code="dashboard.downloadFastMoversAsCsv.label" default="Download Fast Movers as CSV"/>
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+                        <warehouse:message code="dashboard.downloadFastMoversAsCsv.label" default="Download fast movers as CSV"/>
                     </g:link>
 
                 </div>
             </div>
         </div>
-
-        <warehouse:message code="requisitionItems.fastMovers.label" default="Fast Movers (last 30 days)"/>
-        <span class="beta">Beta</span>
-        <%--
-        <span class="action-menu">
-            <button class="action-btn">
-                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-            </button>
-            <div class="actions">
-                <div class="action-menu-item">
-                    <g:link controller="dashboard" action="index" class="${!params.onlyShowMine?'selected':''}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-                        Show all requisitions
-                    </g:link>
-                </div>
-            </div>
-        </span>
-        --%>
+        <warehouse:message code="dashboard.fastMovers.label" default="Fast Movers"/>
     </h2>
-
-
-	<div class="widget-content" style="padding:0; margin:0">
-        <table id="fastMoversDataTable">
+	<div class="widget-content" style="padding:0px; margin:0">
+        <table id="dataTable">
             <thead>
-                <%--<th>Rank</th>--%>
+                <th>ID</th>
+                <th>Rank</th>
                 <th>Code</th>
                 <th>Product</th>
-                <th>Requests</th>
-                <th>Demand</th>
-                <th>QoH</th>
+                <th>Count</th>
+                <th>Requested</th>
+                <th>On Hand</th>
             </thead>
             <tbody>
 
             </tbody>
         </table>
 	</div>
-
 </div>
+<script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
     $(window).load(function(){
 
-        var dataTable = $('#fastMoversDataTable').dataTable( {
+        var dataTable = $('#dataTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
             "iDisplayLength": 5,
@@ -71,14 +57,11 @@
             "bScrollCollapse": true,
             "bJQueryUI": true,
             "bAutoWidth": true,
-            "sPaginationType": "two_button",
+            "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getFastMovers",
             "fnServerParams": function ( data ) {
-                //console.log("server data " + data);
-                //var locationId = $("#locationId").val();
-                //var date = $("#date").val();
-                //data.push({ name: "location.id", value: locationId });
-                //data.push({ name: "date", value: date })
+                var locationId = $("#currentLocationId").val();
+                data.push({ name: "location.id", value: locationId });
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
@@ -99,7 +82,7 @@
 //            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> <br/><br/> Loading... "
             },
             //"fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,
@@ -109,25 +92,20 @@
             ],
             "aoColumns": [
 
-                //{ "mData": "id", "bVisible":false }, // 0
-                //{ "mData": "rank", "sWidth": "1%" }, // 1
-                { "mData": "productCode", "sWidth": "1%" }, // 2
+                { "mData": "id", "bVisible":false }, // 0
+                { "mData": "rank", "sWidth": "1%" }, // 1
+                { "mData": "productCode", "bVisible":false }, // 2
                 { "mData": "name" }, // 3
-                { "mData": "requisitionCount", "sWidth": "5%", "sType": 'numeric' }, // 4
-                { "mData": "quantityRequested", "sWidth": "5%", "sType": 'numeric' }, // 5
-                { "mData": "quantityOnHand", "sWidth": "5%", "sType": 'numeric' } // 5
-                //
+                { "mData": "requisitionCount", "sWidth": "5%"  }, // 4
+                { "mData": "quantityRequested", "sWidth": "5%"  }, // 5
+                { "mData": "quantityOnHand", "sWidth": "5%"  } // 5
 
             ],
             "bUseRendered": false,
-            "aaSorting": [[ 2, "desc"],[3, "desc"]],
+            "aaSorting": [[ 4, "desc" ], [5, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                //console.log(nRow);
-                //console.log(aData);
-                //console.log(iDisplayIndex);
-
                 $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
-                        aData["name"] + '</a>');
+                        aData["productCode"] + " " + aData["name"] + '</a>');
                 return nRow;
             }
 

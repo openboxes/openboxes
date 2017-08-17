@@ -1,2 +1,2 @@
-ID,SKU,Name,Category,Description,Unit of Measure,Tags,Unit price,Manufacturer,Brand,Manufacturer Code,Manufacturer Name,Vendor,Vendor Code,Vendor Name,Cold Chain,UPC,NDC,Date Created,Date Updated
+Product ID,Product Code,Name,Category,Description,Unit of Measure,Tags,Unit price,Manufacturer,Brand,Manufacturer Code,Manufacturer Name,Vendor,Vendor Code,Vendor Name,Cold Chain,UPC,NDC,Date Created,Date Updated
 ff80818144b997860144bc3b81ca0001,AB12,"Miconazole nitrate 2 % cream, 30 gram tube",Drugs and pharmaceutical products,,tube,"tag1,tag2,tag3",0.0001,ACME pharma,,ACME1234,,,,,false,,,13/Mar/2014 12:17:00,13/Mar/2014 02:06:27

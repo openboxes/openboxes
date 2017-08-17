@@ -154,31 +154,31 @@ class FormatTagLib {
 	  */
 	 def metadata = { attrs ->
 		 //log.info ("attrs.obj " + attrs.obj + " [" + attrs.obj.class + "] " + isEnum + " " + attrs.obj.properties.get("name"))
-		 
-		 if (attrs.obj != null) {
+
+		 if (attrs.obj) {
 			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
              Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
              Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
-			 
+
 			 // handle String; localize the string directly
 			 if (attrs.obj instanceof String) {
 				 out << LocalizationUtil.getLocalizedString(attrs.obj,  locale)
 			 }
 			 // handle Enums; by convention, the localized text for a Enum is stored in the message property enum.className.value  (ie enum.ShipmentStatusCode.PENDING)
 			 else if (attrs.obj instanceof Enum) {
-				 String className = attrs.obj.getClass().getSimpleName()		 
+				 String className = attrs.obj.getClass().getSimpleName()
 				 out << warehouse.message(code:'enum.' + className + "." + attrs.obj, locale: locale)
 			 }
 			 // for all other objects, return the localized version of the name
-			 else {				 
-				 // If there's a 'name' attribute
-				 if (attrs.obj.properties.get("name")) { 
-					 out << LocalizationUtil.getLocalizedString(attrs.obj.name, locale)
-				 }				 
+			 else {
+				 // If there's a 'name' attribute on the object
+				 if (attrs?.obj?.properties?.get("name") || attrs?.obj?.name) {
+					 out << LocalizationUtil.getLocalizedString(attrs?.obj?.name, locale)
+				 }
 				 // Otherwise, use value of toString() method (probably just going to return an unlocalized string)
-				 else { 
-					 out << LocalizationUtil.getLocalizedString(attrs.obj.toString(), locale)
+				 else {
+					 out << LocalizationUtil.getLocalizedString(attrs?.obj?.toString(), locale)
 				 }
 			 }
 		 }

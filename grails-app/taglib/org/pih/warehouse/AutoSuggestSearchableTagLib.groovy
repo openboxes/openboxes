@@ -12,97 +12,24 @@ package org.pih.warehouse
 // import java.text.SimpleDateFormat;
 
 class AutoSuggestSearchableTagLib {
-		
 
 	def autoSuggestSearchable = { attrs, body ->
-		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
-		def name = attrs.name
-		def styleClass = attrs.styleClass
-		def valueId = (attrs.valueId)?:"";
-		def valueName = (attrs.valueName)?:"";
-		def width = (attrs.width) ?: '200px';
-		def minLength = (attrs.minLength) ?: 1;
-		def jsonUrl = (attrs.jsonUrl) ?: "";
+		attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+		attrs.name = attrs.name
+		attrs.styleClass = attrs.styleClass
+		attrs.valueId = (attrs.valueId)?:"";
+		attrs.valueName = (attrs.valueName)?:"";
+		attrs.width = (attrs.width) ?: '200px';
+		attrs.minLength = (attrs.minLength) ?: 1;
+		attrs.jsonUrl = (attrs.jsonUrl) ?: "";
 
 		// def showValue = (valueName && valueId) ? true : false;
 		// def spanDisplay = (showValue) ? "inline" : "none";
 		// def suggestDisplay = (showValue) ? "none" : "inline";
 	    // def spanDisplay = "none";
-		def suggestDisplay = "inline";
-		
-		def html = """
-			<span>
-				<style>
-					#${id}-suggest {
-						background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
-						background-repeat: no-repeat;
-						background-position: center left;
-						padding-left: 20px;						
-					}				
-					.ui-autocomplete-term { font-weight: bold; color: #DDD; }
-				</style>
-				
-				<input id="${id}-suggest" type="text" name="${name}.name" 
-					value="${valueName}" style="width: ${width}; display: ${suggestDisplay};" class="${styleClass}"> 	
-				
-				<script>
-					\$(document).ready(function() {
-				      	\$("#${id}-suggest").autocomplete({
-				            width: '${width}',
-				            minLength: ${minLength},
-				            dataType: 'json',
-				            highlight: true,
-				            //selectFirst: true,
-				            scroll: true,
-				            autoFocus: true,
-				            autoFill: true,
-				            //scrollHeight: 300,
-							//define callback to format results
-							source: function(request, response){			
-								\$.getJSON('${jsonUrl}', request, function(data) {
-									var suggestions = [];
-									\$.each(data, function(i, item) {
-										suggestions.push(item);
-									});
-									response(suggestions);
-								});
-					      	},
-					        focus: function(event, ui) {			
-					        	return false;
-					        },	
-					        change: function(event, ui) { 
-					        	return false;
-					        },
-							select: function(event, ui) {
-								// set text display
-								\$("#lotNumber-text").html(ui.item.lotNumber);
-								\$("#product-text").html(ui.item.productName);
-								\$("#quantity-text").html(ui.item.quantity);
-								\$("#expirationDate-text").html(ui.item.expirationDate);
+		attrs.suggestDisplay = "inline";
+		out << g.render(template: '/taglib/autoSuggestSearchable', model: [attrs:attrs]);
 
-								// set hidden values
-								\$("#productId").val(ui.item.productId);
-								\$("#lotNumber-suggest").val(ui.item.lotNumber);
-								\$("#inventoryItemId").val(ui.item.id)
-								//\$("#quantity").val(ui.item.quantity);
-
-								// Update on hand quantity
-								updateQuantityOnHand();			
-
-								\$("#itemFoundForm").show();
-								\$("#itemSearchForm").hide();
-								\$("#quantity").focus();
-								
-							}
-						});
-					});
-					
-				</script>
-			</span>		
-		""";
-			
-		
-		out << html; 
 	}
 	
 }

@@ -2,6 +2,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
+                        ${item?.product?.productCode}
 						<format:product product="${item?.product}"/>
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
 					</td>
@@ -9,7 +10,12 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" /></label></td>                            
 					<td valign="top" class="value">
-						${item?.lotNumber }
+						<g:if test="${item?.lotNumber}">
+							${item?.lotNumber }
+						</g:if>
+						<g:else>
+							<span class="fade">${g.message(code:'default.noLotNumber.label')}</span>
+						</g:else>
 						<g:hiddenField id="lotNumber" name="lotNumber" value="${item?.lotNumber }"/>
 					</td>
 				</tr>
@@ -18,7 +24,7 @@
 						<label><warehouse:message code="inventoryItem.expirationDate.label" /></label>
 					</td>                            
 					<td valign="top" class="value">
-						${item?.expirationDate?:warehouse.message(code:'default.never.label')}
+						${item?.expirationDate?:g.message(code:'default.never.label')}
 					</td>
 				</tr>
 				<tr class="prop">

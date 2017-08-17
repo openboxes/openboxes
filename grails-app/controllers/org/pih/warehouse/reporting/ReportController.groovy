@@ -10,6 +10,8 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.CacheFlush
+import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
@@ -23,7 +25,7 @@ class ReportController {
 	def inventoryService
 	def productService
 	def reportService
-
+    def messageService
 
     def getCsv(list) {
         println list
@@ -57,15 +59,15 @@ class ReportController {
         return csv;
     }
 
-    def getCsvForListOfMapEntries(List binLocations) {
+    def getCsvForListOfMapEntries(List list) {
         def csv = ""
-        if (binLocations) {
-            binLocations[0].eachWithIndex { k, v, index ->
+        if (list) {
+            list[0].eachWithIndex { k, v, index ->
                 csv += StringEscapeUtils.escapeCsv(k) + ","
             }
             csv+= "\n"
 
-            binLocations.each { row ->
+            list.each { entry ->
                 row.eachWithIndex { k, v, index ->
                     csv += StringEscapeUtils.escapeCsv(v ? v.toString() : "") + ","
                 }
@@ -74,6 +76,58 @@ class ReportController {
         }
         return csv
     }
+
+
+    def getCsvForListOfMapEntries(List list, Closure csvHeader, Closure csvRow) {
+        def csv = ""
+        if (list) {
+
+            csv += csvHeader(list[0])
+
+            list.each { entry ->
+                csv += csvRow(entry)
+            }
+        }
+        return csv
+    }
+
+    def binLocationCsvHeader = { binLocation ->
+        String csv = ""
+        if (binLocation) {
+            csv += g.message(code:'default.status.label') + ","
+            csv += g.message(code:'product.productCode.label') + ","
+            csv += g.message(code:'product.label') + ","
+            csv += g.message(code:'productGroup.label') + ","
+            csv += g.message(code:'category.label') + ","
+            csv += g.message(code:'inventoryItem.lotNumber.label') + ","
+            csv += g.message(code:'inventoryItem.expirationDate.label') + ","
+            csv += g.message(code:'location.binLocation.label') + ","
+            csv += g.message(code:'default.quantity.label') + ","
+            csv += "\n"
+        }
+        return csv;
+
+    }
+
+    def binLocationCsvRow = { binLocation ->
+        String csv = ""
+        if (binLocation) {
+            String defaultBinLocation = g.message(code: 'default.label')
+            String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "MMM yyyy")
+            csv += binLocation.status + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.genericProduct?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.inventoryItem?.lotNumber) + ","
+            csv += StringEscapeUtils.escapeCsv(expirationDate) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.name?:defaultBinLocation) + ","
+            csv += binLocation.quantity + ","
+            csv += "\n"
+        }
+        return csv;
+    }
+
 
 	def exportBinLocation = {
         long startTime = System.currentTimeMillis()
@@ -327,5 +381,71 @@ class ReportController {
 			throw new UnsupportedOperationException("Format '${params.format}' not supported")
 		}
 	}
+
+    @CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])
+    def clearBinLocationCache = {
+        flash.message = "Cache have been flushed"
+        redirect(action: "showBinLocationReport")
+    }
+
+
+
+    def showBinLocationReport = {
+
+        log.info "showBinLocationReport " + params
+        def startTime = System.currentTimeMillis()
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+
+        def quantityMap = [:]
+        List binLocations = []
+        List statuses = ["inStock", "outOfStock"]
+
+        statuses = statuses.collect { status ->
+            String messageCode = "binLocationSummary.${status}.label"
+            String label = messageService.getMessage(messageCode)
+            [status: status, label: label]
+        }
+
+        try {
+            if (params.button == "download") {
+                def binLocationReport = inventoryService.getBinLocationReport(location)
+
+                binLocations = binLocationReport.data
+                statuses = binLocationReport.summary
+
+                // Filter on status
+                if (params.status) {
+                    binLocations = binLocations.findAll { it.status == params.status }
+                }
+
+                String csv = getCsvForListOfMapEntries(binLocations, binLocationCsvHeader, binLocationCsvRow)
+                def filename = "Bin Location Report - ${location?.name} - ${params.status?:'All'}.csv"
+                response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+                render(contentType: "text/csv", text: csv)
+                return
+            }
+
+
+        } catch (Exception e) {
+            log.error("Unable to generate bin location report due to error: " + e.message, e)
+            flash.message = e.message
+        }
+
+        log.info("Show bin location report: " + (System.currentTimeMillis() - startTime) + " ms");
+        [
+                location: location,
+                elapsedTime: (System.currentTimeMillis() - startTime),
+                quantityMap: quantityMap,
+                binLocations: binLocations,
+                statuses: statuses
+        ]
+
+    }
+
+
+
+
+
 
 }

@@ -28,13 +28,11 @@
 		</g:form>
 	</div>							
 </div>
-				     
 <script>
 	$(document).ready(function() {
 		$("#searchable-suggest").blur( function () { 
-			$(this).focus();
+		   	$("#dialog-quantity").focus();
 		});
-
 		
 		$("#dlgAddItem").dialog({ 
 			autoOpen: true, 

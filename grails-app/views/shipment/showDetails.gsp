@@ -47,21 +47,7 @@
 									<label><warehouse:message code="default.status.label" /></label>
 								</td>
 								<td valign="top" id="shipmentStatus" class="value">
-									<format:metadata obj="${shipmentInstance?.status?.code}"/>
-                                    ${shipmentInstance?.currentStatus}
-									<%--
-									<span>
-										<g:if test="${shipmentInstance?.status?.location}">
-											<span>-</span>
-											<span class="fade"><warehouse:message code="default.from.label"/></span>
-											<span>${shipmentInstance?.status.location}</span>
-										</g:if>
-										<g:if test="${shipmentInstance?.status?.date}">
-											<span class="fade"><warehouse:message code="default.on.label"/></span>
-											<span><format:date obj="${shipmentInstance?.status.date}"/></span>
-										</g:if>
-									</span>
-									--%>
+									<format:metadata obj="${shipmentInstance?.currentStatus}"/>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -252,6 +238,9 @@
                                                 code="shipping.comments.label" default="Comments"/></label>
                                     </td>
                                     <td valign="top" class="value">
+                                        <g:if test="${!shipmentInstance?.comments}">
+                                            <div class="fade"><g:message code="default.noComments.label"/></div>
+                                        </g:if>
                                         <g:each var="comment" in="${shipmentInstance?.comments}">
                                             <div class="comment">
                                                 <b>${comment?.sender?.name}</b> ·
@@ -958,7 +947,10 @@
                                 </table>
                             </div>
                             <div class="box">
-                                <h2>Add Event</h2>
+                                <h2>
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="event" style="vertical-align: middle"/>
+                                    <label><warehouse:message code="shipping.addEvent.label" default="Add Event"/></label>
+                                </h2>
                                 <g:form controller="shipment" action="saveEvent" method="POST">
                                     <g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
                                     <g:hiddenField name="eventId" value="${eventInstance?.id}" />
@@ -985,7 +977,7 @@
                                             <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
                                                 <g:select id="eventLocation.id" name='eventLocation.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
                                                           from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
-                                                          value="${eventInstance?.eventLocation?.id}" class="chzn-select-deselect">
+                                                          value="${eventInstance?.eventLocation?.id?:session?.warehouse?.id}" class="chzn-select-deselect">
                                                 </g:select>
                                             </td>
                                         </tr>
@@ -996,11 +988,14 @@
                                                 <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
                                                 --%>
                                                 <g:datePicker name="eventDate" value="${eventInstance?.eventDate}" precision="minute"/>
-
-                                                <button type="submit" class="button icon add">
-                                                    <warehouse:message code="default.button.add.label"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td class="name"></td>
+                                            <td class="value">
+                                                <button type="submit" class="button">
+                                                    <warehouse:message code="default.button.save.label"/>
                                                 </button>
-
                                             </td>
                                         </tr>
                                         </tbody>

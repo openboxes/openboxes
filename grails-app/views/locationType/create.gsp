@@ -19,67 +19,84 @@
 	                <g:renderErrors bean="${locationTypeInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form action="save" method="post" >
-            	<fieldset>
-	                <div class="dialog">
-	                    <table>
-	                        <tbody>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                    <label for="name"><warehouse:message code="locationType.name.label" default="Name" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${locationTypeInstance?.name}" />
-	                                </td>
-	                            </tr>
-	                        	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                    <label for="description"><warehouse:message code="locationType.description.label" default="Description" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
-	                                    <g:textField name="description" value="${locationTypeInstance?.description}" />
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-										<label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value">
-	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size() }" style="width: 150px" 
-	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${warehouseInstance?.supportedActivities}" />
-	                                </td>
-	                            </tr>	                            
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                    <label for="sortOrder"><warehouse:message code="locationType.sortOrder.label" default="Sort Order" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
-	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" />
-	                                </td>
-	                            </tr>
-	                        
-	                        
-		                        <tr class="prop">
-		                        	<td valign="top"></td>
-		                        	<td valign="top">
-						                <div class="buttons left">
-						                   <g:submitButton name="create" class="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-						                   
-						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-						                   
-						                </div>                        	
-		                        	</td>
-		                        </tr>
-		                        
-	                        </tbody>
-	                    </table>
-	                </div>
-                </fieldset>
-            </g:form>
+
+            <div class="button-bar">
+                <g:link class="button icon search" action="list" controller="locationType">
+                    <warehouse:message code="default.list.label" args="[g.message(code: 'locationTypes.label')]" />
+                </g:link>
+            </div>
+
+            <g:form method="post" >
+				<div class="box">
+                    <h2><warehouse:message code="default.create.label" args="[entityName]" /></h2>
+				<g:hiddenField name="id" value="${locationTypeInstance?.id}" />
+				<g:hiddenField name="version" value="${locationTypeInstance?.version}" />
+				<div class="dialog">
+					<table>
+						<tbody>
+
+                        <tr class="prop">
+                            <td valign="top" class="name">
+                                <label for="locationTypeCode"><warehouse:message code="locationTypeCode.label" default="Location Type Code" /></label>
+                            </td>
+                            <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
+                                <g:select name="locationTypeCode" class="chzn-select-deselect" from="${org.pih.warehouse.core.LocationTypeCode.list()}"
+                                          noSelection="['':'']"
+                                          value="${locationTypeInstance?.locationTypeCode}"/>
+                            </td>
+                        </tr>
+
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label for="name"><warehouse:message code="default.name.label" /></label>
+							</td>
+							<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
+								<g:textField name="name" value="${locationTypeInstance?.name}" class="text" size="100" style="width:100%"/>
+							</td>
+						</tr>
+
+
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label for="description"><warehouse:message code="default.description.label" /></label>
+							</td>
+							<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
+								<g:textArea name="description" value="${locationTypeInstance?.description}" cols="80" rows="5" style="width:100%"/>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label for="supportedActivities"><warehouse:message code="locationType.supportedActivities.label" /></label>
+							</td>
+							<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'supportedActivities', 'errors')}">
+								<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
+								<g:select name="supportedActivities" multiple="true" from="${activityList }"
+                                          size="${activityList.size() }" style="width: 100%"
+										  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationTypeInstance?.supportedActivities}" />
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label for="sortOrder"><warehouse:message code="default.sortOrder.label" /></label>
+							</td>
+							<td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
+								<g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" class="text"/>
+							</td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top"></td>
+							<td valign="top">
+								<div class="buttons left">
+									<g:actionSubmit class="button" action="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+								</div>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+				</fieldset>
+			</g:form>
         </div>
     </body>
 </html>

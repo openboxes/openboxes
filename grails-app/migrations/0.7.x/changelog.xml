@@ -11,5 +11,7 @@
     <include file="0.7.x/changelog-2017-04-17-1437-adjust-inventory-supported-activity.xml"/>
     <include file="0.7.x/changelog-2017-06-28-1250-refactor-product-group.xml"/>
     <include file="0.7.x/changelog-2017-06-28-2135-add-column-shipment-current-status.xml"/>
+    <include file="0.7.x/changelog-2017-07-27-2321-insert-superuser-role.xml"/>
+    <include file="0.7.x/changelog-2017-08-07-1344-insert-bin-location-type.xml"/>
 
 </databaseChangeLog>

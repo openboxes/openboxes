@@ -430,10 +430,6 @@
             event.preventDefault();
         });
 
-        $('.dataTable').dataTable({
-            "bJQueryUI": false,
-            "sPaginationType": "full_numbers"
-        });
     });
 </script>
 
@@ -471,10 +467,10 @@
             });
 
             scanner.bind('scannerDetectionError',function(event,data){
-                console.log("Error detecting barcode scanner input");
-                console.log(event);
-                console.log(data);
-            })
+                //console.log("Error detecting barcode scanner input", event, data);
+                //console.log(event);
+                //console.log(data);
+            });
         });
     </script>
 </g:if>

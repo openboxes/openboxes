@@ -36,7 +36,7 @@ enum LocationTypeCode {
     }
 
     static list() {
-        [DEPOT, DISPENSARY, WARD, BIN_LOCATION, VIRTUAL]
+        [DEPOT, DISPENSARY, WARD, BIN_LOCATION, SUPPLIER, DONOR, VIRTUAL]
     }
 
 }
