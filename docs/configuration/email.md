@@ -4,13 +4,13 @@
 The default email configuration properties.
 ```
 grails.mail.enabled = true			
+grails.mail.debug = false
 grails.mail.from = info@openboxes.com
 grails.mail.prefix = [OpenBoxes]
 grails.mail.host = localhost
 grails.mail.port = 25
 grails.mail.username = null
 grails.mail.password = null
-grails.mail.debug = false
 ```
 
 ## Using a transactional email service

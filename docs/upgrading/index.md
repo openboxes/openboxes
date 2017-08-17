@@ -1,6 +1,6 @@
 # Upgrading 
 
-## Ubuntu Command Line
+## Using Command Line (Ubuntu)
 1. SSH into your server
 1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
     ```
@@ -13,7 +13,7 @@
     ```
 1. Copy WAR file to Tomcat webapps directory (NOTE: we need to change the name of the WAR file)
     ```
-    sudo cp openboxes-0.7.22.war /var/lib/tomcat7/webapps/openboxes.war
+    sudo cp openboxes-<release-tag>.war /var/lib/tomcat7/webapps/openboxes.war
     ```
 1. Start Tomcat (NOTE: this may take awhile if there are lots of data migrations)
 1. Check the logs 
@@ -21,16 +21,16 @@
     sudo tail -f /var/logs/tomcat7/catalina.out
     ```
 
-## Tomcat Manager
+## Using Tomcat Manager
 This is the easiest way to upgrade, but you need to make sure you 
 1. Install Tomcat manager
-    sudo apt-get install tomcat-manager
-
-1. Add a new user in /usr/share/tomcat7/conf/tomcat-users.xml
+    ```
+    sudo apt-get install tomcat-admin
+    ```
+1. Add a new user in tomcat-users.xml (`/usr/share/tomcat7/conf/tomcat-users.xml`)
     ```
     <user username="<username>" password="<password>" roles="manager-gui"/>
     ```
-
 1. Restart Tomcat
 1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
     ```
