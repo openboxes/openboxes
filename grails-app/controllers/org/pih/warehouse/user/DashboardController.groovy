@@ -393,8 +393,8 @@ class DashboardController {
 				def userInstance = User.get(session.user.id);
 				//userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
 				userInstance.lastLoginDate = new Date();
-				userInstance.save(flush:true);
                 userInstance.warehouse = warehouse
+				userInstance.save(flush:true);
 				session.user = userInstance;
 			}			
 			

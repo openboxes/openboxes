@@ -139,7 +139,7 @@ class ShipmentService {
                 between("dateCreated", start, end)
 				or {
 					//between("expectedShippingDate",null,null)
-					between("expectedShippingDate", now -daysBefore, now +daysAfter)
+					between("expectedShippingDate", start, end)
 					isNull("expectedShippingDate")
 				}
 			}

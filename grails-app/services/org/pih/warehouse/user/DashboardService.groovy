@@ -184,7 +184,7 @@ class DashboardService {
             WHERE location_id = :locationId
         """
         def results = sql.rows(query, [locationId:location.id]);
-
+        log.info "results: " + results
         Date lastUpdated = new Date(results[0].max_last_updated.getTime())
 
         return lastUpdated
