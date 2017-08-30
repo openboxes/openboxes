@@ -11,6 +11,7 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import groovy.sql.Sql
+import groovyx.gpars.GParsPool
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -30,6 +31,7 @@ class DashboardService {
     def grailsApplication
     def inventoryService
     def productService
+    def persistenceInterceptor
 
     boolean transactional = false
 
@@ -604,5 +606,39 @@ class DashboardService {
         }
         return data
     }
+
+
+    def calculateQuantityInParallel(Location location) {
+        def quantityList = []
+        def ids = Product.executeQuery("select distinct(p.id) from Product p where p.active = true")
+        GParsPool.withPool {
+            quantityList = ids.collectParallel { id ->
+                persistenceInterceptor.init()
+                try {
+                    Product product = Product.get(id)
+                    def itemQuantityMap = inventoryService.calculateQuantity(location?.inventory, [product])
+                    log.info "itemQuantityMap: " + itemQuantityMap[product]?.values()
+                    def quantity = itemQuantityMap[product]?.values()?.findAll { it > 0 }?.sum() ?:0
+                    persistenceInterceptor.flush()
+                    return [id: id, quantity: quantity]
+                } catch (Exception e) {
+                    log.error("Error calculating quantity " + e.message, e)
+
+                } finally {
+                    persistenceInterceptor.destroy()
+                }
+            }
+        }
+
+        log.info ("ids: ${ids.size()}, quantityMap: ${quantityList.size()}")
+
+        return quantityList
+    }
+
+
+//    def calculateQuantity(Location location, Product) {
+//        def itemQuantityMap = inventoryService.calculateQuantity(location?.inventory, [product])
+//
+//    }
 
 }

@@ -516,6 +516,28 @@ class DashboardController {
         return;
     }
 
+    def inventorySummary = {
+        long startTime = System.currentTimeMillis()
+
+        def location = Location.load(session.warehouse.id)
+        def quantityList = dashboardService.calculateQuantityInParallel(location)
+
+        log.info "quantityList: " + quantityList
+
+        def inStockCount = quantityList.findAll { it.quantity > 0 }
+        def outOfStockCount = quantityList.findAll { it.quantity <= 0 }
+
+        long responseTime = (System.currentTimeMillis() - startTime)
+        log.info "Calculated quantity in parallel: " + responseTime + "ms"
+
+        render ([responseTime: responseTime,
+                 totalCount: quantityList.size(),
+                 inStockCount: inStockCount?.size(),
+                 outOfStockCount: outOfStockCount?.size()
+        ] as JSON)
+    }
+
+
 }
 
 
