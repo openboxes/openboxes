@@ -26,14 +26,13 @@
     <jqui:resources />
     <link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 
-
     <!-- Include Jquery Validation and Jquery Validation UI plugins -->
     <jqval:resources />
     <jqvalui:resources />
 
     <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes.css')}" type="text/css" media="all" />
 
-<!-- jquery validation messages -->
+    <!-- jquery validation messages -->
     <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
         <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>
