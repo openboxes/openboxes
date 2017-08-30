@@ -536,8 +536,6 @@ class DashboardController {
                  outOfStockCount: outOfStockCount?.size()
         ] as JSON)
     }
-
-
 }
 
 

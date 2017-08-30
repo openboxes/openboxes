@@ -22,12 +22,23 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 
-            <div class="yui-gf" >
-                <div class="yui-u first ">
-                    <div class="filters">
-                        <h1><warehouse:message code="inventory.status.label" default="Status"/></h1>
+            <div class="button-bar">
+                <g:link controller="dashboard" action="index" class="button">
+                    <g:message code="dashboard.backToDashboard.label"/>
+                </g:link>
 
-                        <table>
+                <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" id="${params.id}" class="button">
+                    <g:message code="default.button.download.label"/>
+                </g:link>
+            </div>
+
+            <div class="yui-gf" >
+                <div class="yui-u first">
+                    <div class="box">
+                        <h2><warehouse:message code="inventory.status.label" default="Status"/></h2>
+
+                        <table class="table table-striped">
+                            <tbody>
 
                             <g:each in="${productSummary}" var="status">
                                 <%-- exclude subtotal rows --%>
@@ -41,18 +52,13 @@
                                         </td>
                                     </tr>
                                 </g:if>
-
                             </g:each>
+                            </tbody>
                         </table>
                     </div>
 
                 </div>
                 <div class="yui-u">
-
-
-                    <div class="button-bar">
-                        <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" id="${params.id}" class="button">Download CSV</g:link>
-                    </div>
 
                     <div class="box">
                         <h2>
