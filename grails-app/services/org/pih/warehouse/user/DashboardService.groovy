@@ -17,6 +17,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItemSummary
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -28,6 +29,7 @@ class DashboardService {
     def dataSource
     def grailsApplication
     def inventoryService
+    def productService
 
     boolean transactional = false
 
@@ -188,6 +190,49 @@ class DashboardService {
         Date lastUpdated = new Date(results[0].max_last_updated.getTime())
 
         return lastUpdated
+    }
+
+
+    def getCategories() {
+        def category = productService.getRootCategory()
+        def categories = category.categories
+        categories = categories.groupBy { it?.parentCategory }
+        return categories
+    }
+
+    def getShipmentSummary(Location destination, Location origin, Date startDate, Date endDate) {
+
+        def criteria = Shipment.createCriteria()
+        def results = criteria.list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                countDistinct("id", "count")
+                groupProperty("currentStatus", "status")
+            }
+
+            if (destination) {
+                eq("destination", destination)
+            }
+
+            if (origin) {
+                eq("origin", origin)
+            }
+
+            if (startDate && endDate) {
+                between("dateCreated", startDate, endDate)
+            }
+        }
+
+        println "Results ${results}"
+        // Convert to map
+        def shipmentSummary = [:]
+        results.each { shipmentSummary[it.status] = it.count }
+        println "shipmentSummary ${shipmentSummary}"
+        return shipmentSummary
+    }
+
+    def getOrderSummary(Location location) {
+        return Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
     }
 
 

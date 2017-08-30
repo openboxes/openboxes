@@ -226,19 +226,30 @@
             <a href="javascript:void(0)"><warehouse:message code="shipping.label" /></a>
 			<div class="buttonsBar" style="min-width: 200px;">
                 <div class="megaButton">
-                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
+                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create">
+                        <g:message code="shipping.createOutgoingShipment.label"/>
+                    </g:link>
                 </div>
                 <hr/>
                 <div class="megaButton">
-   					<g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                            <warehouse:message code="shipping.listOutgoing.label"  default="List outbound shipments"/>
+                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                        <label><g:message code="shipping.listOutgoing.label"  default="List outbound shipments"/></label>
                     </g:link>
 				</div>
-				<g:each in="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}" var="statusRow">
+                <div class="megaButton">
+                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                        All Outbound
+                        <div class="right badge">${outboundShipmentCount?:0}</div>
+                    </g:link>
+                </div>
+                <g:each in="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[status:statusRow]" class="shipment-status-${statusRow }">
 							<format:metadata obj="${statusRow}"/>
-						</g:link>
+                            <div class="right badge">${outboundShipmentStats[statusRow]?:0}</div>
+
+                        </g:link>
+
 					</div>
 				</g:each>
 			</div>
@@ -251,24 +262,29 @@
 
 			<div class="buttonsBar" style="min-width: 200px;">
                 <div class="megaButton">
-                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
+                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
+                        <g:message code="shipping.createIncomingShipment.label"/></g:link>
                 </div>
                 <hr/>
                 <div class="megaButton">
 					<g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
-                        <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
+                        <g:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
                     </g:link>
 				</div>
 
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                        All
+                        All Inbound
+                        <div class="right badge">${inboundShipmentCount?:0}</div>
                     </g:link>
                 </div>
 				<g:each in="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}" var="statusRow">
 					<div class="megaButton">
 						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow]" class="shipment-status-${statusRow }">
-							<format:metadata obj="${statusRow}"/>
+							<div class="indent">
+                                <format:metadata obj="${statusRow}"/>
+                                <div class="right badge">${inboundShipmentStats[statusRow]?:0}</div>
+                            </div>
 						</g:link>
 					</div>
 				</g:each>					

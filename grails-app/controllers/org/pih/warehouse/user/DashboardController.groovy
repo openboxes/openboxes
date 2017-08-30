@@ -281,51 +281,45 @@ class DashboardController {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
-		//def startTime = System.currentTimeMillis()
+		def startTime = System.currentTimeMillis()
 
         // Inbound Shipments
-		def incomingShipments = Shipment.findAllByDestinationAndCurrentStatusIsNotNull(location);
-        incomingShipments = incomingShipments?.groupBy{ it?.currentStatus }?.sort()
-        def incomingShipmentsCount = Shipment.countByDestination(location)
+        def inboundShipmentStats = dashboardService.getShipmentSummary(location, null, null, null)
+        def inboundShipmentCount = Shipment.countByDestination(location)
+        log.info "Inbound shipments: " + (System.currentTimeMillis()-startTime) + " ms"
+        startTime = System.currentTimeMillis()
 
 
 		// Outbound Shipments
-		def outgoingShipments = Shipment.findAllByOriginAndCurrentStatusIsNotNull(location)
-        outgoingShipments = outgoingShipments?.groupBy{it?.currentStatus}?.sort()
-        def outgoingShipmentsCount = Shipment.countByOrigin(location)
+		def outboundShipmentStats = dashboardService.getShipmentSummary(null, location, null, null)
+        def outboundShipmentCount = Shipment.countByOrigin(location)
+        log.info "Outbound shipments: " + (System.currentTimeMillis()-startTime) + " ms"
+        startTime = System.currentTimeMillis()
 
-		// Orders
-		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
+        // Orders
+		def incomingOrders = dashboardService.getOrderSummary()
+        log.info "Inbound orders: " + (System.currentTimeMillis()-startTime) + " ms"
+        startTime = System.currentTimeMillis()
+
 
         // Requisitions
-        //def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-		//def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-        //def incomingRequests = [:] //requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
-        //def outgoingRequests = []
-        //def requisitionTemplates = [] //requisitionService.getAllRequisitionTemplates(session.warehouse)
-        //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
-        //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
         def requisitionStatistics = requisitionService.getRequisitionStatistics(location,null,user)
+        log.info "Requisition stats: " + (System.currentTimeMillis()-startTime) + " ms"
+        startTime = System.currentTimeMillis()
 
-        def categories = []
-		def category = productService.getRootCategory()		
-		categories = category.categories
-		categories = categories.groupBy { it?.parentCategory }
 
-        //println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
+        def categories = dashboardService.getCategories()
+        log.info "Categories: " + (System.currentTimeMillis()-startTime) + " ms"
+        startTime = System.currentTimeMillis()
 
-		[
+        [
 			categories: categories,
-			incomingShipments: incomingShipments,
-            incomingShipmentsCount: incomingShipmentsCount,
-            outgoingShipments: outgoingShipments,
-			outgoingShipmentsCount: outgoingShipmentsCount,
+            inboundShipmentStats: inboundShipmentStats,
+            inboundShipmentCount: inboundShipmentCount,
+            outboundShipmentStats: outboundShipmentStats,
+            outboundShipmentCount: outboundShipmentCount,
 			incomingOrders: incomingOrders,
             requisitionStatistics: requisitionStatistics,
-			//incomingRequests: incomingRequests,
-			//outgoingRequests: outgoingRequests,
-            //requisitionTemplates: requisitionTemplates,
-            //myRequisitions: myRequisitions,
 			quickCategories:productService.getQuickCategories(),
 			tags:productService.getAllTags()
 		]
