@@ -1165,7 +1165,7 @@ class InventoryService implements ApplicationContextAware {
 	 * Note that the transaction entries should all be from the same inventory,
 	 * or the quantity results would be somewhat nonsensical
      *
-     * Also note that this method is calculating backwards to get the current quantity on hand gor the given product
+     * Also note that this method is calculating backwards to get the current quantity on hand for the given product
      * and its inventory items.
 	 *
 	 * TODO: add a parameter here to optionally take in a product, which means that we are only
@@ -1178,14 +1178,16 @@ class InventoryService implements ApplicationContextAware {
 		def startTime = System.currentTimeMillis()
 		def quantityMap = [:]
 
-        def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
-        def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
+		// used to keep track of which items we've found an inventory transaction for
+        def reachedInventoryTransaction = [:]
+
+		// used to keep track of which items we've found a product inventory transaction for
+        def reachedProductInventoryTransaction = [:]
 
         if (entries) {
 
             // first make sure the transaction entries are sorted, with most recent first
             entries = entries.sort().reverse()
-
 
             // Iterate over all transaction entries until we hit an end condition
             entries.each { transactionEntry ->
@@ -1714,14 +1716,10 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Calculate quantity on hand values for all available inventory items at the given inventory.
 	 *
-     * FIXME Use sparingly - this is very expensive because it calculates the QoH over an entire inventory.
-     *
 	 * @param inventory
 	 * @return
 	 */
 	Map<InventoryItem, Integer> getQuantityForInventory(Inventory inventory) {
-		//def transactionEntries = getTransactionEntriesByInventory(inventory);
-		//return getQuantityByInventoryItemMap(transactionEntries);
         Location location = Location.findByInventory(inventory)
         return getItemQuantityByLocation(location)
 	}
@@ -1741,6 +1739,30 @@ class InventoryService implements ApplicationContextAware {
         return getItemQuantityByLocation(location, products)
 
     }
+
+    /**
+     * Calculate quantity on hand values for all available inventory items at the given inventory.
+     *
+     * @param inventory
+     * @return
+     */
+    Map<InventoryItem, Integer> calculateQuantity(Location location) {
+        def transactionEntries = getTransactionEntriesByInventory(location?.inventory);
+        return getQuantityByInventoryItemMap(transactionEntries);
+    }
+
+    /**
+     * Calculate quantity on hand values for all available inventory items in the given inventory.
+     *
+     * @param inventory
+     * @param products
+     * @return
+     */
+    Map<InventoryItem, Integer> calculateQuantity(Inventory inventory, List<Product> products) {
+        def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, products)
+        return getQuantityByProductAndInventoryItemMap(transactionEntries, false);
+    }
+
 
 
     /**
