@@ -21,8 +21,7 @@
                     ${warehouse.message(code: 'transaction.label')}
                 </th>
                 <th class="border-right">
-                    ${warehouse.message(code: 'shipment.label')} /
-                    ${warehouse.message(code: 'requisition.label')}
+                    ${warehouse.message(code: 'default.reference.label')}
                 </th>
                 <th class="border-right middle center">
                     ${warehouse.message(code: 'default.comments.label')}
@@ -97,13 +96,13 @@
                     <td class="middle">
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
-                                <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
+                                <strong>
+                                    <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
+                                </strong>
                                 <g:if test="${stockHistoryEntry?.transaction?.source }">
-                                    ${g.message(code:'default.from.label')}
                                     ${stockHistoryEntry?.transaction?.source?.name }
                                 </g:if>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.destination }">
-                                    ${g.message(code:'default.to.label')}
                                     ${stockHistoryEntry?.transaction?.destination?.name }
                                 </g:elseif>
                                 <g:if test="${stockHistoryEntry?.transaction?.transactionNumber}">
@@ -122,34 +121,39 @@
                             <div>
                                 <g:if test="${stockHistoryEntry?.transaction?.incomingShipment }">
                                     <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.incomingShipment?.id }">
-                                        ${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo;
-                                        ${stockHistoryEntry?.transaction.incomingShipment?.name }
+                                        <div title="${stockHistoryEntry?.transaction.incomingShipment?.name }">
+                                            <g:message code="shipment.label"/> ${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber }
+                                        </div>
                                     </g:link>
                                 </g:if>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.outgoingShipment }">
                                     <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.outgoingShipment?.id }">
-                                        ${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber } &rsaquo;
-                                        ${stockHistoryEntry?.transaction.outgoingShipment?.name }
+                                        <div title="${stockHistoryEntry?.transaction.outgoingShipment?.name }">
+                                            <g:message code="shipment.label"/> ${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber }
+                                        </div>
                                     </g:link>
                                 </g:elseif>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.requisition }">
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.transaction?.requisition?.id }">
-                                        ${stockHistoryEntry?.transaction?.requisition?.requestNumber } &rsaquo;
-                                        ${stockHistoryEntry?.transaction?.requisition?.name }
+                                        <div title="${stockHistoryEntry?.transaction?.requisition?.name }">
+                                            <g:message code="requisition.label"/> ${stockHistoryEntry?.transaction?.requisition?.requestNumber }
+                                        </div>
                                     </g:link>
                                 </g:elseif>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}">
                                     <g:set var="requisition" value="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}"/>
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
-                                        ${stockHistoryEntry?.requisition?.requestNumber } &rsaquo;
-                                        ${stockHistoryEntry?.requisition?.name }
+                                        <div title="${stockHistoryEntry?.requisition?.name }">
+                                            <g:message code="requisition.label"/> ${stockHistoryEntry?.requisition?.requestNumber }
+                                        </div>
                                     </g:link>
                                 </g:elseif>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.localTransfer?.destinationTransaction?.requisition}">
                                     <g:set var="requisition" value="${transaction?.localTransfer?.destinationTransaction?.requisition}"/>
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
-                                        ${stockHistoryEntry?.requisition?.requestNumber } &rsaquo;
-                                        ${stockHistoryEntry?.requisition?.name }
+                                        <div title="${stockHistoryEntry?.requisition?.name }">
+                                            <g:message code="requisition.label"/> ${stockHistoryEntry?.requisition?.requestNumber }
+                                        </div>
                                     </g:link>
                                 </g:elseif>
 
