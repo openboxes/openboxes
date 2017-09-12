@@ -96,17 +96,18 @@
                     <td class="middle">
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
-                                <strong>
-                                    <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
-                                </strong>
+                                <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
                                 <g:if test="${stockHistoryEntry?.transaction?.source }">
+                                    &rsaquo;
                                     ${stockHistoryEntry?.transaction?.source?.name }
                                 </g:if>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.destination }">
+                                    &rsaquo;
                                     ${stockHistoryEntry?.transaction?.destination?.name }
                                 </g:elseif>
                                 <g:if test="${stockHistoryEntry?.transaction?.transactionNumber}">
-                                    &rsaquo; ${stockHistoryEntry?.transaction?.transactionNumber }
+                                    &rsaquo;
+                                    ${stockHistoryEntry?.transaction?.transactionNumber }
                                 </g:if>
                             </g:link>
                             <g:if test="${stockHistoryEntry?.transaction?.comment}">
@@ -122,21 +123,21 @@
                                 <g:if test="${stockHistoryEntry?.transaction?.incomingShipment }">
                                     <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.incomingShipment?.id }">
                                         <div title="${stockHistoryEntry?.transaction.incomingShipment?.name }">
-                                            <g:message code="shipment.label"/> ${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber }
+                                            <g:message code="shipment.label"/> &rsaquo; ${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber }
                                         </div>
                                     </g:link>
                                 </g:if>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.outgoingShipment }">
                                     <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.outgoingShipment?.id }">
                                         <div title="${stockHistoryEntry?.transaction.outgoingShipment?.name }">
-                                            <g:message code="shipment.label"/> ${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber }
+                                            <g:message code="shipment.label"/> &rsaquo; ${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber }
                                         </div>
                                     </g:link>
                                 </g:elseif>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.requisition }">
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.transaction?.requisition?.id }">
                                         <div title="${stockHistoryEntry?.transaction?.requisition?.name }">
-                                            <g:message code="requisition.label"/> ${stockHistoryEntry?.transaction?.requisition?.requestNumber }
+                                            <g:message code="requisition.label"/> &rsaquo; ${stockHistoryEntry?.transaction?.requisition?.requestNumber }
                                         </div>
                                     </g:link>
                                 </g:elseif>
@@ -144,7 +145,7 @@
                                     <g:set var="requisition" value="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}"/>
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
                                         <div title="${stockHistoryEntry?.requisition?.name }">
-                                            <g:message code="requisition.label"/> ${stockHistoryEntry?.requisition?.requestNumber }
+                                            <g:message code="requisition.label"/> &rsaquo; ${stockHistoryEntry?.requisition?.requestNumber }
                                         </div>
                                     </g:link>
                                 </g:elseif>
@@ -152,7 +153,7 @@
                                     <g:set var="requisition" value="${transaction?.localTransfer?.destinationTransaction?.requisition}"/>
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
                                         <div title="${stockHistoryEntry?.requisition?.name }">
-                                            <g:message code="requisition.label"/> ${stockHistoryEntry?.requisition?.requestNumber }
+                                            <g:message code="requisition.label"/> &rsaquo; ${stockHistoryEntry?.requisition?.requestNumber }
                                         </div>
                                     </g:link>
                                 </g:elseif>
