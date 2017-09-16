@@ -29,7 +29,7 @@
     </changeSet>
     <changeSet author="jmiranda" id="1505533086957-5">
         <update tableName="location_type">
-            <column name="location_type_code" value="PHARMACY"/>
+            <column name="location_type_code" value="DISPENSARY"/>
             <where>id="6"</where>
         </update>
     </changeSet>
