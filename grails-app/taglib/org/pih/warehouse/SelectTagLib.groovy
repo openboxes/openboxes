@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus;
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.requisition.CommodityClass
@@ -31,6 +32,7 @@ class SelectTagLib {
 	
 	def locationService
 	def shipmentService
+    def requisitionService
 
     @Cacheable("selectCategoryCache")
     def selectCategory = { attrs, body ->
@@ -101,6 +103,17 @@ class SelectTagLib {
     def selectRequisitionStatus = { attrs, body ->
         attrs.from = RequisitionStatus.list()
         attrs.optionValue = { it?.name() }
+        out << g.select(attrs)
+    }
+
+    def selectRequisitionTemplate = { attrs, body ->
+        def requisitionCriteria = new Requisition(isTemplate: true)
+        requisitionCriteria.destination = session.warehouse
+        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [:])
+        requisitionTemplates.sort { it.origin.name }
+        attrs.from = requisitionTemplates
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.origin.name + " (" + format.metadata(obj:it?.commodityClass) + ")" }
         out << g.select(attrs)
 
     }
@@ -317,12 +330,31 @@ class SelectTagLib {
 
 	def selectRequestOrigin = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
-		attrs.from = locationService.getRequestOrigins(currentLocation).sort { it?.name?.toLowerCase() };
-		attrs.optionKey = 'id'
-		attrs.placeholder = attrs.placeholder
-		
+        def requisitionType = params?.type?RequisitionType.valueOf(params.type):null
+
+        log.info "requisition type: ${requisitionType}"
+        def origins = locationService.getNearbyLocations(currentLocation).sort { it?.name?.toLowerCase() }
+
+        // Remove current location
+        origins = origins.minus(currentLocation)
+
+        // Filter by requisition type
+        if (requisitionType) {
+            if (requisitionType == RequisitionType.DEPOT_STOCK) {
+                log.info "Filter by depot"
+                origins = origins.findAll { it.isWarehouse() }
+            }
+            else if (requisitionType == RequisitionType.WARD_STOCK) {
+                log.info "Filter by ward"
+                origins = origins.findAll { it.isWardOrPharmacy() }
+            }
+        }
+
+        attrs.from = origins
+        attrs.optionKey = 'id'
+		//attrs.placeholder = attrs?.placeholder
 		//attrs.optionValue = 'name'
-		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+		attrs.optionValue = { it?.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -374,7 +406,7 @@ class SelectTagLib {
         attrs.from = RequisitionType.list()
         //attrs.optionKey = 'id'
         //attrs.optionValue = 'name'
-        attrs.optionValue = { format.metadata(obj: it)  }
+        attrs.optionValue = { it  }
         out << g.select(attrs)
     }
 

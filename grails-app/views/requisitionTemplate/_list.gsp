@@ -20,14 +20,13 @@
             <th>
                 <warehouse:message code="requisition.isPublished.label"/>
             </th>
-            <th>
-                <warehouse:message code="default.name.label"/>
-            </th>
-
 			<g:sortableColumn property="type"
 				title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
             <g:sortableColumn property="type"
                 title="${warehouse.message(code: 'commodityClass.label', default: 'Commodity Class')}" />
+            <th>
+                <warehouse:message code="default.name.label"/>
+            </th>
             <th>
                 <warehouse:message code="requisition.origin.label"/>
             </th>
@@ -89,14 +88,14 @@
                         <format:metadata obj="${requisition?.isPublished}"/>
                     </span>
                 </td>
-                <td>
-                    <format:metadata obj="${requisition?.name}"/>
-                </td>
 				<td>
 					<format:metadata obj="${requisition?.type}"/>
 				</td>
                 <td>
                     <format:metadata obj="${requisition?.commodityClass}"/>
+                </td>
+                <td>
+                    <format:metadata obj="${requisition?.name}"/>
                 </td>
                 <td>
                     <format:metadata obj="${requisition?.origin?.name}"/>
@@ -105,7 +104,7 @@
                     <format:metadata obj="${requisition?.destination?.name}"/>
                 </td>
 				<td>
-                    <span class="count">${requisition?.requisitionItems?.size()?:0}</span>
+
 				</td>
 				<td>${requisition.requestedBy}</td>
 

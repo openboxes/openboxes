@@ -54,11 +54,6 @@
                                     ${warehouse.message(code: 'requisitionItem.totalQuantity.label', default:'Total quantity')}
                                 </th>
                                 --%>
-                                    <g:if test="${requisition.isDepotRequisition()}">
-                                        <th class="list-header">
-                                            ${warehouse.message(code: 'requisitionItem.recipient.label')}
-                                        </th>
-                                    </g:if>
                                     <th class="list-header middle">
                                         ${warehouse.message(code: 'requisitionItem.status.label')}
                                     </th>
@@ -88,20 +83,6 @@
                                         <input name="quantity" type="text"
                                             class="required number quantity text center" size="10" data-bind="value: quantity" />
                                     </td>
-                                    <%--
-                                    <td class="list-header center">
-                                        <div class="middle" data-bind="text: totalQuantity"></div>
-                                    </td>
-                                    --%>
-                                    <g:if test="${requisition.isDepotRequisition()}">
-                                      <td class="middle list-header"><input type="text"
-                                            data-bind="value: recipient, uniqueName: true" /></td>
-                                    </g:if><%--
-                                    <td class="list-header"><input type="text"
-                                        data-bind="value: comment, uniqueName: true" size="30%"
-                                        class="text" />
-                                    </td>
-                                    --%>
                                     <td class="middle list-header">
                                         <div data-bind="text: status"></div>
                                     </td>

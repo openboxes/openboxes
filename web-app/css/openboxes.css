@@ -642,6 +642,12 @@ textarea, select {
     margin:0;
 }
 
+
+input.large {
+    width: 100%;
+}
+
+
 /*
 input[type=submit] {
 	background-color: #ccc;

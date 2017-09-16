@@ -35,10 +35,16 @@ class RequisitionTemplateController {
 
 	def list = {
         def destination = Location.get(session.warehouse.id)
-		def requisitions = []		
-		//requisitions = Requisition.findAllByIsTemplateAndDestination(true, destination)
-        requisitions = Requisition.findAllByIsTemplate(true)
+        def origin = params?.origin ? Location.get(params?.origin?.id): null
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        def requisitionCriteria = new Requisition()
+        requisitionCriteria.destination = destination
+        requisitionCriteria.origin = origin
+        requisitionCriteria.commodityClass = params.commodityClass?:null
+        requisitionCriteria.type = params.requisitionType?:null
+        requisitionCriteria.isTemplate = true
 
+        def requisitions = requisitionService.getAllRequisitionTemplates(requisitionCriteria, params)
 
         render(view:"list", model:[requisitions: requisitions])
 	}
