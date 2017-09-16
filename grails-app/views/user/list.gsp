@@ -100,7 +100,7 @@
                         </table>
                     </div>
                     <div class="paginateButtons">
-                        <g:paginate total="${userInstanceTotal}" params="${params}"/>
+                        <g:paginate total="${userInstanceTotal}" params="${filterParams}"/>
                     </div>
                 </div>
             </div>

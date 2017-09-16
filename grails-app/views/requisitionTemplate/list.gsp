@@ -39,7 +39,7 @@
                             </div>
                             <div class="filter-list-item">
                                 <label>${g.message(code:'requisition.origin.label')}</label>
-                                <g:selectRequestOrigin name="origin.id" value="${params?.origin?.id}" noSelection="['':'']" class="chzn-select-deselect" />
+                                <g:selectRequestOrigin name="originId" value="${params?.origin?.id}" noSelection="['':'']" class="chzn-select-deselect" />
                             </div>
 
 
@@ -73,8 +73,9 @@
                         </h2>
 
                         <g:render template="list" model="[requisitions:requisitions]"/>
+
                         <div class="paginateButtons">
-                            <g:paginate total="${requisitions.totalCount}" params="${params}"/>
+                            <g:paginate params="${params}" total="${requisitions.totalCount}" />
                         </div>
                     </div>
                 </div>

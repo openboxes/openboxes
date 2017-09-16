@@ -74,7 +74,7 @@
 			<tbody>
 				<tr>
 					<td class="left">
-						<div id="new-requisition-template" class="tag tag-warning">
+						<div id="new-requisition-template" class="title">
                             ${warehouse.message(code: 'requisitionTemplate.new.label') }
                         </div>
                     </td>
@@ -83,4 +83,3 @@
         </table>
 	</g:else>
 </div>
-

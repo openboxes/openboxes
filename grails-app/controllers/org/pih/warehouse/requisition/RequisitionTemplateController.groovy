@@ -34,12 +34,11 @@ class RequisitionTemplateController {
     }
 
 	def list = {
-        def destination = Location.get(session.warehouse.id)
-        def origin = params?.origin ? Location.get(params?.origin?.id): null
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def requisitionCriteria = new Requisition()
-        requisitionCriteria.destination = destination
-        requisitionCriteria.origin = origin
+        requisitionCriteria.name = "%" + params.q + "%"
+        requisitionCriteria.destination = Location.get(session.warehouse.id)
+        requisitionCriteria.origin = params?.originId ? Location.get(params?.originId): null
         requisitionCriteria.commodityClass = params.commodityClass?:null
         requisitionCriteria.type = params.requisitionType?:null
         requisitionCriteria.isTemplate = true
