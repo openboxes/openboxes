@@ -67,6 +67,11 @@ class InventoryController {
     }
 
 
+    def manage = {
+
+    }
+
+
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */

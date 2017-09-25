@@ -1,0 +1,55 @@
+/*App styles*/
+#app {
+    width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+
+.center {
+    margin: 0 auto;
+    width: 300px;
+}
+
+.inline-react-logo {
+    display: inline;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+}
+
+/*Modal styles*/
+.about-modal {
+    width: 400px;
+}
+
+.copyright {
+    float: left;
+}
+
+.about-react-logo {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    padding: 30px;
+    background: url("../images/react.png") no-repeat;
+}
+
+.about-webpack-logo {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    padding: 30px;
+    background: url("../images/webpack.gif") no-repeat;
+}
+
+.about-grails-logo {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    padding: 20px;
+    background: url("../images/grails.png") no-repeat;
+}
