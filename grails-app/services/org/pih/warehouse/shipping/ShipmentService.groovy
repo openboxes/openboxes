@@ -968,6 +968,12 @@ class ShipmentService {
             if (containerIds) {
                 containerIds.each { containerId ->
                     Container container = Container.get(containerId)
+
+                    List childContainerIds = container?.containers?.collect { it.id }
+
+                    // Delete all child containers
+                    deleteContainers(id, childContainerIds, deleteItems)
+
                     println("Contains items: " + container.shipmentItems)
                     if (!deleteItems && container.shipmentItems) {
                         throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
