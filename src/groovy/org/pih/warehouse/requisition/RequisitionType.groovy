@@ -41,6 +41,10 @@ public enum RequisitionType {
 		]
 	}
 
+	static listStockTypes() {
+		[WARD_STOCK, DEPOT_STOCK]
+	}
+
 	String toString() {
 		return name()
 	}

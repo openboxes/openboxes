@@ -1,4 +1,4 @@
-<div id="requisition-template-header">
+<div id="requisition-template-header" class="summary">
 	<g:if test="${requisition?.id}">
 		<table>
 			<tbody>			
@@ -48,12 +48,15 @@
 					</td>
 					<td>
 						<div class="left">	
-							<div class="title">
                                 <g:if test="${requisition.isPublished}">
-                                    <warehouse:message code="default.published.label" default="Published"/>
+                                    <div class="tag tag-success">
+                                        <warehouse:message code="default.published.label" default="Published"/>
+                                    </div>
                                 </g:if>
                                 <g:else>
-                                    <warehouse:message code="default.unpublished.label" default="Unpublished"/>
+                                    <div class="tag tag-warning">
+                                        <warehouse:message code="default.unpublished.label" default="Unpublished"/>
+                                    </div>
                                 </g:else>
                             </div>
 							<div class="clear"></div>

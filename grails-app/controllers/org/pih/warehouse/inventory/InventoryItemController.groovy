@@ -170,8 +170,8 @@ class InventoryItemController {
                     balance[index] += transactionEntry?.quantity
                     totalCredit += transactionEntry?.quantity
                 } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.INVENTORY) {
-                    balance[index] += transactionEntry?.quantity
-                    count[index] += transactionEntry?.quantity
+                    balance[index] = transactionEntry?.quantity
+                    count[index] = transactionEntry?.quantity
                 } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
                     balance[index] += transactionEntry?.quantity
                     count[index] += transactionEntry?.quantity
