@@ -57,6 +57,7 @@
                     <table id="requisition-template-table">
 
                         <tbody>
+                            <%--
                             <tr class="prop">
                                 <td class="name">
                                     <label for="type">
@@ -68,6 +69,7 @@
                                     <format:metadata obj="${requisition.requestNumber}"/>
                                 </td>
                             </tr>
+                            --%>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="type">
@@ -105,7 +107,7 @@
                                 <tr class="prop">
                                     <td class="name">
                                         <label for="origin.id">
-                                            <warehouse:message code="requisition.wardOrPharmacy.label" />
+                                            <warehouse:message code="requisition.origin.label" />
                                         </label>
                                     </td>
                                     <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
@@ -118,7 +120,7 @@
                                 <tr class="prop">
                                     <td class="name">
                                         <label for="origin.id">
-                                            <warehouse:message code="requisition.depot.label" />
+                                            <warehouse:message code="requisition.origin.label" />
                                         </label>
                                     </td>
                                     <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
@@ -169,16 +171,25 @@
                                         class="text">${requisition.description }</g:textArea>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <div class="buttons left">
+                                        <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+                                        &nbsp;
+                                        <g:link controller="requisitionTemplate" action="list">
+                                            <warehouse:message code="default.button.cancel.label"/>
+                                        </g:link>
+                                    </div>
+
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
 
-				</div>
-				<div class="buttons">
-                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                    &nbsp;
-                    <g:link controller="requisitionTemplate" action="list">
-                        <warehouse:message code="default.button.cancel.label"/>
-                    </g:link>
 				</div>
 			</g:form>
 		</div>

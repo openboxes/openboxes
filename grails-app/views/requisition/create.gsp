@@ -62,7 +62,7 @@
 						<div class="status fade" data-bind="html: requisition.status"></div>
 					</div>
 					--%>
-					
+					asfasas
 					
 					<div class="yui-g">
 						<div class="yui-u first">

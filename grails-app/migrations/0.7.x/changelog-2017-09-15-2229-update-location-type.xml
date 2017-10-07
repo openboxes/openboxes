@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1505533086957-1">
+        <update tableName="location_type">
+            <column name="location_type_code" value="DEPOT"/>
+            <where>id="2"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1505533086957-2">
+        <update tableName="location_type">
+            <column name="location_type_code" value="DISPENSARY"/>
+            <where>id="3"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1505533086957-3">
+        <update tableName="location_type">
+            <column name="location_type_code" value="SUPPLIER"/>
+            <where>id="4"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1505533086957-4">
+        <update tableName="location_type">
+            <column name="location_type_code" value="WARD"/>
+            <where>id="5"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1505533086957-5">
+        <update tableName="location_type">
+            <column name="location_type_code" value="DISPENSARY"/>
+            <where>id="6"</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

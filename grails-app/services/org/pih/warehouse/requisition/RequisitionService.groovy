@@ -153,8 +153,8 @@ class RequisitionService {
     /**
      * Get requisition template
      */
-    def getAllRequisitionTemplates(Location destination) {
-        return getRequisitions(new Requisition(destination:destination, isTemplate: true), [max: -1, offset: 0])
+    def getAllRequisitionTemplates(Requisition requisition, Map params) {
+        return getRequisitions(requisition, params)
     }
 
     def getAllRequisitions(Location destination) {
