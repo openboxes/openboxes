@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1508205829567-1">
+        <update tableName="requisition">
+            <column name="type" value="STOCK"/>
+            <where>type="WARD_STOCK"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-2">
+        <update tableName="requisition">
+            <column name="type" value="ADHOC"/>
+            <where>type="WARD_ADHOC"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-3">
+        <update tableName="requisition">
+            <column name="type" value="NON_STOCK"/>
+            <where>id="WARD_NON_STOCK"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-4">
+        <update tableName="requisition">
+            <column name="type" value="STOCK"/>
+            <where>type="DEPOT_STOCK"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-5">
+        <update tableName="requisition">
+            <column name="type" value="ADHOC"/>
+            <where>type="DEPOT_TO_DEPOT"</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>
