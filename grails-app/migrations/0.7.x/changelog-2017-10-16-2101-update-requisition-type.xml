@@ -34,4 +34,27 @@
         </update>
     </changeSet>
 
+    <changeSet author="jmiranda" id="1508205829567-6">
+        <comment>Update date issued based on outbound transaction</comment>
+        <sql>
+            update requisition
+            join transaction on transaction.requisition_id = requisition.id
+            set date_issued = transaction.transaction_date
+            where requisition.status = 'ISSUED'
+            and transaction.destination_id is not null
+            and requisition.date_issued is null;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-7">
+        <comment>Update issued by user based on outbound transaction</comment>
+        <sql>
+            update requisition
+            join transaction on transaction.requisition_id = requisition.id
+            set issued_by_id = transaction.created_by_id
+            where requisition.status = 'ISSUED'
+            and transaction.destination_id is not null
+            and requisition.issued_by_id is null;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
