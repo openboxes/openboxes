@@ -113,14 +113,18 @@
 
             },
             error: function(xhr, status, error) {
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
-                $('#reorderStockCount').html("ERROR " + error);
-                $('#lowStockCount').html("ERROR " + error);
-                $('#overStockCount').html("ERROR " + error);
-                $('#onHandQuantityZeroCount').html("ERROR " + error);
-                $('#totalStockCount').html("ERROR " + error);
+                var errorMessage = "An unexpected error has occurred";
+                if (xhr.responseText) {
+                    var errorJson = JSON.parse(xhr.responseText);
+                    errorMessage += ":\n" + errorJson.errorMessage;
+                }
+
+                var errorHtml = "<img src='${createLinkTo(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
+                $('#reorderStockCount').html(errorHtml);
+                $('#lowStockCount').html(errorHtml);
+                $('#overStockCount').html(errorHtml);
+                $('#onHandQuantityZeroCount').html(errorHtml);
+                $('#totalStockCount').html(errorHtml);
 
             }
         });

@@ -110,16 +110,19 @@
 
             },
             error: function(xhr, status, error) {
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
-                // Expiration
-                $('#expiredStockCount').html("ERROR " + error);
-                $('#expiringIn30DaysStockCount').html("ERROR " + error);
-                $('#expiringIn60DaysStockCount').html("ERROR " + error);
-                $('#expiringIn90DaysStockCount').html("ERROR " + error);
-                $('#expiringIn180DaysStockCount').html("ERROR " + error);
-                $('#expiringIn365DaysStockCount').html("ERROR " + error);
+                var errorMessage = "An unexpected error has occurred";
+                if (xhr.responseText) {
+                    var errorJson = JSON.parse(xhr.responseText);
+                    errorMessage += ":\n" + errorJson.errorMessage;
+                }
+
+                var errorHtml = "<img src='${createLinkTo(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
+                $('#expiredStockCount').html(errorHtml);
+                $('#expiringIn30DaysStockCount').html(errorHtml);
+                $('#expiringIn60DaysStockCount').html(errorHtml);
+                $('#expiringIn90DaysStockCount').html(errorHtml);
+                $('#expiringIn180DaysStockCount').html(errorHtml);
+                $('#expiringIn365DaysStockCount').html(errorHtml);
             }
         });
     });
