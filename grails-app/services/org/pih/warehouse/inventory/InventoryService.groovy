@@ -4223,19 +4223,6 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
 
-            // FIXME Remove this once we're confident that the report looks ok.
-            // DEBUG Keep track of each of the products for debugging purposes
-            map[nameKey].products << [
-                    product:entry.product?.name,
-                    productCode: entry?.product?.productCode,
-                    genericProduct: entry?.genericProduct?.name,
-                    status: inventoryLevel?.statusMessage(entry.currentQuantity?:0),
-                    minQuantity:inventoryLevel?.minQuantity?:0,
-                    reorderQuantity:inventoryLevel?.reorderQuantity?:0,
-                    maxQuantity:inventoryLevel?.maxQuantity?:0,
-                    currentQuantity:entry.currentQuantity?:0,
-                    preferred:inventoryLevel?.preferred?:false
-            ]
             map
         }
 
