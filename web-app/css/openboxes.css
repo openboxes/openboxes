@@ -1374,6 +1374,8 @@ table.small {
     font-size:1.1em;
 }
 
+.number { font-size: 1.1em }
+
 .menu {
     padding: 0px;
     border-right: 1px solid #eee;

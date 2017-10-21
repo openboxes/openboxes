@@ -58,17 +58,89 @@ class InventoryController {
     */
 
 
+    def manage = { ManageInventoryCommand command ->
+        log.info "manage: " + params
+        log.info "manage: " + command
+
+        if(!params.max) params.max = 10
+        if(!params.offset) params.offset = 0
+
+        Map quantityMap
+        Location location = Location.load(session.warehouse.id)
+
+        log.info("tags: " + command.tags)
+        if (command.tags) {
+            def tags = Tag.findAllByIdInList(command.tags)
+
+            def products = productService.getProducts(null, tags, params)
+            command.inventoryItems = products*.inventoryItems.flatten()
+
+
+            quantityMap = inventoryService.getQuantityByInventoryItemMap(location, products)
+
+            command.inventoryItems = command.inventoryItems.collect { inventoryItem ->
+                def quantityOnHand = quantityMap[inventoryItem]
+                [product: inventoryItem.product, inventoryItem: inventoryItem, quantityOnHand: quantityOnHand]
+            }
+
+            command.inventoryItems = command.inventoryItems.findAll { it.quantityOnHand > 0 }
+
+        }
+        [command: command]
+    }
+
+
+    def saveInventoryChanges = { ManageInventoryCommand command ->
+        log.info ("params: " + params)
+        log.info ("command: " + command)
+        log.info ("entries: " + command.entries)
+
+        Transaction transaction = new Transaction(params)
+        try {
+            //transaction.transactionDate = params.transactionDate
+            transaction.createdBy = User.load(session.user.id)
+            transaction.inventory = Location.load(session.warehouse.id).inventory
+
+            command.entries.each { entry ->
+                if (entry?.quantity > 0) {
+                    def transactionEntry = new TransactionEntry()
+                    transactionEntry.inventoryItem = entry.inventoryItem
+                    transactionEntry.product = entry.inventoryItem.product
+                    transactionEntry.quantity = entry.quantity
+                    transaction.addToTransactionEntries(transactionEntry)
+                }
+            }
+
+            log.info("size " + transaction?.transactionEntries?.size())
+
+            if (!transaction?.transactionEntries) {
+                //transaction.errors.reject("default.errors.nonEmpty.message", "List must not be empty")
+                throw new ValidationException("Transaction entries must not be empty", transaction.errors)
+            }
+
+            log.info("validate: " + transaction.validate())
+
+            if (transaction.validate() && transaction.save()) {
+                flash.message = "Transaction ${transaction.id} saved"
+            } else {
+                throw new ValidationException("Transaction errors", transaction.errors)
+            }
+        } catch (Exception e){
+            command.errors = transaction.errors
+            chain(action: "manage", model: [command: command], params: params)
+            return
+        }
+
+        redirect(action: "manage", params: [tags: params.tags])
+
+    }
+
     def analyze = {
         /* single page app using */
     }
 
     def pivot = {
         /* single page app using angularjs */
-    }
-
-
-    def manage = {
-
     }
 
 
@@ -1683,3 +1755,15 @@ class QuantityOnHandReportCommand {
     }
 }
 
+class ManageInventoryCommand {
+
+    List<ManageInventoryEntryCommand> entries = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ManageInventoryEntryCommand.class));
+    List inventoryItems = []
+    List tags = []
+}
+
+class ManageInventoryEntryCommand {
+    InventoryItem inventoryItem
+    Integer quantity
+
+}
