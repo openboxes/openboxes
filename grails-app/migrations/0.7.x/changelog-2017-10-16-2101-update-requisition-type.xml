@@ -16,9 +16,10 @@
         </update>
     </changeSet>
     <changeSet author="jmiranda" id="1508205829567-3">
+        <validCheckSum>c521794afd136a9f73404ab291d4c37c</validCheckSum>
         <update tableName="requisition">
             <column name="type" value="NON_STOCK"/>
-            <where>id="WARD_NON_STOCK"</where>
+            <where>type="WARD_NON_STOCK"</where>
         </update>
     </changeSet>
     <changeSet author="jmiranda" id="1508205829567-4">
