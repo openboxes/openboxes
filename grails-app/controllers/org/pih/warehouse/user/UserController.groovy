@@ -176,7 +176,14 @@ class UserController {
         }
         else {
             def locations = Location.AllDepotWardAndPharmacy()
-            return [userInstance: userInstance, locations: locations]
+			def timezones = []
+			try {
+				timezones = TimeZone?.getAvailableIDs()?.sort()
+			} catch (Exception e) {
+				log.error("No timezones available: " + e.message, e)
+			}
+
+            return [userInstance: userInstance, locations: locations, timezones: timezones]
         }
     }
 	

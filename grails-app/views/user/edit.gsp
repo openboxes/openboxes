@@ -83,7 +83,7 @@
                                                     <label for="password"><warehouse:message code="user.confirmPassword.label" /></label>
                                                 </td>
                                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
-                                                    <g:passwordField name="passwordConfirm" value="" class="text" size="40" />
+                                                    <g:passwordField name="passwordConfirm" class="text" size="40" value=""/>
                                                 </td>
                                             </tr>
 
@@ -102,9 +102,16 @@
                                                     <label for="locale"><warehouse:message
                                                         code="default.timezone.label" default="Timezone" /></label></td>
                                                 <td valign="top" class="value">
-                                                    <g:select id="timezone" name="timezone" from="${TimeZone.getAvailableIDs().sort()}"
-                                                        noSelection="['':'']"
-                                                              value="${userInstance?.timezone}" class="chzn-select-deselect"/>
+                                                    <g:if test="${timezones}">
+
+                                                        <g:select id="timezone" name="timezone" from="${timezones}"
+                                                            noSelection="['':'']"
+                                                                  value="${userInstance?.timezone}" class="chzn-select-deselect"/>
+                                                    </g:if>
+                                                    <g:else>
+                                                        ${userInstance?.timezone}
+                                                        <g:hiddenField name="timezone" value="${userInstance?.timezone}"/>
+                                                    </g:else>
                                                 </td>
                                             </tr>
                                         </tbody>
