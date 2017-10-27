@@ -173,7 +173,7 @@
                                                           onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
                                                           onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                                                <g:message code="default.button.delete.label"/>
+                                                <g:message code="default.button.undo.label"/>
                                             </g:remoteLink>
                                     </g:if>
                                 </g:if>
@@ -185,7 +185,7 @@
                                                       onFailure="alert('An error has occurred.  Please contact your system administrator (re: ${requisition.requestNumber}).')"
                                                       onclick="return confirm('${warehouse.message(code: 'default.button.undo.confirm.message', default: 'Are you sure?')}');">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                                            <g:message code="default.button.delete.label"/>
+                                            <g:message code="default.button.undo.label"/>
                                         </g:remoteLink>
                                     </div>
                                 </g:else>
