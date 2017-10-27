@@ -405,7 +405,7 @@
                             <li><a href="#documents-tab"><warehouse:message code="documents.label" default="Documents"/></a></li>
                             <li><a href="#comments-tab"><warehouse:message code="comments.label" default="Comments"/></a></li>
                             <li><a href="#events-tab"><warehouse:message code="events.label" default="Comments"/></a></li>
-                            <li><a href="#transactions-tab"><warehouse:message code="transactions.label" default="Transactions"/></a></li>
+                            <li><a href="${request.contextPath}/shipment/showTransactions/${shipmentInstance?.id}"><warehouse:message code="transactions.label" default="Transactions"/></a></li>
                         </ul>
                         <div id="details-tab">
 

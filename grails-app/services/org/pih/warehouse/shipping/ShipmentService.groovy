@@ -1236,7 +1236,7 @@ class ShipmentService {
 
 				// TODO only need to create a transaction if the source is a depot - (we need to think about this)
 				if (shipmentInstance.origin?.isWarehouse() && debitStockOnSend) {
-					inventoryService.createSendShipmentTransaction(shipmentInstance)
+					createOutboundTransaction(shipmentInstance)
 				}
 			}
 			else {
@@ -1468,49 +1468,7 @@ class ShipmentService {
 
 			// only need to create a transaction if the destination is a warehouse
 			if (shipmentInstance.destination?.isWarehouse() && creditStockOnReceipt) {
-
-				// Create a new transaction for incoming items
-				Transaction creditTransaction = new Transaction()
-				creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
-				creditTransaction.source = shipmentInstance?.origin
-				creditTransaction.destination = null
-				creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
-				creditTransaction.transactionDate = shipmentInstance.receipt.actualDeliveryDate
-
-				shipmentInstance.receipt.receiptItems.each {
-					def inventoryItem =
-						inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
-
-					if (inventoryItem.hasErrors()) {
-						inventoryItem.errors.allErrors.each { error->
-							def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
-							shipmentInstance.errors.reject("inventoryItem.invalid",
-								errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
-						}
-						throw new ValidationException("Failed to receive shipment while saving inventory item ", shipmentInstance.errors)
-					}
-
-					// Create a new transaction entry
-					TransactionEntry transactionEntry = new TransactionEntry();
-					transactionEntry.quantity = it.quantityReceived;
-					transactionEntry.binLocation = it.binLocation
-					transactionEntry.inventoryItem = inventoryItem;
-					creditTransaction.addToTransactionEntries(transactionEntry);
-					//creditTransaction.incomingShipment = shipmentInstance
-				}
-
-				if (!creditTransaction.hasErrors() && creditTransaction.save()) {
-					// saved successfully
-				}
-				else {
-					// did not save successfully, display errors message
-                    throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
-				}
-
-				// Associate the incoming transaction with the shipment
-				shipmentInstance.addToIncomingTransactions(creditTransaction)
-				shipmentInstance.save(flush:true);
-
+				createInboundTransaction(shipmentInstance)
 			}
 		}
 		else {
@@ -1518,32 +1476,171 @@ class ShipmentService {
 		}
 	}
 
-	
+	boolean synchronizeTransactions(Shipment shipment) {
+        if (shipment.hasShipped() && shipment?.outgoingTransactions?.isEmpty()) {
+            createOutboundTransaction(shipment)
+        }
+
+        if (shipment.wasReceived() && shipment?.incomingTransactions?.isEmpty()) {
+            if (!shipment.receipt) {
+                createReceipt(shipment, shipment.actualShippingDate)
+            }
+            createInboundTransaction(shipment)
+        }
+        return true
+    }
 	/**
 	 * 
 	 * @param shipmentInstance
 	 * @param dateDelivered
 	 * @return
 	 */
-	public Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) { 
+	Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) {
 		Receipt receiptInstance = new Receipt()
 		shipmentInstance.receipt = receiptInstance
 		receiptInstance.shipment = shipmentInstance		
 		receiptInstance.recipient = shipmentInstance?.recipient
 		receiptInstance.expectedDeliveryDate = shipmentInstance?.expectedDeliveryDate;
 		receiptInstance.actualDeliveryDate = dateDelivered;
-		shipmentInstance.shipmentItems.each {
-			ReceiptItem receiptItem = new ReceiptItem(it.properties);
-			receiptItem.setQuantityShipped (it.quantity);
-			receiptItem.setQuantityReceived (it.quantity);
-			receiptItem.setLotNumber(it.lotNumber);
-			receiptItem.setExpirationDate(it.expirationDate);
+		shipmentInstance.shipmentItems.each { shipmentItem ->
+			ReceiptItem receiptItem = new ReceiptItem();
+			receiptItem.quantityShipped = shipmentItem.quantity
+			receiptItem.quantityReceived = shipmentItem.quantity
+            receiptItem.product = shipmentItem.product
+			receiptItem.lotNumber = shipmentItem.lotNumber
+            receiptItem.inventoryItem = shipmentItem.inventoryItem
+			receiptItem.expirationDate = shipmentItem.expirationDate;
+            receiptItem.shipmentItem = shipmentItem
 			receiptInstance.addToReceiptItems(receiptItem);
+            shipmentItem.addToReceiptItems(receiptItem)
 		}
 		return receiptInstance;
 	}
-	
+
+
 	/**
+	 * Create the inbound transaction associated with receiving a shipment.
+     *
+	 * @param shipmentInstance
+	 * @return
+	 */
+	Transaction createInboundTransaction(Shipment shipmentInstance) {
+		// Create a new transaction for incoming items
+		Transaction creditTransaction = new Transaction()
+		creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+		creditTransaction.source = shipmentInstance?.origin
+		creditTransaction.destination = null
+		creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
+		creditTransaction.transactionDate = shipmentInstance.receipt.actualDeliveryDate
+
+		shipmentInstance.receipt.receiptItems.each {
+			def inventoryItem =
+					inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
+
+			if (inventoryItem.hasErrors()) {
+				inventoryItem.errors.allErrors.each { error->
+					def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
+					shipmentInstance.errors.reject("inventoryItem.invalid",
+							errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
+				}
+				throw new ValidationException("Failed to receive shipment while saving inventory item ", shipmentInstance.errors)
+			}
+
+			// Create a new transaction entry
+			TransactionEntry transactionEntry = new TransactionEntry();
+			transactionEntry.quantity = it.quantityReceived;
+			transactionEntry.binLocation = it.binLocation
+			transactionEntry.inventoryItem = inventoryItem;
+			creditTransaction.addToTransactionEntries(transactionEntry);
+		}
+
+		if (creditTransaction.hasErrors() || !creditTransaction.save()) {
+			// did not save successfully, display errors message
+			throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
+		}
+
+		// Associate the incoming transaction with the shipment
+		shipmentInstance.addToIncomingTransactions(creditTransaction)
+		shipmentInstance.save(flush:true);
+
+		return creditTransaction;
+
+	}
+
+    /**
+     * Create a transaction for the Send Shipment event.
+     *
+     * @param shipmentInstance
+     */
+    void createOutboundTransaction(Shipment shipmentInstance) {
+        log.debug "create send shipment transaction"
+
+        if (!shipmentInstance.origin.isWarehouse()) {
+            throw new RuntimeException("Can't create send shipment transaction for origin that is not a depot")
+        }
+
+        try {
+            // Create a new transaction for outgoing items
+            Transaction debitTransaction = new Transaction();
+            debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+            debitTransaction.source = null
+            //debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
+            debitTransaction.destination = shipmentInstance?.destination
+            debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
+            debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
+
+            shipmentInstance.shipmentItems.each {
+                def inventoryItem =
+                        findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+
+                // If the inventory item doesn't exist, we create a new one
+                if (!inventoryItem) {
+                    inventoryItem = new InventoryItem();
+                    inventoryItem.lotNumber = it.lotNumber
+                    inventoryItem.product = it.product
+                    if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+                        // at this point we've saved the inventory item successfully
+                    }
+                    else {
+                        //
+                        inventoryItem.errors.allErrors.each { error ->
+                            def errorObj = [
+                                    inventoryItem,
+                                    error.getField(),
+                                    error.getRejectedValue()] as Object[]
+                            shipmentInstance.errors.reject("inventoryItem.invalid",
+                                    errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+                        }
+                        return;
+                    }
+                }
+
+                // Create a new transaction entry for each shipment item
+                def transactionEntry = new TransactionEntry();
+                transactionEntry.quantity = it.quantity;
+                transactionEntry.inventoryItem = inventoryItem;
+                transactionEntry.binLocation = it.binLocation
+                debitTransaction.addToTransactionEntries(transactionEntry);
+            }
+
+            if (!debitTransaction.save()) {
+                log.info "debit transaction errors " + debitTransaction.errors
+                throw new ValidationException("An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", debitTransaction.errors);
+            }
+
+            // Associate the incoming transaction with the shipment
+            shipmentInstance.addToOutgoingTransactions(debitTransaction)
+            shipmentInstance.save();
+
+        } catch (Exception e) {
+            log.error("An error occrred while creating transaction ", e);
+            throw e
+            //shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
+        }
+    }
+
+
+    /**
 	 * Fetches shipment workflow associated with a shipment of the 
 	 * given shipmentId.
 	 * 
