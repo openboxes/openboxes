@@ -9,31 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-class PartyType {
+class OrganizationController {
 
-    String id
-    String name
-    String description
-
-    PartyTypeCode partyTypeCode
-
-    Date dateCreated;
-    Date lastUpdated;
-
-
-    static mapping = {
-        id generator: 'uuid'
-    }
-
-    static constraints = {
-        name(nullable:false, maxSize: 255)
-        description(nullable:true, maxSize: 255)
-        dateCreated(display:false)
-        lastUpdated(display:false)
-        partyTypeCode(nullable:false)
-    }
-
-    String toString() {
-        return name
-    }
+    def scaffold = true
 }

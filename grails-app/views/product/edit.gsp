@@ -40,18 +40,23 @@
 
                 <div class="tabs tabs-ui">
 					<ul>
-						<li><a href="#tabs-details"><warehouse:message code="product.details.label"/></a></li>
+						<li><a href="#tabs-details"><g:message code="product.details.label"/></a></li>
 						<%-- Only show these tabs if the product has been created --%>
 						<g:if test="${productInstance?.id }">
-                            <li><a href="#tabs-manufacturer"><warehouse:message code="product.manufacturer.label"/></a></li>
-                            <li><a href="#tabs-status"><warehouse:message code="product.stockLevel.label" default="Stock levels"/></a></li>
+                            <li>
+                                <a href="${request.contextPath}/product/editSources/${productInstance?.id}" id="tab-sources">
+                                    <g:message code="product.sources.label" default="Sources"/>
+                                </a>
+                            </li>
+                            <li><a href="#tabs-manufacturer"><g:message code="product.manufacturer.label"/></a></li>
+                            <li><a href="#tabs-status"><g:message code="product.stockLevel.label" default="Stock levels"/></a></li>
                             <%--<li><a href="#tabs-tags"><warehouse:message code="product.tags.label"/></a></li>--%>
-                            <li><a href="#tabs-synonyms"><warehouse:message code="product.synonyms.label"/></a></li>
-                            <li><a href="#tabs-productGroups"><warehouse:message code="product.substitutions.label" default="Substitutes"/></a></li>
-							<li><a href="#tabs-packages"><warehouse:message code="packages.label" default="Packages"/></a></li>
-							<li><a href="#tabs-documents"><warehouse:message code="product.documents.label" default="Documents"/></a></li>
-                            <li><a href="#tabs-attributes"><warehouse:message code="product.attributes.label" default="Attributes"/></a></li>
-                            <li><a href="#tabs-components"><warehouse:message code="product.components.label" default="Bill of Materials"/></a></li>
+                            <li><a href="#tabs-synonyms"><g:message code="product.synonyms.label"/></a></li>
+                            <li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>
+							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
+							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
+                            <li><a href="#tabs-attributes"><g:message code="product.attributes.label" default="Attributes"/></a></li>
+                            <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
                         </g:if>
 					</ul>	
 					<div id="tabs-details" style="padding: 10px;" class="ui-tabs-hide">
@@ -88,6 +93,18 @@
                                             </td>
                                         </tr>
                                         --%>
+
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label for="active"><warehouse:message
+                                                        code="product.active.label" /></label>
+                                            </td>
+                                            <td class="value middle ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
+                                                <g:checkBox name="active" value="${productInstance?.active}" />
+                                            </td>
+                                        </tr>
+
+
                                         <tr class="prop first">
                                             <td class="name middle"><label for="productCode"><warehouse:message
                                                     code="product.productCode.label"/></label>
@@ -183,33 +200,6 @@
                                         </td>
                                     </tr>
 
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.status.label" default="Status"/></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td width="25%">
-
-                                                            <g:checkBox name="active" value="${productInstance?.active}" />
-                                                            <label for="active"><warehouse:message
-                                                            code="product.active.label" /></label>
-                                                        </td>
-                                                        <td width="25%">
-                                                            <g:checkBox name="essential" value="${productInstance?.essential}" />
-                                                            <label for="essential"><warehouse:message
-                                                                    code="product.essential.label" /></label>
-
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
 
                                         <tr class="prop">
                                             <td class="name">
@@ -272,6 +262,37 @@
 
                                             </td>
                                         </tr>
+                                        <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
+                                            <tr class="prop">
+                                                <td class="name">
+                                                    <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
+                                                </td>
+                                                <td class="value">
+                                                    <g:set var="attributeFound" value="f"/>
+                                                    <g:if test="${attribute.options}">
+                                                        <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
+                                                            <option value=""></option>
+                                                            <g:each var="option" in="${attribute.options}" status="optionStatus">
+                                                                <g:set var="selectedText" value=""/>
+                                                                <g:if test="${productInstance?.attributes[status]?.value == option}">
+                                                                    <g:set var="selectedText" value=" selected"/>
+                                                                    <g:set var="attributeFound" value="t"/>
+                                                                </g:if>
+                                                                <option value="${option}"${selectedText}>${option}</option>
+                                                            </g:each>
+                                                            <g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
+                                                            <g:if test="${attribute.allowOther || otherAttVal}">
+                                                                <option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
+                                                                    <g:message code="product.attribute.value.other" default="Other..." />
+                                                                </option>
+                                                            </g:if>
+                                                        </select>
+                                                    </g:if>
+                                                    <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
+                                                    <g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+                                                </td>
+                                            </tr>
+                                        </g:each>
                                     </tbody>
                                     <tfoot>
                                         <tr>

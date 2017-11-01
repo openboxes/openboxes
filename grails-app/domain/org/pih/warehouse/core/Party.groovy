@@ -11,11 +11,21 @@ package org.pih.warehouse.core
 
 class Party {
 
-    String name
+    String id
+    PartyType partyType
 
-    PartyType partytype
+    static hasMany = [roles: PartyRole]
 
+    static mapping = {
+        id generator: 'uuid'
+    }
 
     static constraints = {
+        partyType(nullable:false)
     }
+
+    String toString() {
+        return id
+    }
+
 }

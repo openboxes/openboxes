@@ -478,11 +478,6 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="location" action="list" class="location">
-                            <warehouse:message code="locations.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
                         <g:link controller="locationGroup" action="list" class="site">
                             <warehouse:message code="locationGroups.label" default="Location Groups" />
                         </g:link>
@@ -494,10 +489,34 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
+                        <g:link controller="partyType" action="list">
+                            <warehouse:message code="partyTypes.label" default="Party Types" />
+                        </g:link>
+                    </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="location" action="list" class="location">
+                            <warehouse:message code="locations.label" />
+                        </g:link>
+                    </div>
+
+                    <div class="megaButton">
                         <g:link controller="shipper" action="list" class="shipper">
                             <warehouse:message code="location.shippers.label" />
                         </g:link>
                     </div>
+                    <div class="megaButton">
+                        <g:link controller="organization" action="list">
+                            <warehouse:message code="organizations.label" default="Organization" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="partyRole" action="list">
+                            <warehouse:message code="organizationRoles.label" default="Organization Roles" />
+                        </g:link>
+                    </div>
+                    <hr/>
+
                     <div class="megaButton">
                         <g:link controller="shipmentWorkflow" action="list" >
                             <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />

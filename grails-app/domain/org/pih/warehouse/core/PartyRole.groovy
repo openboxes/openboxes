@@ -9,31 +9,27 @@
 **/ 
 package org.pih.warehouse.core
 
-class PartyType {
+class PartyRole {
 
     String id
-    String name
-    String description
-
-    PartyTypeCode partyTypeCode
-
-    Date dateCreated;
-    Date lastUpdated;
-
+    Party party
+    RoleType roleType
+    Date startDate
+    Date endDate
 
     static mapping = {
         id generator: 'uuid'
     }
 
     static constraints = {
-        name(nullable:false, maxSize: 255)
-        description(nullable:true, maxSize: 255)
-        dateCreated(display:false)
-        lastUpdated(display:false)
-        partyTypeCode(nullable:false)
+        party(nullable:false)
+        roleType(nullable:false)
+        startDate(nullable:true)
+        endDate(nullable:true)
     }
 
     String toString() {
-        return name
+        return party + " " + roleType?.name
     }
+
 }

@@ -101,7 +101,7 @@
                                         </g:else>
                                         <li class="action-menu-item">
                                             <g:link controller="dashboard" action="flushMegamenu" style="color: #666">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}"/>
                                                 ${warehouse.message(code:'cache.flush.label', default: 'Refresh megamenu')}
                                             </g:link>
                                         </li>

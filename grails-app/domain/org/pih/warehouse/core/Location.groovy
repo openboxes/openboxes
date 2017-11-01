@@ -22,6 +22,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	
 	String id
 	String name
+	String description
 	String locationNumber
 
 	byte [] logo				// logo
@@ -47,6 +48,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
+		description(nullable:true)
 		address(nullable:true)
 		locationType(nullable:false)
         locationNumber(nullable:true, unique: true)

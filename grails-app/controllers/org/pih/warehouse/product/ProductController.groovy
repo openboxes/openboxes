@@ -292,7 +292,6 @@ class ProductController {
 
 	def edit = {
 
-        def startTime = System.currentTimeMillis()
 		def productInstance = Product.get(params.id)
 		def location = Location.get(session?.warehouse?.id);
 		if (!productInstance) {
@@ -306,12 +305,24 @@ class ProductController {
 				inventoryLevelInstance = new InventoryLevel();
 			}
 
-            println "edit product: " + (System.currentTimeMillis() - startTime) + " ms"
-
 			[productInstance: productInstance, rootCategory: productService.getRootCategory(),
 				inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
 		}
 	}
+
+
+    def editSources = {
+
+        def productInstance = Product.get(params.id)
+        if (!productInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(controller: "inventory", action: "browse")
+        }
+        else {
+            render(template: "sources", model:[productInstance: productInstance])
+        }
+
+    }
 
 	def update = {
 		log.info "Update called with params " + params

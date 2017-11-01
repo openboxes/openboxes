@@ -1,5 +1,8 @@
 <div class="box dialog">
-    <h2><warehouse:message code="inventory.currentStockEverywhere.label" default="Current stock everywhere"/></h2>
+    <h2>
+        <g:message code="inventory.currentStock.label" default="Current Stock"/>
+        <small><g:message code="default.allLocations.label" default="All Locations"/></small>
+    </h2>
     <table>
         <thead>
         <tr class="odd">

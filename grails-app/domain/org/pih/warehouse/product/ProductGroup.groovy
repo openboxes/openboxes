@@ -21,9 +21,10 @@ class ProductGroup implements Comparable, Serializable {
 	String name
 	String description	
 	Category category 
-	
-	//List products
-	
+
+	// Default product
+	Product defaultProduct
+
 	// Auditing
 	Date dateCreated;
 	Date lastUpdated;

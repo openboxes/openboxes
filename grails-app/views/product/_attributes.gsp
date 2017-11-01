@@ -25,7 +25,7 @@
                     <td class="value">
                         <g:set var="attributeFound" value="f"/>
                         <g:if test="${attribute.options}">
-                            <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector">
+                            <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
                                 <option value=""></option>
                                 <g:each var="option" in="${attribute.options}" status="optionStatus">
                                     <g:set var="selectedText" value=""/>
