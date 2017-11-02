@@ -2124,7 +2124,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.lotNumber = lotNumber
 			inventoryItem.expirationDate = expirationDate;
 			inventoryItem.product = product
-			inventoryItem.save()
+			inventoryItem.save(flush:true)
 		}
 		return inventoryItem
 
@@ -3506,7 +3506,7 @@ class InventoryService implements ApplicationContextAware {
 
             // Find an existing product, should fail if not found
             def product = Product.findByProductCode(row.productCode)
-            assert product
+            assert product != null
 
             // Check the Levenshtein distance between the given name and stored product name (make sure they're close)
             println "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
@@ -3540,6 +3540,13 @@ class InventoryService implements ApplicationContextAware {
             def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
             transactionEntry.inventoryItem = inventoryItem
+
+			// Find the bin location
+			def binLocation = Location.findByNameAndParentLocation(row.binLocation, command.location)
+            log.info "Bin location: " + row.binLocation
+            log.info "Location: " + command.location
+            assert binLocation != null
+			transactionEntry.binLocation = binLocation
 
             transaction.addToTransactionEntries(transactionEntry)
         }
