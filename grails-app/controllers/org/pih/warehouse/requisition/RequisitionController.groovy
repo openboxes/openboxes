@@ -205,8 +205,8 @@ class RequisitionController {
 
         if (requisition.status < RequisitionStatus.VERIFYING) {
             requisition.status = RequisitionStatus.VERIFYING
-            requisition.verifiedBy = User.load(session.user.id)
-            requisition.dateVerified = new Date()
+            //requisition.verifiedBy = User.load(session.user.id)
+            //requisition.dateVerified = new Date()
             requisition.save(flush:true)
         }
 
@@ -283,8 +283,8 @@ class RequisitionController {
 
             if (requisition.status < RequisitionStatus.CHECKING) {
                 requisition.status = RequisitionStatus.CHECKING
-                requisition.checkedBy = User.load(session.user.id)
-                requisition.dateChecked = new Date()
+                //requisition.checkedBy = User.load(session.user.id)
+                //requisition.dateChecked = new Date()
                 requisition.save(flush:true)
             }
 
