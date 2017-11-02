@@ -1,3 +1,11 @@
+<div class="button-bar">
+    <g:isSuperuser>
+        <g:link controller="shipment" action="syncTransactions" id="${shipmentInstance?.id}" class="button">
+            <g:message code="shipment.syncTransactions.label" default="Sync Transactions"/>
+        </g:link>
+    </g:isSuperuser>
+</div>
+
 <div id="transactions" class="box">
     <h2>
         <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_switch_bluegreen.png')}" style="vertical-align: middle"/>
@@ -66,8 +74,3 @@
         </div>
     </g:else>
 </div>
-<g:isSuperuser>
-    <g:link controller="shipment" action="syncTransactions" id="${shipmentInstance?.id}" class="button">
-        <g:message code="shipment.syncTransactions.label" default="Sync Transactions"/>
-    </g:link>
-</g:isSuperuser>

@@ -1591,7 +1591,7 @@ class ShipmentService {
 
             shipmentInstance.shipmentItems.each {
                 def inventoryItem =
-                        findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+						inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
 
                 // If the inventory item doesn't exist, we create a new one
                 if (!inventoryItem) {
