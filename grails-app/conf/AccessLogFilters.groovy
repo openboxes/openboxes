@@ -12,12 +12,11 @@ import org.apache.commons.logging.LogFactory
 
 class AccessLogFilters {
 
-	private static final Log accessLog = LogFactory.getLog('accessLog')
-
 	def filters = {
 		all(controller:'*', action:'*') {
 			before = {
-				accessLog.info("$controllerName:$actionName")
+				log.info("$controllerName.$actionName: [user:${session?.user?.username}, location:${session?.warehouse?.name}]")
+                log.info("$controllerName.$actionName: ${params}")
 			}
 		}
 	}
