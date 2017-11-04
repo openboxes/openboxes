@@ -10,15 +10,11 @@
                                 </div>
 							</td>
 							<td width="10%">
-		            			<span style="font-weight: bold; font-size: 1.2em; color: grey;">
-		            				${fieldValue(bean: userInstance, field: "firstName")} 
-		            				${fieldValue(bean: userInstance, field: "lastName")}
-		            			</span>
-		            			
-								<div class="fade">
-									${userInstance?.email}
+								<div class="title">
+									<g:link action="edit" id="${userInstance?.id}">
+										${fieldValue(bean: userInstance, field: "firstName")} ${fieldValue(bean: userInstance, field: "lastName")}
+									</g:link>
 								</div>
-							
 								<%-- 
 								<span style="font-size: 1.2em">
 									<b>${userInstance?.active ? warehouse.message(code: 'user.active.label') : warehouse.message(code: 'user.inactive.label')}</b>

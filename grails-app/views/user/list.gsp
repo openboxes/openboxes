@@ -77,7 +77,7 @@
                                             <span class="active"><warehouse:message code="default.yes.label"/></span></g:if>
                                         <g:else><span class="inactive"><warehouse:message code="default.no.label"/></span></g:else>
                                     </td>
-                                    <td><g:link action="show" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
+                                    <td><g:link action="edit" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
                                     <td>${fieldValue(bean: userInstance, field: "name")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "email")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
