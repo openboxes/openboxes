@@ -212,7 +212,9 @@ class UserController {
      * Update a user 
      */
     def update = {
-        log.info(params)
+
+        log.info ("Password: " + params.password + ", Confirm password: " + params.confirmPassword)
+
         def userInstance = User.get(params.id)
         if (userInstance) {
             if (params.version) {
@@ -229,16 +231,16 @@ class UserController {
             // so the user must have changed the password.  We need
             // to compare the password with confirm password before
             // setting the new password in the database
-            if (userInstance.password != params.password) {
+            if (params.changePassword && userInstance.password != params.password) {
                 userInstance.properties = params
                 userInstance.password = params?.password?.encodeAsPassword();
                 userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
+                flash.message = "${g.message(code:'default.updated.message', args: ['User password'])}"
             } else {
                 userInstance.properties = params
                 // Needed to bypass the password == passwordConfirm validation
                 userInstance.passwordConfirm = userInstance.password
             }
-
             // If a non-admin user edits their profile they will not have access to
             // the roles or location roles, so we need to prevent the updateRoles
             // method from being called.
@@ -256,8 +258,8 @@ class UserController {
                 if (session.user.id == userInstance?.id) {
                     session.user = User.get(userInstance?.id)
                 }
-
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+                if (!flash.message)
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
                 redirect(action: "show", id: userInstance.id)
             } else {
                 def locations = Location.AllDepotWardAndPharmacy()
