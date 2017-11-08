@@ -15,10 +15,10 @@ class RoleFilters {
     def static changeControllers = ['createProductFromTemplate']
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
-    def static adminActions = ['console':['index','execute'], 'product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create']]
+    def static adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create']]
 
-    def static superuserControllers = ['createProduct', 'createProductFromTemplate', 'admin']
-    def static superuserActions = ['console':['index','execute'], 'product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
+    def static superuserControllers = []
+    def static superuserActions = ['console':['index','execute'], '*': ['delete']]
 
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
@@ -35,7 +35,7 @@ class RoleFilters {
                 def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
 
                 if (missBrowser || missManager || missAdmin || missSuperuser) {
-                    log.error ("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
+                    log.info ("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
                     redirect(controller:"errors", action:"handleUnauthorized")
                     return false
                 }
