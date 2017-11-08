@@ -392,11 +392,21 @@ class SelectTagLib {
 
     def selectRequisitionType = { attrs, body ->
         attrs.from = RequisitionType.list()
-        //attrs.optionKey = 'id'
-        //attrs.optionValue = 'name'
         attrs.optionValue = { it  }
         out << g.select(attrs)
     }
+
+    def selectTimezone = { attrs, body ->
+        def timezones = []
+        try {
+            timezones = TimeZone?.getAvailableIDs()?.sort()
+        } catch (Exception e) {
+            log.warn("No timezones available: " + e.message, e)
+        }
+        attrs.from = timezones
+        out << g.select(attrs)
+    }
+
 
 	/**
 	 * Generic select widget using optgroup.

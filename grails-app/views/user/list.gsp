@@ -8,15 +8,14 @@
 </head>
 <body>
     <div class="body">
-		    <g:if test="${flash.message}">
-		    	<div class="message">${flash.message}</div>
-	        </g:if>
+        <g:if test="${flash.message}">
+            <div class="message">${flash.message}</div>
+        </g:if>
 
 
-			<div class="buttonBar">
-                <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
-                <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
-           	</div>
+        <div class="dialog">
+
+            <g:render template="summary" />
 
             <div class="yui-gf">
                 <div class="yui-u first">
@@ -105,6 +104,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     </body>
 </html>
