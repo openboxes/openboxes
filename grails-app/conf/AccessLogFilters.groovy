@@ -16,7 +16,7 @@ class AccessLogFilters {
 		all(controller:'*', action:'*') {
 			before = {
 				log.info("$controllerName.$actionName: [user:${session?.user?.username}, location:${session?.warehouse?.name}]")
-                log.info("$controllerName.$actionName: ${params}")
+                log.debug("$controllerName.$actionName: ${params}")
 			}
 		}
 	}
