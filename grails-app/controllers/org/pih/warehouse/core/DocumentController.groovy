@@ -9,7 +9,12 @@
 **/ 
 package org.pih.warehouse.core
 
+import groovy.text.Template
+import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.springframework.web.context.request.RequestContextHolder
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
@@ -22,6 +27,9 @@ import javax.activation.MimetypesFileTypeMap
 class DocumentController {
 
     def fileService
+    def grailsApplication
+    GroovyPagesTemplateEngine groovyPagesTemplateEngine
+
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -405,6 +413,67 @@ class DocumentController {
             }
         }
     }
+
+    def printZebraTemplate = {
+        Document document = Document.load(params.id)
+        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItemId)
+        Location location = Location.load(session.warehouse.id)
+
+        String lptPort = grailsApplication.config.openboxes.linePrinterTerminal.port
+
+        Map model = [document:document, inventoryItem:inventoryItem, location:location]
+        String renderedContent = renderTemplate(document, model)
+
+        try {
+            FileOutputStream os = new FileOutputStream(lptPort);
+            PrintStream ps = new PrintStream(os);
+            ps.println(renderedContent);
+            ps.print("\f");
+            ps.close();
+            flash.message = "Label printed successfully"
+        }
+        catch (Exception e) {
+            flash.message = e.message
+        }
+
+        redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.id)
+    }
+
+    def renderZebraTemplate = {
+        Document document = Document.load(params.id)
+        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
+        Location location = Location.load(session.warehouse.id)
+        Map model = [document:document, inventoryItem:inventoryItem, location:location]
+        String renderedContent = renderTemplate(document, model)
+        log.info "renderedContent: ${renderedContent}"
+        render (renderedContent)
+    }
+
+    def viewZebraTemplate = {
+        Document document = Document.load(params.id)
+        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
+        Location location = Location.load(session.warehouse.id)
+        Map model = [document:document, inventoryItem:inventoryItem, location:location]
+        String renderedContent = renderTemplate(document, model)
+        String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
+        redirect(url: url)
+    }
+
+
+    private String renderTemplate(Document document, Map model) {
+        String templateContent = new String(document.fileContents)
+        Template template =
+                groovyPagesTemplateEngine.createTemplate(templateContent, document.name)
+
+        log.info "Template content: " + templateContent
+        log.info "Model: " + model
+
+        Writable renderedTemplate = template.make(model)
+        StringWriter stringWriter = new StringWriter();
+        renderedTemplate.writeTo(stringWriter);
+        return stringWriter.toString();
+    }
+
 
 }
 

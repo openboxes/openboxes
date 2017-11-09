@@ -64,5 +64,10 @@ class Document implements Serializable {
     public boolean isImage() {
         return contentType?.startsWith("image/")
     }
+
+	static List findAllByDocumentCode(DocumentCode documentCode) {
+		List<DocumentType> documentTypes = DocumentType.findAllByDocumentCode(documentCode)
+		return Document.findAllByDocumentTypeInList(documentTypes)
+	}
 	
 }
