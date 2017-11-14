@@ -243,15 +243,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     Boolean isWardRequisition() {
-        return (type in [RequisitionType.WARD_NON_STOCK, RequisitionType.WARD_STOCK, RequisitionType.WARD_ADHOC])
-    }
-
-    Boolean isDepotRequisition() {
-        return (type in [RequisitionType.DEPOT_NON_STOCK, RequisitionType.DEPOT_STOCK, RequisitionType.DEPOT_TO_DEPOT])
-    }
-
-    Boolean isStockRequisition() {
-        return (type in [RequisitionType.WARD_STOCK, RequisitionType.DEPOT_STOCK])
+        return (type in [RequisitionType.NON_STOCK, RequisitionType.STOCK, RequisitionType.ADHOC])
     }
 
     Boolean isOpen() {

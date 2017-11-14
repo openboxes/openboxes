@@ -9,14 +9,11 @@
  **/
 package org.pih.warehouse.requisition
 
-public enum RequisitionType {
-	WARD_STOCK(0),
-    WARD_ADHOC(1),
-	WARD_NON_STOCK(2),
-	DEPOT_STOCK(3),
-    DEPOT_ADHOC(4),
-	DEPOT_NON_STOCK(5),
-	DEPOT_TO_DEPOT(6)
+enum RequisitionType {
+
+	STOCK(0),
+    ADHOC(1),
+	NON_STOCK(2),
 
 	int sortOrder
 
@@ -32,17 +29,14 @@ public enum RequisitionType {
 
 	static list() {
 		[
-			WARD_STOCK,
-			WARD_NON_STOCK,
-			WARD_ADHOC,
-			DEPOT_TO_DEPOT,
-			DEPOT_STOCK,
-			DEPOT_NON_STOCK
+			STOCK,
+			NON_STOCK,
+			ADHOC
 		]
 	}
 
 	static listStockTypes() {
-		[WARD_STOCK, DEPOT_STOCK]
+		[STOCK]
 	}
 
 	String toString() {

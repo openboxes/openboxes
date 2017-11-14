@@ -28,7 +28,7 @@
 		<div class="yui-u first">
 
 
-			<g:form name="requisitionForm" method="post" action="saveStock" useToken="true">
+			<g:form name="requisitionForm" method="post" action="save" useToken="true">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
 
 				<div id="requisition-template-details" class="dialog ui-validation box">
@@ -93,32 +93,17 @@
                                     ${session?.warehouse?.name }
                                 </td>
                             </tr>
-                            <g:if test="${requisition.isWardRequisition()}">
-                                <tr class="prop">
-                                    <td class="name">
-                                        <label for="origin.id">
-                                            <warehouse:message code="requisition.origin.label" />
-                                        </label>
-                                    </td>
-                                    <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
-                                                 noSelection="['null':'']"/>
-                                    </td>
-                                </tr>
-                            </g:if>
-                            <g:elseif test="${requisition.isDepotRequisition()}">
-                                <tr class="prop">
-                                    <td class="name">
-                                        <label for="origin.id">
-                                            <warehouse:message code="requisition.origin.label" />
-                                        </label>
-                                    </td>
-                                    <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                        <g:selectDepot name="origin.id" value="${requisition?.origin?.id}"
-                                                       noSelection="['null':'']"/>
-                                    </td>
-                                </tr>
-                            </g:elseif>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="origin.id">
+                                        <warehouse:message code="requisition.origin.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                        <g:selectRequestOrigin name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
+                                             noSelection="['null':'']"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
@@ -135,19 +120,6 @@
 
                                 </td>
                             </tr>
-                            <g:if test="${requisition.isDepotRequisition()}">
-                                <tr class="prop">
-                                    <td class="name"><label><warehouse:message
-                                                code="requisition.program.label" /></label></td>
-                                    <td class="value">
-                                        <input id="recipientProgram"
-                                               name="recipientProgram" class="autocomplete text" size="60"
-                                               placeholder="${warehouse.message(code:'requisition.program.label')}"
-                                               data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram" />
-
-                                    </td>
-                                </tr>
-                            </g:if>
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message

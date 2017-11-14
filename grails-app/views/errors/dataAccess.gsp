@@ -14,7 +14,13 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<h2><warehouse:message code="errors.dataAccess.label" default="Data Access Error"/></h2>
+
+        <div class="summary">
+            <div class="title">
+                <warehouse:message code="errors.dataAccess.label" default="Data Access Error"/>
+            </div>
+        </div>
+
 		<div style="width: 25%;">
 			<div class="triangle-isosceles">
 				<warehouse:message code="errors.dataAccess.message" default="Apologies, but you just tried to do something unspeakable to the database."/>

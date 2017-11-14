@@ -20,7 +20,12 @@
             
 			<g:render template="summary" model="[requisition:requisition]"/>
 
-		
+            <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
+                <div class="notice">
+                    <warehouse:message code="requisition.hasAlreadyBeenCompleted.message" default="This requisition has already been issued."/>
+                </div>
+            </g:if>
+
 			<div class="yui-gf">
 				<div class="yui-u first">
                     <g:render template="header" model="[requisition:requisition]"/>
@@ -28,15 +33,9 @@
                 </div>
                 <div class="yui-u">
 
-                    <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
-                        <div class="notice">
-                            <warehouse:message code="requisition.hasAlreadyBeenCompleted.message" default="This requisition has already been completed"/>
-                        </div>
-                    </g:if>
-
-                        <g:form controller="requisition" action="complete" method="POST">
-                            <g:hiddenField name="id" value="${requisition?.id }"/>
-                            <div class="box">
+                    <g:form controller="requisition" action="complete" method="POST">
+                        <g:hiddenField name="id" value="${requisition?.id }"/>
+                        <div class="box">
                             <h2>
                                 ${warehouse.message(code:'requisition.issue.label')}
                             </h2>
@@ -44,15 +43,15 @@
                                 <tbody>
                                     <tr class="prop">
                                         <td class="name">
-                                            <label>Issue date:</label>
+                                            <label>Issue date</label>
                                         </td>
                                         <td class="value">
-                                            ${new Date() }
+                                            <g:formatDate date="${new Date() }"/>
                                         </td>
                                     </tr>
                                     <tr class="prop">
                                         <td class="name">
-                                            <label>Issued from:</label>
+                                            <label>Issued from</label>
                                         </td>
                                         <td class="value">
                                             ${requisition?.destination}
@@ -60,7 +59,7 @@
                                     </tr>
                                     <tr class="prop">
                                         <td class="name">
-                                            <label>Issued to:</label>
+                                            <label>Issued to</label>
                                         </td>
                                         <td class="value">
                                             ${requisition.origin}
@@ -84,77 +83,73 @@
                                         </td>
 
                                     </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                        </td>
-                                        <td class="value">
-                                            <table class="requisition">
-                                                <thead>
-                                                    <tr class="odd">
-                                                        <th></th>
-                                                        <th><warehouse:message code="product.label"/></th>
-                                                        <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
-                                                        <th><warehouse:message code="default.quantity.label"/></th>
-                                                        <th><warehouse:message code="product.unitOfMeasure.label"/></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <g:each var="picklistItem" in="${picklist.picklistItems }" status="status">
-                                                        <tr class="${status%2?'odd':'even' }">
-                                                            <td>
-                                                                ${status+1 }
-                                                            </td>
-                                                            <td>
-                                                                ${picklistItem?.inventoryItem?.product?.productCode }
-                                                                ${picklistItem?.inventoryItem?.product }
-                                                            </td>
-                                                            <td>
-                                                                ${picklistItem?.inventoryItem?.lotNumber }
-                                                            </td>
-                                                            <td>
-                                                                ${picklistItem?.quantity }
-                                                            </td>
-                                                            <td>
-                                                                ${picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA" }
-                                                            </td>
-                                                        </tr>
-                                                    </g:each>
-                                                    <g:unless test="${picklist.picklistItems }">
-                                                        <tr>
-                                                            <td colspan="5">
-                                                                <div class="empty center">
-                                                                    <warehouse:message code="picklistItems.empty.label" default="Picklist is empty"/>
-                                                                </div>
-                                                            </td>
-
-                                                        </tr>
-
-                                                    </g:unless>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
-                            </div>
+                        </div>
+                        <div class="box dialog">
+
+                            <table class="requisition">
+                                <thead>
+                                <tr class="odd">
+                                    <th></th>
+                                    <th><warehouse:message code="product.label"/></th>
+                                    <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+                                    <th><warehouse:message code="default.quantity.label"/></th>
+                                    <th><warehouse:message code="product.unitOfMeasure.label"/></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <g:each var="picklistItem" in="${picklist.picklistItems }" status="status">
+                                    <tr class="${status%2?'odd':'even' }">
+                                        <td>
+                                            ${status+1 }
+                                        </td>
+                                        <td>
+                                            ${picklistItem?.inventoryItem?.product?.productCode }
+                                            ${picklistItem?.inventoryItem?.product }
+                                        </td>
+                                        <td>
+                                            ${picklistItem?.inventoryItem?.lotNumber }
+                                        </td>
+                                        <td>
+                                            ${picklistItem?.quantity }
+                                        </td>
+                                        <td>
+                                            ${picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA" }
+                                        </td>
+                                    </tr>
+                                </g:each>
+                                <g:unless test="${picklist.picklistItems }">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty center">
+                                                <warehouse:message code="picklistItems.empty.label" default="Picklist is empty"/>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                </g:unless>
+                                </tbody>
+                            </table>
+                        </div>
 
 
-                                <div class="clear"></div>
-                                <div class="buttons center">
-                                    <g:link controller="requisition" action="confirm" id="${requisition.id }" class="button">
-                                        <warehouse:message code="default.button.back.label"/>
-                                    </g:link>
-                                    <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
+                        <div class="buttons center">
+                            <g:link controller="requisition" action="confirm" id="${requisition.id }" class="button">
+                                <warehouse:message code="default.button.back.label"/>
+                            </g:link>
+                            <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
 
-                                    </g:if>
-                                    <g:else>
-                                        <g:link controller="requisition" action="complete" id="${requisition.id }" class="button">
-                                            <warehouse:message code="default.button.finish.label"/>
-                                        </g:link>
-                                    </g:else>
-                                </div>
+                            </g:if>
+                            <g:else>
+                                <g:link controller="requisition" action="complete" id="${requisition.id }" class="button">
+                                    <warehouse:message code="default.button.finish.label"/>
+                                </g:link>
+                            </g:else>
+                        </div>
 
-                        </g:form>
+                    </g:form>
 
 					               
 				</div>

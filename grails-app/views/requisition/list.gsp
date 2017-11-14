@@ -65,23 +65,6 @@
                         </g:if>
                     </g:each>
                 </div>
-                <%--
-                <div class="buttonBar button-group">
-                    <g:link controller="requisition" action="list" params="['requestedBy.id':session.user.id]" class="button">
-                        ${warehouse.message(code:'requisitions.submittedByMe.label', default: 'Submitted by me')}
-                        (${requisitionsMap["submittedByMe"]?:0 })
-                    </g:link>
-                    <g:link controller="requisition" action="list" params="['createdBy.id':session.user.id]" class="button">
-                        ${warehouse.message(code:'requisitions.createdByMe.label', default: 'Created by me')}
-                        (${requisitionsMap["createdByMe"]?:0 })
-                    </g:link>
-                    <g:link controller="requisition" action="list" params="['updatedBy.id':session.user.id]" class="button">
-                        ${warehouse.message(code:'requisitions.updatedByMe.label', default: 'Updated by me')}
-                        (${requisitionsMap["updatedByMe"]?:0 })
-                    </g:link>
-                </div>
-                --%>
-
             </div>
 
             <div class="yui-gf">
@@ -224,7 +207,7 @@
                                                           title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
                                         --%>
                                         <th>
-
+                                            <g:message code="requisition.timeToProcess.label"/>
                                         </th>
                                     </tr>
                                     </thead>
@@ -279,8 +262,25 @@
                                                 <div title="<g:formatDate date="${requisition.dateRequested }"/>">
                                                     <g:prettyDateFormat date="${requisition.dateRequested}"/>
                                                 </div>
-
                                             </td>
+                                            <td class="middle">
+                                                <g:if test="${requisition.dateIssued && requisition.dateCreated}">
+                                                    <g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateIssued, requisition.dateCreated)}"/>
+                                                </g:if>
+                                                <g:elseif test="${requisition.dateChecked && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateChecked, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                                <g:elseif test="${requisition?.picklist?.datePicked && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition?.picklist?.datePicked, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                                <g:elseif test="${requisition.dateVerified && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateVerified, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                                <g:elseif test="${requisition.lastUpdated && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.lastUpdated, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                            </td>
+
                                             <%--
                                             <td class="middle center">${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
                                             <td class="middle center">${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>

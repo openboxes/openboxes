@@ -113,7 +113,7 @@ class SelectTagLib {
         requisitionTemplates.sort { it.origin.name }
         attrs.from = requisitionTemplates
         attrs.optionKey = "id"
-        attrs.optionValue = { it.origin.name + " (" + format.metadata(obj:it?.commodityClass) + ")" }
+        attrs.optionValue = { it.name + " - " + it.origin.name + " (" + format.metadata(obj:it?.commodityClass) + ")" }
         out << g.select(attrs)
 
     }
@@ -338,18 +338,6 @@ class SelectTagLib {
         // Remove current location
         origins = origins.minus(currentLocation)
 
-        // Filter by requisition type
-        if (requisitionType) {
-            if (requisitionType == RequisitionType.DEPOT_STOCK) {
-                log.info "Filter by depot"
-                origins = origins.findAll { it.isWarehouse() }
-            }
-            else if (requisitionType == RequisitionType.WARD_STOCK) {
-                log.info "Filter by ward"
-                origins = origins.findAll { it.isWardOrPharmacy() }
-            }
-        }
-
         attrs.from = origins
         attrs.optionKey = 'id'
 		//attrs.placeholder = attrs?.placeholder
@@ -404,11 +392,21 @@ class SelectTagLib {
 
     def selectRequisitionType = { attrs, body ->
         attrs.from = RequisitionType.list()
-        //attrs.optionKey = 'id'
-        //attrs.optionValue = 'name'
         attrs.optionValue = { it  }
         out << g.select(attrs)
     }
+
+    def selectTimezone = { attrs, body ->
+        def timezones = []
+        try {
+            timezones = TimeZone?.getAvailableIDs()?.sort()
+        } catch (Exception e) {
+            log.warn("No timezones available: " + e.message, e)
+        }
+        attrs.from = timezones
+        out << g.select(attrs)
+    }
+
 
 	/**
 	 * Generic select widget using optgroup.

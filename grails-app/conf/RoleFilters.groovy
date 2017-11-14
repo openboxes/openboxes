@@ -13,17 +13,30 @@ class RoleFilters {
     def static changeActions = ['edit', 'delete', 'create', 'add', 'process', 'save',
             'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle']
     def static changeControllers = ['createProductFromTemplate']
+
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
-    def static adminActions = ['console':['index','execute'], 'product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
+    def static adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create']]
+
+    def static superuserControllers = []
+    def static superuserActions = ['console':['index','execute'], '*': ['delete']]
+
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
             before = {
-                if (SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" || controllerName == "errors") return true
+
+                // Anonymous
+                if (SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" || controllerName == "errors")
+                    return true
+
+                // Authorized user s
                 def missBrowser = !userService.canUserBrowse(session.user)
                 def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
                 def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
-                if (missBrowser || missManager || missAdmin) {
-                    response.sendError(401)
+                def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
+
+                if (missBrowser || missManager || missAdmin || missSuperuser) {
+                    log.info ("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
+                    redirect(controller:"errors", action:"handleUnauthorized")
                     return false
                 }
                 return true
@@ -31,11 +44,16 @@ class RoleFilters {
         }
     }
 
-    def static Boolean needAdmin(controllerName, actionName) {
+    static Boolean needSuperuser(controllerName, actionName) {
+        superuserControllers?.contains(controllerName) || superuserActions[controllerName]?.contains(actionName) || superuserActions['*'].any { actionName?.startsWith(it) }
+    }
+
+
+    static Boolean needAdmin(controllerName, actionName) {
         adminControllers?.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any { actionName?.startsWith(it) }
     }
 
-    def static Boolean needManager(controllerName, actionName) {
+    static Boolean needManager(controllerName, actionName) {
         changeActions.any { actionName?.startsWith(it) } || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName)
     }
 
