@@ -469,7 +469,7 @@ class DocumentController {
     }
 
 
-    def viewZebraTemplate = {
+    def exportZebraTemplate = {
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
