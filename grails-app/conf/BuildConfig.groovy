@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
         mavenRepo "http://repo.grails.org/grails/plugins/"
 	}
-	
+
 	dependencies {
         build ('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2')  { excludes "ant", "javassist" }
 
@@ -58,6 +58,7 @@ grails.project.dependency.resolution = {
         compile "org.jadira.usertype:usertype.jodatime:1.9"
 
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
+        compile "fr.w3blog:zebra-zpl:0.0.3"
         //runtime ":resources:1.2.RC2"
         //runtime ":cached-resources:1.0"
 
