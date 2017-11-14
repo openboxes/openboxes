@@ -53,7 +53,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         def destination = new Location(name: "Boston")
         def requestedBy = new User(username: "jmiranda")
         def requisition = new Requisition(id:  "1", origin: origin, destination: destination, requestedBy: requestedBy,
-                type: RequisitionType.DEPOT_TO_DEPOT, commodityClass: CommodityClass.MEDICATION,
+                type: RequisitionType.ADHOC, commodityClass: CommodityClass.MEDICATION,
                 dateRequested: new Date(), requestedDeliveryDate: new Date())
 
         mockDomain(Requisition, [requisition])
@@ -69,7 +69,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         assertNotSame requisitionClone, requisition
         assertEquals origin, requisitionClone.origin
         assertEquals destination, requisitionClone.destination
-        assertEquals RequisitionType.DEPOT_TO_DEPOT, requisitionClone.type
+        assertEquals RequisitionType.ADHOC, requisitionClone.type
         assertEquals CommodityClass.MEDICATION, requisitionClone.commodityClass
         assertEquals new Date().clearTime(), requisitionClone.dateRequested.clearTime()
         assertEquals new Date().clearTime(), requisitionClone.requestedDeliveryDate.clearTime()
@@ -166,17 +166,17 @@ class RequisitionTests extends GrailsUnitTestCase {
         def requisition3 = new Requisition(id: "3", destination: boston, origin: miami, dateRequested: today)
         def requisition4 = new Requisition(id: "4", destination: boston, origin: miami, dateRequested: tomorrow)
 
-        def requisition5 = new Requisition(id: "5", destination: boston, origin: miami, dateRequested: today, type: RequisitionType.WARD_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
-        def requisition6 = new Requisition(id: "6", destination: boston, origin: miami, dateRequested: today, type: RequisitionType.WARD_ADHOC, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
-        def requisition7 = new Requisition(id: "7", destination: miami, origin: boston, dateRequested: today, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition5 = new Requisition(id: "5", destination: boston, origin: miami, dateRequested: today, type: RequisitionType.STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition6 = new Requisition(id: "6", destination: boston, origin: miami, dateRequested: today, type: RequisitionType.ADHOC, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition7 = new Requisition(id: "7", destination: miami, origin: boston, dateRequested: today, type: RequisitionType.NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
 
-        def requisition8 = new Requisition(id: "8", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
-        def requisition9 = new Requisition(id: "9", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
-        def requisition10 = new Requisition(id: "10", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
+        def requisition8 = new Requisition(id: "8", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
+        def requisition9 = new Requisition(id: "9", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.NON_STOCK, commodityClass: CommodityClass.CONSUMABLES, dateCreated: today)
+        def requisition10 = new Requisition(id: "10", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.NON_STOCK, commodityClass: CommodityClass.MEDICATION, dateCreated: today)
 
-        def requisition11 = new Requisition(id: "11", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: tomorrow)
-        def requisition12 = new Requisition(id: "12", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK,dateCreated: yesterday)
-        def requisition13 = new Requisition(id: "13", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.WARD_NON_STOCK, dateCreated: today)
+        def requisition11 = new Requisition(id: "11", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.NON_STOCK, dateCreated: tomorrow)
+        def requisition12 = new Requisition(id: "12", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.NON_STOCK,dateCreated: yesterday)
+        def requisition13 = new Requisition(id: "13", destination: miami, origin: boston, dateRequested: tomorrow, type: RequisitionType.NON_STOCK, dateCreated: today)
 
         // def equal1 = 0,
         def firstWins = 1 //, secondWins = -1

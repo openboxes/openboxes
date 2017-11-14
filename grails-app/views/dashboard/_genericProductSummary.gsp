@@ -132,14 +132,22 @@
                     var status = this.id;
                     var count = (data.genericProductByStatusMap[status])?data.genericProductByStatusMap[status]:0;
                     totalCount += count;
-                    var countLink =
-
                     $("#" + status).html("<a href='${request.contextPath}/dashboard/downloadGenericProductSummaryAsCsv?status=" + status + "'>" + count + "</a>");
                 });
                 $("#TOTAL").html("<a href='${request.contextPath}/dashboard/downloadGenericProductSummaryAsCsv?status=ALL'>" + totalCount + "</a>");
             },
             error: function(xhr, status, error) {
+                var errorMessage = "An unexpected error has occurred";
+                if (xhr.responseText) {
+                    var errorJson = JSON.parse(xhr.responseText);
+                    errorMessage += ":\n" + errorJson.errorMessage;
+                }
 
+                var errorHtml = "<img src='${createLinkTo(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
+                $(".indicator").each(function( index ) {
+                    $("#" + this.id).html(errorHtml);
+                });
+                $("#TOTAL").html(errorHtml);
             }
         });
     });

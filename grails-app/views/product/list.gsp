@@ -24,7 +24,7 @@
                     <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button">
                         ${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}
                     </g:link>
-
+                    <g:link controller="product" action="importAsCsv" class="button"><warehouse:message code="product.importAsCsv.label"/></g:link>
                 </div>
 
                 <div class="yui-gf">

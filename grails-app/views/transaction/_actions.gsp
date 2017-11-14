@@ -33,7 +33,7 @@
 			<div class="action-menu-item">
 				<g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Show" />
-				    &nbsp;${warehouse.message(code: 'transaction.show.label')}
+				    &nbsp;${warehouse.message(code: 'default.button.show.label')}
 				</g:link>
 			</div>
 		</g:if>
@@ -41,14 +41,14 @@
 			<div class="action-menu-item">
 				<g:link controller="inventory" action="editTransaction" id="${transactionInstance?.id }">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
-				    &nbsp;${warehouse.message(code: 'transaction.edit.label')}
+				    &nbsp;${warehouse.message(code: 'default.button.edit.label')}
 				</g:link>
 			</div>
 		</g:if>
 		<div class="action-menu-item">
 			<g:link controller="inventory" action="deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
   					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-				&nbsp;${warehouse.message(code: 'transaction.delete.label')}
+				&nbsp;${warehouse.message(code: 'default.button.delete.label')}
 			</g:link>				
 		</div>			
 	</div>

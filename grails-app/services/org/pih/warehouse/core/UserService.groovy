@@ -29,7 +29,9 @@ import com.unboundid.ldap.sdk.controls.PasswordExpiredControl
 import com.unboundid.ldap.sdk.controls.PasswordExpiringControl
 import com.unboundid.util.ssl.SSLUtil
 import com.unboundid.util.ssl.TrustAllTrustManager
+import grails.validation.ValidationException
 import groovy.sql.Sql
+import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
 import sun.security.x509.X500Name
 import util.StringUtil
@@ -45,6 +47,73 @@ class UserService {
 
     User getUser(String id) {
         return User.get(id)
+    }
+
+
+    def updateUser(String userId, String currentUserId, Map params) {
+
+        def userInstance = User.load(userId)
+
+        // Password in the db is different from the one specified
+        // so the user must have changed the password.  We need
+        // to compare the password with confirm password before
+        // setting the new password in the database
+        if (params.changePassword && userInstance.password != params.password) {
+            userInstance.properties = params
+            userInstance.password = params?.password?.encodeAsPassword();
+            userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
+        } else {
+            userInstance.properties = params
+            // Needed to bypass the password == passwordConfirm validation
+            userInstance.passwordConfirm = userInstance.password
+        }
+        // If a non-admin user edits their profile they will not have access to
+        // the roles or location roles, so we need to prevent the updateRoles
+        // method from being called.
+        if (params.locationRolePairs) {
+            updateRoles(userInstance, params.locationRolePairs)
+        }
+
+        // We need to cache current role and check edit privilege here because the roles association
+        // may change once we merge user and request parameters
+        def currentUser = User.load(currentUserId)
+        def canEditRoles = canEditUserRoles(currentUser, userInstance)
+
+        // Check to make sure the roles are dirty
+        def currentRoles = new HashSet(userInstance?.roles)
+        def updatedRoles = Role.findAllByIdInList(params.list("roles"))
+        def isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles) && params.updateRoles
+        log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
+        if (isRolesDirty && !canEditRoles) {
+            Object [] args = [currentUser.username, userInstance.username]
+            userInstance.errors.rejectValue("roles", "user.errors.cannotEditUserRoles.message", args, "User cannot edit user roles")
+            throw new ValidationException("user.errors.cannotEditUserRoles.message", userInstance.errors)
+        }
+
+        log.info "User has errors: ${userInstance.hasErrors()} ${userInstance.errors}"
+        return userInstance.save(failOnError: true)
+    }
+
+    private void updateRoles(user, locationRolePairs){
+        def newAndUpdatedRoles = locationRolePairs.keySet().collect{ locationId ->
+            if(locationRolePairs[locationId]){
+                def location = Location.get(locationId)
+                def role = Role.get(locationRolePairs[locationId])
+                def existingRole = user.locationRoles.find{it.location == location}
+                if(existingRole){
+                    existingRole.role = role
+                }else{
+                    def newLocationRole = new LocationRole(user: user, location:location, role: role)
+                    user.addToLocationRoles(newLocationRole)
+                }
+            }
+        }
+        def rolesToRemove = user.locationRoles.findAll{ oldRole ->
+            !locationRolePairs[oldRole.location.id]
+        }
+        rolesToRemove.each{
+            user.removeFromLocationRoles(it)
+        }
     }
 
     Boolean isSuperuser(User u) {
@@ -81,6 +150,11 @@ class UserService {
             return effectRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
+    }
+
+
+    Boolean canEditUserRoles(User currentUser, User otherUser) {
+        return isSuperuser(currentUser) || (currentUser.highestRole >= otherUser.highestRole)
     }
 
     Boolean isUserInRole(String userId, Collection roleTypes) {

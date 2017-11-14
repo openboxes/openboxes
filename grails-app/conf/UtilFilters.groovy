@@ -28,14 +28,14 @@ class UtilFilters {
 
             afterView = {
                 if (params.showTime) {
-                    session._showTime = params.showTime == "on"
+                    session?._showTime = params.showTime == "on"
                 }
                 if (session._showTime) {
-                    def actionDuration = request._timeAfterRequest - request._timeBeforeRequest
-                    def viewDuration = System.currentTimeMillis() - request._timeAfterRequest
+                    def actionDuration = request?._timeAfterRequest - request?._timeBeforeRequest
+                    def viewDuration = System.currentTimeMillis() - request?._timeAfterRequest
 
-                    request.actionDuration = actionDuration
-                    request.viewDuration = viewDuration
+                    request?.actionDuration = actionDuration
+                    request?.viewDuration = viewDuration
                     log.info("Request duration for (${controllerName}/${actionName}): ${actionDuration}ms/${viewDuration}ms")
                 }
             }

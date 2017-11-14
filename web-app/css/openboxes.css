@@ -68,6 +68,11 @@ a.button:hover {
     color: white;
 }
 
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+}
+
 
 h1 {
     font-weight: normal;

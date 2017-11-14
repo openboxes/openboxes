@@ -117,15 +117,6 @@
                         <span id="destination.id"> ${requisition?.destination?.name }</span>
                     </td>
                 </tr>
-                <g:if test="${requisition.isDepotRequisition()}">
-                    <tr class="prop">
-                        <td class="name"><label><warehouse:message
-                                code="requisition.program.label" /></label></td>
-                        <td class="value">
-                            ${requisition?.recipientProgram }
-                        </td>
-                    </tr>
-                </g:if>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="requisition.dateRequested.label" /></label></td>
@@ -138,6 +129,19 @@
                     <td class="value">
                         <g:formatDate date="${requisition?.requestedDeliveryDate }"/>
 
+                    </td>
+                </tr>
+
+                <tr class="prop">
+                    <td class="name">
+                        <label><warehouse:message
+                                code="default.lastUpdated.label" /></label>
+                    </td>
+                    <td class="value">
+                        <g:formatDate date="${requisition?.lastUpdated }"/>
+                        <div class="fade">
+                            ${requisition?.updatedBy?.name }
+                        </div>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -153,35 +157,36 @@
                         </span>
                     </td>
                 </tr>
-
             </table>
         </div>
 
         <div id="requisition-workflow" class="box dialog">
-            <div style="line-height: 20px;">
-                <h2>
-
-                    <%--
-                    <a class="toggle" href="javascript:void(0);">
-                        <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
-                    </a>
-                    <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
-                    &nbsp;
-                    --%>
-                    <warehouse:message code="default.workflow.label" default="Requisition workflow"/>
-                </h2>
-            </div>
+            <h2>
+                <warehouse:message code="default.workflow.label" default="Requisition workflow"/>
+            </h2>
             <table>
-                <%--
                 <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="default.version.label" default="Version" /></label>
+                    <td class="name">
+                        <label><g:message code="requisition.timeToProcess.label"/></label>
                     </td>
                     <td class="value">
-                        v${requisition?.version }
+                        <g:if test="${requisition.dateIssued && requisition.dateCreated}">
+                            <g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateIssued, requisition.dateCreated)}"/>
+                        </g:if>
+                        <g:elseif test="${requisition.dateChecked && requisition.dateCreated}">
+                            <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateChecked, requisition.dateCreated)}"/></i>
+                        </g:elseif>
+                        <g:elseif test="${requisition?.picklist?.datePicked && requisition.dateCreated}">
+                            <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition?.picklist?.datePicked, requisition.dateCreated)}"/></i>
+                        </g:elseif>
+                        <g:elseif test="${requisition.dateVerified && requisition.dateCreated}">
+                            <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateVerified, requisition.dateCreated)}"/></i>
+                        </g:elseif>
+                        <g:elseif test="${requisition.lastUpdated && requisition.dateCreated}">
+                            <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.lastUpdated, requisition.dateCreated)}"/></i>
+                        </g:elseif>
                     </td>
                 </tr>
-                --%>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
                             code="requisition.requested.label" /></label></td>
@@ -257,6 +262,25 @@
                         </g:else>
                     </td>
                 </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.issued.label" /></label></td>
+                    <td class="value">
+
+                        <g:if test="${requisition?.issuedBy}">
+                            <g:formatDate date="${requisition?.dateIssued }"/>
+                            <div class="fade">
+                                ${requisition?.issuedBy?.name }
+                            </div>
+                        </g:if>
+                        <g:else>
+                            <span class="fade">
+                                ${warehouse.message(code:'default.none.label')}
+                            </span>
+                        </g:else>
+                    </td>
+                </tr>
+
                 <%--
                 <tr class="prop">
                     <td class="name"><label><warehouse:message
@@ -269,18 +293,6 @@
                     </td>
                 </tr>
                 --%>
-                <tr class="prop">
-                    <td class="name">
-                        <label><warehouse:message
-                                code="default.updated.label" /></label>
-                    </td>
-                    <td class="value">
-                        <g:formatDate date="${requisition?.lastUpdated }"/>
-                        <div class="fade">
-                            ${requisition?.updatedBy?.name }
-                        </div>
-                    </td>
-                </tr>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message code="transactions.label" /></label></td>
                     <td class="value">
