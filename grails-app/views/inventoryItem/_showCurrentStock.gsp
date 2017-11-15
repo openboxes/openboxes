@@ -15,6 +15,9 @@
                 <th>
                     <warehouse:message code="default.expires.label"/>
                 </th>
+                <th>
+                    <g:message code="default.comments.label"/>
+                </th>
                 <th class="center middle" >
                     <warehouse:message code="default.qty.label"/>
                 </th>
@@ -42,6 +45,9 @@
                     <td>
                         <g:expirationDate date="${entry?.inventoryItem?.expirationDate}"/>
                     </td>
+                    <td class="middle left">
+                        ${entry?.inventoryItem?.comments}
+                    </td>
                     <td class="middle center">
                         ${entry?.quantity} ${entry?.product?.unitOfMeasure}
                     </td>
@@ -59,7 +65,7 @@
         </tbody>
         <tfoot>
             <tr class="odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
-                <td colspan="4" class="right">
+                <td colspan="5" class="right">
                     <!-- This space intentially left blank -->
                 </td>
                 <td class="center">

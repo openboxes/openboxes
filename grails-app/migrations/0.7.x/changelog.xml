@@ -15,5 +15,6 @@
     <include file="0.7.x/changelog-2017-08-07-1344-insert-bin-location-type.xml"/>
     <include file="0.7.x/changelog-2017-09-15-2229-update-location-type.xml"/>
     <include file="0.7.x/changelog-2017-10-16-2101-update-requisition-type.xml"/>
+    <include file="0.7.x/changelog-2017-11-14-2232-add-inventory-item-comments.xml"/>
 
 </databaseChangeLog>
