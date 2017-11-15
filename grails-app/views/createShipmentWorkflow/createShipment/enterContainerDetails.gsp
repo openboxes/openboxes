@@ -378,7 +378,7 @@
                         <g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
                         <g:set var="shipmentItems" value="${shipmentInstance?.findShipmentItemsByContainer(selectedContainer)}"/>
                         --%>
-                        <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
+                        <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } ?: [:]}"/>
                         <g:set var="shipmentItems" value="${shipmentItemsByContainer[selectedContainer]}"/>
                         <g:if test="${shipmentItems }">
                             <g:set var="count" value="${0 }"/>

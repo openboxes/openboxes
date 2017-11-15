@@ -2135,16 +2135,16 @@ class ShipmentService {
     }
 
 	boolean importPackingList(String shipmentId, InputStream inputStream) {
+		int lineNumber = 0
 		try {
 
 			Shipment shipment = Shipment.get(shipmentId)
-
 			List packingListItems = parsePackingList(inputStream)
-
 
 			if (validatePackingList(packingListItems, shipment?.origin)) {
 
-				packingListItems.each { item ->
+				packingListItems.eachWithIndex { item, index ->
+					lineNumber = index+1
 
 					// Find or create an inventory item given the product, lot number, and expiration date
 					InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(item.product, item.lotNumber, item.expirationDate)
@@ -2194,14 +2194,14 @@ class ShipmentService {
 
 			}
 		} catch (ShipmentItemException e) {
-			log.warn("Unable to import packing list items due to exception: " + e.message, e)
-            throw new RuntimeException(e.message)
+			log.warn("Unable to import packing list items due to exception at ${lineNumber}: " + e.message, e)
+            throw new RuntimeException("Row ${lineNumber}: " + e.message)
 			//throw e;
 
 		} catch (Exception e) {
-			log.warn("Unable to import packing list items due to exception: " + e.message, e)
+			log.warn("Unable to import packing list items due to exception at ${lineNumber}: " + e.message, e)
 			//throw new RuntimeException("make sure this causes a rollback", e)
-			throw new RuntimeException(e.message)
+			throw new RuntimeException("Row ${lineNumber}: " + e.message)
 		}
 		finally {
 			inputStream.close();
