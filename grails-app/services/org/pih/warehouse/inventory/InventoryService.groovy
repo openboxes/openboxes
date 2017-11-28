@@ -1648,7 +1648,7 @@ class InventoryService implements ApplicationContextAware {
         if (binLocation) {
             List binLocations = getQuantityByBinLocation(transactionEntries)
             log.info "Bin locations: " + binLocations
-            def entry = binLocations.find { it.inventoryItem == inventoryItem }
+            def entry = binLocations.find { it.inventoryItem == inventoryItem && it.binLocation == binLocation }
             return entry?.quantity?:0
         }
         else {
