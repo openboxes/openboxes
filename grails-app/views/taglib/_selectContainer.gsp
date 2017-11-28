@@ -1,16 +1,18 @@
-
-
-<select id="${attrs.id}" name="${attrs.name }"> 
-	<option value="">
-		${attrs.noSelection.entrySet().iterator().next().value }
-	</option>
-	<g:each var="shipment" in="${attrs.from}">		
-		<optgroup label="${shipment.name }">
-			<option value="${shipment?.id }:0">
-				<b>${shipment?.name}</b> &rsaquo; <warehouse:message code="shipping.unpackedItems.label"/>
+<select id="shipmentContainer" name="shipmentContainer" class="chzn-select-deselect">
+	<option value="null"></option>
+	<g:each var="shipmentInstance" in="${attrs?.from }">
+		<g:set var="expectedShippingDate" value="${prettyDateFormat(date: shipmentInstance?.expectedShippingDate)}"/>
+		<g:set var="label" value="${shipmentInstance?.shipmentNumber + ' - ' + shipmentInstance?.name + ' to ' + shipmentInstance?.destination?.name + ', departing ' + expectedShippingDate}"/>
+		<optgroup label="${label }">
+			<option value="${shipmentInstance?.id }:0">
+				<g:set var="looseItems" value="${shipmentInstance?.shipmentItems?.findAll { it.container == null }}"/>
+				&nbsp; <warehouse:message code="inventory.looseItems.label"/> &rsaquo; ${looseItems.size() } <warehouse:message code="default.items.label"/>
 			</option>
-			<g:each var="container" in="${shipment.containers }">
-				<option value="${shipment?.id }:${container.id }">${shipment?.name} &rsaquo; ${container?.name }</option>
+			<g:each var="containerInstance" in="${shipmentInstance?.containers }">
+				<g:set var="containerItems" value="${shipmentInstance?.shipmentItems?.findAll { it?.container?.id == containerInstance?.id }}"/>
+				<option value="${shipmentInstance?.id }:${containerInstance?.id }">
+					&nbsp; ${containerInstance?.name } &rsaquo; ${containerItems.size() } <warehouse:message code="default.items.label"/>
+				</option>
 			</g:each>
 		</optgroup>
 	</g:each>

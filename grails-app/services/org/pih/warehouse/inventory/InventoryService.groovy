@@ -61,8 +61,6 @@ class InventoryService implements ApplicationContextAware {
 
 	ApplicationContext applicationContext
 
-	boolean transactional = true
-
 	/**
 	 * @return shipment service
 	 */
@@ -1772,10 +1770,10 @@ class InventoryService implements ApplicationContextAware {
 
         cmd.totalQuantity = getQuantityOnHand(cmd.warehouse, cmd.product)
 
-        cmd.pendingShipmentList = shipmentService.getPendingShipments(cmd.warehouse);
+        //cmd.pendingShipmentList = shipmentService.getPendingShipments(cmd.warehouse);
 
 		// Get all lot numbers for a given product
-		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.product) as List
+		//cmd.lotNumberList = getInventoryItemsByProduct(cmd?.product) as List
 
 		// Get transaction log for a particular product within an inventory
 		cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventory, [cmd.product]);
@@ -2273,48 +2271,46 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param params
 	 */
-	boolean adjustStock(InventoryItem itemInstance, Map params) {
+	boolean adjustStock(AdjustStockCommand command) {
 
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
-        def binLocation = Location.get(params.binLocation.id)
+        def quantity = command.quantity
+        def location = command.location
+        def inventory = command.location.inventory
+        def inventoryItem = command.inventoryItem
+        def binLocation = command.binLocation
+        def quantityAvailable = getQuantityFromBinLocation(location, binLocation, inventoryItem)
 
-		if (itemInstance && inventoryInstance) {
-			def transactionEntry = new TransactionEntry(params);
-			def quantity = 0;
-			try {
-				quantity = Integer.valueOf(params?.newQuantity);
-			} catch (Exception e) {
-				itemInstance.errors.reject("inventoryItem.quantity.invalid")
-			}
+        log.info "Check quantity: ${quantity} vs ${quantityAvailable}: ${quantityAvailable==quantity}"
+        if (quantityAvailable == quantity) {
+            command.errors.rejectValue("quantity","adjustStock.invalid.quantity.message")
+        }
 
-			def transactionInstance = new Transaction(params);
-			if (transactionEntry.hasErrors() || transactionInstance.hasErrors()) {
-				itemInstance.errors = transactionEntry.errors
-				itemInstance.errors = transactionInstance.errors
-			}
+        log.info "command " + command.validate()
+        log.info "command has errors: " + command.hasErrors()
+        log.info "command errors: " + command.errors
 
-			if (!itemInstance.hasErrors() && itemInstance.save()) {
-				// Need to create a transaction if we want the inventory item
-				// to show up in the stock card
-				transactionInstance.transactionDate = new Date();
-				//transactionInstance.transactionDate.clearTime();
-				transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
-				transactionInstance.inventory = inventoryInstance;
-                transactionInstance.comment = params.comment
+        if (command.validate() && !command.hasErrors()) {
+            def transaction = new Transaction();
+            // Need to create a transaction if we want the inventory item to show up in the stock card
+            transaction.transactionDate = new Date();
+            transaction.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
+            transaction.inventory = inventory;
+            transaction.comment = command.comment
 
-				// Add transaction entry to transaction
-				transactionEntry.inventoryItem = itemInstance;
-				transactionEntry.quantity = quantity
-                transactionEntry.binLocation = binLocation
-				transactionInstance.addToTransactionEntries(transactionEntry);
-				if (!transactionInstance.hasErrors() && transactionInstance.save()) {
+            // Add transaction entry to transaction
+            def transactionEntry = new TransactionEntry();
+            transactionEntry.quantity = quantity
+            transactionEntry.inventoryItem = inventoryItem;
+            transactionEntry.binLocation = binLocation
 
-				}
-				else {
-					transactionInstance?.errors.allErrors.each { itemInstance.errors << it; }
-				}
-			}
-		}
+            transaction.addToTransactionEntries(transactionEntry);
+
+            if (!transaction.save()) {
+                log.info("Errors saving transaction: " + transaction.errors)
+                command.errors.addAllErrors(transaction.errors)
+            }
+        }
+        return command
 	}
 	
 	
@@ -2326,78 +2322,69 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param params
 	 */
-	def transferStock(InventoryItem inventoryItem, Inventory inventory, Location binLocation, Location destination, Location source, Integer quantity) {
-		def transaction = new Transaction();
+	def transferStock(TransferStockCommand command) {
 
-        log.info "Bin location " + binLocation
-        log.info "Inventory item " + inventoryItem
+        Integer quantity = command.quantity
+        Location location = command.location
+        Location binLocation = command.binLocation
+        Inventory inventory = command.location.inventory
+        InventoryItem inventoryItem = command.inventoryItem
+        Location otherLocation = command.otherLocation
+        Location otherBinLocation = command.otherBinLocation
+        Boolean transferOut = command.transferOut
 
-		Location location = Location.findByInventory(inventory)
-
-        Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem);
-
-        log.info "Quantity on hand: " + quantityOnHand
-
+        def transaction = new Transaction();
 		if (inventoryItem && inventory) {
 			def transactionEntry = new TransactionEntry();
 			transactionEntry.quantity = quantity;
 			transactionEntry.inventoryItem = inventoryItem
 
-            if (destination && source) {
-                transaction.errors.reject("Cannot specify both destination and source in a transaction")
-            }
-            if (destination) {
-                if (!destination?.inventory) {
-                    //throw new RuntimeException("Destination does not have an inventory")
-                    transaction.errors.reject("Destination does not have an inventory")
-                }
-                if (inventory == destination?.inventory) {
-                    //throw new RuntimeException("Destination must be different from source")
-                    transaction.errors.reject("Cannot transfer to the same location")
-                }
+            Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem);
 
-                // Only check this if the transfer is going out (we don't want to restrict if the stock is being transferred in)
-                if (quantityOnHand < quantity) {
-                    //inventoryItem.errors.reject("inventoryItem.quantity.invalid")
-                    //throw new RuntimeException("Cannot exceed quantity on hand")
-                    transaction.errors.reject("Cannot exceed quantity on hand")
-                }
-
-            }
-            if (source) {
-                if (!source?.inventory) {
-                    //throw new RuntimeException("Destination does not have an inventory")
-                    transaction.errors.reject("Source does not have an inventory")
-                }
-                if (inventory == source?.inventory) {
-                    //throw new RuntimeException("Destination must be different from source")
-                    transaction.errors.reject("Cannot transfer from the same location")
-                }
+            if (!otherLocation?.inventory) {
+                //throw new RuntimeException("Destination does not have an inventory")
+                transaction.errors.reject("Destination does not have an inventory")
             }
 
-			if (quantity <= 0) { 
-				//throw new RuntimeException("Quantity must be greater than 0")
-				transaction.errors.reject("Quantity must be greater than 0")
-			}
+            if (location == otherLocation && binLocation == otherBinLocation) {
+                //throw new RuntimeException("Destination must be different from source")
+                transaction.errors.reject("Cannot transfer to the same location")
+            }
 
+            if (quantityOnHand < quantity) {
+                //inventoryItem.errors.reject("inventoryItem.quantity.invalid")
+                //throw new RuntimeException("Cannot exceed quantity on hand")
+                transaction.errors.reject("Quantity cannot exceed quantity on hand")
+            }
+
+            if (quantity <= 0) {
+                //throw new RuntimeException("Quantity must be greater than 0")
+                transaction.errors.reject("Quantity must be greater than 0")
+            }
 			
-			// Need to create a transaction if we want the inventory item
-			// to show up in the stock card
-			transaction.transactionDate = new Date();		
-			transaction.destination = destination;
-            transaction.source = source
-			transaction.transactionType = (destination) ? TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) : TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+            // Create transaction to handle transfer in / out
+			transaction.transactionDate = new Date();
             transaction.inventory = inventory;
-			transaction.transactionNumber = generateTransactionNumber()
+            transaction.transactionNumber = generateTransactionNumber()
+            transaction.destination = (transferOut) ? otherLocation : null
+            transaction.source = (transferOut) ? null : otherLocation
+			transaction.transactionType = (transferOut) ?
+                    TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) :
+                    TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
 
 			// Add transaction entry to transaction
             transactionEntry.binLocation = binLocation
-			transactionEntry.inventoryItem = inventoryItem;
-			transactionEntry.quantity = quantity
+            transactionEntry.inventoryItem = inventoryItem;
+            transactionEntry.quantity = quantity
 			transaction.addToTransactionEntries(transactionEntry);
-			
+
 			if (!transaction.hasErrors() && transaction.save()) {
-				if (!saveLocalTransfer(transaction)) {
+
+                Transaction mirroredTransaction = createMirroredTransaction(transaction)
+                TransactionEntry mirroredTransactionEntry = mirroredTransaction.transactionEntries.first()
+                mirroredTransactionEntry.binLocation = otherBinLocation
+
+                if (!saveLocalTransfer(transaction, mirroredTransaction)) {
 					throw new ValidationException("Unable to save local transfer", transaction.errors)
 				}
 			}
@@ -2474,6 +2461,12 @@ class InventoryService implements ApplicationContextAware {
 		}
 	}
 
+
+    Boolean saveLocalTransfer(Transaction baseTransaction) {
+        return saveLocalTransfer(baseTransaction, null)
+    }
+
+
 	/**
 	 * Creates or updates the local transfer associated with the given transaction
 	 * Returns true if the save/update was successful
@@ -2481,7 +2474,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param baseTransaction
 	 * @return
 	 */
-	Boolean saveLocalTransfer(Transaction baseTransaction) {
+	Boolean saveLocalTransfer(Transaction baseTransaction, Transaction mirroredTransaction) {
 		// note than we are using exceptions here to take advantage of Grails built-in transactional capabilities on service methods
 		// if there is an error, we want to throw an exception so the whole transaction is rolled back
 		// (we can trap these exceptions if we want in the calling controller)
@@ -2510,11 +2503,13 @@ class InventoryService implements ApplicationContextAware {
 		}
 
 		// create and save the new mirrored transaction
-		Transaction mirroredTransaction = createMirroredTransaction(baseTransaction)
-		mirroredTransaction.transactionNumber = generateTransactionNumber()
-		if (!mirroredTransaction.save(flush: true)) {
-			throw new RuntimeException("Unable to save mirrored transaction " + mirroredTransaction?.id)
-		}
+		if (!mirroredTransaction) {
+            mirroredTransaction = createMirroredTransaction(baseTransaction)
+            mirroredTransaction.transactionNumber = generateTransactionNumber()
+            if (!mirroredTransaction.save(flush: true)) {
+                throw new RuntimeException("Unable to save mirrored transaction " + mirroredTransaction?.id)
+            }
+        }
 
 		// now assign this mirrored transaction to the local transfer
 		Transaction oldTransaction
@@ -4286,7 +4281,6 @@ class InventoryService implements ApplicationContextAware {
         return data
     }
 
-    @Transactional(readOnly=true)
     Map getBinLocationReport(Location location) {
 
         Map binLocationReport = [:]
@@ -4301,7 +4295,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    @Transactional(readOnly=true)
     List getBinLocationSummary(List binLocations) {
 
         List results = []
@@ -4325,7 +4318,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    @Transactional(readOnly=true)
     List getTransactionEntriesWithAssociations(Location location) {
         def startTime = System.currentTimeMillis()
 
