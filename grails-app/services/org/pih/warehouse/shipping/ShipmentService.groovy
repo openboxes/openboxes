@@ -2069,11 +2069,6 @@ class ShipmentService {
 			}
 			item.product = product
 
-
-            log.info ("item pallet " + item.palletName)
-            log.info ("item box " + item.boxName)
-
-
             // there's a pallet
             if (!item.palletName && item?.boxName) {
                 throw new RuntimeException("You must enter a valid Pallet if using the Box column for item " + item.productCode)
@@ -2162,8 +2157,15 @@ class ShipmentService {
                         recipient = findOrCreatePerson(item.recipient)
                     }
 					// Check to see if a shipment item already exists within the given container
-					ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
-					// Create a new shipment item if not found
+					//ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
+
+                    ShipmentItem shipmentItem = shipment.shipmentItems.find {
+                        it.inventoryItem == inventoryItem &&
+                                it.container == container &&
+                                it.recipient == recipient
+                    }
+
+                    // Create a new shipment item if not found
 					if (!shipmentItem) {
 						shipmentItem = new ShipmentItem(
 								product: item.product,
