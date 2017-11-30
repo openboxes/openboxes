@@ -974,15 +974,14 @@ class ShipmentService {
                     // Delete all child containers
                     deleteContainers(id, childContainerIds, deleteItems)
 
-                    println("Contains items: " + container.shipmentItems)
-                    if (!deleteItems && container.shipmentItems) {
+                    //println("Contains items: " + container.shipmentItems)
+                    if (!deleteItems && container.shipmentItemsFromSession) {
                         throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
                     } else {
-                        container.shipmentItems.each { shipmentItem ->
+                        container.shipmentItemsFromSession.each { shipmentItem ->
                             shipment.removeFromShipmentItems(shipmentItem)
                             shipmentItem.delete()
                         }
-
                     }
                     shipment.removeFromContainers(container);
                     if (container?.parentContainer) {

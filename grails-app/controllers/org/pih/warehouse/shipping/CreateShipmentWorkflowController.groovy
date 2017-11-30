@@ -505,9 +505,8 @@ class CreateShipmentWorkflowController {
                 try {
                     shipmentService.deleteAllContainers(params.id, true)
                     flash.message = "Successfully deleted all containers and items"
-                } catch (ShipmentException e) {
-                    flash.message = e.message
                 } catch (Exception e) {
+					log.error("Unable to delete shipment contents: " + e.message, e)
                     flash.message = e.message
                 }
 
