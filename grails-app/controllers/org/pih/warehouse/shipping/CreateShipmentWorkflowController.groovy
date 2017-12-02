@@ -516,23 +516,20 @@ class CreateShipmentWorkflowController {
 				log.info "Import packing list into shipment " + params
 
 				try {
-					MultipartFile multipartFile = request.getFile('fileContents')
-					if (multipartFile.empty) {
-						flash.message = "File cannot be empty. Please select a packing list to import."
-						return
-					}
+                    MultipartFile multipartFile = request.getFile('fileContents')
+                    if (multipartFile.empty) {
+                        flash.message = "File cannot be empty. Please select a packing list to import."
+                        return
+                    }
 
-					if (shipmentService.importPackingList(params.id, multipartFile.inputStream)) {
-						// refresh the shipment instance from database
-						flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
-						flash.message = "Successfully imported all packing list items. "
+                    if (shipmentService.importPackingList(params.id, multipartFile.inputStream)) {
+                        // refresh the shipment instance from database
+                        flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
+                        flash.message = "Successfully imported all packing list items. "
 
-					} else {
-						flash.message = "Failed to import packing list items due to an unknown error."
-					}
-				} catch (ShipmentItemException e) {
-					//flow.shipmentInstance.discard()
-					[itemInstance: e.shipmentItem]
+                    } else {
+                        flash.message = "Failed to import packing list items due to an unknown error."
+                    }
 				} catch (Exception e) {
 					log.warn("Failed to import packing list due to the following error: " + e.message, e)
 					flash.message = "Failed to import packing list due to the following error: " + e.message
