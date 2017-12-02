@@ -160,24 +160,6 @@
 										
 										
 									</tr>
-									<g:if test="${requisition.isDepotRequisition()}">
-										<tr class="prop">
-											<td class="name"><label><warehouse:message
-														code="requisition.program.label" /></label></td>
-											<td class="value">
-											
-												<g:if test="${params?.editHeader || !requisition?.id }">
-													<input id="recipientProgram"
-														name="recipientProgram" class="autocomplete text" size="60"
-														placeholder="${warehouse.message(code:'requisition.program.label')}"
-														data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram" />
-												</g:if>
-												<g:else>
-													${requisition?.recipientProgram }
-												</g:else>
-											</td>
-										</tr>
-									</g:if>
 									<tr class="prop">
 										<td class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label" /></label></td>
 										<td class="value">
@@ -239,16 +221,6 @@
 									<th class="list-header center">
 										${warehouse.message(code: 'product.uom.label', default: 'UOM')}
 									</th>
-									<g:if test="${requisition.isDepotRequisition()}">
-				          				<th class="list-header">
-											${warehouse.message(code: 'requisitionItem.recipient.label')}
-										</th>
-									</g:if>
-									<%--
-									<th class="list-header">
-										${warehouse.message(code: 'requisitionItem.comment.label')}
-									</th>
-									 --%>
 									<th class="center">
 										${warehouse.message(code: 'requisitionItem.delete.label')}
 									</th>
@@ -271,15 +243,8 @@
 									<td class="list-header center middle">
 										<div class="unitOfMeasure" data-bind="text: unitOfMeasure"></div>
 									</td>
-									<g:if test="${requisition.isDepotRequisition()}">
-							          <td class="list-header"><input type="text"
-											data-bind="value: recipient, uniqueName: true" /></td>
-									</g:if><%-- 
 									<td class="list-header"><input type="text"
-										data-bind="value: comment, uniqueName: true" size="30%"
-										class="text" />
-									</td>
-									--%>									
+										data-bind="value: recipient, uniqueName: true" /></td>
 									<td class="center middle">
 										<a href='#' class="button"
 											data-bind='click: $root.requisition.removeItem' tabindex="-1"> 
@@ -334,14 +299,10 @@
 
     	// Hack to make the requisition type in the name more pretty (need to internationalize this)
 		var requisitionTypes = new Object();
-		requisitionTypes['WARD_ADHOC'] = 'Adhoc';
-		requisitionTypes['WARD_STOCK'] = 'Stock';
-		requisitionTypes['WARD_NON_STOCK'] = 'Non Stock'; 
-		requisitionTypes['DEPOT'] = 'Depot'; 
-		requisitionTypes['DEPOT_STOCK'] = 'Depot'; 
-		requisitionTypes['DEPOT_NON_STOCK'] = 'Depot'; 
-		requisitionTypes['DEPOT_TO_DEPOT'] = 'Depot'; 
-        
+		requisitionTypes['ADHOC'] = 'Adhoc';
+		requisitionTypes['STOCK'] = 'Stock';
+		requisitionTypes['NON_STOCK'] = 'Non Stock';
+
         var requisitionFromServer = ${requisition.toJson() as JSON};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);

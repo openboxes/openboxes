@@ -12,9 +12,11 @@ class LinkTagLib extends ApplicationTagLib {
         if (!SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)) {
             def missManager = RoleFilters.needManager(controllerName, actionName) && !userService.isUserManager(session.user)
             def missAdmin = RoleFilters.needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
-            if (missManager || missAdmin) {
-                out << body()
-                return;
+            def missSuperuser = RoleFilters.needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
+
+            // If user is not authorized to access link we just display the link body (text)
+            if (missManager || missAdmin || missSuperuser) {
+                attrs.onclick = "alert('Access denied'); return false;"
             }
         }
 

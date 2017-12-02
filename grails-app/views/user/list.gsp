@@ -8,15 +8,14 @@
 </head>
 <body>
     <div class="body">
-		    <g:if test="${flash.message}">
-		    	<div class="message">${flash.message}</div>
-	        </g:if>
+        <g:if test="${flash.message}">
+            <div class="message">${flash.message}</div>
+        </g:if>
 
 
-			<div class="buttonBar">
-                <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
-                <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
-           	</div>
+        <div class="dialog">
+
+            <g:render template="summary" />
 
             <div class="yui-gf">
                 <div class="yui-u first">
@@ -77,7 +76,7 @@
                                             <span class="active"><warehouse:message code="default.yes.label"/></span></g:if>
                                         <g:else><span class="inactive"><warehouse:message code="default.no.label"/></span></g:else>
                                     </td>
-                                    <td><g:link action="show" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
+                                    <td><g:link action="edit" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
                                     <td>${fieldValue(bean: userInstance, field: "name")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "email")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
@@ -105,6 +104,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     </body>
 </html>

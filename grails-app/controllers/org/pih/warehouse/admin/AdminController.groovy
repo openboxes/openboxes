@@ -16,6 +16,14 @@ import org.pih.warehouse.jobs.DataCleaningJob
 import org.springframework.web.multipart.MultipartFile
 import util.ClickstreamUtil
 
+import javax.print.Doc
+import javax.print.DocFlavor
+import javax.print.DocPrintJob
+import javax.print.PrintService
+import javax.print.SimpleDoc
+import javax.print.attribute.Attribute
+import java.awt.print.PrinterJob
+
 //import java.net.HttpURLConnection;
 //import java.net.URLConnection;
 import java.util.concurrent.FutureTask;
@@ -199,6 +207,32 @@ class AdminController {
 		chain(action: "showUpgrade", model: [command : command])
 		//redirect (view: "showUpgrade", model: [command: command])
 	}
+
+
+	def testZebraPrinter = {
+        try {
+
+            PrintService[] printServices = PrinterJob.lookupPrintServices();
+            //PrinterJob
+            DocPrintJob job = psZebra.createPrintJob();
+
+            String s = "N" + "\n" +
+                    "q305" + "\n" +
+                    "Q203,26" + "\n" +
+                    "B55,26,0,1,2,2,152,B,\"" + code + "\"" + "\n" +
+                    "P1,1";
+
+            InputStream inputStream = new ByteArrayInputStream(s.getBytes());
+            DocFlavor flavor = DocFlavor.INPUT_STREAM.AUTOSENSE;
+            Doc doc = new SimpleDoc(inputStream, flavor, null);
+
+            job.print(doc, null);
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+
 	
 	def showSettings = { 		
 		def externalConfigProperties = []
@@ -216,8 +250,11 @@ class AdminController {
 			}
 		}
 
-        [
+		PrintService[] printServices = PrinterJob.lookupPrintServices();
+
+		[
             quartzScheduler:quartzScheduler,
+			printServices:printServices,
 			externalConfigProperties: externalConfigProperties,
 			systemProperties : System.properties,
 			env: GrailsUtil.environment,

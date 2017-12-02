@@ -19,10 +19,10 @@ class StringUtil {
 		return value ? value?.replaceFirst(".*", { match -> return "".padLeft(match.length(), mask)}) : value
 	}
 
-    public static String substitute(text, binding) {
+    public static String renderTemplate(template, binding) {
         def engine = new SimpleTemplateEngine()
-        def template = engine.createTemplate(text).make(binding)
-        return template.toString()
+        def content = engine.createTemplate(template).make(binding)
+        return content.toString()
     }
 
     public static String format(text, args) {

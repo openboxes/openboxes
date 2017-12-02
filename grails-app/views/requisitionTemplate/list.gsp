@@ -17,15 +17,9 @@
                 <g:link class="button icon log" controller="requisitionTemplate" action="list">
                     <warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/>
                 </g:link>
-                <g:isUserAdmin>
-                    <g:each var="stockType" in="${org.pih.warehouse.requisition.RequisitionType.listStockTypes()}">
-                        <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:stockType]">
-                            <g:set var="stockTypeName" value="${format.metadata(obj: stockType).toLowerCase()}"/>
-                            <warehouse:message code="default.add.label" args="[stockTypeName]"/>
-                        </g:link>
-
-                    </g:each>
-                </g:isUserAdmin>
+                <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'STOCK']">
+                    <warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/>
+                </g:link>
             </div>
             <div class="yui-gf">
                 <div class="yui-u first">

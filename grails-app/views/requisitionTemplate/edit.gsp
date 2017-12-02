@@ -30,14 +30,10 @@
 --%>
 
 <g:render template="summary" model="[requisition:requisition]"/>
-<%--
-    <div class="buttonBar">
-        <g:link class="button icon log" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/></g:link>
-        <g:isUserAdmin>
-            <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']"><warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/></g:link>
-        </g:isUserAdmin>
-    </div>
---%>
+<div class="buttonBar">
+    <g:link class="button icon log" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[g.message(code:'requisitionTemplates.label')]"/></g:link>
+    <g:link class="button icon add" controller="requisitionTemplate" action="create"><warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/></g:link>
+</div>
 <div class="yui-gd">
     <div class="yui-u first">
         <g:render template="header" model="[requisition:requisition]"/>

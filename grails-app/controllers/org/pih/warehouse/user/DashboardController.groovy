@@ -479,7 +479,10 @@ class DashboardController {
     def downloadGenericProductSummaryAsCsv = {
         def location = Location.get(session?.warehouse?.id)
         def genericProductSummary = inventoryService.getGenericProductSummary(location)
-        def data = (params.status == "ALL") ? genericProductSummary.values().flatten() : genericProductSummary[params.status]
+
+        def data = (params.status == "ALL") ?
+                genericProductSummary.values().flatten() :
+                genericProductSummary[params.status]
 
 		// Rename columns and filter out debugging columns
 		data = data.collect { ["Status":it.status,
@@ -487,7 +490,7 @@ class DashboardController {
 							   "Minimum Qty":it.minQuantity,
 							   "Reorder Qty":it.reorderQuantity,
 							   "Maximum Qty":it.maxQuantity,
-							   "Available Qty":it.maxQuantity]}
+							   "Available Qty":it.currentQuantity]}
 
         def sw = new StringWriter()
         if (data) {
