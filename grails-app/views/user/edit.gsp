@@ -106,12 +106,17 @@
                                             </td>
                                         </tr>
                                     </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                            &nbsp;
+                                            <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
                                 </table>
-                                <div class="buttons center">
-                                    <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-                                    &nbsp;
-                                    <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
-                                </div>
 
                             </g:form>
                         </div>
@@ -147,12 +152,18 @@
                                         </tr>
 
                                     </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                            <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                            &nbsp;
+                                            <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
+                                        </td>
+                                    </tr>
                                 </table>
-                                <div class="buttons center">
-                                    <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-                                    &nbsp;
-                                    <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
-                                </div>
 
 
                             </g:form>
@@ -167,7 +178,7 @@
                                 <g:hiddenField name="version" value="${userInstance?.version}" />
                                 <g:hiddenField name="updateRoles" value="${true}" />
 
-                                <table style="width:auto;">
+                                <table>
                                     <tbody>
                                         <g:isUserAdmin>
                                             <tr class="prop">
@@ -212,7 +223,7 @@
                                                 </td>
                                                 <td valign="top">
                                                     <div id="location-roles" style="overflow-y:auto; max-height:200px;">
-                                                        <table style="width:auto;">
+                                                        <table>
                                                             <thead>
                                                             <tr>
                                                                 <th><warehouse:message code="location.label"/></th>
@@ -241,12 +252,20 @@
                                             </tr>
                                         </g:isUserAdmin>
                                     </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                            <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                            &nbsp;
+                                            <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
+
+                                        </td>
+                                    </tr>
+                                    </tfoot>
                                 </table>
-                                <div class="buttons center">
-                                    <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-                                    &nbsp;
-                                    <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
-                                </div>
                             </g:form>
                         </div>
                     </div>
