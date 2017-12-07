@@ -233,6 +233,7 @@ class Product implements Comparable, Serializable {
         documents joinTable: [name: 'product_document', column: 'document_id', key: 'product_id']
         productGroups joinTable: [name: 'product_group_product', column: 'product_group_id', key: 'product_id']
         synonyms cascade: 'all-delete-orphan', sort: 'name'
+        productSuppliers cascade: 'all-delete-orphan'//, sort: 'dateCreated'
         productComponents cascade: "all-delete-orphan"
     }
 
@@ -245,7 +246,6 @@ class Product implements Comparable, Serializable {
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
         productType(nullable:true)
-
         active(nullable: true)
         coldChain(nullable: true)
         reconditioned(nullable: true)
@@ -405,7 +405,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
-    String toString() { return "${productCode}:${name}"; }
+    String toString() { return "${name}"; }
 
     /**
      * Sort by name

@@ -12,32 +12,43 @@ package org.pih.warehouse.product
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
+import org.pih.warehouse.core.UnitOfMeasure
 
-class ProductSupplier {
+class ProductSupplier implements Comparable<ProductSupplier>{
 
     String id
 
     // Unique identifier for product supplier combination
-    String identifier
+    String code
+
+    String name
+
+    String description
+
+    // Product code of the original product used to derive this
+    String productCode
 
     // The generic product
     Product product
 
-    // Universal product code - http://en.wikipedia.org/wiki/Universal_Product_Code
-    String upc
-
     // National drug code - http://en.wikipedia.org/wiki/National_Drug_Code
     String ndc
 
-    // Manufacturer details
+    String upc
+
+    // Manufacturer
     Organization manufacturer
+
+    // Manufacturer details
     String manufacturerCode // Manufacturer's product code (e.g. catalog code)
     String manufacturerName // Manufacturer's product name
     String brandName        // Manufacturer's brand name
     String modelNumber      // Manufacturer's model number
 
-    // Supplier details
+    // Supplier
     Organization supplier
+
+    // Supplier details
     String supplierCode        // Supplier's product code
     String supplierName        // Supplier's alternative product name
 
@@ -52,22 +63,30 @@ class ProductSupplier {
     BigDecimal standardLeadTimeDays
 
     // Price per unit
-    BigDecimal pricePerUnit
+    BigDecimal unitPrice
 
     // Minimum required to order
     BigDecimal minOrderQuantity
 
+    // Supplier's default unit of measure
+    UnitOfMeasure unitOfMeasure
+
     // Additional comments
     String comments
 
+    // Auditing fields
+    Date dateCreated
+    Date lastUpdated
 
     static constraints = {
 
+        code(nullable:true)
+        name(nullable: false)
+        description(nullable: false)
         product(nullable:false)
-
-        identifier(nullable:true)
-        upc(nullable: true, maxSize: 255)
+        productCode(nullable:true)
         ndc(nullable: true, maxSize: 255)
+        upc(nullable: true, maxSize: 255)
 
         supplier(nullable: true)
         supplierCode(nullable: true, maxSize: 255)
@@ -80,16 +99,21 @@ class ProductSupplier {
         manufacturerName(nullable: true, maxSize: 255)
 
         standardLeadTimeDays(nullable:true)
-        pricePerUnit(nullable:true)
+        unitPrice(nullable:true)
         minOrderQuantity(nullable:true)
-
-
-        availableFrom(nullable:true)
-        availableTo(nullable:true)
-
+        unitOfMeasure(nullable:true)
         ratingTypeCode(nullable:true)
         preferenceTypeCode(nullable:true)
         comments(nullable:true)
 
     }
+
+    int compareTo(ProductSupplier obj) {
+        return preferenceTypeCode <=> obj.preferenceTypeCode ?:
+                ratingTypeCode <=> obj.ratingTypeCode ?:
+                    dateCreated <=> obj.dateCreated ?:
+                        id <=> obj.id
+    }
+
+
 }
