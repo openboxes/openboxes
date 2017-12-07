@@ -2,7 +2,7 @@
     <g:hiddenField name="action" value="save"/>
     <g:hiddenField name="id" value="${productInstance?.id}" />
     <g:hiddenField name="version" value="${productInstance?.version}" />
-    <div class="box" >
+    <div class="box dialog" >
         <h2>
             <warehouse:message code="product.attributes.label" default="Product attributes"/>
         </h2>
@@ -52,28 +52,18 @@
             <tfoot>
             <tr>
                 <td colspan="2">
-                    <div class="center">
 
+                    <div class="right">
+                        <g:link controller="attribute" action="list" class="button"><g:message code="attributes.label"/></g:link>
+                    </div>
+                    <div class="center">
                         <button type="submit" class="button icon approve">
                             ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
                         </button>
-                        &nbsp;
-                        <g:if test="${productInstance?.id }">
-                            <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
-                                ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                            </g:link>
-                        </g:if>
-                        <g:else>
-                            <g:link controller="inventory" action="browse" class="button icon remove">
-                                ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                            </g:link>
-                        </g:else>
                     </div>
                 </td>
             </tr>
-
             </tfoot>
         </table>
     </div>
-
 </g:form>

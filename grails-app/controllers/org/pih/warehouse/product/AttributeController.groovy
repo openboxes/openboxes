@@ -79,7 +79,7 @@ class AttributeController {
 		
         if (attributeInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-            redirect(action: "show", id: attributeInstance.id)
+            redirect(action: "edit", id: attributeInstance.id)
         }
         else {
             render(view: (params.id ? "edit" : "create"), model: [attributeInstance: attributeInstance])
