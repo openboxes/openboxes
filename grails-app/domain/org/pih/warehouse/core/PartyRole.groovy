@@ -29,7 +29,7 @@ class PartyRole {
     }
 
     String toString() {
-        return party + " " + roleType?.name
+        return party.toString() + " " + roleType?.name
     }
 
 }

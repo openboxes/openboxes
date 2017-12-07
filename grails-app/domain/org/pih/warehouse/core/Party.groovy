@@ -9,14 +9,18 @@
 **/ 
 package org.pih.warehouse.core
 
-class Party {
+class Party implements Comparable<Party> {
 
     String id
     PartyType partyType
 
+    Date dateCreated
+    Date lastUpdated
+
     static hasMany = [roles: PartyRole]
 
     static mapping = {
+        tablePerHierarchy false
         id generator: 'uuid'
     }
 
@@ -26,6 +30,12 @@ class Party {
 
     String toString() {
         return id
+    }
+
+    int compareTo(Party party) {
+        return dateCreated <=> party?.dateCreated ?:
+                lastUpdated <=> party?.lastUpdated ?:
+                   id <=> party.id
     }
 
 }

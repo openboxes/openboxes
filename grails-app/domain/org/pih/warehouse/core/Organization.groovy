@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 class Organization extends Party {
 
     String id
+    String code
     String name
     String description
 
@@ -24,6 +25,7 @@ class Organization extends Party {
     }
 
     static constraints = {
+        code(nullable:true)
         name(nullable:false, maxSize: 255)
         description(nullable:true, maxSize: 255)
     }
@@ -32,4 +34,12 @@ class Organization extends Party {
     String toString() {
         return name
     }
+
+    int compareTo(Organization obj) {
+        return name <=> obj.name ?:
+                    dateCreated <=> obj.dateCreated ?:
+                        id <=> obj.id
+    }
+
+
 }
