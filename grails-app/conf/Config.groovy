@@ -12,6 +12,7 @@ import grails.util.GrailsUtil
 import org.apache.log4j.AsyncAppender
 import org.apache.log4j.Level
 import org.apache.log4j.net.SMTPAppender
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 
@@ -471,6 +472,16 @@ openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummar
 openboxes.dashboard.column2.widgets=["binLocationSummary","valueSummary","productSummary","genericProductSummary","expiringSummary"]
 openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
 
+// OpenBoxes identifier config
+openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
+openboxes.identifier.alphabetic = Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS
+openboxes.identifier.alphanumeric = Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS
+openboxes.identifier.transaction.format = Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT
+openboxes.identifier.order.format = Constants.DEFAULT_ORDER_NUMBER_FORMAT
+openboxes.identifier.product.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
+openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
+openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
+openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
