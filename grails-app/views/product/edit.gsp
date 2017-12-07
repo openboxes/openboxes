@@ -44,7 +44,7 @@
 						<%-- Only show these tabs if the product has been created --%>
 						<g:if test="${productInstance?.id }">
                             <li>
-                                <a href="${request.contextPath}/product/editSources/${productInstance?.id}" id="tab-sources">
+                                <a href="${request.contextPath}/product/productSuppliers/${productInstance?.id}" id="tab-sources">
                                     <g:message code="product.sources.label" default="Sources"/>
                                 </a>
                             </li>
@@ -59,7 +59,7 @@
                             <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
                         </g:if>
 					</ul>	
-					<div id="tabs-details" style="padding: 10px;" class="ui-tabs-hide">
+					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
                         <g:form action="${formAction}" method="post">
                             <g:hiddenField name="id" value="${productInstance?.id}" />
@@ -166,6 +166,37 @@
                                                     placeholder="Detailed text description (optional)" />
                                             </td>
                                         </tr>
+                                        <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
+                                            <tr class="prop">
+                                                <td class="name">
+                                                    <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
+                                                </td>
+                                                <td class="value">
+                                                    <g:set var="attributeFound" value="f"/>
+                                                    <g:if test="${attribute.options}">
+                                                        <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
+                                                            <option value=""></option>
+                                                            <g:each var="option" in="${attribute.options}" status="optionStatus">
+                                                                <g:set var="selectedText" value=""/>
+                                                                <g:if test="${productInstance?.attributes[status]?.value == option}">
+                                                                    <g:set var="selectedText" value=" selected"/>
+                                                                    <g:set var="attributeFound" value="t"/>
+                                                                </g:if>
+                                                                <option value="${option}"${selectedText}>${option}</option>
+                                                            </g:each>
+                                                            <g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
+                                                            <g:if test="${attribute.allowOther || otherAttVal}">
+                                                                <option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
+                                                                    <g:message code="product.attribute.value.other" default="Other..." />
+                                                                </option>
+                                                            </g:if>
+                                                        </select>
+                                                    </g:if>
+                                                    <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
+                                                    <g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+                                                </td>
+                                            </tr>
+                                        </g:each>
                                         <tr class="prop">
                                             <td class="name middle"><label for="upc"><warehouse:message
                                                     code="product.upc.label" /></label></td>
@@ -262,37 +293,7 @@
 
                                             </td>
                                         </tr>
-                                        <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
-                                            <tr class="prop">
-                                                <td class="name">
-                                                    <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
-                                                </td>
-                                                <td class="value">
-                                                    <g:set var="attributeFound" value="f"/>
-                                                    <g:if test="${attribute.options}">
-                                                        <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
-                                                            <option value=""></option>
-                                                            <g:each var="option" in="${attribute.options}" status="optionStatus">
-                                                                <g:set var="selectedText" value=""/>
-                                                                <g:if test="${productInstance?.attributes[status]?.value == option}">
-                                                                    <g:set var="selectedText" value=" selected"/>
-                                                                    <g:set var="attributeFound" value="t"/>
-                                                                </g:if>
-                                                                <option value="${option}"${selectedText}>${option}</option>
-                                                            </g:each>
-                                                            <g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
-                                                            <g:if test="${attribute.allowOther || otherAttVal}">
-                                                                <option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
-                                                                    <g:message code="product.attribute.value.other" default="Other..." />
-                                                                </option>
-                                                            </g:if>
-                                                        </select>
-                                                    </g:if>
-                                                    <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
-                                                    <g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
-                                                </td>
-                                            </tr>
-                                        </g:each>
+
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -386,37 +387,37 @@
                             </g:form>
                         </div>
                      --%>
-                        <div id="tabs-manufacturer" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-manufacturer" class="ui-tabs-hide">
                             <g:render template="manufacturers" model="[productInstance:productInstance]"/>
 
                         </div>
 
-                        <div id="tabs-synonyms" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-synonyms" class="ui-tabs-hide">
                             <div class="box">
                                 <h2><warehouse:message code="product.synonyms.label" default="Synonyms"/></h2>
                                 <g:render template="synonyms" model="[product: productInstance, synonyms:productInstance?.synonyms]"/>
                             </div>
                         </div>
 
-                        <div id="tabs-productGroups" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-productGroups" class="ui-tabs-hide">
                             <div class="box">
                                 <h2><warehouse:message code="product.substitutions.label" default="Substitutions"/></h2>
                                 <g:render template="productGroups" model="[product: productInstance, productGroups:productInstance?.productGroups]"/>
                             </div>
                         </div>
-                        <div id="tabs-attributes" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-attributes" class="ui-tabs-hide">
                             <g:render template="attributes" model="[productInstance:productInstance]"/>
                         </div>
-                        <div id="tabs-status" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-status" class="ui-tabs-hide">
                             <g:render template="inventoryLevels" model="[productInstance:productInstance]"/>
 						</div>
-                        <div id="tabs-components" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-components" class="ui-tabs-hide">
                             <g:render template="productComponents" model="[productInstance:productInstance]"/>
                         </div>
-						<div id="tabs-documents" style="padding: 10px;" class="ui-tabs-hide">
+						<div id="tabs-documents" class="ui-tabs-hide">
                             <g:render template="documents" model="[productInstance:productInstance]"/>
 						</div>
-						<div id="tabs-packages" style="padding: 10px;" class="ui-tabs-hide">
+						<div id="tabs-packages" class="ui-tabs-hide">
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 
 						</div>
@@ -473,13 +474,13 @@
 	    			}
 				); 
 
-				$(".dialog").dialog({ autoOpen: false, modal: true, width: '800px'});
-
-				$(".open-dialog").click(function() { 
+                $(".open-dialog").livequery('click', function(event) {
+				    event.preventDefault();
 					var id = $(this).attr("dialog-id");
-					$("#"+id).dialog('open');
+					$("#"+id).dialog({ autoOpen: true, modal: true, width: 800});
 				});
-				$(".close-dialog").click(function() { 
+                $(".close-dialog").livequery('click', function(event) {
+                    event.preventDefault();
 					var id = $(this).attr("dialog-id");
 					$("#"+id).dialog('close');
 				});

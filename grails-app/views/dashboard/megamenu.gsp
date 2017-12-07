@@ -348,6 +348,9 @@
                         <g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
                     </div>
                     <div class="megaButton">
+                        <g:link controller="productSupplier" action="list" class="list"><warehouse:message code="productSuppliers.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
                         <g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
                     </div>
                     <div class="megaButton">
@@ -463,6 +466,11 @@
                             <warehouse:message code="partyTypes.label" default="Party Types" />
                         </g:link>
                     </div>
+                    <div class="megaButton">
+                        <g:link controller="partyRole" action="list">
+                            <warehouse:message code="partyRoles.label" default="Party Roles" />
+                        </g:link>
+                    </div>
                     <hr/>
                     <div class="megaButton">
                         <g:link controller="location" action="list" class="location">
@@ -477,12 +485,7 @@
                     </div>
                     <div class="megaButton">
                         <g:link controller="organization" action="list">
-                            <warehouse:message code="organizations.label" default="Organization" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="partyRole" action="list">
-                            <warehouse:message code="organizationRoles.label" default="Organization Roles" />
+                            <warehouse:message code="organizations.label" default="Organizations" />
                         </g:link>
                     </div>
                     <hr/>

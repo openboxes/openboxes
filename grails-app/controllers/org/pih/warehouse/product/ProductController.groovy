@@ -311,7 +311,7 @@ class ProductController {
 	}
 
 
-    def editSources = {
+    def productSuppliers = {
 
         def productInstance = Product.get(params.id)
         if (!productInstance) {
@@ -319,7 +319,7 @@ class ProductController {
             redirect(controller: "inventory", action: "browse")
         }
         else {
-            render(template: "sources", model:[productInstance: productInstance])
+            render(template: "productSuppliers", model:[productInstance: productInstance])
         }
 
     }
