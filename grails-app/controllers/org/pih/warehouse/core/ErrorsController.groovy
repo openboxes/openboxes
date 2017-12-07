@@ -23,32 +23,47 @@ class ErrorsController {
 	def userService
     def grailsApplication
 
-
-    def update = {
-        render(view: "/error")
-    }
-
 	def handleException = {
         if (request.isXhr()) {
             render([errorCode: 500, errorMessage: request?.exception?.message?:""] as JSON)
-            return
         }
-		render(view: "/error")
+        else {
+            render(view: "/error")
+        }
 	}
 	
-	def handleNotFound = { 
-		render(view:"/errors/notFound")
+	def handleNotFound = {
+        if (request.isXhr()) {
+            render([errorCode: 404, errorMessage: "Resource not found"] as JSON)
+        }
+        else {
+            render(view: "/errors/notFound")
+        }
 	}
 	
-	def handleUnauthorized = { 
-		render(view:"/errors/accessDenied")
+	def handleUnauthorized = {
+        if (request.isXhr()) {
+            render([errorCode: 401, errorMessage: "Access denied"] as JSON)
+        }
+        else {
+            render(view:"/errors/accessDenied")
+        }
 	}
 
     def handleInvalidDataAccess = {
-        render(view:"/errors/dataAccess")
+        if (request.isXhr()) {
+            render([errorCode: 500, errorMessage: "Illegal data access"] as JSON)
+        }
+        else {
+            render(view:"/errors/dataAccess")
+        }
     }
 
     def handleMethodNotAllowed = {
+        if (request.isXhr()) {
+            render([errorCode: 405, errorMessage: "Method not allowed"] as JSON)
+            return
+        }
         render(view:"/errors/methodNotAllowed")
     }
 
