@@ -54,9 +54,9 @@
                                         </li>
                                         --%>
                                         <li class="action-menu-item">
-                                            <g:link controller="user" action="show" id="${session.user.id }" style="color: #666;">
+                                            <g:link controller="user" action="edit" id="${session.user.id }" style="color: #666;">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}"/>
-                                                <warehouse:message code="profile.label" default="Profile"/>
+                                                <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]"></g:message>
                                             </g:link>
                                         </li>
                                         <li class="action-menu-item">
