@@ -11,6 +11,7 @@ package util
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationEditor
+import org.pih.warehouse.core.OrganizationEditor
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.TagEditor
 import org.pih.warehouse.product.Category
@@ -27,6 +28,7 @@ public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 		registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true));
         registry.registerCustomEditor(Location.class, new LocationEditor())
         registry.registerCustomEditor(Category.class, new CategoryEditor())
+        registry.registerCustomEditor(Category.class, new OrganizationEditor())
         registry.registerCustomEditor(Tag.class, new TagEditor())
 	}
 }

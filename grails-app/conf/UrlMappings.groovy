@@ -34,10 +34,9 @@ class UrlMappings {
 		"401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
         "405"(controller:"errors", action:"handleMethodNotAllowed")
-
-        //"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
-        //"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
-		"500"(controller:"errors", action:"handleException")
+		//"500"(controller:"errors", action:"handleException")
+		//"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
+		//"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
         "/"(controller:"home", action:"index")
 	}
 
