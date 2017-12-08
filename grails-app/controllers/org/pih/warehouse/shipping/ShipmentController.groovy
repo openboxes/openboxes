@@ -235,6 +235,17 @@ class ShipmentController {
 			[shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes : eventTypes]
 		}
 	}
+
+	def showTransactions = {
+		def shipmentInstance = Shipment.get(params.id)
+		render (template: "showTransactions", model: [shipmentInstance: shipmentInstance])
+	}
+
+    def syncTransactions = {
+        def shipmentInstance = Shipment.get(params.id)
+        shipmentService.synchronizeTransactions(shipmentInstance)
+        redirect(action: "showDetails", id: params.id)
+    }
 	
 	def editDetails = {
 		log.info params

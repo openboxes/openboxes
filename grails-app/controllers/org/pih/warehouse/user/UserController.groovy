@@ -10,6 +10,8 @@
 package org.pih.warehouse.user
 
 import grails.plugin.springcache.annotations.CacheFlush
+import grails.validation.ValidationException
+import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.core.*
 
 import java.awt.Image as AWTImage
@@ -168,7 +170,9 @@ class UserController {
      * Show the edit form for a user
      */
     def edit = {
-    	log.info "edit user"
+
+        log.info "edit user"
+
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
@@ -205,7 +209,7 @@ class UserController {
      * Update a user 
      */
     def update = {
-        log.info(params)
+
         def userInstance = User.get(params.id)
         if (userInstance) {
             if (params.version) {
@@ -218,71 +222,35 @@ class UserController {
                 }
             }
 
-            // Password in the db is different from the one specified
-            // so the user must have changed the password.  We need
-            // to compare the password with confirm password before
-            // setting the new password in the database
-            if (userInstance.password != params.password) {
-                userInstance.properties = params
-                userInstance.password = params?.password?.encodeAsPassword();
-                userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
-            } else {
-                userInstance.properties = params
-                // Needed to bypass the password == passwordConfirm validation
-                userInstance.passwordConfirm = userInstance.password
-            }
-
-            // If a non-admin user edits their profile they will not have access to
-            // the roles or location roles, so we need to prevent the updateRoles
-            // method from being called.
-            if (params.locationRolePairs) {
-                updateRoles(userInstance, params.locationRolePairs)
-            }
-
-			if (params.timezone) {
-				session.timezone = TimeZone.getTimeZone(params.timezone)
-
-			}
-
-            if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-                // if this is the current user, update reference to that user in the session
+            try {
+                 userInstance = userService.updateUser(params.id, session.user.id, params)
+                // Update session data if the user is editing their own profile
                 if (session.user.id == userInstance?.id) {
                     session.user = User.get(userInstance?.id)
+                    if (params.timezone) {
+                        session.timezone = TimeZone.getTimeZone(params.timezone)
+                    }
                 }
 
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+                if (!flash.message)
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+
                 redirect(action: "show", id: userInstance.id)
-            } else {
+
+            } catch (ValidationException e) {
+                userInstance = User.read(params.id)
+                userInstance.errors = e.errors
                 def locations = Location.AllDepotWardAndPharmacy()
                 render(view: "edit", model: [userInstance: userInstance, locations: locations])
             }
+
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
     }
 
-   private void updateRoles(user, locationRolePairs){
-     def newAndUpdatedRoles = locationRolePairs.keySet().collect{ locationId ->
-       if(locationRolePairs[locationId]){
-         def location = Location.get(locationId)
-         def role = Role.get(locationRolePairs[locationId])
-         def existingRole = user.locationRoles.find{it.location == location}
-         if(existingRole){
-            existingRole.role = role
-         }else{
-           def newLocationRole = new LocationRole(user: user, location:location, role: role)
-           user.addToLocationRoles(newLocationRole)
-         }
-       }
-     }
-     def rolesToRemove = user.locationRoles.findAll{ oldRole ->
-        !locationRolePairs[oldRole.location.id]
-     }
-     rolesToRemove.each{ 
-       user.removeFromLocationRoles(it)       
-     }
-   }
+
    
    
    def disableTranslationMode = {

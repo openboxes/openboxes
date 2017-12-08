@@ -10,16 +10,8 @@
                 &nbsp;
                 --%>
                 <warehouse:message code="requisitionTemplate.label" default="Requisition template"/>
-                <div class="right">
-                    <g:if test="${requisition?.id }">
-                        <g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id }" class=" icon edit">
-                            ${warehouse.message(code:'requisition.button.edit.label')}
-                        </g:link>
-                    </g:if>
-                </div>
             </h2>
         </div>
-
 
         <table id="requisition-header-details-table" class="header-summary-table">
 
@@ -56,12 +48,8 @@
 
                 <tr class="prop">
                     <td class="name">
-                        <label for="origin.id"> <g:if
-                                test="${requisition.isWardRequisition()}">
-                            <warehouse:message code="requisition.requestingWard.label" />
-                        </g:if> <g:else>
-                            <warehouse:message code="requisition.requestingDepot.label" />
-                        </g:else>
+                        <label for="origin.id">
+                            <warehouse:message code="requisition.origin.label" />
                         </label>
                     </td>
                     <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
@@ -80,15 +68,6 @@
                         <span id="destination.id"> ${requisition?.destination?.name }</span>
                     </td>
                 </tr>
-                <g:if test="${requisition.isDepotRequisition()}">
-                    <tr>
-                        <td class="name"><label><warehouse:message
-                                code="requisition.program.label" /></label></td>
-                        <td class="value">
-                            ${requisition?.recipientProgram }
-                        </td>
-                    </tr>
-                </g:if>
                 <tr class="prop">
                     <td class="name">
                         <label for="description">

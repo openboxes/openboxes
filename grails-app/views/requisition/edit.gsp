@@ -30,15 +30,15 @@
         </div>
         <div class="yui-u">
 
-			<g:form name="requisitionForm" method="post" action="save">
+			<g:form name="requisitionForm" method="post" action="saveRequisitionItems">
                 <g:if test="${requisition?.id}">
 
-                    <div class="box">
+                    <div class="box dialog">
                         <h2>
                             <warehouse:message code="requisition.addRequisitionItems.label" default="Add requisition items"/>
                         </h2>
 
-                        <table id="requisition-items" class="ui-validation-items zebra"
+                        <table id="requisition-items" class="ui-validation-items zebra "
                             data-bind="visible: requisition.requisitionItems().length">
                             <thead>
 
@@ -54,11 +54,6 @@
                                     ${warehouse.message(code: 'requisitionItem.totalQuantity.label', default:'Total quantity')}
                                 </th>
                                 --%>
-                                    <g:if test="${requisition.isDepotRequisition()}">
-                                        <th class="list-header">
-                                            ${warehouse.message(code: 'requisitionItem.recipient.label')}
-                                        </th>
-                                    </g:if>
                                     <th class="list-header middle">
                                         ${warehouse.message(code: 'requisitionItem.status.label')}
                                     </th>
@@ -88,20 +83,6 @@
                                         <input name="quantity" type="text"
                                             class="required number quantity text center" size="10" data-bind="value: quantity" />
                                     </td>
-                                    <%--
-                                    <td class="list-header center">
-                                        <div class="middle" data-bind="text: totalQuantity"></div>
-                                    </td>
-                                    --%>
-                                    <g:if test="${requisition.isDepotRequisition()}">
-                                      <td class="middle list-header"><input type="text"
-                                            data-bind="value: recipient, uniqueName: true" /></td>
-                                    </g:if><%--
-                                    <td class="list-header"><input type="text"
-                                        data-bind="value: comment, uniqueName: true" size="30%"
-                                        class="text" />
-                                    </td>
-                                    --%>
                                     <td class="middle list-header">
                                         <div data-bind="text: status"></div>
                                     </td>
@@ -151,13 +132,9 @@
 
 		// Hack to make the requisition type in the name more pretty (need to internationalize this)
 		var requisitionTypes = new Object();
-		requisitionTypes['WARD_ADHOC'] = 'Adhoc';
-		requisitionTypes['WARD_STOCK'] = 'Stock';
-		requisitionTypes['WARD_NON_STOCK'] = 'Non Stock'; 
-		requisitionTypes['DEPOT'] = 'Depot'; 
-		requisitionTypes['DEPOT_STOCK'] = 'Depot'; 
-		requisitionTypes['DEPOT_NON_STOCK'] = 'Depot'; 
-		requisitionTypes['DEPOT_TO_DEPOT'] = 'Depot'; 
+		requisitionTypes['ADHOC'] = 'Adhoc';
+		requisitionTypes['STOCK'] = 'Stock';
+		requisitionTypes['NON_STOCK'] = 'Non Stock';
 
 		var requisitionFromServer = ${requisition.toJson() as JSON};
 		var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);

@@ -82,7 +82,7 @@
 
 <g:render template="/common/navbar" />
 
-
+<input type="hidden" id="currentLocationId" value="${session?.warehouse?.id}"/>
 <div id='content' class="body">
     <div class="container-fluid">
         <div class="row">
@@ -108,7 +108,7 @@
 
             <footer>
                 <p>
-                &copy; OpenBoxes 2015
+                &copy; OpenBoxes 2017
                 </p>
             </footer>
 

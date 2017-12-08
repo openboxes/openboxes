@@ -18,6 +18,51 @@
 
         <div class="body">
 
+            <div class="summary">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="top">
+                                <div class="title">
+                                    <warehouse:message code="default.list.label" args="${[entityName]}" /> (${requisitions.totalCount})
+                                </div>
+                            </td>
+                            <td class="right">
+                                <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
+                                    <warehouse:message code="requisition.button.export.label" default="Export requisitions"/>
+                                </g:link>
+                                <g:link controller="requisition" action="exportRequisitionItems" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
+                                    <warehouse:message code="requisition.button.export.label" default="Export requisition items"/>
+                                </g:link>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="buttonBar">
+                <div class="button-group">
+                    <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
+                        ${warehouse.message(code:'requisitions.relatedToMe.label', default: 'My requisitions')}
+                        (${requisitionStatistics["MINE"]?:0 })
+                    </g:link>
+                </div>
+                <div class="button-group">
+                    <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
+                        <warehouse:message code="default.all.label"/>
+                        (${requisitionStatistics["ALL"]})
+                    </g:link>
+                    <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
+                        <g:if test="${requisitionStatistics[requisitionStatus]>0}">
+                            <g:set var="isPrimary" value="${params.status==requisitionStatus.name()?true:false}"/>
+                            <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="button ${isPrimary?'primary':''}">
+                                <format:metadata obj="${requisitionStatus}"/>
+                                (${requisitionStatistics[requisitionStatus]?:0 })
+                            </g:link>
+                        </g:if>
+                    </g:each>
+                </div>
+            </div>
 
             <div class="yui-gf">
 				<div class="yui-u first">
@@ -228,7 +273,7 @@
                                                           title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
                                         --%>
                                         <th>
-
+                                            <g:message code="requisition.timeToProcess.label"/>
                                         </th>
                                     </tr>
                                     </thead>
@@ -285,8 +330,25 @@
                                                 <div title="<g:formatDate date="${requisition.dateRequested }"/>">
                                                     <g:prettyDateFormat date="${requisition.dateRequested}"/>
                                                 </div>
-
                                             </td>
+                                            <td class="middle">
+                                                <g:if test="${requisition.dateIssued && requisition.dateCreated}">
+                                                    <g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateIssued, requisition.dateCreated)}"/>
+                                                </g:if>
+                                                <g:elseif test="${requisition.dateChecked && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateChecked, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                                <g:elseif test="${requisition?.picklist?.datePicked && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition?.picklist?.datePicked, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                                <g:elseif test="${requisition.dateVerified && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.dateVerified, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                                <g:elseif test="${requisition.lastUpdated && requisition.dateCreated}">
+                                                    <i><g:relativeTime timeDuration="${groovy.time.TimeCategory.minus(requisition.lastUpdated, requisition.dateCreated)}"/></i>
+                                                </g:elseif>
+                                            </td>
+
                                             <%--
                                             <td class="middle center">${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
                                             <td class="middle center">${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>

@@ -1,13 +1,11 @@
-<head>
-    <link rel="stylesheet" type="text/css" href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-    <style>
-        #dataTable_filter { margin: 5px;}
-        #dataTable_length { margin: 5px; }
-        #dataTable_info { margin: 5px; }
-        #dataTable_paginate { margin: 0px; }
+<style>
+#dataTable_filter { margin: 5px;}
+#dataTable_length { margin: 5px; }
+#dataTable_info { margin: 5px; }
+#dataTable_paginate { margin: 0px; }
 
-    </style>
-</head>
+</style>
+
 
 <div class="box">
     <h2>
@@ -29,8 +27,8 @@
         <warehouse:message code="dashboard.fastMovers.title.label" default="Fast Movers (within last 30 days)"/>
         <small><warehouse:message code="dashboard.fastMovers.subtitle.label" default="Within last 30 days" args="[(end-start)]"/></small>
     </h2>
-	<div class="widget-content" style="padding:0px; margin:0">
-        <table id="dataTable">
+	<div id="fastMoversWidget" class="widget-content" style="padding:0;margin:0">
+        <table id="fastMoversDataTable">
             <thead>
                 <th><warehouse:message code="default.id.label" default="ID"/></th>
                 <th><warehouse:message code="fastMovers.rank.label" default="Rank"/></th>
@@ -50,8 +48,9 @@
 <script>
     $(window).load(function(){
 
-        var dataTable = $('#dataTable').dataTable( {
+        var dataTable = $('#fastMoversDataTable').dataTable( {
             "bProcessing": true,
+            //"bServerSide": true,
             "sServerMethod": "GET",
             "iDisplayLength": 5,
             "bSearch": false,
@@ -61,8 +60,7 @@
             "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/dashboard/fastMovers",
             "fnServerParams": function ( data ) {
-                var locationId = $("#currentLocationId").val();
-                data.push({ name: "location.id", value: locationId });
+                data.push({ name: "location.id", value: $("#currentLocationId").val() });
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
@@ -72,7 +70,7 @@
                     "data": aoData,
                     "success": fnCallback,
                     "timeout": 120000,   // optional if you want to handle timeouts (which you should)
-                    "error": handleAjaxError // this sets up jQuery to give me errors
+                    "error": handleFastMoversAjaxError // this sets up jQuery to give me errors
                 } );
             },
 //            "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -83,7 +81,7 @@
 //            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> <br/><br/> Loading... "
+                "sProcessing": "Loading ... <img alt='spinner' src='${request.contextPath}/images/spinner.gif' />"
             },
             //"fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,
@@ -115,7 +113,7 @@
 
     });
 
-    function handleAjaxError( xhr, status, error ) {
+    function handleFastMoversAjaxError( xhr, status, error ) {
         if ( status === 'timeout' ) {
             alert( 'The server took too long to send the data.' );
         }
@@ -125,15 +123,14 @@
                 return;
             }
 
+            var errorMessage = "<p class='error'>An unexpected error has occurred on the server.  Please contact your system administrator.</p>";
+
             if (xhr.responseText) {
-                var error = eval("(" + xhr.responseText + ")");
-                alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);
-            } else {
-                alert('An unknown error occurred on the server.  Please contact your system administrator.');
+                var error = JSON.parse(xhr.responseText);
+                errorMessage = errorMessage += "<code>" + error.errorMessage + "</code>"
             }
+            $("#fastMoversWidget").html(errorMessage);
         }
-        console.log(dataTable);
-        dataTable.fnProcessingDisplay( false );
     }
 
 </script>

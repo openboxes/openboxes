@@ -126,12 +126,21 @@ grails.validateable.packages = [
 ]
 
 /* Default settings for emails sent through the SMTP appender  */
-mail.error.server = 'localhost'
-mail.error.port = 25
-mail.error.from = 'justin@openboxes.com'
+//mail.error.server = 'localhost'
+//mail.error.port = 25
+//mail.error.from = 'justin@openboxes.com'
+//mail.error.to = 'errors@openboxes.com'
+//mail.error.subject = '[OpenBoxes '+GrailsUtil.environment+']'
+//mail.error.debug = true
+mail.error.debug = false
 mail.error.to = 'errors@openboxes.com'
-mail.error.subject = '[OpenBoxes '+GrailsUtil.environment+']'
-mail.error.debug = true
+mail.error.server = grails.mail.host
+mail.error.port = grails.mail.port
+mail.error.from = grails.mail.from
+mail.error.username = grails.mail.username
+mail.error.password = grails.mail.password
+mail.error.prefix = grails.mail.prefix
+
 
 // set per-environment serverURL stem for creating absolute links
 environments {
@@ -212,7 +221,7 @@ log4j = {
                 "Username: %X{username}%n" +
                 "Location: %X{location}%n" +
                 "Locale: %X{locale}%n" +
-				"IP address: %X{ipAddress} http://whatismyipaddress.com/ip/%X{ipAddress}%n" +
+				"IP address: %X{ipAddress}%n" +
 				"Request URI: %X{requestUri}%n" +
                 "Request URL: %X{requestUrl}%n" +
 				"Query string: %X{queryString}%n" +
@@ -226,7 +235,7 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " %m",
+					subject: mail.error.prefix + " %m",
 					threshold: Level.ERROR,
 					//SMTPHost: mail.error.server,
 					layout: pattern(conversionPattern: conversionPattern))
@@ -237,11 +246,11 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " %m",
+					subject: mail.error.prefix + " %m",
 					threshold: Level.ERROR,
-					//SMTPHost: mail.error.server,
-					//SMTPUsername: mail.error.username,
-					//SMTPPassword: mail.error.password,
+					SMTPHost: mail.error.server,
+					SMTPUsername: mail.error.username,
+					SMTPPassword: mail.error.password,
 					SMTPDebug: mail.error.debug,
 					layout: pattern(conversionPattern: conversionPattern))
 			}
@@ -251,12 +260,12 @@ log4j = {
 					name: 'smtp',
 					to: mail.error.to,
 					from: mail.error.from,
-					subject: mail.error.subject + " An application error occurred",
+					subject: mail.error.prefix + " Application error occurred",
 					threshold: Level.ERROR,
-					//SMTPHost: mail.error.server,
-					//SMTPUsername: mail.error.username,
+					SMTPHost: mail.error.server,
+					SMTPUsername: mail.error.username,
 					SMTPDebug: mail.error.debug,
-					//SMTPPassword: mail.error.password,
+					SMTPPassword: mail.error.password,
 					layout: pattern(conversionPattern: conversionPattern))
 			}
 

@@ -63,32 +63,8 @@ class RequisitionController {
 		render(view:"listStock", model:[requisitions: requisitions])		
 	}
 
-    def create = {
-        println params
-		def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.type = params.type as RequisitionType
-        def locations
-        if (requisition.isWardRequisition()) {
-            locations = getWardsPharmacies()
-        } else {
-            locations = getDepots()
-        }
-		
-		if (!locations) { 
-			requisition.errors.rejectValue("origin", "requisition.origin.error")
-		}
-		
-        render(view:"edit", model:[requisition:requisition, locations: locations])
-    }
-
     def chooseTemplate = {
-        println params
-        def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_STOCK
-        //requisition.name = getName(requisition)
-        def templates = Requisition.findAllByIsPublishedAndIsTemplate(true,true)
-
-        render(view:"chooseTemplate", model:[requisition:requisition, templates:templates])
+        render(view:"chooseTemplate")
     }
 
     def createStockFromTemplate = {
@@ -119,40 +95,16 @@ class RequisitionController {
 
         println "redirecting to create stock page " + requisition.id
         render(view:"createStock", model:[requisition:requisition])
-
-
     }
 
-    def createNonStock = {
-        println params
+    def create = {
         def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
-        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_NON_STOCK
-        //requisition.name = getName(requisition)
+        requisition.type = params.type as RequisitionType
         render(view:"createNonStock", model:[requisition:requisition])
     }
 
-    def createAdhoc = {
-        println params
-        def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
-        requisition.type = params.type as RequisitionType ?: RequisitionType.WARD_ADHOC
-        //requisition.name = getName(requisition)
-        render(view:"createNonStock", model:[requisition:requisition])
-    }
-
-    def createDepot = {
-        println params
-        def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
-        requisition.type = params.type as RequisitionType ?: RequisitionType.DEPOT_TO_DEPOT
-        //requisition.name = getName(requisition)
-        render(view:"createNonStock", model:[requisition:requisition])
-    }
-
-
-    def saveNonStock = {
-        log.info "Save non stock requisition " + params
+    def save = {
+        log.info "Save requisition " + params
         withForm {
             def requisition = new Requisition(params)
             // Need to handle commodity class since it is an enum
@@ -160,45 +112,32 @@ class RequisitionController {
                 requisition.commodityClass = params.commodityClass as CommodityClass
             }
             requisition.name = getName(requisition)
+            requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
             requisition = requisitionService.saveRequisition(requisition)
             if (!requisition.hasErrors()) {
                 redirect(controller: "requisition", action: "edit", id: requisition?.id)
             } else {
-                render(view: "createNonStock", model: [requisition: requisition])
+
+                if (requisition.type == RequisitionType.STOCK) {
+                    render(view: "createStock", model: [requisition: requisition])
+                }
+                else {
+                    render(view: "createNonStock", model: [requisition: requisition])
+                }
             }
         }.invalidToken {
             flash.message = "${g.message(code: 'requisition.invalid.duplicate.message')}"
             def requisition = Requisition.findByRequestNumber(params.requestNumber)
-            redirect(action: "show", id: requisition?.id)
+            if (requisition) {
+                redirect(action: "show", id: requisition?.id)
+            }
+            else {
+                redirect(action: "list")
+            }
         }
     }
 
-    def saveStock = {
 
-        log.info "Save stock requisition " + params
-        withForm {
-            def requisition = new Requisition(params)
-
-            // Need to handle commodity class since it is an enum
-            if (params.commodityClass) {
-                requisition.commodityClass = params.commodityClass as CommodityClass
-            }
-            requisition.name = getName(requisition)
-            def value = requisitionService.saveRequisition(requisition)
-            println "Value = " + value
-
-            if (value.hasErrors()) {
-                println "There are errors " + requisition.errors
-                render(view: "createStock", model: [requisition: requisition])
-            } else {
-                redirect(controller: "requisition", action: "show", id: requisition?.id)
-            }
-        }.invalidToken {
-            flash.message = "${g.message(code: 'requisition.invalid.duplicate.message')}"
-            redirect(action: "list")
-        }
-
-    }
 
 
 	def edit = {
@@ -271,6 +210,8 @@ class RequisitionController {
 
         if (requisition.status < RequisitionStatus.VERIFYING) {
             requisition.status = RequisitionStatus.VERIFYING
+            //requisition.verifiedBy = User.load(session.user.id)
+            //requisition.dateVerified = new Date()
             requisition.save(flush:true)
         }
 
@@ -312,36 +253,36 @@ class RequisitionController {
     }
 
 
-    def save = {
+    def saveRequisitionItems = {
         def jsonResponse = []
-            def requisition = new Requisition()
-            try {
-                def jsonRequest = request.JSON
-                println "Save requisition: " + jsonRequest
-                requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
-                if (!requisition.hasErrors()) {
-                    jsonResponse = [success: true, data: requisition.toJson()]
+        def requisition = new Requisition()
+        try {
+            def jsonRequest = request.JSON
+            println "Save requisition: " + jsonRequest
+            requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session?.warehouse?.id))
+            if (!requisition.hasErrors()) {
+                jsonResponse = [success: true, data: requisition.toJson()]
             }
             else {
-                    jsonResponse = [success: false, errors: requisition.errors]
-                }
-                log.info(jsonResponse as JSON)
-
-            } catch (HibernateException e) {
-                println "hibernate exception " + e.message
-                jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
-
-            } catch (HibernateSystemException e) {
-                println "hibernate system exception " + e.message
-                jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
-
-            } catch (Exception e) {
-                log.error("Error saving requisition: " + e.message, e)
-                log.info("Errors: " + requisition.errors)
-                log.info("Message: " + e.message)
-                jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+                jsonResponse = [success: false, errors: requisition.errors]
             }
-            render jsonResponse as JSON
+            log.info(jsonResponse as JSON)
+
+        } catch (HibernateException e) {
+            println "hibernate exception " + e.message
+            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+
+        } catch (HibernateSystemException e) {
+            println "hibernate system exception " + e.message
+            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+
+        } catch (Exception e) {
+            log.error("Error saving requisition: " + e.message, e)
+            log.info("Errors: " + requisition.errors)
+            log.info("Message: " + e.message)
+            jsonResponse = [success: false, errors: requisition?.errors, message: e.message]
+        }
+        render jsonResponse as JSON
     }
 
 
@@ -351,6 +292,8 @@ class RequisitionController {
 
             if (requisition.status < RequisitionStatus.CHECKING) {
                 requisition.status = RequisitionStatus.CHECKING
+                //requisition.checkedBy = User.load(session.user.id)
+                //requisition.dateChecked = new Date()
                 requisition.save(flush:true)
             }
 
@@ -380,9 +323,6 @@ class RequisitionController {
 
 	def pick = {
 		println "Pick " + params
-
-
-
 		def requisition = Requisition.get(params?.id)
 		if (requisition) {
 
@@ -396,7 +336,6 @@ class RequisitionController {
 
             if (requisition.status < RequisitionStatus.PICKING) {
     			requisition.status = RequisitionStatus.PICKING
-
                 // Approve all pending requisition items
                 requisition.requisitionItems.each { requisitionItem ->
                     if (requisitionItem.isPending()) {
@@ -529,28 +468,29 @@ class RequisitionController {
 	def transfer = { 
 		def requisition = Requisition.get(params.id)
 		def picklist = Picklist.findByRequisition(requisition)
-		
+
+
+
 		//requisitionService.transferStock(requisition)
 		
 		[requisition:requisition, picklist:picklist]
 	}
 	
 	def complete = { 
-		def transaction 
-		try { 
-			def requisition = Requisition.get(params.id)
-			// def picklist = Picklist.findByRequisition(requisition)
-			transaction = requisitionService.issueRequisition(requisition, params.comments)
+        def requisition = Requisition.get(params.id)
+		try {
+            def issuedBy = User.load(session.user.id)
+			requisitionService.issueRequisition(requisition, issuedBy, params.comments)
 		} 
 		catch (ValidationException e) { 
 			//flash.message = e.message 
-			def requisition = Requisition.read(params.id)
+			requisition = Requisition.read(params.id)
 			def picklist = Picklist.findByRequisition(requisition)
 			requisition.errors = e.errors
 			render(view: "transfer", model:[requisition:requisition,picklist:picklist])
 			return
 		}
-		flash.message = "Successfully saved outbound transaction with ID " + transaction.id
+		flash.message = "Successfully issued requisition " + requisition?.requestNumber
 		redirect(action: "show", id: params.id)
 	}
 	

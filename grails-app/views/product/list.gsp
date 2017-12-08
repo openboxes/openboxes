@@ -15,6 +15,18 @@
 				<div class="message">${flash.message}</div>
             </g:if>
             <div>
+            
+				<div class="button-bar">
+                    <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label')]"/></g:link>
+	            	<g:isUserAdmin>
+                        <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label')]"/></g:link>
+	                </g:isUserAdmin>
+                    <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button">
+                        ${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}
+                    </g:link>
+                    <g:link controller="product" action="importAsCsv" class="button"><warehouse:message code="product.importAsCsv.label"/></g:link>
+                </div>
+
 
                 <div class="yui-gf">
                     <div class="yui-u first">

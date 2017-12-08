@@ -28,7 +28,7 @@
 		<div class="yui-u first">
 
 
-			<g:form name="requisitionForm" method="post" action="saveStock" useToken="true">
+			<g:form name="requisitionForm" method="post" action="save" useToken="true">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
 
 				<div id="requisition-template-details" class="dialog ui-validation box">
@@ -82,32 +82,28 @@
                                                             noSelection="['null':'']"/>
                                 </td>
                             </tr>
-                            <g:if test="${requisition.isWardRequisition()}">
-                                <tr class="prop">
-                                    <td class="name">
-                                        <label for="origin.id">
-                                            <warehouse:message code="requisition.wardOrPharmacy.label" />
-                                        </label>
-                                    </td>
-                                    <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                            <g:selectWardOrPharmacy name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
-                                                 noSelection="['null':'']"/>
-                                    </td>
-                                </tr>
-                            </g:if>
-                            <g:elseif test="${requisition.isDepotRequisition()}">
-                                <tr class="prop">
-                                    <td class="name">
-                                        <label for="origin.id">
-                                            <warehouse:message code="requisition.depot.label" />
-                                        </label>
-                                    </td>
-                                    <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                        <g:selectDepot name="origin.id" value="${requisition?.origin?.id}"
-                                                       noSelection="['null':'']"/>
-                                    </td>
-                                </tr>
-                            </g:elseif>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="destination.id">
+                                        <warehouse:message code="requisition.destination.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
+                                    ${session?.warehouse?.name }
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="origin.id">
+                                        <warehouse:message code="requisition.origin.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                        <g:selectRequestOrigin name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
+                                             noSelection="['null':'']"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
@@ -124,19 +120,6 @@
 
                                 </td>
                             </tr>
-                            <g:if test="${requisition.isDepotRequisition()}">
-                                <tr class="prop">
-                                    <td class="name"><label><warehouse:message
-                                                code="requisition.program.label" /></label></td>
-                                    <td class="value">
-                                        <input id="recipientProgram"
-                                               name="recipientProgram" class="autocomplete text" size="60"
-                                               placeholder="${warehouse.message(code:'requisition.program.label')}"
-                                               data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram" />
-
-                                    </td>
-                                </tr>
-                            </g:if>
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
@@ -146,19 +129,6 @@
                                                         value="${requisition?.dateRequested}" format="MM/dd/yyyy"/>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="destination.id">
-                                        <warehouse:message code="requisition.destination.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
-                                    ${session?.warehouse?.name }
-                                </td>
-                            </tr>
-
-
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
@@ -182,84 +152,78 @@
                                         class="text large">${requisition.description }</g:textArea>
                                 </td>
                             </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="requisitionItems">
+                                        <warehouse:message code="requisition.requisitionItems.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <table id="requisition-item-template-table">
+                                        <tbody>
+                                            <tr>
+                                                <td >
+                                                    <table >
+                                                        <tr>
+                                                            <th>
+                                                                ${warehouse.message(code: 'product.productCode.label')}
+                                                            </th>
+                                                            <th>
+                                                                ${warehouse.message(code: 'product.label')}
+                                                            </th>
+                                                            <th>
+                                                                ${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}
+                                                            </th>
+                                                            <th>
+                                                                ${warehouse.message(code: 'requisitionItem.quantity.label')}
+                                                            </th>
+                                                            <th>
+                                                                ${warehouse.message(code: 'requisitionItem.productPackage.label')}
+                                                            </th>
+                                                            <th>
+                                                                ${warehouse.message(code: 'requisitionItem.orderIndex.label', default: 'Sort order')}
+                                                            </th>
+                                                        </tr>
+                                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems?.sort()}" status="i">
+                                                            <tr class="${i%2?'even':'odd'}">
+                                                                <td>
+                                                                    ${requisitionItem?.product?.productCode}
+                                                                </td>
+                                                                <td>
+                                                                    <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
+                                                                    <format:product product="${requisitionItem?.product}"/>
+                                                                </td>
+                                                                <td>
+                                                                    ${requisitionItem?.quantity}
+                                                                </td>
+                                                                <td>
+                                                                    <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="large text" size="5"/>
+                                                                </td>
+                                                                <td>
+                                                                    EA/1
+                                                                </td>
+                                                                <td>
+                                                                    <g:hiddenField name="requisitionItems[${i}].orderIndex" value="${requisitionItem?.orderIndex}"/>
+                                                                    ${requisitionItem?.orderIndex}
+                                                                </td>
+                                                            </tr>
+                                                        </g:each>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="box">
-                    <h2>
-                        <warehouse:message code="requisition.requisitionItems.label" />
-                    </h2>
-                    <table id="requisition-item-template-table">
-                        <tbody>
-                            <tr>
-                                <td >
-                                    <table >
-                                        <tr>
-                                            <th>
-                                                ${warehouse.message(code: 'product.productCode.label')}
-                                            </th>
-                                            <th>
-                                                ${warehouse.message(code: 'product.label')}
-                                            </th>
-                                            <th>
-                                                ${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}
-                                            </th>
-                                            <th>
-                                                ${warehouse.message(code: 'requisitionItem.quantity.label')}
-                                            </th>
-                                            <th>
-                                                ${warehouse.message(code: 'requisitionItem.productPackage.label')}
-                                            </th>
-                                            <th>
-                                                ${warehouse.message(code: 'requisitionItem.orderIndex.label', default: 'Sort order')}
-                                            </th>
-                                        </tr>
-                                        <g:each var="requisitionItem" in="${requisition?.requisitionItems?.sort()}" status="i">
-                                            <tr class="${i%2?'even':'odd'}">
-                                                <td>
-                                                    ${requisitionItem?.product?.productCode}
-                                                </td>
-                                                <td>
-                                                    <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
-                                                    <format:product product="${requisitionItem?.product}"/>
-                                                </td>
-                                                <td>
-                                                    ${requisitionItem?.quantity}
-                                                </td>
-                                                <td>
-                                                    <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="large text" size="5"/>
-                                                </td>
-                                                <td>
-                                                    EA/1
-                                                </td>
-                                                <td>
-                                                    <g:hiddenField name="requisitionItems[${i}].orderIndex" value="${requisitionItem?.orderIndex}"/>
-                                                    ${requisitionItem?.orderIndex}
-                                                </td>
-                                            </tr>
-                                        </g:each>
-                                    </table>
-                                </td>
-
-
-
-                        </tbody>
-                    </table>
-
-				</div>
 				<div class="buttons">
-                    <g:link controller="requisition" action="chooseTemplate" class="button icon arrowleft">
+                    <g:link controller="requisition" action="chooseTemplate" class="button">
                         ${warehouse.message(code:'default.button.back.label', default: 'Back')}
                     </g:link>
-                    <button class="button icon approve" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
+                    <button class="button" name="next">${warehouse.message(code:'default.button.next.label', default: 'Next') }</button>
 
-                    <%--
-                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                    --%>
-                    &nbsp;
-                    <g:link controller="requisitionTemplate" action="list" class="button icon remove">
-                        <warehouse:message code="default.button.cancel.label"/>
-                    </g:link>
 				</div>
 			</g:form>
 		</div>

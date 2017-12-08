@@ -173,7 +173,7 @@ class FormatTagLib {
 			 // for all other objects, return the localized version of the name
 			 else {
 				 // If there's a 'name' attribute on the object
-				 if (attrs?.obj?.properties?.get("name") || attrs?.obj?.name) {
+				 if (attrs?.obj?.properties?.get("name")) {
 					 out << LocalizationUtil.getLocalizedString(attrs?.obj?.name, locale)
 				 }
 				 // Otherwise, use value of toString() method (probably just going to return an unlocalized string)

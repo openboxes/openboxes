@@ -51,14 +51,10 @@
 
     	// Hack to make the requisition type in the name more pretty (need to internationalize this)
 		var requisitionTypes = new Object();
-		requisitionTypes['WARD_ADHOC'] = 'Adhoc';
-		requisitionTypes['WARD_STOCK'] = 'Stock';
-		requisitionTypes['WARD_NON_STOCK'] = 'Non Stock'; 
-		requisitionTypes['DEPOT'] = 'Depot'; 
-		requisitionTypes['DEPOT_STOCK'] = 'Depot'; 
-		requisitionTypes['DEPOT_NON_STOCK'] = 'Depot'; 
-		requisitionTypes['DEPOT_TO_DEPOT'] = 'Depot'; 
-        
+		requisitionTypes['ADHOC'] = 'Adhoc';
+		requisitionTypes['STOCK'] = 'Stock';
+		requisitionTypes['NON_STOCK'] = 'Non Stock';
+
         var requisitionFromServer = ${requisition.toJson() as JSON};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);

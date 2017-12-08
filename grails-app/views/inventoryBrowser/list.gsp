@@ -9,14 +9,11 @@
 </div>
 
 <div id="body">
-    <h2>${session.warehouse.name}
-    <small>
-        <span id="processingTime"></span> |
-        <span id="totalValue"></span>
-    </small>
+    <h2>
+        ${session.warehouse.name}
     </h2>
     <hr/>
-    <table id="dataTable" class="box">
+    <table id="dataTable" class="table table-bordered">
         <thead>
         <tr>
             <th>Product Group ID</th>
@@ -38,6 +35,12 @@
 
         </tbody>
         <tfoot>
+        <tr>
+            <td colspan="13">
+                <span id="processingTime"></span>
+                <span id="totalValue"></span>
+            </td>
+        </tr>
 
         </tfoot>
     </table>
@@ -52,8 +55,8 @@
 
         //$("#dataTable").dataTable();
 
-        var locationId = $("#locationId").val();
-
+        var locationId = $("#currentLocationId").val();
+        console.log(locationId);
         var dataTable = $('#dataTable').dataTable( {
             "bProcessing": true,
             "bServerSide": false,
@@ -122,14 +125,12 @@
             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
                 console.log(aData);
                 switch(aData["status"]){
-                    case 'IN_STOCK_OBSOLETE':
                     case 'IN_STOCK':
                         $(nRow).css('color', 'green')
                         break;
                     case 'NOT_STOCKED':
                         $(nRow).css('color', 'grey')
                         break;
-                    case 'STOCK_OUT_OBSOLETE':
                     case 'STOCK_OUT':
                         $(nRow).css('color', 'red')
                         break;

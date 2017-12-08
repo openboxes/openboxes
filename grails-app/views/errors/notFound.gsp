@@ -19,7 +19,12 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<h1><warehouse:message code="notFound.label" default="Page Not Found"/></h1>
+
+		<div class="summary">
+			<div class="title">
+				<g:message code="errors.notFound.label" default="Resource Not Found"/> (404)
+			</div>
+		</div>
 		<div style="width: 25%;">
 			<div class="triangle-isosceles">
 				<warehouse:message code="errors.accessDenied.message" default="Apologies, but I can't find that page."/>
