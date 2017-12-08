@@ -242,13 +242,14 @@ class MigrationService {
     }
 
     def deleteOrganizations() {
+
+        int deletedCount
+
         LocationType supplierType = LocationType.findByLocationTypeCode(LocationTypeCode.SUPPLIER)
         def suppliers = Location.createCriteria().list {
             eq("active", true)
             eq("locationType", supplierType)
             isNotNull("organization")
-            //ilike("comments", "Migrated%")
-            //maxResults(10)
         }
 
         if (suppliers) {
@@ -256,13 +257,15 @@ class MigrationService {
                 supplier.organization.delete();
                 supplier.organization = null
             }
+            deletedCount = suppliers.size()
+
         } else {
             // FIXME Need to remove
             PartyRole.executeUpdate("delete from PartyRole")
-            Organization.executeUpdate("delete from Organization")
+            deletedCount = Organization.executeUpdate("delete from Organization")
         }
 
-        return suppliers.size();
+        return deletedCount
 
     }
 

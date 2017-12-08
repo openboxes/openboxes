@@ -57,19 +57,6 @@
                                       onLoading="onLoading()" onComplete="onComplete()">Delete</g:remoteLink>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        Local Locations
-                    </td>
-                    <td>
-                        <g:link controller="location" action="index" class="button">List</g:link>
-                        %{--<g:remoteLink action="migrateLocalLocations" params="[preview:true]" class="button" update="status"--}%
-                                      %{--onLoading="onLoading()" onComplete="onComplete()">Preview</g:remoteLink>--}%
-                        <g:remoteLink action="migrateLocalLocations" class="button" update="status"
-                                      onLoading="onLoading()" onComplete="onComplete()">Migrate</g:remoteLink>
-                        %{--<g:remoteLink action="deleteProductManufacturers" class="button" update="status">Delete</g:remoteLink>--}%
-                    </td>
-                </tr>
                 </tbody>
             </table>
         </div>
