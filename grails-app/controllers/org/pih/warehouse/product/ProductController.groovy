@@ -352,7 +352,7 @@ class ProductController {
 			*/
 			
             updateTags(productInstance, params)
-
+            updateAttributes(productInstance, params)
 
 			log.info("Categories " + productInstance?.categories);
 
