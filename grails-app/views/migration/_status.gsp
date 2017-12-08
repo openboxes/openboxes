@@ -8,8 +8,8 @@
         ${errors}
     </div>
 </g:if>
-<g:hasErrors bean="${target}">
+<g:hasErrors bean="${command}">
     <div class="errors">
-        <g:renderErrors bean="${target}" as="list" />
+        <g:renderErrors bean="${command}" as="list" />
     </div>
 </g:hasErrors>
