@@ -54,10 +54,10 @@
 								  <label for="description"><warehouse:message code="organization.description.label" default="Description" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'description', 'errors')}">
-									<g:textField class="text" size="80" name="description" maxlength="255" value="${organizationInstance?.description}" />
+									<g:textArea class="text" name="description" maxlength="255" value="${organizationInstance?.description}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="dateCreated"><warehouse:message code="organization.dateCreated.label" default="Date Created" /></label>
