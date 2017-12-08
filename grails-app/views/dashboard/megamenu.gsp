@@ -419,6 +419,11 @@
                         </div>
                     </g:authorize>
                     <div class="megaButton">
+                        <g:link controller="migration" action="index" class="list">
+                            <g:message code="default.migrateData.label" default="Migrate Data" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
                         <g:link controller="console" action="index" class="list">
                             <g:message code="default.console.label" default="Console" />
                         </g:link>
