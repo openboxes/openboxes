@@ -9,7 +9,7 @@
 		<content tag="pageTitle"><g:message code="default.${createEdit}.label" args="[entityName]" /></content>
     </head>
     <body>
-        <div class="body">      
+        <div class="dialog">
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -148,19 +148,70 @@
         var nextIndex = 0;
 
         $(document).ready(function() {
-            $("")
-            <g:each var="option" in="${attributeInstance?.options}" status="status">
-            addOption('${option}');
-            </g:each>
+            <g:if test="${attributeInstance?.options}">
+                <g:each var="option" in="${attributeInstance?.options}" status="status">
+                    addOption('${option}');
+                </g:each>
+            </g:if>
+            <g:else>
+                addOption('');
+            </g:else>
+
+            $("input[name='option']").bind('paste', function(event) {
+                // Prevent full text from being pasted into field
+                event.preventDefault();
+
+                var element = $(this);
+                var pasteData = event.originalEvent.clipboardData.getData('text');
+
+
+                var lines = pasteData.split(/\r\n|\r|\n/);
+                console.log("lines: ", lines);
+                console.log("lines: ", lines.length);
+                $.each(lines, function(index, line){
+                    addOption(line);
+                });
+
+                // Remove all blank options
+                removeBlanks();
+            });
+
         });
 
+        function removeBlanks() {
+            console.log("remove blanks");
+            var options = $("input[name='option']");
+            $.each(options, function(index) {
+                var option = $(this);
+                if (option.val() == '') {
+                    var parent = option.parents().eq(1);
+                    console.log(parent);
+                    if (parent.is(":not(#optionRowTemplate)")) {
+                        parent.remove()
+                    }
+                }
+            });
+
+        }
+
         function addOption(optionValue) {
+            console.log("add option" + optionValue);
+
+            // Clone the template
             var row = $("#optionRowTemplate").clone(true).show();
-            $(row).attr("id", "optionRow"+nextIndex).addClass(nextIndex % 2 == 0 ? 'odd' : 'even');
+
+            // Set ID and class
+            $(row).attr("id", "optionRow"+nextIndex).addClass("optionRow").addClass(nextIndex % 2 == 0 ? 'odd' : 'even');
+
+            // Set value
             var input = $(row).find("input[name='option']").val(optionValue);
+
+            // Attach delete action to anchor tag
             $(row).find("a").click(function(event) {
                 $(this).parent().remove();
             });
+
+            // Add to table
             $('#optionsTable').append(row);
 
             // Apply focus to input field after the row has been rendered
