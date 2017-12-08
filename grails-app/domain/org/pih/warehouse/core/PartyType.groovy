@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 class PartyType {
 
     String id
+    String code
     String name
     String description
 
@@ -26,6 +27,7 @@ class PartyType {
     }
 
     static constraints = {
+        code(nullable:false)
         name(nullable:false, maxSize: 255)
         description(nullable:true, maxSize: 255)
         dateCreated(display:false)

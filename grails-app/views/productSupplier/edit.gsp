@@ -42,7 +42,11 @@
                                                    valueId="${productSupplierInstance?.product?.id}"
                                                    valueName="${productSupplierInstance?.product?.name}"/>
 
-								</td>
+								    <g:link controller="product" action="edit" id="${productSupplierInstance?.product?.id}" class="button">
+                                        <g:message code="default.show.label" args="[g.message(code:'product.label')]"/>
+                                    </g:link>
+                                </td>
+
 							</tr>
 						
 							<tr class="prop">
@@ -59,7 +63,7 @@
                                     <label for="name"><g:message code="default.name.label"/></label>
                                 </td>
                                 <td class="value ">
-                                    <g:textField name="name" size="80" class="medium text" value="${productSupplier?.name}" />
+                                    <g:textField name="name" size="80" class="medium text" value="${productSupplierInstance?.name}" />
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -67,7 +71,15 @@
                                     <label for="name"><g:message code="default.description.label"/></label>
                                 </td>
                                 <td class="value ">
-                                    <g:textArea name="description" class="medium text" value="${productSupplier?.description}" />
+                                    <g:textArea name="description" class="medium text" value="${productSupplierInstance?.description}" />
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="name"><g:message code="productSupplier.productCode.label"/></label>
+                                </td>
+                                <td class="value ">
+                                    <g:textArea name="productCode" class="medium text" value="${productSupplierInstance?.productCode}" />
                                 </td>
                             </tr>
 
@@ -166,11 +178,10 @@
 								  <label for="manufacturer"><warehouse:message code="productSupplier.manufacturer.label" default="Manufacturer" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'manufacturer', 'errors')}">
-                                    ${productSupplier?.manufacturer}
                                     <g:selectOrganization name="manufacturer"
                                                           noSelection="['':'']"
                                                           roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"
-                                                          value="${productSupplier?.manufacturer?.id}"
+                                                          value="${productSupplierInstance?.manufacturer?.id}"
                                                           class="chzn-select-deselect"/>
 
 								</td>

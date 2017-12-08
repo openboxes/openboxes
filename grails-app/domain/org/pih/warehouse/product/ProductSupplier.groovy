@@ -78,11 +78,15 @@ class ProductSupplier implements Comparable<ProductSupplier>{
     Date dateCreated
     Date lastUpdated
 
+    static mapping = {
+        description type: 'text'
+    }
+
     static constraints = {
 
         code(nullable:true)
         name(nullable: false)
-        description(nullable: false)
+        description(nullable: true)
         product(nullable:false)
         productCode(nullable:true)
         ndc(nullable: true, maxSize: 255)

@@ -63,6 +63,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		})
 		fgColor(nullable:true)
 		logo(nullable:true, maxSize:10485760) // 10 MBs
+        local(nullable:true)
 		manager(nullable:true)
 		inventory(nullable:true)
 		active(nullable:false)

@@ -20,8 +20,8 @@ class Party implements Comparable<Party> {
     static hasMany = [roles: PartyRole]
 
     static mapping = {
-        tablePerHierarchy false
         id generator: 'uuid'
+        roles cascade: "all-delete-orphan"
     }
 
     static constraints = {

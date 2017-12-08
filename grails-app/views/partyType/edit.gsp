@@ -30,10 +30,18 @@
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
-								  <label for="name"><warehouse:message code="partyType.name.label" default="Name" /></label>
+									<label for="code"><warehouse:message code="default.code.label" default="code" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: partyTypeInstance, field: 'code', 'errors')}">
+									<g:textField class="text" size="80" name="code" maxlength="255" value="${partyTypeInstance?.code}" />
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+								  <label for="name"><warehouse:message code="default.name.label" default="Name" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: partyTypeInstance, field: 'name', 'errors')}">
 									<g:textField class="text" size="80" name="name" maxlength="255" value="${partyTypeInstance?.name}" />

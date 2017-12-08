@@ -12,10 +12,11 @@ package org.pih.warehouse.core
 class PartyRole {
 
     String id
-    Party party
     RoleType roleType
     Date startDate
     Date endDate
+
+    static belongsTo = [party: Party]
 
     static mapping = {
         id generator: 'uuid'
@@ -29,7 +30,7 @@ class PartyRole {
     }
 
     String toString() {
-        return party.toString() + " " + roleType?.name
+        return roleType?.name
     }
 
 }

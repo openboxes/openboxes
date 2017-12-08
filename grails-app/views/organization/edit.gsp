@@ -82,26 +82,25 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'roles', 'errors')}">
 									
-<ul>
-<g:each in="${organizationInstance?.roles?}" var="r">
-    <li><g:link controller="partyRole" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
-</g:each>
-</ul>
-<g:link controller="partyRole" action="create" params="['organization.id': organizationInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole')])}</g:link>
+									<ul>
+									<g:each in="${organizationInstance?.roles?}" var="r">
+										<li><g:link controller="partyRole" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
+									</g:each>
+									</ul>
+									<g:link controller="partyRole" action="create" params="['organization.id': organizationInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole')])}</g:link>
 
 								</td>
 							</tr>
-						
+						</tbody>
+						<tfoot>
 							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top left">
-									<div class="buttons">
-										<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-										<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-									</div>
+                                    <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+                                    <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 								</td>
 							</tr>
-						</tbody>
+					</tfoot>
 					</table>
 				</div>
             </g:form>
