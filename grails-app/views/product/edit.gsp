@@ -193,7 +193,10 @@
                                                         </select>
                                                     </g:if>
                                                     <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
-                                                    <g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+                                                    <g:textField class="otherAttributeValue text medium"
+                                                                 style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
+                                                                 name="productAttributes.${attribute?.id}.otherValue"
+                                                                 value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
                                                 </td>
                                             </tr>
                                         </g:each>
@@ -232,67 +235,6 @@
                                     </tr>
 
 
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.handlingRequirements.label" default="Handling requirements"></warehouse:message></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')} ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')} ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td width="25%">
-                                                            <g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
-                                                            <label for="coldChain"><warehouse:message
-                                                                code="product.coldChain.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
-                                                            <label for="controlledSubstance"><warehouse:message
-                                                                code="product.controlledSubstance.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
-                                                            <label for="hazardousMaterial"><warehouse:message
-                                                                code="product.hazardousMaterial.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="reconditioned" value="${productInstance?.reconditioned}" />
-                                                            <label for="reconditioned"><warehouse:message
-                                                                    code="product.reconditioned.label" default="Reconditioned"/></label>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.inventoryControl.label" default="Inventory control"></warehouse:message></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td width="25%">
-                                                            <g:checkBox name="serialized" value="${productInstance?.serialized}" />
-                                                            <label for="serialized"><warehouse:message
-                                                                code="product.serialized.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
-                                                            <label for="lotControl"><warehouse:message
-                                                                code="product.lotControl.label" /></label>
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                        </tr>
 
                                     </tbody>
                                     <tfoot>

@@ -44,7 +44,11 @@
                             </select>
                         </g:if>
                         <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
-                        <g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+                        <g:textField class="otherAttributeValue text medium"
+                                     size="100"
+                                     style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
+                                     name="productAttributes.${attribute?.id}.otherValue"
+                                     value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
                     </td>
                 </tr>
             </g:each>

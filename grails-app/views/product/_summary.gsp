@@ -77,10 +77,6 @@
             </td>
             <td>
                 <div class="button-container">
-					<g:link controller='inventory' action='browse' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'application_form_magnify.png')}" />&nbsp;
-						${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
-					</g:link>
 					<div class="button-group">
 						<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
