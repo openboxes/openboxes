@@ -440,7 +440,12 @@
                     </div>
                     <div class="megaButton">
                         <g:link controller="admin" action="sendMail" class="list">
-                            <g:message code="config.sendMail.label" default="Send Email"/>
+                            <g:message code="config.sendMail.label" default="Email"/>
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="localization" action="list" class="list">
+                            <g:message code="localization.label" default="Localization"/>
                         </g:link>
                     </div>
                     <hr/>
