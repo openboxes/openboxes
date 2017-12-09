@@ -17,7 +17,7 @@ import java.text.MessageFormat;
 import org.pih.warehouse.core.Localization;
 
 class MessageTagLib {
-   
+
 	static namespace = "warehouse"
     def grailsApplication
 	def messageSource
@@ -36,7 +36,7 @@ class MessageTagLib {
     }
     */
 
-    //@Cacheable("messageCache")
+    @Cacheable("messageCache")
     def message = { attrs, body ->
         long startTime = System.currentTimeMillis()
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
@@ -44,7 +44,7 @@ class MessageTagLib {
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {
 
-            def localization = null; //Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
+            def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
                 println "Querying database for translation " + attrs.code + " " + session?.user?.locale
                 //println "Arguments: " + attrs?.args + ":" + attrs?.args?.class
