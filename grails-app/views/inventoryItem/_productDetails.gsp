@@ -110,12 +110,19 @@
                     <label><warehouse:message code="product.totalValue.label"/></label>
                 </td>
                 <td class="value middle">
-                    <p>
-                        ${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') }
-                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                    </p>
+                    ${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') }
+                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                 </td>
             </tr>
+        <tr class="prop">
+            <td class="label">
+                <label><warehouse:message code="product.totalValue.label"/></label>
+            </td>
+            <td class="value middle">
+                <g:abcClassification product="${productInstance.id}"/>
+            </td>
+        </tr>
+
         </tbody>
     </table>
 </div>
@@ -187,8 +194,6 @@
                 </td>
             </tr>
             --%>
-
-
             <g:set var="status" value="${0 }"/>
             <g:each var="productAttribute" in="${productInstance?.attributes}">
                 <tr class="prop">
