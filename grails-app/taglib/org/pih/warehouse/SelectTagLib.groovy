@@ -451,6 +451,14 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectLocale = { attrs, body ->
+        attrs.value = session.user.locale?.language ?: grailsApplication.config.openboxes.local.defaultLocale
+        attrs.from = grailsApplication.config.openboxes.locale.supportedLocales
+        attrs.optionValue = { new Locale(it).displayName }
+        out << g.select(attrs)
+
+    }
+
 
 	/**
 	 * Generic select widget using optgroup.

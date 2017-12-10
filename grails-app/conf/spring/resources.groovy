@@ -157,6 +157,16 @@ beans = {
         timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
     }
 
+    messageCache(EhCacheFactoryBean) { bean ->
+        cacheManager = ref("springcacheCacheManager")
+        cacheName = "messageCache"
+        eternal = false
+        diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+    }
+
     /**
 	 * c3P0 pooled data source that allows 'DB keepalive' queries
 	 * to prevent stale/closed DB connections

@@ -551,6 +551,7 @@ openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
 openboxes.stockCard.consumption.reasonCodes = [ ReasonCode.STOCKOUT, ReasonCode.LOW_STOCK, ReasonCode.EXPIRED, ReasonCode.DAMAGED, ReasonCode.COULD_NOT_LOCATE, ReasonCode.INSUFFICIENT_QUANTITY_RECONDITIONED]
 
 // Localization configuration - default and supported locales
+openboxes.locale.database.enabled = false
 openboxes.locale.defaultLocale = 'en'
 openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es' , 'pt']
 

@@ -3105,3 +3105,7 @@ input {
     hyphens: auto;
 
 }
+
+/* Hack to allow Chosen results to display correctly in jQuery dialogs  */
+.ui-dialog .ui-dialog-content { overflow:visible !important;}
+.ui-dialog { overflow: inherit !important; }

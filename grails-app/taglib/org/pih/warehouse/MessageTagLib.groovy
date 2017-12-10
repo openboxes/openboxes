@@ -38,8 +38,18 @@ class MessageTagLib {
 
     @Cacheable("messageCache")
     def message = { attrs, body ->
-        long startTime = System.currentTimeMillis()
+
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
+
+
+        boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.database.enabled
+        if (!databaseStoreEnabled) {
+            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
+            out << defaultTagLib.message.call(attrs)
+            return
+        }
+
 
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {
@@ -73,7 +83,6 @@ class MessageTagLib {
 									data-args="${attrs.args}" 
 									data-localized="" 
 									src="${createLinkTo(dir: 'images/icons/silk', file: 'database.png')}"/>
-							
 							"""
                     return;
                 } else {

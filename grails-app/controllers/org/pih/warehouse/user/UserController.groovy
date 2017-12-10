@@ -27,7 +27,7 @@ class UserController {
     static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
     MailService mailService;
 	def userService
-	
+
     /**
      * Show index page - just a redirect to the list page.
      */
@@ -251,19 +251,29 @@ class UserController {
     }
 
 
-   
-   
-   def disableDebugMode = { 
-	   log.info ("params " + params)
-	   
+
+   def disableLocalizationMode = {
 	   session.useDebugLocale = false
-	   redirect(controller: "dashboard", action: "index")	   
+	   def referer = request.getHeader("Referer")
+	   if (referer) {
+		   redirect(url: referer)
+	   }
+	   else {
+		   redirect(controller: "dashboard", action: "index")
+	   }
    }
 
-   def enableDebugMode = { 
-	   log.info ("params " + params)
+   def enableLocalizationMode = {
 	   session.useDebugLocale = true
-	   redirect(controller: "dashboard", action: "index")
+
+	   def referer = request.getHeader("Referer")
+	   if (referer) {
+		   redirect(url: referer)
+	   }
+	   else {
+		   redirect(controller: "dashboard", action: "index")
+	   }
+
    }
     
 	/**

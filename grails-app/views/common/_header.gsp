@@ -67,11 +67,10 @@
                                         </li>
 
                                         <g:if test="${session._showTime}">
-
                                             <li class="action-menu-item">
                                                 <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'clock_delete.png')}"/>
-                                                    <warehouse:message code="dashboard.disableShowTime.label" default="Disable show time"/>
+                                                    <warehouse:message code="dashboard.disableResponseTime.label" default="Hide response time"/>
                                                 </g:link>
                                             </li>
                                         </g:if>
@@ -79,23 +78,23 @@
                                             <li class="action-menu-item">
                                                 <g:link controller="dashboard" action="index" params="[showTime:'on']" style="color: #666;">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'clock_add.png')}"/>
-                                                    <warehouse:message code="dashboard.enableShowTime.label" default="Enable show time"/>
+                                                    <warehouse:message code="dashboard.enableResponseTime.label" default="Enable response time"/>
                                                 </g:link>
                                             </li>
                                         </g:else>
                                         <g:if test="${session.useDebugLocale }">
                                             <li class="action-menu-item">
-                                                <g:link controller="user" action="disableDebugMode" style="color: #666;">
+                                                <g:link controller="user" action="disableLocalizationMode" style="color: #666;">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'bug_delete.png')}"/>
-                                                    ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}
+                                                    ${warehouse.message(code:'localization.disable.label', default: 'Disable translation mode')}
                                                 </g:link>
                                             </li>
                                         </g:if>
                                         <g:else>
                                             <li class="action-menu-item">
-                                                <g:link controller="user" action="enableDebugMode" style="color: #666;">
+                                                <g:link controller="user" action="enableLocalizationMode" style="color: #666;">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'bug_add.png')}"/>
-                                                    ${warehouse.message(code:'debug.enable.label', default: 'Enable debug mode')}
+                                                    ${warehouse.message(code:'localization.enable.label', default: 'Enable translation mode')}
                                                 </g:link>
                                             </li>
                                         </g:else>
