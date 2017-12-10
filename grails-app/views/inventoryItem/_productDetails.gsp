@@ -75,7 +75,7 @@
 
 
 
-        <tr class="prop">
+            <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.latestInventoryDate.label"/></label>
                 </td>
@@ -133,7 +133,14 @@
     <table>
         <tbody>
 
-
+            <tr class="prop">
+                <td class="label">
+                    <label>${warehouse.message(code: 'product.productCode.label') }</label>
+                </td>
+                <td class="value">
+                    ${productInstance?.productCode}
+                </td>
+            </tr>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="category.label"/></label>
@@ -169,11 +176,35 @@
                         <span title="${productInstance?.description }">${productInstance?.description?.substring(0,50)}...</span>
                     </g:if>
                     <g:else>
-                        ${productInstance?.description }
+                        ${productInstance?.description?:g.message(code:'default.none.label') }
                     </g:else>
                 </td>
             </tr>
-            <%--
+            <tr class="prop">
+                <td class="label left">
+                    <label><warehouse:message code="productSuppliers.label"/></label>
+                </td>
+                <td class="value">
+                    <g:if test="${productInstance?.productSuppliers }">
+                        <ul>
+                            <g:each var="productSupplier" in="${productInstance?.productSuppliers }">
+                                <li>
+                                    <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-sources">
+                                        ${productSupplier?.code }
+                                        ${productSupplier?.productCode }
+                                    </g:link>
+                                </li>
+                            </g:each>
+                        </ul>
+                    </g:if>
+                    <g:else>
+                        <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
+                            <warehouse:message code="default.button.manage.label"/>
+                        </g:link>
+                    </g:else>
+                </td>
+            </tr>
+
             <tr class="prop">
                 <td class="label left">
                     <label><warehouse:message code="productGroups.label"/></label>
@@ -188,12 +219,12 @@
                     </g:if>
                     <g:else>
                         <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
-                            <warehouse:message code="default.button.edit.label"/>
+                            <warehouse:message code="default.button.manage.label"/>
                         </g:link>
                     </g:else>
                 </td>
             </tr>
-            --%>
+
             <g:set var="status" value="${0 }"/>
             <g:each var="productAttribute" in="${productInstance?.attributes}">
                 <tr class="prop">
