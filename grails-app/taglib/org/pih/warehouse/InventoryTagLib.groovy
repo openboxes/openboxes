@@ -41,7 +41,7 @@ class InventoryTagLib {
         def location = attrs.location ? Location.get(attrs.location) : Location.get(session.warehouse.id)
         def product = Product.get(attrs.product)
         InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(product, location?.inventory)
-        out << "${inventoryLevel?.abcClass?:g.message(code:'default.none.label')}"
+        out << "${inventoryLevel?.abcClass?:product?.abcClass?:g.message(code:'default.none.label')}"
     }
 	
 }

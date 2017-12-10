@@ -114,14 +114,14 @@
                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                 </td>
             </tr>
-        <tr class="prop">
-            <td class="label">
-                <label><warehouse:message code="product.totalValue.label"/></label>
-            </td>
-            <td class="value middle">
-                <g:abcClassification product="${productInstance.id}"/>
-            </td>
-        </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.abcClass.label"/></label>
+                </td>
+                <td class="value middle">
+                    <g:abcClassification product="${productInstance.id}"/>
+                </td>
+            </tr>
 
         </tbody>
     </table>

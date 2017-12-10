@@ -201,6 +201,13 @@
                                             </tr>
                                         </g:each>
                                         <tr class="prop">
+                                            <td class="name"><label for="abcClass"><warehouse:message
+                                                    code="product.abcClass.label" /></label></td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'abcClass', 'errors')}">
+                                                <g:textField name="abcClass" value="${productInstance?.abcClass}" size="50" class="medium text"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
                                             <td class="name middle"><label for="upc"><warehouse:message
                                                     code="product.upc.label" /></label></td>
                                             <td class="value ${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
