@@ -55,8 +55,7 @@ class MessageTagLib {
 
             def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
-                println "Querying database for translation " + attrs.code + " " + session?.user?.locale
-                //println "Arguments: " + attrs?.args + ":" + attrs?.args?.class
+
                 def message = localization.text
 
                 // If there are arguments, we need to get the
