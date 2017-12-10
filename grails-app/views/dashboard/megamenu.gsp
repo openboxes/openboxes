@@ -200,13 +200,13 @@
 				</div>
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                        All (${outgoingShipmentsCount})
+                        <warehouse:message code="default.all.label"/> (${outboundShipmentsTotal})
                     </g:link>
                 </div>
-				<g:each in="${outgoingShipments}" var="statusRow">
+				<g:each in="${outboundShipmentsCount}" var="statusRow">
 					<div class="megaButton">
-						<g:link controller="shipment" action="list" params="[status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+						<g:link controller="shipment" action="list" params="[status:statusRow.status]" class="shipment-status-${statusRow.status }">
+							<format:metadata obj="${statusRow.status}"/> (${statusRow.count})
 						</g:link>
 					</div>
 				</g:each>
@@ -228,19 +228,18 @@
                         <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
                     </g:link>
 				</div>
-
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                        All (${incomingShipmentsCount})
+                        <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
                     </g:link>
                 </div>
-				<g:each in="${incomingShipments}" var="statusRow">
+				<g:each in="${inboundShipmentsCount}" var="statusRow">
 					<div class="megaButton">
-						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
+							<format:metadata obj="${statusRow.status}"/> (${statusRow.count})
 						</g:link>
 					</div>
-				</g:each>					
+				</g:each>
 			</div>
 		</li>		
 	</g:authorize>			

@@ -333,7 +333,7 @@ class DashboardController {
 		render results as JSON
 	}
 
-    @Cacheable("megamenuCache")
+    //@Cacheable("megamenuCache")
 	def megamenu = {
 
         def user = User.get(session?.user?.id)
@@ -342,27 +342,29 @@ class DashboardController {
 		//def startTime = System.currentTimeMillis()
 
         // Inbound Shipments
-		def incomingShipments = Shipment.findAllByDestinationAndCurrentStatusIsNotNull(location);
-        incomingShipments = incomingShipments?.groupBy{ it?.currentStatus }?.sort()
-        def incomingShipmentsCount = Shipment.countByDestination(location)
+		def inboundShipmentsTotal = Shipment.countByDestination(location)
+		def inboundShipmentsCount = Shipment.executeQuery(
+				"""	select shipment.currentStatus, count(*) 
+							from Shipment as shipment
+							where shipment.destination = :destination
+							group by shipment.currentStatus""", [destination:location])
 
+		inboundShipmentsCount = inboundShipmentsCount.collect { [status: it[0], count: it[1]] }
 
 		// Outbound Shipments
-		def outgoingShipments = Shipment.findAllByOriginAndCurrentStatusIsNotNull(location)
-        outgoingShipments = outgoingShipments?.groupBy{it?.currentStatus}?.sort()
-        def outgoingShipmentsCount = Shipment.countByOrigin(location)
+		def outboundShipmentsTotal = Shipment.countByOrigin(location)
+		def outboundShipmentsCount = Shipment.executeQuery(
+				"""	select shipment.currentStatus, count(*) 
+							from Shipment as shipment 
+							where shipment.origin = :origin 
+							group by shipment.currentStatus""", [origin:location])
+
+		outboundShipmentsCount = outboundShipmentsCount.collect { [status: it[0], count: it[1]] }
 
 		// Orders
-		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [location])
+		def incomingOrders = Order.executeQuery('select o.status, count(*) as count from Order as o where o.destination = ? group by o.status', [location])
 
         // Requisitions
-        //def incomingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-		//def outgoingRequests = requisitionService.getRequisitions(session?.warehouse).groupBy{it?.status}.sort()
-        //def incomingRequests = [:] //requisitionService.getAllRequisitions(session.warehouse).groupBy{it?.status}.sort()
-        //def outgoingRequests = []
-        //def requisitionTemplates = [] //requisitionService.getAllRequisitionTemplates(session.warehouse)
-        //Requisition requisition = new Requisition(destination: session?.warehouse, requestedBy:  session?.user)
-        //def myRequisitions = requisitionService.getRequisitions(requisition, [:])
         def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, user, new Date()-30)
 
         def categories = []
@@ -374,10 +376,10 @@ class DashboardController {
 
 		[
 			categories: categories,
-			incomingShipments: incomingShipments,
-            incomingShipmentsCount: incomingShipmentsCount,
-            outgoingShipments: outgoingShipments,
-			outgoingShipmentsCount: outgoingShipmentsCount,
+			inboundShipmentsTotal: inboundShipmentsTotal?:0,
+			inboundShipmentsCount: inboundShipmentsCount,
+			outboundShipmentsTotal: outboundShipmentsTotal?:0,
+			outboundShipmentsCount: outboundShipmentsCount,
 			incomingOrders: incomingOrders,
             requisitionStatistics: requisitionStatistics,
 			quickCategories:productService.getQuickCategories(),
