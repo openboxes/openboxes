@@ -1,5 +1,5 @@
 
-<g:if test="${inventoryLevelInstance?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED}">
+<g:if test="${inventoryLevel?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED}">
     <g:if test="${totalQuantity <= 0}">
         <span class="tag tag-danger"><g:message code="product.noStock.label"/></span>
     </g:if>
@@ -16,13 +16,8 @@
         <span class="tag tag-success"><g:message code="product.inStock.label"/></span>
     </g:else>
 </g:if>
-<g:elseif test="${inventoryLevelInstance?.status == org.pih.warehouse.inventory.InventoryStatus.NOT_SUPPORTED}">
+<g:else>
     <span class="tag tag-warning">
-        <g:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
+        <g:message code="enum.InventoryStatus.${inventoryLevel.status}"/>
     </span>
-</g:elseif>
-<g:elseif test="${inventoryLevelInstance?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED_NON_INVENTORY}">
-    <span class="tag tag-warning">
-        <g:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-    </span>
-</g:elseif>
+</g:else>
