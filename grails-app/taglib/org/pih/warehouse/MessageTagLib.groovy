@@ -41,8 +41,7 @@ class MessageTagLib {
 
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
 
-
-        boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.database.enabled
+        boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
         if (!databaseStoreEnabled) {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
             attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;

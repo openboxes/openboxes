@@ -25,10 +25,12 @@ class LocalizationController {
         def localizationInstanceList
         def localizationInstanceTotal
 
-        if (params.q) {
+        if (params.q || params.locale) {
             localizationInstanceList = Localization.createCriteria().list(params) {
+                if (params.locale) {
+                    eq("locale", params.locale)
+                }
                 or {
-                    eq("locale", params.q)
                     ilike("code", params.q + "%")
                     ilike("text", "%" + params.q + "%")
                 }

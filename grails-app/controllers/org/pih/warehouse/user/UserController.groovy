@@ -254,6 +254,10 @@ class UserController {
 
    def disableLocalizationMode = {
 	   session.useDebugLocale = false
+       if (!grailsApplication.config.openboxes.locale.custom.enabled) {
+           flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
+       }
+
 	   def referer = request.getHeader("Referer")
 	   if (referer) {
 		   redirect(url: referer)
@@ -265,6 +269,9 @@ class UserController {
 
    def enableLocalizationMode = {
 	   session.useDebugLocale = true
+       if (!grailsApplication.config.openboxes.locale.custom.enabled) {
+           flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
+       }
 
 	   def referer = request.getHeader("Referer")
 	   if (referer) {

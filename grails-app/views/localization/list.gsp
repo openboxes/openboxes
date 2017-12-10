@@ -36,9 +36,14 @@
                     <table>
                         <tr class="prop">
                             <td class="value" colspan="2">
-                                <g:textField name="q" value="${params.q}" class="text medium" size="100"/>
-                                <g:submitButton name="Search" class="button"/>
-                                <g:link controller="localization" action="list" class="button"><g:message code="default.button.clear.label"/></g:link>
+                                <div style="width: 100px" class="left">
+                                <g:selectLocale name="locale" value="${params.locale}" class="chzn-select-deselect"/>
+                                </div>
+                                <div class="left">
+                                    <g:textField name="q" value="${params.q}" class="text medium" size="60"/>
+                                    <g:submitButton name="Search" class="button"/>
+                                    <g:link controller="localization" action="list" class="button"><g:message code="default.button.clear.label"/></g:link>
+                                </div>
                             </td>
                         </tr>
                     </table>
