@@ -36,7 +36,7 @@ class MessageTagLib {
     }
     */
 
-    @Cacheable("messageCache")
+    //@Cacheable("messageCache")
     def message = { attrs, body ->
 
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
@@ -52,7 +52,6 @@ class MessageTagLib {
 
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {
-
             def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
 
