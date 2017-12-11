@@ -5,5 +5,7 @@
 
     <include file="0.8.x/changelog-2016-05-04-2245-create-product-type-table.xml"/>
     <include file="0.8.x/changelog-2016-05-04-2245-create-product-component-table.xml"/>
+    <include file="0.8.x/changelog-2017-12-10-1250-create-clickstream-tables.xml"/>
+    <include file="0.8.x/changelog-2017-12-10-1250-refactor-generic-product.xml"/>
 
 </databaseChangeLog>
