@@ -839,14 +839,18 @@ class ShipmentService {
 
             // Check whether there's any stock in the bin location for the given inventory item
             def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
+			def quantityAllocated = getQuantityAllocated(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs quantity allocated ${quantityAllocated}"
 
-            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity +
-                    "] vs onhand quantity [" + quantityOnHand + "]");
-            if (shipmentItem.quantity > quantityOnHand) {
-                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
+            // Quantity allocated includes the current shipment item quantity
+			def quantityAvailable = quantityOnHand - quantityAllocated + shipmentItem.quantity
+            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
+                    shipmentItem.quantity + "] vs quantity available [" + quantityAvailable + "]");
+            if (shipmentItem.quantity > quantityAvailable) {
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                             shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityAvailable + " " + shipmentItem?.product?.unitOfMeasure,
                             shipmentItem?.product?.productCode,
                             shipmentItem?.inventoryItem?.lotNumber,
                             origin.name,
@@ -859,6 +863,24 @@ class ShipmentService {
         }
         return true;
     }
+
+
+	Integer getQuantityAllocated(Location location, Location binLocation, InventoryItem inventoryItem) {
+
+		def results = ShipmentItem.createCriteria().list {
+			projections {
+				sum("quantity")
+			}
+            shipment {
+                eq("origin", location)
+            }
+			eq("binLocation", binLocation)
+			eq("inventoryItem", inventoryItem)
+		}
+
+        return results[0] ?: 0
+
+	}
 
     /**
      * Get quantity on hand for the given bin location and inventory item stored at the given location.
@@ -879,8 +901,7 @@ class ShipmentService {
         }
 
         def quantityOnHand = binLocations.sum { it.quantity }
-        quantityOnHand = quantityOnHand?:0
-        return quantityOnHand
+        return quantityOnHand?:0
     }
 
 
