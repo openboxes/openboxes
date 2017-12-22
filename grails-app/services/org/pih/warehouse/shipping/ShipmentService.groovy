@@ -839,14 +839,18 @@ class ShipmentService {
 
             // Check whether there's any stock in the bin location for the given inventory item
             def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
+			def quantityAllocated = getQuantityAllocated(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs quantity allocated ${quantityAllocated}"
 
-            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity +
-                    "] vs onhand quantity [" + quantityOnHand + "]");
-            if (shipmentItem.quantity > quantityOnHand) {
-                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
+            // Quantity allocated includes the current shipment item quantity
+			def quantityAvailable = quantityOnHand - quantityAllocated + shipmentItem.quantity
+            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
+                    shipmentItem.quantity + "] vs quantity available [" + quantityAvailable + "]");
+            if (shipmentItem.quantity > quantityAvailable) {
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                             shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityAvailable + " " + shipmentItem?.product?.unitOfMeasure,
                             shipmentItem?.product?.productCode,
                             shipmentItem?.inventoryItem?.lotNumber,
                             origin.name,
@@ -859,6 +863,24 @@ class ShipmentService {
         }
         return true;
     }
+
+
+	Integer getQuantityAllocated(Location location, Location binLocation, InventoryItem inventoryItem) {
+
+		def results = ShipmentItem.createCriteria().list {
+			projections {
+				sum("quantity")
+			}
+            shipment {
+                eq("origin", location)
+            }
+			eq("binLocation", binLocation)
+			eq("inventoryItem", inventoryItem)
+		}
+
+        return results[0] ?: 0
+
+	}
 
     /**
      * Get quantity on hand for the given bin location and inventory item stored at the given location.
@@ -879,8 +901,7 @@ class ShipmentService {
         }
 
         def quantityOnHand = binLocations.sum { it.quantity }
-        quantityOnHand = quantityOnHand?:0
-        return quantityOnHand
+        return quantityOnHand?:0
     }
 
 
@@ -974,15 +995,14 @@ class ShipmentService {
                     // Delete all child containers
                     deleteContainers(id, childContainerIds, deleteItems)
 
-                    println("Contains items: " + container.shipmentItems)
-                    if (!deleteItems && container.shipmentItems) {
+                    //println("Contains items: " + container.shipmentItems)
+                    if (!deleteItems && container.shipmentItemsFromSession) {
                         throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
                     } else {
-                        container.shipmentItems.each { shipmentItem ->
+                        container.shipmentItemsFromSession.each { shipmentItem ->
                             shipment.removeFromShipmentItems(shipmentItem)
                             shipmentItem.delete()
                         }
-
                     }
                     shipment.removeFromContainers(container);
                     if (container?.parentContainer) {
@@ -2032,11 +2052,13 @@ class ShipmentService {
         String value = null
         if (cell) {
             try {
+                cell.setCellType(Cell.CELL_TYPE_STRING);
                 value = cell.getStringCellValue()
             }
             catch (IllegalStateException e) {
                 log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
-                value = Integer.valueOf((int) cell.getNumericCellValue())
+                //value = Integer.valueOf((int) cell.getNumericCellValue())
+                throw e;
             }
         }
         return value?.trim()
@@ -2058,8 +2080,34 @@ class ShipmentService {
         return value
     }
 
+    def findDuplicatePackingListItems(List packingListItems) {
+        List packingListItemsUniqueConstraint =
+                packingListItems.collect { [
+                        palletName: it.palletName,
+                        boxName: it.boxName,
+                        productCode: it.productCode,
+                        lotNumber: it.lotNumber,
+                        expirationDate: it.expirationDate,
+                        recipient: it.recipient]
+                }
+
+        final Set duplicates = new HashSet();
+        final Set master = new HashSet();
+        for (def item : packingListItemsUniqueConstraint) {
+            if (!master.add(item)) {
+                duplicates.add(item);
+            }
+        }
+        return duplicates
+    }
+
 
 	boolean validatePackingList(List packingListItems, Location location) {
+
+        def duplicates = findDuplicatePackingListItems(packingListItems)
+        if (duplicates) {
+            throw new RuntimeException("Found duplicates ${duplicates*.productCode}")
+        }
 
 		packingListItems.each { item ->
 			// Find a product using the product code
@@ -2068,11 +2116,6 @@ class ShipmentService {
 				throw new RuntimeException("Cannot find product with product code " + item.productCode)
 			}
 			item.product = product
-
-
-            log.info ("item pallet " + item.palletName)
-            log.info ("item box " + item.boxName)
-
 
             // there's a pallet
             if (!item.palletName && item?.boxName) {
@@ -2101,33 +2144,43 @@ class ShipmentService {
      * @return
      */
     Person findOrCreatePerson(String recipient) {
+        log.info "Find or create person: ${recipient}"
+
         Person person
-		if (EmailValidator.getInstance().isValid(recipient)) {
-			InternetAddress emailAddress = new InternetAddress(recipient, false)
-			person = Person.findByEmail(emailAddress.address)
+        if (recipient) {
+            // Recipient string includes email and name,
+            if (EmailValidator.getInstance().isValid(recipient)) {
+                InternetAddress emailAddress = new InternetAddress(recipient, false)
+                person = Person.findByEmail(emailAddress.address)
 
-			// Person record not found, creating a new person as long as the name is provided
-			if (!person) {
-				// If there's no personal attribute we cannot determine the first and last name of the recipient.
-				// This will return null and should throw an error
-				if (!emailAddress.personal) {
-					throw new RuntimeException("Unable to find a recipient with email address ${recipient}.")
-				}
-				String[] names = emailAddress.personal.split(" ", 2)
-				person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
-				person.save(flush: true)
-			}
-		}
-        else {
-            String[] names = recipient.split(" ", 2)
-            if (names.length <= 1) {
-                throw new RuntimeException("Recipient must have at least two names (i.e. first name and last name)")
+                // Person record not found, creating a new person as long as the name is provided
+                if (!person) {
+                    // If there's no personal attribute we cannot determine the first and last name of the recipient.
+                    // This will return null and should throw an error
+                    if (!emailAddress.personal) {
+                        throw new RuntimeException("Cannot find a recipient with email address ${recipient}")
+                    }
+                    String[] names = emailAddress.personal.split(" ", 2)
+                    person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
+                    if (!person.save(flush: true)) {
+                        throw new ValidationException("Cannot save recipient ${recipient} due to errors", person.errors)
+                    }
+                }
             }
+            // Recipient string only includes name
+            else {
+                String[] names = recipient.split(" ", 2)
+                if (names.length <= 1) {
+                    throw new RuntimeException("Recipient ${recipient} must have at least two names (i.e. first name and last name)")
+                }
 
-            person = Person.findByFirstNameAndLastName(names[0], names[1])
-            if (!person) {
-                person = new Person(firstName: names[0], lastName: names[1])
-                person.save(flush: true)
+                person = Person.findByFirstNameAndLastName(names[0], names[1])
+                if (!person) {
+                    person = new Person(firstName: names[0], lastName: names[1])
+                    if(!person.save(flush: true)) {
+                        throw new ValidationException("Cannot save recipient ${recipient} due to errors", person.errors)
+                    }
+                }
             }
         }
         return person
@@ -2135,77 +2188,72 @@ class ShipmentService {
     }
 
 	boolean importPackingList(String shipmentId, InputStream inputStream) {
-		int lineNumber = 0
-		try {
+        int lineNumber = 0
 
-			Shipment shipment = Shipment.get(shipmentId)
-			List packingListItems = parsePackingList(inputStream)
+        Shipment shipment = Shipment.get(shipmentId)
+        List packingListItems = parsePackingList(inputStream)
 
-			if (validatePackingList(packingListItems, shipment?.origin)) {
+        log.info "Parsed ${packingListItems.size()} items"
 
-				packingListItems.eachWithIndex { item, index ->
-					lineNumber = index+1
+        if (validatePackingList(packingListItems, shipment?.origin)) {
 
-					// Find or create an inventory item given the product, lot number, and expiration date
-					InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(item.product, item.lotNumber, item.expirationDate)
-					log.info("Inventory item: " + inventoryItem)
+            packingListItems.eachWithIndex { item, index ->
+                lineNumber = index + 1
 
-					// Find or create the pallet and box (if provided). Items are added to Unpacked Items by default.
-					Container pallet = item.palletName ? shipment.findOrCreatePallet(item.palletName) : null
-					Container box = item.boxName ? pallet?.findOrCreateBox(item.boxName) : null
+                // Find or create an inventory item given the product, lot number, and expiration date
+                InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(item.product, item.lotNumber, item.expirationDate)
+                log.info("Inventory item: " + inventoryItem)
 
-					// The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
-					Container container = box ?: pallet ?: null
+                // Find or create the pallet and box (if provided). Items are added to Unpacked Items by default.
+                Container pallet = item.palletName ? shipment.findOrCreatePallet(item.palletName) : null
+                Container box = item.boxName ? pallet?.findOrCreateBox(item.boxName) : null
 
-                    Person recipient
-                    if (item.recipient) {
-                        recipient = findOrCreatePerson(item.recipient)
-                    }
-					// Check to see if a shipment item already exists within the given container
-					ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
-					// Create a new shipment item if not found
-					if (!shipmentItem) {
-						shipmentItem = new ShipmentItem(
-								product: item.product,
-								lotNumber: inventoryItem.lotNumber ?: '',
-								expirationDate: inventoryItem?.expirationDate,
-								inventoryItem: inventoryItem,
-								container: container,
-								quantity: item.quantity,
-                                recipient: recipient
-						);
-						addToShipmentItems(shipmentItem, shipment)
-					}
-					// Modify quantity and container for existing shipment items
-					else {
-						//shipmentItem.inventoryItem = inventoryItem
-						shipmentItem.container = container
-						shipmentItem.quantity = item.quantity
-                        shipmentItem.recipient = recipient
-					}
-				}
+                // The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
+                Container container = box ?: pallet ?: null
 
-                log.info "Packing list items " + packingListItems
-                log.info "Shipment items  " + shipment?.shipmentItems
+                Person recipient
+                if (item.recipient) {
+                    recipient = findOrCreatePerson(item.recipient)
+                }
+                // Check to see if a shipment item already exists within the given container
+                //ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
 
-                if(packingListItems?.size() != shipment?.shipmentItems?.size()) {
-                    throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but there were ${shipment?.shipmentItems?.size()} items added to the shipment. This usually means that you are trying to add identical items to the same pallet or you are trying to import a packing list that does not contain items that have already been added to the shipment. Please review your packing list for duplicate or missing items.", shipment: shipment)
+                ShipmentItem shipmentItem = shipment.shipmentItems.find {
+                    it.inventoryItem == inventoryItem &&
+                            it.container == container &&
+                            it.recipient == recipient
                 }
 
-			}
-		} catch (ShipmentItemException e) {
-			log.warn("Unable to import packing list items due to exception at ${lineNumber}: " + e.message, e)
-            throw new RuntimeException("Row ${lineNumber}: " + e.message)
-			//throw e;
+                // Create a new shipment item if not found
+                if (!shipmentItem) {
+                    shipmentItem = new ShipmentItem(
+                            product: item.product,
+                            lotNumber: inventoryItem.lotNumber ?: '',
+                            expirationDate: inventoryItem?.expirationDate,
+                            inventoryItem: inventoryItem,
+                            container: container,
+                            quantity: item.quantity,
+                            recipient: recipient
+                    );
+                    addToShipmentItems(shipmentItem, shipment)
+                }
+                // Modify quantity and container for existing shipment items
+                else {
+                    //shipmentItem.inventoryItem = inventoryItem
+                    shipmentItem.container = container
+                    shipmentItem.quantity = item.quantity
+                    shipmentItem.recipient = recipient
+                }
+            }
 
-		} catch (Exception e) {
-			log.warn("Unable to import packing list items due to exception at ${lineNumber}: " + e.message, e)
-			//throw new RuntimeException("make sure this causes a rollback", e)
-			throw new RuntimeException("Row ${lineNumber}: " + e.message)
-		}
-		finally {
-			inputStream.close();
-		}
+            log.info "Packing list items " + packingListItems.size()
+            log.info "Shipment items  " + shipment?.shipmentItems?.size()
+
+            if (packingListItems?.size() != shipment?.shipmentItems?.size()) {
+                throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but there were ${shipment?.shipmentItems?.size()} items added to the shipment. This usually means that you are trying to add identical items to the same pallet or you are trying to import a packing list that does not contain items that have already been added to the shipment. Please review your packing list for duplicate or missing items.", shipment: shipment)
+            }
+            if (inputStream) inputStream.close();
+        }
 
 		return true
 	}

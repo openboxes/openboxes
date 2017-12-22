@@ -1648,7 +1648,7 @@ class InventoryService implements ApplicationContextAware {
         if (binLocation) {
             List binLocations = getQuantityByBinLocation(transactionEntries)
             log.info "Bin locations: " + binLocations
-            def entry = binLocations.find { it.inventoryItem == inventoryItem }
+            def entry = binLocations.find { it.inventoryItem == inventoryItem && it.binLocation == binLocation }
             return entry?.quantity?:0
         }
         else {
@@ -3542,11 +3542,13 @@ class InventoryService implements ApplicationContextAware {
             transactionEntry.inventoryItem = inventoryItem
 
 			// Find the bin location
-			def binLocation = Location.findByNameAndParentLocation(row.binLocation, command.location)
-            log.info "Bin location: " + row.binLocation
-            log.info "Location: " + command.location
-            assert binLocation != null
-			transactionEntry.binLocation = binLocation
+			if (row.binLocation) {
+				def binLocation = Location.findByNameAndParentLocation(row.binLocation, command.location)
+				log.info "Bin location: " + row.binLocation
+				log.info "Location: " + command.location
+				assert binLocation != null
+				transactionEntry.binLocation = binLocation
+			}
 
             transaction.addToTransactionEntries(transactionEntry)
         }
