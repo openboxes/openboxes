@@ -5,14 +5,6 @@
 
     		<table class="zebra">
     			<tbody>
-                    <thead>
-                        <tr class="prop odd">
-                            <td colspan="3">
-                                <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
-                            </td>
-                        </tr>
-                    </thead>
-
                     <tr>
                         <td class="center" style="width: 1%">
                             <img src="${createLinkTo(dir:'images/icons/silk/', file: 'accept.png')}" class="middle"/>

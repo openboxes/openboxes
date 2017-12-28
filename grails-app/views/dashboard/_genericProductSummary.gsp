@@ -5,13 +5,6 @@
 	<div class="widget-content" style="padding:0; margin:0">
 		<div id="genericProductSummary">
     		<table class="zebra">
-                <thead>
-                    <tr class="prop odd">
-                        <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
-                        </td>
-                    </tr>
-                </thead>
     			<tbody>
                 <tr class="prop">
                     <td class="center" style="width: 1%">
