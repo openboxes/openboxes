@@ -828,7 +828,7 @@ class ShipmentService {
      */
     boolean validateShipmentItem(ShipmentItem shipmentItem, boolean binLocationRequired) {
         def origin = Location.get(shipmentItem?.shipment?.origin?.id);
-        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequest=${binLocationRequired}")
+        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequired=${binLocationRequired}")
 
         // Location must be locally managed and
         if (origin.requiresOutboundQuantityValidation()) {
@@ -845,7 +845,7 @@ class ShipmentService {
             // Quantity allocated includes the current shipment item quantity
 			def quantityAvailable = quantityOnHand - quantityAllocated + shipmentItem.quantity
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
-                    shipmentItem.quantity + "] vs quantity available [" + quantityAvailable + "]");
+                    shipmentItem.quantity + "] <= quantity available [" + quantityAvailable + "]");
             if (shipmentItem.quantity > quantityAvailable) {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
@@ -873,6 +873,7 @@ class ShipmentService {
 			}
             shipment {
                 eq("origin", location)
+				eq("currentStatus", ShipmentStatusCode.PENDING)
             }
 			eq("binLocation", binLocation)
 			eq("inventoryItem", inventoryItem)
