@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet id="1442807680525-1-remove-duplicates" author="jmiranda">
+        <sql>
+            <![CDATA[
+                DELETE is1 FROM inventory_snapshot is1
+                INNER JOIN inventory_snapshot is2
+                WHERE is1.id < is2.id
+                AND is1.date = is2.date
+                AND is1.location_id = is2.location_id
+                AND is1.product_id = is2.product_id;
+            ]]>
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda" id="1442807680525-1">
+        <preConditions onFail="HALT" onError="HALT">
+            <sqlCheck expectedResult="0">
+                <![CDATA[
+                    select date, location_id, product_id, count(*)
+                    from inventory_snapshot
+                    group by date, location_id, product_id
+                    having count(*) > 1
+                ]]>
+            </sqlCheck>
+        </preConditions>
+        <addUniqueConstraint constraintName="inventory_snapshot_key"
+                             tableName="inventory_snapshot"
+                             columnNames="date, location_id, product_id"/>
+	</changeSet>
+
+    <changeSet id="1442807680525-2-remove-duplicates" author="jmiranda">
+        <sql>
+            <![CDATA[
+                DELETE is1 FROM inventory_item_snapshot is1
+                INNER JOIN inventory_snapshot is2
+                WHERE is1.id < is2.id
+                AND is1.date = is2.date
+                AND is1.location_id = is2.location_id
+                AND is1.product_id = is2.product_id
+                AND is1.inventory_item_id = is2.inventory_item_id
+            ]]>
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="jmiranda" id="1442807680525-2">
+        <preConditions onFail="HALT" onError="HALT">
+            <sqlCheck expectedResult="0">
+                select date, location_id, product_id, inventory_item_id, count(*)
+                from inventory_item_snapshot
+                group by date, location_id, product_id, inventory_item_id
+                having count(*) > 1
+            </sqlCheck>
+        </preConditions>
+        <addUniqueConstraint constraintName="inventory_item_snapshot_key"
+                             tableName="inventory_item_snapshot"
+                             columnNames="date, location_id, product_id, inventory_item_id"/>
+    </changeSet>
+
+
+    <!--
+    <changeSet author="jmiranda" id="1442807680525-3">
+        <comment>Need to update the ID column for all records so that they are set to an auto-incremented value during modify column operation.</comment>
+        <sql>
+            UPDATE inventory_snapshot set id = NULL;
+        </sql>
+        <modifyColumn tableName="inventory_snapshot">
+            <column name="id" type="bigint(20)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="inventory_snapshot_pk"/>
+            </column>
+        </modifyColumn>
+    </changeSet>
+    -->
+
+</databaseChangeLog>
