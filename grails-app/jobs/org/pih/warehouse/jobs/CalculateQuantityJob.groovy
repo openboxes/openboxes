@@ -9,6 +9,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 import org.quartz.JobExecutionContext
+import util.LiquibaseUtil
 
 class CalculateQuantityJob {
 
@@ -21,6 +22,12 @@ class CalculateQuantityJob {
     }
 
     def execute(JobExecutionContext context) {
+
+        if (LiquibaseUtil.isRunningMigrations()) {
+            log.info "Postponing job execution until liquibase migrations are complete"
+            return
+        }
+
 
         def startTime = System.currentTimeMillis()
         def date = context.mergedJobDataMap.get('date')

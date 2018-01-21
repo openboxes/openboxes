@@ -28,6 +28,7 @@ import javax.sql.DataSource
 
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
+import util.LiquibaseUtil
 
 class BootStrap {
 
@@ -70,6 +71,8 @@ class BootStrap {
 
             //def fileOpener = new ClassLoaderFileOpener()
             def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations(database)
+            log.info("Liquibase running: " + isRunningMigrations)
             log.info("Setting default schema to " + connection.catalog)
             log.info("Product Version: " + database.databaseProductVersion)
             log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
@@ -85,8 +88,6 @@ class BootStrap {
             // Run through the updates in the master changelog
             liquibase = new Liquibase("changelog.xml", fileOpener, database);
             liquibase.update(null)
-
-
         }
         finally {
             if (liquibase && liquibase.database) {
