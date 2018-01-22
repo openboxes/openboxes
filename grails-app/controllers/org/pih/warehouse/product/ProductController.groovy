@@ -329,78 +329,62 @@ class ProductController {
 		def productInstance = Product.get(params.id)
 
 		if (productInstance) {
-			if (params.version) {
-				def version = params.version.toLong()
-				if (productInstance.version > version) {
-					productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this product while you were editing")
-					render(view: "edit", model: [productInstance: productInstance])
-					return
-				}
-			}
-			productInstance.properties = params
-
-			/*
-			try {
-				productService.saveProduct(productInstance)
-			}
-			catch (ValidationException e) {
-				productInstance = Product.read(params.id)
-				productInstance.errors = e.errors
-				render view: "edit", model: [productInstance:productInstance]
-			}
-			*/
-			
-            updateTags(productInstance, params)
-            updateAttributes(productInstance, params)
-
-			log.info("Categories " + productInstance?.categories);
-
-			// find the phones that are marked for deletion
-			def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
-
-			log.info("toBeDeleted: " + _toBeDeleted )
-
-			// if there are phones to be deleted remove them all
-			if (_toBeDeleted) {
-				productInstance.categories.removeAll(_toBeDeleted)
-			}
-
-            // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
-            // when the session is closed.
-            if (productInstance.validate()) {
-                if (!productInstance.productCode) {
-                    productInstance.productCode = productService.generateProductIdentifier();
+            if (params.version) {
+                def version = params.version.toLong()
+                if (productInstance.version > version) {
+                    productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
+                            warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this product while you were editing")
+                    render(view: "edit", model: [productInstance: productInstance])
+                    return
                 }
             }
+            productInstance.properties = params
+
+            try {
+                updateTags(productInstance, params)
+                updateAttributes(productInstance, params)
+
+                log.info("Categories " + productInstance?.categories);
+
+                // find the phones that are marked for deletion
+                def _toBeDeleted = productInstance.categories.findAll { (it?.deleted || (it == null)) }
+
+                log.info("toBeDeleted: " + _toBeDeleted)
+
+                // if there are phones to be deleted remove them all
+                if (_toBeDeleted) {
+                    productInstance.categories.removeAll(_toBeDeleted)
+                }
+
+                // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
+                // when the session is closed.
+                if (productInstance.validate()) {
+                    if (!productInstance.productCode) {
+                        productInstance.productCode = productService.generateProductIdentifier();
+                    }
+                }
 
 
-			if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
-				//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
-                redirect(controller: "product", action: "edit", id: productInstance?.id)
-			}
-			else {
+                if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
+                    //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                    redirect(controller: "product", action: "edit", id: productInstance?.id)
+                } else {
+                    render(view: "edit", model: [productInstance: productInstance])
+                }
 
-				def location = Location.get(session?.warehouse?.id);
-				def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
-				if (!inventoryLevelInstance) {
-					inventoryLevelInstance = new InventoryLevel();
-				}
-
-
-				render(view: "edit", model: [productInstance: productInstance,
-					rootCategory: productService.getRootCategory(),
-					inventoryInstance: location.inventory,
-					inventoryLevelInstance:inventoryLevelInstance])
-			}
-		}
-		else {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-			redirect(controller: "inventoryItem", action: "browse")
+            } catch (ValidationException e) {
+                productInstance = Product.read(params.id)
+                productInstance.errors = e.errors
+                render view: "edit", model: [productInstance:productInstance]
+            }
+        }
+        else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(controller: "inventoryItem", action: "browse")
 
 
-		}
+        }
 	}
 
     def updateTags(productInstance, params) {
@@ -446,6 +430,14 @@ class ProductController {
             if (attVal == "_other" || attVal == null || attVal == '') {
                 attVal = params["productAttributes." + it.id + ".otherValue"]
             }
+
+			if (it.required && !attVal) {
+                productInstance.errors.rejectValue("attributes", "product.attribute.required",
+                [] as Object[],
+                "Product attribute ${it.name} is required")
+                throw new ValidationException("Attribute required", productInstance.errors)
+            }
+
             ProductAttribute existing = existingAtts.get(it.id)
             if (attVal != null && attVal != '') {
                 if (!existing) {

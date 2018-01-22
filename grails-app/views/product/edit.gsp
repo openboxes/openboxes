@@ -55,7 +55,7 @@
                             <li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>
 							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
 							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
-                            <li><a href="#tabs-attributes"><g:message code="product.attributes.label" default="Attributes"/></a></li>
+                            <%--<li><a href="#tabs-attributes"><g:message code="product.attributes.label" default="Attributes"/></a></li>--%>
                             <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
                         </g:if>
 					</ul>	
@@ -193,7 +193,7 @@
                                                         </select>
                                                     </g:if>
                                                     <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
-                                                    <g:textField class="otherAttributeValue text medium"
+                                                    <g:textField size="50" class="otherAttributeValue text medium"
                                                                  style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
                                                                  name="productAttributes.${attribute?.id}.otherValue"
                                                                  value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
@@ -354,9 +354,11 @@
                                 <g:render template="productGroups" model="[product: productInstance, productGroups:productInstance?.productGroups]"/>
                             </div>
                         </div>
+                        <%--
                         <div id="tabs-attributes" class="ui-tabs-hide">
                             <g:render template="attributes" model="[productInstance:productInstance]"/>
                         </div>
+                        --%>
                         <div id="tabs-status" class="ui-tabs-hide">
                             <g:render template="inventoryLevels" model="[productInstance:productInstance]"/>
 						</div>
