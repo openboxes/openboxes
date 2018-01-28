@@ -7,7 +7,7 @@ class AssignIdentifierJob {
     def identifierService
 
     static triggers = {
-        simple startDelay: 10000l, repeatInterval: 10000l   // run every 5 minutes
+        simple startDelay: 60000l, repeatInterval: 300000l   // run every 5 minutes
 	}
 
 	def execute() {
