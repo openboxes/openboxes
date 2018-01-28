@@ -1573,15 +1573,14 @@ class InventoryController {
 		log.info "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
 		def warehouseInstance = Location.get(session?.warehouse?.id);
-		def products = Product.list();
+        def products = transactionInstance?.transactionEntries.collect { it.inventoryItem.product }
 		def inventoryItems = InventoryItem.findAllByProductInList(products)
 		def model = [ 
 			inventoryItemsMap: inventoryItems.groupBy { it.product } ,
 			transactionInstance: transactionInstance?:new Transaction(),
-			productInstanceMap: Product.list().groupBy { it?.category },
 			transactionTypeList: TransactionType.list(),
-			locationInstanceList: Location.list(),
-			quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
+			locationInstanceList: Location.findAllByParentLocationIsNull(),
+			quantityMap: [:],//inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
 			warehouseInstance: warehouseInstance
         ]
 
