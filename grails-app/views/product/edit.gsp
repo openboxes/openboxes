@@ -56,7 +56,9 @@
 							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
 							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
                             <%--<li><a href="#tabs-attributes"><g:message code="product.attributes.label" default="Attributes"/></a></li>--%>
-                            <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
+                            <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
+                                <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
+                            </g:if>
                         </g:if>
 					</ul>	
 					<div id="tabs-details" class="ui-tabs-hide">

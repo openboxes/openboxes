@@ -490,6 +490,9 @@ openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 // Feedback mechanism that allows screenshots
 //openboxes.feedback.enabled = false
 
+// Bill of Materials feature
+openboxes.bom.enabled = false
+
 // UserVoice widget
 openboxes.uservoice.widget.enabled = true
 openboxes.uservoice.widget.position = "right"
