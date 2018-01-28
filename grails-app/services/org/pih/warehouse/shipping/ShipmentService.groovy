@@ -1923,6 +1923,9 @@ class ShipmentService {
 				deleteOutboundTransactions(shipmentInstance)
 				deleteEvent(shipmentInstance, eventInstance)
 			}
+			else {
+				deleteEvent(shipmentInstance, eventInstance)
+			}
 			
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)
