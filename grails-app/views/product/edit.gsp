@@ -174,31 +174,31 @@
                                                     <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
                                                 </td>
                                                 <td class="value">
-                                                    <g:set var="attributeFound" value="f"/>
+
+                                                    <g:set var="productAttribute" value="${productInstance?.attributes?.find { it.attribute.id == attribute.id } }"/>
+                                                    <g:set var="otherSelected" value="${productAttribute?.value && !attribute.options.contains(productAttribute?.value)}"/>
                                                     <g:if test="${attribute.options}">
                                                         <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
                                                             <option value=""></option>
                                                             <g:each var="option" in="${attribute.options}" status="optionStatus">
                                                                 <g:set var="selectedText" value=""/>
-                                                                <g:if test="${productInstance?.attributes[status]?.value == option}">
+                                                                <g:if test="${productAttribute?.value == option}">
                                                                     <g:set var="selectedText" value=" selected"/>
-                                                                    <g:set var="attributeFound" value="t"/>
                                                                 </g:if>
                                                                 <option value="${option}"${selectedText}>${option}</option>
                                                             </g:each>
-                                                            <g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
-                                                            <g:if test="${attribute.allowOther || otherAttVal}">
-                                                                <option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
+                                                            <g:if test="${attribute.allowOther || otherSelected}">
+                                                                <option value="_other"<g:if test="${otherSelected}"> selected</g:if>>
                                                                     <g:message code="product.attribute.value.other" default="Other..." />
                                                                 </option>
                                                             </g:if>
                                                         </select>
                                                     </g:if>
-                                                    <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
+                                                    <g:set var="onlyOtherVal" value="${attribute.allowOther && otherSelected}"/>
                                                     <g:textField size="50" class="otherAttributeValue text medium"
                                                                  style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
                                                                  name="productAttributes.${attribute?.id}.otherValue"
-                                                                 value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+                                                                 value="${otherAttVal || onlyOtherVal ? productAttribute?.value : ''}"/>
                                                 </td>
                                             </tr>
                                         </g:each>

@@ -426,28 +426,34 @@ class ProductController {
 
         // Process attributes
         Attribute.list().each() {
-            String attVal = params["productAttributes." + it.id + ".value"]
-            if (attVal == "_other" || attVal == null || attVal == '') {
-                attVal = params["productAttributes." + it.id + ".otherValue"]
+            String value = params["productAttributes." + it.id + ".value"]
+            if (value == "_other" || value == null || value == '') {
+                value = params["productAttributes." + it.id + ".otherValue"]
             }
 
-			if (it.required && !attVal) {
+			if (it.required && !value) {
                 productInstance.errors.rejectValue("attributes", "product.attribute.required",
                 [] as Object[],
                 "Product attribute ${it.name} is required")
                 throw new ValidationException("Attribute required", productInstance.errors)
             }
 
-            ProductAttribute existing = existingAtts.get(it.id)
-            if (attVal != null && attVal != '') {
-                if (!existing) {
-                    existing = new ProductAttribute(["attribute":it])
-                    productInstance.attributes.add(existing)
+            ProductAttribute existingAttribute = existingAtts.get(it.id)
+            if (value) {
+                if (!existingAttribute) {
+                    existingAttribute = new ProductAttribute("attribute":it, value: value)
+                    productInstance.addToAttributes(existingAttribute)
                 }
-                existing.value = attVal;
+                else {
+                    existingAttribute.value = value;
+                }
             }
             else {
-                productInstance.attributes.remove(existing)
+                if (existingAttribute) {
+                    log.info("removing attribute ${existingAttribute.id}")
+                    productInstance.removeFromAttributes(existingAttribute)
+                    existingAttribute.delete()
+                }
             }
         }
     }
