@@ -71,7 +71,7 @@ class BootStrap {
 
             //def fileOpener = new ClassLoaderFileOpener()
             def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations(database)
+            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: " + isRunningMigrations)
             log.info("Setting default schema to " + connection.catalog)
             log.info("Product Version: " + database.databaseProductVersion)

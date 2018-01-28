@@ -25,17 +25,23 @@ class LiquibaseUtil {
         return database
     }
 
-
-    static isRunningMigrations() {
-        return LiquibaseUtil.isRunningMigrations(getDatabase())
-    }
-
-	static isRunningMigrations(Database database) {
+	static isRunningMigrations() {
         boolean isRunning = false
-        LockHandler lockHandler = LockHandler.getInstance(database)
-        if (lockHandler) {
-            DatabaseChangeLogLock [] locks = lockHandler.listLocks()
-            isRunning = locks
+        def database
+        try {
+            database = getDatabase()
+            LockHandler lockHandler = LockHandler.getInstance(database)
+            if (lockHandler) {
+                DatabaseChangeLogLock[] locks = lockHandler.listLocks()
+                isRunning = locks
+            }
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+        finally {
+            if (database) {
+                database.close()
+            }
         }
         return isRunning
 	}
