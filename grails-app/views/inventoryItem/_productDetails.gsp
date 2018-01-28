@@ -146,7 +146,7 @@
                     <label><warehouse:message code="category.label"/></label>
                 </td>
                 <td class="value" id="productCategory">
-                    <span class="">
+                    <span class="dont-break-out">
                         <g:if test="${productInstance?.category?.name }">
                             <g:link controller="inventory" action="browse" params="[subcategoryId:productInstance?.category?.id,showHiddenProducts:'on',showOutOfStockProducts:'on',searchPerformed:true]">
                                 <format:category category="${productInstance?.category}"/>
