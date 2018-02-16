@@ -33,6 +33,7 @@
     <jqvalui:resources />
 
     <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'loading.css')}" type="text/css" media="all" />
 
 <!-- jquery validation messages -->
     <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
