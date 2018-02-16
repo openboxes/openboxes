@@ -9,6 +9,8 @@
  * */
 package org.pih.warehouse.core
 
+import org.pih.warehouse.auth.AuthService
+
 // import java.util.Date
 
 class User extends Person {
@@ -62,8 +64,22 @@ class User extends Person {
     /**
      * @return  the highest role for this user
      */
-    def getHighestRole() {
+    def getHighestRole(Location currentLocation) {
+        def roles = getEffectiveRoles(currentLocation)
         return (roles) ? roles.sort().iterator().next() : null
+    }
+
+
+    def getRolesByCurrentLocation(Location currentLocation) {
+        if(!currentLocation) return []
+        return locationRoles?.findAll{it.location == currentLocation}?.collect{it.role} ?: []
+    }
+
+    def getEffectiveRoles(Location currentLocation) {
+        def defaultRoles = roles?.collect{it} ?: []
+        def rolesByLocation = getRolesByCurrentLocation(currentLocation)
+        defaultRoles.addAll(rolesByLocation)
+        return defaultRoles
     }
 
     /**
@@ -74,7 +90,7 @@ class User extends Person {
         locationRoles.each {
             pairs[it.location.id] = it.role.id
         }
-        pairs
+        return pairs
     }
 
     /**
