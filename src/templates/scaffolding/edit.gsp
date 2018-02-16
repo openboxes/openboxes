@@ -46,16 +46,18 @@
 								</td>
 							</tr>
 						<%  }   } %>
-							<tr class="prop">
-								<td valign="top"></td>
-								<td valign="top left">
-									<div class="buttons">
-										<g:actionSubmit class="button" action="update" value="\${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-										<g:actionSubmit class="button" action="delete" value="\${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('\${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-									</div>
-								</td>
-							</tr>
 						</tbody>
+                        <tfoot>
+                            <tr class="prop">
+                                <td valign="top"></td>
+                                <td valign="top left">
+                                    <div class="buttons left">
+                                        <g:actionSubmit class="button" action="update" value="\${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+                                        <g:actionSubmit class="button" action="delete" value="\${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('\${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
 					</table>
 				</div>
             </g:form>
