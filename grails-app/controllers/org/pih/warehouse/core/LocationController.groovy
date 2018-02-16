@@ -32,37 +32,15 @@ class LocationController {
 	
 	def list = {
 
-		def locations = []
 		def locationsTotal = 0;
 		def locationType = LocationType.get(params["locationType.id"])
 		def locationGroup = LocationGroup.get(params["locationGroup.id"])
 		
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		if (params.q && locationType) {
-			def terms = "%" + params.q + "%"
-			locations = Location.findAllByNameLikeAndLocationType(terms, locationType, params)
-			locationsTotal = Location.countByNameLikeAndLocationType(terms, locationType, params);
-		}
-		else if (locationType) { 
-			locations = Location.findAllByLocationType(locationType, params)
-			locationsTotal = Location.countByLocationType(locationType, params);
-		}
-		else if (params.q) {
-			def terms = "%" + params.q + "%"
-			locations = Location.findAllByNameLike(terms, params)
-			locationsTotal = Location.countByNameLike(terms, params);
-		}
-		else {
-			locations = Location.list(params)
-			locationsTotal = Location.count()
-		}
+		params.offset = params.offset ? params.int("offset") : 0
+		def locations = locationService.getLocations(locationType, locationGroup, params.q, params.max, params.offset as int)
 		
-		// Filter by location group
-		if (locationGroup) { 
-			locations = locations.findAll { it.locationGroup == locationGroup } 
-		}
-		
-		[locationInstanceList: locations, locationInstanceTotal: locationsTotal]
+		[locationInstanceList: locations, locationInstanceTotal: locations.totalCount]
 	}
 	
 	def show = { 
