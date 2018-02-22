@@ -167,7 +167,7 @@
                                                 <th class="left"><g:message code="shipping.shipped.label" /></th>
                                                 <th class="left"><g:message code="shipping.received.label" /></th>
                                                 <th class="left"><g:message code="default.quantity.label" /></th>
-                                                <th class="left" colspan="2"><g:message code="location.binLocation.label" /></th>
+                                                <th class="left" colspan="3"><g:message code="location.binLocation.label" /></th>
                                                 <th class="left"><g:message code="default.comment.label" /></th>
                                                 <th ><g:message code="default.actions.label" /></th>
                                             </tr>
@@ -219,15 +219,21 @@
                                                             </g:if>
                                                         </td>
                                                         <td class="middle ${hasErrors?'errors':''}">
-                                                            <g:textField class="text" name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" style="width:100%" />
-                                                        </td>
-                                                        <td class="middle center">
-                                                            <g:selectBinLocation name="receiptItems[${i}].binLocation.id"
-                                                                                 class="chzn-select-deselect" noSelection="['null':'']" value="${receiptItem?.binLocation?.id}"/>
+                                                            <input class="text" name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" type="number"
+                                                                   min="0" max="${receiptItem?.quantityShipped}" />
                                                         </td>
                                                         <td class="middle left">
-                                                            <a href="javascript:void(-1)" data-id="${receiptItem?.id}" class="btnShowPutaways">
-                                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'box.png')}" class="middle"/>
+                                                            <g:selectBinLocation id="receiptItems-${i}-binLocation" name="receiptItems[${i}].binLocation.id"
+                                                                                 class="chzn-select-deselect binLocation" noSelection="['null':'']" value="${receiptItem?.binLocation?.id}"/>
+                                                        </td>
+                                                        <td class="middle center">
+                                                            <a href="javascript:void(-1)" data-id="${receiptItem?.id}" data-index="${i}" class="btnCopyPutaway" title="${warehouse.message(code:'default.button.copy.label')}">
+                                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_copy.png')}" class="middle"/>
+                                                            </a>
+                                                        </td>
+                                                        <td class="middle center">
+                                                            <a href="javascript:void(-1)" data-id="${receiptItem?.id}" class="btnShowPutaways" title="${warehouse.message(code:'default.button.zoom.label')}">
+                                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png')}" class="middle"/>
                                                             </a>
                                                         </td>
 
@@ -266,7 +272,7 @@
                     <div class="button-container">
                         <button type="submit" name="saveButton" value="saveAndContinue" class="button">
                             <img src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png')}"/>
-                            &nbsp;<g:message code="default.button.saveAndContinue.label" />
+                            &nbsp;<g:message code="default.button.save.label" />
                         </button>
                         <button type="submit" name="saveButton" value="saveAndExit" class="button">
                             <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_go.png')}"/>
@@ -294,10 +300,21 @@
                     //expires: 1
                 }
             });
+
+            // Copy putaway location for every row
+            $(".btnCopyPutaway").click(function(event){
+                let index = $(this).data("index");
+                let binLocation = $("#receiptItems-" + index + "-binLocation");
+                let binLocations = $(".binLocation");
+                $.each(binLocations, function(index, element) {
+                   $(element).val(binLocation.val());
+                   $(element).trigger("chosen:updated");
+                });
+            });
+
             // Show Contents dialog
             $("#dlgShowPutaways").dialog({ autoOpen: false, modal: true, width: 500 });
             $(".btnShowPutaways").click(function(event) {
-                console.log("here");
                 var id = $(this).data("id");
                 var url = "${request.contextPath}/shipment/showPutawayLocations/" + id;
                 $("#dlgShowPutaways").load(url).dialog('open');
