@@ -15,9 +15,10 @@
            	
            	<div>
 				<div class="buttonBar">            	
-                    <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
+                    <g:link class="button icon search" action="list">
+                        <warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
                     <g:isUserAdmin>
-                        <g:link class="button icon add" action="edit"><warehouse:message code="default.add.label"
+                        <g:link class="button icon add" action="edit"><warehouse:message code="default.create.label"
                              args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
                     </g:isUserAdmin>
                 </div>
