@@ -41,48 +41,31 @@
                             </h2>
                             <table>
                                 <tbody>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label>Issue date</label>
-                                        </td>
-                                        <td class="value">
-                                            <g:formatDate date="${new Date() }"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label>Issued from</label>
-                                        </td>
-                                        <td class="value">
-                                            ${requisition?.destination}
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label>Issued to</label>
-                                        </td>
-                                        <td class="value">
-                                            ${requisition.origin}
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <label>Issued by</label>
-                                        </td>
-                                        <td class="value">
-                                            ${session.user.name}
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label><warehouse:message code="requisition.issuedBy.label"/></label>
+                                    </td>
+                                    <td class="value">
+                                        <g:selectPerson name="issuedBy" class="chzn-select-deselect" value="${session.user}" noSelection="['null':'']"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label><warehouse:message code="requisition.deliveredBy.label" default="Delivered By"/></label>
+                                    </td>
+                                    <td class="value">
+                                        <g:selectPerson name="deliveredBy" class="chzn-select-deselect" value="${requisition.deliveredBy}" noSelection="['null':'']"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
 
-                                        <td class="name">
-                                            <label>Comments</label>
-                                        </td>
-                                        <td class="value">
-                                            <g:textArea name="comments" cols="80" rows="6"></g:textArea>
-                                        </td>
-
-                                    </tr>
+                                    <td class="name">
+                                        <label>Comments</label>
+                                    </td>
+                                    <td class="value">
+                                        <g:textArea name="comments" cols="80" rows="6"></g:textArea>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -99,7 +82,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <g:each var="picklistItem" in="${picklist.picklistItems }" status="status">
+                                <g:each var="picklistItem" in="${picklist?.picklistItems }" status="status">
                                     <tr class="${status%2?'odd':'even' }">
                                         <td>
                                             ${status+1 }
@@ -119,7 +102,7 @@
                                         </td>
                                     </tr>
                                 </g:each>
-                                <g:unless test="${picklist.picklistItems }">
+                                <g:unless test="${picklist?.picklistItems }">
                                     <tr>
                                         <td colspan="5">
                                             <div class="empty center">
@@ -143,9 +126,9 @@
 
                             </g:if>
                             <g:else>
-                                <g:link controller="requisition" action="complete" id="${requisition.id }" class="button">
+                                <g:submitButton name="finish" value="Finish" class="button">
                                     <warehouse:message code="default.button.finish.label"/>
-                                </g:link>
+                                </g:submitButton>
                             </g:else>
                         </div>
 

@@ -467,11 +467,14 @@ class RequisitionController {
 		[requisition:requisition, picklist:picklist]
 	}
 	
-	def complete = { 
+	def complete = {
         def requisition = Requisition.get(params.id)
 		try {
-            def issuedBy = User.load(session.user.id)
-			requisitionService.issueRequisition(requisition, issuedBy, params.comments)
+            User issuedBy = User.load(params.int("issuedBy"))
+            User deliveredBy = User.load(params.int("deliveredBy"))
+            String comments = params.comments
+
+			requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)
 		} 
 		catch (ValidationException e) { 
 			//flash.message = e.message 
