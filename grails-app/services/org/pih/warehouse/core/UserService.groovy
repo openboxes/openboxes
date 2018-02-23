@@ -154,7 +154,8 @@ class UserService {
 
 
     Boolean canEditUserRoles(User currentUser, User otherUser) {
-        return isSuperuser(currentUser) || (currentUser.highestRole >= otherUser.highestRole)
+        def location = AuthService.currentLocation.get()
+        return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
     }
 
     Boolean isUserInRole(String userId, Collection roleTypes) {
@@ -235,16 +236,15 @@ class UserService {
         return users;
     }
 
-    private def rolesForCurrentLocation(user){
+    private def rolesForCurrentLocation(User user){
         def currentLocation = AuthService.currentLocation?.get()
-        if(!currentLocation) return []
-        user?.locationRoles?.findAll{it.location == currentLocation}?.collect{it.role} ?: []
+        return user.getRolesByCurrentLocation(currentLocation)
     }
 
-    private def effectRoles(user){
-        def defaultRoles = user?.roles?.collect{it} ?: []
-        defaultRoles.addAll(rolesForCurrentLocation(user))
-        defaultRoles
+    private def effectRoles(User user){
+        def currentLocation = AuthService.currentLocation?.get()
+
+        return user.getEffectiveRoles(currentLocation)
     }
 	
 

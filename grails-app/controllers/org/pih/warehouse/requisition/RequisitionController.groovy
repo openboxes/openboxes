@@ -467,11 +467,14 @@ class RequisitionController {
 		[requisition:requisition, picklist:picklist]
 	}
 	
-	def complete = { 
+	def complete = {
         def requisition = Requisition.get(params.id)
 		try {
-            def issuedBy = User.load(session.user.id)
-			requisitionService.issueRequisition(requisition, issuedBy, params.comments)
+            User issuedBy = User.load(params.int("issuedBy"))
+            User deliveredBy = User.load(params.int("deliveredBy"))
+            String comments = params.comments
+
+			requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)
 		} 
 		catch (ValidationException e) { 
 			//flash.message = e.message 
@@ -495,14 +498,32 @@ class RequisitionController {
     }
 
     def rollback = {
+        def action = "show"
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisitionService.rollbackRequisition(requisition)
             flash.message = "${warehouse.message(code: 'default.rollback.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
 
+            switch (requisition.status) {
+                case RequisitionStatus.CHECKING:
+                    action = "transfer"
+                    break;
+
+                case RequisitionStatus.PICKING:
+                    action = "pick"
+                    break;
+
+                case RequisitionStatus.EDITING:
+                    action = "edit"
+                    break;
+
+                case RequisitionStatus.VERIFYING:
+                    action = "review"
+                    break;
+            }
         }
         flash.message = "Successfully rolled back requisition " + requisition.requestNumber
-        redirect(action: "show", id: params.id)
+        redirect(action: action, id: params.id)
 
     }
 

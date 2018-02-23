@@ -39,3 +39,16 @@
 		</tr>
 	</table>
 </div>
+<div class="button-bar">
+    <g:link class="button icon search" action="list" controller="location">
+        <warehouse:message code="default.list.label" args="[g.message(code: 'locations.label')]" />
+    </g:link>
+    <g:link class="button icon add" action="create" controller="location">
+        <warehouse:message code="default.create.label" args="[g.message(code: 'location.label')]" />
+    </g:link>
+    <g:if test="${locationInstance}">
+        <g:link class="button icon edit" action="edit" controller="location" id="${locationInstance?.id}">
+            <warehouse:message code="default.edit.label" args="[g.message(code: 'location.label')]" />
+        </g:link>
+    </g:if>
+</div>

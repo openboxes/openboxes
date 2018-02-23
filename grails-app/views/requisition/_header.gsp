@@ -280,6 +280,24 @@
                         </g:else>
                     </td>
                 </tr>
+                <tr class="prop">
+                    <td class="name"><label><warehouse:message
+                            code="requisition.delivered.label" default="Delivered" /></label></td>
+                    <td class="value">
+
+                        <g:if test="${requisition?.deliveredBy}">
+                            <g:formatDate date="${requisition?.dateDelivered }"/>
+                            <div class="fade">
+                                ${requisition?.deliveredBy?.name }
+                            </div>
+                        </g:if>
+                        <g:else>
+                            <span class="fade">
+                                ${warehouse.message(code:'default.none.label')}
+                            </span>
+                        </g:else>
+                    </td>
+                </tr>
 
                 <%--
                 <tr class="prop">
