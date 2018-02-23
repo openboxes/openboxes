@@ -10,6 +10,7 @@
 package org.pih.warehouse.admin
 
 import grails.util.GrailsUtil
+import net.sf.ehcache.Cache
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.jobs.DataCleaningJob
@@ -42,7 +43,7 @@ class AdminController {
 	def grailsApplication
 	def config = ConfigurationHolder.config
     def quartzScheduler
-
+	def springcacheService
 
 	def index = { }
 
@@ -252,9 +253,21 @@ class AdminController {
 
 		PrintService[] printServices = PrinterJob.lookupPrintServices();
 
-		[
+        def caches = new ArrayList()
+        def cacheNames = springcacheService.springcacheCacheManager.cacheNames
+
+        for (cacheName in cacheNames) {
+            Cache cache = springcacheService.springcacheCacheManager.getCache(cacheName)
+            if (cache instanceof Cache) {
+                caches.add(cache)
+            }
+        }
+
+
+                [
             quartzScheduler:quartzScheduler,
 			printServices:printServices,
+            caches: caches,
 			externalConfigProperties: externalConfigProperties,
 			systemProperties : System.properties,
 			env: GrailsUtil.environment,
