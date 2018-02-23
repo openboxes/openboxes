@@ -9,6 +9,11 @@
 		<g:renderErrors bean="${transaction}" as="list" />
 	</div>
 </g:hasErrors>
+<g:hasErrors bean="${command}">
+	<div class="errors">
+		<g:renderErrors bean="${command}" as="list" />
+	</div>
+</g:hasErrors>
 <g:hasErrors bean="${flash.itemInstance}">
 	<div class="errors dialog">
 		<g:renderErrors bean="${flash.itemInstance}" as="list" />
