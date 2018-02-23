@@ -1306,7 +1306,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
-    Map getQuantityByInventoryItemMap(location, products) {
+    Map getQuantityByInventoryItemMap(Location location, List<Product> products) {
         def transactionEntries = getTransactionEntriesByInventoryAndProduct(location.inventory, products)
         return getQuantityByInventoryItemMap(transactionEntries)
     }
