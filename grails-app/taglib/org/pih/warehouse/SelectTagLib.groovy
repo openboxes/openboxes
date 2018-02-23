@@ -109,7 +109,7 @@ class SelectTagLib {
     def selectRequisitionTemplate = { attrs, body ->
         def requisitionCriteria = new Requisition(isTemplate: true)
         requisitionCriteria.destination = session.warehouse
-        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [:])
+        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [max: -1, offset: 0])
         requisitionTemplates.sort { it.origin.name }
         attrs.from = requisitionTemplates
         attrs.optionKey = "id"

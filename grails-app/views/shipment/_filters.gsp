@@ -84,8 +84,8 @@
                         <g:else>
                             <label>${warehouse.message(code: 'shipping.destination.label')}</label>
                             <div>
-                                <g:selectLocation name="origin" class="chzn-select-deselect"
-                                                  optionKey="id" optionValue="name" value="${origin}"
+                                <g:selectLocation name="destination" class="chzn-select-deselect"
+                                                  optionKey="id" optionValue="name" value="${destination}"
                                                   noSelection="['null':warehouse.message(code:'default.all.label')]" />
                             </div>
                         </g:else>
