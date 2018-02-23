@@ -180,7 +180,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       def today = new Date().format("MM/dd/yyyy")
       //def tomorrow = new Date().plus(1).format("MM/dd/yyyy")
       controller.session.warehouse = location1
-      controller.params.type = "WARD_STOCK"
+      controller.params.type = "STOCK"
       controller.create()
       assert renderArgs.view == "edit"
       assert renderArgs.model
@@ -188,7 +188,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       assert renderArgs.model.requisition
       def requisition = renderArgs.model.requisition
       assert requisition.dateRequested.format("MM/dd/yyyy") == today
-      assert requisition.type == RequisitionType.WARD_STOCK
+      assert requisition.type == RequisitionType.STOCK
       assert requisition.status == RequisitionStatus.CREATED
       assert requisition.requestedDeliveryDate.format("MM/dd/yyyy") == today
 

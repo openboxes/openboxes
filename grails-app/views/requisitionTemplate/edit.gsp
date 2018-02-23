@@ -30,14 +30,10 @@
 --%>
 
 <g:render template="summary" model="[requisition:requisition]"/>
-<%--
-    <div class="buttonBar">
-        <g:link class="button icon log" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/></g:link>
-        <g:isUserAdmin>
-            <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']"><warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/></g:link>
-        </g:isUserAdmin>
-    </div>
---%>
+<div class="buttonBar">
+    <g:link class="button icon log" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[g.message(code:'requisitionTemplates.label')]"/></g:link>
+    <g:link class="button icon add" controller="requisitionTemplate" action="create"><warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/></g:link>
+</div>
 <div class="yui-gd">
     <div class="yui-u first">
         <g:render template="header" model="[requisition:requisition]"/>
@@ -52,11 +48,9 @@
                 <g:hiddenField name="version" value="${requisition?.version}" />
                 <table>
                     <tr>
-                        <td>
-                            <g:textField id="productCodesInput" name="multipleProductCodes" value=""/>
+                        <td width="75%">
+                            <g:textField id="productCodesInput" name="multipleProductCodes" value="" class="text large"/>
                         </td>
-                    </tr>
-                    <tr>
                         <td class="left">
                             <button class="button icon add">
                                 ${warehouse.message(code:'requisitionTemplate.addToProducts.label', default: 'Add to products')}
@@ -137,7 +131,9 @@
                                 </td>
                                 <td class="center middle">
                                     <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id"
-                                                           product="${requisitionItem?.product}" value="${requisitionItem?.productPackage?.id}"/>
+                                                           product="${requisitionItem?.product}"
+                                                           class="chzn-select-deselect"
+                                                           value="${requisitionItem?.productPackage?.id}"/>
                                 </td>
                                 <td class="center middle">
                                     ${(requisitionItem?.orderIndex?:0)+1}
@@ -161,12 +157,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td>
-
-                                </td>
-                                <td>
-
-                                </td>
+                                <td colspan="2"></td>
                                 <td>
                                     <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
                                                    width="350" styleClass="text"/>
@@ -175,7 +166,9 @@
                                     <g:textField name="quantity" value="" class="text" size="6"/>
                                 </td>
                                 <td class="center">
-                                    EA/1
+                                    <g:select name="unitOfMeasure"
+                                                       class="chzn-select-deselect"
+                                                           from="['EA/1']"/>
                                 </td>
                                 <td class="center">
                                     <g:set var="orderIndex" value="${requisition.requisitionItems.size()}"/>
@@ -211,28 +204,26 @@
         $("#product-suggest").focus();
         $("#add-requisition-item").click(function(event) {
             event.preventDefault();
-            var productId = $("#product-value").val();
+            var productId = $("#product-id").val();
             var requisitionId = $("#id").val();
             var quantity = $("#quantity").val();
             var orderIndex = $("#orderIndex").val();
             console.log(productId);
             console.log(requisitionId);
 
-            var jsonData = { "productId": productId, "requisitionId": requisitionId, "quantity": quantity, "orderIndex": orderIndex }
-            console.log(jsonData);
+            var params = { "product.id": productId, "requisition.id": requisitionId, "quantity": quantity, "orderIndex": orderIndex }
+            console.log(params);
             $.ajax({
                 url: "${request.contextPath}/json/addToRequisitionItems",
                 type: "get",
                 contentType: 'text/json',
                 dataType: "json",
-                data: jsonData,
+                data: params,
                 success: function(data) {
-                    console.log("success");
                     console.log(data);
                     location.reload();
                 },
                 error: function(data) {
-                    console.log("error");
                     console.log(data);
                     location.reload();
                 }

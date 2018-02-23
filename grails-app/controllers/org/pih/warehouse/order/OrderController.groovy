@@ -545,7 +545,7 @@ class OrderController {
                     flash.message = "Failed to import packing list items due to an unknown error."
                 }
             } catch (Exception e) {
-                log.error("Failed to import packing list due to the following error: " + e.message, e)
+                log.warn("Failed to import packing list due to the following error: " + e.message, e)
                 flash.message = "Failed to import packing list due to the following error: " + e.message
             }
         }

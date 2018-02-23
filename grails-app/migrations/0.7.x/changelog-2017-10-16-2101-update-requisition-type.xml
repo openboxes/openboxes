@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1508205829567-1">
+        <update tableName="requisition">
+            <column name="type" value="STOCK"/>
+            <where>type="WARD_STOCK"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-2">
+        <update tableName="requisition">
+            <column name="type" value="ADHOC"/>
+            <where>type="WARD_ADHOC"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-3">
+        <validCheckSum>c521794afd136a9f73404ab291d4c37c</validCheckSum>
+        <update tableName="requisition">
+            <column name="type" value="NON_STOCK"/>
+            <where>type="WARD_NON_STOCK"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-4">
+        <update tableName="requisition">
+            <column name="type" value="STOCK"/>
+            <where>type="DEPOT_STOCK"</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-5">
+        <update tableName="requisition">
+            <column name="type" value="ADHOC"/>
+            <where>type="DEPOT_TO_DEPOT"</where>
+        </update>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1508205829567-6">
+        <comment>Update date issued based on outbound transaction</comment>
+        <sql>
+            update requisition
+            join transaction on transaction.requisition_id = requisition.id
+            set date_issued = transaction.transaction_date
+            where requisition.status = 'ISSUED'
+            and transaction.destination_id is not null
+            and requisition.date_issued is null;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda" id="1508205829567-7">
+        <comment>Update issued by user based on outbound transaction</comment>
+        <sql>
+            update requisition
+            join transaction on transaction.requisition_id = requisition.id
+            set issued_by_id = transaction.created_by_id
+            where requisition.status = 'ISSUED'
+            and transaction.destination_id is not null
+            and requisition.issued_by_id is null;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1648,7 +1648,7 @@ class InventoryService implements ApplicationContextAware {
         if (binLocation) {
             List binLocations = getQuantityByBinLocation(transactionEntries)
             log.info "Bin locations: " + binLocations
-            def entry = binLocations.find { it.inventoryItem == inventoryItem }
+            def entry = binLocations.find { it.inventoryItem == inventoryItem && it.binLocation == binLocation }
             return entry?.quantity?:0
         }
         else {
@@ -2124,7 +2124,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem.lotNumber = lotNumber
 			inventoryItem.expirationDate = expirationDate;
 			inventoryItem.product = product
-			inventoryItem.save()
+			inventoryItem.save(flush:true)
 		}
 		return inventoryItem
 
@@ -2403,78 +2403,6 @@ class InventoryService implements ApplicationContextAware {
 			}
 		}
 		return transaction
-	}
-
-	/**
-	 * Create a transaction for the Send Shipment event.
-	 *
-	 * @param shipmentInstance
-	 */
-	void createSendShipmentTransaction(Shipment shipmentInstance) {
-		log.debug "create send shipment transaction"
-
-		if (!shipmentInstance.origin.isWarehouse()) {
-			throw new RuntimeException("Can't create send shipment transaction for origin that is not a depot")
-		}
-
-		try {
-			// Create a new transaction for outgoing items
-			Transaction debitTransaction = new Transaction();
-			debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
-			debitTransaction.source = null
-			//debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
-			debitTransaction.destination = shipmentInstance?.destination
-			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
-			debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
-
-			shipmentInstance.shipmentItems.each {
-				def inventoryItem =
-						findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-
-				// If the inventory item doesn't exist, we create a new one
-				if (!inventoryItem) {
-					inventoryItem = new InventoryItem();
-					inventoryItem.lotNumber = it.lotNumber
-					inventoryItem.product = it.product
-					if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-						// at this point we've saved the inventory item successfully
-					}
-					else {
-						//
-						inventoryItem.errors.allErrors.each { error ->
-							def errorObj = [
-								inventoryItem,
-								error.getField(),
-								error.getRejectedValue()] as Object[]
-							shipmentInstance.errors.reject("inventoryItem.invalid",
-									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
-						}
-						return;
-					}
-				}
-
-				// Create a new transaction entry for each shipment item
-				def transactionEntry = new TransactionEntry();
-				transactionEntry.quantity = it.quantity;
-				transactionEntry.inventoryItem = inventoryItem;
-                transactionEntry.binLocation = it.binLocation
-				debitTransaction.addToTransactionEntries(transactionEntry);
-			}
-
-			if (!debitTransaction.save()) {
-				log.info "debit transaction errors " + debitTransaction.errors
-				throw new ValidationException("An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", debitTransaction.errors);
-			}
-
-			// Associate the incoming transaction with the shipment
-			shipmentInstance.addToOutgoingTransactions(debitTransaction)
-			shipmentInstance.save();
-
-		} catch (Exception e) {
-			log.error("An error occrred while creating transaction ", e);
-			throw e
-			//shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
-		}
 	}
 
 	/**
@@ -3578,7 +3506,7 @@ class InventoryService implements ApplicationContextAware {
 
             // Find an existing product, should fail if not found
             def product = Product.findByProductCode(row.productCode)
-            assert product
+            assert product != null
 
             // Check the Levenshtein distance between the given name and stored product name (make sure they're close)
             println "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
@@ -3612,6 +3540,15 @@ class InventoryService implements ApplicationContextAware {
             def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
             transactionEntry.inventoryItem = inventoryItem
+
+			// Find the bin location
+			if (row.binLocation) {
+				def binLocation = Location.findByNameAndParentLocation(row.binLocation, command.location)
+				log.info "Bin location: " + row.binLocation
+				log.info "Location: " + command.location
+				assert binLocation != null
+				transactionEntry.binLocation = binLocation
+			}
 
             transaction.addToTransactionEntries(transactionEntry)
         }
@@ -4223,19 +4160,6 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
 
-            // FIXME Remove this once we're confident that the report looks ok.
-            // DEBUG Keep track of each of the products for debugging purposes
-            map[nameKey].products << [
-                    product:entry.product?.name,
-                    productCode: entry?.product?.productCode,
-                    genericProduct: entry?.genericProduct?.name,
-                    status: inventoryLevel?.statusMessage(entry.currentQuantity?:0),
-                    minQuantity:inventoryLevel?.minQuantity?:0,
-                    reorderQuantity:inventoryLevel?.reorderQuantity?:0,
-                    maxQuantity:inventoryLevel?.maxQuantity?:0,
-                    currentQuantity:entry.currentQuantity?:0,
-                    preferred:inventoryLevel?.preferred?:false
-            ]
             map
         }
 

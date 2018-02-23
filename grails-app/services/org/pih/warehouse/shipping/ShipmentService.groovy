@@ -828,7 +828,7 @@ class ShipmentService {
      */
     boolean validateShipmentItem(ShipmentItem shipmentItem, boolean binLocationRequired) {
         def origin = Location.get(shipmentItem?.shipment?.origin?.id);
-        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequest=${binLocationRequired}")
+        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequired=${binLocationRequired}")
 
         // Location must be locally managed and
         if (origin.requiresOutboundQuantityValidation()) {
@@ -839,14 +839,18 @@ class ShipmentService {
 
             // Check whether there's any stock in the bin location for the given inventory item
             def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
+			def quantityAllocated = getQuantityAllocated(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs quantity allocated ${quantityAllocated}"
 
-            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" + shipmentItem.quantity +
-                    "] vs onhand quantity [" + quantityOnHand + "]");
-            if (shipmentItem.quantity > quantityOnHand) {
-                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedOnHandQuantity",
+            // Quantity allocated includes the current shipment item quantity
+			def quantityAvailable = quantityOnHand - quantityAllocated + shipmentItem.quantity
+            log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
+                    shipmentItem.quantity + "] <= quantity available [" + quantityAvailable + "]");
+            if (shipmentItem.quantity > quantityAvailable) {
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                             shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityAvailable + " " + shipmentItem?.product?.unitOfMeasure,
                             shipmentItem?.product?.productCode,
                             shipmentItem?.inventoryItem?.lotNumber,
                             origin.name,
@@ -859,6 +863,25 @@ class ShipmentService {
         }
         return true;
     }
+
+
+	Integer getQuantityAllocated(Location location, Location binLocation, InventoryItem inventoryItem) {
+
+		def results = ShipmentItem.createCriteria().list {
+			projections {
+				sum("quantity")
+			}
+            shipment {
+                eq("origin", location)
+				eq("currentStatus", ShipmentStatusCode.PENDING)
+            }
+			eq("binLocation", binLocation)
+			eq("inventoryItem", inventoryItem)
+		}
+
+        return results[0] ?: 0
+
+	}
 
     /**
      * Get quantity on hand for the given bin location and inventory item stored at the given location.
@@ -879,8 +902,7 @@ class ShipmentService {
         }
 
         def quantityOnHand = binLocations.sum { it.quantity }
-        quantityOnHand = quantityOnHand?:0
-        return quantityOnHand
+        return quantityOnHand?:0
     }
 
 
@@ -968,15 +990,20 @@ class ShipmentService {
             if (containerIds) {
                 containerIds.each { containerId ->
                     Container container = Container.get(containerId)
-                    println("Contains items: " + container.shipmentItems)
-                    if (!deleteItems && container.shipmentItems) {
+
+                    List childContainerIds = container?.containers?.collect { it.id }
+
+                    // Delete all child containers
+                    deleteContainers(id, childContainerIds, deleteItems)
+
+                    //println("Contains items: " + container.shipmentItems)
+                    if (!deleteItems && container.shipmentItemsFromSession) {
                         throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment);
                     } else {
-                        container.shipmentItems.each { shipmentItem ->
+                        container.shipmentItemsFromSession.each { shipmentItem ->
                             shipment.removeFromShipmentItems(shipmentItem)
                             shipmentItem.delete()
                         }
-
                     }
                     shipment.removeFromContainers(container);
                     if (container?.parentContainer) {
@@ -1230,7 +1257,7 @@ class ShipmentService {
 
 				// TODO only need to create a transaction if the source is a depot - (we need to think about this)
 				if (shipmentInstance.origin?.isWarehouse() && debitStockOnSend) {
-					inventoryService.createSendShipmentTransaction(shipmentInstance)
+					createOutboundTransaction(shipmentInstance)
 				}
 			}
 			else {
@@ -1462,49 +1489,7 @@ class ShipmentService {
 
 			// only need to create a transaction if the destination is a warehouse
 			if (shipmentInstance.destination?.isWarehouse() && creditStockOnReceipt) {
-
-				// Create a new transaction for incoming items
-				Transaction creditTransaction = new Transaction()
-				creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
-				creditTransaction.source = shipmentInstance?.origin
-				creditTransaction.destination = null
-				creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
-				creditTransaction.transactionDate = shipmentInstance.receipt.actualDeliveryDate
-
-				shipmentInstance.receipt.receiptItems.each {
-					def inventoryItem =
-						inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
-
-					if (inventoryItem.hasErrors()) {
-						inventoryItem.errors.allErrors.each { error->
-							def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
-							shipmentInstance.errors.reject("inventoryItem.invalid",
-								errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
-						}
-						throw new ValidationException("Failed to receive shipment while saving inventory item ", shipmentInstance.errors)
-					}
-
-					// Create a new transaction entry
-					TransactionEntry transactionEntry = new TransactionEntry();
-					transactionEntry.quantity = it.quantityReceived;
-					transactionEntry.binLocation = it.binLocation
-					transactionEntry.inventoryItem = inventoryItem;
-					creditTransaction.addToTransactionEntries(transactionEntry);
-					//creditTransaction.incomingShipment = shipmentInstance
-				}
-
-				if (!creditTransaction.hasErrors() && creditTransaction.save()) {
-					// saved successfully
-				}
-				else {
-					// did not save successfully, display errors message
-                    throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
-				}
-
-				// Associate the incoming transaction with the shipment
-				shipmentInstance.addToIncomingTransactions(creditTransaction)
-				shipmentInstance.save(flush:true);
-
+				createInboundTransaction(shipmentInstance)
 			}
 		}
 		else {
@@ -1512,32 +1497,171 @@ class ShipmentService {
 		}
 	}
 
-	
+	boolean synchronizeTransactions(Shipment shipment) {
+        if (shipment.hasShipped() && shipment?.outgoingTransactions?.isEmpty()) {
+            createOutboundTransaction(shipment)
+        }
+
+        if (shipment.wasReceived() && shipment?.incomingTransactions?.isEmpty()) {
+            if (!shipment.receipt) {
+                createReceipt(shipment, shipment.actualShippingDate)
+            }
+            createInboundTransaction(shipment)
+        }
+        return true
+    }
 	/**
 	 * 
 	 * @param shipmentInstance
 	 * @param dateDelivered
 	 * @return
 	 */
-	public Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) { 
+	Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) {
 		Receipt receiptInstance = new Receipt()
 		shipmentInstance.receipt = receiptInstance
 		receiptInstance.shipment = shipmentInstance		
 		receiptInstance.recipient = shipmentInstance?.recipient
 		receiptInstance.expectedDeliveryDate = shipmentInstance?.expectedDeliveryDate;
 		receiptInstance.actualDeliveryDate = dateDelivered;
-		shipmentInstance.shipmentItems.each {
-			ReceiptItem receiptItem = new ReceiptItem(it.properties);
-			receiptItem.setQuantityShipped (it.quantity);
-			receiptItem.setQuantityReceived (it.quantity);
-			receiptItem.setLotNumber(it.lotNumber);
-			receiptItem.setExpirationDate(it.expirationDate);
+		shipmentInstance.shipmentItems.each { shipmentItem ->
+			ReceiptItem receiptItem = new ReceiptItem();
+			receiptItem.quantityShipped = shipmentItem.quantity
+			receiptItem.quantityReceived = shipmentItem.quantity
+            receiptItem.product = shipmentItem.product
+			receiptItem.lotNumber = shipmentItem.lotNumber
+            receiptItem.inventoryItem = shipmentItem.inventoryItem
+			receiptItem.expirationDate = shipmentItem.expirationDate;
+            receiptItem.shipmentItem = shipmentItem
 			receiptInstance.addToReceiptItems(receiptItem);
+            shipmentItem.addToReceiptItems(receiptItem)
 		}
 		return receiptInstance;
 	}
-	
+
+
 	/**
+	 * Create the inbound transaction associated with receiving a shipment.
+     *
+	 * @param shipmentInstance
+	 * @return
+	 */
+	Transaction createInboundTransaction(Shipment shipmentInstance) {
+		// Create a new transaction for incoming items
+		Transaction creditTransaction = new Transaction()
+		creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+		creditTransaction.source = shipmentInstance?.origin
+		creditTransaction.destination = null
+		creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
+		creditTransaction.transactionDate = shipmentInstance.receipt.actualDeliveryDate
+
+		shipmentInstance.receipt.receiptItems.each {
+			def inventoryItem =
+					inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
+
+			if (inventoryItem.hasErrors()) {
+				inventoryItem.errors.allErrors.each { error->
+					def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
+					shipmentInstance.errors.reject("inventoryItem.invalid",
+							errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
+				}
+				throw new ValidationException("Failed to receive shipment while saving inventory item ", shipmentInstance.errors)
+			}
+
+			// Create a new transaction entry
+			TransactionEntry transactionEntry = new TransactionEntry();
+			transactionEntry.quantity = it.quantityReceived;
+			transactionEntry.binLocation = it.binLocation
+			transactionEntry.inventoryItem = inventoryItem;
+			creditTransaction.addToTransactionEntries(transactionEntry);
+		}
+
+		if (creditTransaction.hasErrors() || !creditTransaction.save()) {
+			// did not save successfully, display errors message
+			throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
+		}
+
+		// Associate the incoming transaction with the shipment
+		shipmentInstance.addToIncomingTransactions(creditTransaction)
+		shipmentInstance.save(flush:true);
+
+		return creditTransaction;
+
+	}
+
+    /**
+     * Create a transaction for the Send Shipment event.
+     *
+     * @param shipmentInstance
+     */
+    void createOutboundTransaction(Shipment shipmentInstance) {
+        log.debug "create send shipment transaction"
+
+        if (!shipmentInstance.origin.isWarehouse()) {
+            throw new RuntimeException("Can't create send shipment transaction for origin that is not a depot")
+        }
+
+        try {
+            // Create a new transaction for outgoing items
+            Transaction debitTransaction = new Transaction();
+            debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+            debitTransaction.source = null
+            //debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
+            debitTransaction.destination = shipmentInstance?.destination
+            debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
+            debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
+
+            shipmentInstance.shipmentItems.each {
+                def inventoryItem =
+						inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+
+                // If the inventory item doesn't exist, we create a new one
+                if (!inventoryItem) {
+                    inventoryItem = new InventoryItem();
+                    inventoryItem.lotNumber = it.lotNumber
+                    inventoryItem.product = it.product
+                    if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+                        // at this point we've saved the inventory item successfully
+                    }
+                    else {
+                        //
+                        inventoryItem.errors.allErrors.each { error ->
+                            def errorObj = [
+                                    inventoryItem,
+                                    error.getField(),
+                                    error.getRejectedValue()] as Object[]
+                            shipmentInstance.errors.reject("inventoryItem.invalid",
+                                    errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+                        }
+                        return;
+                    }
+                }
+
+                // Create a new transaction entry for each shipment item
+                def transactionEntry = new TransactionEntry();
+                transactionEntry.quantity = it.quantity;
+                transactionEntry.inventoryItem = inventoryItem;
+                transactionEntry.binLocation = it.binLocation
+                debitTransaction.addToTransactionEntries(transactionEntry);
+            }
+
+            if (!debitTransaction.save()) {
+                log.info "debit transaction errors " + debitTransaction.errors
+                throw new ValidationException("An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", debitTransaction.errors);
+            }
+
+            // Associate the incoming transaction with the shipment
+            shipmentInstance.addToOutgoingTransactions(debitTransaction)
+            shipmentInstance.save();
+
+        } catch (Exception e) {
+            log.error("An error occrred while creating transaction ", e);
+            throw e
+            //shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
+        }
+    }
+
+
+    /**
 	 * Fetches shipment workflow associated with a shipment of the 
 	 * given shipmentId.
 	 * 
@@ -1799,6 +1923,9 @@ class ShipmentService {
 				deleteOutboundTransactions(shipmentInstance)
 				deleteEvent(shipmentInstance, eventInstance)
 			}
+			else {
+				deleteEvent(shipmentInstance, eventInstance)
+			}
 			
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)
@@ -1929,11 +2056,13 @@ class ShipmentService {
         String value = null
         if (cell) {
             try {
+                cell.setCellType(Cell.CELL_TYPE_STRING);
                 value = cell.getStringCellValue()
             }
             catch (IllegalStateException e) {
                 log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
-                value = Integer.valueOf((int) cell.getNumericCellValue())
+                //value = Integer.valueOf((int) cell.getNumericCellValue())
+                throw e;
             }
         }
         return value?.trim()
@@ -1955,8 +2084,34 @@ class ShipmentService {
         return value
     }
 
+    def findDuplicatePackingListItems(List packingListItems) {
+        List packingListItemsUniqueConstraint =
+                packingListItems.collect { [
+                        palletName: it.palletName,
+                        boxName: it.boxName,
+                        productCode: it.productCode,
+                        lotNumber: it.lotNumber,
+                        expirationDate: it.expirationDate,
+                        recipient: it.recipient]
+                }
+
+        final Set duplicates = new HashSet();
+        final Set master = new HashSet();
+        for (def item : packingListItemsUniqueConstraint) {
+            if (!master.add(item)) {
+                duplicates.add(item);
+            }
+        }
+        return duplicates
+    }
+
 
 	boolean validatePackingList(List packingListItems, Location location) {
+
+        def duplicates = findDuplicatePackingListItems(packingListItems)
+        if (duplicates) {
+            throw new RuntimeException("Found duplicates ${duplicates*.productCode}")
+        }
 
 		packingListItems.each { item ->
 			// Find a product using the product code
@@ -1965,11 +2120,6 @@ class ShipmentService {
 				throw new RuntimeException("Cannot find product with product code " + item.productCode)
 			}
 			item.product = product
-
-
-            log.info ("item pallet " + item.palletName)
-            log.info ("item box " + item.boxName)
-
 
             // there's a pallet
             if (!item.palletName && item?.boxName) {
@@ -1998,33 +2148,43 @@ class ShipmentService {
      * @return
      */
     Person findOrCreatePerson(String recipient) {
+        log.info "Find or create person: ${recipient}"
+
         Person person
-		if (EmailValidator.getInstance().isValid(recipient)) {
-			InternetAddress emailAddress = new InternetAddress(recipient, false)
-			person = Person.findByEmail(emailAddress.address)
+        if (recipient) {
+            // Recipient string includes email and name,
+            if (EmailValidator.getInstance().isValid(recipient)) {
+                InternetAddress emailAddress = new InternetAddress(recipient, false)
+                person = Person.findByEmail(emailAddress.address)
 
-			// Person record not found, creating a new person as long as the name is provided
-			if (!person) {
-				// If there's no personal attribute we cannot determine the first and last name of the recipient.
-				// This will return null and should throw an error
-				if (!emailAddress.personal) {
-					throw new RuntimeException("Unable to find a recipient with email address ${recipient}.")
-				}
-				String[] names = emailAddress.personal.split(" ", 2)
-				person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
-				person.save(flush: true)
-			}
-		}
-        else {
-            String[] names = recipient.split(" ", 2)
-            if (names.length <= 1) {
-                throw new RuntimeException("Recipient must have at least two names (i.e. first name and last name)")
+                // Person record not found, creating a new person as long as the name is provided
+                if (!person) {
+                    // If there's no personal attribute we cannot determine the first and last name of the recipient.
+                    // This will return null and should throw an error
+                    if (!emailAddress.personal) {
+                        throw new RuntimeException("Cannot find a recipient with email address ${recipient}")
+                    }
+                    String[] names = emailAddress.personal.split(" ", 2)
+                    person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
+                    if (!person.save(flush: true)) {
+                        throw new ValidationException("Cannot save recipient ${recipient} due to errors", person.errors)
+                    }
+                }
             }
+            // Recipient string only includes name
+            else {
+                String[] names = recipient.split(" ", 2)
+                if (names.length <= 1) {
+                    throw new RuntimeException("Recipient ${recipient} must have at least two names (i.e. first name and last name)")
+                }
 
-            person = Person.findByFirstNameAndLastName(names[0], names[1])
-            if (!person) {
-                person = new Person(firstName: names[0], lastName: names[1])
-                person.save(flush: true)
+                person = Person.findByFirstNameAndLastName(names[0], names[1])
+                if (!person) {
+                    person = new Person(firstName: names[0], lastName: names[1])
+                    if(!person.save(flush: true)) {
+                        throw new ValidationException("Cannot save recipient ${recipient} due to errors", person.errors)
+                    }
+                }
             }
         }
         return person
@@ -2032,77 +2192,72 @@ class ShipmentService {
     }
 
 	boolean importPackingList(String shipmentId, InputStream inputStream) {
-		try {
+        int lineNumber = 0
 
-			Shipment shipment = Shipment.get(shipmentId)
+        Shipment shipment = Shipment.get(shipmentId)
+        List packingListItems = parsePackingList(inputStream)
 
-			List packingListItems = parsePackingList(inputStream)
+        log.info "Parsed ${packingListItems.size()} items"
 
+        if (validatePackingList(packingListItems, shipment?.origin)) {
 
-			if (validatePackingList(packingListItems, shipment?.origin)) {
+            packingListItems.eachWithIndex { item, index ->
+                lineNumber = index + 1
 
-				packingListItems.each { item ->
+                // Find or create an inventory item given the product, lot number, and expiration date
+                InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(item.product, item.lotNumber, item.expirationDate)
+                log.info("Inventory item: " + inventoryItem)
 
-					// Find or create an inventory item given the product, lot number, and expiration date
-					InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(item.product, item.lotNumber, item.expirationDate)
-					log.info("Inventory item: " + inventoryItem)
+                // Find or create the pallet and box (if provided). Items are added to Unpacked Items by default.
+                Container pallet = item.palletName ? shipment.findOrCreatePallet(item.palletName) : null
+                Container box = item.boxName ? pallet?.findOrCreateBox(item.boxName) : null
 
-					// Find or create the pallet and box (if provided). Items are added to Unpacked Items by default.
-					Container pallet = item.palletName ? shipment.findOrCreatePallet(item.palletName) : null
-					Container box = item.boxName ? pallet?.findOrCreateBox(item.boxName) : null
+                // The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
+                Container container = box ?: pallet ?: null
 
-					// The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
-					Container container = box ?: pallet ?: null
+                Person recipient
+                if (item.recipient) {
+                    recipient = findOrCreatePerson(item.recipient)
+                }
+                // Check to see if a shipment item already exists within the given container
+                //ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
 
-                    Person recipient
-                    if (item.recipient) {
-                        recipient = findOrCreatePerson(item.recipient)
-                    }
-					// Check to see if a shipment item already exists within the given container
-					ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
-					// Create a new shipment item if not found
-					if (!shipmentItem) {
-						shipmentItem = new ShipmentItem(
-								product: item.product,
-								lotNumber: inventoryItem.lotNumber ?: '',
-								expirationDate: inventoryItem?.expirationDate,
-								inventoryItem: inventoryItem,
-								container: container,
-								quantity: item.quantity,
-                                recipient: recipient
-						);
-						addToShipmentItems(shipmentItem, shipment)
-					}
-					// Modify quantity and container for existing shipment items
-					else {
-						//shipmentItem.inventoryItem = inventoryItem
-						shipmentItem.container = container
-						shipmentItem.quantity = item.quantity
-                        shipmentItem.recipient = recipient
-					}
-				}
-
-                log.info "Packing list items " + packingListItems
-                log.info "Shipment items  " + shipment?.shipmentItems
-
-                if(packingListItems?.size() != shipment?.shipmentItems?.size()) {
-                    throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but there were ${shipment?.shipmentItems?.size()} items added to the shipment. This usually means that you are trying to add identical items to the same pallet or you are trying to import a packing list that does not contain items that have already been added to the shipment. Please review your packing list for duplicate or missing items.", shipment: shipment)
+                ShipmentItem shipmentItem = shipment.shipmentItems.find {
+                    it.inventoryItem == inventoryItem &&
+                            it.container == container &&
+                            it.recipient == recipient
                 }
 
-			}
-		} catch (ShipmentItemException e) {
-			log.error("Unable to import packing list items due to exception: " + e.message, e)
-            throw new RuntimeException(e.message)
-			//throw e;
+                // Create a new shipment item if not found
+                if (!shipmentItem) {
+                    shipmentItem = new ShipmentItem(
+                            product: item.product,
+                            lotNumber: inventoryItem.lotNumber ?: '',
+                            expirationDate: inventoryItem?.expirationDate,
+                            inventoryItem: inventoryItem,
+                            container: container,
+                            quantity: item.quantity,
+                            recipient: recipient
+                    );
+                    addToShipmentItems(shipmentItem, shipment)
+                }
+                // Modify quantity and container for existing shipment items
+                else {
+                    //shipmentItem.inventoryItem = inventoryItem
+                    shipmentItem.container = container
+                    shipmentItem.quantity = item.quantity
+                    shipmentItem.recipient = recipient
+                }
+            }
 
-		} catch (Exception e) {
-			log.error("Unable to import packing list items due to exception: " + e.message, e)
-			//throw new RuntimeException("make sure this causes a rollback", e)
-			throw new RuntimeException(e.message)
-		}
-		finally {
-			inputStream.close();
-		}
+            log.info "Packing list items " + packingListItems.size()
+            log.info "Shipment items  " + shipment?.shipmentItems?.size()
+
+            if (packingListItems?.size() != shipment?.shipmentItems?.size()) {
+                throw new ShipmentException(message: "Expected ${packingListItems?.size()} packing list items, but there were ${shipment?.shipmentItems?.size()} items added to the shipment. This usually means that you are trying to add identical items to the same pallet or you are trying to import a packing list that does not contain items that have already been added to the shipment. Please review your packing list for duplicate or missing items.", shipment: shipment)
+            }
+            if (inputStream) inputStream.close();
+        }
 
 		return true
 	}

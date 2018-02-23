@@ -68,6 +68,11 @@ a.button:hover {
     color: white;
 }
 
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+}
+
 
 h1 {
     font-weight: normal;
@@ -641,6 +646,12 @@ input.text, input.large, span.large,
 textarea, select {
     margin:0;
 }
+
+
+textarea, input.large {
+    width: 100%;
+}
+
 
 /*
 input[type=submit] {

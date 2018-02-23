@@ -110,7 +110,7 @@ class SelectTagLib {
     def selectRequisitionTemplate = { attrs, body ->
         def requisitionCriteria = new Requisition(isTemplate: true)
         requisitionCriteria.destination = session.warehouse
-        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [:])
+        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [max: -1, offset: 0])
         requisitionTemplates.sort { it.origin.name }
         attrs.from = requisitionTemplates
         attrs.optionKey = "id"
@@ -409,11 +409,21 @@ class SelectTagLib {
 
     def selectRequisitionType = { attrs, body ->
         attrs.from = RequisitionType.list()
-        //attrs.optionKey = 'id'
-        //attrs.optionValue = 'name'
-        attrs.optionValue = { format.metadata(obj: it)  }
+        attrs.optionValue = { it  }
         out << g.select(attrs)
     }
+
+    def selectTimezone = { attrs, body ->
+        def timezones = []
+        try {
+            timezones = TimeZone?.getAvailableIDs()?.sort()
+        } catch (Exception e) {
+            log.warn("No timezones available: " + e.message, e)
+        }
+        attrs.from = timezones
+        out << g.select(attrs)
+    }
+
 
 	/**
 	 * Generic select widget using optgroup.

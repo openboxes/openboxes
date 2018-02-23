@@ -121,8 +121,7 @@
                                 <li>
                                     <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
                                     <a class="button" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                        <format:metadata obj="${warehouse}"/>
-
+                                        ${warehouse.name}
                                     </a>
                                 </li>
                             </g:each>
@@ -172,11 +171,6 @@
                         </li>
                     </ul>
                 </li>
-                <%--
-                <li class="active"><a href="./">Fixed top</a></li>
-                --%>
-
-
 
             </ul>
         </div><!--/.nav-collapse -->

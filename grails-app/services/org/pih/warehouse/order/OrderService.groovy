@@ -450,7 +450,7 @@ class OrderService {
 
 
         } catch (Exception e) {
-            log.error("Unable to import packing list items due to exception: " + e.message, e)
+            log.warn("Unable to import packing list items due to exception: " + e.message, e)
             //throw new RuntimeException("make sure this causes a rollback", e)
             throw new RuntimeException(e.message)
         }

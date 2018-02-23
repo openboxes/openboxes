@@ -12,30 +12,66 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="yui-ga">
+
+            <div class="buttonBar">
+                <g:link class="button icon log" controller="requisitionTemplate" action="list">
+                    <warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/>
+                </g:link>
+                <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'STOCK']">
+                    <warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/>
+                </g:link>
+            </div>
+            <div class="yui-gf">
                 <div class="yui-u first">
+                    <div class="box">
+                        <h2><g:message code="default.filters.label"/></h2>
+                        <g:form action="list" method="GET">
+                            <div class="filter-list-item">
+                                <label>${g.message(code:'default.search.label')}</label>
+                                <input type="text" name="q" class="text large"
+                                       placeholder="${g.message(code: 'default.name.label')}" value="${params.q}"/>
+                            </div>
+                            <div class="filter-list-item">
+                                <label>${g.message(code:'requisition.origin.label')}</label>
+                                <g:selectRequestOrigin name="originId" value="${params?.origin?.id}" noSelection="['':'']" class="chzn-select-deselect" />
+                            </div>
 
 
-                    <div class="buttonBar">
-                        <g:link class="button icon log" controller="requisitionTemplate" action="list">
-                            <warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/>
-                        </g:link>
-                        <g:isUserAdmin>
-                            <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'WARD_STOCK']">
-                                <warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/>
-                            </g:link>
-                        </g:isUserAdmin>
+                            <div class="filter-list-item">
+                                <label>${g.message(code:'requisition.requisitionType.label')}</label>
+                                <g:selectRequisitionType name="requisitionType" value="${params.requisitionType}"
+                                                         noSelection="['':'']" class="chzn-select-deselect"/>
+                            </div>
+                            <div class="filter-list-item">
+                                <label>${g.message(code:'requisition.commodityClass.label')}</label>
+                                <g:selectCommodityClass name="commodityClass" value="${params.commodityClass}"
+                                                        noSelection="['':'']" class="chzn-select-deselect"/>
+                            </div>
+                            <div class="buttons">
+                                <button class="button"><g:message code="default.search.label"/></button>
+
+                            </div>
+                        </g:form>
                     </div>
 
+                </div>
+                <div class="yui-u">
                     <g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
                     <g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
                     <div class="box">
 
-                        <h2>${warehouse.message(code:'requisitionTemplates.label')}</h2>
+                        <h2>
+                            ${g.message(code:'requisitionTemplates.label')}
+                            <small><g:message code="default.showingResults.message"
+                                              args="[requisitions.size(), requisitions.totalCount]"/></small>
+                        </h2>
 
                         <g:render template="list" model="[requisitions:requisitions]"/>
-                    </div>
 
+                        <div class="paginateButtons">
+                            <g:paginate params="${params}" total="${requisitions.totalCount}" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
