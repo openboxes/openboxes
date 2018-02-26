@@ -31,10 +31,11 @@
 
 
             <div class="buttonBar" style="text-align: right">
-                <g:link class="button" controller="inventory" action="manage" params="[type:'list', tags: params.tags]">List View</g:link>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'list2', tags: params.tags]">List View (alternative)</g:link>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'box', tags: params.tags]">Box View</g:link>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'tabs', tags: params.tags]">Tab View</g:link>
+                <warehouse:message code="default.viewBy.label" default="View By"></warehouse:message>
+                <g:link class="button" controller="inventory" action="manage" params="[type:'list', tags: params.tags]">List</g:link>
+                <g:link class="button" controller="inventory" action="manage" params="[type:'list2', tags: params.tags]">List(alternative)</g:link>
+                <g:link class="button" controller="inventory" action="manage" params="[type:'box', tags: params.tags]">Box</g:link>
+                <g:link class="button" controller="inventory" action="manage" params="[type:'tabs', tags: params.tags]">Tab</g:link>
             </div>
             <div class="dialog">
 
@@ -72,9 +73,38 @@
                     </div>
 					<div class="yui-u">
 
-
                         <form method="POST" action="saveInventoryChanges">
-
+                            <div class="box">
+                                <h2><g:message code="inventory.manage.label"/></h2>
+                                <table>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <g:message code="transaction.type.label"/>
+                                        </td>
+                                        <td class="value">
+                                            <g:message code="consumption.label"/>
+                                            <%--<g:selectTransactionType name="transactionType" class="chzn-select-deselect"/>--%>
+                                            <g:hiddenField name="transactionType.id" value="2"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <g:message code="transaction.transactionDate.label"/>
+                                        </td>
+                                        <td class="value">
+                                            <g:datePicker name="transactionDate" value="${new Date()}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <g:message code="comments.label"/>
+                                        </td>
+                                        <td class="value">
+                                            <g:textArea name="comment" class="text large"></g:textArea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                             <g:if test="${params.type=='tabs'}">
 
                                 <div class="tabs">
@@ -449,44 +479,12 @@
                                     </div>
                                 </g:unless>
                             </g:else>
-
-                            <g:if test="${command?.inventoryItems}">
-                                <table>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <g:message code="transaction.type.label"/>
-                                        </td>
-                                        <td class="value">
-                                            <g:message code="consumption.label"/>
-                                            <%--<g:selectTransactionType name="transactionType" class="chzn-select-deselect"/>--%>
-                                            <g:hiddenField name="transactionType.id" value="2"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <g:message code="transaction.transactionDate.label"/>
-                                        </td>
-                                        <td class="value">
-                                            <g:datePicker name="transactionDate" value="${new Date()}"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="prop">
-                                        <td class="name">
-                                            <g:message code="comments.label"/>
-                                        </td>
-                                        <td class="value">
-                                            <g:textArea name="comment" class="text large"></g:textArea>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <div class="buttons">
-
-                                    <button class="button"><g:message code="default.button.save.label"/></button>
-                                </div>
-                            </g:if>
+                            <div class="buttons">
+                                <button class="button"><g:message code="default.button.save.label"/></button>
+                            </div>
                         </form>
 					</div>
-				</div>    	
+				</div>
 			</div>
 		</div>
         <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
