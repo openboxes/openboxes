@@ -15,6 +15,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.hibernate.HibernateException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
@@ -470,8 +471,8 @@ class RequisitionController {
 	def complete = {
         def requisition = Requisition.get(params.id)
 		try {
-            User issuedBy = User.load(params.int("issuedBy"))
-            User deliveredBy = User.load(params.int("deliveredBy"))
+            User issuedBy = User.load(params?.issuedBy?.id)
+            Person deliveredBy = Person.load(params?.deliveredBy?.id)
             String comments = params.comments
 
 			requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)

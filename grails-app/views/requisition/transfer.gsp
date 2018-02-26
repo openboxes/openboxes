@@ -46,7 +46,9 @@
                                         <label><warehouse:message code="requisition.issuedBy.label"/></label>
                                     </td>
                                     <td class="value">
-                                        <g:selectPerson name="issuedBy" class="chzn-select-deselect" value="${session.user}" noSelection="['null':'']"/>
+                                        <g:autoSuggest id="issuedBy" name="issuedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                                       valueId="${requisition?.issuedBy?.id?:session?.user?.id}"
+                                                       valueName="${requisition?.issuedBy?.name?:session?.user?.name}"/>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -54,7 +56,9 @@
                                         <label><warehouse:message code="requisition.deliveredBy.label" default="Delivered By"/></label>
                                     </td>
                                     <td class="value">
-                                        <g:selectPerson name="deliveredBy" class="chzn-select-deselect" value="${requisition.deliveredBy}" noSelection="['null':'']"/>
+                                        <g:autoSuggest id="deliveredBy" name="deliveredBy" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                                       valueId="${requisition?.deliveredBy?.id}"
+                                                       valueName="${requisition?.deliveredBy?.name}"/>
                                     </td>
                                 </tr>
                                 <tr class="prop">
