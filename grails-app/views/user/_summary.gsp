@@ -10,7 +10,7 @@
                         <g:userPhoto user="${userInstance}"/>
                     </div>
                 </td>
-                <td width="10%">
+                <td width="50%">
                     <div class="title">
                         <g:link action="edit" id="${userInstance?.id}">
                             ${fieldValue(bean: userInstance, field: "firstName")} ${fieldValue(bean: userInstance, field: "lastName")}
