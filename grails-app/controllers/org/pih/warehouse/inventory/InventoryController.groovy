@@ -59,22 +59,36 @@ class InventoryController {
 
 
     def manage = { ManageInventoryCommand command ->
-        log.info "manage: " + params
-        log.info "manage: " + command
 
         if(!params.max) params.max = 10
         if(!params.offset) params.offset = 0
+        if(!params.type) params.type = 'list'
 
+        List products = []
         Map quantityMap
         Location location = Location.load(session.warehouse.id)
 
         log.info("tags: " + command.tags)
         if (command.tags) {
             def tags = Tag.findAllByIdInList(command.tags)
+            products.addAll(productService.getProducts(null, tags, params))
+        }
 
-            def products = productService.getProducts(null, tags, params)
+        if (command.productCodes) {
+            command?.productCodes.split(",").each { productCode ->
+                log.info "Product code " + productCode
+                def product = Product.findByProductCodeLike(productCode)
+                if (product) {
+                    products.add(product)
+                }
+            }
+        }
+
+        log.info ("Products: " + products)
+        if (products) {
+
+            products = products.unique()
             command.inventoryItems = products*.inventoryItems.flatten()
-
 
             quantityMap = inventoryService.getQuantityByInventoryItemMap(location, products)
 
@@ -84,8 +98,8 @@ class InventoryController {
             }
 
             command.inventoryItems = command.inventoryItems.findAll { it.quantityOnHand > 0 }
-
         }
+
         [command: command]
     }
 
@@ -1759,6 +1773,7 @@ class ManageInventoryCommand {
 
     List<ManageInventoryEntryCommand> entries = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ManageInventoryEntryCommand.class));
     List inventoryItems = []
+    String productCodes
     List tags = []
 }
 

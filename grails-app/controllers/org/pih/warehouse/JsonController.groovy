@@ -404,7 +404,10 @@ class JsonController {
         def searchTerm = params.term + "%";
         def c = Product.createCriteria()
         def products = c.list {
-            ilike("productCode", searchTerm)
+            or {
+                ilike("productCode", searchTerm)
+                ilike("name", searchTerm)
+            }
         }
 
         //"id": "Netta rufina", "label": "Red-crested Pochard", "value": "Red-crested Pochard" },

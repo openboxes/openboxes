@@ -9,6 +9,8 @@
         <style>
             tr.newProduct { border-top: 1px dotted black; }
         </style>
+        <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+
     </head>
     <body>
         <div class="body">
@@ -31,11 +33,8 @@
 
 
             <div class="buttonBar" style="text-align: right">
-                <warehouse:message code="default.viewBy.label" default="View By"></warehouse:message>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'list', tags: params.tags]">List</g:link>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'list2', tags: params.tags]">List(alternative)</g:link>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'box', tags: params.tags]">Box</g:link>
-                <g:link class="button" controller="inventory" action="manage" params="[type:'tabs', tags: params.tags]">Tab</g:link>
+                <g:link controller="inventory" action="manage" params="[type:'list', tags: params.tags, productCodes: params.productCodes]">List View</g:link> &nbsp;|&nbsp;
+                <g:link controller="inventory" action="manage" params="[type:'tabs', tags: params.tags, productCodes: params.productCodes]">Tab View</g:link>
             </div>
             <div class="dialog">
 
@@ -49,10 +48,18 @@
                                     <table>
                                         <tr>
                                             <td>
+                                                <label><g:message code="product.tag.label"/></label>
                                                 <g:selectTags name="tags" noSelection="['':'']"
                                                               value="${command.tags}"
                                                               data-placeholder="Select tags"
                                                               class="chzn-select-deselect"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label><g:message code="product.productCode.label"/></label>
+                                                <g:textField id="productCodes" name="productCodes"
+                                                             value="${command?.productCodes}" placeholder="Add products by product code"/>
                                             </td>
                                         </tr>
                                         <tr>
@@ -185,7 +192,7 @@
                                                                         ${quantityOnHand}
                                                                     </td>
                                                                     <td class="middle">
-                                                                        <input type="number" name="quantityUsed" class="text number" size="8" autocomplete="off" min="0" max="${quantityOnHand}" />
+                                                                        <input type="number" name="quantityUsed" class="text number" size="10" autocomplete="off" min="0" max="${quantityOnHand}" />
                                                                     </td>
                                                                 </tr>
                                                             </g:each>
@@ -197,191 +204,6 @@
                                     </g:if>
                                 </div>
                             </g:if>
-                            <g:elseif test="${params.type=='box'}">
-                                <g:if test="${command?.inventoryItems}">
-                                    <g:set var="inventoryItemsMap" value="${command?.inventoryItems?.groupBy { it.product.category } }"/>
-                                    <g:each var="category" in="${inventoryItemsMap.keySet()}">
-                                        <div class="box dialog">
-                                            <h2>${category.name}</h2>
-                                            <table>
-                                                <tr>
-                                                    <th>
-
-                                                    </th>
-                                                    <th class="middle" style="width: 1%">
-                                                        <g:message code="product.productCode.label"/>
-                                                    </th>
-                                                    <th class="middle">
-                                                        <g:message code="product.name.label"/>
-                                                    </th>
-                                                    <th class="middle">
-                                                        <g:message code="inventoryItem.lotNumber.label"/>
-                                                    </th>
-                                                    <th class="middle">
-                                                        <g:message code="inventoryItem.expirationDate.label"/>
-                                                    </th>
-                                                    <th class="middle">
-                                                        <g:message code="default.quantityOnHand.label"/>
-                                                    </th>
-                                                    <th class="middle">
-                                                        <g:message code="default.quantityRemaining.label" default="Quantity Remaining"/>
-                                                    </th>
-                                                </tr>
-                                                <g:set var="inventoryItems" value="${inventoryItemsMap[category]}"/>
-                                                <g:each var="entry" in="${inventoryItems}" status="i">
-                                                    <g:set var="inventoryItem" value="${entry.inventoryItem}"/>
-                                                    <g:set var="quantityOnHand" value="${entry.quantityOnHand}"/>
-                                                    <g:hiddenField name="items[${i}].inventoryItem.id" value="${inventoryItem?.id}"/>
-                                                    <tr class="${i%2==0?'even':'odd' } prop">
-                                                        <td class="center middle">
-                                                            <g:if test="${inventoryItem?.product?.images }">
-                                                                <div class="nailthumb-container">
-                                                                    <g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-                                                                    <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
-                                                                </div>
-                                                            </g:if>
-                                                            <g:else>
-                                                                <div class="nailthumb-container">
-                                                                    <img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
-                                                                </div>
-                                                            </g:else>
-                                                        </td>
-                                                        <td class="center middle">
-                                                            ${inventoryItem?.product?.productCode }
-                                                        </td>
-                                                        <td class="left middle">
-                                                            <g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-                                                                <div title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">
-                                                                    ${inventoryItem?.product?.name}
-                                                                </div>
-                                                            </g:link>
-                                                        </td>
-                                                        <td class="middle left">
-                                                            <div class="lot">${inventoryItem?.lotNumber }</div>
-                                                        </td>
-                                                        <td class="middle">
-                                                            <g:expirationDate date="${inventoryItem?.expirationDate}"/>
-                                                        </td>
-                                                        <td class="middle">
-                                                            ${quantityOnHand}
-                                                        </td>
-                                                        <td class="middle">
-                                                            <input type="number" name="items[${i}].quantityUsed" class="text number" size="8" autocomplete="off" min="0" max="${quantityOnHand}" />
-                                                        </td>
-                                                    </tr>
-                                                </g:each>
-                                            </table>
-                                        </div>
-                                    </g:each>
-
-                                </g:if>
-                                <g:unless test="${command?.inventoryItems}">
-                                    <tr>
-                                        <td colspan="12" class="even center">
-                                            <div class="fade empty">
-                                                <g:message code="default.none.label"/>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </g:unless>
-                            </g:elseif>
-                            <g:elseif test="${params.type == 'list'}">
-                                <g:if test="${command?.inventoryItems}">
-                                    <g:if test="${params.list('tags').size() == 1}">
-                                        <g:hiddenField name="tags" value="${params.tags}"/>
-                                    </g:if>
-                                    <g:else>
-                                        <g:each var="tag" in="${params.tags}">
-                                            <g:hiddenField name="tags" value="${tag}"/>
-                                        </g:each>
-                                    </g:else>
-
-
-                                    <div class="box dialog">
-                                        <h2><g:message code="inventory.manage.label"/></h2>
-                                        <table>
-                                            <tr>
-                                                <th>
-
-                                                </th>
-                                                <th class="middle" style="width: 1%">
-                                                    <g:message code="product.productCode.label"/>
-                                                </th>
-                                                <th class="middle">
-                                                    <g:message code="product.name.label"/>
-                                                </th>
-                                                <th class="middle">
-                                                    <g:message code="inventoryItem.lotNumber.label"/>
-                                                </th>
-                                                <th class="middle">
-                                                    <g:message code="inventoryItem.expirationDate.label"/>
-                                                </th>
-                                                <th class="middle">
-                                                    <g:message code="default.quantityOnHand.label"/>
-                                                </th>
-                                                <th class="middle">
-                                                    <g:message code="default.quantityUsed.label"/>
-                                                </th>
-                                            </tr>
-                                            <g:set var="showProduct" value="${true}"/>
-                                            <g:each var="entry" in="${command?.inventoryItems}" status="i">
-                                                <g:set var="inventoryItem" value="${entry.inventoryItem}"/>
-                                                <g:set var="quantityOnHand" value="${entry.quantityOnHand}"/>
-                                                <g:set var="newProduct" value="${product != entry.product}"/>
-
-                                                <tr class="prop ${i%2==0?'even':'odd' } ${newProduct?'newProduct':''}">
-                                                    <td class="center middle">
-                                                        <g:if test="${inventoryItem?.product?.images }">
-                                                            <div class="nailthumb-container">
-                                                                <g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-                                                                <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
-                                                            </div>
-                                                        </g:if>
-                                                        <g:else>
-                                                            <div class="nailthumb-container">
-                                                                <img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
-                                                            </div>
-                                                        </g:else>
-                                                    </td>
-                                                    <td class="center middle">
-                                                        ${inventoryItem?.product?.productCode }
-                                                    </td>
-                                                    <td class="left middle">
-                                                        <g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-                                                            <div title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">
-                                                                ${inventoryItem?.product?.name}
-                                                            </div>
-                                                        </g:link>
-                                                    </td>
-                                                    <td class="middle left">
-                                                        <div class="lot">${inventoryItem?.lotNumber }</div>
-                                                    </td>
-                                                    <td class="middle">
-                                                        <g:expirationDate date="${inventoryItem?.expirationDate}"/>
-                                                    </td>
-                                                    <td class="middle">
-                                                        ${quantityOnHand}
-                                                    </td>
-                                                    <td class="middle">
-                                                        <g:hiddenField name="entries[${i}].inventoryItem.id" value="${inventoryItem?.id}"/>
-                                                        <input type="number" name="entries[${i}].quantity" class="text number" size="8" autocomplete="off" min="0" max="${quantityOnHand}" value="${0}" />
-                                                    </td>
-                                                </tr>
-                                                <g:set var="product" value="${entry.product}"/>
-
-                                            </g:each>
-                                        </table>
-                                    </div>
-                                </g:if>
-                                <g:unless test="${command?.inventoryItems}">
-                                    <div class="box">
-                                        <h2></h2>
-                                        <div class="center fade empty">
-                                            None
-                                        </div>
-                                    </div>
-                                </g:unless>
-                            </g:elseif>
                             <g:else>
                                 <g:if test="${command?.inventoryItems}">
                                     <g:if test="${params.list('tags').size() == 1}">
@@ -461,7 +283,7 @@
                                                     </td>
                                                     <td class="middle">
                                                         <g:hiddenField name="entries[${i}].inventoryItem.id" value="${inventoryItem?.id}"/>
-                                                        <input type="number" name="entries[${i}].quantity" class="text number" size="8" autocomplete="off" min="0" max="${quantityOnHand}" value="${quantityOnHand}" />
+                                                        <input type="number" name="entries[${i}].quantity" class="text number" size="10" autocomplete="off" min="0" max="${quantityOnHand}" value="${0}" />
                                                     </td>
                                                 </tr>
                                                 <g:set var="product" value="${entry.product}"/>
@@ -489,12 +311,22 @@
 		</div>
         <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
         <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
-		<script>
+        <script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
+
+        <script>
 			$(document).ready(function() {
                 $(".tabs").tabs({
                     cookie : {
                         expires : 1
                     }
+                });
+
+                $('#productCodes').tagsInput({
+                    'autocomplete_url':'${createLink(controller: 'json', action: 'findProductCodes')}',
+                    'width': 'auto',
+                    'height': 'auto',
+                    'placeholder':'test',
+                    'removeWithBackspace' : true
                 });
 			});	
 		</script>
