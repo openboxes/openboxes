@@ -626,43 +626,59 @@ class InventoryItemController {
     /**
 	 * Handles form submission from Show Stock Card > Adjust Stock dialog.	
 	 */
-	def adjustStock = {
-		log.info "Params " + params;
-		def itemInstance = InventoryItem.get(params.id)
-	//	def inventoryInstance = Inventory.get(params?.inventory?.id)
-		if (itemInstance) {
-			boolean hasErrors = inventoryService.adjustStock(itemInstance, params);
-			if (!itemInstance.hasErrors() && !hasErrors) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
-			}
-			else {
-				// There were errors, so we want to display the itemInstance.errors to the user
-				flash.itemInstance = itemInstance;
-			}
-		}
-		redirect(controller: "inventoryItem", action: "showStockCard", id: itemInstance?.product?.id, params: ['inventoryItem.id':itemInstance?.id])
+	def adjustStock = { AdjustStockCommand command ->
+        InventoryItem inventoryItem = command.inventoryItem
+        try {
+            inventoryService.adjustStock(command);
+            if (!command.hasErrors()) {
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
+            }
+        } catch (ValidationException e) {
+            command.errors = e.errors
+        }
+		chain(controller: "inventoryItem", action: "showStockCard",
+                id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id], model: [command:command])
 	}
 
-	def transferStock = {
-		log.info "Transfer stock " + params;
-		def quantity = 0
-		def destination = Location.get(params?.destination?.id)
-        def source = Location.get(params?.source?.id)
+    def showDialog = {
+        def location = Location.get(session.warehouse.id)
         def inventoryItem = InventoryItem.get(params.id)
-		def inventory = Inventory.get(params?.inventory?.id)
-        def binLocation = Location.get(params.binLocation.id)
+        def binLocation = Location.get(params.binLocation)
+        def quantityAvailable = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
+
+        render(template: params.template, model: [location         : location,
+                                                  binLocation      : binLocation,
+                                                  inventoryItem    : inventoryItem,
+                                                  quantityAvailable: quantityAvailable])
+    }
+
+    def refreshBinLocation = {
+        log.info "params: " + params
+        render g.selectBinLocationByLocation(params)
+    }
+
+
+	def transferStock = { TransferStockCommand command ->
+        log.info "Transfer stock " + params
+        log.info "Command " + command
+
+        InventoryItem inventoryItem = command.inventoryItem
+
 		if (inventoryItem) {
-			
-			try {
-				quantity = Integer.valueOf(params?.quantity);
-			} catch (Exception e) {
-				inventoryItem.errors.reject("inventoryItem.quantity.invalid")
-			}
-			
-			def transaction
-			try { 
-				transaction = inventoryService.transferStock(inventoryItem, inventory, binLocation, destination, source, quantity);
-			} catch (Exception e) {
+
+            Transaction transaction
+            try {
+				transaction = inventoryService.transferStock(command);
+
+                if (!transaction.hasErrors()) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
+                }
+                else {
+                    chain(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, model:[transaction:transaction])
+                    return
+                }
+
+            } catch (Exception e) {
 				log.error("Error transferring stock " + e.message, e)
 				flash.transaction = transaction
 				chain(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, model:[transaction:transaction, itemInstance:inventoryItem])
@@ -671,13 +687,6 @@ class InventoryItemController {
 			log.info("transaction " + transaction + " " + transaction?.id)
 			
 			
-			if (!transaction.hasErrors()) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
-			}
-			else {
-				chain(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, model:[transaction:transaction])
-				return
-			}
 		}
 		redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id])
 	}
@@ -700,7 +709,7 @@ class InventoryItemController {
 				}
 			}
 			itemInstance.properties = params
-			
+
 			// FIXME Temporary hack to handle a changed values for these two fields
 			itemInstance.lotNumber = params?.lotNumber
 			
@@ -951,12 +960,4 @@ class InventoryItemController {
 		}
 		redirect(action: "showStockCard",  params: ['product.id':productInstance?.id])		
 	}
-	
-	
-	def editItemDialog = {
-		def itemInstance = InventoryItem.get(params.id);
-		render(view:'editItemDialog', model: [itemInstance: itemInstance]);
-	}
-
 }
-

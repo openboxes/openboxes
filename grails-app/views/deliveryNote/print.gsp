@@ -243,12 +243,40 @@
     </table>
 
 
-    <div style="padding-bottom: 50px;">
-        <warehouse:message code="deliveryReceipt.instructions.message"/>
+    <div style="margin: 50px 0 50px 0;">
+        <warehouse:message code="deliveryNote.deliveredBy.message"/>
     </div>
 
-    <table style="border-top: 1px solid black;">
+    <table>
         <tr>
+            <td><strong>${requisition.deliveredBy}</strong></td>
+            <td></td>
+            <td class="right"></td>
+        </tr>
+        <tr style="border-top: 1px solid black;">
+            <td width="33%" class="left">
+                <warehouse:message code="deliveryReceipt.name.label"/>
+            </td>
+            <td width="33%" class="center">
+                <warehouse:message code="deliveryReceipt.signature.label"/>
+            </td>
+            <td width="33%" class="right">
+                <warehouse:message code="deliveryReceipt.date.label"/>
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin: 50px 0 50px 0;">
+        <warehouse:message code="deliveryNote.receivedBy.message"/>
+    </div>
+
+    <table >
+        <tr>
+            <td><strong>${requisition?.receivedBy?.name}</strong></td>
+            <td></td>
+            <td class="right"></td>
+        </tr>
+        <tr style="border-top: 1px solid black;">
             <td width="33%" class="left">
                 <warehouse:message code="deliveryReceipt.name.label"/>
             </td>

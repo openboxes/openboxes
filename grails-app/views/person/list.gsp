@@ -11,7 +11,7 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">
+            <div class="list dialog">
 
 				<div class="buttonBar">            	
 	            	<span class="linkButton">
@@ -22,53 +22,63 @@
 	            	</span>
             	</div>
             
-	            <div class="dialog box">
+	            <div class="box">
+                    <h2><g:message code="default.list.label" args="[g.message(code:'persons.label')]"/></h2>
 					<g:form action="list" method="get">
-						<label><warehouse:message code="person.search.label"/></label>            
-						<g:textField name="q" size="45" value="${params.q }"/>					
-						<button type="submit"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
-							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
-						</button>		          
+                        <div class="filter">
+                            <label><warehouse:message code="default.search.label"/></label>
+                            <g:textField name="q" size="45" value="${params.q }" class="text"/>
+                            <button type="submit" class="button"><img
+                                src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+                                alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
+                            </button>
+                        </div>
 					</g:form>
-				</div> 				
-				<br/>
-                <table>
-                    <thead>
-                        <tr>                                                    
-                            <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" />
-                            
-                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'person.name.label')}" />
-                                                                        
-                            <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" />
-                        
-                            <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" />
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <g:each in="${personInstanceList}" status="i" var="personInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-							<td>
-								${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
-							</td>                           
-                        
-                            <td>
-								<g:link action="edit" id="${personInstance.id}">
-                            		${fieldValue(bean: personInstance, field: "firstName")}
-                        			${fieldValue(bean: personInstance, field: "lastName")}
-                        		</g:link>
-                        	</td>
-                        
-                            <td>${fieldValue(bean: personInstance, field: "email")}</td>
-                        
-                            <td>${fieldValue(bean: personInstance, field: "phoneNumber")}</td>
-                        
-                        </tr>
-                    </g:each>
-                    </tbody>
-                </table>
+                    <table>
+                        <thead>
+                            <tr>
+
+                                <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" />
+
+                                <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" />
+
+                                <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" />
+
+                                <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" />
+
+                                <th><g:message code="default.actions.label"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <g:each in="${personInstanceList}" status="i" var="personInstance">
+                            <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+
+
+                                <td>
+                                    <g:link action="edit" id="${personInstance.id}">
+                                        ${fieldValue(bean: personInstance, field: "firstName")}
+                                        ${fieldValue(bean: personInstance, field: "lastName")}
+                                    </g:link>
+                                </td>
+
+                                <td>
+                                    ${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
+                                </td>
+
+                                <td>${fieldValue(bean: personInstance, field: "email")}</td>
+
+                                <td>${fieldValue(bean: personInstance, field: "phoneNumber")}</td>
+
+                                <td>
+                                    <g:link controller="person" action="delete" id="${personInstance?.id}">
+                                        <g:message code="default.button.delete.label"/>
+                                    </g:link>
+                                </td>
+                            </tr>
+                        </g:each>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="paginateButtons">
                 <g:paginate total="${personInstanceTotal}" />

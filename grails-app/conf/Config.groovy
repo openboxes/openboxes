@@ -460,6 +460,31 @@ openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummar
 openboxes.dashboard.column2.widgets=["binLocationSummary","valueSummary","productSummary","genericProductSummary","expiringSummary"]
 openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
 
+springcache {
+	defaults {
+		// set default cache properties that will apply to all caches that do not override them
+		eternal = false
+		diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+	}
+	caches {
+        binLocationReportCache { }
+        binLocationSummaryCache { }
+        dashboardCache { }
+        fastMoversCache { }
+        inventoryBrowserCache { }
+        inventorySnapshotCache { }
+        megamenuCache { }
+        newCache { }
+        quantityOnHandCache { }
+        selectCategoryCache { }
+        selectTagCache { }
+        selectTagsCache { }
+	}
+}
+
 
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false

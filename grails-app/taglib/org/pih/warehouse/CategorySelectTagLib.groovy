@@ -62,32 +62,7 @@ class CategorySelectTagLib {
 		
 	}
 	
-	def selectProducts = { attrs ->
-		//def selectedCategory = Category.get(attrs.value as int)
-		//def rootCategory = productService.getRootCategory();
-		//out << "<select class='" + attrs.cssClass + "' id='" + attrs.id + "' name='" + attrs.name + "'>";
-		//out << render(template:"../category/selectOptions", model:[category:rootCategory, selected:selectedCategory, level: 0])
-		//out << "</select>"
-		//out << "<select class'" + attrs.cssClass + "' id='" + attrs.id + "' name='" + attrs.name + "'>";
-		if (attrs?.category) { 		
-			attrs.category = Category.get(attrs.category.id)
-			attrs.products = inventoryService.getProductsByCategory(attrs.category).sort { it.name } 
-			//attrs.from = inventoryService.getProductsByCategory(category)
-			//attrs.from = Product.list().sort { it?.name?.toLowerCase() };
-			//attrs.optionKey = 'id'
-			//attrs.optionValue = 'name'
-			//attrs.value = attrs.value
-			//attrs.optionValue = { it.name }
-			
-			//out << g.select(attrs) 
-			out << render(template:"../taglib/selectProducts", model:[attrs:attrs])
-	
-			
-		}
-		else { 
-			out << "select a category"
-		}
-	}
+
 	
 	def categorySelect = { attrs ->		
 		def selectedCategory = Category.get(attrs.value)

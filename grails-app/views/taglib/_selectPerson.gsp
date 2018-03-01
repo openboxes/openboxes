@@ -49,6 +49,13 @@
                 //$("#text-${attrs.id}").text(ui.item.label).parent().show();
                 $("#select-${attrs.id}").trigger("selected");
                 return false;
+            },
+            change: function(event, ui) {
+                if (!ui.item) {
+                    $("#hidden-${attrs.id}").val("");
+                    $("#select-${attrs.id}").val("");
+                    $("#select-${attrs.id}").trigger("selected");
+                }
             }
         });
     });
