@@ -108,12 +108,22 @@ class BootStrap {
 
 
         // Debug logging used to figure out what log4j properties are ruining it for the rest of us
-        this.getClass().getClassLoader().getResources("log4j.properties").each {
-            println "log4j.properties => " + it
+        getClass().getClassLoader().getResources("log4j.properties").each {
+            log.info "log4j.properties => " + it
         }
 
-        this.getClass().getClassLoader().getResources("log4j.xml").each {
-            println "log4j.xml => " +  it
+        getClass().getClassLoader().getResources("log4j.xml").each {
+            log.info "log4j.xml => " +  it
+        }
+
+        // Create uploads directory if it doesn't already exist
+        def folder = new File("uploads")
+        if (!folder.exists()) {
+            log.info("Creating uploads directory if it doesn't already exist")
+            folder.mkdirs()
+        }
+        else {
+            log.info("Uploads directory already exists")
         }
 
     }

@@ -31,10 +31,40 @@ class LocationService {
 		return Location.findAllByActiveAndParentLocationIsNull(true);
 	}
 
+	def getLocations(LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
+        log.info "Location type " + locationType?.locationTypeCode
+		def terms = "%" + query + "%"
+		def locations = Location.createCriteria().list(max: max, offset: offset) {
+			if (query) {
+				ilike("name", terms)
+			}
+
+            if (locationType) {
+                eq("locationType", locationType)
+
+            }
+            if (locationGroup) {
+                eq("locationGroup", locationGroup)
+            }
+
+            if (locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION) {
+                isNotNull("parentLocation")
+            }
+            else {
+                isNull("parentLocation")
+            }
+
+
+		}
+        return locations
+
+	}
+
+
 	def getLoginLocations(Integer currentLocationId) {
 		return getLoginLocations(Location.get(currentLocationId))
 	}
-	
+
 	def getLoginLocations(Location currentLocation) {
         log.info "Get login locations (currentLocation=${currentLocation?.name})"
 

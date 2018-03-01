@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.Requisition
@@ -109,7 +110,7 @@ class SelectTagLib {
     def selectRequisitionTemplate = { attrs, body ->
         def requisitionCriteria = new Requisition(isTemplate: true)
         requisitionCriteria.destination = session.warehouse
-        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [:])
+        def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [max: -1, offset: 0])
         requisitionTemplates.sort { it.origin.name }
         attrs.from = requisitionTemplates
         attrs.optionKey = "id"
@@ -144,13 +145,18 @@ class SelectTagLib {
 		attrs.optionValue = { it.name }
 		out << g.select(attrs)
 	}
-	
+
+    def selectPendingShipment = { attrs, body ->
+        def currentLocation = Location.get(session?.warehouse?.id)
+        attrs.from = shipmentService.getPendingShipments(currentLocation).sort { it?.name?.toLowerCase() };
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")"}
+    }
+
 	def selectShipment = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = shipmentService.getShipmentsByLocation(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
-		//attrs.optionValue = 'name'
-		//attrs.value = attrs.value 
 		attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")"}
 		out << g.select(attrs)
 	}
@@ -202,8 +208,17 @@ class SelectTagLib {
     }
 
 
+    def selectProducts = { attrs, body ->
+        def products = Product.executeQuery("select id, name from Product")
+        products =products.collect { [id: it[0], name: it[1]] }
+        attrs.from = products
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
 	def selectWardOrPharmacy = { attrs, body ->
-        log.info "select ward or pharmacy"
+        //log.info "select ward or pharmacy"
         def currentLocation = Location.get(session.warehouse.id)
         def locations = []
         if (currentLocation) {
@@ -273,6 +288,23 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectBinLocationByLocation = { attrs, body ->
+        log.info "selectBinLocationByLocation: " + attrs
+        def location = Location.get(attrs.id)
+        if (location) {
+            attrs.from = Location.findAllByParentLocationAndActive(location, true).sort { it?.name?.toLowerCase() };
+        }
+
+        attrs["class"] = "chzn-select-deselect"
+        attrs["noSelection"] = ["":""]
+        attrs.optionKey = 'id'
+        attrs.optionValue = 'name'
+
+        log.info "attrs: " + attrs;
+
+        out << g.select(attrs)
+    }
+
 	
 	def selectLocation = { attrs,body ->
 
@@ -281,7 +313,7 @@ class SelectTagLib {
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
 
-        log.info "get all locations " + (System.currentTimeMillis() - startTime) + " ms"
+        //log.info "get all locations " + (System.currentTimeMillis() - startTime) + " ms"
 
 
 		attrs.optionKey = 'id'
@@ -294,14 +326,21 @@ class SelectTagLib {
 		else { 
 			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		}
-        log.info "render select location " + (System.currentTimeMillis() - startTime) + " ms"
+        //log.info "render select location " + (System.currentTimeMillis() - startTime) + " ms"
 		//out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
 
         out << g.select(attrs)
 	}
 
-		
-	def selectTransactionDestination = { attrs,body ->		
+    def selectTransactionType = { attrs,body ->
+        attrs.from = TransactionType.list()
+        attrs.optionKey = 'id'
+        attrs.optionValue = { format.metadata(obj: it?.name) }
+        out << g.select(attrs)
+    }
+
+
+    def selectTransactionDestination = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getTransactionDestinations(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'		
@@ -332,7 +371,7 @@ class SelectTagLib {
 		def currentLocation = Location.get(session?.warehouse?.id)
         def requisitionType = params?.type?RequisitionType.valueOf(params.type):null
 
-        log.info "requisition type: ${requisitionType}"
+        //log.info "requisition type: ${requisitionType}"
         def origins = locationService.getNearbyLocations(currentLocation).sort { it?.name?.toLowerCase() }
 
         // Remove current location

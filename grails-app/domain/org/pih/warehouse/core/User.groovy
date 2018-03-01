@@ -9,6 +9,8 @@
  * */
 package org.pih.warehouse.core
 
+import org.pih.warehouse.auth.AuthService
+
 // import java.util.Date
 
 class User extends Person {
@@ -39,7 +41,7 @@ class User extends Person {
     static transients = ["passwordConfirm"]
     static constraints = {
         active(nullable: true)
-        username(blank: true, unique: true, maxSize: 255)
+        username(blank: false, unique: true, maxSize: 255)
         password(blank: false, minSize: 6, maxSize: 255, validator: { password, obj ->
             def passwordConfirm = obj.properties['passwordConfirm']
             if (passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
@@ -62,8 +64,22 @@ class User extends Person {
     /**
      * @return  the highest role for this user
      */
-    def getHighestRole() {
+    def getHighestRole(Location currentLocation) {
+        def roles = getEffectiveRoles(currentLocation)
         return (roles) ? roles.sort().iterator().next() : null
+    }
+
+
+    def getRolesByCurrentLocation(Location currentLocation) {
+        if(!currentLocation) return []
+        return locationRoles?.findAll{it.location == currentLocation}?.collect{it.role} ?: []
+    }
+
+    def getEffectiveRoles(Location currentLocation) {
+        def defaultRoles = roles?.collect{it} ?: []
+        def rolesByLocation = getRolesByCurrentLocation(currentLocation)
+        defaultRoles.addAll(rolesByLocation)
+        return defaultRoles
     }
 
     /**
@@ -74,7 +90,7 @@ class User extends Person {
         locationRoles.each {
             pairs[it.location.id] = it.role.id
         }
-        pairs
+        return pairs
     }
 
     /**

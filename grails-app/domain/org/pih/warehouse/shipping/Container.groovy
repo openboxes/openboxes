@@ -112,10 +112,21 @@ class Container implements Comparable, java.io.Serializable {
 		)
 	
 	}
-	
-	List<ShipmentItem> getShipmentItems() { 
-		return ShipmentItem.findAllByContainer(this)
+
+    List<ShipmentItem> getShipmentItems() {
+        return ShipmentItem.findAllByContainer(this)
 	}
+
+    /**
+     * Avoid collection [org.pih.warehouse.core.User.locationRoles] was not processed by flush().
+     *
+     * FIXME Refactor method above once this works, but I didn't want to break the code above since it's used all over the place.
+     *
+     * @return
+     */
+    def getShipmentItemsFromSession() {
+        return shipment?.shipmentItems?.findAll { it.container == this }
+    }
 	
 	String getOptionValue() {
 		return containerType.name + "-" + name
