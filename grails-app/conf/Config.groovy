@@ -504,6 +504,7 @@ springcache {
         inventoryBrowserCache { }
         inventorySnapshotCache { }
         megamenuCache { }
+        messageCache { }
         quantityOnHandCache { }
         selectTagCache { }
         selectTagsCache { }
