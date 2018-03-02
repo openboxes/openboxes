@@ -471,8 +471,8 @@ class RequisitionController {
 	def complete = {
         def requisition = Requisition.get(params.id)
 		try {
-            User issuedBy = User.load(params?.issuedBy?.id)
-            Person deliveredBy = Person.load(params?.deliveredBy?.id)
+            User issuedBy = User.get(params?.issuedBy?.id)
+            Person deliveredBy = Person.get(params?.deliveredBy?.id)
             String comments = params.comments
 
 			requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)
