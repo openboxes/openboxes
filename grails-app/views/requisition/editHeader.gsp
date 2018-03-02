@@ -123,7 +123,7 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.requestedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="requestedBy.id" value="${requisition?.requestedBy}"
+                                    <g:selectPerson name="requestedBy" value="${requisition?.requestedBy}"
                                                     noSelection="['null':'']" size="40"/>
 
                                 </td>
@@ -132,7 +132,7 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.verifiedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="verifiedBy.id" value="${requisition?.verifiedBy}"
+                                    <g:selectPerson name="verifiedBy" value="${requisition?.verifiedBy}"
                                                     noSelection="['null':'']" size="40"/>
 
                                 </td>
@@ -142,7 +142,7 @@
                                     <td class="name"><label><warehouse:message
                                             code="picklist.picker.label" /></label></td>
                                     <td class="value">
-                                        <g:selectPerson name="picklist.picker.id" value="${requisition?.picklist?.picker}"
+                                        <g:selectPerson name="picklist.picker" value="${requisition?.picklist?.picker}"
                                                         noSelection="['null':'']" size="40"/>
 
                                     </td>
@@ -152,7 +152,17 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.checkedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="checkedBy.id" value="${requisition?.checkedBy}"
+                                    <g:selectPerson name="checkedBy" value="${requisition?.checkedBy}"
+                                                    noSelection="['null':'']" size="40"/>
+
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td class="name"><label><warehouse:message
+                                        code="requisition.deliveredBy.label" /></label></td>
+                                <td class="value">
+                                    <g:selectPerson name="deliveredBy" value="${requisition?.deliveredBy}"
                                                     noSelection="['null':'']" size="40"/>
 
                                 </td>
@@ -162,7 +172,7 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.receivedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="receivedBy.id" value="${requisition?.receivedBy}"
+                                    <g:selectPerson name="receivedBy" value="${requisition?.receivedBy}"
                                                     noSelection="['null':'']" size="40"/>
 
                                 </td>

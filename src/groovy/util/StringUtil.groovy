@@ -10,23 +10,43 @@
 package util
 
 import groovy.text.SimpleTemplateEngine
+
+import java.text.DateFormat
 import java.text.MessageFormat
+import java.text.SimpleDateFormat
 
 
 class StringUtil {
 	
-	public static String mask(String value, String mask) {		
+	static String mask(String value, String mask) {
 		return value ? value?.replaceFirst(".*", { match -> return "".padLeft(match.length(), mask)}) : value
 	}
 
-    public static String renderTemplate(template, binding) {
+    static String renderTemplate(template, binding) {
         def engine = new SimpleTemplateEngine()
         def content = engine.createTemplate(template).make(binding)
         return content.toString()
     }
 
-    public static String format(text, args) {
+    static String format(text, args) {
         return MessageFormat.format(text, args)
-
     }
+
+    static Date parseDate(String format, String source) {
+        if (source) {
+            DateFormat dateFormat = new SimpleDateFormat(format)
+            return dateFormat.parse(source)
+        }
+        return null
+    }
+
+    static String formatString(String format, Date date) {
+        if (date) {
+            DateFormat dateFormat = new SimpleDateFormat(format)
+            return dateFormat.format(date)
+        }
+        return null
+    }
+
+
 }

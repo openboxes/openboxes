@@ -483,6 +483,35 @@ openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_NUMBER_F
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 
+// Cache configuration
+springcache {
+	defaults {
+		// set default cache properties that will apply to all caches that do not override them
+		eternal = false
+		diskPersistent = false
+        memoryStoreEvictionPolicy = "LRU"
+        timeToLive = 3600       // 1 hour = 60 * 60 * 1
+        timeToIdle = 1800       // 30 minutes = 60 * 60 * 0.5
+	}
+	caches {
+        binLocationReportCache { }
+        binLocationSummaryCache { }
+        dashboardCache { }
+        dashboardTotalStockValueCache { }
+        dashboardProductSummaryCache { }
+        dashboardGenericProductSummaryCache { }
+        fastMoversCache { }
+        inventoryBrowserCache { }
+        inventorySnapshotCache { }
+        megamenuCache { }
+        quantityOnHandCache { }
+        selectTagCache { }
+        selectTagsCache { }
+        selectCategoryCache { }
+	}
+}
+
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"

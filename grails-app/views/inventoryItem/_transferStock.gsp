@@ -1,90 +1,107 @@
-<div id="dlgTransferStock-${dialogId}" title="${warehouse.message(code: 'inventory.transferStock.label')}" style="display: none;" >
-    <div class="dialog">
+<div class="dialog">
+    <g:form controller="inventoryItem" action="transferStock">
+        <g:hiddenField name="id" value="${inventoryItem?.id}"/>
+        <g:hiddenField name="product.id" value="${inventoryItem?.product?.id}"/>
+        <g:hiddenField name="inventoryItem.id" value="${inventoryItem?.id}"/>
+        <g:hiddenField name="location.id" value="${location?.id}"/>
+        <g:hiddenField name="binLocation.id" value="${binLocation?.id}"/>
+        <g:hiddenField name="transferOut" value="true"/>
+
         <table>
-            <tr>
-                <td>
-                    <g:form controller="inventoryItem" action="transferStock">
-                        <g:hiddenField name="id" value="${itemInstance?.id}"/>
-                        <g:hiddenField name="product.id" value="${itemInstance?.product?.id}"/>
-                        <g:hiddenField name="binLocation.id" value="${binLocation?.id}"/>
-                        <g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-                        <table>
-                            <tbody>
-                            <tr class="prop">
-                                <td valign="top" class="name"><label><warehouse:message code="inventory.transferTo.label" default="Transfer to" /></label></td>
-                                <td valign="top" class="value">
-                                    <g:selectLocation id="transferTo-${itemInstance?.id}"
-                                                      name="destination.id"
-                                                      class="chzn-select-deselect"
-                                                      noSelection="['null':'']"
-                                                      data-placeholder="Choose where stock is being transferred to ..."
-                                                      value=""/>
+            <tbody>
 
-
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name"><label><warehouse:message code="inventory.transferFrom.label" default="Transfer from" /></label></td>
-                                <td valign="top" class="value">
-                                    ${session.warehouse.name}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
-                                <td valign="middle" class="value">
-                                    <g:if test="${binLocation}">
-                                        ${binLocation?.name}
-                                    </g:if>
-                                    <g:else>
-                                        <g:message code="default.label"/>
-                                    </g:else>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name"><label><warehouse:message code="inventory.quantity.label" /></label></td>
-                                <td valign="top" class="value">
-                                    ${itemQuantity}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name"><label><warehouse:message code="inventory.quantityToTransfer.label" /></label></td>
-                                <td valign="middle" class="value">
-                                    <g:textField name="quantity" size="10" value="" class="text medium"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name"><label><warehouse:message code="product.unitOfMeasure.label" /></label></td>
-                                <td valign="top" class="value">
-                                    ${commandInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-                                </td>
-                            </tr>
-                            </tbody>
-                            <tfoot>
-                            <tr>
-                                <td colspan="2" class="center">
-                                    <button class="button icon approve">
-                                        <warehouse:message code="inventory.transferStock.label"/>
-                                    </button>
-                                    &nbsp;
-                                    <a href="javascript:void(-1);" id="btnTransferClose-${dialogId }" class="middle">
-                                        <warehouse:message code="default.button.cancel.label"/>
-                                    </a>
-                                </td>
-                            </tr>
-                            </tfoot>
-                        </table>
-                    </g:form>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><label><g:message code="product.label"/></label></label>
+                </td>
+                <td valign="top" class="value">
+                    ${inventoryItem?.product?.productCode}
+                    ${inventoryItem?.product?.name}
                 </td>
             </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><label><g:message code="inventoryItem.lotNumber.label"/></label></label>
+                </td>
+                <td valign="top" class="value">
+                    ${inventoryItem?.lotNumber}
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><label><g:message code="transaction.source.label"/></label></label>
+                </td>
+                <td valign="top" class="value">
+                    ${location.name}
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><g:message code="location.binLocation.label" /></label>
+                </td>
+                <td valign="middle" class="value">
+                    <g:if test="${binLocation}">
+                        ${binLocation?.name}
+                    </g:if>
+                    <g:else>
+                        <g:message code="default.label"/>
+                    </g:else>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><g:message code="inventory.quantity.label" /></label>
+                </td>
+                <td valign="top" class="value">
+                    ${quantityAvailable}
+                    ${inventoryItem?.product?.unitOfMeasure?:g.message(code:'default.each.label')}
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><g:message code="transaction.destination.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    <div>
+                        <g:selectLocation id="transferTo-${inventoryItem?.id}" name="otherLocation.id" class="chzn-select-deselect trigger-change"
+                                            noSelection="['null':'']"
+                                            data-placeholder="Choose where stock is being transferred to ..."
+                                            data-url="${request.contextPath}/inventoryItem/refreshBinLocation"
+                                            data-target="#transferTo-binLocation"
+                                            value=""/>
+                    </div>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><g:message code="location.binLocation.label" /></label>
+                </td>
+                <td valign="top" class="value">
+                    <div id="transferTo-binLocation">
+                        <g:select from="[]" name="otherBinLocation.id" class="chzn-select-deselect"
+                                  noSelection="['':g.message(code: 'default.label')]"></g:select>
+                    </div>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><g:message code="inventory.quantityToTransfer.label" /></label>
+                </td>
+                <td valign="middle" class="value">
+                    <input type="number" name="quantity" size="10" value="${quantityAvailable }" class="text" style="font-size:15px"/>
+                    ${inventoryItem?.product?.unitOfMeasure?:g.message(code:'default.each.label')}
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="2" class="center">
+                    <button class="button icon approve">
+                        <warehouse:message code="inventory.transferStock.label"/>
+                    </button>
+                </td>
+            </tr>
+            </tfoot>
         </table>
-    </div>
-
+    </g:form>
 </div>
-<script type="text/javascript">
-    $(document).ready(function(){
-        $("#dlgTransferStock-${dialogId}").dialog({ autoOpen: false, modal: true, width: 800, height: 400 });
-        $("#btnTransferStock-${dialogId}").click(function() { $("#dlgTransferStock-${dialogId}").dialog('open'); });
-        $("#btnTransferClose-${dialogId}").click(function() { $("#dlgTransferStock-${dialogId}").dialog('close'); });
-    });
-</script>
-

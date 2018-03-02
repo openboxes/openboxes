@@ -27,6 +27,10 @@ class DateTagLib {
         if (!attrs.format) {
 			attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
         }
+		if (session.timezone) {
+			attrs.timeZone = session.timezone
+		}
+
 
         out << formatTagLib.formatDate.call(attrs)
 	}

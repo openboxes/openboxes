@@ -21,6 +21,7 @@
     tr.selected {
         border-top: 1px solid lightgrey;
         border-bottom: 1px solid lightgrey;
+        background-color: #ebf2f9;
     }
     tr.selected .containerName a {
         color: #666;
@@ -106,7 +107,7 @@
             <g:render template="moveItem" model="['item':itemToMove]"/>
         </g:if>
 
-
+        <hr/>
         <div class="buttonBar">
             <g:render template="shipmentButtons"/>
             <g:render template="containerButtons" model="[container:selectedContainer]"/>
@@ -134,14 +135,12 @@
                         <table class="sortable"><%-- data-update-url="${createLink(controller:'json', action:'sortContainers')}" --%>
                             <thead>
                             <tr>
-                                <td class="left middle" colspan="3">
-                                    <g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']" class="button icon arrowleft">
-                                        Previous
+                                <td class="right middle" colspan="5">
+                                    <g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']" class="button icon arrowup">
+                                        <g:message code="default.button.previous.label"/>
                                     </g:link>
-                                </td>
-                                <td class="right middle" colspan="2">
-                                    <g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']" class="button icon arrowright">
-                                        Next
+                                    <g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']" class="button icon arrowdown">
+                                        <g:message code="default.button.next.label"/>
                                     </g:link>
                                 </td>
                             </tr>
@@ -204,7 +203,7 @@
                                         </td>
 
                                         <td style="vertical-align: middle;" id="${containerInstance?.id }" class="left">
-                                            <div class="draggable draghandle tag" childContainer="${containerInstance?.id}">
+                                            <div class="draggable draghandle tag" childContainer="${containerInstance?.id}" style="display:block;">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_out_longer.png')}" class="middle"/>
                                                 &nbsp;
                                                 <span class="containerName">
@@ -290,12 +289,10 @@
                                 <td colspan="5">
                                     <div class="center">
 
-                                        <div class="button-group">
-                                            <a href="javascript:void(0);" class="btnAddContainers button">Add packing units</a>
-                                            <g:submitButton name="deleteContainersAndItems" value="Delete Selected" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"></g:submitButton>
-                                            <g:submitButton name="deleteAllContainersAndItems" value="Delete All" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"></g:submitButton>
+                                        <a href="javascript:void(0);" class="btnAddContainers button">Add packing units</a>
+                                        <g:submitButton name="deleteContainersAndItems" value="Delete Selected" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"></g:submitButton>
+                                        <g:submitButton name="deleteAllContainersAndItems" value="Delete All" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"></g:submitButton>
 
-                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -315,7 +312,7 @@
                             <g:hiddenField name="containerId" value="${selectedContainer?.id}"/>
                             <g:autoSuggest id="inventoryItem" name="inventoryItem" jsonUrl="${request.contextPath }/json/findInventoryItems"
                                            placeholder="Enter lot number or product code" styleClass="text" width="500" minLength="2" delay="500"/>
-                            <g:textField name="quantity" value="" class="text" placeholder="Quantity" size="5"/>
+                            <g:textField name="quantity" value="" class="text" placeholder="Quantity" size="10"/>
                             <g:submitButton name="addShipmentItem" value="Add item" class="button icon add"></g:submitButton>
                         </g:form>
                     </div>
@@ -324,6 +321,7 @@
                 <%-- Display the contents of the currently selected container --%>
                 <div class="box">
                     <h2>
+
                         <span class="middle">
                             <g:if test="${selectedContainer}">
                                 <g:if test="${selectedContainer.parentContainer }">
@@ -335,27 +333,40 @@
                                 <warehouse:message code="shipping.unpackedItems.label" />
                             </g:else>
                         </span>
+                        <span>
+                            <g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']" class="button icon arrowup">
+                                <g:message code="default.button.previous.label"/>
+                            </g:link>
+                            <g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']" class="button icon arrowdown">
+                                <g:message code="default.button.next.label"/>
+                            </g:link>
+                        </span>
+
+
                     </h2>
                     <table style="border: 0px solid lightgrey">
-                        <tr>
-                            <td class="left" style="width:1%;">
-                                <div class="action-menu" >
-                                    <button id="selectedContainerActionBtn" class="action-btn">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-                                    </button>
-                                    <div class="actions">
-                                        <g:render template="containerMenuItems" model="[container:selectedContainer]"/>
-                                        <g:render template="shipmentMenuItems" />
+                        <tbody>
+                            <tr>
+                                <td class="left" style="width:1%;">
+                                    <div class="action-menu" >
+                                        <button id="selectedContainerActionBtn" class="action-btn">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+                                        </button>
+                                        <div class="actions">
+                                            <g:render template="containerMenuItems" model="[container:selectedContainer]"/>
+                                            <g:render template="shipmentMenuItems" />
 
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="middle left">
-                                <div class="">
-                                    <g:render template="/container/summary" model="[container:selectedContainer]"/>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="middle left">
+                                    <div class="">
+                                        <g:render template="/container/summary" model="[container:selectedContainer]"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
                     </table>
 
                     <table>

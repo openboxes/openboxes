@@ -43,6 +43,11 @@
                                 <warehouse:message code="inventory.browse.label" />
                             </g:link>
                         </div>
+                        <div class="megaButton">
+                            <g:link controller="inventory" action="manage">
+                                <warehouse:message code="inventory.manage.label" />
+                            </g:link>
+                        </div>
                         <hr/>
                         <div class="megaButton">
                             <g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">

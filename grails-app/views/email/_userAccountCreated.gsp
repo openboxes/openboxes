@@ -50,16 +50,15 @@
                         </div>
                     </td>
                 </tr>
-                <g:if test="${TimeZone?.getAvailableIDs()}">
-                    <tr class="prop">
-                        <td valign="top" class="name">
-                            <label for="locale"><warehouse:message
-                                    code="default.timezone.label" default="Timezone" /></label></td>
-                        <td valign="top" class="value">
-                            ${userInstance?.timezone}
-                        </td>
-                    </tr>
-                </g:if>
+
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="locale"><warehouse:message
+                                code="default.timezone.label" default="Timezone" /></label></td>
+                    <td valign="top" class="value">
+                        ${userInstance?.timezone}
+                    </td>
+                </tr>
                 <tr class="prop">
                     <td class="name">
                         <label for="interest"><warehouse:message code="user.interest.label" default="Interest" /></label>

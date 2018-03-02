@@ -34,6 +34,9 @@
                         <li>
                             <a href="#tabs-6" id="background-jobs-tab"><warehouse:message code="admin.backgroundJobs.header"/></a>
                         </li>
+                        <li>
+                            <a href="#tabs-7" id="cache-tab"><warehouse:message code="admin.cache.header" default="Caches"/></a>
+                        </li>
                     </ul>
                     <div id="tabs-1">
                         <table>
@@ -253,7 +256,8 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <table>
+                                            <div style="overflow: auto; max-height: 200px;">
+                                                <table>
                                                 <g:each var="supportedAttributeCategory" in="${printService.supportedAttributeCategories}">
                                                     <tr>
                                                         <td>
@@ -264,7 +268,8 @@
                                                         </td>
                                                     </tr>
                                                 </g:each>
-                                            </table>
+                                                </table>
+                                            </div>
                                         </td>
                                     </tr>
                                 </g:each>
@@ -326,11 +331,52 @@
                             </div>
 
                         </div>
+                    </div>
+                    <div id="tabs-7">
+                        <div class="box">
+
+                            %{--<h2>Cache</h2>--}%
+                            %{--<g:each in="${springcacheService.properties}" var="property">--}%
+                                %{--<li>${property}</li>--}%
+                            %{--</g:each>--}%
+                            <table>
+                                <tr>
+                                    <th>name</th>
+                                    <th>status</th>
+                                    <th>eternal</th>
+                                    <th>overflowToDisk</th>
+                                    <th>maxElementsInMemory</th>
+                                    <th>maxElementsOnDisk</th>
+                                    <th>memoryStoreEvictionPolicy</th>
+                                    <th>timeToLiveSeconds</th>
+                                    <th>timeToIdleSeconds</th>
+                                    <th>diskPersistent</th>
+                                    <th>diskExpiryThreadIntervalSeconds</th>
+                                </tr>
+                            <g:each in="${caches}" var="cache">
+                                <tr>
+                                    <td>${cache?.name}</td>
+                                    <td>${(cache?.disabled)?'disabled':'enabled'}</td>
+                                    <td>${cache.cacheConfiguration.eternal}</td>
+                                    <td>${cache.cacheConfiguration.overflowToDisk}</td>
+                                    <td>${cache.cacheConfiguration.maxElementsInMemory}</td>
+                                    <td>${cache.cacheConfiguration.maxElementsOnDisk}</td>
+                                    <td>${cache.cacheConfiguration.memoryStoreEvictionPolicy}</td>
+                                    <td>${cache.cacheConfiguration.timeToLiveSeconds}</td>
+                                    <td>${cache.cacheConfiguration.timeToIdleSeconds}</td>
+                                    <td>${cache.cacheConfiguration.diskPersistent}</td>
+                                    <td>${cache.cacheConfiguration.diskExpiryThreadIntervalSeconds}</td>
+                                </tr>
+
+                            </g:each>
+                            </table>
+                        </div>
 
                     </div>
                 </div>
             </div>
         </div>
+
 
         <script>
             $(document).ready(function() {

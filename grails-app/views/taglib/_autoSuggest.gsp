@@ -7,6 +7,9 @@
 
 <script language="javascript">
     $(document).ready(function() {
+
+        $.notify.defaults({autoHideDelay: 1000});
+
         $("#${attrs.id}-suggest").click(function() {
             $(this).trigger("focus");
         });
@@ -39,23 +42,46 @@
                 console.log("changed: ", ui.item);
                 // If the user does not select a value, we remove the value
                 if (!ui.item) {
-                    $(this).prev().val("null").trigger("change");
-                    $(this).val("");				// set the value in the textbox to empty string
-                    $("#${attrs.id}-suggest").trigger("selected");
+                    var textField = $(this);
+                    var hiddenField = $("#${attrs.id}-id");
+                    selectItem(hiddenField, textField, null, "");
+                    $(this).notify("Unselected item", {className: "success"});
                 }
                 return false;
             },
             select: function(event, ui) {
                 console.log("selected: ", ui.item);
+
                 if (ui.item) {
-                    // Set the id of the item selected
-                    $("#${attrs.id}-id").val(ui.item.id).trigger("change");
+                    var textField = $(this);
+                    var hiddenField = $("#${attrs.id}-id");
 
-                    // Set a hidden value that is passed back to the server
-                    $(this).prev().val(ui.item.label).trigger("change");
-
-                    // Sets the text value displayed to the user
-                    $(this).val(ui.item.label).trigger("change");
+                    // Attempt to create a new person
+                    if (ui.item.id == "new") {
+                        $.ajax({
+                            type: "POST",
+                            url: "${request.contextPath}/json/createPerson",
+                            data: { name: ui.item.valueText },
+                            success: function(data, status, xhr) {
+                                selectItem(hiddenField, textField, data.id, data.value);
+                                textField.notify("Created " + data.value, {className: "success"});
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                if (xhr.responseText) {
+                                    let data = JSON.parse(xhr.responseText);
+                                    textField.notify("Error: " + data.errorMessage, {className: "error"});
+                                }
+                                else {
+                                    textField.notify("An unexpected error has occurred", {className: "error"});
+                                }
+                            }
+                        });
+                    }
+                    // Otherwise display selected person
+                    else {
+                        selectItem(hiddenField, textField, ui.item.id, ui.item.label);
+                        $(this).notify("Selected item " + ui.item.label, {className: "success"});
+                    }
                 }
 
                 // Set focus on the next field
@@ -74,6 +100,16 @@
         };
     });
 
+    function selectItem(hiddenField, textField, id, label) {
+        // Set the id of the item selected
+        hiddenField.val(id).trigger("change");
+
+        // Set a hidden value that is passed back to the server
+        textField.prev().val(label).trigger("change");
+
+        // Sets the text value displayed to the user
+        textField.val(label).trigger("change");
+    }
 
     $.fn.focusNextInputField = function() {
         return this.each(function() {

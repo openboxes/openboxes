@@ -114,7 +114,7 @@ class Transaction implements Comparable, Serializable {
 		source(nullable:true,
 			validator: { value, obj->
 							if (value && obj.destination) { return false }   // transaction cannot have both a source and a destination
-							if (value && obj.inventory?.warehouse == value) { return false }   // source warehouse can't be the same as transaction warehouse
+							//if (value && obj.inventory?.warehouse == value) { return false }   // source warehouse can't be the same as transaction warehouse
 							if (obj.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID && !value) { return false } // transfer in transaction must have source
 							return true 
 						})
@@ -122,7 +122,7 @@ class Transaction implements Comparable, Serializable {
 		destination(nullable:true, 
 			validator: { value, obj-> 
 							if (value && obj.source) { return false }  // transaction cannot have both a source and a destination
-							if (value && obj.inventory?.warehouse == value) { return false } // destination warehouse can't be the same as transaction warehouse
+							//if (value && obj.inventory?.warehouse == value) { return false } // destination warehouse can't be the same as transaction warehouse
 							if (obj.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID && !value) { return false } // transfer out transaction must have destination
 							return true 
 						})

@@ -11,9 +11,14 @@ package util
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationEditor
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PersonEditor
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.OrganizationEditor
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.TagEditor
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserEditor
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.CategoryEditor
 import org.springframework.beans.PropertyEditorRegistrar
@@ -27,8 +32,10 @@ public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true));
         registry.registerCustomEditor(Location.class, new LocationEditor())
+        registry.registerCustomEditor(Person.class, new PersonEditor())
+        registry.registerCustomEditor(User.class, new UserEditor())
         registry.registerCustomEditor(Category.class, new CategoryEditor())
-        registry.registerCustomEditor(Category.class, new OrganizationEditor())
+        registry.registerCustomEditor(Organization.class, new OrganizationEditor())
         registry.registerCustomEditor(Tag.class, new TagEditor())
 	}
 }

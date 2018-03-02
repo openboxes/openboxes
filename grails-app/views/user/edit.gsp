@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.*" %>
-<g:set var="adminAndBrowser" value="${[Role.browser(), Role.manager()]}" />
+<g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager()]}" />
 <g:set var="allRoles" value="${[Role.admin(), Role.browser(), Role.manager()]}" />
 <g:set var="locationRolePairs" value="${userInstance?.locationRolePairs()}" />
 <html>
@@ -108,11 +108,15 @@
                                     </tbody>
                                     <tfoot>
                                     <tr>
-                                        <td></td>
                                         <td>
-                                            <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-                                            &nbsp;
-                                            <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
+
+                                        </td>
+                                        <td>
+                                            <div class="buttons left">
+                                                <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                                &nbsp;
+                                                <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+                                            </div>
                                         </td>
                                     </tr>
                                     </tfoot>
@@ -158,11 +162,14 @@
 
                                         </td>
                                         <td>
-                                            <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-                                            &nbsp;
-                                            <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
+                                            <div class="buttons left">
+                                                <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                                &nbsp;
+                                                <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+                                            </div>
                                         </td>
                                     </tr>
+                                    </tfoot>
                                 </table>
 
 
@@ -222,7 +229,7 @@
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
                                                 <td valign="top">
-                                                    <div id="location-roles" style="overflow-y:auto; max-height:200px;">
+                                                    <div id="location-roles" style="overflow-y:auto; max-height:500px;">
                                                         <table>
                                                             <thead>
                                                             <tr>
@@ -258,10 +265,11 @@
 
                                         </td>
                                         <td>
-                                            <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
-                                            &nbsp;
-                                            <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
-
+                                            <div class="buttons left">
+                                                <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                                &nbsp;
+                                                <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+                                            </div>
                                         </td>
                                     </tr>
                                     </tfoot>

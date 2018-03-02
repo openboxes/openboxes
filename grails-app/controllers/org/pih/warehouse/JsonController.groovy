@@ -491,7 +491,10 @@ class JsonController {
         def searchTerm = params.term + "%";
         def c = Product.createCriteria()
         def products = c.list {
-            ilike("productCode", searchTerm)
+            or {
+                ilike("productCode", searchTerm)
+                ilike("name", searchTerm)
+            }
         }
 
         //"id": "Netta rufina", "label": "Red-crested Pochard", "value": "Red-crested Pochard" },
@@ -693,6 +696,7 @@ class JsonController {
 		if (params.term) {
 
             boolean includeQuantity = true
+
 			// Improved the performance of the auto-suggest by moving
 			def tempItems = inventoryService.findInventoryItems(params.term)
 
@@ -706,10 +710,15 @@ class JsonController {
                 else {
                     def quantitiesByInventoryItem = [:]
                     if (includeQuantity) {
-                        tempItems.each { inventoryItem ->
-                            def quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
-                            quantitiesByInventoryItem[inventoryItem] = quantity ?: 0
-                        }
+
+                        quantitiesByInventoryItem = inventoryService.getQuantityByInventoryItemMap(location, tempItems*.product)
+
+//                        tempItems.each { inventoryItem ->
+//                            startTime = System.currentTimeMillis()
+//                            def quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
+//                            quantitiesByInventoryItem[inventoryItem] = quantity ?: 0
+//                            log.info ("${inventoryItem} took ${System.currentTimeMillis() - startTime} ms")
+//                        }
                     }
 
 
@@ -810,6 +819,37 @@ class JsonController {
 		render items as JSON;
 	}
 
+
+    def createPerson = {
+        log.info ("createPerson" + params)
+        def data = [id: null, label: "Unable to create person with name " + params.name]
+
+        def names = params.name.split(" ")
+        if (names) {
+            Person person
+            if (names.length == 1) {
+                throw new Exception("Person must have at least two names")
+            }
+            if (names.length == 2) {
+                person = new Person(firstName: names[0], lastName: names[1])
+            }
+            else if (names.length == 3) {
+                person = new Person(firstName: names[0] + " " + names[1], lastName: names[2])
+            }
+            else {
+                throw new Exception("Person must have at most three names")
+            }
+
+            if (person) {
+                person.save(flush: true)
+                data = [id: person.id, value: person.name]
+            }
+        }
+
+        render data as JSON
+
+    }
+
 	def findPersonByName = {
 		log.info "findPersonByName: " + params
 		def items = new TreeSet();
@@ -830,7 +870,7 @@ class JsonController {
 							
 				if (items) {
 					items.unique();
-					items = items.collect() {						
+                    items = items.collect() {
 						
 						[
                             id: it.id,
@@ -841,23 +881,22 @@ class JsonController {
 							desc: (it?.email) ? it.email : "",
 						]
 					}
-
-				}
+                }
 				else {
                     /*
                     response.status = 404;
                     render "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}"
                     */
-					def item =  [
-						value: "null",
-						valueText : params.term,
-						label: "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}",
-						desc: params.term,
-						icon: ""
-					];
-					items.add(item)
-
+//					def item =  [
+//						value: "null",
+//						valueText : params.term,
+//						label: "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}",
+//						desc: params.term,
+//						icon: ""
+//					];
+//					items.add(item)
 				}
+                items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
