@@ -40,21 +40,28 @@
 
                 <div class="tabs tabs-ui">
 					<ul>
-						<li><a href="#tabs-details"><warehouse:message code="product.details.label"/></a></li>
+						<li><a href="#tabs-details"><g:message code="product.details.label"/></a></li>
 						<%-- Only show these tabs if the product has been created --%>
 						<g:if test="${productInstance?.id }">
-                            <li><a href="#tabs-manufacturer"><warehouse:message code="product.manufacturer.label"/></a></li>
-                            <li><a href="#tabs-status"><warehouse:message code="product.stockLevel.label" default="Stock levels"/></a></li>
+                            <li>
+                                <a href="${request.contextPath}/product/productSuppliers/${productInstance?.id}" id="tab-sources">
+                                    <g:message code="product.sources.label" default="Sources"/>
+                                </a>
+                            </li>
+                            <li><a href="#tabs-manufacturer"><g:message code="product.manufacturer.label"/></a></li>
+                            <li><a href="#tabs-status"><g:message code="product.stockLevel.label" default="Stock levels"/></a></li>
                             <%--<li><a href="#tabs-tags"><warehouse:message code="product.tags.label"/></a></li>--%>
-                            <li><a href="#tabs-synonyms"><warehouse:message code="product.synonyms.label"/></a></li>
-                            <li><a href="#tabs-productGroups"><warehouse:message code="product.substitutions.label" default="Substitutes"/></a></li>
-							<li><a href="#tabs-packages"><warehouse:message code="packages.label" default="Packages"/></a></li>
-							<li><a href="#tabs-documents"><warehouse:message code="product.documents.label" default="Documents"/></a></li>
-                            <li><a href="#tabs-attributes"><warehouse:message code="product.attributes.label" default="Attributes"/></a></li>
-                            <li><a href="#tabs-components"><warehouse:message code="product.components.label" default="Bill of Materials"/></a></li>
+                            <li><a href="#tabs-synonyms"><g:message code="product.synonyms.label"/></a></li>
+                            <li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>
+							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
+							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
+                            <%--<li><a href="#tabs-attributes"><g:message code="product.attributes.label" default="Attributes"/></a></li>--%>
+                            <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
+                                <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
+                            </g:if>
                         </g:if>
 					</ul>	
-					<div id="tabs-details" style="padding: 10px;" class="ui-tabs-hide">
+					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
                         <g:form action="${formAction}" method="post">
                             <g:hiddenField name="id" value="${productInstance?.id}" />
@@ -88,6 +95,18 @@
                                             </td>
                                         </tr>
                                         --%>
+
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label for="active"><warehouse:message
+                                                        code="product.active.label" /></label>
+                                            </td>
+                                            <td class="value middle ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
+                                                <g:checkBox name="active" value="${productInstance?.active}" />
+                                            </td>
+                                        </tr>
+
+
                                         <tr class="prop first">
                                             <td class="name middle"><label for="productCode"><warehouse:message
                                                     code="product.productCode.label"/></label>
@@ -149,6 +168,47 @@
                                                     placeholder="Detailed text description (optional)" />
                                             </td>
                                         </tr>
+                                        <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
+                                            <tr class="prop">
+                                                <td class="name">
+                                                    <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
+                                                </td>
+                                                <td class="value">
+
+                                                    <g:set var="productAttribute" value="${productInstance?.attributes?.find { it.attribute.id == attribute.id } }"/>
+                                                    <g:set var="otherSelected" value="${productAttribute?.value && !attribute.options.contains(productAttribute?.value)}"/>
+                                                    <g:if test="${attribute.options}">
+                                                        <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
+                                                            <option value=""></option>
+                                                            <g:each var="option" in="${attribute.options}" status="optionStatus">
+                                                                <g:set var="selectedText" value=""/>
+                                                                <g:if test="${productAttribute?.value == option}">
+                                                                    <g:set var="selectedText" value=" selected"/>
+                                                                </g:if>
+                                                                <option value="${option}"${selectedText}>${option}</option>
+                                                            </g:each>
+                                                            <g:if test="${attribute.allowOther || otherSelected}">
+                                                                <option value="_other"<g:if test="${otherSelected}"> selected</g:if>>
+                                                                    <g:message code="product.attribute.value.other" default="Other..." />
+                                                                </option>
+                                                            </g:if>
+                                                        </select>
+                                                    </g:if>
+                                                    <g:set var="onlyOtherVal" value="${attribute.allowOther && otherSelected}"/>
+                                                    <g:textField size="50" class="otherAttributeValue text medium"
+                                                                 style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
+                                                                 name="productAttributes.${attribute?.id}.otherValue"
+                                                                 value="${otherAttVal || onlyOtherVal ? productAttribute?.value : ''}"/>
+                                                </td>
+                                            </tr>
+                                        </g:each>
+                                        <tr class="prop">
+                                            <td class="name"><label for="abcClass"><warehouse:message
+                                                    code="product.abcClass.label" /></label></td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'abcClass', 'errors')}">
+                                                <g:textField name="abcClass" value="${productInstance?.abcClass}" size="50" class="medium text"/>
+                                            </td>
+                                        </tr>
                                         <tr class="prop">
                                             <td class="name middle"><label for="upc"><warehouse:message
                                                     code="product.upc.label" /></label></td>
@@ -183,95 +243,8 @@
                                         </td>
                                     </tr>
 
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.status.label" default="Status"/></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'active', 'errors')} ${hasErrors(bean: productInstance, field: 'essential', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td width="25%">
 
-                                                            <g:checkBox name="active" value="${productInstance?.active}" />
-                                                            <label for="active"><warehouse:message
-                                                            code="product.active.label" /></label>
-                                                        </td>
-                                                        <td width="25%">
-                                                            <g:checkBox name="essential" value="${productInstance?.essential}" />
-                                                            <label for="essential"><warehouse:message
-                                                                    code="product.essential.label" /></label>
 
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.handlingRequirements.label" default="Handling requirements"></warehouse:message></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')} ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')} ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td width="25%">
-                                                            <g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
-                                                            <label for="coldChain"><warehouse:message
-                                                                code="product.coldChain.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
-                                                            <label for="controlledSubstance"><warehouse:message
-                                                                code="product.controlledSubstance.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
-                                                            <label for="hazardousMaterial"><warehouse:message
-                                                                code="product.hazardousMaterial.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="reconditioned" value="${productInstance?.reconditioned}" />
-                                                            <label for="reconditioned"><warehouse:message
-                                                                    code="product.reconditioned.label" default="Reconditioned"/></label>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label><warehouse:message code="product.inventoryControl.label" default="Inventory control"></warehouse:message></label>
-                                            </td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
-                                                <table>
-                                                    <tr>
-                                                        <td width="25%">
-                                                            <g:checkBox name="serialized" value="${productInstance?.serialized}" />
-                                                            <label for="serialized"><warehouse:message
-                                                                code="product.serialized.label" /></label>
-                                                        </td>
-
-                                                        <td width="25%">
-                                                            <g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
-                                                            <label for="lotControl"><warehouse:message
-                                                                code="product.lotControl.label" /></label>
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                        <td width="25%">
-                                                        </td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -365,37 +338,39 @@
                             </g:form>
                         </div>
                      --%>
-                        <div id="tabs-manufacturer" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-manufacturer" class="ui-tabs-hide">
                             <g:render template="manufacturers" model="[productInstance:productInstance]"/>
 
                         </div>
 
-                        <div id="tabs-synonyms" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-synonyms" class="ui-tabs-hide">
                             <div class="box">
                                 <h2><warehouse:message code="product.synonyms.label" default="Synonyms"/></h2>
                                 <g:render template="synonyms" model="[product: productInstance, synonyms:productInstance?.synonyms]"/>
                             </div>
                         </div>
 
-                        <div id="tabs-productGroups" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-productGroups" class="ui-tabs-hide">
                             <div class="box">
                                 <h2><warehouse:message code="product.substitutions.label" default="Substitutions"/></h2>
                                 <g:render template="productGroups" model="[product: productInstance, productGroups:productInstance?.productGroups]"/>
                             </div>
                         </div>
-                        <div id="tabs-attributes" style="padding: 10px;" class="ui-tabs-hide">
+                        <%--
+                        <div id="tabs-attributes" class="ui-tabs-hide">
                             <g:render template="attributes" model="[productInstance:productInstance]"/>
                         </div>
-                        <div id="tabs-status" style="padding: 10px;" class="ui-tabs-hide">
+                        --%>
+                        <div id="tabs-status" class="ui-tabs-hide">
                             <g:render template="inventoryLevels" model="[productInstance:productInstance]"/>
 						</div>
-                        <div id="tabs-components" style="padding: 10px;" class="ui-tabs-hide">
+                        <div id="tabs-components" class="ui-tabs-hide">
                             <g:render template="productComponents" model="[productInstance:productInstance]"/>
                         </div>
-						<div id="tabs-documents" style="padding: 10px;" class="ui-tabs-hide">
+						<div id="tabs-documents" class="ui-tabs-hide">
                             <g:render template="documents" model="[productInstance:productInstance]"/>
 						</div>
-						<div id="tabs-packages" style="padding: 10px;" class="ui-tabs-hide">
+						<div id="tabs-packages" class="ui-tabs-hide">
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 
 						</div>
@@ -452,13 +427,13 @@
 	    			}
 				); 
 
-				$(".dialog").dialog({ autoOpen: false, modal: true, width: '800px'});
-
-				$(".open-dialog").click(function() { 
+                $(".open-dialog").livequery('click', function(event) {
+				    event.preventDefault();
 					var id = $(this).attr("dialog-id");
-					$("#"+id).dialog('open');
+					$("#"+id).dialog({ autoOpen: true, modal: true, width: 800});
 				});
-				$(".close-dialog").click(function() { 
+                $(".close-dialog").livequery('click', function(event) {
+                    event.preventDefault();
 					var id = $(this).attr("dialog-id");
 					$("#"+id).dialog('close');
 				});

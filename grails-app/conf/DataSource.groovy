@@ -46,7 +46,7 @@ environments {
 	}
 	test {
 		dataSource {
-			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull"
+			url = "jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&zeroDateTimeBehavior=convertToNull"
 		}
 	}
 	production {

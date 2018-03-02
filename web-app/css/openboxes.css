@@ -106,7 +106,7 @@ textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-    /*border: 1px solid #b2d1ff;*/
+    border: 1px solid #b2d1ff;
     /* Causing buttons to change background color ?? when in focus  */
 }
 
@@ -625,6 +625,7 @@ legend span {
 
 /* Form fields
 -------------------------------------------------------------- */
+input{box-sizing:border-box}
 
 input[type=text],
 input[type=password],
@@ -3123,3 +3124,7 @@ input {
     font-weight:normal;
 
 }
+
+/* Hack to allow Chosen results to display correctly in jQuery dialogs  */
+.ui-dialog .ui-dialog-content { overflow:visible !important;}
+.ui-dialog { overflow: inherit !important; }

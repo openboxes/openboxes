@@ -20,7 +20,6 @@ beans = {
 	//	java.util.Locale.setDefault(defaultLocale)
 	//}
 
-
     /**
 	 * c3P0 pooled data source that allows 'DB keepalive' queries
 	 * to prevent stale/closed DB connections

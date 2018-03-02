@@ -205,13 +205,13 @@
 				</div>
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                        All (${outgoingShipmentsCount})
+                        <warehouse:message code="default.all.label"/> (${outboundShipmentsTotal})
                     </g:link>
                 </div>
-				<g:each in="${outgoingShipments}" var="statusRow">
+				<g:each in="${outboundShipmentsCount}" var="statusRow">
 					<div class="megaButton">
-						<g:link controller="shipment" action="list" params="[status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+						<g:link controller="shipment" action="list" params="[status:statusRow.status]" class="shipment-status-${statusRow.status }">
+							<format:metadata obj="${statusRow.status}"/> (${statusRow.count})
 						</g:link>
 					</div>
 				</g:each>
@@ -233,19 +233,18 @@
                         <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
                     </g:link>
 				</div>
-
                 <div class="megaButton">
                     <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                        All (${incomingShipmentsCount})
+                        <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
                     </g:link>
                 </div>
-				<g:each in="${incomingShipments}" var="statusRow">
+				<g:each in="${inboundShipmentsCount}" var="statusRow">
 					<div class="megaButton">
-						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="shipment-status-${statusRow.key }">
-							<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+						<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
+							<format:metadata obj="${statusRow.status}"/> (${statusRow.count})
 						</g:link>
 					</div>
-				</g:each>					
+				</g:each>
 			</div>
 		</li>		
 	</g:authorize>			
@@ -353,6 +352,9 @@
                         <g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
                     </div>
                     <div class="megaButton">
+                        <g:link controller="productSupplier" action="list" class="list"><warehouse:message code="productSuppliers.label"/></g:link>
+                    </div>
+                    <div class="megaButton">
                         <g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
                     </div>
                     <div class="megaButton">
@@ -421,6 +423,11 @@
                         </div>
                     </g:authorize>
                     <div class="megaButton">
+                        <g:link controller="migration" action="index" class="list">
+                            <g:message code="default.migrateData.label" default="Migrate Data" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
                         <g:link controller="console" action="index" class="list">
                             <g:message code="default.console.label" default="Console" />
                         </g:link>
@@ -437,7 +444,12 @@
                     </div>
                     <div class="megaButton">
                         <g:link controller="admin" action="sendMail" class="list">
-                            <g:message code="config.sendMail.label" default="Send Email"/>
+                            <g:message code="config.sendMail.label" default="Email"/>
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="localization" action="list" class="list">
+                            <g:message code="localization.label" default="Localization"/>
                         </g:link>
                     </div>
                     <hr/>
@@ -453,11 +465,6 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
-                        <g:link controller="location" action="list" class="location">
-                            <warehouse:message code="locations.label" />
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
                         <g:link controller="locationGroup" action="list" class="site">
                             <warehouse:message code="locationGroups.label" default="Location Groups" />
                         </g:link>
@@ -469,10 +476,34 @@
                         </g:link>
                     </div>
                     <div class="megaButton">
+                        <g:link controller="partyType" action="list">
+                            <warehouse:message code="partyTypes.label" default="Party Types" />
+                        </g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="partyRole" action="list">
+                            <warehouse:message code="partyRoles.label" default="Party Roles" />
+                        </g:link>
+                    </div>
+                    <hr/>
+                    <div class="megaButton">
+                        <g:link controller="location" action="list" class="location">
+                            <warehouse:message code="locations.label" />
+                        </g:link>
+                    </div>
+
+                    <div class="megaButton">
                         <g:link controller="shipper" action="list" class="shipper">
                             <warehouse:message code="location.shippers.label" />
                         </g:link>
                     </div>
+                    <div class="megaButton">
+                        <g:link controller="organization" action="list">
+                            <warehouse:message code="organizations.label" default="Organizations" />
+                        </g:link>
+                    </div>
+                    <hr/>
+
                     <div class="megaButton">
                         <g:link controller="shipmentWorkflow" action="list" >
                             <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />

@@ -130,7 +130,7 @@
                                     <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
                                 </td>
                                 <td class="center middle">
-                                    <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id"
+                                    <g:selectProductPackage name="requisitionItems[${i}].productPackage.id"
                                                            product="${requisitionItem?.product}"
                                                            class="chzn-select-deselect"
                                                            value="${requisitionItem?.productPackage?.id}"/>

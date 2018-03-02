@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1512927334382-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="party"/>
+            </not>
+        </preConditions>
+        <createTable tableName="party">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="party_type_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="class" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="party_role"/>
+            </not>
+        </preConditions>
+        <createTable tableName="party_role">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATETIME"/>
+            <column name="party_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="party_type"/>
+            </not>
+        </preConditions>
+        <createTable tableName="party_type">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="party_type_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_supplier"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_supplier">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="brand_name" type="VARCHAR(255)"/>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="comments" type="VARCHAR(255)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGTEXT"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manufacturer_id" type="VARCHAR(255)"/>
+            <column name="manufacturer_code" type="VARCHAR(255)"/>
+            <column name="manufacturer_name" type="VARCHAR(255)"/>
+            <column name="min_order_quantity" type="DECIMAL(19,2)"/>
+            <column name="model_number" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ndc" type="VARCHAR(255)"/>
+            <column name="preference_type_code" type="VARCHAR(255)"/>
+            <column name="product_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_code" type="VARCHAR(255)"/>
+            <column name="rating_type_code" type="VARCHAR(255)"/>
+            <column name="standard_lead_time_days" type="DECIMAL(19,2)"/>
+            <column name="supplier_id" type="VARCHAR(255)"/>
+            <column name="supplier_code" type="VARCHAR(255)"/>
+            <column name="supplier_name" type="VARCHAR(255)"/>
+            <column name="unit_of_measure_id" type="VARCHAR(255)"/>
+            <column name="unit_price" type="DECIMAL(19,2)"/>
+            <column name="upc" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="attribute" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="attribute">
+            <column name="active" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="attribute" columnName="allow_multiple"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="attribute">
+            <column name="allow_multiple" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="attribute" columnName="code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="attribute">
+            <column name="code" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="attribute" columnName="default_value"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="attribute">
+            <column name="default_value" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="attribute" columnName="description"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="attribute">
+            <column name="description" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="attribute" columnName="required"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="attribute">
+            <column name="required" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location" columnName="description"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="location">
+            <column name="description" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location" columnName="organization_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="location">
+            <column name="organization_id" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="abc_class"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="abc_class" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="role" columnName="name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="role">
+            <column name="name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-19">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="code"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="code" tableName="attribute" unique="true">
+            <column name="code"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-21">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK714F9FB5606C7D95"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="organization_id" baseTableName="location"
+                                 constraintName="FK714F9FB5606C7D95" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="party"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-22">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK6581AE69DFE4C4C"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="party_type_id" baseTableName="party"
+                                 constraintName="FK6581AE69DFE4C4C" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="party_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-23">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1C92FE2F3E67CF9F"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="party_id" baseTableName="party_role"
+                                 constraintName="FK1C92FE2F3E67CF9F" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="party"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-26">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK3A097B1C2A475A37"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="manufacturer_id" baseTableName="product_supplier"
+                                 constraintName="FK3A097B1C2A475A37" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="party"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-27">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK3A097B1CDED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_supplier"
+                                 constraintName="FK3A097B1CDED5FAE7" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-28">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK3A097B1CF42F7E5C"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="supplier_id" baseTableName="product_supplier"
+                                 constraintName="FK3A097B1CF42F7E5C" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="party"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-29">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK3A097B1C24DEBC91"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="unit_of_measure_id" baseTableName="product_supplier"
+                                 constraintName="FK3A097B1C24DEBC91" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="unit_of_measure"/>
+    </changeSet>
+</databaseChangeLog>

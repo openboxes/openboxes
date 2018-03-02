@@ -61,33 +61,7 @@
         		</td>
 				<td class="right" width="1%">
         			<div id="product-status" class="title">
-						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
-							<g:if test="${totalQuantity <= 0}">
-								<span class="tag tag-danger"><warehouse:message code="product.noStock.label"/></span>
-							</g:if>
-							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-								<span class="tag tag-warning"><warehouse:message code="product.lowStock.label"/></span>
-							</g:elseif>
-							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-								<span class="tag tag-warning"><warehouse:message code="product.reorder.label"/></span>
-							</g:elseif>
-							<g:elseif test="${totalQuantity > inventoryLevelInstance?.maxQuantity}">
-								<span class="tag tag-success"><warehouse:message code="product.overStock.label"/></span>
-							</g:elseif>
-							<g:else>
-								<span class="tag tag-success"><warehouse:message code="product.inStock.label"/></span>
-							</g:else>
-						</g:if>
-						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-							<span class="tag tag-warning">
-								<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
-							</span>
-						</g:elseif>
-						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-							<span class="tag tag-warning">
-								<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-							</span>
-						</g:elseif>
+						<g:productStatus product="${productInstance.id}"/>
         			</div>
 			
 				</td>
@@ -103,10 +77,6 @@
             </td>
             <td>
                 <div class="button-container">
-					<g:link controller='inventory' action='browse' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'application_form_magnify.png')}" />&nbsp;
-						${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
-					</g:link>
 					<div class="button-group">
 						<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;

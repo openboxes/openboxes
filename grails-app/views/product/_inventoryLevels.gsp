@@ -110,22 +110,11 @@
                 <td colspan="10" class="center">
 
                     <a href="javascript:void(0);" class="open-dialog create button icon add" dialog-id="inventory-level-dialog">
-                        ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create new stock level')}</a>
+                        ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}</a>
 
                     <g:link class="button icon log" controller="inventoryLevel" action="export" id="${productInstance?.id}">
                         ${warehouse.message(code:'inventoryLevel.export.label', default: 'Export stock levels')}
                     </g:link>
-
-                    <g:if test="${productInstance?.id }">
-                        <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
-                            ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                        </g:link>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="inventory" action="browse" class="button icon remove">
-                            ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                        </g:link>
-                    </g:else>
 
                 </td>
             </tr>

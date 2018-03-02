@@ -27,7 +27,7 @@ class UserController {
     static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
     MailService mailService;
 	def userService
-	
+
     /**
      * Show index page - just a redirect to the list page.
      */
@@ -80,7 +80,7 @@ class UserController {
 				flash.message = "Error sending email " + e.message
 			}
 		}
-		redirect(action: "show", id: userInstance?.id)
+		redirect(action: "edit", id: userInstance?.id)
 	}
 
 	
@@ -107,7 +107,7 @@ class UserController {
 
         if (userInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
-            redirect(action: "show", id: userInstance.id)
+            redirect(action: "edit", id: userInstance.id)
         }
         else {
             render(view: "create", model: [userInstance: userInstance])
@@ -202,7 +202,7 @@ class UserController {
 				return;
 			}
 		}
-		redirect(action: "show", id: userInstance.id)
+		redirect(action: "edit", id: userInstance.id)
 	}
 
     /**
@@ -235,7 +235,7 @@ class UserController {
                 if (!flash.message)
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
 
-                redirect(action: "show", id: userInstance.id)
+                redirect(action: "edit", id: userInstance.id)
 
             } catch (ValidationException e) {
                 userInstance = User.read(params.id)
@@ -251,19 +251,36 @@ class UserController {
     }
 
 
-   
-   
-   def disableDebugMode = { 
-	   log.info ("params " + params)
-	   
+
+   def disableLocalizationMode = {
 	   session.useDebugLocale = false
-	   redirect(controller: "dashboard", action: "index")	   
+       if (!grailsApplication.config.openboxes.locale.custom.enabled) {
+           flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
+       }
+
+	   def referer = request.getHeader("Referer")
+	   if (referer) {
+		   redirect(url: referer)
+	   }
+	   else {
+		   redirect(controller: "dashboard", action: "index")
+	   }
    }
 
-   def enableDebugMode = { 
-	   log.info ("params " + params)
+   def enableLocalizationMode = {
 	   session.useDebugLocale = true
-	   redirect(controller: "dashboard", action: "index")
+       if (!grailsApplication.config.openboxes.locale.custom.enabled) {
+           flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
+       }
+
+	   def referer = request.getHeader("Referer")
+	   if (referer) {
+		   redirect(url: referer)
+	   }
+	   else {
+		   redirect(controller: "dashboard", action: "index")
+	   }
+
    }
     
 	/**
@@ -340,7 +357,7 @@ class UserController {
         if (userInstance) {			
 			if (userInstance?.id == session?.user?.id) { 
 				flash.message = "${warehouse.message(code: 'default.cannot.delete.self.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-				redirect(action: "show", id: params.id)
+				redirect(action: "edit", id: params.id)
 			}
 			else { 			
 	            try {
@@ -350,7 +367,7 @@ class UserController {
 	            }
 	            catch (org.springframework.dao.DataIntegrityViolationException e) {
 	                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-	                redirect(action: "show", id: params.id)
+	                redirect(action: "edit", id: params.id)
 	            }
 			}
         }
@@ -430,7 +447,7 @@ class UserController {
 	            flash.message = "${warehouse.message(code: 'user.photoTooLarge.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
 				
 			}
-            redirect(action: "show", id: userInstance.id)
+            redirect(action: "edit", id: userInstance.id)
 		} 
 		else { 
 			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"

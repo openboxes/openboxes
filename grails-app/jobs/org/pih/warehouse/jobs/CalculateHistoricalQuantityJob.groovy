@@ -12,6 +12,10 @@ import org.quartz.JobExecutionException
 import org.quartz.PersistJobDataAfterExecution
 import org.quartz.Scheduler
 
+import liquibase.Liquibase
+import liquibase.database.DatabaseFactory
+import util.LiquibaseUtil
+
 class CalculateHistoricalQuantityJob {
 
     static dates = []
@@ -24,6 +28,12 @@ class CalculateHistoricalQuantityJob {
     }
 
     def execute(JobExecutionContext context) {
+
+        if (LiquibaseUtil.isRunningMigrations()) {
+            log.info "Postponing job execution until liquibase migrations are complete"
+            return
+        }
+
         enabled = ConfigHolder.config.openboxes.jobs.calculateHistoricalQuantityJob.enabled
         if (enabled) {
             log.info "Executing calculate historical quantity job at ${new Date()} with context ${context}"

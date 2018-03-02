@@ -101,14 +101,14 @@
                                 </g:else>
                                 <g:if test="${session.useDebugLocale }">
                                     <li>
-                                        <g:link controller="user" action="disableDebugMode">
+                                        <g:link controller="user" action="disableLocalizationMode">
                                             ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}
                                         </g:link>
                                     </li>
                                 </g:if>
                                 <g:else>
                                     <li>
-                                        <g:link controller="user" action="enableDebugMode">
+                                        <g:link controller="user" action="enableLocalizationMode">
                                             ${warehouse.message(code:'debug.enable.label', default: 'Enable debug mode')}
                                         </g:link>
                                     </li>

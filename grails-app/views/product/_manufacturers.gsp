@@ -142,17 +142,6 @@
                             <button type="submit" class="button icon approve">
                                 ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
                             </button>
-                            &nbsp;
-                            <g:if test="${productInstance?.id }">
-                                <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon arrowright">
-                                    ${warehouse.message(code: 'default.button.done.label', default: 'Done')}
-                                </g:link>
-                            </g:if>
-                            <g:else>
-                                <g:link controller="inventory" action="browse" class="button icon arrowright">
-                                    ${warehouse.message(code: 'default.button.done.label', default: 'Done')}
-                                </g:link>
-                            </g:else>
                         </div>
                     </td>
                 </tr>

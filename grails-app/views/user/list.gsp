@@ -27,7 +27,7 @@
                                     <p>
                                         <label><warehouse:message code="user.search.label"/></label>
                                     </p>
-                                    <g:textField name="q" size="40" value="${params.q }" class="text"/>
+                                    <g:textField name="q" value="${params.q }" class="text" minlength="40"/>
                                 </li>
                                 <li class="filter-list-item">
                                     <p>

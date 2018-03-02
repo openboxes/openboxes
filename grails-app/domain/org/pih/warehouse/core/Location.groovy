@@ -22,6 +22,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	
 	String id
 	String name
+	String description
 	String locationNumber
 
 	byte [] logo				// logo
@@ -32,6 +33,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	Location parentLocation; 
 	LocationType locationType	
 	LocationGroup locationGroup;
+	Organization organization
 
 	User manager								// the person in charge of the warehouse
 	Inventory inventory							// each warehouse has a single inventory
@@ -47,7 +49,9 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
+		description(nullable:true)
 		address(nullable:true)
+		organization(nullable:true)
 		locationType(nullable:false)
         locationNumber(nullable:true, unique: true)
 		locationGroup(nullable:true)
@@ -59,6 +63,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		})
 		fgColor(nullable:true)
 		logo(nullable:true, maxSize:10485760) // 10 MBs
+        local(nullable:true)
 		manager(nullable:true)
 		inventory(nullable:true)
 		active(nullable:false)

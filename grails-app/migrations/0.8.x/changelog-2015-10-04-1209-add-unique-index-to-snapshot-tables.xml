@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1442807680525-1">
+        <preConditions onFail="HALT" onError="HALT">
+            <sqlCheck expectedResult="0">
+                <![CDATA[
+                    SELECT count(*) AS duplicate_count
+                    FROM (
+                        SELECT date, location_id, product_id
+                        FROM inventory_snapshot
+                        GROUP BY date, location_id, product_id
+                        HAVING COUNT(*) > 1
+                    ) AS inventory_snapshot_duplicates
+                ]]>
+            </sqlCheck>
+        </preConditions>
+        <addUniqueConstraint constraintName="inventory_snapshot_key"
+                             tableName="inventory_snapshot"
+                             columnNames="date, location_id, product_id"/>
+	</changeSet>
+
+    <changeSet author="jmiranda" id="1442807680525-2">
+        <preConditions onFail="HALT" onError="HALT">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) AS duplicate_count
+                FROM (
+                    SELECT date, location_id, product_id, inventory_item_id
+                    FROM inventory_item_snapshot
+                    GROUP BY date, location_id, product_id, inventory_item_id
+                    HAVING COUNT(*) > 1
+                ) AS inventory_item_snapshot_duplicates
+
+            </sqlCheck>
+        </preConditions>
+        <addUniqueConstraint constraintName="inventory_item_snapshot_key"
+                             tableName="inventory_item_snapshot"
+                             columnNames="date, location_id, product_id, inventory_item_id"/>
+    </changeSet>
+
+
+</databaseChangeLog>

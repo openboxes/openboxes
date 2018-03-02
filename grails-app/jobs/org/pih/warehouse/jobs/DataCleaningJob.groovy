@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
+import util.LiquibaseUtil
 
 class DataCleaningJob {
 
@@ -15,6 +16,12 @@ class DataCleaningJob {
     }
 
 	def execute(context) {
+
+        if (LiquibaseUtil.isRunningMigrations()) {
+            log.info "Postponing job execution until liquibase migrations are complete"
+            return
+        }
+
         log.debug "Starting data cleaning job at ${new Date()}"
         def startTime = System.currentTimeMillis()
         shipmentService.bulkUpdateShipments()

@@ -2,7 +2,7 @@
     <g:hiddenField name="action" value="save"/>
     <g:hiddenField name="id" value="${productInstance?.id}" />
     <g:hiddenField name="version" value="${productInstance?.version}" />
-    <div class="box" >
+    <div class="box dialog" >
         <h2>
             <warehouse:message code="product.attributes.label" default="Product attributes"/>
         </h2>
@@ -25,7 +25,7 @@
                     <td class="value">
                         <g:set var="attributeFound" value="f"/>
                         <g:if test="${attribute.options}">
-                            <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector">
+                            <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
                                 <option value=""></option>
                                 <g:each var="option" in="${attribute.options}" status="optionStatus">
                                     <g:set var="selectedText" value=""/>
@@ -44,7 +44,11 @@
                             </select>
                         </g:if>
                         <g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
-                        <g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
+                        <g:textField class="otherAttributeValue text medium"
+                                     size="100"
+                                     style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
+                                     name="productAttributes.${attribute?.id}.otherValue"
+                                     value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
                     </td>
                 </tr>
             </g:each>
@@ -52,28 +56,18 @@
             <tfoot>
             <tr>
                 <td colspan="2">
-                    <div class="center">
 
+                    <div class="right">
+                        <g:link controller="attribute" action="list" class="button"><g:message code="attributes.label"/></g:link>
+                    </div>
+                    <div class="center">
                         <button type="submit" class="button icon approve">
                             ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
                         </button>
-                        &nbsp;
-                        <g:if test="${productInstance?.id }">
-                            <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
-                                ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                            </g:link>
-                        </g:if>
-                        <g:else>
-                            <g:link controller="inventory" action="browse" class="button icon remove">
-                                ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                            </g:link>
-                        </g:else>
                     </div>
                 </td>
             </tr>
-
             </tfoot>
         </table>
     </div>
-
 </g:form>

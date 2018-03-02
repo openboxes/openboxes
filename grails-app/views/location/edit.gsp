@@ -85,6 +85,15 @@
                                         </g:if>
                                         <tr class="prop">
                                             <td valign="top" class="name">
+                                                <label for="organization.id"><g:message code="organization.label" /></label>
+                                            </td>
+                                            <td valign="top" class="value">
+                                                <g:select name="organization.id" from="${org.pih.warehouse.core.Organization.list()}" class="chzn-select-deselect"
+                                                          optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.organization?.id}" noSelection="['null':'']" />
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td valign="top" class="name">
                                                 <label for="name"><warehouse:message code="location.locationType.label" /></label>
 
                                             </td>
