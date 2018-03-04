@@ -96,7 +96,7 @@ class AttributeController {
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-                redirect(action: "list", id: params.id)
+                redirect(action: "edit", id: params.id)
             }
         }
         else {

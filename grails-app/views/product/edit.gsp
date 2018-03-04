@@ -50,12 +50,10 @@
                             </li>
                             <li><a href="#tabs-manufacturer"><g:message code="product.manufacturer.label"/></a></li>
                             <li><a href="#tabs-status"><g:message code="product.stockLevel.label" default="Stock levels"/></a></li>
-                            <%--<li><a href="#tabs-tags"><warehouse:message code="product.tags.label"/></a></li>--%>
                             <li><a href="#tabs-synonyms"><g:message code="product.synonyms.label"/></a></li>
                             <li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>
 							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
 							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
-                            <%--<li><a href="#tabs-attributes"><g:message code="product.attributes.label" default="Attributes"/></a></li>--%>
                             <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
                                 <li><a href="#tabs-components"><g:message code="product.components.label" default="Bill of Materials"/></a></li>
                             </g:if>
@@ -169,38 +167,40 @@
                                             </td>
                                         </tr>
                                         <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
-                                            <tr class="prop">
-                                                <td class="name">
-                                                    <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
-                                                </td>
-                                                <td class="value">
 
-                                                    <g:set var="productAttribute" value="${productInstance?.attributes?.find { it.attribute.id == attribute.id } }"/>
-                                                    <g:set var="otherSelected" value="${productAttribute?.value && !attribute.options.contains(productAttribute?.value)}"/>
-                                                    <g:if test="${attribute.options}">
-                                                        <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
-                                                            <option value=""></option>
-                                                            <g:each var="option" in="${attribute.options}" status="optionStatus">
-                                                                <g:set var="selectedText" value=""/>
-                                                                <g:if test="${productAttribute?.value == option}">
-                                                                    <g:set var="selectedText" value=" selected"/>
+                                            <g:if test="${attribute.active}">
+                                                <tr class="prop">
+                                                    <td class="name">
+                                                        <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
+                                                    </td>
+                                                    <td class="value">
+                                                        <g:set var="productAttribute" value="${productInstance?.attributes?.find { it.attribute.id == attribute.id } }"/>
+                                                        <g:set var="otherSelected" value="${productAttribute?.value && !attribute.options.contains(productAttribute?.value)}"/>
+                                                        <g:if test="${attribute.options}">
+                                                            <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
+                                                                <option value=""></option>
+                                                                <g:each var="option" in="${attribute.options}" status="optionStatus">
+                                                                    <g:set var="selectedText" value=""/>
+                                                                    <g:if test="${productAttribute?.value == option}">
+                                                                        <g:set var="selectedText" value=" selected"/>
+                                                                    </g:if>
+                                                                    <option value="${option}"${selectedText}>${option}</option>
+                                                                </g:each>
+                                                                <g:if test="${attribute.allowOther || otherSelected}">
+                                                                    <option value="_other"<g:if test="${otherSelected}"> selected</g:if>>
+                                                                        <g:message code="product.attribute.value.other" default="Other..." />
+                                                                    </option>
                                                                 </g:if>
-                                                                <option value="${option}"${selectedText}>${option}</option>
-                                                            </g:each>
-                                                            <g:if test="${attribute.allowOther || otherSelected}">
-                                                                <option value="_other"<g:if test="${otherSelected}"> selected</g:if>>
-                                                                    <g:message code="product.attribute.value.other" default="Other..." />
-                                                                </option>
-                                                            </g:if>
-                                                        </select>
-                                                    </g:if>
-                                                    <g:set var="onlyOtherVal" value="${attribute.allowOther && otherSelected}"/>
-                                                    <g:textField size="50" class="otherAttributeValue text medium"
-                                                                 style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
-                                                                 name="productAttributes.${attribute?.id}.otherValue"
-                                                                 value="${otherAttVal || onlyOtherVal ? productAttribute?.value : ''}"/>
-                                                </td>
-                                            </tr>
+                                                            </select>
+                                                        </g:if>
+                                                        <g:set var="onlyOtherVal" value="${attribute.allowOther && otherSelected || !attribute.options}"/>
+                                                        <g:textField size="50" class="otherAttributeValue text medium"
+                                                                     style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
+                                                                     name="productAttributes.${attribute?.id}.otherValue"
+                                                                     value="${otherAttVal || onlyOtherVal ? productAttribute?.value : ''}"/>
+                                                    </td>
+                                                </tr>
+                                            </g:if>
                                         </g:each>
                                         <tr class="prop">
                                             <td class="name"><label for="abcClass"><warehouse:message
@@ -250,7 +250,7 @@
                                         <tr>
                                             <td></td>
                                             <td>
-                                                <div>
+                                                <div class="buttons left">
                                                     <button type="submit" class="button icon approve">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
                                                     &nbsp;
                                                     <g:if test="${productInstance?.id }">

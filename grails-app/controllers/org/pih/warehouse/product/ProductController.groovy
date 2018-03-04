@@ -431,7 +431,7 @@ class ProductController {
                 value = params["productAttributes." + it.id + ".otherValue"]
             }
 
-			if (it.required && !value) {
+			if (it.active && it.required && !value) {
                 productInstance.errors.rejectValue("attributes", "product.attribute.required",
                 [] as Object[],
                 "Product attribute ${it.name} is required")
