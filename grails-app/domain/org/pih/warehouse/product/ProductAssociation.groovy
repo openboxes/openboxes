@@ -16,10 +16,12 @@ class ProductAssociation {
 
 	String id
 	ProductAssociationTypeCode code
-
 	Product associatedProduct
+    BigDecimal quantity = 0
+    String comments
 
-	Integer quantity = 0
+    Date dateCreated
+    Date lastUpdated
 
 	static belongsTo = [ product : Product ]
 	
@@ -31,6 +33,7 @@ class ProductAssociation {
         code(nullable: false)
         associatedProduct(nullable:false)
         quantity(nullable:true)
+        comments(nullable:true)
 	}
 	
 }
