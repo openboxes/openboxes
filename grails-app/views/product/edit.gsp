@@ -48,7 +48,6 @@
                                     <g:message code="product.sources.label" default="Sources"/>
                                 </a>
                             </li>
-                            <li><a href="#tabs-manufacturer"><g:message code="product.manufacturer.label"/></a></li>
                             <li><a href="#tabs-status"><g:message code="product.stockLevel.label" default="Stock levels"/></a></li>
                             <li><a href="#tabs-synonyms"><g:message code="product.synonyms.label"/></a></li>
                             <li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>
@@ -242,8 +241,125 @@
                                             </script>
                                         </td>
                                     </tr>
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="brandName"><warehouse:message
+                                                code="product.brandName.label" /></label></td>
+                                        <td class="value ${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
+                                            <g:autoSuggestString id="brandName" name="brandName" size="50" class="text"
+                                                                 jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                 value="${productInstance?.brandName}"
+                                                                 placeholder="e.g. Advil, Tylenol"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="manufacturer"><warehouse:message
+                                                code="product.manufacturer.label" /></label></td>
+                                        <td class="value ${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
+                                            <%--
+                                            <g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
+                                            --%>
+                                            <g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text"
+                                                                 jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                 value="${productInstance?.manufacturer}"
+                                                                 placeholder="e.g. Pfizer, Beckton Dickson"/>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="manufacturerCode"><warehouse:message
+                                                code="product.manufacturerCode.label"/></label></td>
+                                        <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
+                                            <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="50" class="text"/>
+                                            <%--
+                                            <g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="50" class="text"
+                                                jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                value="${productInstance?.manufacturerCode}"
+                                                placeholder=""/>
+                                            --%>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="manufacturerName"><warehouse:message
+                                                code="product.manufacturerName.label"/></label></td>
+                                        <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
+                                            <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" size="50" class="text"/>
+                                            <%--
+                                            <g:autoSuggestString id="manufacturerName" name="manufacturerName" size="50" class="text"
+                                                jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                value="${productInstance?.manufacturerName}"
+                                                placeholder=""/>
+                                            --%>
+                                        </td>
+                                    </tr>
 
 
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="modelNumber"><warehouse:message
+                                                code="product.modelNumber.label" /></label></td>
+                                        <td
+                                                class="value ${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
+                                            <g:textField name="modelNumber" value="${productInstance?.modelNumber}" size="50" class="text"/>
+                                            <%--
+                                            <g:autoSuggestString id="modelNumber" name="modelNumber" size="50" class="text"
+                                                jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                value="${productInstance?.modelNumber}" promptOnMatch="true"
+                                                placeholder="e.g. Usually only pertains to equipment "/>
+                                            --%>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="vendor"><warehouse:message
+                                                code="product.vendor.label" /></label></td>
+                                        <td
+                                                class="value ${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
+                                            <g:autoSuggestString id="vendor" name="vendor" size="50" class="text"
+                                                                 jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                 value="${productInstance?.vendor}"
+                                                                 placeholder="e.g. IDA, IMRES, McKesson"/>
+
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="vendorCode"><warehouse:message
+                                                code="product.vendorCode.label"/></label></td>
+                                        <td class="value ${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
+                                            <g:textField name="vendorCode" value="${productInstance?.vendorCode}" size="50" class="text"/>
+                                            <%--
+                                            <g:autoSuggestString id="vendorCode" name="vendorCode" size="50" class="text"
+                                                jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                value="${productInstance?.vendorCode}"
+                                                placeholder=""/>
+                                            --%>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name middle fade"><label for="vendorName"><warehouse:message
+                                                code="product.vendorName.label"/></label></td>
+                                        <td class="value ${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
+                                            <g:textField name="vendorName" value="${productInstance?.vendorName}" size="50" class="text"/>
+                                            <%--
+                                            <g:autoSuggestString id="vendorName" name="vendorName" size="50" class="text"
+                                                jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                value="${productInstance?.vendorName}"
+                                                placeholder=""/>
+                                            --%>
+
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name middle"><label for="pricePerUnit"><warehouse:message
+                                                code="product.pricePerUnit.label"/></label></td>
+                                        <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
+                                            <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
+                                                         value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
+                                                         class="text" size="50" />
+
+                                            <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
+
+                                        </td>
+                                    </tr>
 
                                     </tbody>
                                     <tfoot>
@@ -280,68 +396,6 @@
 
                     <%-- Only show these tabs if the product has been created --%>
                     <g:if test="${productInstance?.id }">
-                        <%--
-                        <div id="tabs-tags" style="padding: 10px;" class="ui-tabs-hide">
-                            <g:form controller="product" action="updateTags" method="post">
-                                <g:hiddenField name="action" value="save"/>
-                                <g:hiddenField name="id" value="${productInstance?.id}" />
-                                <g:hiddenField name="version" value="${productInstance?.version}" />
-                                <div class="box" >
-                                    <h2>
-                                        <warehouse:message code="product.tags.label" default="Product tags"/>
-                                    </h2>
-                                    <table>
-                                        <tbody>
-                                            <tr class="prop">
-
-                                                <td class="value">
-                                                    <g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
-                                                    <script>
-                                                        $(function() {
-                                                            $('#tags1').tagsInput({
-                                                                'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
-                                                                'width': 'auto',
-                                                                'height': '20px',
-                                                                'removeWithBackspace' : true
-                                                            });
-                                                        });
-                                                    </script>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="2">
-                                                    <div class="center">
-                                                        <button type="submit" class="button icon approve">
-                                                            ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
-                                                        </button>
-                                                        &nbsp;
-                                                        <g:if test="${productInstance?.id }">
-                                                            <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon arrowright">
-                                                                ${warehouse.message(code: 'default.button.done.label', default: 'Done')}
-                                                            </g:link>
-                                                        </g:if>
-                                                        <g:else>
-                                                            <g:link controller="inventory" action="browse" class="button icon arrowright">
-                                                                ${warehouse.message(code: 'default.button.done.label', default: 'Done')}
-                                                            </g:link>
-                                                        </g:else>
-                                                    </div>
-
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-
-                                </div>
-                            </g:form>
-                        </div>
-                     --%>
-                        <div id="tabs-manufacturer" class="ui-tabs-hide">
-                            <g:render template="manufacturers" model="[productInstance:productInstance]"/>
-
-                        </div>
 
                         <div id="tabs-synonyms" class="ui-tabs-hide">
                             <div class="box">
