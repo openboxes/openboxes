@@ -346,12 +346,12 @@ class ProductController {
 
                 log.info("Categories " + productInstance?.categories);
 
-                // find the phones that are marked for deletion
+                // find the categories that are marked for deletion
                 def _toBeDeleted = productInstance.categories.findAll { (it?.deleted || (it == null)) }
 
                 log.info("toBeDeleted: " + _toBeDeleted)
 
-                // if there are phones to be deleted remove them all
+                // if there are categories to be deleted remove them all
                 if (_toBeDeleted) {
                     productInstance.categories.removeAll(_toBeDeleted)
                 }
