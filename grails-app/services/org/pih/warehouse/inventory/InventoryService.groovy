@@ -1005,6 +1005,7 @@ class InventoryService implements ApplicationContextAware {
 		def startTime = System.currentTimeMillis()
         def products = Product.createCriteria().list(max: maxResults, offset: offset) {
             createAlias('productSuppliers', 'ps', CriteriaSpecification.LEFT_JOIN)
+            createAlias('inventoryItems', 'ii', CriteriaSpecification.LEFT_JOIN)
 
             if(categories) {
                 inList("category", categories)
@@ -1035,6 +1036,7 @@ class InventoryService implements ApplicationContextAware {
                             ilike("ps.manufacturerName", "%" + term + "%")
                             ilike("ps.supplierCode", "%" + term + "%")
                             ilike("ps.supplierName", "%" + term + "%")
+                            ilike("ii.lotNumber", "%" + term + "%")
                         }
                     }
                 }
