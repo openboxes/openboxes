@@ -80,10 +80,6 @@
                                    data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
                                     <g:message code="default.button.edit.label"/>
                                 </a>
-                                <g:link controller="productSupplier" action="edit" id="${productSupplier.id}" class="button" method="DELETE">
-                                    <g:message code="default.advanced.label"/>
-                                </g:link>
-
                             </td>
                         </tr>
                     </g:each>
