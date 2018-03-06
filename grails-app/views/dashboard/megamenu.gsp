@@ -355,6 +355,12 @@
                         <g:link controller="productSupplier" action="list" class="list"><warehouse:message code="productSuppliers.label"/></g:link>
                     </div>
                     <div class="megaButton">
+                        <g:link controller="productAssociation" action="list" class="list"><warehouse:message code="product.associations.label" default="Associations"/></g:link>
+                    </div>
+                    <div class="megaButton">
+                        <g:link controller="productComponent" action="list" class="list"><warehouse:message code="product.components.label" default="Components"/></g:link>
+                    </div>
+                    <div class="megaButton">
                         <g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
                     </div>
                     <div class="megaButton">

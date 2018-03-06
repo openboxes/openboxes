@@ -28,7 +28,9 @@
                                 <g:sortableColumn property="id" title="${warehouse.message(code: 'productAssociation.id.label', default: 'Id')}" />
                             
                                 <g:sortableColumn property="code" title="${warehouse.message(code: 'productAssociation.code.label', default: 'Code')}" />
-                            
+
+                                <th><warehouse:message code="productAssociation.product.label" default="Product" /></th>
+
                                 <th><warehouse:message code="productAssociation.associatedProduct.label" default="Associated Product" /></th>
                             
                                 <g:sortableColumn property="quantity" title="${warehouse.message(code: 'productAssociation.quantity.label', default: 'Quantity')}" />
@@ -46,7 +48,9 @@
                                 <td><g:link action="edit" id="${productAssociationInstance.id}">${fieldValue(bean: productAssociationInstance, field: "id")}</g:link></td>
                             
                                 <td>${fieldValue(bean: productAssociationInstance, field: "code")}</td>
-                            
+
+                                <td>${fieldValue(bean: productAssociationInstance, field: "product")}</td>
+
                                 <td>${fieldValue(bean: productAssociationInstance, field: "associatedProduct")}</td>
                             
                                 <td>${fieldValue(bean: productAssociationInstance, field: "quantity")}</td>
