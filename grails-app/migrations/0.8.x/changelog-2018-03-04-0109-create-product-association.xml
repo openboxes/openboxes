@@ -4,6 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
     <changeSet author="jmiranda (generated)" id="1520147365111-1">
+        <validCheckSum>163d49c82ab8a752615f57117246990</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="product_association"/>
