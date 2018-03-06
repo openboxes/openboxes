@@ -15,6 +15,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.hibernate.HibernateException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
@@ -476,11 +477,14 @@ class RequisitionController {
 		[requisition:requisition, picklist:picklist]
 	}
 	
-	def complete = { 
+	def complete = {
         def requisition = Requisition.get(params.id)
 		try {
-            def issuedBy = User.load(session.user.id)
-			requisitionService.issueRequisition(requisition, issuedBy, params.comments)
+            User issuedBy = User.get(params?.issuedBy?.id)
+            Person deliveredBy = Person.get(params?.deliveredBy?.id)
+            String comments = params.comments
+
+			requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)
 		} 
 		catch (ValidationException e) { 
 			//flash.message = e.message 
@@ -504,14 +508,32 @@ class RequisitionController {
     }
 
     def rollback = {
+        def action = "show"
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisitionService.rollbackRequisition(requisition)
             flash.message = "${warehouse.message(code: 'default.rollback.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
 
+            switch (requisition.status) {
+                case RequisitionStatus.CHECKING:
+                    action = "transfer"
+                    break;
+
+                case RequisitionStatus.PICKING:
+                    action = "pick"
+                    break;
+
+                case RequisitionStatus.EDITING:
+                    action = "edit"
+                    break;
+
+                case RequisitionStatus.VERIFYING:
+                    action = "review"
+                    break;
+            }
         }
         flash.message = "Successfully rolled back requisition " + requisition.requestNumber
-        redirect(action: "show", id: params.id)
+        redirect(action: action, id: params.id)
 
     }
 

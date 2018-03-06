@@ -104,17 +104,22 @@
 										</div>
 									</td>
 								</tr>
-								<g:if test="${TimeZone?.getAvailableIDs()}">
-									<tr class="prop">
-										<td valign="top" class="name">
-											<label for="locale"><warehouse:message
-													code="default.timezone.label" default="Timezone" /></label></td>
-										<td valign="top" class="value">
-											<g:select id="timezone" name="timezone" from="${TimeZone?.getAvailableIDs()?.sort()}"
-													  noSelection="['':'']" value="${userInstance?.timezone}" class="chzn-select-deselect"/>
-										</td>
-									</tr>
-								</g:if>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="locale"><warehouse:message
+												code="default.timezone.label" default="Timezone" /></label></td>
+									<td valign="top" class="value">
+										<g:if test="${timezones}">
+											<g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
+															  noSelection="['':'']"
+															  class="chzn-select-deselect"/>
+										</g:if>
+										<g:else>
+											<g:textField name="timezone" value="${userInstance?.timezone}" size="40" class="text medium"/>
+										</g:else>
+									</td>
+								</tr>
+
                                 <tr class="prop">
                                     <td class="name">
                                         <label for="interest"><warehouse:message code="user.interest.label" default="Interest" /></label>

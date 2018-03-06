@@ -344,9 +344,9 @@
                                     </table>
                                 </div>
                             </div>
-
                         </g:if>
                     </div>
+                    <div class="loading">Loading...</div>
                 </div>
             </g:form>
         </div>
@@ -449,8 +449,24 @@
         }
 
         $(document).ready(function() {
-
-            $(".tabs").tabs({cookie:{expires:1}});
+            $(".loading").hide();
+            $(".tabs").tabs({
+                cookie:{
+                    expires:1
+                },
+                ajaxOptions: {
+                    error: function(xhr, status, index, anchor) {
+                        $(anchor.hash).html();
+                    },
+                    beforeSend: function() {
+                        $('.loading').show();
+                    },
+                    complete: function() {
+                        $(".loading").hide();
+                    }
+                }
+            }
+            );
 
             // Define all dialog windows
             $("#dlgShowContents").dialog({ autoOpen: false, modal: true, width: 800 });

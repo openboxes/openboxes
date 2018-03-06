@@ -4,27 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <title><warehouse:message code="locations.label" /></title>
-        <style>
-        	.vertical-text { 
-				color:#333;
-				border:0px solid red;
-				writing-mode:tb-rl;
-				-webkit-transform:rotate(-60deg);
-				-moz-transform:rotate(-60deg);
-				-o-transform: rotate(-60deg);
-				white-space:nowrap;
-				display:block;
-				bottom:0;
-				width:20px;
-				height:20px;
-				font-family: ‘Trebuchet MS’, Helvetica, sans-serif;
-				font-weight:normal;
-				
-        	}
-        	tr th { border-top: 0;}
-        	
-        </style>
-        
+
     </head>
     <body>        
         <div class="body">
@@ -34,7 +14,14 @@
             </g:if>
            	
            	<div>
-
+				<div class="buttonBar">            	
+                    <g:link class="button icon search" action="list">
+                        <warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
+                    <g:isUserAdmin>
+                        <g:link class="button icon add" action="edit"><warehouse:message code="default.create.label"
+                             args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
+                    </g:isUserAdmin>
+                </div>
 
                 <div class="yui-gf">
                     <div class="yui-u first">
@@ -92,13 +79,13 @@
                                         <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
                                         <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
                                         <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
-                                        <th class="left bottom"><warehouse:message code="default.color.label" /></th>
                                         <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
                                         <g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
                                             <th class="bottom">
                                                 <span class="vertical-text"><warehouse:message code="enum.ActivityCode.${activity}"/></span>
                                             </th>
                                         </g:each>
+                                        <th class="left bottom"><warehouse:message code="default.color.label" /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -112,11 +99,6 @@
                                             </td>
                                             <td class="left middle"><format:metadata obj="${locationInstance?.locationType}"/></td>
                                             <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
-                                            <td class="center middle border-right">
-                                                <div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
-                                                    ${locationInstance?.name }
-                                                </div>
-                                            </td>
                                             <td class="left middle">
                                                 <g:if test="${locationInstance.active }">
                                                     <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
@@ -137,13 +119,21 @@
 
                                                 </td>
                                             </g:each>
+                                            <td class="center middle border-right">
+                                                <div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
+                                                    ${locationInstance?.name }
+                                                </div>
+                                            </td>
                                         </tr>
                                     </g:each>
                                 </tbody>
                             </table>
+
+                            <g:set var="pageParams"
+                                   value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q].findAll {it.value}}"/>
                             <g:if test="${locationInstanceTotal >= params.max }">
                                 <div class="paginateButtons">
-                                    <g:paginate total="${locationInstanceTotal}" />
+                                    <g:paginate total="${locationInstanceTotal}" max="${params.max}" offset="${params.offset}" params="${pageParams}"/>
                                 </div>
                             </g:if>
                         </div>
@@ -151,12 +141,6 @@
 
                     </div>
                 </div>
-
-
-
-
-	           		             
-
             </div>
         </div>
     </body>

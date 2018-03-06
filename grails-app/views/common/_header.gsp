@@ -223,7 +223,7 @@
                             <g:if test="${session?.warehouse}">
                                 <li>
                                     <button class="warehouse-switch button">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" class="warehouse-switch"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" />
                                         ${session?.warehouse?.name }
                                     </button>
                                 </li>
@@ -234,7 +234,6 @@
 
                         <li>
                             <span class="action-menu">
-
                                 <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}" class="action-hover-btn"/>
                                 <ul class="actions" style="text-align:left;">
 

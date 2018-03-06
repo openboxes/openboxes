@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.LocalTransfer
@@ -332,7 +333,7 @@ class RequisitionService {
      * @param comments
      * @return
      */
-	def issueRequisition(Requisition requisition, User issuedBy, String comments) {
+	def issueRequisition(Requisition requisition, User issuedBy, Person deliveredBy, String comments) {
 		
 		// Make sure a transaction has not already been created for this requisition
 		def outboundTransaction = Transaction.findByRequisition(requisition)
@@ -372,9 +373,12 @@ class RequisitionService {
 				throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
 			}
 			else {
+                Date now = new Date()
 				requisition.status = RequisitionStatus.ISSUED
-                requisition.dateIssued = new Date();
+                requisition.dateIssued = now
                 requisition.issuedBy = issuedBy
+                requisition.dateDelivered = now
+                requisition.deliveredBy = deliveredBy
 				requisition.save(flush:true) 
 			}
 	
