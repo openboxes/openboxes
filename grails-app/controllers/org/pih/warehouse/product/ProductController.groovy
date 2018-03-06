@@ -374,9 +374,13 @@ class ProductController {
                 }
 
             } catch (ValidationException e) {
+                log.error("Validation error: " + e.message, e)
+                // Clear attributes to prevent transient object exception
+                productInstance.attributes.clear()
                 productInstance = Product.read(params.id)
                 productInstance.errors = e.errors
                 render view: "edit", model: [productInstance:productInstance]
+                return
             }
         }
         else {
@@ -418,18 +422,21 @@ class ProductController {
     }
 
 
-    def updateAttributes(productInstance, params)  {
+    def updateAttributes(Product productInstance, Map params)  {
         Map existingAtts = new HashMap();
         productInstance.attributes.each() {
             existingAtts.put(it.attribute.id, it)
         }
 
         // Process attributes
-        Attribute.list().each() {
+        Attribute.findAllByActive(true).each() {
+
             String value = params["productAttributes." + it.id + ".value"]
             if (value == "_other" || value == null || value == '') {
                 value = params["productAttributes." + it.id + ".otherValue"]
             }
+
+            log.info ("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
 
 			if (it.active && it.required && !value) {
                 productInstance.errors.rejectValue("attributes", "product.attribute.required",
@@ -443,16 +450,19 @@ class ProductController {
                 if (!existingAttribute) {
                     existingAttribute = new ProductAttribute("attribute":it, value: value)
                     productInstance.addToAttributes(existingAttribute)
+                    productInstance.save()
                 }
                 else {
                     existingAttribute.value = value;
+                    existingAttribute.save()
                 }
             }
             else {
-                if (existingAttribute) {
-                    log.info("removing attribute ${existingAttribute.id}")
+                if (existingAttribute?.attribute?.active) {
+                    log.info("removing attribute ${existingAttribute.attribute.name}")
                     productInstance.removeFromAttributes(existingAttribute)
                     existingAttribute.delete()
+                    productInstance.save()
                 }
             }
         }
