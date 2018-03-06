@@ -27,28 +27,12 @@
 				<td class="top">
 								
 					<div id="product-header" style="float: left;">
-						<div>
-							<g:if test="${productInstance?.manufacturer }">
-								<span class="manufacturer">${productInstance?.manufacturer }</span> 
-							</g:if>
-							<g:if test="${productInstance?.manufacturerCode }">
-								<span class="manufacturerCode">Mfr# ${productInstance?.manufacturerCode }</span>
-							</g:if>
-						</div>	
 			            <div id="product-title" class="title">
 			            	<small>${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
-			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
+			                	${productInstance?.name }
 			                </g:link>				
 			            </div>
-                        <div class="product-generic fade" style="text-transform:uppercase; line-height: 20px;">
-                            <g:if test="${productInstance?.productGroups }">
-                                ${productInstance?.productGroups?.sort().first()}
-                            </g:if>
-                            <g:else>
-                                ${productInstance?.name }
-                            </g:else>
-                        </div>
                         <div id="product-tags">
                             <g:each var="tag" in="${productInstance?.tags }">
                                 <g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">

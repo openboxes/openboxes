@@ -27,8 +27,7 @@
 			<li><a href="${request.contextPath}/inventoryItem/showStockHistory/${commandInstance?.product?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showCurrentStockAllLocations/${commandInstance?.product?.id}"><warehouse:message code="inventory.currentStockAllLocations.label" default="All Locations"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showAlternativeProducts/${commandInstance?.product?.id}"><warehouse:message code="product.substitutions.label" default="Substitution"/></a></li>
-			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.suppliers.label" default="Suppliers"/></a></li>
-            <li><a href="${request.contextPath}/inventoryItem/showPendingRequisitions/${commandInstance?.product?.id}"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>
+			<li><a href="${request.contextPath}/inventoryItem/showPendingRequisitions/${commandInstance?.product?.id}"><warehouse:message code="request.pendingRequestLog.label" default="Pending requisitions"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showPendingShipments/${commandInstance?.product?.id}"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showConsumption/${commandInstance?.product?.id}"><warehouse:message code="inventory.consumption.label" default="Consumption"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showInventorySnapshot/${commandInstance?.product?.id}"><warehouse:message code="inventory.snapshot.label" default="Snapshot"/></a></li>
