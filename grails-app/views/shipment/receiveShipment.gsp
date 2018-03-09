@@ -195,7 +195,7 @@
                                                 </td>
                                                 <td class="middle ${hasErrors?'errors':''}">
                                                     <input class="text" name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" type="number"
-                                                           min="0" max="${receiptItem?.quantityShipped}" />
+                                                           min="0" />
                                                 </td>
                                                 <td class="middle left">
                                                     <g:selectBinLocation id="receiptItems-${i}-binLocation" name="receiptItems[${i}].binLocation.id"
