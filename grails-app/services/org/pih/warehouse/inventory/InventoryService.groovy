@@ -1070,6 +1070,7 @@ class InventoryService implements ApplicationContextAware {
             createAlias('inventoryItems', 'ii', CriteriaSpecification.LEFT_JOIN)
 
 			eq("active", true)
+			eq("active", true)
             if(categories) {
                 inList("category", categories)
             }
