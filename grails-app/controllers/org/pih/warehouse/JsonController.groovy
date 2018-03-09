@@ -404,6 +404,7 @@ class JsonController {
         def searchTerm = params.term + "%";
         def c = Product.createCriteria()
         def products = c.list {
+            eq("active", true)
             or {
                 ilike("productCode", searchTerm)
                 ilike("name", searchTerm)
@@ -436,6 +437,7 @@ class JsonController {
 			projections {
 				property "${params.field}"
 			}
+            eq("active", true)
 			ilike("${params.field}", searchTerm)
 		}		
 		results = results.unique().collect { [ value: it, label: it ] }
@@ -469,6 +471,7 @@ class JsonController {
 			projections {
 				property "name"
 			}
+            eq("active", true)
 			ilike("name", searchTerm)
 		}
 		
