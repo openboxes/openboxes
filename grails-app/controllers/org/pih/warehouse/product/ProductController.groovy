@@ -164,15 +164,7 @@ class ProductController {
 
 		params.max = Math.min(params.max ? params.int('max') : 10, 1000)
 
-//        if (params.q) {
-//            productInstanceList = Product.findAllByNameLike("%" + params.q + "%", params)
-//            productInstanceTotal = Product.countByNameLike("%" + params.q + "%", params);
-//        }
-//        else {
-//            productInstanceList = Product.list(params)
-//            productInstanceTotal = Product.count()
-//        }
-
+        boolean includeInactive = params.boolean('includeInactive')?:false
         def category = params.categoryId ? Category.load(params.categoryId) : null
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
         params.name = params.q
@@ -185,7 +177,7 @@ class ProductController {
         params.productCode = params.q
         params.unitOfMeasure = params.q
 
-        productInstanceList = productService.getProducts(params.q, category, tags, params)
+        productInstanceList = productService.getProducts(params.q, category, tags, includeInactive, params)
         flash.productIds = productInstanceList.collect { it.id }
 
 		[productInstanceList: productInstanceList, productInstanceTotal: productInstanceList.totalCount]

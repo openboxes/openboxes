@@ -972,6 +972,7 @@ class InventoryService implements ApplicationContextAware {
 	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResults, offset) {
 		def startTime = System.currentTimeMillis()
         def products = Product.createCriteria().list(max: maxResults, offset: offset) {
+			eq("active", true)
             if(categories) {
                 inList("category", categories)
             }
@@ -1981,7 +1982,10 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List getProductsByCategory(Category category) {
-		def products = Product.createCriteria().list() { eq("category", category) }
+		def products = Product.createCriteria().list() {
+            eq("active", true)
+            eq("category", category)
+        }
 		return products;
 	}
 
@@ -1998,7 +2002,10 @@ class InventoryService implements ApplicationContextAware {
 			if (categories) {
 				log.debug("get products by nested category: " + category + " -> " + categories)
 
-				products = Product.createCriteria().list() { 'in'("category", categories) }
+				products = Product.createCriteria().list() {
+                    eq("active", true)
+                    'in'("category", categories)
+                }
 			}
 		}
 		return products;

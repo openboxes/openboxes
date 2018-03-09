@@ -136,7 +136,7 @@ class IdentifierService {
 
 
     void assignProductIdentifiers() {
-        def products = Product.findAll("from Product as p where productCode is null or productCode = ''")
+        def products = Product.findAll("from Product as p where p.active = true and (p.productCode is null or p.productCode = '')")
         products.each { product ->
             try {
                 def productCode = generateProductIdentifier()
