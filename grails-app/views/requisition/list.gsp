@@ -13,7 +13,9 @@
 <body>
 
     <g:set var="pageParams"
-       value="['origin.id':params?.origin?.id,q:params.q,commodityClass:params.commodityClass,status:params.status,type:params.type,'createdBy.id':params?.createdBy?.id,sort:params?.sort,order:params?.order,relatedToMe:params.relatedToMe]"/>
+       value="['origin.id':params?.origin?.id, q:params.q, commodityClass:params.commodityClass, status:params.status,
+               requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
+               'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe]"/>
 
 
     <div class="body">
@@ -31,10 +33,10 @@
                             </div>
                         </td>
                         <td class="right">
-                            <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
+                            <g:link controller="requisition" action="exportRequisitions" params="${pageParams.findAll {it.value != 'null' }}" class="button">
                                 <warehouse:message code="requisition.button.export.label" default="Export requisitions"/>
                             </g:link>
-                            <g:link controller="requisition" action="exportRequisitionItems" params="${pageParams.findAll {it.value != 'null' }}" class="button icon arrowdown">
+                            <g:link controller="requisition" action="exportRequisitionItems" params="${pageParams.findAll {it.value != 'null' }}" class="button">
                                 <warehouse:message code="requisition.button.export.label" default="Export requisition items"/>
                             </g:link>
                         </td>
@@ -87,6 +89,13 @@
                                 </p>
                             </div>
                             <div class="filter-list-item">
+                                <label><warehouse:message code="requisition.origin.label"/></label>
+                                <p>
+                                    <g:selectWardOrPharmacy name="origin.id" value="${params?.origin?.id}"
+                                                            noSelection="['null':'']" class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.destination.label"/></label>
                                 <p style="line-height: 16px; font-size: 1.2em;">
                                     <g:select id="destinationId" name="destination.id" value="${session.warehouse.id}" from="${[session.warehouse]}" class="chzn-select" readOnly="readOnly"/>
@@ -107,13 +116,6 @@
                                 </p>
                             </div>
 
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="requisition.origin.label"/></label>
-                                <p>
-                                    <g:selectWardOrPharmacy name="origin.id" value="${params?.origin?.id}"
-                                        noSelection="['null':'']" class="chzn-select-deselect"/>
-                                </p>
-                            </div>
                             <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.commodityClass.label"/></label>
                                 <p>
