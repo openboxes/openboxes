@@ -20,6 +20,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import util.ReportUtil
 
 import java.text.SimpleDateFormat
 
@@ -34,7 +35,7 @@ class ProductService {
 	def sessionFactory
 	def grailsApplication
 	def identifierService
-	
+
 	/**
 	 * 	
 	 * @param query
@@ -735,63 +736,45 @@ class ProductService {
 	 * @return
 	 */
 	String exportProducts(products) {
-		def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
-		def sw = new StringWriter()
-		
-		def csvWriter = new CSVWriter(sw, {
-			"Product ID" { it.id }
-			"Product Code" { it.productCode }
-			"Name" { it.name }
-			"Category" { it.category }
-			"Description" { it.description }
-			"Unit of Measure" { it.unitOfMeasure }
-            "Tags" { it.tags }
-            "Unit price" { it.unitPrice }
-			"Manufacturer" { it.manufacturer }
-			"Brand" { it.brandName }
-			"Manufacturer Code" { it.manufacturerCode }
-			"Manufacturer Name" { it.manufacturerName }			
-			"Vendor" { it.vendor }
-			"Vendor Code" { it.vendorCode }
-			"Vendor Name" { it.vendorName }
-			"Cold Chain" { it.coldChain }
-			"UPC" { it.upc }
-			"NDC" { it.ndc }
-			"Date Created" { it.dateCreated }
-			"Date Updated" { it.lastUpdated }
-		})
-		
+
+        def rows = []
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+		def attributes = Attribute.findAllByExportable(true)
+        def formatTagLib = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+
 		products.each { product ->
 			def row =  [
-				id: product?.id,
-				productCode: product.productCode?:'',
-				name: product.name,
-				category: product?.category?.name,
-				description: product?.description?:'',
-				unitOfMeasure: product.unitOfMeasure?:'',
-                tags: product.tagsToString()?:'',
-                unitPrice: product.pricePerUnit?:'',
-				manufacturer: product.manufacturer?:'',
-				brandName: product.brandName?:'',
-				manufacturerCode: product.manufacturerCode?:'',
-				manufacturerName: product.manufacturerName?:'',
-				vendor: product.vendor?:'',
-				vendorCode: product.vendorCode?:'',
-				vendorName: product.vendorName?:'',
-				coldChain: product.coldChain?:Boolean.FALSE,
-				upc: product.upc?:'',
-				ndc: product.ndc?:'',
-				dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
-				lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
+				Id: product?.id,
+				ProductCode: product.productCode?:'',
+				Name: product.name,
+				Category: product?.category?.name,
+				Description: product?.description?:'',
+				UnitOfMeasure: product.unitOfMeasure?:'',
+                Tags: product.tagsToString()?:'',
+                UnitCost: product.pricePerUnit?:'',
+				Manufacturer: product.manufacturer?:'',
+				BrandName: product.brandName?:'',
+				ManufacturerCode: product.manufacturerCode?:'',
+				ManufacturerName: product.manufacturerName?:'',
+				Vendor: product.vendor?:'',
+				VendorCode: product.vendorCode?:'',
+				VendorName: product.vendorName?:'',
+				ColdChain: product.coldChain?:Boolean.FALSE,
+				UPC: product.upc?:'',
+				NDC: product.ndc?:'',
+				Created: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
+				Updated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
 			]
-			// We just want to make sure that these match because we use the same format to
-			// FIXME It would be better if we could drive the export off of this array of columns,
-			// but I'm not sure how.  It's possible that the constant could be a map of column
-			// names to closures (that might work)
-			assert row.keySet().size() == Constants.EXPORT_PRODUCT_COLUMNS.size()
-			csvWriter << row
+
+            attributes.eachWithIndex { attribute, index ->
+                def productAttribute = product.getProductAttribute(attribute)
+                def attributeName = formatTagLib.metadata(obj:attribute)
+                row << [ "${attributeName}":productAttribute?.value?:'' ]
+            }
+            rows << row
+
 		}
-		return sw.toString()
+		return ReportUtil.getCsvForListOfMapEntries(rows)
     }
 	
 	/**
