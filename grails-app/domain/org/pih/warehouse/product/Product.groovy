@@ -76,6 +76,9 @@ class Product implements Comparable, Serializable {
     // Price per unit (global for the entire system)
     BigDecimal pricePerUnit
 
+    // Cost per unit
+    BigDecimal costPerUnit
+
     // Controlled Substances
     // http://en.wikipedia.org/wiki/Controlled_Substances_Act
     // http://bfa.sdsu.edu/ehs/deapp1.htm

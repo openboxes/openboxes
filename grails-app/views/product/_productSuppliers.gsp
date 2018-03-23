@@ -1,6 +1,6 @@
 <div class="box">
     <h2>
-        <warehouse:message code="product.sources.label" default="Product Sources"/>
+        <warehouse:message code="product.productSuppliers.label" default="Product Sources"/>
     </h2>
 
     <div class="dialog">
@@ -11,7 +11,7 @@
 
                 <th><g:message code="productSupplier.product.label" default="Product" /></th>
             --%>
-            <g:sortableColumn property="code" title="${warehouse.message(code: 'productSupplier.code.label', default: 'Code')}" />
+            <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label', default: 'Code')}" />
 
             <th><g:message code="default.name.label" default="Name" /></th>
 
