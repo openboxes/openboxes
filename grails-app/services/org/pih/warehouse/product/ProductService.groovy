@@ -1155,5 +1155,22 @@ class ProductService {
 		return assemblyProduct
 	}
 
+	List parseProductCatalogItems(def csv) {
+        List rows = []
+
+        // Iterate over each line and either update an existing product or create a new product
+        csv.toCsvReader(['skipLines':1]).eachLine { tokens ->
+
+            def productCatalogCode = tokens[0]
+            def productCatalog = ProductCatalog.findByCode(productCatalogCode)
+
+            def productCode = tokens[1]
+            def product = Product.findByIdOrProductCode(productCode, productCode)
+
+            rows << [productCatalog: productCatalog, product: product]
+        }
+
+        return rows;
+	}
 
 }
