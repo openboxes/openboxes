@@ -306,6 +306,10 @@ class Product implements Comparable, Serializable {
     }
 
 
+    List<ProductAssociation> getSubstitutions() {
+        return ProductAssociation.findAllByProductAndCode(this, ProductAssociationTypeCode.SUBSTITUTE)
+    }
+
 
     Set<Product> alternativeProducts() {
         def products = []
