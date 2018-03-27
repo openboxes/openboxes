@@ -739,7 +739,7 @@ class ProductService {
 
         def rows = []
         def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
-		def attributes = Attribute.findAllByExportable(true)
+		def attributes = Attribute.findAllByExportableAndActive(true, true)
         def formatTagLib = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
 
 		products.each { product ->
