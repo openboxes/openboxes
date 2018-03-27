@@ -50,7 +50,13 @@
                             </li>
                             <li><a href="#tabs-status"><g:message code="product.stockLevel.label" default="Stock levels"/></a></li>
                             <li><a href="#tabs-synonyms"><g:message code="product.synonyms.label"/></a></li>
-                            <li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>
+                            <li>
+                                <a href="${request.contextPath}/product/productSubstitutions/${productInstance?.id}" id="tab-productSubstitutions">
+                                    <g:message code="product.substitutions.label" default="Substitutions"/>
+                                </a>
+                            </li>
+
+                            %{--<li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>--}%
 							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
 							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
                             <g:if test="${grailsApplication.config.openboxes.bom.enabled}">

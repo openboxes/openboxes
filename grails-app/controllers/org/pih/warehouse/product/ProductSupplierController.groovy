@@ -148,7 +148,7 @@ class ProductSupplierController {
             productSupplier = new ProductSupplier()
             productSupplier.product = product
         }
-        render(template: "../product/productSupplierDialog", model: [productSupplier: productSupplier])
+        render(template: "dialog", model: [productSupplier: productSupplier])
     }
 
 }

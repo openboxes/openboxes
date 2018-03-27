@@ -335,6 +335,12 @@ class Product implements Comparable, Serializable {
         return productGroups ? productGroups?.sort()?.first() : null
     }
 
+
+    List<ProductAssociation> getSubstitutions() {
+        return ProductAssociation.findAllByProductAndCode(this, ProductAssociationTypeCode.SUBSTITUTE)
+    }
+
+
     /**
      * Get products related to this product through all product groups.
      * @return
