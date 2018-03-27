@@ -9,6 +9,8 @@
     <include file="0.8.x/changelog-2017-12-10-1250-create-clickstream-tables.xml"/>
     <include file="0.8.x/changelog-2017-12-10-1250-refactor-generic-product.xml"/>
     <include file="0.8.x/changelog-2018-03-04-0109-create-product-association.xml"/>
+    <include file="0.8.x/changelog-2018-03-21-2114-add-column-attribute-exportable.xml"/>
+    <include file="0.8.x/changelog-2018-03-22-2137-add-column-unit-cost.xml"/>
     <include file="0.8.x/changelog-2018-03-22-2341-create-product-catalog.xml"/>
 
 </databaseChangeLog>

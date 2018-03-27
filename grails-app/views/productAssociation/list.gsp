@@ -49,9 +49,20 @@
                             
                                 <td>${fieldValue(bean: productAssociationInstance, field: "code")}</td>
 
-                                <td>${fieldValue(bean: productAssociationInstance, field: "product")}</td>
+                                <td>
+                                    <g:link controller="product" action="edit" id="${productAssociationInstance?.product?.id}">
+                                        ${fieldValue(bean: productAssociationInstance?.product, field: "productCode")}
+                                        ${fieldValue(bean: productAssociationInstance?.product, field: "name")}
+                                    </g:link>
 
-                                <td>${fieldValue(bean: productAssociationInstance, field: "associatedProduct")}</td>
+                                </td>
+
+                                <td>
+                                    <g:link controller="product" action="edit" id="${productAssociationInstance?.product?.id}">
+                                        ${fieldValue(bean: productAssociationInstance?.associatedProduct, field: "productCode")}
+                                        ${fieldValue(bean: productAssociationInstance?.associatedProduct, field: "name")}
+                                    </g:link>
+                                </td>
                             
                                 <td>${fieldValue(bean: productAssociationInstance, field: "quantity")}</td>
                             

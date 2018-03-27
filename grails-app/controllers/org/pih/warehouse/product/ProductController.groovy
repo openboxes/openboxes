@@ -322,8 +322,19 @@ class ProductController {
         else {
             render(template: "productSuppliers", model:[productInstance: productInstance])
         }
-
     }
+
+    def productSubstitutions = {
+        def productInstance = Product.get(params.id)
+        if (!productInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(controller: "inventory", action: "browse")
+        }
+        else {
+            render(template: "productSubstitutions", model:[productInstance: productInstance])
+        }
+    }
+
 
 	def update = {
 		log.info "Update called with params " + params
@@ -1080,6 +1091,7 @@ class ProductController {
         render(template:'productGroups', model:[product: product, productGroups:product.productGroups])
     }
 
+
 	def addProductComponent = {
         Product assemblyProduct = productService.addProductComponent(params.assemblyProduct.id, params.componentProduct.id, params.quantity as BigDecimal, params.unitOfMeasure)
 		render(template:'productComponents', model:[productInstance: assemblyProduct])
@@ -1194,6 +1206,7 @@ class ProductController {
 
 	}
 
+
 	def productCatalogs = {
 		def product = Product.get(params.id)
 
@@ -1211,6 +1224,18 @@ class ProductController {
 		render template: "productCatalogs", model: [productCatalogs:productCatalogs, product: product]
 	}
 
+	def removeFromProductAssociations = {
+		String productId
+		def productAssociation = ProductAssociation.get(params.id)
+		if (productAssociation) {
+			productId = productAssociation.product.id
+			productAssociation.delete()
+			redirect(action: "productSubstitutions", id: productId)
+		}
+		else {
+			response.status = 404
+		}
+	}
 
 
 }

@@ -62,6 +62,9 @@ class ProductSupplier implements Comparable<ProductSupplier>{
     // Number of days between order and delivery
     BigDecimal standardLeadTimeDays
 
+    // Cost per unit
+    BigDecimal unitCost
+
     // Price per unit
     BigDecimal unitPrice
 
