@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import com.mysql.jdbc.MysqlDataTruncation
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.hibernate.Criteria
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.UnitOfMeasure
 
@@ -332,8 +333,6 @@ class ProductController {
         else {
             render(template: "productSubstitutions", model:[productInstance: productInstance])
         }
-
-
     }
 
 
@@ -1194,22 +1193,52 @@ class ProductController {
         render(template:"/email/productCreated", model:[productInstance:productInstance, userInstance:userInstance])
     }
 
+	def addProductCatalog = { ProductCatalogCommand command ->
+		log.info("Add product ${command.product} to ${command.productCatalog}" + params)
+		def product = command.product
+		def productCatalog = command.productCatalog
+		if (!productCatalog.productCatalogItems.contains(product)) {
+			productCatalog.addToProductCatalogItem(new ProductCatalogItem(product:product))
+			productCatalog.save()
+		}
 
-    def removeFromProductAssociations = {
-        String productId
-        def productAssociation = ProductAssociation.get(params.id)
-        if (productAssociation) {
-            productId = productAssociation.product.id
-            productAssociation.delete()
-            redirect(action: "productSubstitutions", id: productId)
+		redirect(action: "productCatalogs", id: command.product.id)
+
+	}
+
+
+	def productCatalogs = {
+		def product = Product.get(params.id)
+
+        def productCatalogs = ProductCatalogItem.createCriteria().list {
+            projections {
+                property("productCatalog")
+            }
+            eq("product", product)
+            resultTransformer Criteria.DISTINCT_ROOT_ENTITY
         }
-        else {
-            response.status = 404
-        }
-    }
+
+        log.info "productCatalogs: " + productCatalogs
+		//def productCatalogs = ProductCatalog.list()
+
+		render template: "productCatalogs", model: [productCatalogs:productCatalogs, product: product]
+	}
+
+	def removeFromProductAssociations = {
+		String productId
+		def productAssociation = ProductAssociation.get(params.id)
+		if (productAssociation) {
+			productId = productAssociation.product.id
+			productAssociation.delete()
+			redirect(action: "productSubstitutions", id: productId)
+		}
+		else {
+			response.status = 404
+		}
+	}
+
 
 }
-
 
 
 
