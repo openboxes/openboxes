@@ -29,6 +29,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus;
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
@@ -497,7 +498,12 @@ class SelectTagLib {
         attrs.from = grailsApplication.config.openboxes.locale.supportedLocales
         attrs.optionValue = { new Locale(it).displayName }
         out << g.select(attrs)
+    }
 
+    def selectProductAssociationTypeCode = { attrs, body ->
+        attrs.from = ProductAssociationTypeCode.list()
+        attrs.optionValue = {it}
+        out << g.select(attrs)
     }
 
 
