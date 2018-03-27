@@ -23,6 +23,7 @@ class Attribute {
 	String name 			// The name of the attribute (e.g. 'vitality')
     String description
     Boolean active = Boolean.TRUE
+	Boolean exportable = Boolean.TRUE
 
 	List options;			// Valid coded option values for this attribute
 
