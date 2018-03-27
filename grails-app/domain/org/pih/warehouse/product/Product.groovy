@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.apache.commons.lang.NotImplementedException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
@@ -276,37 +277,68 @@ class Product implements Comparable, Serializable {
         updatedBy(nullable: true)
     }
 
+    /**
+     * Get the list of categories associated with this product.
+     *
+     * @return
+     */
     def getCategoriesList() {
         return LazyList.decorate(categories,
                 FactoryUtils.instantiateFactory(Category.class))
     }
 
+    /**
+     * Get the root category.
+     *
+     * @return
+     */
     Category getRootCategory() {
         Category rootCategory = new Category();
         rootCategory.categories = this.categories;
         return rootCategory;
     }
 
+    /**
+     * Get all images associated with this product.
+     *
+     * @return
+     */
     Collection getImages() {
         return documents?.findAll { it.contentType.startsWith("image") }
     }
 
+    /**
+     * Get the thumbnail (of the first image) associated with this product.
+     *
+     * @return
+     */
     Document getThumbnail() {
         return this?.images ? this.images?.sort()?.first() : null
     }
 
+    /**
+     * Get product package for the given UoM code.
+     *
+     * @param uomCode
+     * @return
+     */
     ProductPackage getProductPackage(uomCode) {
         def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
         return ProductPackage.findByProductAndUom(this, unitOfMeasure)
     }
 
-
+    /**
+     * Get the first generic product (product group) associated with this product.
+     * @return
+     */
     ProductGroup getGenericProduct() {
         return productGroups ? productGroups?.sort()?.first() : null
     }
 
-
-
+    /**
+     * Get products related to this product through all product groups.
+     * @return
+     */
     Set<Product> alternativeProducts() {
         def products = []
         productGroups.each { productGroup ->
@@ -321,7 +353,19 @@ class Product implements Comparable, Serializable {
         return products
     }
 
+    /**
+     * Get the product attribute associated with the given attribute.
+     *
+     * @param attribute
+     * @return
+     */
+    ProductAttribute getProductAttribute(Attribute attribute) {
+        if (!attribute) {
+            return null
+        }
 
+        attributes.find { it.attribute == attribute }
+    }
 
 
     /*
@@ -334,6 +378,12 @@ class Product implements Comparable, Serializable {
     }
     */
 
+    /**
+     * Get the inventory level by location id.
+     *
+     * @param locationId
+     * @return
+     */
     InventoryLevel getInventoryLevel(locationId) {
         if (id) {
             def location = Location.get(locationId)
@@ -341,8 +391,14 @@ class Product implements Comparable, Serializable {
         }
     }
 
+    /**
+     * Get the product status given the location and current quantity.
+     *
+     * @param locationId
+     * @param currentQuantity
+     * @return
+     */
     def getStatus(String locationId, Integer currentQuantity) {
-        def status = ""
         def inventoryLevel = getInventoryLevel(locationId)
         def latestInventoryDate = latestInventoryDate(locationId)
         log.info "Location " + locationId
@@ -352,14 +408,22 @@ class Product implements Comparable, Serializable {
         return inventoryLevel?.statusMessage(currentQuantity)
     }
 
-
+    /**
+     * Currently not implement since it would require coupling InventoryService to Product.
+     *
+     * @param locationId
+     */
     def getQuantityOnHand(Integer locationId) {
-
+        throw new NotImplementedException()
     }
 
+    /**
+     * Currently not implement since it would require coupling InventoryService to Product.
+     *
+     * @param locationId
+     */
     def getQuantityAvailableToPromise(Integer locationId) {
-
-
+        throw new NotImplementedException()
     }
 
 
