@@ -107,6 +107,7 @@ class ProductSupplier implements Comparable<ProductSupplier>{
 
         standardLeadTimeDays(nullable:true)
         unitPrice(nullable:true)
+        unitCost(nullable:true)
         minOrderQuantity(nullable:true)
         unitOfMeasure(nullable:true)
         ratingTypeCode(nullable:true)

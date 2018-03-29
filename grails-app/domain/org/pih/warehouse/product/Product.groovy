@@ -276,6 +276,7 @@ class Product implements Comparable, Serializable {
         //route(nullable:true)
         //dosageForm(nullable:true)
         pricePerUnit(nullable: true)
+        costPerUnit(nullable:true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
     }
