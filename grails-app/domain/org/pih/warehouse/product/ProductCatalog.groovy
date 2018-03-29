@@ -31,9 +31,31 @@ class ProductCatalog implements Comparable, Serializable {
         productCatalogItems sort:'product'
     }
 
+    static namedQueries = {
+        includesProduct { product ->
+            productCatalogItems {
+                eq 'product', product
+            }
+            order("name", "asc")
+        }
+    }
+
 
     boolean contains(Product product) {
         return productCatalogItems.find { it.product == product }
+    }
+
+    /**
+     * Remove all catalog items for the given product.
+     *
+     * @param product
+     */
+    void removeProduct(Product product) {
+        def list = productCatalogItems.findAll { it.product = product }
+        list.toArray().each {
+            removeFromProductCatalogItems(it)
+            it.delete()
+        }
     }
 
     /**

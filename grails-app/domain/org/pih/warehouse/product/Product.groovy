@@ -344,6 +344,9 @@ class Product implements Comparable, Serializable {
         return ProductAssociation.findAllByProductAndCode(this, ProductAssociationTypeCode.SUBSTITUTE)
     }
 
+    List<ProductCatalog> getProductCatalogs() {
+        return ProductCatalog.includesProduct(this).listDistinct()
+    }
 
     /**
      * Get products related to this product through all product groups.

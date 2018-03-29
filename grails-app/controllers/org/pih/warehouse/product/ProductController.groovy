@@ -1193,17 +1193,42 @@ class ProductController {
         render(template:"/email/productCreated", model:[productInstance:productInstance, userInstance:userInstance])
     }
 
-	def addProductCatalog = { ProductCatalogCommand command ->
+	def addToProductCatalog = { ProductCatalogCommand command ->
 		log.info("Add product ${command.product} to ${command.productCatalog}" + params)
 		def product = command.product
 		def productCatalog = command.productCatalog
-		if (!productCatalog.productCatalogItems.contains(product)) {
-			productCatalog.addToProductCatalogItem(new ProductCatalogItem(product:product))
-			productCatalog.save()
-		}
-
+        if (product && productCatalog) {
+            if (!productCatalog.productCatalogItems.contains(product)) {
+                productCatalog.addToProductCatalogItems(new ProductCatalogItem(product: product))
+                productCatalog.save()
+            }
+        }
 		redirect(action: "productCatalogs", id: command.product.id)
+	}
 
+    def includesProduct = {
+        def product = Product.get(params.id)
+
+        render ([products: ProductCatalog.includesProduct(product).listDistinct()] as JSON)
+    }
+
+	def removeFromProductCatalog = {
+        log.info ("params: " + params)
+		def product = Product.get(params.id)
+        def productCatalog = ProductCatalog.get(params.productCatalog.id)
+		if (productCatalog && product) {
+            log.info ("product: " + product)
+            log.info ("productCatalog: " + productCatalog)
+            //productCatalog.removeProduct(product)
+            def list = productCatalog.productCatalogItems.findAll { it.product = product }
+            list.toArray().each { productCatalogItem ->
+                productCatalog.removeFromProductCatalogItems(productCatalogItem)
+                productCatalogItem.delete()
+                productCatalog.save()
+            }
+
+		}
+        redirect(action: "productCatalogs", id: product.id)
 	}
 
 
