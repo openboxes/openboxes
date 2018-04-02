@@ -228,6 +228,7 @@ class ProductService {
 		// Get all products, including hidden ones
 		def products = Product.list()
 		def searchResults = Product.createCriteria().list() {
+            eq("active", true)
 			or {
 				or {
 					searchTerms.each {
@@ -276,9 +277,11 @@ class ProductService {
     */
 
     List<Product> getProducts(String query, Category category, List<Tag> tags, params) {
-        //def params = [name: query]
+        return getProducts(category, tags, false, params)
+    }
 
-        return getProducts(category, tags, params)
+    List<Product> getProducts(String query, Category category, List<Tag> tags, boolean includeInactive, params) {
+        return getProducts(category, tags, includeInactive, params)
 
     }
 
@@ -291,10 +294,25 @@ class ProductService {
 	List<Product> getProducts(String [] ids) {
 		def products = []
 		if (ids) {
-			products = Product.createCriteria().list() { 'in'("id", ids) }
+			products = Product.createCriteria().list() {
+                eq("active", true)
+                'in'("id", ids)
+            }
 		}
 		return products
 	}
+
+    /**
+     * Get all products that match category, tags, and search parameters.
+     * @param category
+     * @param tags
+     * @param params
+     * @return
+     */
+    List<Product> getProducts(Category category, List<Tag> tags, params) {
+        return getProducts(category, tags, false, params)
+    }
+
 
     /**
      * Get all products that match category, tags, and other search parameters.
@@ -304,11 +322,14 @@ class ProductService {
      * @param params
      * @return
      */
-    def getProducts(Category category, List<Tag> tagsInput, Map params) {
+    def getProducts(Category category, List<Tag> tagsInput, boolean includeInactive, Map params) {
         println "get products where category=" + category + ", tags=" + tagsInput + ", params=" + params
 
         def criteria = Product.createCriteria()
         def results = criteria.list(max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc") {
+            if (!includeInactive) {
+                eq("active", true)
+            }
             and {
                 if (category) {
                     if (params.includeCategoryChildren) {
@@ -413,7 +434,7 @@ class ProductService {
 			//command?.data[0].newField = 'new field'
 			//command?.data[0].newDate = new Date()
 			params.prompts = [:]
-			params.prompts["product.id"] = Product.findAllByNameLike("%" + params.search1 + "%")
+			params.prompts["product.id"] = Product.findAllByActiveAndNameLike(true, "%" + params.search1 + "%")
 
 			//def lotNumber = (params.lotNumber) ? String.valueOf(params.lotNumber) : null;
 			//if (params?.lotNumber instanceof Double) {
@@ -1105,8 +1126,10 @@ class ProductService {
 			similarProducts.addAll(productsInSameCategory)
 		}*/
 		def searchTerms = product.name.split(",")
-		if (searchTerms) { 
-			similarProducts.addAll(Product.findAllByNameLike("%" + searchTerms[0] +"%"))
+		if (searchTerms) {
+
+			def products = Product.findAllByNameLike("%" + searchTerms[0] +"%")
+			similarProducts.addAll(products)
 		}
 		/*
 		if (!similarProducts) { 
@@ -1121,6 +1144,12 @@ class ProductService {
 		similarProducts.remove(product)
 		
 		return similarProducts
+	}
+
+
+	def findProducts() {
+
+		Product.findAll("from Product as p where productCode is null or productCode = ''")
 	}
 
 }

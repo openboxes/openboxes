@@ -117,6 +117,10 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
+
+// request parameters to mask when logging exceptions
+grails.exceptionresolver.params.exclude = ['password']
+
 grails.validateable.packages = [
 	'org.pih.warehouse.inventory', 
 	'org.pih.warehouse.fulfillment',
@@ -286,9 +290,6 @@ log4j = {
 	root {
 		error 'stdout', 'smtp'
 		additivity = false
-		//error 'smtp'
-		//info 'stdout'
-		//additivity: false
 	}
 
 
@@ -342,6 +343,8 @@ log4j = {
    debug 	'org.apache.cxf',
             'grails.plugin.rendering',
 		   	'org.apache.commons.mail',
+            'grails.plugins.raven',
+            'net.kencochrane.raven',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
@@ -485,6 +488,12 @@ springcache {
 	}
 }
 
+
+// Grails Sentry/Raven plugin
+// NOTE: You'll need to enable the plugin and set a DSN using an external config properties file
+// (namely, openboxes-config.properties or openboxes-config.groovy)
+grails.plugins.raven.active = false
+grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
 
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
