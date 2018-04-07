@@ -75,7 +75,7 @@
     <changeSet author="jmiranda (generated)" id="1521820146168-4">
         <preConditions onFail="MARK_RAN">
             <not>
-                <indexExists indexName="FK187E54C9FB5E604E"/>
+                <foreignKeyConstraintExists foreignKeyName="FK187E54C9FB5E604E"/>
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="product_catalog_id" baseTableName="product_catalog_item" constraintName="FK187E54C9FB5E604E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product_catalog"/>
@@ -83,7 +83,7 @@
     <changeSet author="jmiranda (generated)" id="1521820146168-5">
         <preConditions onFail="MARK_RAN">
             <not>
-                <indexExists indexName="FK187E54C9DED5FAE7"/>
+                <foreignKeyConstraintExists foreignKeyName="FK187E54C9DED5FAE7"/>
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_catalog_item" constraintName="FK187E54C9DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
