@@ -27,13 +27,17 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductService
+import org.pih.warehouse.report.ConsumptionService
 import org.pih.warehouse.requisition.Requisition
+
+import java.text.SimpleDateFormat
 
 class ConsumptionController {
 
     def dataService
     ProductService productService
     InventoryService inventoryService
+    ConsumptionService consumptionService
 
     def show = { ShowConsumptionCommand command ->
         log.info "Consumption " + params
@@ -339,6 +343,122 @@ class ConsumptionController {
         }
     }
 
+
+    def index = {
+        redirect(action: "list")
+    }
+
+    def refresh = {
+        long startTime = System.currentTimeMillis()
+        Location location = Location.load(session?.warehouse?.id)
+        def records = consumptionService.refreshConsumptionData(location)
+        long duration = System.currentTimeMillis() - startTime
+        flash.message = "Calculated consumption ${records.size()} records in ${duration} ms"
+        log.info("Calculated consumption for ${records.size()} records in ${duration} ms")
+
+        redirect(controller: "consumption", action: "list")
+    }
+
+
+
+    def list = { ConsumptionCommand command ->
+
+        Location location = Location.get(session?.warehouse?.id)
+
+        def dateFormat = new SimpleDateFormat("ddMMyyyy")
+        //def dateKeys = inventoryService.getConsumptionDateKeys()
+        def calendar = Calendar.instance
+
+        // Set end date to user-entered date or the end of the current month
+        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        command.endDate = command?.endDate?:calendar.getTime()
+
+        // Set start date to user-entered date or the first of the year
+        calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
+        command.startDate = command?.startDate?:calendar.getTime()
+
+        //def results = consumptionService.getConsumptions(location, command?.startDate, command?.endDate, command?.groupBy)
+        def consumptions = consumptionService.getConsumptionTransactionsBetween(location, command?.startDate, command?.endDate)
+        log.info "Consumptions: ${consumptions.size()}"
+
+        def consumptionMap = consumptions.groupBy { it.product };
+
+        //def products = Product.list()
+        def products = consumptions*.product.unique();
+        //products = products.findAll { consumptionMap[it] > 0 }
+        def productMap = products.groupBy { it.category };
+
+
+        def dateKeys = (command?.startDate..command?.endDate).collect { date ->
+            calendar.setTime(date);
+            [
+                    date: date,
+                    day: calendar.get(Calendar.DAY_OF_MONTH),
+                    week: calendar.get(Calendar.WEEK_OF_YEAR),
+                    month: calendar.get(Calendar.MONTH),
+                    year: calendar.get(Calendar.YEAR),
+                    key: dateFormat.format(date)
+            ]
+        }.sort { it.date }
+
+
+        def groupBy = command?.groupBy;
+        log.info("groupBy = " + groupBy)
+        def daysBetween = (groupBy!="default") ? -1 : command?.endDate - command?.startDate
+        log.info ("Days between: " + daysBetween)
+        if (daysBetween > 365 || groupBy.equals("yearly")) {
+            groupBy = "yearly"
+            dateFormat = new SimpleDateFormat("yyyy")
+        }
+        else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
+            groupBy = "monthly"
+            dateFormat = new SimpleDateFormat("MMM yyyy")
+        }
+        else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
+            groupBy = "weekly"
+            dateFormat = new SimpleDateFormat("'Week' w")
+        }
+        else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
+            groupBy = "daily"
+            dateFormat = new SimpleDateFormat("MMM dd yyyy")
+        }
+        else {
+            groupBy = "monthly"
+            dateFormat = new SimpleDateFormat("MMM yyyy")
+        }
+        dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
+
+
+        log.debug("consumption " + consumptionMap)
+        def consumptionProductDateMap = [:]
+        consumptions.each {
+            def dateKey = it.product.id + "_" + dateFormat.format(it.transactionDate)
+            def quantity = consumptionProductDateMap[dateKey];
+            if (!quantity) quantity = 0;
+            quantity += it.quantityIssued?:0
+            consumptionProductDateMap[dateKey] = quantity;
+
+            def totalKey = it.product.id + "_Total"
+            def totalQuantity = consumptionProductDateMap[totalKey];
+            if (!totalQuantity) totalQuantity = 0;
+            totalQuantity += it.quantityIssued?:0
+            consumptionProductDateMap[totalKey] = totalQuantity;
+
+        }
+
+        [
+                command: command,
+                productMap : productMap,
+                consumptionMap: consumptionMap,
+                consumptionProductDateMap: consumptionProductDateMap,
+                productKeys: products,
+                dateKeys: dateKeys
+        ]
+    }
+
+
+
+
 }
 
 
@@ -471,4 +591,14 @@ class ShowConsumptionRowCommand {
         return transferOutLocations
     }
 
+}
+
+class ConsumptionCommand {
+    String groupBy
+    Date startDate
+    Date endDate
+
+    static constraints = {
+
+    }
 }

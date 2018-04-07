@@ -15,23 +15,62 @@ import org.pih.warehouse.product.Product
 
 class Consumption {
 
-	String id 
+    String id
+
 	Product product
-	InventoryItem inventoryItem
+    String productCode
+    String productName
+    String categoryName
+//    String catalogNames
+//    String tagNames
+
+    InventoryItem inventoryItem
+    String lotNumber
+    Date expirationDate
+
 	Location location
-	int day
-	int month
-	int year
-	Date transactionDate 
-	Integer quantity
-	
-	Date lastUpdated
+	String locationName
+    String locationGroup
+    String locationType
+
+    String transactionNumber
+    String transactionCode
+    String transactionType
+
+    Date transactionDate
+    int day
+    int month
+    int year
+
+    Boolean canceled
+    Boolean substituted
+    Boolean modified
+    String reasonCode
+
+    BigDecimal quantity = 0;
+
+    BigDecimal quantityRequested = 0
+    BigDecimal quantityIssued = 0
+    BigDecimal quantityConsumed = 0
+    BigDecimal quantityExpired = 0
+    BigDecimal quantityCanceled = 0
+    BigDecimal quantityDemand = 0
+    BigDecimal quantitySubstituted = 0
+    BigDecimal quantityModified = 0
+
+    Date lastUpdated
 	Date dateCreated
-			
-	static mapping = {
-		id generator: 'uuid'
-	}
-	
+
+    static mapping = {
+        id generator: 'uuid'
+        cache true
+    }
+
     static constraints = {
+        transactionNumber(nullable:true)
+        transactionCode(nullable:true)
+        lotNumber(nullable:true)
+        expirationDate(nullable:true)
+        reasonCode(nullable:true)
     }
 }

@@ -2871,43 +2871,6 @@ class InventoryService implements ApplicationContextAware {
 
 	/**
 	 *
-	 * @return
-	 */
-	def getConsumptionTransactionsBetween(Date startDate, Date endDate) {
-		log.debug("startDate = " + startDate + " endDate = " + endDate)
-		def criteria = Consumption.createCriteria()
-		def results = criteria.list {
-			if (startDate && endDate) {
-				between('transactionDate', startDate, endDate)
-			}
-		}
-
-		return results
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	def getConsumptions(Date startDate, Date endDate, String groupBy) {
-		log.debug("startDate = " + startDate + " endDate = " + endDate)
-		def criteria = Consumption.createCriteria()
-		def results = criteria.list {
-			if (startDate && endDate) {
-				between('transactionDate', startDate, endDate)
-			}
-			projections {
-				sum('quantity')
-				groupProperty('product')
-				groupProperty('transactionDate')
-			}
-		}
-
-		return results
-	}
-
-	/**
-	 *
 	 */
 	def getQuantity(Product product, Location location, Date beforeDate) {
 		def quantity = 0;
