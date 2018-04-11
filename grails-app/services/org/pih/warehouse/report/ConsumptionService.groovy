@@ -10,150 +10,203 @@
 package org.pih.warehouse.report
 
 import groovyx.gpars.GParsPool
+import org.apache.commons.lang.StringEscapeUtils
+import org.hibernate.FetchMode
+import org.hibernate.classic.Session
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.reporting.Consumption
+import org.pih.warehouse.reporting.ConsumptionFact
+
+import java.text.DateFormat
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
 
 class ConsumptionService {
 
+    def sessionFactory
     def persistenceInterceptor
+    def dataService
+    boolean transactional = false
 
-    boolean transactional = true
+    static DateFormat weekFormat = new SimpleDateFormat("w");
+    static DateFormat dayFormat = new SimpleDateFormat("dd");
+    static DateFormat weekdayAbbrFormat = new SimpleDateFormat("EEE");
+    static DateFormat weekdayNameFormat = new SimpleDateFormat("EEEEE");
+    static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    static DateFormat monthFormat = new SimpleDateFormat("MM");
+    static DateFormat monthAbbrFormat = new SimpleDateFormat("MMM");
+    static DateFormat monthNameFormat = new SimpleDateFormat("MMMMM");
+    static DateFormat yearFormat = new SimpleDateFormat("yyyy");
+    static DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
 
-    List<String> refreshConsumptionData(Location location) {
+
+    List refreshConsumptionData(Location location) {
+        long startTime = System.currentTimeMillis()
+
         // Delete all consumption rows
-        Integer deletedRecords = Consumption.executeUpdate("delete Consumption c where location.id = :locationId", [locationId: location?.id])
+        Integer deletedRecords = ConsumptionFact.executeUpdate("delete ConsumptionFact c where location.id = :locationId", [locationId: location?.id])
+        log.info "Deleted ${deletedRecords} records in ${System.currentTimeMillis()-startTime}"
 
-        log.info "Deleted ${deletedRecords} records"
+        log.info ("Calcuating consumption for location ${location?.id}")
+        persistenceInterceptor.init()
 
-        def consumptionList = []
-        //List<String> ids = getTransactionEntries(location)
-        //List<String> ids = getTransactions(location)
-        List<Transaction> transactions = getTransactions(location)
+        //def transactions = getTransactions(location)
 
+        def transactionEntries = getTransactionEntries(location)
+        if (transactionEntries) {
+            log.info("Processing ${transactionEntries.size()} transactions for location ${location?.name}")
+            try {
+                List consumptionRecords = []
 
-        log.info ("Calculating consumption based on ${transactions.size()} transactions")
-        GParsPool.withPool {
-            consumptionList = transactions.collectParallel { transaction ->
-                //log.info ("Calcuating consumption for transaction ${transaction?.id}")
-                persistenceInterceptor.init()
-                try {
-                    //Transaction transaction = Transaction.findById(id, [fetch: [outboundTransfer: 'eager', inboundTransfer: 'eager', transactionEntries: 'eager']])
-                    if (transaction) {
-                        transaction.transactionEntries.each { transactionEntry ->
-                            return calculateConsumption(transactionEntry)
-                        }
-                    }
-                    persistenceInterceptor.flush()
-                } catch (Exception e) {
-                    log.error("Error calculating consumption data " + e.message, e)
-
-                } finally {
-                    persistenceInterceptor.destroy()
+                transactionEntries.each { transactionEntry ->
+                    def consumptionRecord = calculateConsumption(transactionEntry)
+                    consumptionRecords.add(consumptionRecord)
                 }
+
+//                transactions.each { transaction ->
+//                    if (transaction) {
+//                        transaction.transactionEntries.each { transactionEntry ->
+//                            def consumptionRecord = calculateConsumption(transactionEntry)
+//                            consumptionRecords.add(consumptionRecord)
+//                        }
+//                    }
+//                }
+                long saveStartTime = System.currentTimeMillis()
+                saveConsumptionRecords(consumptionRecords)
+                log.info("Saved ${consumptionRecords.size()} consumption records in ${System.currentTimeMillis()-saveStartTime} ms")
+
+                persistenceInterceptor.flush()
+            } catch (Exception e) {
+                log.error("Error calculating consumption data " + e.message, e)
+
+            } finally {
+                persistenceInterceptor.destroy()
             }
         }
-        log.info "Calculated consumption for ${consumptionList?.size()} transactions"
-        return consumptionList
+        log.info("Refreshing consumption data took ${System.currentTimeMillis()-startTime} ms")
+        return [location]
     }
 
 
-//    List<String> getTransactionEntries(Location location) {
-//
-//        def transactionIds = TransactionEntry.createCriteria().listDistinct {
-//            projections {
-//                property("id")
-//            }
-//            transaction {
-//                transactionType {
-//                    eq("transactionCode", TransactionCode.DEBIT)
-//                }
-//                eq("inventory", location.inventory)
-//            }
-//
-//            maxResults(100)
-//        }
-//        return transactionIds;
-//    }
+    List refreshConsumptionData() {
+        def locationList = []
+        List<Location> locations = Location.list()
+        log.info ("Calculating consumption based on ${locations.size()} transactions")
+        GParsPool.withPool {
+            locationList = locations.collectParallel { Location location ->
+                return refreshConsumptionData(location)
+            }
+        }
+        log.info "Calculated consumption for ${locationList?.size()} locations"
 
-//    List<String> getTransactions(Location location) {
-//
-//        def transactionIds = Transaction.createCriteria().listDistinct {
-//            projections {
-//                property("id")
-//            }
-//            transactionType {
-//                eq("transactionCode", TransactionCode.DEBIT)
-//            }
-//            eq("inventory", location.inventory)
-//            //maxResults(1000)
-//        }
-//        return transactionIds;
-//    }
+        log.info "Persisting ${locationList.size()} consumption records"
 
-    List<Transaction> getTransactionEntries(Location location) {
-        def transactions = TransactionEntry.createCriteria().list([fetch: [outboundTransfer: 'eager', inboundTransfer: 'eager', transactionEntries: 'eager']]) {
+
+        return locationList
+    }
+
+
+    void saveConsumptionRecords(List consumptionRecords) {
+        Session session = sessionFactory.openSession();
+        org.hibernate.Transaction tx = session.beginTransaction();
+        consumptionRecords.eachWithIndex { consumption, index ->
+            session.save(consumption)
+            // Flush and clear the session every 100 records
+            if(index.mod(100)==0) {
+                session.flush();
+                session.clear();
+            }
+        }
+        tx.commit();
+        session.close();
+    }
+
+
+    List<Transaction> getTransactions(Location location) {
+        def transactions = Transaction.createCriteria().list {
             transactionType {
                 eq("transactionCode", TransactionCode.DEBIT)
             }
             eq("inventory", location.inventory)
-            maxResults(100)
         }
         return transactions;
     }
 
+    List <TransactionEntry> getTransactionEntries(Location location) {
+        def transactionEntries = TransactionEntry.createCriteria().list {
+            fetchMode 'transaction', FetchMode.JOIN
+            //fetchMode 'transaction.outboundTransfer', FetchMode.JOIN
+            //fetchMode 'transaction.inboundTransfer', FetchMode.JOIN
+            fetchMode 'inventoryItem', FetchMode.JOIN
+            fetchMode 'inventoryItem.product', FetchMode.JOIN
+            fetchMode 'inventoryItem.product.productGroups', FetchMode.JOIN
+            transaction {
+                transactionType {
+                    eq("transactionCode", TransactionCode.DEBIT)
+                }
+                eq("inventory", location.inventory)
+            }
+        }
+        return transactionEntries;
+
+    }
 
 
-    Consumption calculateConsumption(TransactionEntry transactionEntry) {
-
-        //TransactionEntry transactionEntry = TransactionEntry.get(id)
+    ConsumptionFact calculateConsumption(TransactionEntry transactionEntry) {
 
         if (transactionEntry) {
             Transaction transaction = transactionEntry.transaction
-            def consumption = [:]
-//            def consumption = [
-//                    product: transactionEntry.inventoryItem.product,
-//                    productCode: transactionEntry.inventoryItem.product?.productCode,
-//                    productName: transactionEntry.inventoryItem.product?.name,
-//                    categoryName: transactionEntry.inventoryItem?.product?.category?.name,
-//
-//                    inventoryItem: transactionEntry.inventoryItem,
-//                    lotNumber: transactionEntry?.inventoryItem?.lotNumber,
-//                    expirationDate: transactionEntry?.inventoryItem?.expirationDate,
-//
-//                    quantityIssued: transactionEntry.quantity,
-//                    quantityCanceled: 0,
-//                    quantityDemand: 0,
-//                    quantityRequested: 0,
-//                    quantitySubstituted: 0,
-//                    quantityModified: 0,
-//
-//                    transaction: transaction,
-//                    transactionNumber: transaction.transactionNumber,
-//                    transactionDate: transaction.transactionDate,
-//                    transactionCode: transaction.transactionType.transactionCode.toString(),
-//                    transactionType: transaction.transactionType.name,
-//
-//                    canceled: false,
-//                    substituted: false,
-//                    modified: false,
-//
-//                    reasonCode: "None",
-//
-//                    location: transaction.inventory.warehouse,
-//                    locationName: transaction.inventory.warehouse.name,
-//                    locationType: transaction.inventory.warehouse.locationType?.name,
-//                    locationGroup: transaction.inventory.warehouse.locationGroup?.name,
-//
-//                    month: transaction.transactionDate.month,
-//                    day: transaction.transactionDate.day,
-//                    year: transaction.transactionDate.year + 1900
-//            ]
+            def consumption = new ConsumptionFact(
+                    product: transactionEntry.inventoryItem.product,
+                    genericProduct: transactionEntry.inventoryItem.product?.genericProduct,
 
+                    productCode: transactionEntry.inventoryItem.product?.productCode,
+                    productName: transactionEntry.inventoryItem.product?.name,
+
+                    category: transactionEntry.inventoryItem?.product?.category,
+                    categoryName: transactionEntry.inventoryItem?.product?.category?.name,
+                    unitCost: transactionEntry?.inventoryItem?.product?.pricePerUnit,
+                    unitPrice: 0.0,
+
+                    inventoryItem: transactionEntry.inventoryItem,
+                    lotNumber: transactionEntry?.inventoryItem?.lotNumber,
+                    expirationDate: transactionEntry?.inventoryItem?.expirationDate,
+
+                    quantityIssued: transactionEntry.quantity,
+                    quantityCanceled: 0,
+                    quantityDemand: 0,
+                    quantityRequested: 0,
+                    quantitySubstituted: 0,
+                    quantityModified: 0,
+
+                    transaction: transaction,
+                    transactionNumber: transaction.transactionNumber,
+                    transactionCode: transaction.transactionType.transactionCode.toString(),
+                    transactionType: transaction.transactionType.name,
+
+                    canceled: false,
+                    substituted: false,
+                    modified: false,
+
+                    reasonCode: "None",
+
+                    location: transaction.inventory.warehouse,
+                    locationName: transaction.inventory.warehouse.name,
+                    locationType: transaction.inventory.warehouse.locationType?.name,
+                    locationGroup: transaction.inventory.warehouse.locationGroup?.name,
+
+                    transactionDate: transaction.transactionDate,
+                    week: weekFormat.format(transaction.transactionDate),
+                    month: monthFormat.format(transaction.transactionDate),
+                    day: dayFormat.format(transaction.transactionDate),
+                    year: yearFormat.format(transaction.transactionDate),
+                    monthYear: yearMonthFormat.format(transaction.transactionDate)
+            )
             //consumption.save(failOnError: true)
             return consumption
         }
@@ -161,43 +214,148 @@ class ConsumptionService {
 
     }
 
-    /**
-     *
-     * @return
-     */
-    def getConsumptionTransactionsBetween(Location location, Date startDate, Date endDate) {
-        log.info("location " + location + "startDate = " + startDate + " endDate = " + endDate)
-        def criteria = Consumption.createCriteria()
-        def results = criteria.list {
+
+    def aggregateConsumption(Location location, Category category, Date startDate, Date endDate) {
+        def results = ConsumptionFact.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                groupProperty('product', "product")
+                groupProperty('productCode', "Product Code")
+                groupProperty('productName', "Product Name")
+                groupProperty("categoryName", "Category Name")
+                groupProperty("day", "Day")
+                groupProperty("week", "Week")
+                groupProperty("month", "Month")
+                groupProperty("year", "Year")
+                sum("quantityIssued", "Issued")
+            }
+
             if (startDate && endDate) {
                 between('transactionDate', startDate, endDate)
             }
+            if (category) {
+                eq("categoryName", category.name)
+            }
             eq("location", location)
+            order("productName", "asc")
         }
+        return results
+
+    }
+
+
+    def listConsumption(Location location, Category category, Date startDate, Date endDate) {
+
+        def results = ConsumptionFact.createCriteria().list {
+            //resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (startDate && endDate) {
+                between('transactionDate', startDate, endDate)
+            }
+            if (category) {
+                eq("categoryName", category.name)
+            }
+            eq("location", location)
+            order("productName", "asc")
+        }
+
+        log.info "list consumption: " + results
 
         return results
     }
 
-    /**
-     *
-     * @return
-     */
-    def getConsumptions(Location location, Date startDate, Date endDate, String groupBy) {
-        log.debug("startDate = " + startDate + " endDate = " + endDate)
-        def criteria = Consumption.createCriteria()
-        def results = criteria.list {
-            if (startDate && endDate) {
-                between('transactionDate', startDate, endDate)
-            }
-            eq("location", location)
-            projections {
-                sum('quantityIssued')
-                groupProperty('product')
-                groupProperty('transactionDate')
-            }
-        }
 
-        return results
+    def generateCrossTab(List<ConsumptionFact> consumptionFactList, Date startDate, Date endDate, String groupBy) {
+
+
+        def calendar = Calendar.instance
+        def dateFormat = new SimpleDateFormat("ddMMyyyy")
+
+        def dateKeys = (startDate..endDate).collect { date ->
+            calendar.setTime(date);
+            [
+                    date: date,
+                    day: calendar.get(Calendar.DAY_OF_MONTH),
+                    week: calendar.get(Calendar.WEEK_OF_YEAR),
+                    month: calendar.get(Calendar.MONTH),
+                    year: calendar.get(Calendar.YEAR),
+                    key: dateFormat.format(date)
+            ]
+        }.sort { it.date }
+
+
+        def daysBetween = (groupBy!="default") ? -1 : endDate - startDate
+        if (daysBetween > 365 || groupBy.equals("yearly")) {
+            dateFormat = yearFormat
+        }
+        else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
+            dateFormat = yearMonthFormat
+        }
+        else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
+            dateFormat = weekFormat
+        }
+        else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
+            dateFormat = dayFormat
+        }
+        else {
+            dateFormat = yearMonthFormat
+        }
+        dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
+
+        log.info ("consumptionFactList: " + consumptionFactList)
+
+        def consumptionFactMap = consumptionFactList.inject([:]) { result, consumptionFact ->
+            def productId = consumptionFact["productId"]
+            def transactionDate = consumptionFact["transactionDate"]
+            def quantityIssued = consumptionFact["quantityIssued"]
+            def dateKey = dateFormat.format(transactionDate)
+            def quantityMap = result[productId]
+            if (!quantityMap) {
+                quantityMap = [:]
+            }
+            def quantity = quantityMap[dateKey]?:0
+            quantity += quantityIssued
+            quantityMap[dateKey] = quantity
+            result[productId] = quantityMap
+            result
+        }
+        log.info "Consumption map: " + consumptionFactMap
+
+        def crosstabRows = []
+        def products = consumptionFactList.collect { it.product }.unique()
+        products.each { Product product ->
+            BigDecimal totalIssued = 0
+            BigDecimal totalDemand = 0
+            BigDecimal totalCanceled = 0
+            BigDecimal unitCost = product?.costPerUnit?:product?.pricePerUnit?:0
+            Map row = [
+                    "Code": product?.productCode,
+                    "Name": product?.name,
+                    "Tags": StringEscapeUtils.escapeCsv(product.tagsToString()),
+                    "Catalogs": StringEscapeUtils.escapeCsv(product.productCatalogsToString()),
+                    "Unit Cost": NumberFormat.getNumberInstance().format(unitCost)
+            ]
+
+            def consumptionAggregated = consumptionFactMap[product?.id]
+            dateKeys.each { dateKey ->
+                def quantityIssued = consumptionAggregated[dateKey]?:0
+                totalIssued += quantityIssued
+                row += [ "${dateKey}" : quantityIssued ]
+            }
+            BigDecimal averageIssued = totalIssued / dateKeys.size()
+
+            row += [
+                    "Total Demand": totalDemand,
+                    "Total Canceled": totalCanceled,
+                    "Total Issued": totalIssued,
+                    "Total Cost": NumberFormat.getNumberInstance().format(totalIssued * unitCost),
+                    "Average Issued": averageIssued,
+                    "Average Cost": NumberFormat.getNumberInstance().format(averageIssued * unitCost)
+            ]
+            crosstabRows << row
+        }
+        log.info "crosstabRows: " + crosstabRows
+        return crosstabRows
     }
 
 }

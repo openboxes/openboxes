@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.reporting
 
+import grails.converters.JSON
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
@@ -348,20 +349,18 @@ class ConsumptionController {
         redirect(action: "list")
     }
 
-    def refresh = {
+    def refresh = { ConsumptionCommand command ->
         long startTime = System.currentTimeMillis()
-        Location location = Location.load(session?.warehouse?.id)
+        Location location = command?.location?:Location.load(session?.warehouse?.id)
         def records = consumptionService.refreshConsumptionData(location)
         long duration = System.currentTimeMillis() - startTime
         flash.message = "Calculated consumption ${records.size()} records in ${duration} ms"
         log.info("Calculated consumption for ${records.size()} records in ${duration} ms")
-
         redirect(controller: "consumption", action: "list")
     }
 
 
-
-    def list = { ConsumptionCommand command ->
+    def pivot = { ConsumptionCommand command ->
 
         Location location = Location.get(session?.warehouse?.id)
 
@@ -377,85 +376,63 @@ class ConsumptionController {
         calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
         command.startDate = command?.startDate?:calendar.getTime()
 
-        //def results = consumptionService.getConsumptions(location, command?.startDate, command?.endDate, command?.groupBy)
-        def consumptions = consumptionService.getConsumptionTransactionsBetween(location, command?.startDate, command?.endDate)
-        log.info "Consumptions: ${consumptions.size()}"
 
-        def consumptionMap = consumptions.groupBy { it.product };
-
-        //def products = Product.list()
-        def products = consumptions*.product.unique();
-        //products = products.findAll { consumptionMap[it] > 0 }
-        def productMap = products.groupBy { it.category };
-
-
-        def dateKeys = (command?.startDate..command?.endDate).collect { date ->
-            calendar.setTime(date);
-            [
-                    date: date,
-                    day: calendar.get(Calendar.DAY_OF_MONTH),
-                    week: calendar.get(Calendar.WEEK_OF_YEAR),
-                    month: calendar.get(Calendar.MONTH),
-                    year: calendar.get(Calendar.YEAR),
-                    key: dateFormat.format(date)
-            ]
-        }.sort { it.date }
-
-
-        def groupBy = command?.groupBy;
-        log.info("groupBy = " + groupBy)
-        def daysBetween = (groupBy!="default") ? -1 : command?.endDate - command?.startDate
-        log.info ("Days between: " + daysBetween)
-        if (daysBetween > 365 || groupBy.equals("yearly")) {
-            groupBy = "yearly"
-            dateFormat = new SimpleDateFormat("yyyy")
-        }
-        else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
-            groupBy = "monthly"
-            dateFormat = new SimpleDateFormat("MMM yyyy")
-        }
-        else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
-            groupBy = "weekly"
-            dateFormat = new SimpleDateFormat("'Week' w")
-        }
-        else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
-            groupBy = "daily"
-            dateFormat = new SimpleDateFormat("MMM dd yyyy")
-        }
-        else {
-            groupBy = "monthly"
-            dateFormat = new SimpleDateFormat("MMM yyyy")
-        }
-        dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
-
-
-        log.debug("consumption " + consumptionMap)
-        def consumptionProductDateMap = [:]
-        consumptions.each {
-            def dateKey = it.product.id + "_" + dateFormat.format(it.transactionDate)
-            def quantity = consumptionProductDateMap[dateKey];
-            if (!quantity) quantity = 0;
-            quantity += it.quantityIssued?:0
-            consumptionProductDateMap[dateKey] = quantity;
-
-            def totalKey = it.product.id + "_Total"
-            def totalQuantity = consumptionProductDateMap[totalKey];
-            if (!totalQuantity) totalQuantity = 0;
-            totalQuantity += it.quantityIssued?:0
-            consumptionProductDateMap[totalKey] = totalQuantity;
-
-        }
-
-        [
-                command: command,
-                productMap : productMap,
-                consumptionMap: consumptionMap,
-                consumptionProductDateMap: consumptionProductDateMap,
-                productKeys: products,
-                dateKeys: dateKeys
-        ]
+        [ command: command]
     }
 
+
+    def list = { ConsumptionCommand command ->
+
+        log.info "Params: " + params
+
+        Location location = Location.get(session?.warehouse?.id)
+
+        Calendar calendar = Calendar.instance
+
+        // Set end date to user-entered date or the end of the current month
+        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        command.endDate = command?.endDate?:calendar.getTime()
+
+        // Set start date to user-entered date or the first of the year
+        calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
+        command.startDate = command?.startDate?:calendar.getTime()
+
+        if (command.download) {
+            def data = consumptionService.listConsumption(command.location, command.category, command.startDate, command.endDate)
+            def crosstab = consumptionService.generateCrossTab(data, command.startDate, command.endDate, null)
+            log.info "crosstab " + crosstab
+            String csv = dataService.generateCsv(crosstab)
+            response.setHeader("Content-disposition", "attachment; filename='Consumption-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
+            render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+            return
+        }
+
+        [ command: command ]
+    }
+
+
+    def aggregate = { ConsumptionCommand command ->
+
+        String locationId = command?.location?.id?:session?.warehouse?.id
+
+        Location location = Location.get(locationId)
+
+        def dateFormat = new SimpleDateFormat("ddMMyyyy")
+        //def dateKeys = inventoryService.getConsumptionDateKeys()
+        def calendar = Calendar.instance
+
+        // Set end date to user-entered date or the end of the current month
+        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        command.endDate = command?.endDate?:calendar.getTime()
+
+        // Set start date to user-entered date or the first of the year
+        calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
+        command.startDate = command?.startDate?:calendar.getTime()
+
+        List <ConsumptionFact> results = consumptionService.listConsumption(location, command?.category, command.startDate, command.endDate)
+
+        render results as JSON
+    }
 
 
 
@@ -594,11 +571,22 @@ class ShowConsumptionRowCommand {
 }
 
 class ConsumptionCommand {
+
+    Category category
+    Location location
     String groupBy
     Date startDate
     Date endDate
 
+    Boolean aggregate = Boolean.FALSE
+    Boolean download = Boolean.FALSE
+
     static constraints = {
+        category(nullable:true)
+        location(nullable:true)
+        startDate(nullable:true)
+        endDate(nullable:true)
+        groupBy(nullable:true)
 
     }
 }
