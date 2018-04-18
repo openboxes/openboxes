@@ -3825,19 +3825,33 @@ class InventoryService implements ApplicationContextAware {
     }
 
     def getTransactionDates() {
-        //return Transaction.executeQuery('select distinct transactionDate from Transaction')
         def transactionDates = []
-        //def results = Transaction.executeQuery("select distinct year(transactionDate), month(transactionDate), day(transactionDate) from Transaction where inventory = :inventory",
-        //        [inventory:location.inventory])
-
-        def results = Transaction.executeQuery("select transactionDate from Transaction")
+        def results = Transaction.executeQuery(
+                "select transactionDate " +
+                        "from Transaction " +
+                        "order by transactionDate desc")
 
         results.each { date ->
-            //def date = new Date().updated([year: it[0], month: it[1], day: it[2]])
             date.clearTime()
             transactionDates << date
         }
-        return transactionDates.unique().sort().reverse()
+        return transactionDates.unique()
+    }
+
+
+    def getTransactionDates(Date onOrAfterDate) {
+        def transactionDates = []
+        def results = Transaction.executeQuery(
+				        "select transactionDate " +
+                        "from Transaction " +
+                        "where transactionDate >= :onOrAfterDate " +
+                        "order by transactionDate desc", [onOrAfterDate:onOrAfterDate])
+
+        results.each { date ->
+            date.clearTime()
+            transactionDates << date
+        }
+        return transactionDates.unique()
     }
 
 

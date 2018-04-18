@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.FetchMode
 import org.hibernate.classic.Session
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.inventory.Transaction
@@ -28,22 +29,10 @@ import java.text.SimpleDateFormat
 
 class ConsumptionService {
 
+    def dataService
     def sessionFactory
     def persistenceInterceptor
-    def dataService
     boolean transactional = false
-
-    static DateFormat weekFormat = new SimpleDateFormat("w");
-    static DateFormat dayFormat = new SimpleDateFormat("dd");
-    static DateFormat weekdayAbbrFormat = new SimpleDateFormat("EEE");
-    static DateFormat weekdayNameFormat = new SimpleDateFormat("EEEEE");
-    static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    static DateFormat monthFormat = new SimpleDateFormat("MM");
-    static DateFormat monthAbbrFormat = new SimpleDateFormat("MMM");
-    static DateFormat monthNameFormat = new SimpleDateFormat("MMMMM");
-    static DateFormat yearFormat = new SimpleDateFormat("yyyy");
-    static DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
-
 
     List refreshConsumptionData(Location location) {
         long startTime = System.currentTimeMillis()
@@ -52,10 +41,8 @@ class ConsumptionService {
         Integer deletedRecords = ConsumptionFact.executeUpdate("delete ConsumptionFact c where location.id = :locationId", [locationId: location?.id])
         log.info "Deleted ${deletedRecords} records in ${System.currentTimeMillis()-startTime}"
 
-        log.info ("Calcuating consumption for location ${location?.id}")
+        log.info ("Processing consumption for location ${location?.name}")
         persistenceInterceptor.init()
-
-        //def transactions = getTransactions(location)
 
         def transactionEntries = getTransactionEntries(location)
         if (transactionEntries) {
@@ -67,15 +54,6 @@ class ConsumptionService {
                     def consumptionRecord = calculateConsumption(transactionEntry)
                     consumptionRecords.add(consumptionRecord)
                 }
-
-//                transactions.each { transaction ->
-//                    if (transaction) {
-//                        transaction.transactionEntries.each { transactionEntry ->
-//                            def consumptionRecord = calculateConsumption(transactionEntry)
-//                            consumptionRecords.add(consumptionRecord)
-//                        }
-//                    }
-//                }
                 long saveStartTime = System.currentTimeMillis()
                 saveConsumptionRecords(consumptionRecords)
                 log.info("Saved ${consumptionRecords.size()} consumption records in ${System.currentTimeMillis()-saveStartTime} ms")
@@ -161,7 +139,7 @@ class ConsumptionService {
 
         if (transactionEntry) {
             Transaction transaction = transactionEntry.transaction
-            def consumption = new ConsumptionFact(
+            def consumptionFact = new ConsumptionFact(
                     product: transactionEntry.inventoryItem.product,
                     genericProduct: transactionEntry.inventoryItem.product?.genericProduct,
 
@@ -201,14 +179,14 @@ class ConsumptionService {
                     locationGroup: transaction.inventory.warehouse.locationGroup?.name,
 
                     transactionDate: transaction.transactionDate,
-                    week: weekFormat.format(transaction.transactionDate),
-                    month: monthFormat.format(transaction.transactionDate),
-                    day: dayFormat.format(transaction.transactionDate),
-                    year: yearFormat.format(transaction.transactionDate),
-                    monthYear: yearMonthFormat.format(transaction.transactionDate)
+                    week: Constants.weekFormat.format(transaction.transactionDate),
+                    month: Constants.monthFormat.format(transaction.transactionDate),
+                    day: Constants.dayFormat.format(transaction.transactionDate),
+                    year: Constants.yearFormat.format(transaction.transactionDate),
+                    monthYear: Constants.yearMonthFormat.format(transaction.transactionDate)
             )
             //consumption.save(failOnError: true)
-            return consumption
+            return consumptionFact
         }
 
 

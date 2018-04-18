@@ -39,6 +39,18 @@ class Constants {
 	static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
 	static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
 
+	// Dimension date formats
+	static DateFormat weekFormat = new SimpleDateFormat("w");
+	static DateFormat dayFormat = new SimpleDateFormat("dd");
+	static DateFormat weekdayAbbrFormat = new SimpleDateFormat("EEE");
+	static DateFormat weekdayNameFormat = new SimpleDateFormat("EEEEE");
+	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	static DateFormat monthFormat = new SimpleDateFormat("MM");
+	static DateFormat monthAbbrFormat = new SimpleDateFormat("MMM");
+	static DateFormat monthNameFormat = new SimpleDateFormat("MMMMM");
+	static DateFormat yearFormat = new SimpleDateFormat("yyyy");
+	static DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
+
 	static final String DEFAULT_WEIGHT_UNITS = "lbs"
 	static final String DEFAULT_VOLUME_UNITS = "ft"
 

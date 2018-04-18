@@ -28,7 +28,12 @@ class ReportController {
 	def reportService
     def messageService
 
-
+    def refreshTransactionFactData = {
+        def startTime = System.currentTimeMillis()
+        def results = reportService.refreshTransactionFactData()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime, results: results, groovyVersion: GroovySystem.version] as JSON)
+    }
 
 
     def binLocationCsvHeader = { binLocation ->
