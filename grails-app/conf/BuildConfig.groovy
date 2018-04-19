@@ -107,6 +107,33 @@ grails.project.dependency.resolution = {
         runtime(":jquery:1.7.2")
         runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
 
+        compile(":barcode4j:0.2.1")
+
+        // Moved from application.properties
+        compile(":bubbling:2.1.4")
+        compile(":clickstream:0.2.0")
+        compile(":codenarc:0.17")
+        compile(":console:1.1")
+        compile(":csv:0.3.1")
+        compile(":dynamic-controller:0.3")
+        compile(":external-config-reload:1.4.0")
+        compile(":famfamfam:1.0.1")
+        compile(":google-analytics:1.0")
+        compile(":google-visualization:0.6.2")
+        compile(":grails-ui:1.2.3")
+        compile(":image-builder:0.2")
+        compile(":joda-time:1.4")
+        compile(":ldap:0.8.2")
+        compile(":pretty-time:0.3")
+        compile(":profile-template:0.1")
+        runtime(":runtime-logging:0.4")
+        compile(":springcache:1.3.1")
+        //compile(":template-cache:0.1")
+        compile(":ui-performance:1.2.2")
+        compile(":webflow:1.3.8")
+        compile(":yui:2.8.2.1")
+
+
         //test(":spock:0.6") {
         //    exclude "spock-grails-support"
         //}
