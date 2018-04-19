@@ -546,7 +546,7 @@ class ProductController {
 	 * @param userInstance
 	 * @return
 	 */
-	def sendProductCreatedNotification(Product productInstance, String templateName) {
+	def sendProductCreatedNotification(Product productInstance) {
 		try {
 			def recipientList = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_NOTIFICATION).collect { it.email }
 			if (recipientList) {
