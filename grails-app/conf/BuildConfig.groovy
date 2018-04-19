@@ -78,8 +78,11 @@ grails.project.dependency.resolution = {
 
 	}
 	plugins {
+        runtime(':tomcat:1.3.9')
+        runtime(':hibernate:1.3.9') { excludes 'antlr' }
+        runtime(":cache-headers:1.1.5")
 
-		compile ":rendering:0.4.4"
+        compile ":rendering:0.4.4"
 		compile ":raven:0.5.8"
 
 		runtime( ':constraints:0.6.0' )
@@ -96,14 +99,11 @@ grails.project.dependency.resolution = {
         //runtime(":liquibase:1.9.3.6") { excludes 'data-source' }
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
-        runtime(':hibernate:1.3.9') { excludes 'antlr' }
-        runtime(':tomcat:1.3.9') 
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
         runtime(':quartz2:2.1.6.2')
         runtime(":resources:1.1.6")
         runtime(":zipped-resources:1.0") { excludes 'resources' }
         runtime(":cached-resources:1.0") { excludes 'resources' }
-        runtime(":cache-headers:1.1.5")
         runtime(":jquery:1.7.2")
         runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
 
