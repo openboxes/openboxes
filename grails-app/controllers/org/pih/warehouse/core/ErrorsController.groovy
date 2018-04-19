@@ -88,6 +88,12 @@ class ErrorsController {
         if (enabled) {
             def recipients = ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients) as List
 
+            def errorNotificationList = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
+            errorNotificationList.each { errorNotificationUser ->
+                if (errorNotificationUser.email)
+                    recipients.add(errorNotificationUser.email);
+            }
+
             def ccList = []
             def reportedBy = User.findByUsername(params.reportedBy)
             if (params.ccMe && reportedBy) {

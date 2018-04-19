@@ -446,7 +446,9 @@ class UserController {
 	def sendUserStatusChanged(User userInstance) {		
 		try { 
 			// Send notification emails to all administrators
-			def users = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
+			def users = userService.findUsersByRoleType(RoleType.ROLE_USER_NOTIFICATION)
+
+			// Include the user whose status has changed
 			users << userInstance;
 			
 			def recipients = users.collect { it.email }

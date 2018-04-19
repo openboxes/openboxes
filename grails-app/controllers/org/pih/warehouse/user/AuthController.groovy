@@ -191,25 +191,16 @@ class AuthController {
 
                 // Send email to administrators
                 try {
-					def recipients = [ ];
-					def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
-					if (roleAdmin) {
-						def criteria = User.createCriteria()
-						recipients = criteria.list {
-							roles {
-								eq("id", roleAdmin.id)
-							}
-						}
-						
-						// Send email to administrators
-						if (recipients) {							
-							def to = recipients?.collect { it.email }?.unique()							
-							def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"							
-							def body = g.render(template:"/email/userAccountCreated", model:[userInstance:userInstance])
-							mailService.sendHtmlMail(subject, body.toString(), to);							
-						}
+					def recipients = userService.findUsersByRoleType(RoleType.ROLE_USER_NOTIFICATION)
+
+					// Send email to user notification recipients
+					if (recipients) {
+						def to = recipients?.collect { it.email }?.unique()
+						def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"
+						def body = g.render(template:"/email/userAccountCreated", model:[userInstance:userInstance])
+						mailService.sendHtmlMail(subject, body.toString(), to);
 					}
-				
+
 					// Send confirmation email to user 
 					if (userInstance.email) { 
 						def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message', args: [userInstance.email])}"

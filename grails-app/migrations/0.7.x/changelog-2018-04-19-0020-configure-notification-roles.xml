@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1524151310622-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from role where id = "ff80818162d9f9cc0162d9fbbeb40001"</sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ff80818162d9f9cc0162d9fbbeb40001"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_USER_NOTIFICATION"/>
+            <column name="name" value="User Notifications"/>
+            <column name="description" value="Role that represents users who should receive notifications about users."/>
+            <column name="date_created" valueDate="2018-04-19T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-04-19T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from role where id = "ff80818162d9f9cc0162d9fbf09e0002"</sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ff80818162d9f9cc0162d9fbf09e0002"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_PRODUCT_NOTIFICATION"/>
+            <column name="name" value="Product Notifications"/>
+            <column name="description" value="Role that represents users who should receive notifications about products."/>
+            <column name="date_created" valueDate="2018-04-19T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-04-19T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from role where id = "ff80818162d9f9cc0162d9fc1c220003"</sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ff80818162d9f9cc0162d9fc1c220003"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_SHIPMENT_NOTIFICATION"/>
+            <column name="name" value="Shipment Notifications"/>
+            <column name="description" value="Role that represents users who should receive notifications about shipments."/>
+            <column name="date_created" valueDate="2018-04-19T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-04-19T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from role where id = "ff80818162debf330162dec0548e0001"</sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ff80818162debf330162dec0548e0001"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_ORDER_NOTIFICATION"/>
+            <column name="name" value="Order Notifications"/>
+            <column name="description" value="Role that represents users who should receive notifications about orders."/>
+            <column name="date_created" valueDate="2018-04-19T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-04-19T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from role where id = "ff80818162d9f9cc0162d9fc48990004"</sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ff80818162d9f9cc0162d9fc48990004"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_ERROR_NOTIFICATION"/>
+            <column name="name" value="Error Notifications"/>
+            <column name="description" value="Role that represents users who should receive notifications about errors."/>
+            <column name="date_created" valueDate="2018-04-19T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-04-19T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from role where id = "ff80818162d9f9cc0162d9fc74fa0005"</sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ff80818162d9f9cc0162d9fc74fa0005"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_FEEDBACK_NOTIFICATION"/>
+            <column name="name" value="Feedback Recipient"/>
+            <column name="description" value="Role that represents users who should receive notifications about feedback."/>
+            <column name="date_created" valueDate="2018-04-19T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-04-19T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-7" >
+        <comment>Add role ROLE_SHIPMENT_NOTIFICATION to all active admin users that do not already have that role.</comment>
+        <sql>
+            INSERT INTO user_role (user_id, role_id)
+            SELECT user_id, 'ff80818162d9f9cc0162d9fc1c220003'
+            FROM user
+            JOIN user_role ON user.id = user_role.user_id
+            JOIN role ON role.id = user_role.role_id
+            WHERE role_type = 'ROLE_ADMIN'
+            AND user_id not in (select user_id from user_role where role_id = 'ff80818162d9f9cc0162d9fc1c220003')
+            AND active = true;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda" id="1524151310622-8">
+        <comment>Add role ROLE_PRODUCT_NOTIFICATION to all active admin users that do not already have that role.</comment>
+        <sql>
+            INSERT INTO user_role (user_id, role_id)
+            SELECT user_id, 'ff80818162d9f9cc0162d9fbf09e0002'
+            FROM user
+            JOIN user_role ON user.id = user_role.user_id
+            JOIN role ON role.id = user_role.role_id
+            WHERE role_type = 'ROLE_ADMIN'
+            AND user_id not in (select user_id from user_role where role_id = 'ff80818162d9f9cc0162d9fbf09e0002')
+            AND active = true;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

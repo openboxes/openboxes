@@ -1456,8 +1456,8 @@ class CreateShipmentWorkflowController {
 		if (!recipients) recipients = new HashSet<Person>()
 		
 		// Add all admins to the email
-		def adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
-		adminList.each { adminUser -> 
+		def adminList = userService.findUsersByRoleType(RoleType.ROLE_SHIPMENT_NOTIFICATION)
+		adminList.each { adminUser ->
 			if (adminUser?.email) {
 				recipients.add(adminUser);
 			}
