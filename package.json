@@ -1,0 +1,29 @@
+{
+  "name": "openboxes",
+  "version": "1.0.0",
+  "description": "OpenBoxes Web App",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openboxes/openboxes.git"
+  },
+  "author": "PIH",
+  "license": "EPL-1.0",
+  "bugs": {
+    "url": "https://github.com/openboxes/openboxes/issues"
+  },
+  "homepage": "https://github.com/openboxes/openboxes#readme",
+  "dependencies": {
+    "bootstrap": "^4.1.0",
+    "jquery": "^3.3.1",
+    "react": "^16.3.2"
+  }
+}
