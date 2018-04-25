@@ -28,3 +28,6 @@ tags
 /uploads
 site/
 .slcache
+node_modules
+/web-app/js/bundle*
+/web-app/css/bundle*
