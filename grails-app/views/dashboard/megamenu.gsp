@@ -219,6 +219,18 @@
 
         </li>
 	</g:authorize>		
+
+    <li>
+        <a href="javascript:void(0)"><warehouse:message code="stockMovement.label" /></a>
+        <div class="buttonsBar" style="min-width: 200px;">
+            <div class="megaButton">
+                <g:link controller="stockMovement">
+                    <warehouse:message code="stockMovement.create.label"/>
+                </g:link>
+            </div>
+        </div>
+    </li>
+
 	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
 		<li>
             <a href="javascript:void(0)"><warehouse:message code="receiving.label" /></a>
