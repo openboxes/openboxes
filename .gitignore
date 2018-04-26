@@ -29,5 +29,6 @@ tags
 site/
 .slcache
 node_modules
+npm-debug.log
 /web-app/js/bundle*
 /web-app/css/bundle*
