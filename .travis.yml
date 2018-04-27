@@ -2,9 +2,10 @@ language: groovy
 jdk:
 - openjdk7
 before_install:
-- sudo add-apt-repository -y ppa:groovy-dev/grails
-- sudo apt-get update
-- sudo apt-get install grails-1.3.9
+- curl -s http://get.sdkman.io | bash
+- echo sdkman_auto_answer=true > ~/.sdkman/etc/config
+- source "/home/travis/.sdkman/bin/sdkman-init.sh"
+- sdk install grails 1.3.9
 script: 'grails test-app unit: --non-interactive'
 cache:
   directories:
