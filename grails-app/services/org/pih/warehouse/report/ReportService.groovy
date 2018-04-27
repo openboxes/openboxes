@@ -30,9 +30,15 @@ import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.ConsumptionFact
+import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.reporting.LocationDimension
+import org.pih.warehouse.reporting.LotDimension
+import org.pih.warehouse.reporting.ProductDimension
 import org.pih.warehouse.reporting.TransactionFact
+import org.pih.warehouse.reporting.TransactionTypeDimension
 import org.pih.warehouse.requisition.Requisition
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -43,6 +49,7 @@ import util.InventoryUtil
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 
 class ReportService implements ApplicationContextAware {
 
@@ -560,11 +567,139 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
-    /**
-     * Transaction Fact table
-     */
+    void buildDimensions() {
+        destroyTransactionFact()
+        buildDateDimension()
+        buildProductDimension()
+        buildLocationDimension()
+        buildTransactionTypeDimension()
+        buildLotDimension()
+        buildTransactionFact()
+    }
 
-    List refreshTransactionFactData() {
+	void executeStatements(List dmlStatements) {
+		Sql sql = new Sql(dataSource)
+
+		dmlStatements.each { String dmlStatement ->
+            def startTime = System.currentTimeMillis()
+            log.info "Executing statement: " + dmlStatement
+			sql.execute(dmlStatement)
+            log.info("Executed in ${(System.currentTimeMillis()-startTime)} ms")
+		}
+	}
+
+	void buildTransactionTypeDimension() {
+		String deleteStatement = "delete from transaction_type_dimension;"
+		String insertStatement = """
+            INSERT into transaction_type_dimension (version, transaction_code, transaction_type_name, transaction_type_id)
+            SELECT 0, transaction_type.transaction_code, transaction_type.name, transaction_type.id
+            FROM transaction_type
+        """
+        executeStatements([deleteStatement, insertStatement])
+	}
+
+	void buildLotDimension() {
+		String deleteStatement = "delete from lot_dimension;"
+		String insertStatement = """
+            INSERT INTO lot_dimension (version, product_code, lot_number, expiration_date, inventory_item_id)
+            SELECT 0, product.product_code, inventory_item.lot_number, inventory_item.expiration_date, inventory_item.id
+            FROM inventory_item
+            JOIN product ON product.id = inventory_item.product_id;
+        """
+        executeStatements([deleteStatement, insertStatement])
+	}
+
+    void buildProductDimension() {
+        String deleteStatement = "delete from product_dimension"
+		String insertStatement = """
+            INSERT INTO product_dimension (version, product_id, active, product_code, product_name, generic_product, category_name, abc_class, unit_cost, unit_price)
+            SELECT 0, product.id, product.active, product.product_code, product.name, NULL, category.name, product.abc_class, product.cost_per_unit, product.price_per_unit
+            FROM product
+            JOIN category ON category.id = product.category_id
+        """
+        executeStatements([deleteStatement, insertStatement])
+    }
+
+    void buildLocationDimension() {
+        String deleteStatement = "delete from location_dimension"
+        String insertStatement = """
+            INSERT INTO location_dimension (version, location_name, location_number, location_type_code, location_type_name, location_group_name, parent_location_name, location_id, location_type_id, location_group_id)
+            SELECT 0, location.name, location.location_number, location_type.location_type_code, location_type.name, location_group.name, parent_location.name, location.id, location_type.id, location_group.id
+            FROM location
+            JOIN location_type ON location_type.id = location.location_type_id
+            LEFT JOIN location_group ON location_group.id = location.location_group_id
+            LEFT JOIN location parent_location ON parent_location.id = location.parent_location_id;        """
+        executeStatements([deleteStatement, insertStatement])
+    }
+
+    void buildDateDimension() {
+        DateDimension.executeUpdate("delete from DateDimension ")
+        def minTransactionDate = Transaction.minTransactionDate.list()
+        log.info ("minTransactionDate: " + minTransactionDate)
+        Date today = new Date()
+        (minTransactionDate..today).each { Date date ->
+            date.clearTime()
+            DateDimension dateDimension = new DateDimension()
+            dateDimension.date = date
+            dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
+            dateDimension.month = date[Calendar.MONTH]+1
+            dateDimension.year = date[Calendar.YEAR]
+            dateDimension.week = date[Calendar.WEEK_OF_YEAR]
+            dateDimension.monthName = date.format("MMMMM")
+            dateDimension.monthYear = date.format("MM-yyyy")
+            dateDimension.dayOfWeek = date.format("EEEEE")
+            dateDimension.save()
+        }
+    }
+    
+    def destroyTransactionFact() {
+        String deleteStatement = "truncate transaction_fact"
+        executeStatements([deleteStatement])
+    }
+
+
+    def buildTransactionFact() {
+        String insertStatement = """
+            insert into transaction_fact (version, 
+                transaction_number, 
+                product_key_id, 
+                lot_key_id, 
+                location_key_id, 
+                transaction_date_key_id, 
+                transaction_type_key_id,
+                transaction_date, 
+                quantity, 
+                transaction_entry_id, 
+                transaction_id)
+            select  
+                0, 
+                transaction.transaction_number,
+                product_dimension.id as product_key,             
+                lot_dimension.id as lot_key,
+                location_dimension.id as location_key,
+                transaction_date_dimension.id as transaction_date_key,
+                transaction_type_dimension.id as transaction_type_key,
+                transaction.transaction_date,
+                transaction_entry.quantity,
+                transaction_entry.id as transaction_entry_id,
+                transaction.id as transction_id
+            from transaction_entry 
+            join transaction on transaction.id = transaction_entry.transaction_id
+            join inventory on transaction.inventory_id = inventory.id 
+            join location on location.inventory_id = transaction.inventory_id
+            join transaction_type on transaction_type.id = transaction.transaction_type_id 
+            join inventory_item on inventory_item.id = transaction_entry.inventory_item_id
+            join lot_dimension on lot_dimension.inventory_item_id = transaction_entry.inventory_item_id
+            join product_dimension on product_dimension.product_id = inventory_item.product_id
+            join location_dimension on location_dimension.location_id = location.id
+            join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
+            join transaction_type_dimension on transaction_type_dimension.transaction_type_id = transaction_type.id
+        """
+        executeStatements([insertStatement])
+    }
+
+
+    List buildTransactionFactOld() {
         def dateList = []
         def startTime = System.currentTimeMillis()
         Integer deletedRecords = TransactionFact.executeUpdate("delete TransactionFact tf")
@@ -572,12 +707,7 @@ class ReportService implements ApplicationContextAware {
         def dates = inventoryService.getTransactionDates()
 
         log.info ("Refresh transaction fact table for ${dates.size()} dates")
-
-        //dates = dates.subList(0,100)
-        //Date date1 = Date.parse("yyyy-MM-dd", "2015-08-04")
-        //dates = [date1]
-
-		GParsPool.withPool {
+        GParsPool.withPool {
             dates.eachWithIndexParallel { Date date, int index ->
                 refreshTransactionFactData(date)
             }
@@ -585,6 +715,8 @@ class ReportService implements ApplicationContextAware {
 
         return dateList
     }
+
+
 
     def refreshTransactionFactData(Date date) {
         List transactionFacts = []
@@ -637,21 +769,18 @@ class ReportService implements ApplicationContextAware {
 
 
     void saveTransactionEntryMaps(List transactionEntryMaps) {
+
+        String dateFormat = "yyyy-MM-dd hh:mm:ss"
+        String timestamp = new Date().format(dateFormat)
+
         Sql sql = new Sql(dataSource)
         sql.withBatch(1024) { ps ->
             transactionEntryMaps.eachWithIndex { map, index ->
-                String dateFormat = "yyyy-MM-dd hh:mm:ss"
-                String timestamp = new Date().format(dateFormat)
-                map.week = 0 //Constants.weekFormat.format(map.transactionDate)
-                map.month = 0 //Constants.monthFormat.format(map.transactionDate)
-                map.day = 0 //Constants.dayFormat.format(map.transactionDate)
-                map.year = 0 //Constants.yearFormat.format(map.transactionDate)
-                map.monthYear = 0 //Constants.yearMonthFormat.format(map.transactionDate)
-                map.expirationDate = map.expirationDate ? map.expirationDate.format(dateFormat) : null
-                map.transactionDate = map.transactionDate ? map.transactionDate.format(dateFormat) : null
+                //map.expirationDate = map.expirationDate ? map.expirationDate.format(dateFormat) : null
+                //map.transactionDate = map.transactionDate ? map.transactionDate.format(dateFormat) : null
 
-                //log.debug "Map ${map}"
-
+                // Debits should be negative so we can use sum aggregation
+                map.quantity = (map.transactionCode=='DEBIT') ? -map.quantity : map.quantity
 
                 String statement = "insert into transaction_fact (" +
                         "id, " +
