@@ -96,7 +96,24 @@ class Transaction implements Comparable, Serializable {
 	
 	// Transient attributs
 	static transients = ['localTransfer']
-	
+
+
+	static namedQueries = {
+        minTransactionDate {
+            projections {
+                min 'transactionDate'
+            }
+            uniqueResult = true
+        }
+
+        maxTransactionDate {
+            projections {
+                max 'transactionDate'
+            }
+            uniqueResult = true
+		}
+    }
+
     // Constraints 
     static constraints = {
 	    transactionType(nullable:false)
