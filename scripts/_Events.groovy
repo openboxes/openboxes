@@ -113,30 +113,6 @@ eventCreateWarStart = { warName, stagingDir ->
 	}
 }
 
-
-eventTestPhaseStart = {name ->
-    if (name == "unit") {
-        println "Starting Jasmine Tests"
-        def command = """phantomjs spec/lib/run_jasmine_test.coffee spec/TestRunner.html"""
-        def proc = command.execute()
-        proc.waitFor()
-        println "${proc.in.text}"
-        if (proc.exitValue() == 1) {
-            event("JasminFailed", ["Tests FAILED"])
-        } else {
-            println "Tests PASSED"
-        }
-    }
-    if (name == "functional"){
-       ant.delete(dir:"${basedir}/target/geb-reports")
-    }
-}
-
-eventJasminFailed = { msg ->
-    println msg
-    System.exit(1)
-}
-
 eventCompileEnd = {
     println "classesDirPath: " + classesDirPath
     ant.copy(todir:classesDirPath) {
