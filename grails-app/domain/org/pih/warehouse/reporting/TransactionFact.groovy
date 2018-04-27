@@ -11,56 +11,33 @@ package org.pih.warehouse.reporting
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 
 class TransactionFact {
 
-    String id
-
     // Dimension Keys
-	Product product
-    Category category
-    Location location
-    ProductGroup genericProduct
-    InventoryItem inventoryItem
+    LotDimension lotKey
+	ProductDimension productKey
+    LocationDimension locationKey
+    DateDimension transactionDateKey
+    TransactionTypeDimension transactionTypeKey
 
-    // Product dimension
-    String productCode
-    String productName
-    BigDecimal unitCost
-    BigDecimal unitPrice
-    String categoryName
 
-    // Inventory item dimension
-    String lotNumber
-    Date expirationDate
-
-    // Location dimension
-	String locationName
-    String locationGroup
-    String locationType
-
-    // Transaction dimension
-    String transactionEntryId
-    String transactionNumber
-    String transactionCode
-    String transactionType
-
-    // Date dimension
+    // Transaction facts
     Date transactionDate
-    String day
-    String week
-    String month
-    String year
-    String monthYear
+    String transactionNumber
+    Transaction transaction
+    TransactionEntry transactionEntry
 
-    // Fact table data
-    Boolean canceled
-    Boolean substituted
-    Boolean modified
-    String reasonCode
+    // Facts
+    Boolean canceled = Boolean.FALSE
+    Boolean substituted = Boolean.FALSE
+    Boolean modified = Boolean.FALSE
+    String reasonCode = ""
 
     BigDecimal quantity = 0;
     BigDecimal quantityRequested = 0
@@ -72,26 +49,31 @@ class TransactionFact {
     BigDecimal quantitySubstituted = 0
     BigDecimal quantityModified = 0
 
-    Date lastUpdated
-	Date dateCreated
-
     static mapping = {
-        id generator: "uuid"
-        cache true
     }
 
     static constraints = {
-        genericProduct(nullable:true)
-        product(nullable:true)
-        location(nullable:true)
-        inventoryItem(nullable:true)
-        category(nullable:true)
-        unitCost(nullable:true)
-        unitPrice(nullable:true)
-        transactionNumber(nullable:true)
-        transactionCode(nullable:true)
-        lotNumber(nullable:true)
-        expirationDate(nullable:true)
+        lotKey(nullable:false)
+        productKey(nullable:false)
+        locationKey(nullable:false)
+        transactionDateKey(nullable:false)
+        transactionTypeKey(nullable:false)
+        transactionDate(nullable:false)
+        transactionNumber(nullable:false)
+        transaction(nullable:false)
+        transactionEntry(nullable:false)
+        canceled(nullable:true)
+        substituted(nullable:true)
+        modified(nullable:true)
         reasonCode(nullable:true)
+        quantity(nullable:true)
+        quantityRequested(nullable:true)
+        quantityIssued(nullable:true)
+        quantityConsumed(nullable:true)
+        quantityExpired(nullable:true)
+        quantityCanceled(nullable:true)
+        quantityDemand(nullable:true)
+        quantitySubstituted(nullable:true)
+        quantityModified(nullable:true)
     }
 }
