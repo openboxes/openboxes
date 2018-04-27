@@ -11,6 +11,8 @@ package org.pih.warehouse.data
 
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
+import org.hibernate.FetchMode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
@@ -20,14 +22,85 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 
 class MigrationService {
 
+    def dataService
+    def inventoryService
     def persistenceInterceptor
 
     boolean transactional = true
+
+    def migrateInventoryTransactions(Location location) {
+        def inventoryTransactions = Transaction.createCriteria().list {
+            fetchMode 'transactionEntries', FetchMode.JOIN
+            fetchMode 'inventory', FetchMode.JOIN
+            fetchMode 'inventory.warehouse', FetchMode.JOIN
+            fetchMode 'inventoryItem', FetchMode.JOIN
+            fetchMode 'inventoryItem.product', FetchMode.JOIN
+            transaction {
+                transactionType {
+                    eq("transactionCode", TransactionCode.INVENTORY)
+                }
+                eq("inventory", location.inventory)
+                order("transactionDate", "desc")
+            }
+            maxResults(10)
+        }
+        log.info "Inventory transactions: " + inventoryTransactions.size()
+        def adjustmentDebit = TransactionType.get(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID)
+        def adjustmentCredit = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
+
+        def results = []
+        //inventoryTransactions.eachWithIndex { transactionEntry, index ->
+        GParsPool.withPool {
+            results = inventoryTransactions.collectParallel { TransactionEntry transactionEntry ->
+                persistenceInterceptor.init()
+                log.info "Process transaction entry ${transactionEntry.id}"
+                InventoryItem inventoryItem = transactionEntry?.inventoryItem
+                Location transactionLocation = transactionEntry?.transaction?.inventory?.warehouse
+                Date transactionDate = transactionEntry.transaction?.transactionDate
+                BigDecimal quantityOnHand = inventoryService.getQuantity(inventoryItem, location, transactionDate)
+
+
+
+                BigDecimal newQuantity = transactionEntry.quantity - quantityOnHand
+                if (newQuantity >= 0) {
+                    transactionEntry?.quantity = newQuantity
+                    transactionEntry?.transaction?.transactionType = adjustmentCredit
+                }
+                else {
+                    transactionEntry?.quantity = -newQuantity
+                    transactionEntry?.transaction.transactionCode = adjustmentDebit
+                }
+                return [
+                    locationId: transactionLocation.id,
+                    locationName: transactionLocation.name,
+                    productId: inventoryItem?.product?.id,
+                    code: inventoryItem.product?.productCode,
+                    lotNumber: inventoryItem.lotNumber,
+                    transactionDate: transactionEntry?.transaction?.transactionDate,
+                    transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode,
+                    quantity: transactionEntry.quantity,
+                    quantityOnHand: quantityOnHand
+                ]
+                persistenceInterceptor.flush()
+                persistenceInterceptor.destroy()
+            }
+        }
+        //}
+
+        return results
+    }
+
+
 
 
     def migrateOrganizations() {
