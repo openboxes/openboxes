@@ -3492,7 +3492,7 @@ class InventoryService implements ApplicationContextAware {
         def transactionEntries = []
         if (date) {
             def products = tagIds ? getProductsByTagId(tagIds) : []
-            log.info "Get products by tag ${tagIds}: " + products.toString()
+            log.debug "Get products by tag ${tagIds}: " + products.toString()
             transactionEntries = criteria.list {
                 if (products) {
                     inventoryItem {
@@ -3532,7 +3532,7 @@ class InventoryService implements ApplicationContextAware {
 //            }
 
 
-            log.info "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.debug "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
         }
         return transactionEntries;
     }
@@ -4064,8 +4064,8 @@ class InventoryService implements ApplicationContextAware {
 						log.error("Error executing batch update for location ${location.name} " + e.message, e)
 					}
 				}
-				log.info ("Time to execute batch statements " + (System.currentTimeMillis() - startTime2) + " ms")
-                log.info "Saved ${products?.size()} snapshots for products=ALL, location=${location}, date=${date.format("MMM-dd-yyyy")} in ${(System.currentTimeMillis() - startTime)} ms"
+				log.debug ("Time to execute batch statements " + (System.currentTimeMillis() - startTime2) + " ms")
+                log.info "Saved ${products?.size()} product snapshots for products=ALL, location=${location}, date=${date.format("MMM-dd-yyyy")} in ${(System.currentTimeMillis() - startTime)} ms"
 			}
         } catch (Exception e) {
             log.error("Unable to complete snapshot process", e)
