@@ -97,10 +97,7 @@ class MigrationService {
             runningBalanceMap[itemKey] = runningBalance
             Integer adjustmentQuantity = 0
             Integer oldQuantity = transactionEntry.quantity
-
-            // Update balance and total balance for all transaction entries
-            transactionEntry.balance = runningBalance
-            transactionEntry.totalBalance = runningBalanceMap.values().sum()
+            Integer productBalance = runningBalanceMap.values().sum()
 
             if (transactionEntry?.transaction?.transactionType?.transactionCode == TransactionCode.INVENTORY) {
 
@@ -108,7 +105,8 @@ class MigrationService {
 
                 // Convert inventory transaction to adjustment
                 if (performMigration) {
-                    transactionEntry.comments = "Automatically converted transaction from INVENTORY ${oldQuantity} to ADJUSTMENT ${adjustmentQuantity} with expected TOTAL BALANCE ${transactionEntry.totalBalance} on ${new Date()}"
+                    transactionEntry.comments = "Automatically converted transaction from INVENTORY ${oldQuantity} " +
+                            "to ADJUSTMENT ${adjustmentQuantity} with expected BALANCE ${productBalance} on ${new Date()}"
                     transactionEntry.transaction.transactionType = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
                     transactionEntry.quantity = adjustmentQuantity
                     transactionEntry.save()
