@@ -320,7 +320,7 @@ class Product implements Comparable, Serializable {
     }
     */
 
-    InventoryLevel getInventoryLevel(locationId) {
+    InventoryLevel getInventoryLevel(String locationId) {
         if (id) {
             def location = Location.get(locationId)
             return InventoryLevel.findByProductAndInventory(this, location.inventory)
@@ -328,13 +328,7 @@ class Product implements Comparable, Serializable {
     }
 
     def getStatus(String locationId, Integer currentQuantity) {
-        def status = ""
         def inventoryLevel = getInventoryLevel(locationId)
-        def latestInventoryDate = latestInventoryDate(locationId)
-        log.info "Location " + locationId
-        log.info "Current quantity = " + currentQuantity
-        log.info "Status: " + inventoryLevel?.status
-        log.info "Latest inventory " + latestInventoryDate
         return inventoryLevel?.statusMessage(currentQuantity)
     }
 
@@ -357,7 +351,7 @@ class Product implements Comparable, Serializable {
      */
     Date latestInventoryDate(def locationId) {
         def inventory = Location.get(locationId).inventory
-        def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]]).first()
+        def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY]]).first()
         return date
     }
 
@@ -367,7 +361,7 @@ class Product implements Comparable, Serializable {
      * @param locationId
      * @return
      */
-    String getBinLocation(def locationId) {
+    String getBinLocation(String locationId) {
         def inventoryLevel = getInventoryLevel(locationId)
         return inventoryLevel?.binLocation
     }
