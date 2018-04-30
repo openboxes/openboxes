@@ -200,8 +200,8 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) { 	
-		log.debug "Sending email to " + to
-		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+		log.info "Sending email with subject ${subject} to ${to}"
+		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
 		if (isMailEnabled() || override) { 		
 			log.info "Sending html email '" + subject + "' to " + to; 
 			try { 			
