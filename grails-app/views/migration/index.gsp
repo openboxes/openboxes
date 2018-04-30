@@ -25,6 +25,7 @@
                 <thead>
                 <tr>
                     <th>Data</th>
+                    <th>Count</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -34,6 +35,7 @@
                     <td>
                         Organizations
                     </td>
+                    <td>N/A</td>
                     <td>
                         <g:link controller="organization" action="index" class="button">List</g:link>
                         %{--<g:remoteLink action="migrateOrganizations" params="[preview:true]" class="button" update="status"--}%
@@ -47,6 +49,7 @@
                     <td>
                         Product Suppliers
                     </td>
+                    <td>N/A</td>
                     <td>
                         <g:link controller="productSupplier" action="index" class="button">List</g:link>
                         %{--<g:remoteLink action="migrateProductSuppliers" params="[preview:true]" class="button" update="status"--}%
@@ -57,6 +60,17 @@
                                       onLoading="onLoading()" onComplete="onComplete()">Delete</g:remoteLink>
                     </td>
                 </tr>
+                <tr>
+                    <td>Inventory Transactions</td>
+                    <td>${inventoryTransactionCount}</td>
+                    <td>
+                        <g:link controller="migration" action="previewInventoryTransaction" params="[max:1]" class="button">Preview</g:link>
+                        <g:link controller="migration" action="migrationInventoryTransactions" params="[max:1]" class="button">Migrate</g:link>
+
+                    </td>
+                </tr>
+
+
                 </tbody>
             </table>
         </div>

@@ -38,11 +38,11 @@ class MigrationService {
 
     boolean transactional = true
 
-    def migrateInventoryTransactions(Location location) {
-        def inventoryTransactions = Transaction.createCriteria().list {
-            fetchMode 'transactionEntries', FetchMode.JOIN
-            fetchMode 'inventory', FetchMode.JOIN
-            fetchMode 'inventory.warehouse', FetchMode.JOIN
+    def getInventoryTransactionEntries(Location location, Integer max) {
+        def inventoryTransactions = TransactionEntry.createCriteria().list {
+            fetchMode 'transaction', FetchMode.JOIN
+            fetchMode 'transaction.inventory', FetchMode.JOIN
+            fetchMode 'transaction.inventory.warehouse', FetchMode.JOIN
             fetchMode 'inventoryItem', FetchMode.JOIN
             fetchMode 'inventoryItem.product', FetchMode.JOIN
             transaction {
@@ -50,54 +50,207 @@ class MigrationService {
                     eq("transactionCode", TransactionCode.INVENTORY)
                 }
                 eq("inventory", location.inventory)
-                order("transactionDate", "desc")
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
             }
-            maxResults(10)
+            maxResults(max)
         }
-        log.info "Inventory transactions: " + inventoryTransactions.size()
-        def adjustmentDebit = TransactionType.get(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID)
-        def adjustmentCredit = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
+        return inventoryTransactions
+    }
 
-        def results = []
-        //inventoryTransactions.eachWithIndex { transactionEntry, index ->
-        GParsPool.withPool {
-            results = inventoryTransactions.collectParallel { TransactionEntry transactionEntry ->
-                persistenceInterceptor.init()
-                log.info "Process transaction entry ${transactionEntry.id}"
-                InventoryItem inventoryItem = transactionEntry?.inventoryItem
-                Location transactionLocation = transactionEntry?.transaction?.inventory?.warehouse
-                Date transactionDate = transactionEntry.transaction?.transactionDate
-                BigDecimal quantityOnHand = inventoryService.getQuantity(inventoryItem, location, transactionDate)
-
-
-
-                BigDecimal newQuantity = transactionEntry.quantity - quantityOnHand
-                if (newQuantity >= 0) {
-                    transactionEntry?.quantity = newQuantity
-                    transactionEntry?.transaction?.transactionType = adjustmentCredit
-                }
-                else {
-                    transactionEntry?.quantity = -newQuantity
-                    transactionEntry?.transaction.transactionCode = adjustmentDebit
-                }
-                return [
-                    locationId: transactionLocation.id,
-                    locationName: transactionLocation.name,
-                    productId: inventoryItem?.product?.id,
-                    code: inventoryItem.product?.productCode,
-                    lotNumber: inventoryItem.lotNumber,
-                    transactionDate: transactionEntry?.transaction?.transactionDate,
-                    transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode,
-                    quantity: transactionEntry.quantity,
-                    quantityOnHand: quantityOnHand
-                ]
-                persistenceInterceptor.flush()
-                persistenceInterceptor.destroy()
+    def getTransactionEntries(Location location, Product product) {
+        TransactionEntry.createCriteria().list {
+            inventoryItem {
+                eq("product", product)
+            }
+            transaction {
+                eq("inventory", location.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
             }
         }
-        //}
+    }
 
-        return results
+
+    def migrateInventoryTransactions(Location location, Product product, boolean performMigration) {
+
+        def runningBalance
+        def previousTransaction
+        def runningBalanceList = []
+        def transactionEntries = getTransactionEntries(location, product)
+        def runningBalanceMap = [:]
+
+
+        log.info "DATE".padRight(25) + "CODE".padRight(20) + "ITEMKEY".padRight(25) + "QTY".padRight(5) + "PRE".padRight(5) + "BAL".padRight(5) + "ADJ".padRight(5)
+
+        for (transactionEntry in  transactionEntries) {
+
+
+            boolean sameTransaction = (previousTransaction == transactionEntry.transaction)
+            if (!sameTransaction && transactionEntry.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
+                runningBalanceMap = [:]
+            }
+            def itemKey = "${transactionEntry?.inventoryItem?.product?.productCode}:${transactionEntry?.inventoryItem?.lotNumber}:${transactionEntry?.binLocation?.name}"
+            Integer runningBalanceBefore = runningBalanceMap[itemKey]?:0
+
+            runningBalance = applyTransactionEntry(runningBalanceBefore, transactionEntry, sameTransaction)
+            runningBalanceMap[itemKey] = runningBalance
+            Integer adjustmentQuantity = 0
+            Integer oldQuantity = transactionEntry.quantity
+
+            // Update balance and total balance for all transaction entries
+            transactionEntry.balance = runningBalance
+            transactionEntry.totalBalance = runningBalanceMap.values().sum()
+
+            if (transactionEntry?.transaction?.transactionType?.transactionCode == TransactionCode.INVENTORY) {
+
+                adjustmentQuantity = runningBalance - runningBalanceBefore
+
+                // Convert inventory transaction to adjustment
+                if (performMigration) {
+                    transactionEntry.comments = "Automatically converted transaction from INVENTORY ${oldQuantity} to ADJUSTMENT ${adjustmentQuantity} with expected TOTAL BALANCE ${transactionEntry.totalBalance} on ${new Date()}"
+                    transactionEntry.transaction.transactionType = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
+                    transactionEntry.quantity = adjustmentQuantity
+                    transactionEntry.save()
+                }
+            }
+
+            log.info "${transactionEntry?.transaction?.transactionDate.toString().padRight(25)}" +
+                    "${transactionEntry?.transaction?.transactionType?.transactionCode.name().padRight(20)}" +
+                    "${itemKey.padRight(25)}" +
+                    "${transactionEntry?.quantity?.toString().padRight(5)}" +
+                    "${runningBalanceBefore.toString()?.padRight(5)}" +
+                    "${runningBalance.toString()?.padRight(5)}" +
+                    "${adjustmentQuantity.toString()?.padRight(5)}"
+
+            previousTransaction = transactionEntry.transaction
+
+            runningBalanceList << [transactionEntry:
+                                           [
+                                                   productCode: transactionEntry?.inventoryItem?.product?.productCode,
+                                                   lotNumber: transactionEntry?.inventoryItem.lotNumber,
+                                                   binLocation: transactionEntry?.binLocation?.name,
+                                                   transactionDate: transactionEntry?.transaction?.transactionDate,
+                                                   transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode.name(),
+                                                   quantity: transactionEntry?.quantity
+                                           ], runningBalance: runningBalanceMap.clone()]
+        }
+
+        return runningBalanceList
+    }
+
+    /**
+     *
+     * @param initialQuantity
+     * @param transactionEntry
+     * @return
+     */
+    def applyTransactionEntry(BigDecimal runningBalance, TransactionEntry transactionEntry, boolean sameTransaction) {
+        BigDecimal balance = runningBalance;
+
+        def transactionCode = transactionEntry?.transaction?.transactionType?.transactionCode;
+        if (transactionCode == TransactionCode.PRODUCT_INVENTORY) {
+            if (sameTransaction) {
+                balance += transactionEntry.quantity;
+            }
+            else {
+                balance = transactionEntry.quantity;
+            }
+        }
+        else if (transactionCode == TransactionCode.INVENTORY) {
+            balance = transactionEntry.quantity;
+        }
+        else if (transactionCode == TransactionCode.DEBIT) {
+            balance -= transactionEntry.quantity;
+        }
+        else if (transactionCode == TransactionCode.CREDIT) {
+            balance += transactionEntry.quantity;
+        }
+        return balance;
+    }
+
+    def getQuantityBeforeTransactionEntry(TransactionEntry transactionEntry) {
+        def quantity = 0;
+        InventoryItem inventoryItem = transactionEntry.inventoryItem
+        Location location = transactionEntry.transaction.inventory.warehouse
+        Date date = transactionEntry.transaction.transactionDate
+        def transactionEntries = inventoryService.getTransactionEntriesOnOrBeforeDate(inventoryItem, location, date)
+        log.info ("Transaction entries: " + transactionEntries)
+        transactionEntries.remove(transactionEntry)
+        quantity = inventoryService.adjustQuantity(quantity, transactionEntries)
+        return quantity
+
+    }
+
+    def getQuantityByBinLocationsBeforeTransactionEntry(TransactionEntry transactionEntry) {
+        InventoryItem inventoryItem = transactionEntry.inventoryItem
+        Location location = transactionEntry.transaction.inventory.warehouse
+        Date date = transactionEntry.transaction.transactionDate
+        def transactionEntries = inventoryService.getTransactionEntriesOnOrBeforeDate(inventoryItem, location, date)
+        transactionEntries.removeAll(transactionEntry.transaction?.transactionEntries)
+        def binLocations = inventoryService.getQuantityByBinLocation(transactionEntries, true)
+        binLocations = binLocations.collect { it.value }
+        return binLocations
+
+    }
+
+
+    def migrateInventoryTransaction(TransactionEntry transactionEntry) {
+
+        InventoryItem inventoryItem = transactionEntry?.inventoryItem
+        Location transactionLocation = transactionEntry?.transaction?.inventory?.warehouse
+        Location binLocation = transactionEntry?.binLocation
+        Date transactionDate = transactionEntry.transaction?.transactionDate
+        Product product = transactionEntry.inventoryItem?.product
+        log.info "Process transaction entry ${transactionEntry.id} for product ${product.productCode}"
+
+        BigDecimal quantityOnHandThen = getQuantityBeforeTransactionEntry(transactionEntry)
+        //BigDecimal quantityOnHandThen = inventoryService.getQuantity(inventoryItem, transactionLocation, transactionDate)
+        //BigDecimal binQuantityOnHandNow = inventoryService.getQuantityFromBinLocation(transactionLocation, binLocation, inventoryItem)
+        def adjustmentDebit = TransactionType.load(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID)
+        def adjustmentCredit = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
+        BigDecimal newQuantity = transactionEntry.quantity - quantityOnHandThen
+        def oldQuantity = transactionEntry?.quantity
+        def adjustmentType
+        def newTransactionType
+        if (newQuantity >= 0) {
+            newTransactionType = adjustmentCredit
+            adjustmentType = "CREDIT"
+        }
+        else {
+            adjustmentType = "DEBIT"
+            newQuantity = -newQuantity
+            newTransactionType = adjustmentDebit
+        }
+//        transactionEntry?.quantity = newQuantity
+//        transactionEntry?.transaction?.transactionType = newTransactionType
+//        transactionEntry.comments = "Migrated from INVENTORY ${oldQuantity} to ${adjustmentType} ${newQuantity} (QoH should be ${quantityOnHandThen})"
+//        transactionEntry.save(flush:true)
+
+        def binLocations = getQuantityByBinLocationsBeforeTransactionEntry(transactionEntry)
+        BigDecimal productQuantityOnHandNow = inventoryService.getQuantityOnHand(transactionLocation, product)
+
+        return [
+                locationId: transactionLocation.id,
+                locationName: transactionLocation.name,
+                productId: inventoryItem?.product?.id,
+                code: inventoryItem.product?.productCode,
+                lotNumber: inventoryItem.lotNumber,
+                binLocation: binLocation?.name,
+                transactionEntry: transactionEntry?.id,
+                transactionDate: transactionEntry?.transaction?.transactionDate,
+                transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode,
+                adjustmentType: adjustmentType,
+                oldQuantity: oldQuantity,
+                quantityOnHandThen:quantityOnHandThen,
+                newQuantity: newQuantity,
+                //itemQohThen: quantityOnHandThen,
+                productQohNow: productQuantityOnHandNow,
+                //binQohNow: binQuantityOnHandNow
+                binLocations: binLocations
+        ]
+
+
     }
 
 

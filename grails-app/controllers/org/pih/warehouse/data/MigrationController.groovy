@@ -9,7 +9,9 @@
 **/ 
 package org.pih.warehouse.data
 
+import grails.converters.JSON
 import grails.validation.ValidationException
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
@@ -19,6 +21,8 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.Errors
@@ -27,7 +31,55 @@ class MigrationController {
 
     def migrationService
 
-    def index = { }
+    def index = {
+
+        TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+        def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
+
+        [inventoryTransactionCount:inventoryTransactionCount]
+    }
+
+
+    def previewInventoryTransaction = {
+        def location = Location.get(session.warehouse.id)
+
+        params.max = params.max ? params.int('max') : 1
+
+        // FIXME This might be an expensive query just to get a single product
+        def transactionEntries = migrationService.getInventoryTransactionEntries(location, params.max)
+
+        def product = transactionEntries[0].inventoryItem.product
+        def results = migrationService.migrateInventoryTransactions(location, product,false)
+        render ([results: results] as JSON)
+    }
+
+    def migrateInventoryTransactions = {
+        def startTime = System.currentTimeMillis()
+        def product = Product.get(params.id)
+        def location = Location.get(session.warehouse.id)
+
+        def results = migrationService.migrateInventoryTransactions(location, product, false)
+
+        log.info "Migrated in ${(System.currentTimeMillis() - startTime)} ms"
+        render ([results:results] as JSON)
+
+    }
+
+
+//    def migrateInventoryTransactions = {
+//
+//        def startTime = System.currentTimeMillis()
+//        def location = Location.get(session.warehouse.id)
+//
+//        def results = migrationService.migrateInventoryTransactions(location)
+//
+////        String csv = dataService.generateCsv(results)
+////        response.setHeader("Content-disposition", "attachment; filename='InventoryTransactions-${location.name}.csv'")
+////        render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+////
+//        log.info "Migrated in ${(System.currentTimeMillis() - startTime)} ms"
+//        render ([results:results] as JSON)
+//    }
 
 
     def migrateProductSuppliers = { MigrationCommand command ->
