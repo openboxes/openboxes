@@ -181,8 +181,15 @@ class InventoryItemController {
                     isBaseline = true
                 }
 
+                boolean isCredit = (transaction?.transactionType?.transactionCode==org.pih.warehouse.inventory.TransactionCode.CREDIT && transactionEntry?.quantity >= 0) ||
+                        (transaction?.transactionType?.transactionCode==org.pih.warehouse.inventory.TransactionCode.DEBIT && transactionEntry.quantity < 0)
+
+                boolean isDebit = (transaction?.transactionType?.transactionCode==org.pih.warehouse.inventory.TransactionCode.DEBIT && transactionEntry?.quantity > 0) ||
+                        (transaction?.transactionType?.transactionCode==org.pih.warehouse.inventory.TransactionCode.CREDIT && transactionEntry.quantity < 0)
+
                 stockHistoryList << [
                         transactionDate: transaction.transactionDate,
+                        transactionCode: transaction?.transactionType?.transactionCode,
                         transaction: transaction,
                         shipment: null,
                         requisition: null,
@@ -190,10 +197,14 @@ class InventoryItemController {
                         inventoryItem: transactionEntry.inventoryItem,
 						comments: transactionEntry.comments,
                         quantity: transactionEntry.quantity,
+                        isDebit: isDebit,
+                        isCredit: isCredit,
                         balance: balance.values().sum(),
                         showDetails: (i==0),
                         isBaseline: isBaseline,
-                        isSameTransaction: (previousTransaction?.id == transaction?.id)
+                        isSameTransaction: (previousTransaction?.id == transaction?.id),
+						runningBalance: transactionEntry.balance,
+						totalBalance: transactionEntry.totalBalance
                 ]
                 previousTransaction = transaction
             }
