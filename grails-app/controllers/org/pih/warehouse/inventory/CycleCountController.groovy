@@ -22,35 +22,26 @@ class CycleCountController {
     def exportAsCsv = {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
+        log.info "Returned ${binLocations.size()} bin locations for location ${location}"
         List rows = binLocations.collect {
             [
-                    status: StringEscapeUtils.escapeCsv(it.status),
-                    latestInventoryDate: it.product.latestInventoryDate(location.id)?:"",
-                    productCode: StringEscapeUtils.escapeCsv(it.product.productCode),
-                    productName: StringEscapeUtils.escapeCsv(it.product.name?:""),
-                    genericProduct: StringEscapeUtils.escapeCsv(it.genericProduct?.name?:""),
-                    category: StringEscapeUtils.escapeCsv(it.category.name?:""),
-                    lotNumber: StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber?:""),
-                    expirationDate: it.inventoryItem.expirationDate?:"",
-                    binLocation: StringEscapeUtils.escapeCsv(it?.binLocation?.name?:""),
-                    binLocationOld: StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id)?:""),
-                    quantity: it.quantity?:0
+                    "Status"             : g.message(code: "binLocationSummary.${it.status}.label"),
+                    "Last Inventory Date": it.product.latestInventoryDate(location.id) ?: "",
+                    "Product Code"       : StringEscapeUtils.escapeCsv(it.product.productCode),
+                    "Product Name"       : it.product.name ?: "",
+                    "Generic Product"    : it.genericProduct?.name ?: "",
+                    "Category"           : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
+                    "Lot Number"         : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
+                    "Expiration Date"    : it.inventoryItem.expirationDate ?: "",
+                    "Bin Location"       : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
+                    "Bin Location Old"   : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
+                    "ABC Classification" : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
+                    "Quantity on Hand"   : it.quantity ?: 0,
+                    "Quantity Counted"   : "",
+                    "Quantity Variance"  : ""
 
             ]
-
         }
-
-//        Map quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
-//        def rows = quantityMap.collect { Product product, Integer quantity ->
-//            [
-//                    status: product.getStatus(location.id, quantity),
-//                    latestInventoryDate: product.latestInventoryDate(location.id)?:"",
-//                    productCode: StringEscapeUtils.escapeCsv(product.productCode),
-//                    productName: StringEscapeUtils.escapeCsv(product.name),
-//                    genericProduct: StringEscapeUtils.escapeCsv(product.genericProduct?.name),
-//
-//            ]
-//        }
 
         String csv = dataService.generateCsv(rows)
         response.setHeader("Content-disposition", "attachment; filename='CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv'")

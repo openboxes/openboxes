@@ -327,19 +327,14 @@ class Product implements Comparable, Serializable {
         }
     }
 
-    def getStatus(String locationId, Integer currentQuantity) {
+    String getAbcClassification(String locationId) {
+        def inventoryLevel = getInventoryLevel(locationId)
+        return inventoryLevel?.abcClass
+    }
+
+    String getStatus(String locationId, Integer currentQuantity) {
         def inventoryLevel = getInventoryLevel(locationId)
         return inventoryLevel?.statusMessage(currentQuantity)
-    }
-
-
-    def getQuantityOnHand(Integer locationId) {
-
-    }
-
-    def getQuantityAvailableToPromise(Integer locationId) {
-
-
     }
 
 
