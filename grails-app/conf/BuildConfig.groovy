@@ -75,8 +75,10 @@ grails.project.dependency.resolution = {
 		test 'dumbster:dumbster:1.6'
         test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
 
-
-	}
+        compile "org.codehaus.gpars:gpars:0.12"
+        compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
+        compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
+    }
 	plugins {
         runtime(':tomcat:1.3.9')
         runtime(':hibernate:1.3.9') { excludes 'antlr' }
