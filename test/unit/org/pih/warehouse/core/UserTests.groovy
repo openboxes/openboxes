@@ -73,7 +73,6 @@ class UserTests extends GrailsUnitTestCase {
         user1.validate()
         println user1.errors
 
-        assertNotNull user1.errors["email"]
         assertNotNull user1.errors["username"]
         assertNotNull user1.errors["password"]
         assertNotNull user1.errors["firstName"]
@@ -83,7 +82,6 @@ class UserTests extends GrailsUnitTestCase {
         user2.validate()
         println user2.errors
 
-        assertNotNull user1.errors["email"]
         assertNotNull user1.errors["username"]
         assertNotNull user1.errors["password"]
         assertNotNull user1.errors["firstName"]

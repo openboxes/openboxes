@@ -648,7 +648,7 @@ class RequisitionController {
                 requisition.origin,
                 requisition.recipientProgram,
                 commodityClass,
-                "${g:formatDate(date: requisition.dateRequested, format: 'MMM dd yyyy')}"
+                requisition?.dateRequested?.format("MMM dd yyyy")
             ]
 
         return requisitionName.findAll{ it }.join(" - ")
