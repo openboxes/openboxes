@@ -113,6 +113,26 @@ eventCreateWarStart = { warName, stagingDir ->
 	}
 }
 
+eventTestPhaseStart = {name ->
+    if (name == "unit") {
+        println "Starting React Tests"
+        def command = """npm run test"""
+        def proc = command.execute()
+        proc.waitFor()
+        println "${proc.in.text}"
+        if (proc.exitValue() == 1) {
+            event("ReactTestsFailed", ["Tests FAILED"])
+        } else {
+            println "Tests PASSED"
+        }
+    }
+}
+
+eventReactTestsFailed = { msg ->
+    println msg
+    System.exit(1)
+}
+
 eventCompileEnd = {
     println "classesDirPath: " + classesDirPath
     ant.copy(todir:classesDirPath) {
