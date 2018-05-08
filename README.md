@@ -177,6 +177,12 @@ http://localhost:8080/openboxes
 ##### 12. Log into OpenBoxes 
 You can use the default accounts (manager:password OR admin:password).  Once you are logged in as an admin, you can create own account.  Or you can use the signup form to create a new account.
 
+##### 13. React tests
+To run new frontend (React) tests type:
+```
+npm test
+```
+
 ### Troubleshooting
 #### Problem
 ```

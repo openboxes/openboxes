@@ -120,6 +120,7 @@ eventTestPhaseStart = {name ->
         def proc = command.execute()
         proc.waitFor()
         println "${proc.in.text}"
+        println "${proc.err.text}"
         if (proc.exitValue() == 1) {
             event("ReactTestsFailed", ["Tests FAILED"])
         } else {
