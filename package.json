@@ -11,7 +11,7 @@
   "scripts": {
     "watch": "webpack --watch --colors --progress",
     "bundle": "webpack",
-    "test": "test"
+    "test": "webpack"
   },
   "repository": {
     "type": "git",
