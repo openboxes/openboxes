@@ -2,11 +2,8 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
+import App from './components/app';
 import '../css/main.scss';
-
-const App = () => (
-  <div>React Component</div>
-);
 
 ReactDOM.render(
   <BrowserRouter>
