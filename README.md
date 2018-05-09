@@ -131,7 +131,7 @@ npm install
 ```
 
 ##### 7. Build React frontend
-You will need to build React frontend before starting the application.
+You can build React frontend with this command, but it will be automatically build when starting the application.
 ```    
 npm run bundle
 ```
