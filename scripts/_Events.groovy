@@ -88,6 +88,22 @@ eventRunAppStart = {
 	metadata.'app.buildDate' = new java.text.SimpleDateFormat("d MMM yyyy hh:mm:ss a").format(new java.util.Date());
 	metadata.'app.buildNumber' = buildNumber.toString()
 	//metadata.persist()
+
+    println "Building React frontend"
+    def command = """npm run bundle"""
+    def proc = command.execute()
+    proc.waitFor()
+    println "${proc.in.text}"
+    if (proc.exitValue() == 1) {
+        event("ReactBuildFailed", ["React build FAILED"])
+    } else {
+        println "React build finished"
+    }
+}
+
+eventReactBuildFailed = { msg ->
+    println msg
+    System.exit(1)
 }
 
 eventCreateWarStart = { warName, stagingDir ->
