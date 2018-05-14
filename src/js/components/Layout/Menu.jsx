@@ -1,4 +1,6 @@
 import React from 'react';
+import _ from 'lodash';
+import { Scrollbars } from 'react-custom-scrollbars';
 import translations from '../../en';
 
 const { navbar } = translations;
@@ -6,31 +8,39 @@ const { navbar } = translations;
 const Menu = () => (
   <div className="collapse navbar-collapse w-100 menu-container" id="navbarSupportedContent">
     <ul className="navbar-nav mr-auto flex-wrap">
-      { Object.entries(navbar).map((section) => {
-        if (!section[1].subsections) {
+      { _.map(navbar, (section, key) => {
+        if (!section.subsections) {
           return (
-            <li className="nav-item" key={section[0]}>
-              <a className="nav-link" href={section[1].link}>{section[1].label}</a>
+            <li className="nav-item" key={key}>
+              <a className="nav-link" href={section.link}>{section.label}</a>
             </li>
           );
         }
         return (
-          <li className="nav-item dropdown" key={section[0]}>
+          <li className="nav-item dropdown" key={key}>
             <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
-              {section[1].label}
+              {section.label}
             </a>
             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-              {
-                Object.entries(section[1].subsections).map(subsection => (
+              <Scrollbars
+                autoHeight
+                autoHeightMin={0}
+                autoHeightMax="50vh"
+                hideTracksWhenNotNeeded
+                autoHide
+              >
+                {
+                _.map(section.subsections, (subsection, subKey) => (
                   <a
                     className="dropdown-item"
-                    key={subsection[0]}
-                    href={subsection[1].link}
+                    key={subKey}
+                    href={subsection.link}
                   >
-                    {subsection[1].label}
+                    {subsection.label}
                   </a>
                 ))
-              }
+                }
+              </Scrollbars>
             </div>
           </li>
         );

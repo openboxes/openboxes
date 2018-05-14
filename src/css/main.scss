@@ -45,8 +45,7 @@
 
 .dropdown-menu {
     margin: 0 !important;
-    max-height: 50vh;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
 }
 
@@ -69,4 +68,13 @@
     line-height: 30px;
     color: #9b9b9b;
     border-bottom: solid 1px #cacaca;
+}
+
+#footer > div > a, #footer > div > b > a {
+    color: #777;
+}
+
+.footer {
+    font-size: 12px;
+    color: #777;
 }
