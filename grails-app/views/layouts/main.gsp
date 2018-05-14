@@ -1,29 +1,22 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title><g:layoutTitle/></title>
-    <g:layoutHead/>
-    <r:layoutResources/>
+    <title><g:layoutTitle default="OpenBoxes" /></title>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css/', file:'bundle.css')}">
+
+    <style>
+        #footer > div > a, #footer > div > b > a {
+            color: #777;
+        }
+    </style>
+
 </head>
-<body>
-    <header class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <a href="/openboxes" class="brand"><img alt="Logo_nav" id="topbar_logo" src="/openboxes/images/logo.png">&nbsp;openboxes</a>
-            <ul class="nav">
-                <li>test</li>
-            </ul>
-
-            <ul class="nav pull-right">
-                <li><a href="/openboxes/auth/login">Login</a></li>
-
-            </ul>
-        </div>
-    </header>
-
-    <div class="container">
-        <g:layoutBody/>
+<body class="d-flex flex-column">
+    <div style="flex: 1">
+        <g:layoutBody />
     </div>
-<r:layoutResources/>
+    <div class="border-top align-self-end text-center py-2" style="width: 100%; font-size: 12px; color: #777;">
+        <g:render template="/common/footer" />
+    </div>
 </body>
 </html>

@@ -1,14 +1,17 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap';
 
-import App from './components/app';
+import StockMovement from './components/StockMovement';
+import MainLayoutRoute from './components/Layout/MainLayoutRoute';
 import '../css/main.scss';
 
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      <Route path="/**/stockMovement" component={App} />
+      <MainLayoutRoute path="/**/stockMovement" component={StockMovement} />
     </Switch>
   </BrowserRouter>
   , document.getElementById('root'),
