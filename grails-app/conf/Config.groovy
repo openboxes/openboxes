@@ -567,6 +567,9 @@ openboxes.locale.defaultCurrencySymbol = "\$"
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
 
+// Add item to shipment search
+openboxes.shipping.search.maxResults = 1000
+
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""
