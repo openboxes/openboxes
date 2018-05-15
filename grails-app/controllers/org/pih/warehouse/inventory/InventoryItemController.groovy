@@ -187,6 +187,9 @@ class InventoryItemController {
                 boolean isDebit = (transaction?.transactionType?.transactionCode==org.pih.warehouse.inventory.TransactionCode.DEBIT && transactionEntry?.quantity > 0) ||
                         (transaction?.transactionType?.transactionCode==org.pih.warehouse.inventory.TransactionCode.CREDIT && transactionEntry.quantity < 0)
 
+                // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
+                def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity
+
                 stockHistoryList << [
                         transactionDate: transaction.transactionDate,
                         transactionCode: transaction?.transactionType?.transactionCode,
@@ -196,15 +199,15 @@ class InventoryItemController {
                         binLocation: transactionEntry.binLocation,
                         inventoryItem: transactionEntry.inventoryItem,
 						comments: transactionEntry.comments,
-                        quantity: transactionEntry.quantity,
+                        quantity: quantity,
                         isDebit: isDebit,
                         isCredit: isCredit,
                         balance: balance.values().sum(),
                         showDetails: (i==0),
                         isBaseline: isBaseline,
                         isSameTransaction: (previousTransaction?.id == transaction?.id),
-						runningBalance: transactionEntry.balance,
-						totalBalance: transactionEntry.totalBalance
+						//runningBalance: transactionEntry.balance,
+						//totalBalance: transactionEntry.totalBalance
                 ]
                 previousTransaction = transaction
             }
