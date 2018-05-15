@@ -64,8 +64,9 @@
                     <td>Inventory Transactions</td>
                     <td>${inventoryTransactionCount}</td>
                     <td>
-                        <g:link controller="migration" action="previewInventoryTransaction" params="[max:1]" class="button">Preview</g:link>
-                        <g:link controller="migration" action="migrationInventoryTransactions" params="[max:1]" class="button">Migrate</g:link>
+                        <g:link controller="migration" action="nextInventoryTransaction" params="[max:1]" class="button" target="_blank">Next</g:link>
+                        <g:link controller="migration" action="migrateInventoryTransactions" params="[max:1, performMigration:false]" class="button" target="_blank">Preview</g:link>
+                        <g:link controller="migration" action="migrateInventoryTransactions" params="[max:1, performMigration:true]" class="button" target="_blank">Migrate</g:link>
 
                     </td>
                 </tr>

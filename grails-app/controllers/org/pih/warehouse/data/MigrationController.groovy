@@ -30,35 +30,56 @@ import org.springframework.validation.Errors
 class MigrationController {
 
     def migrationService
+    def inventoryService
 
     def index = {
+        def location = Location.get(session.warehouse.id)
 
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
-        def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
+        def inventoryTransactionCount = Transaction.countByTransactionTypeAndInventory(inventoryTransactionType, location.inventory)
 
         [inventoryTransactionCount:inventoryTransactionCount]
     }
 
 
-    def previewInventoryTransaction = {
+    def nextInventoryTransaction = {
         def location = Location.get(session.warehouse.id)
 
         params.max = params.max ? params.int('max') : 1
 
         // FIXME This might be an expensive query just to get a single product
-        def transactionEntries = migrationService.getInventoryTransactionEntries(location, params.max)
+        def transactionEntries = migrationService.getInventoryTransactionEntries(location, 1)
+//        transactionEntries = transactionEntries.collect { [
+//                transactionNumber: it.transaction.transactionNumber,
+//                transactionDate: it.transaction.transactionDate,
+//                transactionType: it.transaction.transactionType.name,
+//                transactionCode: it.transaction.transactionType.transactionCode.name(),
+//                productCode: it.inventoryItem.product.productCode,
+//                productName: it.inventoryItem.product.name,
+//                lotNumber: it.inventoryItem.lotNumber,
+//                quantity: it.quantity
+//            ]
+//        }
 
-        def product = transactionEntries[0].inventoryItem.product
-        def results = migrationService.migrateInventoryTransactions(location, product,false)
-        render ([results: results] as JSON)
+//        render ([transactionEntries: transactionEntries] as JSON)
+        def product = transactionEntries[0]?.inventoryItem?.product
+        if (product) {
+            redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
+        }
+        else {
+            render "No inventory transactions"
+        }
     }
+
 
     def migrateInventoryTransactions = {
         def startTime = System.currentTimeMillis()
-        def product = Product.get(params.id)
         def location = Location.get(session.warehouse.id)
 
-        def results = migrationService.migrateInventoryTransactions(location, product, false)
+        params.max = params.max ? params.int('max') : 1
+
+        boolean performMigration = params.boolean("performMigration") ?: false
+        def results = migrationService.migrateInventoryTransactions(location, params.max, performMigration)
 
         log.info "Migrated in ${(System.currentTimeMillis() - startTime)} ms"
         render ([results:results] as JSON)

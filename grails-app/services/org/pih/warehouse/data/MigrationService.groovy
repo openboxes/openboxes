@@ -38,6 +38,8 @@ class MigrationService {
 
     boolean transactional = true
 
+
+
     def getInventoryTransactionEntries(Location location, Integer max) {
         def inventoryTransactions = TransactionEntry.createCriteria().list {
             fetchMode 'transaction', FetchMode.JOIN
@@ -67,12 +69,38 @@ class MigrationService {
                 eq("inventory", location.inventory)
                 order("transactionDate", "asc")
                 order("dateCreated", "asc")
+                transactionType {
+                    order("transactionCode", "desc")
+                }
             }
         }
     }
 
+    def migrateInventoryTransactions(Location location, Integer max, Boolean performMigration) {
+
+        // FIXME This might be an expensive query just to get a single product
+        def transactionEntries = getInventoryTransactionEntries(location, max, )
+
+        def results = []
+        transactionEntries.each {
+            def product = it?.inventoryItem?.product
+            def quantityOnHandBefore = inventoryService.getQuantityOnHand(location, product)
+
+            results << migrateInventoryTransactions(location, product, performMigration)
+
+            def quantityOnHandAfter = inventoryService.getQuantityOnHand(location, product)
+
+            log.info "Compare ${quantityOnHandBefore} vs ${quantityOnHandBefore}"
+            if (quantityOnHandBefore != quantityOnHandAfter)
+                throw new Exception("Migration lead to different quantitys for product ${product.productCode} and location ${location.name}")
+        }
+        return results
+    }
+
 
     def migrateInventoryTransactions(Location location, Product product, boolean performMigration) {
+
+        log.info ("Migrating inventory transactions for product ${product} at location ${location.name} ${performMigration}")
 
         def runningBalance
         def previousTransaction
@@ -80,11 +108,13 @@ class MigrationService {
         def transactionEntries = getTransactionEntries(location, product)
         def runningBalanceMap = [:]
 
-
-        log.info "DATE".padRight(25) + "CODE".padRight(20) + "ITEMKEY".padRight(25) + "QTY".padRight(5) + "PRE".padRight(5) + "BAL".padRight(5) + "ADJ".padRight(5)
+        log.info "DATE".padRight(25) + "CODE".padRight(20) + "ITEMKEY".padRight(25) + "QTY".padRight(5) + "PRE".padRight(5) + "BAL".padRight(10) + "ADJ".padRight(5)
 
         for (transactionEntry in  transactionEntries) {
 
+            if (transactionEntry.transaction.transactionEntries.size() > 1) {
+                throw new RuntimeException("Inventory transaction for product ${product.productCode} at location ${location.name} has more than one transaction entry")
+            }
 
             boolean sameTransaction = (previousTransaction == transactionEntry.transaction)
             if (!sameTransaction && transactionEntry.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
@@ -98,28 +128,31 @@ class MigrationService {
             Integer adjustmentQuantity = 0
             Integer oldQuantity = transactionEntry.quantity
             Integer productBalance = runningBalanceMap.values().sum()
+            String comments
 
             if (transactionEntry?.transaction?.transactionType?.transactionCode == TransactionCode.INVENTORY) {
 
                 adjustmentQuantity = runningBalance - runningBalanceBefore
 
                 // Convert inventory transaction to adjustment
+                comments = "Automatically converted transaction from INVENTORY ${oldQuantity} " +
+                        "to ADJUSTMENT ${adjustmentQuantity} with expected BALANCE ${productBalance} on ${new Date()}"
+
                 if (performMigration) {
-                    transactionEntry.comments = "Automatically converted transaction from INVENTORY ${oldQuantity} " +
-                            "to ADJUSTMENT ${adjustmentQuantity} with expected BALANCE ${productBalance} on ${new Date()}"
                     transactionEntry.transaction.transactionType = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
                     transactionEntry.quantity = adjustmentQuantity
-                    transactionEntry.save()
+                    transactionEntry.comments = comments
+                    transactionEntry.save(flush:true, failOnError: true)
                 }
             }
 
             log.info "${transactionEntry?.transaction?.transactionDate.toString().padRight(25)}" +
                     "${transactionEntry?.transaction?.transactionType?.transactionCode.name().padRight(20)}" +
                     "${itemKey.padRight(25)}" +
-                    "${transactionEntry?.quantity?.toString().padRight(5)}" +
-                    "${runningBalanceBefore.toString()?.padRight(5)}" +
-                    "${runningBalance.toString()?.padRight(5)}" +
-                    "${adjustmentQuantity.toString()?.padRight(5)}"
+                    "${transactionEntry?.quantity?.toString().padRight(10)}" +
+                    "${runningBalanceBefore.toString()?.padRight(10)}" +
+                    "${runningBalance.toString()?.padRight(10)}" +
+                    "${adjustmentQuantity.toString()?.padRight(10)}"
 
             previousTransaction = transactionEntry.transaction
 
@@ -130,7 +163,9 @@ class MigrationService {
                                                    binLocation: transactionEntry?.binLocation?.name,
                                                    transactionDate: transactionEntry?.transaction?.transactionDate,
                                                    transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode.name(),
-                                                   quantity: transactionEntry?.quantity
+                                                   quantity: transactionEntry?.quantity,
+                                                   totalQuantity: runningBalanceMap.values().sum(),
+                                                   comments:comments
                                            ], runningBalance: runningBalanceMap.clone()]
         }
 
