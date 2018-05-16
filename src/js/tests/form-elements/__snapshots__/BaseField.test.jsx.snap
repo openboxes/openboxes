@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BaseField component is correctly rendering attributes 1`] = `
+<div
+  className="padding-left-md padding-right-md form-group required hidden "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 control-label"
+      htmlFor="test"
+    >
+      test label
+    </label>
+    <input
+      dynamicAttr="dynamic property"
+      hidden={true}
+      id="test"
+      required={true}
+      testAttr={true}
+    />
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BaseField component is correctly rendering component label 1`] = `
+<div
+  className="padding-left-md padding-right-md form-group   "
+>
+  <div
+    className="row"
+  >
+    <span>
+      test
+    </span>
+    <input />
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BaseField component is correctly rendering text label 1`] = `
+<div
+  className="padding-left-md padding-right-md form-group   "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 control-label"
+      htmlFor="test"
+    >
+      test label
+    </label>
+    <input />
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;
