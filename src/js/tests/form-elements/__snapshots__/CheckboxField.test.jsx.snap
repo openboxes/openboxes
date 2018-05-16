@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CheckboxField component is correctly rendering renders correctly 1`] = `
+<div
+  className="padding-left-md padding-right-md form-group   "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 control-label"
+      htmlFor="test-field"
+    >
+      test label
+    </label>
+    <div
+      className="col-md-4"
+    >
+      <input
+        checked={undefined}
+        id="test-field"
+        name="test-field"
+        onChange={[Function]}
+        type="checkbox"
+      />
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;
