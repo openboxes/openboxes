@@ -1,4 +1,4 @@
-const translations = {
+const en = {
   navbar: {
     dashboard: {
       label: 'Dashboard',
@@ -13,7 +13,7 @@ const translations = {
           link: '/openboxes/inventoryBrowser/index',
         },
         snapshot: {
-          label: 'Inventory Periodic Snapshots',
+          label: 'Inventory Snapshots',
           link: '/openboxes/snapshot/index',
         },
       },
@@ -399,4 +399,4 @@ const translations = {
   },
 };
 
-export default translations;
+export default en;
