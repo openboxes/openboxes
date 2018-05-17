@@ -1,5 +1,3 @@
-/* eslint-disable no-undef,react/prop-types */
-
 import React from 'react';
 import renderer from 'react-test-renderer';
 import CheckboxField from '../../components/form-elements/CheckboxField';

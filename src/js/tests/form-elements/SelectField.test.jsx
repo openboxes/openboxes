@@ -1,5 +1,3 @@
-/* eslint-disable no-undef,react/prop-types */
-
 import React from 'react';
 import renderer from 'react-test-renderer';
 import SelectField from '../../components/form-elements/SelectField';
