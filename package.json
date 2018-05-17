@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/openboxes/openboxes#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "bootstrap": "^4.1.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
