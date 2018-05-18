@@ -13,7 +13,6 @@ cache:
   directories:
   - "$HOME/.grails"
   - "$HOME/.ivy2"
-  - "$HOME/.sdkman"
   - node_modules
 notifications:
   slack:
