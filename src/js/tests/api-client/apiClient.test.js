@@ -1,4 +1,3 @@
-/* eslint-disable no-undef  */
 import apiClient from '../../utils/apiClient';
 
 describe('apiClient', () => {
