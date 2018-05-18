@@ -8,7 +8,7 @@ exports[`CheckboxField component is correctly rendering renders correctly 1`] = 
     className="row"
   >
     <label
-      className="col-md-2 control-label"
+      className="col-md-2 col-form-label"
       htmlFor="test-field"
     >
       test label
