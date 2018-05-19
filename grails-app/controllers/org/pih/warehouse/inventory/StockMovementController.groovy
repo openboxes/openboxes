@@ -20,11 +20,13 @@ class StockMovementController {
 
     def list = {
         def stockMovements = stockMovementService.getStockMovements(10)
+        response.status = 200
         render ([stockMovements.collect { it.toJson() }] as JSON)
     }
 
     def read = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        response.status = 200
         render ([stockMovement: stockMovement.toJson()] as JSON)
     }
 
