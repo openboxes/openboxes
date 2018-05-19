@@ -17,7 +17,10 @@
     "verbose": true,
     "roots": [
       "<rootDir>/src/"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.(css|scss)$": "<rootDir>/src/js/tests/__mocks__/styleMock.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -33,14 +36,17 @@
     "bootstrap": "^4.1.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
+    "moment": "^2.22.1",
     "popper.js": "^1.14.3",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
     "react-custom-scrollbars": "^4.2.1",
+    "react-datetime": "^2.14.0",
     "react-dom": "^16.3.2",
     "react-localize-redux": "^2.17.5",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
+    "react-select": "^1.2.1",
     "redux": "^4.0.0",
     "redux-form": "^7.3.0",
     "redux-promise": "^0.5.3"

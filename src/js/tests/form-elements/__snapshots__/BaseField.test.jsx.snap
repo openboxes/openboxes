@@ -2,22 +2,20 @@
 
 exports[`BaseField component is correctly rendering attributes 1`] = `
 <div
-  className="padding-left-md padding-right-md form-group required hidden "
+  className="padding-left-md padding-right-md form-group required d-none "
 >
   <div
     className="row"
   >
     <label
-      className="col-md-2 control-label"
+      className="col-md-2 col-form-label"
       htmlFor="test"
     >
       test label
     </label>
     <input
       dynamicAttr="dynamic property"
-      hidden={true}
       id="test"
-      required={true}
       testAttr={true}
     />
   </div>
@@ -81,7 +79,7 @@ exports[`BaseField component is correctly rendering text label 1`] = `
     className="row"
   >
     <label
-      className="col-md-2 control-label"
+      className="col-md-2 col-form-label"
       htmlFor="test"
     >
       test label
