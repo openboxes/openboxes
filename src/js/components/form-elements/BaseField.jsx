@@ -5,7 +5,12 @@ import { Field } from 'redux-form';
 import { renderField } from '../../utils/form-utils';
 
 const BaseField = (props) => {
-  const { fieldName, fieldConfig, renderInput } = props;
+  const {
+    fieldName,
+    fieldConfig,
+    renderInput,
+    touched,
+  } = props;
   const dynamicAttr = fieldConfig.getDynamicAttr ? fieldConfig.getDynamicAttr(props) : {};
 
   return (
@@ -15,6 +20,7 @@ const BaseField = (props) => {
       renderInput={renderInput}
       attributes={{ ...fieldConfig.attributes, ...dynamicAttr }}
       label={fieldConfig.label}
+      touched={touched}
     />
   );
 };
@@ -27,4 +33,9 @@ BaseField.propTypes = {
     getDynamicAttr: PropTypes.func,
   }).isRequired,
   renderInput: PropTypes.func.isRequired,
+  touched: PropTypes.bool,
+};
+
+BaseField.defaultProps = {
+  touched: false,
 };

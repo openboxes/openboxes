@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import BaseField from './BaseField';
 
-const BaseReactField = (props) => {
-  const renderInput = (input, attr) => {
+class BaseReactField extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      touched: false,
+    };
+
+    this.renderInput = this.renderInput.bind(this);
+  }
+
+  renderInput(input, attr) {
     const onChange = (value) => {
       if (attr.onChange) {
         attr.onChange(value);
@@ -16,20 +26,22 @@ const BaseReactField = (props) => {
       ...attr,
       onChange,
       value: input.value,
-      onFocus: input.onFocus,
-      onBlur: input.onBlur,
+      onBlur: () => this.setState({ touched: true }),
     };
 
-    return props.renderInput(attributes);
-  };
+    return this.props.renderInput(attributes);
+  }
 
-  return (
-    <BaseField
-      {...props}
-      renderInput={renderInput}
-    />
-  );
-};
+  render() {
+    return (
+      <BaseField
+        {...this.props}
+        renderInput={this.renderInput}
+        touched={this.state.touched}
+      />
+    );
+  }
+}
 
 export default BaseReactField;
 

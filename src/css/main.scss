@@ -111,7 +111,8 @@ $red-light: #ce8483;
   color: $red-mid;
 }
 
-.has-error .form-control {
+.has-error .form-control,
+.has-error .Select-control {
   border-color: $red-mid;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
