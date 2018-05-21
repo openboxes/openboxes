@@ -10,6 +10,7 @@ const BaseField = (props) => {
     fieldConfig,
     renderInput,
     touched,
+    arrayField,
   } = props;
   const dynamicAttr = fieldConfig.getDynamicAttr ? fieldConfig.getDynamicAttr(props) : {};
 
@@ -21,6 +22,7 @@ const BaseField = (props) => {
       attributes={{ ...fieldConfig.attributes, ...dynamicAttr }}
       label={fieldConfig.label}
       touched={touched}
+      arrayField={arrayField}
     />
   );
 };
@@ -34,8 +36,10 @@ BaseField.propTypes = {
   }).isRequired,
   renderInput: PropTypes.func.isRequired,
   touched: PropTypes.bool,
+  arrayField: PropTypes.bool,
 };
 
 BaseField.defaultProps = {
   touched: false,
+  arrayField: false,
 };

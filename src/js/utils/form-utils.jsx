@@ -19,12 +19,24 @@ export const renderField = ({
   attributes: { required, hidden, ...otherAttributes },
   label: FieldLabel,
   touched: fieldTouched,
+  arrayField,
   input,
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
 
   const className = `form-group ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched) && error ? 'has-error' : ''}`;
+
+  if (arrayField) {
+    return (
+      <div className={className}>
+        {renderInput(input, attr)}
+        <div className="help-block" style={{ float: 'left' }}>
+          { touched || fieldTouched ? error : '' }
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`padding-left-md padding-right-md ${className}`}>
@@ -34,7 +46,9 @@ export const renderField = ({
             <label htmlFor={attr.id} className="col-md-2 col-form-label">{ FieldLabel }</label> :
             <FieldLabel />
         }
-        {renderInput(input, attr)}
+        <div className="col-md-4">
+          {renderInput(input, attr)}
+        </div>
       </div>
       <div className="row">
         <div className="col-md-2" />
@@ -54,11 +68,13 @@ renderField.propTypes = {
     PropTypes.func,
   ]),
   touched: PropTypes.bool,
+  arrayField: PropTypes.bool,
   input: PropTypes.shape({}).isRequired,
   meta: PropTypes.shape({}).isRequired,
 };
 
 renderField.defaultProps = {
   touched: false,
+  arrayField: false,
   label: '',
 };
