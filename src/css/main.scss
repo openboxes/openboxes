@@ -1,101 +1,114 @@
-$gray-dark: #737373;
-$red: #f00;
-$red-dark: #843534;
-$red-mid: #a94442;
-$red-light: #ce8483;
+$white-alpha: #EFECEC;
+
+$gray-alpha: #CCC;
+$gray-beta: #999;
+$gray-gamma: #888;
+$gray-delta: #777;
+$gray-epsilon: #737373;
+$gray-zeta: #666;
+
+$red-alpha: #843534;
+$red-beta: #a94442;
+$red-gamma: #ce8483;
+
+$blue-alpha: #163038;
+$blue-beta: #0c769e;
+$blue-gamma: #3bafda;
+$blue-delta: #4fc1e9;
+$blue-epsilon: #bce7f7;
 
 .brand-name {
-    padding-left: 10px;
-    font-size: 1.5em !important;
-    font-weight: bold;
-    color: #666 !important;
-    font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
-    text-transform: lowercase;
+  padding-left: 10px;
+  font-size: 1.5em !important;
+  font-weight: bold;
+  color: $gray-zeta !important;
+  font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
+  text-transform: lowercase;
 }
 
 .menu-container {
-    border-top: 1px solid #888;
-    border-bottom: 1px solid #666;
-    background-color: #888;
-    color: #FFF;
-    line-height: 1.2;
+  border-top: 1px solid $gray-gamma;
+  border-bottom: 1px solid $gray-zeta;
+  background-color: $gray-gamma;
+  color: white;
+  line-height: 1.2;
 }
 
 .nav-link {
-    padding: 7px 15px !important;
-    color: #FFF !important;
-    font-size: 14px;
+  padding: 7px 15px !important;
+  color: white !important;
+  font-size: 14px;
 }
 
 .dropdown:hover {
-    background-color: white;
-    .nav-link {
-        color: black !important;
-    }
+  background-color: white;
+  .nav-link {
+  color: black !important;
+  }
 }
 
 .nav-link:hover {
-    background-color: white;
-    color: black !important;
+  background-color: white;
+  color: black !important;
 }
 
 .dropdown:hover .dropdown-menu {
-    display: block;
-    color: black !important;
+  display: block;
+  color: black !important;
 }
 
 .dropdown-toggle::after {
-    display: none !important;
+  display: none !important;
 }
 
 .dropdown-menu {
-    margin: 0 !important;
-    overflow-y: hidden;
-    overflow-x: hidden;
+  margin: 0 !important;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .dropdown-item:hover, .dropdown-item:active {
-    background-color: lightgrey !important;
-    color: black;
+  background-color: lightgrey !important;
+  color: black;
 }
 
 .dropdown-item {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .bradcrumbs-container {
-    padding-left: 10px;
-    width: 100%;
-    height: 30px;
-    background-image: linear-gradient(#FFFFFF, #EFECEC);
-    justify-content: flex-start;
-    align-items: center;
-    line-height: 30px;
-    color: #9b9b9b;
-    border-bottom: solid 1px #cacaca;
+  padding-left: 10px;
+  width: 100%;
+  height: 30px;
+  background-image: linear-gradient(white, $white-alpha);
+  justify-content: flex-start;
+  align-items: center;
+  line-height: 30px;
+  color: $gray-beta;
+  border-bottom: solid 1px $gray-alpha;
 }
 
 #footer > div > a, #footer > div > b > a {
-    color: #777;
+  color: $gray-delta;
 }
 
 .footer {
-    font-size: 12px;
-    color: #777;
+  font-size: 12px;
+  color: $gray-delta;
 }
 
 .language-selector {
-    border-radius: 0.25rem;
-    border: 2px solid lightgrey;
-    background-color: lightgrey;
+  border-radius: 0.25rem;
+  border: 2px solid lightgrey;
+  background-color: lightgrey;
 }
 
 .form-group {
   &.required {
-    .col-form-label:after {
-      content: "*";
-      color: $red;
-    }
+  .col-form-label:after {
+    content: "*";
+    color: red;
+  }
   }
 }
 
@@ -103,23 +116,145 @@ $red-light: #ce8483;
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
-  color: $gray-dark;
+  color: $gray-epsilon;
 }
 
 .has-error .help-block,
 .has-error .col-form-label {
-  color: $red-mid;
+  color: $red-beta;
 }
 
 .has-error .form-control,
 .has-error .Select-control {
-  border-color: $red-mid;
+  border-color: $red-beta;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
 }
 
 .has-error .form-control:focus {
-  border-color: $red-dark;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-light;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-light;
+  border-color: $red-alpha;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-gamma;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-gamma;
+}
+
+/* = WIZARD STEPS CONTAINER
+----------------------------*/
+.wizard-steps {
+  height: 36px;
+  padding: 0;
+  line-height: 36px;
+  list-style: none;
+}
+
+/* = DEFAULT STEPS
+----------------------------*/
+.wizard-steps div {
+  padding-bottom: 2px;
+}
+
+.wizard-steps div:first-child a {
+  border-radius: 4px 0 0 4px;
+  -webkit-border-radius: 4px 0 0 4px;
+  -moz-border-radius: 4px 0 0 4px
+}
+
+.wizard-steps div, .wizard-steps div a, .wizard-steps div span {
+  display: inline-block;
+  vertical-align: top
+}
+
+.wizard-steps div a, .wizard-steps div:not(:first-child) span {
+  height: 36px;
+  padding: 0 10px 0 25px;
+  line-height: 36px
+}
+
+.wizard-steps div:first-child a {
+  padding: 0 10px
+}
+
+.wizard-steps div a {
+  position: relative;
+  color: white;
+  text-decoration: none;
+  background-color: $blue-epsilon;
+  border: 1px solid $blue-gamma;
+}
+
+.wizard-steps div:first-child a {
+  padding-left: 10px
+}
+
+.wizard-steps div a:after, .wizard-steps div a:before {
+  position: absolute;
+  top: -1px;
+  width: 0;
+  height: 0;
+  content: '';
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent
+}
+
+.wizard-steps div a:before {
+  right: -11px;
+  z-index: 3;
+  border-left: 11px solid $blue-epsilon;
+}
+
+.wizard-steps div a:after {
+  right: -12px;
+  z-index: 2;
+  border-left: 11px solid $blue-beta
+}
+
+.wizard-steps div a:focus, .wizard-steps div a:hover {
+  background-color: $blue-delta;
+  border: 1px solid $blue-delta
+}
+
+.wizard-steps div a:focus:before, .wizard-steps div a:hover:before {
+  border-left-color: $blue-delta
+}
+
+/* = COMPLETED STEPS
+----------------------------*/
+
+.wizard-steps .completed-step a {
+  background-color: $blue-gamma;
+  border: 1px solid $blue-gamma;
+}
+
+.wizard-steps .completed-step a:before {
+  border-left-color: $blue-gamma;
+}
+
+.wizard-steps .completed-step a:after {
+  border-left-color: $blue-beta
+}
+
+/* = CURRENT STEP
+----------------------------*/
+
+.wizard-steps .active-step a {
+  background-color: $blue-alpha;
+  border: 1px solid $blue-alpha
+}
+
+.wizard-steps .active-step a:before {
+  border-left-color: $blue-alpha
+}
+
+.wizard-steps .active-step a:after {
+  border-left-color: $blue-beta
+}
+
+/* = DISABLED STEPS
+----------------------------*/
+
+.wizard-steps .disabled-step {
+  cursor: default;
+}
+
+.wizard-steps .disabled-step a {
+  pointer-events: none;
 }
