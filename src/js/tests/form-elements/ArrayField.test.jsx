@@ -20,10 +20,40 @@ jest.mock('redux-form', () => ({
 }));
 
 describe('ArrayField component is correctly rendering', () => {
-  it('renders correctly', () => {
+  it('with Add button', () => {
     const fieldConfig = {
       type: ArrayField,
       addButton: 'Add item',
+      fields: {
+        textField: {
+          type: TextField,
+          label: 'Name',
+        },
+        textField2: {
+          type: TextField,
+          label: 'Name',
+        },
+        button: {
+          type: ButtonField,
+          buttonLabel: 'Delete',
+          getDynamicAttr: ({ removeRow }) => ({
+            onClick: removeRow,
+          }),
+          attributes: {
+            className: 'btn btn-outline-danger',
+          },
+        },
+      },
+    };
+
+    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+
+    expect(rendered.toJSON()).toMatchSnapshot();
+  });
+
+  it('with no Add button', () => {
+    const fieldConfig = {
+      type: ArrayField,
       fields: {
         textField: {
           type: TextField,
