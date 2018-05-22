@@ -24,16 +24,14 @@ const SelectField = (props) => {
     const delimiter = attributes.delimiter || ';';
 
     return (
-      <div className="col-md-4">
-        <Select
-          name={attributes.id}
-          {...attributes}
-          options={options}
-          delimiter={delimiter}
-          value={attributes.multi ? _.join(attributes.value, delimiter) : attributes.value}
-          onChange={onChange}
-        />
-      </div>
+      <Select
+        name={attributes.id}
+        {...attributes}
+        options={options}
+        delimiter={delimiter}
+        value={attributes.multi ? _.join(attributes.value, delimiter) : attributes.value}
+        onChange={onChange}
+      />
     );
   };
 
