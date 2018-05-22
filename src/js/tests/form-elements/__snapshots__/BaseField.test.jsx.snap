@@ -8,7 +8,7 @@ exports[`BaseField component is correctly rendering attributes 1`] = `
     className="row"
   >
     <label
-      className="col-md-2 col-form-label"
+      className="col-md-2 col-form-label text-right"
       htmlFor="test"
     >
       test label
@@ -87,7 +87,7 @@ exports[`BaseField component is correctly rendering text label 1`] = `
     className="row"
   >
     <label
-      className="col-md-2 col-form-label"
+      className="col-md-2 col-form-label text-right"
       htmlFor="test"
     >
       test label

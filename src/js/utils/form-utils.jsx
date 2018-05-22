@@ -43,7 +43,7 @@ export const renderField = ({
       <div className="row">
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-form-label">{ FieldLabel }</label> :
+            <label htmlFor={attr.id} className="col-md-2 col-form-label text-right">{ FieldLabel }</label> :
             <FieldLabel />
         }
         <div className="col-md-4">
