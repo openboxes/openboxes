@@ -38,15 +38,17 @@ const ArrayField = (props) => {
               </tr>))}
           </tbody>
         </table>
-        <div className="text-center">
-          {
-            typeof AddButton === 'string' ?
-              <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => addRow()}>
-                {AddButton}
-              </button>
-              : <AddButton addRow={addRow} />
-          }
-        </div>
+        { AddButton &&
+          <div className="text-center">
+            {
+              typeof AddButton === 'string' ?
+                <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => addRow()}>
+                  {AddButton}
+                </button>
+                : <AddButton addRow={addRow} />
+            }
+          </div>
+        }
       </div>
     );
   };
