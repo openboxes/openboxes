@@ -36,6 +36,7 @@ class ModalWrapper extends Component {
     return (
       <div>
         <button
+          type="button"
           className={this.props.btnOpenClassName}
           style={this.props.btnOpenStyle}
           onClick={() => this.openModal()}

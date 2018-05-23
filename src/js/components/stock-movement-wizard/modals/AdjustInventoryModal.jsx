@@ -1,5 +1,5 @@
 import React from 'react';
-import ModalWrapper from '../form-elements/ModalWrapper';
+import ModalWrapper from '../../form-elements/ModalWrapper';
 
 const AdjustInventoryModal = () => (
   <ModalWrapper title="Adjust Inventory" >
