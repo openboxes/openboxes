@@ -258,3 +258,29 @@ $blue-epsilon: #bce7f7;
 .wizard-steps .disabled-step a {
   pointer-events: none;
 }
+
+/* MODALS
+----------------------------*/
+
+.modal-content-custom {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  border: 1px solid $gray-alpha;
+  background: white;
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  max-width: 50vw;
+  max-height: 50vh;
+} 
+
+.modal-body-container {
+  height: 20vh;
+  width: 20vw;
+}
