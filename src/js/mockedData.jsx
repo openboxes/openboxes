@@ -74,8 +74,16 @@ const STOCK_LIST_MOCKS = [
   { value: '4', label: '4th Stock List' },
 ];
 
+const PRODUCTS_MOCKS = [
+  { value: '1', label: 'Advil 200mg' },
+  { value: '2', label: 'Tylenol 325mg' },
+  { value: '3', label: 'Aspirin 20mg' },
+  { value: '4', label: 'Similac Advance low iron 400g' },
+];
+
 export {
   LOCATION_MOCKS,
   USERNAMES_MOCKS,
   STOCK_LIST_MOCKS,
+  PRODUCTS_MOCKS,
 };

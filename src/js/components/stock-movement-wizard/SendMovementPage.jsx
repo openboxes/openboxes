@@ -31,6 +31,6 @@ export default reduxForm({
 SendMovementPage.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
-  pristine: PropTypes.shape.isRequired,
-  submitting: PropTypes.shape.isRequired,
+  pristine: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
 };
