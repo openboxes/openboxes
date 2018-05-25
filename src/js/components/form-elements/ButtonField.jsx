@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const ButtonField = (props) => {
   const {
     fieldName,
-    fieldConfig: { buttonLabel: ButtonLabel, attributes, getDynamicAttr },
+    fieldConfig: { buttonLabel: ButtonLabel, getDynamicAttr, attributes = {} },
   } = props;
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };

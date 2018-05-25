@@ -25,9 +25,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -48,9 +49,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -82,9 +84,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -105,9 +108,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -172,9 +176,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -195,9 +200,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -229,9 +235,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"
@@ -252,9 +259,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
             <div
               className="help-block"

@@ -19,9 +19,10 @@ exports[`TextField component is correctly rendering renders correctly 1`] = `
       <input
         className="form-control"
         id="test-field"
-        name="test-field"
+        onBlur={[Function]}
         onChange={[Function]}
         type="text"
+        value={undefined}
       />
     </div>
   </div>
