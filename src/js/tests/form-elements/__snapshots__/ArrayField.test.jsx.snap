@@ -20,7 +20,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -30,21 +30,11 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -54,16 +44,6 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
@@ -79,7 +59,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -89,21 +69,11 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -113,16 +83,6 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
@@ -171,7 +131,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -181,21 +141,11 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -205,16 +155,6 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
@@ -230,7 +170,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -240,21 +180,11 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
@@ -264,16 +194,6 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               type="text"
               value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
