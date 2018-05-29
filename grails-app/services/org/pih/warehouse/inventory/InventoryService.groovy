@@ -1860,7 +1860,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return	get quantity by location and product
 	 */
 	Integer getQuantityOnHand(Location location, Product product) {
-		log.info "quantity on hand for location " + location + " product " + product
+		log.debug "quantity on hand for location " + location + " product " + product
 		def quantityMap = getQuantityForProducts(location.inventory, [product.id])
         log.debug "quantity map " + quantityMap;
 		def quantity = quantityMap[product.id]
@@ -3315,9 +3315,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	public Map<String, Integer> getQuantityForProducts(Inventory inventory, ArrayList<String> productIds) {
-        log.debug "inventory " + inventory + " " + ", productIds: " + productIds
 		def ids = productIds.collect{ "'${it}'"}.join(",")
-        log.debug "ids: " + ids
 		def result =[:]
 		if (ids) {
             //
