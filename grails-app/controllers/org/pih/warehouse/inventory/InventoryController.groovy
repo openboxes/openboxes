@@ -1515,7 +1515,7 @@ class InventoryController {
         def products = transactionInstance?.transactionEntries.collect { it.inventoryItem.product }
 		def inventoryItems = InventoryItem.findAllByProductInList(products)
 		def model = [ 
-			inventoryItemsMap: inventoryItems.groupBy { it.product } ,
+			inventoryItemsMap: inventoryItems.groupBy { it.product?.id } ,
 			transactionInstance: transactionInstance?:new Transaction(),
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.findAllByParentLocationIsNull(),
