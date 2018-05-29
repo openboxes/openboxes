@@ -9,6 +9,7 @@ const withValueSelector = ({
   fieldConfig: {
     component: FieldComponent,
     componentConfig,
+    label,
     getDynamicAttr,
     attributes = {},
   }, ...props
@@ -20,7 +21,7 @@ const withValueSelector = ({
 
   return connect(state => ({
     fieldName,
-    fieldConfig: componentConfig,
+    fieldConfig: { label, ...componentConfig },
     ...props,
     selectedValue: selector(state, field),
   }))(FieldComponent);

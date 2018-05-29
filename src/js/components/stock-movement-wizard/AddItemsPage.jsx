@@ -54,6 +54,7 @@ const STOCKLIST_FIELDS = {
     fields: {
       productCode: {
         type: ValueSelectorField,
+        label: 'Requisition items',
         attributes: {
           formName: 'stock-movement-wizard',
         },
@@ -62,7 +63,6 @@ const STOCKLIST_FIELDS = {
         }),
         component: SelectField,
         componentConfig: {
-          label: 'Requisition items',
           attributes: {
             openOnClick: false,
             options: PRODUCTS_MOCKS,
