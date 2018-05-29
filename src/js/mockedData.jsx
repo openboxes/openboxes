@@ -81,9 +81,25 @@ const PRODUCTS_MOCKS = [
   { value: '4', label: 'Similac Advance low iron 400g' },
 ];
 
+const STOCK_LIST_ITEMS_MOCKS = {
+  1: [{ productCode: 1, maxQuantity: 10 },
+    { productCode: 4, maxQuantity: 10 },
+    { productCode: 3, maxQuantity: 10 }],
+  2: [{ productCode: 2, maxQuantity: 10 },
+    { productCode: 1, maxQuantity: 10 },
+    { productCode: 4, maxQuantity: 10 }],
+  3: [{ productCode: 3, maxQuantity: 10 },
+    { productCode: 1, maxQuantity: 10 },
+    { productCode: 2, maxQuantity: 10 }],
+  4: [{ productCode: 4, maxQuantity: 10 },
+    { productCode: 3, maxQuantity: 10 },
+    { productCode: 2, maxQuantity: 10 }],
+};
+
 export {
   LOCATION_MOCKS,
   USERNAMES_MOCKS,
   STOCK_LIST_MOCKS,
   PRODUCTS_MOCKS,
+  STOCK_LIST_ITEMS_MOCKS,
 };

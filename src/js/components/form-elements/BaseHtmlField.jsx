@@ -14,7 +14,7 @@ const BaseHtmlField = (props) => {
 
       input.onChange(value);
     };
-    const attributes = { ...input, ...attr, onChange };
+    const attributes = { ...attr, value: input.value, onChange };
 
     return props.renderInput(attributes);
   };

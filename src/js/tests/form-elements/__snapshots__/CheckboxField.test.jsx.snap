@@ -2,7 +2,7 @@
 
 exports[`CheckboxField component is correctly rendering renders correctly 1`] = `
 <div
-  className="padding-left-md padding-right-md form-group   "
+  className="padding-left-md padding-right-md form-group my-0   "
 >
   <div
     className="row"
@@ -20,6 +20,7 @@ exports[`CheckboxField component is correctly rendering renders correctly 1`] = 
         checked={undefined}
         id="test-field"
         name="test-field"
+        onBlur={[Function]}
         onChange={[Function]}
         type="checkbox"
       />

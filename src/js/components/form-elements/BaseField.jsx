@@ -1,31 +1,60 @@
-import React from 'react';
+import _ from 'lodash';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
 
 import { renderField } from '../../utils/form-utils';
 
-const BaseField = (props) => {
-  const {
-    fieldName,
-    fieldConfig,
-    renderInput,
-    touched,
-    arrayField,
-  } = props;
-  const dynamicAttr = fieldConfig.getDynamicAttr ? fieldConfig.getDynamicAttr(props) : {};
+class BaseField extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <Field
-      name={fieldName}
-      component={renderField}
-      renderInput={renderInput}
-      attributes={{ ...fieldConfig.attributes, ...dynamicAttr }}
-      label={fieldConfig.label}
-      touched={touched}
-      arrayField={arrayField}
-    />
-  );
-};
+    this.state = {
+      touched: false,
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.touched !== nextState.touched) {
+      return true;
+    }
+
+    return !_.isEqualWith(this.props, nextProps, (objValue, othValue) => {
+      if (typeof objValue === 'function' || typeof othValue === 'function') {
+        return true;
+      }
+
+      return undefined;
+    });
+  }
+
+  render() {
+    const {
+      fieldName,
+      fieldConfig: { label, getDynamicAttr, attributes = {} },
+      renderInput,
+      arrayField,
+      ...otherProps
+    } = this.props;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(otherProps) : {};
+
+    return (
+      <Field
+        name={fieldName}
+        component={renderField}
+        renderInput={renderInput}
+        attributes={{
+          ...attributes,
+          ...dynamicAttr,
+          onBlur: () => this.setState({ touched: true }),
+        }}
+        label={label}
+        touched={this.state.touched}
+        arrayField={arrayField}
+      />
+    );
+  }
+}
 
 export default BaseField;
 
@@ -35,11 +64,9 @@ BaseField.propTypes = {
     getDynamicAttr: PropTypes.func,
   }).isRequired,
   renderInput: PropTypes.func.isRequired,
-  touched: PropTypes.bool,
   arrayField: PropTypes.bool,
 };
 
 BaseField.defaultProps = {
-  touched: false,
   arrayField: false,
 };

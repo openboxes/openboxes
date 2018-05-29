@@ -24,16 +24,17 @@ export const renderField = ({
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
-
-  const className = `form-group ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched) && error ? 'has-error' : ''}`;
+  const className = `form-group my-0 ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched) && error ? 'has-error' : ''}`;
 
   if (arrayField) {
     return (
       <div className={className}>
         {renderInput(input, attr)}
-        <div className="help-block" style={{ float: 'left' }}>
-          { touched || fieldTouched ? error : '' }
-        </div>
+        { (touched || fieldTouched) && error &&
+          <div className="help-block mb-0" style={{ float: 'left' }}>
+            { error }
+          </div>
+        }
       </div>
     );
   }

@@ -20,48 +20,30 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
@@ -77,48 +59,30 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
@@ -167,48 +131,30 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
@@ -224,48 +170,30 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       <tr>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField"
-              name="[object Object].textField"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
           <div
-            className="form-group   "
+            className="form-group my-0   "
           >
             <input
               className="form-control"
               id="[object Object].textField2"
-              name="[object Object].textField2"
+              onBlur={[Function]}
               onChange={[Function]}
               type="text"
+              value={undefined}
             />
-            <div
-              className="help-block"
-              style={
-                Object {
-                  "float": "left",
-                }
-              }
-            >
-              
-            </div>
           </div>
         </td>
         <td>
