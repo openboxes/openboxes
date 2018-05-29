@@ -23,22 +23,28 @@ class CycleCountController {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
+
         List rows = binLocations.collect {
             [
-                    "Status"             : g.message(code: "binLocationSummary.${it.status}.label"),
-                    "Last Inventory Date": it.product.latestInventoryDate(location.id) ?: "",
-                    "Product Code"       : StringEscapeUtils.escapeCsv(it.product.productCode),
-                    "Product Name"       : it.product.name ?: "",
-                    "Generic Product"    : it.genericProduct?.name ?: "",
+                    "Product code"       : StringEscapeUtils.escapeCsv(it.product.productCode),
+                    "Product name"       : it.product.name ?: "",
+                    "Generic product"    : it.genericProduct?.name ?: "",
                     "Category"           : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
-                    "Lot Number"         : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
-                    "Expiration Date"    : it.inventoryItem.expirationDate ?: "",
-                    "Bin Location"       : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
-                    "Bin Location Old"   : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
-                    "ABC Classification" : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
+                    "Lot number"         : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
+                    "Expiration date"    : it.inventoryItem.expirationDate ? it.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
+                    "ABC classification" : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
+                    "Bin location"       : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
+                    "Bin location old"   : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
+                    "Status"             : g.message(code: "binLocationSummary.${it.status}.label"),
+                    "Last inventory date": it.product.latestInventoryDate(location.id) ?: "",
                     "Quantity on Hand"   : it.quantity ?: 0,
-                    "Quantity Counted"   : "",
-                    "Quantity Variance"  : ""
+                    "Physical lot/serial number"   : "",
+                    "Physical bin location"  : "",
+                    "Physical expiration date": "",
+                    "Physical quantity": "",
+                    "Was bin location updated in OpenBoxes?": "",
+                    "${StringEscapeUtils.escapeCsv("Was quantity, lot/serial, and expiration date updated in OpenBoxes?")}" : "",
+                    "Comment": "",
 
             ]
         }
