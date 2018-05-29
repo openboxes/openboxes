@@ -90,6 +90,15 @@
 							</g:link>
 						</g:isSuperuser>
 					</div>
+
+                    <g:isSuperuser>
+                        <div class="button-group">
+                            <g:link controller="migration" action="migrateProduct" id="${productInstance?.id}" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'shading.png')}"/>&nbsp;
+                                <warehouse:message code="product.migrateInventoryTransactions.label" default="Migrate Inventory Transactions"/>
+                            </g:link>
+                        </div>
+                    </g:isSuperuser>
                 </div>
             </td>
         </tr>
