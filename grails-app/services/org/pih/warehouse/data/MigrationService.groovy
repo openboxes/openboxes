@@ -9,9 +9,12 @@
 **/ 
 package org.pih.warehouse.data
 
+import grails.converters.JSON
 import grails.validation.ValidationException
+import groovyx.gpars.GParsExecutorsPool
 import groovyx.gpars.GParsPool
 import org.hibernate.FetchMode
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -35,33 +38,119 @@ class MigrationService {
     def dataService
     def inventoryService
     def persistenceInterceptor
+    def mailService
+
+    def sessionFactory
+
 
     boolean transactional = true
 
+    def getCurrentInventory() {
 
 
-    def getInventoryTransactionEntries(Location location, Integer max) {
-        def inventoryTransactions = TransactionEntry.createCriteria().list {
-            fetchMode 'transaction', FetchMode.JOIN
-            fetchMode 'transaction.inventory', FetchMode.JOIN
-            fetchMode 'transaction.inventory.warehouse', FetchMode.JOIN
-            fetchMode 'inventoryItem', FetchMode.JOIN
-            fetchMode 'inventoryItem.product', FetchMode.JOIN
+        def currentInventory = []
+
+        def locations = Location.findAllByParentLocationIsNullAndInventoryIsNotNull([max:15, offset: 10])
+
+        GParsPool.withPool {
+            log.info ("locations: ${locations.size()}")
+            currentInventory = locations.collectParallel { location ->
+                persistenceInterceptor.init()
+                def currentInventoryMap = []
+                try {
+                    def startTime = System.currentTimeMillis()
+
+                    //Map<Product, Integer> currentInventory = inventoryService.getCurrentInventory(location)
+                    Map<Product, Integer> quantityMap = inventoryService.getQuantityByProductMap(location)
+
+                    log.info "Calculated current inventory for ${location.name} in ${(System.currentTimeMillis()-startTime)} ms"
+                    currentInventoryMap = [
+                            location: location.name,
+                            products: quantityMap.keySet()?.size()?:0,
+                            checksum: quantityMap.values().sum(),
+                            quantityMap: quantityMap
+                    ]
+                    persistenceInterceptor.flush()
+                } catch (Exception e) {
+                    log.error("Exception occurred while calculating current inventory for ${location.name}")
+                } finally {
+                    persistenceInterceptor.destroy()
+                }
+                return currentInventoryMap
+            }
+        }
+
+
+        // Filter out locations with no inventory
+        currentInventory = currentInventory.findAll { it.products > 0 }
+
+        // Convert from a list of quantity maps to a list of tuples (location, product, quantity)
+        log.info "Converting to list of tuples "
+        def data = []
+        currentInventory.each { result ->
+            log.info "Converting result ${result}"
+            result.quantityMap.keySet().collect { product ->
+                log.info "Converting product ${product?.productCode} and ${result.location}"
+                def quantity = result.quantityMap[product]
+                data << [location: result?.location, product: product?.productCode, quantity: quantity]
+            }
+        }
+
+
+        return data
+    }
+
+    def getLocationsWithTransactions(List<TransactionCode> transactionCodes) {
+        def results = TransactionEntry.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                transaction {
+                    inventory {
+                        warehouse {
+                            groupProperty "id", "locationId"
+                            groupProperty "name", "locationName"
+                        }
+                    }
+                }
+                count "id",'transactionCount'
+            }
+            if (transactionCodes) {
+                transaction {
+                    transactionType {
+                        'in'("transactionCode", transactionCodes)
+                    }
+                }
+            }
+        }
+
+        return results
+//        def locationIds = results.collect { it.locationId }
+//        return Location.findAllByIdInList(locationIds)
+    }
+
+    def getProductsWithTransactions(Location location, List<TransactionCode> transactionCodes) {
+        return TransactionEntry.createCriteria().list {
+            projections {
+                inventoryItem {
+                    distinct("product")
+                }
+            }
             transaction {
-                transactionType {
-                    eq("transactionCode", TransactionCode.INVENTORY)
+                if (transactionCodes) {
+                    transactionType {
+                        'in'("transactionCode", transactionCodes)
+                    }
                 }
                 eq("inventory", location.inventory)
                 order("transactionDate", "asc")
                 order("dateCreated", "asc")
             }
-            maxResults(max)
         }
-        return inventoryTransactions
     }
 
     def getTransactionEntries(Location location, Product product) {
         TransactionEntry.createCriteria().list {
+            //fetchMode 'transaction', FetchMode.JOIN
             inventoryItem {
                 eq("product", product)
             }
@@ -76,23 +165,55 @@ class MigrationService {
         }
     }
 
-    def migrateInventoryTransactions(Location location, Integer max, Boolean performMigration) {
+    /**
+     * Migrate all inventory transactions across all locations.
+     *
+     * @return
+     */
+    def migrateInventoryTransactions() {
+        def locationCounts = getLocationsWithTransactions([TransactionCode.INVENTORY])
 
-        // FIXME This might be an expensive query just to get a single product
-        def transactionEntries = getInventoryTransactionEntries(location, max, )
+        GParsPool.withPool {
+            locationCounts.eachParallel {
+                persistenceInterceptor.init()
+                def location = Location.get(it.locationId)
+                log.info("Migrating ${it.transactionCount} inventory transactions for location ${location.name}")
+                migrateInventoryTransactions(location, true)
+                persistenceInterceptor.flush()
+                persistenceInterceptor.destroy()
+            }
+        }
+    }
 
-        def results = []
-        transactionEntries.each {
-            def product = it?.inventoryItem?.product
-            def quantityOnHandBefore = inventoryService.getQuantityOnHand(location, product)
+    /**
+     * Migrate all inventory transactions for the given location.
+     *
+     * @param location
+     * @param performMigration
+     * @return
+     */
+    def migrateInventoryTransactions(Location location, Boolean performMigration) {
+        def products = getProductsWithTransactions(location, [TransactionCode.INVENTORY])
 
-            results << migrateInventoryTransactions(location, product, performMigration)
+        def results = products.collect { product ->
+            //def quantityOnHandBefore = inventoryService.getQuantityOnHand(location, product)
 
-            def quantityOnHandAfter = inventoryService.getQuantityOnHand(location, product)
+            def stockHistory = migrateInventoryTransactions(location, product, performMigration)
 
-            log.info "Compare ${quantityOnHandBefore} vs ${quantityOnHandBefore}"
-            if (quantityOnHandBefore != quantityOnHandAfter)
-                throw new Exception("Migration lead to different quantitys for product ${product.productCode} and location ${location.name}")
+            //def quantityOnHandAfter = inventoryService.getQuantityOnHand(location, product)
+
+            return [
+                    productCode         : product?.productCode,
+                    location            : location?.name,
+                    //quantityOnHandBefore: quantityOnHandBefore,
+                    //quantityOnHandAfter : quantityOnHandAfter,
+                    stockHistory        : stockHistory
+            ]
+            //log.info "Compare ${quantityOnHandBefore} vs ${quantityOnHandAfter}"
+            //if (quantityOnHandBefore != quantityOnHandAfter) {
+            //    log.error("Migration leads to different quantities (${quantityOnHandBefore} vs ${quantityOnHandAfter}) for product ${product.productCode} and location ${location.name}")
+            //    throw new RuntimeException("Migration leads to different quantities for product ${product.productCode} and location ${location.name}")
+            //}
         }
         return results
     }
@@ -100,21 +221,17 @@ class MigrationService {
 
     def migrateInventoryTransactions(Location location, Product product, boolean performMigration) {
 
-        log.info ("Migrating inventory transactions for product ${product} at location ${location.name} ${performMigration}")
+        log.info ("Migrating inventory transactions for product ${product.productCode} ${product.name} at location ${location.name} ${performMigration}")
 
+        def results = []
         def runningBalance
         def previousTransaction
-        def runningBalanceList = []
         def transactionEntries = getTransactionEntries(location, product)
         def runningBalanceMap = [:]
-
-        log.info "DATE".padRight(25) + "CODE".padRight(20) + "ITEMKEY".padRight(25) + "QTY".padRight(5) + "PRE".padRight(5) + "BAL".padRight(10) + "ADJ".padRight(5)
+        def adjustments = []
+        results << "DATE".padRight(25) + "CODE".padRight(20) + "ITEMKEY".padRight(50) + "QTY".padRight(10) + "PRE".padRight(10) + "BAL".padRight(10) + "ADJ".padRight(10)
 
         for (transactionEntry in  transactionEntries) {
-
-            if (transactionEntry.transaction.transactionEntries.size() > 1) {
-                throw new RuntimeException("Inventory transaction for product ${product.productCode} at location ${location.name} has more than one transaction entry")
-            }
 
             boolean sameTransaction = (previousTransaction == transactionEntry.transaction)
             if (!sameTransaction && transactionEntry.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
@@ -138,38 +255,42 @@ class MigrationService {
                 comments = "Automatically converted transaction from INVENTORY ${oldQuantity} " +
                         "to ADJUSTMENT ${adjustmentQuantity} with expected BALANCE ${productBalance} on ${new Date()}"
 
-                if (performMigration) {
-                    transactionEntry.transaction.transactionType = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
-                    transactionEntry.quantity = adjustmentQuantity
-                    transactionEntry.comments = comments
-                    transactionEntry.save(flush:true, failOnError: true)
-                }
+                adjustments << [
+                        transactionEntry: transactionEntry,
+                        transaction: transactionEntry.transaction,
+                        quantity: adjustmentQuantity,
+                        comments: comments
+                ]
             }
 
-            log.info "${transactionEntry?.transaction?.transactionDate.toString().padRight(25)}" +
+            // Stock history showing each transaction applied
+            results << "${transactionEntry?.transaction?.transactionDate.toString().padRight(25)}" +
                     "${transactionEntry?.transaction?.transactionType?.transactionCode.name().padRight(20)}" +
-                    "${itemKey.padRight(25)}" +
+                    "${itemKey?.padRight(50)}" +
                     "${transactionEntry?.quantity?.toString().padRight(10)}" +
                     "${runningBalanceBefore.toString()?.padRight(10)}" +
                     "${runningBalance.toString()?.padRight(10)}" +
                     "${adjustmentQuantity.toString()?.padRight(10)}"
 
             previousTransaction = transactionEntry.transaction
-
-            runningBalanceList << [transactionEntry:
-                                           [
-                                                   productCode: transactionEntry?.inventoryItem?.product?.productCode,
-                                                   lotNumber: transactionEntry?.inventoryItem.lotNumber,
-                                                   binLocation: transactionEntry?.binLocation?.name,
-                                                   transactionDate: transactionEntry?.transaction?.transactionDate,
-                                                   transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode.name(),
-                                                   quantity: transactionEntry?.quantity,
-                                                   totalQuantity: runningBalanceMap.values().sum(),
-                                                   comments:comments
-                                           ], runningBalance: runningBalanceMap.clone()]
         }
 
-        return runningBalanceList
+        if (performMigration) {
+            if (adjustments) {
+                def adjustmentsByTransaction = adjustments.groupBy { it?.transaction }
+                adjustmentsByTransaction.keySet().each { Transaction transaction ->
+                    transaction.transactionType = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
+                    def adjustmentsWithinTransaction = adjustmentsByTransaction[transaction]
+                    adjustmentsWithinTransaction.each { adjustment ->
+                        adjustment.transactionEntry.quantity = it.quantity
+                        adjustment.transactionEntry.comments = it.comments
+                        adjustment.transactionEntry.save(failOnError:true)
+                    }
+                    transaction.save(failOnError:true)
+                }
+            }
+        }
+        return results
     }
 
     /**

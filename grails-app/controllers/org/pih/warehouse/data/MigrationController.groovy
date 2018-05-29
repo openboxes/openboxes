@@ -22,13 +22,17 @@ import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.jobs.DataMigrationJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.Errors
+import util.ReportUtil
 
 class MigrationController {
 
+    def dataService
     def migrationService
     def inventoryService
 
@@ -41,28 +45,39 @@ class MigrationController {
         [inventoryTransactionCount:inventoryTransactionCount]
     }
 
+    def currentInventory = {
+        def startTime = System.currentTimeMillis()
+        def data = migrationService.getCurrentInventory()
+        log.info "Results: ${data}"
+        if (params.format == "csv") {
+            def csv = dataService.generateCsv(data)
+            response.setHeader("Content-disposition", "attachment; filename='MigrateInventoryTransactions.csv'");
+            render(contentType: "text/csv", text: csv);
+            return
+        }
+        render ([responseTime: (System.currentTimeMillis()-startTime), count: data.size(), results:data] as JSON)
+    }
+
+    def locationsWithInventoryTransactions = {
+        def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
+
+        //locations = locations.collect { [id: it.id, name: it?.name] }
+
+        render ([count: locations.size(), locations:locations] as JSON)
+    }
+
+
+    def productsWithInventoryTransactions = {
+        def location = Location.get(session.warehouse.id)
+        def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
+        products = products.collect { [productCode: it.productCode]}
+        render ([products:products] as JSON)
+    }
 
     def nextInventoryTransaction = {
         def location = Location.get(session.warehouse.id)
-
-        params.max = params.max ? params.int('max') : 1
-
-        // FIXME This might be an expensive query just to get a single product
-        def transactionEntries = migrationService.getInventoryTransactionEntries(location, 1)
-//        transactionEntries = transactionEntries.collect { [
-//                transactionNumber: it.transaction.transactionNumber,
-//                transactionDate: it.transaction.transactionDate,
-//                transactionType: it.transaction.transactionType.name,
-//                transactionCode: it.transaction.transactionType.transactionCode.name(),
-//                productCode: it.inventoryItem.product.productCode,
-//                productName: it.inventoryItem.product.name,
-//                lotNumber: it.inventoryItem.lotNumber,
-//                quantity: it.quantity
-//            ]
-//        }
-
-//        render ([transactionEntries: transactionEntries] as JSON)
-        def product = transactionEntries[0]?.inventoryItem?.product
+        def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
+        def product = products[0]
         if (product) {
             redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
         }
@@ -71,6 +86,25 @@ class MigrationController {
         }
     }
 
+    def migrateProduct = {
+        def location = Location.get(session.warehouse.id)
+        Product product = Product.get(params.id)
+        try {
+            def results = migrationService.migrateInventoryTransactions(location, product, true)
+            flash.message = "Migrated product ${product.productCode}"
+            log.info ("Results: " + results)
+        } catch (Exception e) {
+            log.error("Unable to migrate product ${product.productCode} due to error: " + e.message, e)
+            flash.message = "Unable to migrate product ${product.productCode} due to error: " + e.message
+        }
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
+    }
+
+    def migrateAllInventoryTransactions = {
+        DataMigrationJob.triggerNow([:])
+        flash.message = "Triggered data migration job in background"
+        redirect(controller: "migration")
+    }
 
     def migrateInventoryTransactions = {
         def startTime = System.currentTimeMillis()
@@ -79,28 +113,23 @@ class MigrationController {
         params.max = params.max ? params.int('max') : 1
 
         boolean performMigration = params.boolean("performMigration") ?: false
-        def results = migrationService.migrateInventoryTransactions(location, params.max, performMigration)
+        def results = migrationService.migrateInventoryTransactions(location, performMigration)
 
-        log.info "Migrated in ${(System.currentTimeMillis() - startTime)} ms"
-        render ([results:results] as JSON)
+        def responseTime = System.currentTimeMillis() - startTime
+        log.info "Migrated in ${(responseTime)} ms"
+
+        if (params.format == "csv") {
+            results.remove("stockHistory")
+            def data = dataService.generateCsv(results)
+            response.setHeader("Content-disposition", "attachment; filename='MigrateInventoryTransactions.csv'");
+            render(contentType: "text/csv", text: data);
+            return
+        }
+
+        render ([responseTime: responseTime, count: results.size(), results:results] as JSON)
 
     }
 
-
-//    def migrateInventoryTransactions = {
-//
-//        def startTime = System.currentTimeMillis()
-//        def location = Location.get(session.warehouse.id)
-//
-//        def results = migrationService.migrateInventoryTransactions(location)
-//
-////        String csv = dataService.generateCsv(results)
-////        response.setHeader("Content-disposition", "attachment; filename='InventoryTransactions-${location.name}.csv'")
-////        render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
-////
-//        log.info "Migrated in ${(System.currentTimeMillis() - startTime)} ms"
-//        render ([results:results] as JSON)
-//    }
 
 
     def migrateProductSuppliers = { MigrationCommand command ->
