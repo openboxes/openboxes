@@ -9,6 +9,7 @@ import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import ArrayField from '../form-elements/ArrayField';
 import ButtonField from '../form-elements/ButtonField';
+import LabelField from '../form-elements/LabelField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
 import { PRODUCTS_MOCKS, STOCK_LIST_ITEMS_MOCKS } from '../../mockedData';
@@ -73,10 +74,10 @@ const STOCKLIST_FIELDS = {
         },
       },
       maxQuantity: {
-        type: TextField,
+        type: LabelField,
         label: 'Max QTY',
       },
-      neededQuantity: {
+      quantity: {
         type: TextField,
         label: 'Needed QTY',
       },
@@ -92,7 +93,7 @@ class AddItemsPage extends Component {
     if (this.props.stockList) {
       lineItems = _.map(
         STOCK_LIST_ITEMS_MOCKS[this.props.stockList],
-        val => ({ ...val, disabled: true }),
+        val => ({ ...val, quantity: val.maxQuantity, disabled: true }),
       );
     } else {
       lineItems = new Array(20).fill({});
