@@ -5,6 +5,9 @@
 /*.sql
 *Db.properties
 *Db.script
+/node_modules
+/web-app/css/bundle.css*
+/web-app/js/bundle.js*
 /plugins
 /web-app/plugins
 /web-app/WEB-INF/classes
