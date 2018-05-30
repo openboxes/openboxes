@@ -50,6 +50,10 @@ module.exports = {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader'] }),
       },
+      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: 'file-loader?name=./fonts/[hash].[ext]' },
+      { test: /\.(woff|woff2)$/, use: 'url-loader?prefix=font/&limit=5000&name=./fonts/[hash].[ext]' },
+      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./fonts/[hash].[ext]' },
+      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./fonts/[hash].[ext]' },
     ],
   },
   resolve: {

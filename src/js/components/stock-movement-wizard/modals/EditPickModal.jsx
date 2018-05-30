@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ModalWrapper from '../../form-elements/ModalWrapper';
 
-const AdjustInventoryModal = (props) => {
+const EditPickModal = (props) => {
   const {
     fieldConfig: { attributes, getDynamicAttr },
   } = props;
@@ -11,14 +11,14 @@ const AdjustInventoryModal = (props) => {
 
   return (
     <ModalWrapper {...attr}>
-      <div>Adjust Inventory form placeholder</div>
+      <div>Edit Pick form placeholder</div>
     </ModalWrapper>
   );
 };
 
-export default AdjustInventoryModal;
+export default EditPickModal;
 
-AdjustInventoryModal.propTypes = {
+EditPickModal.propTypes = {
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,

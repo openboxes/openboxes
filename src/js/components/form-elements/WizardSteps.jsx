@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 const WizardSteps = props => (
-  <div className="container-fluid">
+  <div className="container-fluid d-print-none">
     <div className="row">
       <div className="wizard-steps d-flex flex-wrap">
         { _.map(props.steps, (step, index) => (

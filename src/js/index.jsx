@@ -8,6 +8,7 @@ import { initialize, addTranslationForLanguage } from 'react-localize-redux';
 
 import 'bootstrap/dist/js/bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'font-awesome/css/font-awesome.min.css';
 import '../css/main.scss';
 
 import rootReducer from './reducers';
