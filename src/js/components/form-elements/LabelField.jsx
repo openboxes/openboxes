@@ -6,10 +6,11 @@ const LabelField = (props) => {
   const { fieldName, fieldConfig: { attributes, getDynamicAttr } } = props;
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
+  const { formatValue, ...otherAttr } = attr;
 
   const renderField = ({ input: { value } }) => (
     <div className="form-group">
-      <span {...attr}>{value}</span>
+      <span {...otherAttr}>{formatValue ? formatValue(value) : value}</span>
     </div>
   );
 

@@ -9,6 +9,6 @@ Enzyme.configure({ adapter: new Adapter() });
 test('StockMovement component is rendering properly', () => {
   const wrapper = shallow(<StockMovement />);
 
-  expect(wrapper.text()).toEqual('<ReduxForm />');
+  expect(wrapper.text()).toEqual('<WizardSteps /><ReduxForm />');
   // TODO add more tests once we add more steps to Stock Movement
 });

@@ -31,12 +31,13 @@ const NO_STOCKLIST_FIELDS = {
     type: ArrayField,
     addButton: 'Add line',
     fields: {
-      productCode: {
+      product: {
         type: SelectField,
         label: 'Requisition items',
         attributes: {
           openOnClick: false,
           options: PRODUCTS_MOCKS,
+          objectValue: true,
         },
       },
       quantity: {
@@ -53,7 +54,7 @@ const STOCKLIST_FIELDS = {
     type: ArrayField,
     addButton: 'Add line',
     fields: {
-      productCode: {
+      product: {
         type: ValueSelectorField,
         label: 'Requisition items',
         attributes: {
@@ -67,6 +68,7 @@ const STOCKLIST_FIELDS = {
           attributes: {
             openOnClick: false,
             options: PRODUCTS_MOCKS,
+            objectValue: true,
           },
           getDynamicAttr: ({ selectedValue }) => ({
             disabled: !!selectedValue,
@@ -121,7 +123,7 @@ class AddItemsPage extends Component {
           <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
             Previous
           </button>
-          <button type="submit" className="btn btn-outline-primary">Next</button>
+          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
         </div>
       </form>
     );

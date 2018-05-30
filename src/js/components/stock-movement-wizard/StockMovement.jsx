@@ -4,8 +4,13 @@ import AddItemsPage from './AddItemsPage';
 import EditPage from './EditPage';
 import PickPage from './PickPage';
 import SendMovementPage from './SendMovementPage';
+import WizardSteps from '../form-elements/WizardSteps';
 
 class StockMovements extends Component {
+  static getStepList() {
+    return ['Create', 'Add items', 'Edit', 'Pick', 'Send'];
+  }
+
   static showResults(values) {
     window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`);
   }
@@ -58,6 +63,9 @@ class StockMovements extends Component {
 
     return (
       <div className="container-fluid pt-2">
+        <div className="pb-3">
+          <WizardSteps steps={StockMovements.getStepList()} currentStep={this.state.page} />
+        </div>
         <div>
           {formList[page - 1]}
         </div>
