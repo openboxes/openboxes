@@ -11,6 +11,7 @@ package org.pih.warehouse.data
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import groovy.sql.Sql
 import groovyx.gpars.GParsExecutorsPool
 import groovyx.gpars.GParsPool
 import org.hibernate.FetchMode
@@ -40,17 +41,16 @@ class MigrationService {
     def persistenceInterceptor
     def mailService
 
+    def dataSource
     def sessionFactory
 
 
     boolean transactional = true
 
-    def getCurrentInventory() {
 
+    def getCurrentInventory(List<Location> locations) {
 
         def currentInventory = []
-
-        def locations = Location.findAllByParentLocationIsNullAndInventoryIsNotNull([max:15, offset: 10])
 
         GParsPool.withPool {
             log.info ("locations: ${locations.size()}")
@@ -59,8 +59,6 @@ class MigrationService {
                 def currentInventoryMap = []
                 try {
                     def startTime = System.currentTimeMillis()
-
-                    //Map<Product, Integer> currentInventory = inventoryService.getCurrentInventory(location)
                     Map<Product, Integer> quantityMap = inventoryService.getQuantityByProductMap(location)
 
                     log.info "Calculated current inventory for ${location.name} in ${(System.currentTimeMillis()-startTime)} ms"
@@ -88,9 +86,7 @@ class MigrationService {
         log.info "Converting to list of tuples "
         def data = []
         currentInventory.each { result ->
-            log.info "Converting result ${result}"
             result.quantityMap.keySet().collect { product ->
-                log.info "Converting product ${product?.productCode} and ${result.location}"
                 def quantity = result.quantityMap[product]
                 data << [location: result?.location, product: product?.productCode, quantity: quantity]
             }
@@ -203,11 +199,11 @@ class MigrationService {
             //def quantityOnHandAfter = inventoryService.getQuantityOnHand(location, product)
 
             return [
-                    productCode         : product?.productCode,
-                    location            : location?.name,
+                    productCode : product?.productCode,
+                    location    : location?.name,
                     //quantityOnHandBefore: quantityOnHandBefore,
                     //quantityOnHandAfter : quantityOnHandAfter,
-                    stockHistory        : stockHistory
+                    stockHistory: stockHistory
             ]
             //log.info "Compare ${quantityOnHandBefore} vs ${quantityOnHandAfter}"
             //if (quantityOnHandBefore != quantityOnHandAfter) {
@@ -277,16 +273,20 @@ class MigrationService {
 
         if (performMigration) {
             if (adjustments) {
+                def sql = new Sql(dataSource)
                 def adjustmentsByTransaction = adjustments.groupBy { it?.transaction }
-                adjustmentsByTransaction.keySet().each { Transaction transaction ->
-                    transaction.transactionType = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
-                    def adjustmentsWithinTransaction = adjustmentsByTransaction[transaction]
-                    adjustmentsWithinTransaction.each { adjustment ->
-                        adjustment.transactionEntry.quantity = it.quantity
-                        adjustment.transactionEntry.comments = it.comments
-                        adjustment.transactionEntry.save(failOnError:true)
+                sql.withBatch(1000) { statement ->
+                    adjustmentsByTransaction.keySet().each { Transaction transaction ->
+                        def transactionUpdate = "update transaction set transaction_type_id = '${Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID}' where id = '${transaction.id}'"
+                        statement.addBatch(transactionUpdate)
+                        def adjustmentsWithinTransaction = adjustmentsByTransaction[transaction]
+                        adjustmentsWithinTransaction.each { adjustment ->
+                            def transactionEntryUpdate =
+                                "update transaction_entry set quantity = ${adjustment.quantity}, comments = '${adjustment.comments}' where id = '${adjustment?.transactionEntry?.id}'"
+                            statement.addBatch(transactionEntryUpdate)
+                        }
                     }
-                    transaction.save(failOnError:true)
+                    statement.executeBatch()
                 }
             }
         }

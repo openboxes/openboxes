@@ -47,11 +47,11 @@ class MigrationController {
 
     def currentInventory = {
         def startTime = System.currentTimeMillis()
-        def data = migrationService.getCurrentInventory()
-        log.info "Results: ${data}"
+        def location = Location.get(session.warehouse.id)
+        def data = migrationService.getCurrentInventory([location])
         if (params.format == "csv") {
             def csv = dataService.generateCsv(data)
-            response.setHeader("Content-disposition", "attachment; filename='MigrateInventoryTransactions.csv'");
+            response.setHeader("Content-disposition", "attachment; filename='CurrentInventory_${location.name}.csv'");
             render(contentType: "text/csv", text: csv);
             return
         }
