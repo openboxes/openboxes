@@ -284,3 +284,23 @@ $blue-epsilon: #bce7f7;
   height: 20vh;
   width: 20vw;
 }
+
+/* DATE FIELD
+----------------------------*/
+
+.date-field tr {
+  background-color: initial !important;
+}
+
+.date-field thead th {
+  border-bottom: 1px solid #f9f9f9;
+  border-top: none;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.date-field td {
+  border: none;
+  padding: 0;
+  vertical-align: middle;
+}

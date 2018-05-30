@@ -9,7 +9,7 @@ const LabelField = (props) => {
   const { formatValue, ...otherAttr } = attr;
 
   const renderField = ({ input: { value } }) => (
-    <div className="form-group">
+    <div className="form-group my-0">
       <span {...otherAttr}>{formatValue ? formatValue(value) : value}</span>
     </div>
   );

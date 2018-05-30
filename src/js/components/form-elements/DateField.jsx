@@ -13,12 +13,14 @@ const DateField = (props) => {
     };
 
     return (
-      <DateTime
-        timeFormat={false}
-        closeOnSelect
-        {...attributes}
-        onChange={date => onChange(date)}
-      />
+      <div className="date-field">
+        <DateTime
+          timeFormat={false}
+          closeOnSelect
+          {...attributes}
+          onChange={date => onChange(date)}
+        />
+      </div>
     );
   };
 
