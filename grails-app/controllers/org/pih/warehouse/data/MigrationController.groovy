@@ -39,15 +39,24 @@ class MigrationController {
     def index = {
         def location = Location.get(session.warehouse.id)
 
+        def organizations = migrationService.getSuppliersForMigration()
+
+        def productSuppliers = migrationService.getProductsForMigration()
+
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
         def inventoryTransactionCount = Transaction.countByTransactionTypeAndInventory(inventoryTransactionType, location.inventory)
 
-        [inventoryTransactionCount:inventoryTransactionCount]
+        [
+                organizationCount: organizations.size(),
+                inventoryTransactionCount:inventoryTransactionCount,
+                productSupplierCount: productSuppliers.size(),
+        ]
     }
 
     def currentInventory = {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
+
         def data = migrationService.getCurrentInventory([location])
         if (params.format == "csv") {
             def csv = dataService.generateCsv(data)
@@ -60,9 +69,7 @@ class MigrationController {
 
     def locationsWithInventoryTransactions = {
         def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
-
-        //locations = locations.collect { [id: it.id, name: it?.name] }
-
+        locations = locations.collect { it.locationId }
         render ([count: locations.size(), locations:locations] as JSON)
     }
 

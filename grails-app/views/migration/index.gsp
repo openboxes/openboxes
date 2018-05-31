@@ -37,7 +37,7 @@
                     <td>
                         Organizations
                     </td>
-                    <td>N/A</td>
+                    <td>${organizationCount}</td>
                     <td>
                         <g:link controller="organization" action="index" class="button">List</g:link>
                         %{--<g:remoteLink action="migrateOrganizations" params="[preview:true]" class="button" update="status"--}%
@@ -51,7 +51,7 @@
                     <td>
                         Product Suppliers
                     </td>
-                    <td>N/A</td>
+                    <td>${productSupplierCount}</td>
                     <td>
                         <g:link controller="productSupplier" action="index" class="button">List</g:link>
                         %{--<g:remoteLink action="migrateProductSuppliers" params="[preview:true]" class="button" update="status"--}%

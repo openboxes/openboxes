@@ -86,9 +86,11 @@ class MigrationService {
         log.info "Converting to list of tuples "
         def data = []
         currentInventory.each { result ->
-            result.quantityMap.keySet().collect { product ->
-                def quantity = result.quantityMap[product]
-                data << [location: result?.location, product: product?.productCode, quantity: quantity]
+            if (result) {
+                result.quantityMap.keySet().collect { product ->
+                    def quantity = result.quantityMap[product]
+                    data << [location: result?.location, product: product?.productCode, quantity: quantity]
+                }
             }
         }
 
