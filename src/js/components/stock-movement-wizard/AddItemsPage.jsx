@@ -101,7 +101,7 @@ class AddItemsPage extends Component {
       lineItems = new Array(20).fill({});
     }
 
-    this.props.initialize('stock-movement-wizard', { lineItems }, true);
+    this.props.initialize('stock-movement-wizard', { lineItems, pickPage: [] }, true);
   }
 
   getFields() {
@@ -114,7 +114,6 @@ class AddItemsPage extends Component {
 
   render() {
     const { handleSubmit, previousPage } = this.props;
-
     return (
       <form onSubmit={handleSubmit}>
         {_.map(this.getFields(), (fieldConfig, fieldName) =>

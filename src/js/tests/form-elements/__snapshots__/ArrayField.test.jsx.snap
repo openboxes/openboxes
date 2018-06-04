@@ -3,7 +3,7 @@
 exports[`ArrayField component is correctly rendering with Add button 1`] = `
 <div>
   <table
-    className="table table-striped"
+    className="table table-striped text-center"
   >
     <thead>
       <tr>
@@ -18,7 +18,9 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
     </thead>
     <tbody>
       <tr>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -32,7 +34,9 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -46,7 +50,9 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <button
             className="btn btn-outline-danger"
             onClick={[Function]}
@@ -57,7 +63,9 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
         </td>
       </tr>
       <tr>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -71,7 +79,9 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -85,7 +95,9 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <button
             className="btn btn-outline-danger"
             onClick={[Function]}
@@ -114,7 +126,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
 exports[`ArrayField component is correctly rendering with no Add button 1`] = `
 <div>
   <table
-    className="table table-striped"
+    className="table table-striped text-center"
   >
     <thead>
       <tr>
@@ -129,7 +141,9 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
     </thead>
     <tbody>
       <tr>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -143,7 +157,9 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -157,7 +173,9 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <button
             className="btn btn-outline-danger"
             onClick={[Function]}
@@ -168,7 +186,9 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
         </td>
       </tr>
       <tr>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -182,7 +202,9 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <div
             className="form-group my-0   "
           >
@@ -196,7 +218,9 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             />
           </div>
         </td>
-        <td>
+        <td
+          className="align-middle"
+        >
           <button
             className="btn btn-outline-danger"
             onClick={[Function]}

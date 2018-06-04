@@ -26,7 +26,7 @@ class FieldArrayComponent extends Component {
 
     return (
       <div>
-        <table className="table table-striped">
+        <table className="table table-striped text-center">
           <thead>
             <tr>
               { _.map(fieldsConfig.fields, (config, name) =>
@@ -38,7 +38,7 @@ class FieldArrayComponent extends Component {
             // eslint-disable-next-line react/no-array-index-key
               <tr key={index}>
                 { _.map(fieldsConfig.fields, (config, name) => (
-                  <td key={`${field}.${name}`}>
+                  <td key={`${field}.${name}`} className="align-middle">
                     { renderFormField(config, `${field}.${name}`, {
                     ...properties,
                     arrayField: true,
