@@ -67,7 +67,6 @@ const USERNAMES_MOCKS = ['Julian Benson',
 ];
 
 const STOCK_LIST_MOCKS = [
-  { value: '', label: ' ' },
   { value: '1', label: '1st Stock List' },
   { value: '2', label: '2nd Stock List' },
   { value: '3', label: '3rd Stock List' },
