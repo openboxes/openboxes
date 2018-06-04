@@ -262,6 +262,10 @@ $blue-epsilon: #bce7f7;
 /* MODALS
 ----------------------------*/
 
+.ReactModalPortal .ReactModal__Overlay--after-open {
+  z-index: 4 !important;
+}
+
 .modal-content-custom {
   position: absolute;
   top: 50%;
@@ -303,4 +307,13 @@ $blue-epsilon: #bce7f7;
   border: none;
   padding: 0;
   vertical-align: middle;
+}
+
+/* PRINT STYLING
+----------------------------*/
+
+@media print {
+  .print-mt {
+    margin-top: 40px;
+  }
 }

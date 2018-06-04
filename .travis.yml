@@ -13,6 +13,7 @@ cache:
   directories:
   - "$HOME/.grails"
   - "$HOME/.ivy2"
+  - node_modules
 notifications:
   slack:
     secure: NJ2bhtLK2Xn0vPfq/lAxehuwLshp50Uep1mHMTbiQ7WK/YxNhLbrjgIbh9ZcM/UxZ4AhYX3Wv4VUI9iyEa06XUNTtxaM3ia8Eqao1wTVMl9N0RvU+VgHINORmyZZlf4MNBOZItwsmZT2b094gAfPIg7r8VuCo1wVqGjubVfTeUQ=

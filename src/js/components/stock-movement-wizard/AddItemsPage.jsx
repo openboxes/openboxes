@@ -150,7 +150,7 @@ class AddItemsPage extends Component {
       );
     }
 
-    this.props.initialize('stock-movement-wizard', { lineItems }, true);
+    this.props.initialize('stock-movement-wizard', { lineItems, pickPage: [] }, true);
   }
 
   getFields() {
@@ -165,7 +165,6 @@ class AddItemsPage extends Component {
 
   render() {
     const { handleSubmit, previousPage } = this.props;
-
     return (
       <form onSubmit={handleSubmit(() => (this.props.origin.type === 'Supplier' ? this.props.goToPage(5) : this.props.onSubmit()))}>
         {_.map(this.getFields(), (fieldConfig, fieldName) =>

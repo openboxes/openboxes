@@ -67,7 +67,6 @@ const USERNAMES_MOCKS = ['Julian Benson',
 ];
 
 const STOCK_LIST_MOCKS = [
-  { value: '', label: ' ' },
   { value: '1', label: '1st Stock List' },
   { value: '2', label: '2nd Stock List' },
   { value: '3', label: '3rd Stock List' },
@@ -132,6 +131,97 @@ const REASON_CODE_MOCKS = [
   { value: '3', label: 'Because I said so' },
 ];
 
+const LOT_DATA = [
+  {
+    productCode: 1,
+    lot: '1111',
+    bin: '1',
+    quantity: '50',
+    expiryDate: '2018/05/31',
+    recipient: true,
+  },
+  {
+    productCode: 1,
+    lot: '1111',
+    bin: '2',
+    quantity: '20',
+    expiryDate: '2018/05/31',
+    recipient: false,
+  },
+  {
+    productCode: 1,
+    lot: '2222',
+    bin: '1',
+    quantity: '50',
+    expiryDate: '2018/06/10',
+    recipient: true,
+  },
+  {
+    productCode: 2,
+    lot: '3333',
+    bin: '1',
+    quantity: '102',
+    expiryDate: '2018/06/10',
+    recipient: false,
+  },
+  {
+    productCode: 2,
+    lot: '3333',
+    bin: '1',
+    quantity: '103',
+    expiryDate: '2018/06/10',
+    recipient: false,
+  },
+  {
+    productCode: 2,
+    lot: '3333',
+    bin: '2',
+    quantity: '101',
+    expiryDate: '2018/06/10',
+    recipient: true,
+  },
+  {
+    productCode: 3,
+    lot: '4444',
+    bin: '1',
+    quantity: '200',
+    expiryDate: '2018/06/01',
+    recipient: false,
+  },
+  {
+    productCode: 3,
+    lot: '5555',
+    bin: '1',
+    quantity: '300',
+    expiryDate: '2018/06/02',
+    recipient: true,
+  },
+  {
+    productCode: 3,
+    lot: '5555',
+    bin: '2',
+    quantity: '100',
+    expiryDate: '2018/06/03',
+    recipient: false,
+  },
+  {
+    productCode: 4,
+    lot: '6666',
+    bin: '1',
+    quantity: '123',
+    expiryDate: '2018/06/01',
+    recipient: false,
+  },
+  {
+    productCode: 4,
+    lot: '7777',
+    bin: '1',
+    quantity: '111',
+    expiryDate: '2018/06/02',
+    recipient: false,
+  },
+];
+
 export {
   LOCATION_MOCKS,
   USERNAMES_MOCKS,
@@ -139,4 +229,5 @@ export {
   PRODUCTS_MOCKS,
   STOCK_LIST_ITEMS_MOCKS,
   REASON_CODE_MOCKS,
+  LOT_DATA,
 };
