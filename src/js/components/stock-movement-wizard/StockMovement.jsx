@@ -17,11 +17,15 @@ class StockMovements extends Component {
 
   constructor(props) {
     super(props);
-    this.nextPage = this.nextPage.bind(this);
-    this.previousPage = this.previousPage.bind(this);
+
     this.state = {
       page: 1,
+      prevPage: 1,
     };
+
+    this.nextPage = this.nextPage.bind(this);
+    this.previousPage = this.previousPage.bind(this);
+    this.goToPage = this.goToPage.bind(this);
   }
 
   getFormList() {
@@ -31,6 +35,7 @@ class StockMovements extends Component {
       />,
       <AddItemsPage
         previousPage={this.previousPage}
+        goToPage={this.goToPage}
         onSubmit={this.nextPage}
       />,
       <EditPage
@@ -49,11 +54,15 @@ class StockMovements extends Component {
   }
 
   nextPage() {
-    this.setState({ page: this.state.page + 1 });
+    this.setState({ prevPage: this.state.page, page: this.state.page + 1 });
   }
 
   previousPage() {
-    this.setState({ page: this.state.page - 1 });
+    this.setState({ prevPage: this.state.prevPage - 1, page: this.state.prevPage });
+  }
+
+  goToPage(page) {
+    this.setState({ prevPage: this.state.page, page });
   }
 
   render() {
