@@ -25,6 +25,7 @@ class CycleCountController {
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
 
         List rows = binLocations.collect {
+            def latestInventoryDate = it.product.latestInventoryDate(location.id)
             [
                     "Product code"       : StringEscapeUtils.escapeCsv(it.product.productCode),
                     "Product name"       : it.product.name ?: "",
@@ -36,7 +37,7 @@ class CycleCountController {
                     "Bin location"       : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
                     "Bin location old"   : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
                     "Status"             : g.message(code: "binLocationSummary.${it.status}.label"),
-                    "Last inventory date": it.product.latestInventoryDate(location.id) ?: "",
+                    "Last inventory date": latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
                     "Quantity on Hand"   : it.quantity ?: 0,
                     "Physical lot/serial number"   : "",
                     "Physical bin location"  : "",
