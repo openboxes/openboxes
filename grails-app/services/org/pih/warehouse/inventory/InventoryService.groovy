@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
+import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -51,7 +52,7 @@ class InventoryService implements ApplicationContextAware {
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
     def startTime = System.currentTimeMillis()
     def lastBatchStarted = startTime
-
+    def persistenceInterceptor
 
     def dataService
 	def productService
@@ -1354,6 +1355,33 @@ class InventoryService implements ApplicationContextAware {
 		return binLocationMap
 	}
 
+
+    List getQuantityByBinLocation(Location location) {
+        def startTime = System.currentTimeMillis()
+        List binLocations
+        def products = getProductsWithTransactions(location)
+        GParsPool.withPool(8) {
+            log.info "Processing ${products.size()} products"
+            binLocations = products.collectParallel { product ->
+                persistenceInterceptor.init()
+                List localBinLocations = []
+                try {
+                    def localTransactionEntries = getTransactionEntriesByInventoryAndProduct(location.inventory, [product])
+                    localBinLocations = getQuantityByBinLocation(localTransactionEntries)
+                    persistenceInterceptor.flush()
+                } catch (Exception e)  {
+                    log.info ("Error processing product ${product.productCode}: " + e.message)
+                } finally {
+                    persistenceInterceptor.destroy()
+                }
+                return localBinLocations
+            }
+        }
+        binLocations = binLocations.flatten()
+        log.info ("Calculate quantity: " + (System.currentTimeMillis()-startTime) + " ms")
+        return binLocations
+    }
+
     List getQuantityByBinLocation(Location location, Location binLocation) {
         List transactionEntries = getTransactionEntriesByInventoryAndBinLocation(location?.inventory, binLocation)
         List binLocations = getQuantityByBinLocation(transactionEntries)
@@ -1399,11 +1427,11 @@ class InventoryService implements ApplicationContextAware {
 
         // first get the quantity and inventory item map
         Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
-        quantityBinLocationMap.keySet().each { product ->
+        quantityBinLocationMap.keySet().each { Product product ->
             quantityBinLocationMap[product].keySet().each { inventoryItem ->
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
-                    def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber?:"") + ", Qty: " + quantity
+                    def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber ?: "") + ", Qty: " + quantity
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantity != 0 || includeOutOfStock) {
@@ -1421,7 +1449,6 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
             }
-
         }
 
         // Sort by expiration date, then bin location
@@ -2188,7 +2215,8 @@ class InventoryService implements ApplicationContextAware {
 				order("dateCreated", "asc")
 			}
 		}
-        log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
+		log.info "transactionEntries " + transactionEntries.size()
+		log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return transactionEntries;
 	}
@@ -3936,9 +3964,22 @@ class InventoryService implements ApplicationContextAware {
         lastBatchStarted = batchEnded
     }
 
+    def getProductsWithTransactions(Location location) {
+        def products = TransactionEntry.createCriteria().list() {
+            projections {
+                inventoryItem {
+                    distinct "product"
+                }
+            }
+            transaction {
+                eq("inventory", location.inventory)
+            }
+        }
+        return products
+    }
+
+
     def getDistinctProducts(Location location) {
-
-
         def productCount = TransactionEntry.createCriteria().get {
             projections {
                 inventoryItem {
@@ -4349,7 +4390,7 @@ class InventoryService implements ApplicationContextAware {
 
 		log.info "transactionEntries " + transactionEntries.size()
 
-        log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime)
+        log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime) + " ms"
 
         return transactionEntries;
     }
