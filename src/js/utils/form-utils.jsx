@@ -79,3 +79,6 @@ renderField.defaultProps = {
   arrayField: false,
   label: '',
 };
+
+export const generateKey = () =>
+  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

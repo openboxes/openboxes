@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { renderFormField } from '../../utils/form-utils';
+import PickPageFieldArrayComponent from './PickPageFieldArrayComponent';
 
 class FieldArrayComponent extends Component {
   shouldComponentUpdate(nextProps) {
@@ -23,6 +24,16 @@ class FieldArrayComponent extends Component {
     const { fieldsConfig, properties, fields } = this.props;
     const AddButton = fieldsConfig.addButton;
     const addRow = (row = {}) => fields.push(row);
+
+    if (fieldsConfig.pickPage) {
+      return (
+        <PickPageFieldArrayComponent
+          fieldsConfig={fieldsConfig}
+          properties={properties}
+          fields={fields}
+        />
+      );
+    }
 
     return (
       <div>
