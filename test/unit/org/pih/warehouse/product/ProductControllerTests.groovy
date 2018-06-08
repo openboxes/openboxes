@@ -37,7 +37,7 @@ class ProductControllerTests extends ControllerUnitTestCase{
 		mockDomain(Category, [category])
 
 		def productServiceMock = mockFor(ProductService)
-		productServiceMock.demand.getProducts(1..1) { arg1, arg2, arg3, arg4 ->
+		productServiceMock.demand.getProducts(1..1) { arg1, arg2, arg3, arg4, arg5 ->
 			println "Get products from mock service " + products
 			return new PagedResultList(Product.list(), 2);
 		}
