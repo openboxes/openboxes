@@ -53,7 +53,7 @@ class ReportController {
         String csv = ""
         if (binLocation) {
             String defaultBinLocation = g.message(code: 'default.label')
-            String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "MMM yyyy")
+            String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
             csv += binLocation.status + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","

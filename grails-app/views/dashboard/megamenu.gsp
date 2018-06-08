@@ -269,6 +269,11 @@
             </div>
             --%>
             <div class="megaButton">
+                <g:link controller="cycleCount" action="exportAsCsv">
+                    <warehouse:message code="report.cycleCount.label" default="Cycle Count Report"/>
+                </g:link>
+            </div>
+            <div class="megaButton">
                 <g:link controller="report" action="showBinLocationReport">
                     <warehouse:message code="report.binLocationReport.label" default="Bin Location Report"/>
                 </g:link>

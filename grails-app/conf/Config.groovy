@@ -513,6 +513,12 @@ springcache {
 }
 
 
+// Grails Sentry/Raven plugin
+// NOTE: You'll need to enable the plugin and set a DSN using an external config properties file
+// (namely, openboxes-config.properties or openboxes-config.groovy)
+grails.plugins.raven.active = false
+grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
@@ -595,6 +601,9 @@ openboxes.locale.defaultCurrencySymbol = "\$"
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
+
+// Add item to shipment search
+openboxes.shipping.search.maxResults = 1000
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
