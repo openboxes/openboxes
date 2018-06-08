@@ -69,6 +69,12 @@
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
+                                    <label for="includeInactive">
+                                        <g:checkBox name="includeInactive" value="true" checked="${params.includeInactive}"/>
+                                        <warehouse:message code="default.includeInactive.label" default="Include inactive"/>
+                                    </label>
+                                </div>
+                                <div class="filter-list-item">
                                     <label><warehouse:message code="default.limit.label" default="Limit"/></label>
                                     <p>
                                         <g:select id="max"
@@ -112,6 +118,7 @@
                                             <%--
                                             <th></th>
                                             --%>
+                                            <th>${warehouse.message(code:'product.active.label')}</th>
                                             <th>${warehouse.message(code:'product.productCode.label')}</th>
                                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" params="${params}"/>
                                             <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" params="${params}"/>
@@ -131,6 +138,10 @@
                                                     </span>
                                                 </td>
                                                 --%>
+
+                                                <td align="center">
+                                                    ${(productInstance.active) ? g.message(code:"default.active.label") : g.message(code:"default.inactive.label")}
+                                                </td>
                                                 <td align="center">
                                                     <g:link action="edit" id="${productInstance.id}">
                                                         ${productInstance.productCode}

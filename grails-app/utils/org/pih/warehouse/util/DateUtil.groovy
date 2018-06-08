@@ -9,6 +9,10 @@
 **/ 
 package org.pih.warehouse.util
 
+import grails.validation.ValidationException
+
+import java.text.SimpleDateFormat
+
 
 class DateUtil {
 
@@ -26,6 +30,25 @@ class DateUtil {
 			date = calendar.getTime();			
 		}
 		return date;
+	}
+
+
+	static Date[] parseDateRange(String dateRangeStr, String format, String separator) {
+
+        if (!dateRangeStr)
+            return null
+
+		String [] dateRanges = dateRangeStr.split(separator)
+        if (dateRanges.length != 2) {
+            throw new ValidationException("Date range must have exactly two dates")
+        }
+
+        Date [] dateRange = new Date [2]
+        def dateFormat = new SimpleDateFormat(format)
+        dateRanges.eachWithIndex{ String dateRangeEntry, int i ->
+            dateRange[i] = dateFormat.parse(dateRangeEntry)
+        }
+        return dateRange
 	}
 	
 }

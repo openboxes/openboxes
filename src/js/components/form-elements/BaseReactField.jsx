@@ -12,7 +12,7 @@ const BaseReactField = (props) => {
 
       input.onChange(value);
     };
-    const attributes = { ...attr, onChange, value: input.value };
+    const attributes = { ...attr, value: input.value, onChange };
 
     return props.renderInput(attributes);
   };

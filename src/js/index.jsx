@@ -8,10 +8,11 @@ import { initialize, addTranslationForLanguage } from 'react-localize-redux';
 
 import 'bootstrap/dist/js/bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'font-awesome/css/font-awesome.min.css';
 import '../css/main.scss';
 
 import rootReducer from './reducers';
-import StockMovement from './components/StockMovement';
+import StockMovement from './components/stock-movement-wizard/StockMovement';
 import MainLayoutRoute from './components/Layout/MainLayoutRoute';
 import en from './en';
 import fr from './fr';

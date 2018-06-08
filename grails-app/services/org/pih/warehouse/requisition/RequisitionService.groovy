@@ -23,6 +23,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.util.DateUtil
 
 class RequisitionService {
 
@@ -200,9 +201,20 @@ class RequisitionService {
         def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
         def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
 
+        def issuedDateRange = DateUtil.parseDateRange(params.issuedDateRange, "d/MMM/yyyy", "-")
+        def requestedDateRange = DateUtil.parseDateRange(params.requestedDateRange, "d/MMM/yyyy", "-")
+
         def criteria = Requisition.createCriteria()
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
             and {
+                if (issuedDateRange) {
+                    between("dateIssued", issuedDateRange[0], issuedDateRange[1])
+                }
+
+                if (requestedDateRange) {
+                    between("dateRequested", requestedDateRange[0], requestedDateRange[1])
+                }
+
                 // Base query needs to include the following
                 if (!requisition.isTemplate) {
                     or {

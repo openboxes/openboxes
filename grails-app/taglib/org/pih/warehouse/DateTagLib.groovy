@@ -88,9 +88,12 @@ class DateTagLib {
 	}
 
 	def prettyDateFormat = { attrs, body ->
-		def date = (attrs.date)?:new Date();
-		def p = new PrettyTime();
-		out << p.format(date)
+		String prettyDate = ""
+		if (attrs.date) {
+			def p = new PrettyTime();
+			prettyDate = p.format(attrs.date)
+		}
+        out << prettyDate
 	}
 		
 }

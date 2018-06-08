@@ -228,6 +228,7 @@ class UserService {
         if (role) {
             def criteria = User.createCriteria()
             users = criteria.list {
+                eq("active", true)
                 roles {
                     eq("id", role.id)
                 }
@@ -254,10 +255,10 @@ class UserService {
         if (roleAdmin) {
           def criteria = User.createCriteria()
           recipients = criteria.list {
+              eq("active", true)
               roles {
                   eq("id", roleAdmin.id)
               }
-              eq("active", true)
           }
         }
         return recipients

@@ -1,0 +1,236 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ArrayField component is correctly rendering with Add button 1`] = `
+<div>
+  <table
+    className="table table-striped text-center"
+  >
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Name
+        </th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField2"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <button
+            className="btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField2"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <button
+            className="btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="text-center"
+  >
+    <button
+      className="btn btn-outline-success margin-bottom-lg"
+      onClick={[Function]}
+      type="button"
+    >
+      Add item
+    </button>
+  </div>
+</div>
+`;
+
+exports[`ArrayField component is correctly rendering with no Add button 1`] = `
+<div>
+  <table
+    className="table table-striped text-center"
+  >
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Name
+        </th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField2"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <button
+            className="btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <div
+            className="form-group my-0   "
+          >
+            <input
+              className="form-control"
+              id="[object Object].textField2"
+              onBlur={[Function]}
+              onChange={[Function]}
+              type="text"
+              value={undefined}
+            />
+          </div>
+        </td>
+        <td
+          className="align-middle"
+        >
+          <button
+            className="btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

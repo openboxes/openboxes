@@ -397,11 +397,21 @@ class Product implements Comparable, Serializable {
      * @param locationId
      * @return
      */
-    InventoryLevel getInventoryLevel(locationId) {
+    InventoryLevel getInventoryLevel(String locationId) {
         if (id) {
             def location = Location.get(locationId)
             return InventoryLevel.findByProductAndInventory(this, location.inventory)
         }
+    }
+
+    /**
+     * Get ABC classification for this product at the given location.
+     * @param locationId
+     * @return
+     */
+    String getAbcClassification(String locationId) {
+        def inventoryLevel = getInventoryLevel(locationId)
+        return inventoryLevel?.abcClass?:abcClass
     }
 
     /**
@@ -413,11 +423,6 @@ class Product implements Comparable, Serializable {
      */
     def getStatus(String locationId, Integer currentQuantity) {
         def inventoryLevel = getInventoryLevel(locationId)
-        def latestInventoryDate = latestInventoryDate(locationId)
-        log.info "Location " + locationId
-        log.info "Current quantity = " + currentQuantity
-        log.info "Status: " + inventoryLevel?.status
-        log.info "Latest inventory " + latestInventoryDate
         return inventoryLevel?.statusMessage(currentQuantity)
     }
 
@@ -440,15 +445,16 @@ class Product implements Comparable, Serializable {
     }
 
 
+
     /**
      * Get the latest inventory date for this product at the given location.
      *
      * @param locationId
      * @return
      */
-    Date latestInventoryDate(def locationId) {
+    Date latestInventoryDate(String locationId) {
         def inventory = Location.get(locationId).inventory
-        def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te  left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]]).first()
+        def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY]]).first()
         return date
     }
 
@@ -458,7 +464,7 @@ class Product implements Comparable, Serializable {
      * @param locationId
      * @return
      */
-    String getBinLocation(def locationId) {
+    String getBinLocation(String locationId) {
         def inventoryLevel = getInventoryLevel(locationId)
         return inventoryLevel?.binLocation
     }
