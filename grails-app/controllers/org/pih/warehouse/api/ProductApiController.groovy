@@ -24,7 +24,7 @@ class ProductApiController {
 	}
 
     def read = {
-        Product product = Product.get(params.id)
+        Product product = Product.findByIdOrProductCode(params.id)
         render product.toJson() as JSON
     }
 
