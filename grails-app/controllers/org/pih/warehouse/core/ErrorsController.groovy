@@ -24,8 +24,7 @@ class ErrorsController {
     def grailsApplication
 
 	def handleException = {
-        def contentType = request.getHeader("Content-Type")
-        if (request.isXhr() || contentType.equals("application/json")) {
+        if (isAjax(request)) {
             render([errorCode: 500, errorMessage: request?.exception?.message?:""] as JSON)
         }
         else {
@@ -34,7 +33,7 @@ class ErrorsController {
 	}
 	
 	def handleNotFound = {
-        if (request.isXhr()) {
+        if (isAjax(request)) {
             render([errorCode: 404, errorMessage: "Resource not found"] as JSON)
         }
         else {
@@ -43,7 +42,7 @@ class ErrorsController {
 	}
 	
 	def handleUnauthorized = {
-        if (request.isXhr()) {
+        if (isAjax(request)) {
             render([errorCode: 401, errorMessage: "Access denied"] as JSON)
         }
         else {
@@ -52,7 +51,7 @@ class ErrorsController {
 	}
 
     def handleInvalidDataAccess = {
-        if (request.isXhr()) {
+        if (isAjax(request)) {
             render([errorCode: 500, errorMessage: "Illegal data access"] as JSON)
         }
         else {
@@ -61,11 +60,16 @@ class ErrorsController {
     }
 
     def handleMethodNotAllowed = {
-        if (request.isXhr()) {
+        if (isAjax(request)) {
             render([errorCode: 405, errorMessage: "Method not allowed"] as JSON)
             return
         }
         render(view:"/errors/methodNotAllowed")
+    }
+
+    boolean isAjax(request) {
+        def contentType = request.getHeader("Content-Type")
+        return request.isXhr() || contentType.equals("application/json")
     }
 
     def sendFeedback = {
