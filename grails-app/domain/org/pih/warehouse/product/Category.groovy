@@ -149,16 +149,7 @@ class Category implements Comparable, Serializable {
     Map toJson() {
         [
             id: id,
-            description: description,
-            name: name,
-            version: version,
-            dateCreated: dateCreated?.format("dd/MMM/yyyy hh:mm a"),
-            lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
-            sortOrder: sortOrder,
-            deleted: deleted,
-            isRoot: isRoot,
-            categories: categories?.collect{ it.toJson() }
-            //parentCategory: parentCategory.toJson()
+            name: name
         ]
     }
 
