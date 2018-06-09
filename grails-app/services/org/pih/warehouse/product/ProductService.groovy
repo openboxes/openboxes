@@ -277,13 +277,6 @@ class ProductService {
     }
     */
 
-    List<Product> getProducts(String query, Category category, List<Tag> tags, params) {
-        //def params = [name: query]
-
-        return getProducts(category, tags, params)
-
-    }
-
     /**
      * Get all products that match the given product identifiers.
      *
