@@ -26,8 +26,9 @@ class RoleFilters {
 
                 // Anonymous
                 if (SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" ||
-                        SecurityFilters.controllersWithAuthUserNotRequired.contains(controllerName))
+                        SecurityFilters.controllersWithAuthUserNotRequired.contains(controllerName)) {
                     return true
+                }
 
                 // Authorized user s
                 def missBrowser = !userService.canUserBrowse(session.user)
@@ -48,7 +49,6 @@ class RoleFilters {
     static Boolean needSuperuser(controllerName, actionName) {
         superuserControllers?.contains(controllerName) || superuserActions[controllerName]?.contains(actionName) || superuserActions['*'].any { actionName?.startsWith(it) }
     }
-
 
     static Boolean needAdmin(controllerName, actionName) {
         adminControllers?.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any { actionName?.startsWith(it) }

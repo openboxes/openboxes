@@ -14,9 +14,11 @@ import org.pih.warehouse.core.User
 
 class SecurityFilters {
 	
-  static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors', 'stockMovement']
-  static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
-  static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+	static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
+	static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
+	static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+	static ArrayList controllersWithLocationNotRequired = ['productApi']
+
 	def authService 
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
@@ -26,8 +28,8 @@ class SecurityFilters {
 				AuthService.currentUser.set(null)
 				AuthService.currentLocation.set(null)
 			}
-			before = {	
-				
+			before = {
+
 				// Set the current user (if there's on in the session)
 				if (session.user) { 
 					if (!AuthService.currentUser) {  
@@ -146,12 +148,8 @@ class SecurityFilters {
 				
 				// When a user has not selected a warehouse and they are requesting an action that requires one, 
 				// we redirect to the choose warehouse page.
-				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName))) {						
-					//def targetUri = (request.forwardURI - request.contextPath);
-					//if (request.queryString)
-					//	targetUri += "?" + request.queryString
+				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName) || controllersWithLocationNotRequired.contains(controllerName))) {
 
-						
 					if (session?.warehouseStillNotSelected) { 
 						// FIXME cannot use warehouse tag lib here
 						// MissingPropertyException: No such property: warehouse for class: SecurityFilters

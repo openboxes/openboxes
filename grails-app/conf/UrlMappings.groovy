@@ -21,9 +21,20 @@ class UrlMappings {
 			  }
 		}
 		
-		"/api/$action/$id"(controller:"api", parseRequest:true){
+
+        "/api/${resource}s"(parseRequest: true) {
+            controller = { "${params.resource}Api" }
+            action = [GET: "list", POST: "create"]
+        }
+		"/api/${resource}s/$id"(parseRequest: true) {
+            controller = {"${params.resource}Api" }
+            action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
+        }
+
+		"/api/$action/$id?"(controller:"api", parseRequest:true){
 			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
 		}
+
 		//"/test/searchByFirstName.json?q=$q"(controller:"test") { 
 		//	action = [GET:"searchByFirstName"]
 		//}
