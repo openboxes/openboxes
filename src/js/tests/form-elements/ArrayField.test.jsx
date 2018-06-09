@@ -17,6 +17,7 @@ jest.mock('redux-form', () => ({
     const fields = [{}, {}];
     return <Component fields={fields} {...others} />;
   },
+  formValueSelector: () => {},
 }));
 
 describe('ArrayField component is correctly rendering', () => {

@@ -6,6 +6,7 @@ $gray-gamma: #888;
 $gray-delta: #777;
 $gray-epsilon: #737373;
 $gray-zeta: #666;
+$gray-eta: #EEE;
 
 $red-alpha: #843534;
 $red-beta: #a94442;
@@ -280,13 +281,8 @@ $blue-epsilon: #bce7f7;
   padding: 20px;
   margin-right: -50%;
   transform: translate(-50%, -50%);
-  max-width: 50vw;
-  max-height: 50vh;
-} 
-
-.modal-body-container {
-  height: 20vh;
-  width: 20vw;
+  max-width: 80vw;
+  max-height: 80vh;
 }
 
 /* DATE FIELD
@@ -316,4 +312,29 @@ $blue-epsilon: #bce7f7;
   .print-mt {
     margin-top: 40px;
   }
+}
+
+.clickable-row:hover {
+  cursor: pointer;
+  background-color: $gray-eta !important;
+}
+
+/* TABLE - ROW STRIKETROUGH
+----------------------------*/
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  position: relative;
+}
+
+tr.crossed-out td:before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-bottom: 2px solid $red-beta;
+  width: 100%;
 }

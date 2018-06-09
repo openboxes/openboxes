@@ -150,7 +150,9 @@ class AddItemsPage extends Component {
       );
     }
 
-    this.props.initialize('stock-movement-wizard', { lineItems, pickPage: [] }, true);
+    this.props.initialize('stock-movement-wizard', {
+      lineItems, pickPage: [], adjustInventory: [], editPick: [],
+    }, true);
   }
 
   getFields() {

@@ -1,31 +1,28 @@
 import React, { Component } from 'react';
-import { reduxForm, arrayInsert, formValueSelector, change } from 'redux-form';
+import { reduxForm, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
+import { renderFormField, generateKey } from '../../utils/form-utils';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import AdjustInventoryModal from './modals/AdjustInventoryModal';
 import EditPickModal from './modals/EditPickModal';
-import {
-  LOT_DATA,
-  PRODUCTS_MOCKS,
-} from '../../mockedData';
+import { AVAILABLE_LOTS } from '../../mockedData';
 
 const FIELDS = {
   pickPage: {
     type: ArrayField,
+    pickPage: true,
     fields: {
-      productCode: {
-        type: LabelField,
-        label: 'Code',
-      },
-      productName: {
+      product: {
         type: LabelField,
         label: 'Product Name',
+        attributes: {
+          formatValue: value => (`${value.code} - ${value.name}`),
+        },
       },
       lot: {
         type: LabelField,
@@ -41,7 +38,11 @@ const FIELDS = {
       },
       quantity: {
         type: LabelField,
-        label: 'Qty',
+        label: 'Qty required',
+      },
+      qtyPicked: {
+        type: LabelField,
+        label: 'Qty picked',
       },
       recipient: {
         type: ValueSelectorField,
@@ -60,19 +61,43 @@ const FIELDS = {
         },
       },
       buttonEditPick: {
-        type: EditPickModal,
         label: 'Edit Pick',
+        type: ValueSelectorField,
         attributes: {
-          btnOpenText: 'Edit',
-          title: 'Edit Pick',
+          formName: 'stock-movement-wizard',
+        },
+        getDynamicAttr: ({ rowIndex }) => ({
+          field: `pickPage[${rowIndex}].product.code`,
+        }),
+        component: EditPickModal,
+        componentConfig: {
+          attributes: {
+            btnOpenText: 'Edit',
+            title: 'Edit Pick',
+          },
+          getDynamicAttr: ({ selectedValue }) => ({
+            productCode: selectedValue,
+          }),
         },
       },
       buttonAdjustInventory: {
-        type: AdjustInventoryModal,
         label: 'Adjust Inventory',
+        type: ValueSelectorField,
         attributes: {
-          btnOpenText: 'Adjust',
-          title: 'Adjust Inventory',
+          formName: 'stock-movement-wizard',
+        },
+        getDynamicAttr: ({ rowIndex }) => ({
+          field: `pickPage[${rowIndex}].product`,
+        }),
+        component: AdjustInventoryModal,
+        componentConfig: {
+          attributes: {
+            btnOpenText: 'Adjust',
+            title: 'Adjust Inventory',
+          },
+          getDynamicAttr: ({ selectedValue }) => ({
+            product: selectedValue,
+          }),
         },
       },
     },
@@ -82,24 +107,54 @@ const FIELDS = {
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["print"] }] */
 /* eslint no-param-reassign: "error" */
 class PickPage extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {};
-  }
-
   componentDidMount() {
-    let pickPage = [];
-    _.forEach(this.props.lineItems, (line) => {
-      pickPage = _.concat(
-        pickPage,
-        _.filter(LOT_DATA, data => data.productCode === line.product.code),
-      );
-    });
-    _.forEach(pickPage, (pick) => {
-      pick.productName = _.find(PRODUCTS_MOCKS, prod => prod.value.code === pick.productCode).label;
-    });
-    this.props.change('stock-movement-wizard', 'pickPage', pickPage);
+    // TODO: once API will be ready, rewrite this to get data from backend
+    if (!_.some(this.props.pickPageData, 'availableLots')) {
+      const { lineItems } = this.props;
+      let pickPage = [];
+      _.forEach(lineItems, (line) => {
+        // Get available lots for every product
+        const availableLots =
+          _.filter(
+            AVAILABLE_LOTS,
+            data => data.product.code === line.product.code,
+          );
+        // Get picked lots (out of all available lots)
+        const lotsPicked =
+          _.filter(
+            availableLots,
+            data => data.product.code === line.product.code && data.qtyPicked > 0,
+          );
+        // Create array for PickPage table: line items with lots picked for them
+        // (rowKey = unique value, that will be used as row key inside rendered table)
+        pickPage = _.concat(
+          pickPage,
+          {
+            ...line,
+            availableLots: _.map(availableLots, lot => (
+              {
+                ...lot,
+                lotWithBin: `${lot.lot}-${lot.bin}`,
+              }
+            )),
+            parent: true,
+            qtyPicked: _.reduce(lotsPicked, (sum, lot) => sum + parseInt(lot.qtyPicked, 10), 0),
+            rowKey: generateKey(),
+          },
+          // Add fields to picked lots:
+          // - initialPick (Bool),
+          // - lotWithBin (String made from lot and bin fields, assumed to be unique),
+          _.map(lotsPicked, lot => ({
+            ...lot,
+            initialPick: true,
+            lotWithBin: `${lot.lot}-${lot.bin}`,
+            rowKey: generateKey(),
+          })),
+        );
+      });
+      // Update specfied field in redux form
+      this.props.change('stock-movement-wizard', 'pickPage', pickPage);
+    }
   }
 
   print() {
@@ -136,9 +191,10 @@ export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { arrayInsert, change })(PickPage));
+})(connect(mapStateToProps, { change })(PickPage));
 
 PickPage.propTypes = {
+  pickPageData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   change: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
