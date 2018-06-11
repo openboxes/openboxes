@@ -338,3 +338,11 @@ tr.crossed-out td:before {
   border-bottom: 2px solid $red-beta;
   width: 100%;
 }
+
+.print-buttons-container {
+  display: flex;
+  position: absolute;
+  float: right;
+  flex-direction: column;
+  right: 5px;
+}

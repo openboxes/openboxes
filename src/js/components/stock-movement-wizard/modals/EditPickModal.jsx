@@ -94,6 +94,9 @@ class EditPickModal extends Component {
   }
 
   onSave() {
+    const elements = document.getElementsByClassName('collapse-all');
+    _.forEach(elements, element => element.classList.remove('show'));
+
     const { pickPage, editPick } = this.props;
     // Get all new lot picks
     const newPicks = editPick;

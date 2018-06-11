@@ -4,7 +4,7 @@ import { reduxForm, initialize, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import validate from './validate';
+import { validate } from './validate';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import ArrayField from '../form-elements/ArrayField';
