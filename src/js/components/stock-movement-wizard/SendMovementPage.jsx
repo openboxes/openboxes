@@ -45,8 +45,6 @@ const SendMovementPage = (props) => {
     description, origin, destination, stockList, requestedBy, dateRequested,
   } = props;
 
-  console.log(props);
-
   const tableItems =
     pickPage.length ? _.filter(pickPage, pick => !!pick.lotWithBin && !pick.crossedOut) : lineItems;
 
@@ -134,19 +132,19 @@ const SendMovementPage = (props) => {
               {
                 _.map(
                   tableItems,
-                  item =>
+                  (item, index) =>
                   (
-                    <tr key={item.lotWithBin}>
-                      <td key={item.lotWithBin + item.product.name}>{item.product.name}</td>
-                      <td key={item.lotWithBin + item.lot}>{item.lot}</td>
-                      <td key={item.lotWithBin + item.expiryDate}>
+                    <tr key={index}>
+                      <td>{item.product.name}</td>
+                      <td>{item.lot}</td>
+                      <td>
                         {item.expiryDate || item.expiry}
                       </td>
-                      <td key={item.lotWithBin + item.qtyPicked}>
+                      <td>
                         {item.qtyPicked || item.quantity}
                       </td>
-                      <td key={item.lotWithBin + item.bin}>{item.bin}</td>
-                      <td key={item.lotWithBin + item.recipient}>
+                      <td>{item.bin}</td>
+                      <td>
                         {item.recipient ? <span className="fa fa-user" /> : null}
                       </td>
                     </tr>
