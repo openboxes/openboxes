@@ -102,12 +102,13 @@ const VENDOR_FIELDS = {
         type: TextField,
         label: 'Box',
       },
-      productCode: {
+      product: {
         type: SelectField,
-        label: 'Requisition items',
+        label: 'Item',
         attributes: {
           openOnClick: false,
           options: PRODUCTS_MOCKS,
+          objectValue: true,
         },
       },
       lot: {
