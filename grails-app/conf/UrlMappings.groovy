@@ -20,18 +20,29 @@ class UrlMappings {
 				 // apply constraints here
 			  }
 		}
-		
 
-        "/api/${resource}s"(parseRequest: true) {
+        // REST APIs with complex plural resource names
+        "/api/categories"(parseRequest: false) {
+            controller = { "categoryApi" }
+            action = [GET: "list", POST: "save"]
+        }
+        "/api/categories/$id"(parseRequest: false) {
+            controller = {"categoryApi" }
+            action = [GET:"read", POST:"save", PUT:"save", DELETE:"delete"]
+        }
+
+        // Standard REST APIs
+        "/api/${resource}s"(parseRequest: false) {
             controller = { "${params.resource}Api" }
             action = [GET: "list", POST: "create"]
         }
-		"/api/${resource}s/$id"(parseRequest: true) {
+		"/api/${resource}s/$id"(parseRequest: false) {
             controller = {"${params.resource}Api" }
             action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
         }
 
-		"/api/$action/$id?"(controller:"api", parseRequest:true){
+        // Anonymous REST APIs like Status, Login, Logout
+		"/api/$action/$id?"(controller:"api", parseRequest:false){
 			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 

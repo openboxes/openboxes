@@ -20,7 +20,7 @@ class SecurityFilters {
 	static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
 	static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
 	static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
-	static ArrayList controllersWithLocationNotRequired = ['productApi']
+	static ArrayList controllersWithLocationNotRequired = ['categoryApi','productApi']
 
 	def authService 
 	def filters = {
@@ -159,7 +159,8 @@ class SecurityFilters {
 				
 				// When a user has not selected a warehouse and they are requesting an action that requires one, 
 				// we redirect to the choose warehouse page.
-				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName) || controllersWithLocationNotRequired.contains(controllerName))) {
+				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName) ||
+                        controllersWithLocationNotRequired.contains(controllerName) || controllerName.endsWith("Api"))) {
 
 					if (session?.warehouseStillNotSelected) { 
 						// FIXME cannot use warehouse tag lib here
