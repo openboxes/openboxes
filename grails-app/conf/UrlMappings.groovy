@@ -46,7 +46,19 @@ class UrlMappings {
 			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		//"/test/searchByFirstName.json?q=$q"(controller:"test") { 
+        "/api/generic/${resource}/"(parseRequest: false) {
+            controller = "genericApi"
+            action = [GET: "list"]
+        }
+
+        "/api/generic/${resource}/$id"(parseRequest: false) {
+            controller = "genericApi"
+            action = [GET:"read"]
+        }
+
+
+
+        //"/test/searchByFirstName.json?q=$q"(controller:"test") {
 		//	action = [GET:"searchByFirstName"]
 		//}
 			
