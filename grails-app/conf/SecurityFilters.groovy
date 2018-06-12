@@ -7,10 +7,13 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
+
+import org.apache.http.auth.AuthenticationException
 import org.apache.http.client.utils.URIBuilder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.util.RequestUtil
 
 class SecurityFilters {
 	
@@ -130,6 +133,9 @@ class SecurityFilters {
                         log.info "Not saving targetUri " + targetUri
                     }
 
+                    if (RequestUtil.isAjax(request)) {
+                        throw new AuthenticationException("Action ${actionName} requires authentication")
+                    }
 
                     redirect(controller: 'auth', action:'login')
 					return false;
@@ -142,7 +148,12 @@ class SecurityFilters {
 					// MissingPropertyException: No such property: warehouse for class: SecurityFilters
 					//flash.message = "${warehouse.message(code: 'auth.accountRequestUnderReview.message')}"
 					//flash.message = "auth.accountRequestUnderReview.message"
-					redirect(controller: 'auth', action:'login')
+
+                    if (RequestUtil.isAjax(request)) {
+                        throw new AuthenticationException("Action ${actionName} requires authentication")
+                    }
+
+                    redirect(controller: 'auth', action:'login')
 					return false;
 				}
 				

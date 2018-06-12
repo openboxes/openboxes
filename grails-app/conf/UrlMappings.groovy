@@ -1,5 +1,5 @@
-import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import grails.validation.ValidationException
+import org.hibernate.ObjectNotFoundException
 
 /**
 * Copyright (c) 2012 Partners In Health.  All rights reserved.
@@ -46,6 +46,10 @@ class UrlMappings {
 		"404"(controller:"errors", action:"handleNotFound")
         "405"(controller:"errors", action:"handleMethodNotAllowed")
 		"500"(controller:"errors", action:"handleException")
+        "500"(controller:"errors", action:"handleNotFound", exception: ObjectNotFoundException)
+        "500"(controller:"errors", action:"handleValidationErrors", exception: ValidationException)
+        "500"(controller:"errors", action:"handleUnauthorized", exception: AuthorizationException)
+
 		//"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
 		//"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
         "/"(controller:"home", action:"index")
