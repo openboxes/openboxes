@@ -10,6 +10,9 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
+import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class ProductApiController {
@@ -24,12 +27,34 @@ class ProductApiController {
 	}
 
     def read = {
-        Product product = Product.findByIdOrProductCode(params.id)
+        Product product = Product.findByIdOrProductCode(params.id, params.id)
+        if (!product) {
+            throw new ObjectNotFoundException(params.id, "Product")
+        }
         render product.toJson() as JSON
     }
 
     def create = {
-        throw new Exception("Not implemented yet")
+        log.info "Save category " + params
+        Product product = Product.get(params.id)
+        if (!product) {
+            product = new Product(request.JSON)
+        }
+        else {
+            product.properties = request.JSON;
+        }
+
+        if (!product.hasErrors() && product.save()) {
+            render product.toJson() as JSON
+        }
+        else {
+            throw new ValidationException("Unable to save product due to errors", product.errors)
+        }
+    }
+
+
+    def delete = {
+
     }
 
 }
