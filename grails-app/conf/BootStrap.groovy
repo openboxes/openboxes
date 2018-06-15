@@ -119,7 +119,6 @@ class BootStrap {
                 expectedDeliveryDate: receipt.expectedDeliveryDate,
                 actualDeliveryDate: receipt.actualDeliveryDate,
                 recipient: receipt.recipient,
-                name: receipt.expectedDeliveryDate,
                 shipment: receipt.shipment,
                 recipientItems: receipt.receiptItems
         ]}
@@ -132,8 +131,7 @@ class BootStrap {
                 quantityReceived: receiptItem.quantityReceived,
                 quantityShipped: receiptItem.quantityShipped,
                 binLocation: receiptItem.binLocation,
-                quantity: receiptItem.quantity,
-                recipient: receiptItem.recipient,
+                recipient: receiptItem.recipient
         ]}
 
         JSON.registerObjectMarshaller(Shipment) { Shipment shipment -> [
@@ -143,7 +141,7 @@ class BootStrap {
                 origin: shipment.origin,
                 destination: shipment.destination,
                 shipmentItems: shipment.shipmentItems,
-                containers: containers
+                containers: shipment.containers
         ]}
 
         JSON.registerObjectMarshaller(ShipmentItem) { ShipmentItem shipmentItem -> [
