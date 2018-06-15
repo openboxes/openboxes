@@ -22,17 +22,29 @@ class GenericApiController {
     GenericApiService genericApiService
 
     def list = {
-        log.info "List " + params
         List data = genericApiService.getList(params.resource, params)
-        render (["data":["${params.resource}":data.collect { it.toJson() }]] as JSON)
+        render (["data":data] as JSON)
 	}
 
     def read = {
-        log.info "Read " + params
-        Object object = genericApiService.getObject(params.resource, params.id)
-        render ([data:["${params.resource}":object.toJson()]] as JSON)
+        Object domainObject = genericApiService.getObject(params.resource, params.id)
+        render ([data:domainObject] as JSON)
     }
 
+    def create = {
+        Object domainObject = genericApiService.createObject(params.resource, request.JSON)
+        response.status = 201
+        render ([data:domainObject] as JSON)
+    }
 
+    def update = {
+        Object domainObject = genericApiService.updateObject(params.resource, params.id, request.JSON)
+        render ([data:domainObject] as JSON)
+    }
+
+    def delete = {
+        genericApiService.deleteObject(params.resource, params.id)
+        response.status = 204
+    }
 
 }
