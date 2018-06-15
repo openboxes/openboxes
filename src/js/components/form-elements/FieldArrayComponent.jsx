@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import PickPageFieldArrayComponent from './PickPageFieldArrayComponent';
 import TableRow from './TableRow';
-import TableRowWithSelector from './TableRowWithSelector';
 
 class FieldArrayComponent extends Component {
   shouldComponentUpdate(nextProps) {
@@ -24,6 +23,7 @@ class FieldArrayComponent extends Component {
   render() {
     const { fieldsConfig, properties, fields } = this.props;
     const AddButton = fieldsConfig.addButton;
+    const RowComponent = fieldsConfig.rowComponent || TableRow;
     const addRow = (row = {}) => fields.push(row);
 
     if (fieldsConfig.pickPage) {
@@ -46,34 +46,18 @@ class FieldArrayComponent extends Component {
             </tr>
           </thead>
           <tbody>
-            {fields.map((field, index) => {
-              if (fieldsConfig.rowWithSelector) {
-                return (
-                  <TableRowWithSelector
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                    field={field}
-                    index={index}
-                    properties={properties}
-                    addRow={addRow}
-                    fieldsConfig={fieldsConfig}
-                    removeRow={() => fields.remove(index)}
-                  />
-                );
-              }
-              return (
-                <TableRow
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  field={field}
-                  index={index}
-                  properties={properties}
-                  addRow={addRow}
-                  fieldsConfig={fieldsConfig}
-                  removeRow={() => fields.remove(index)}
-                />
-              );
-            })}
+            {fields.map((field, index) => (
+              <RowComponent
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                field={field}
+                index={index}
+                properties={properties}
+                addRow={addRow}
+                fieldsConfig={fieldsConfig}
+                removeRow={() => fields.remove(index)}
+              />))
+            }
           </tbody>
         </table>
         { AddButton &&
