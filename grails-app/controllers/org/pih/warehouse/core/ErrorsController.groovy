@@ -54,7 +54,7 @@ class ErrorsController {
         log.info "Unauthorized user"
         if (RequestUtil.isAjax(request)) {
             response.status = 401
-            render([errorCode: 401, errorMessage: "Unauthorized user"] as JSON)
+            render([errorCode: 401, errorMessage: "Unauthorized user: ${request?.exception?.message}"] as JSON)
         }
         else {
             redirect(controller: "auth", action: "login")
