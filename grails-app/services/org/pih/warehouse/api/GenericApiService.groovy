@@ -9,9 +9,12 @@
 **/ 
 package org.pih.warehouse.api
 
+import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.product.Product
 
 class GenericApiService {
 
@@ -31,31 +34,52 @@ class GenericApiService {
         def className = resourceName.capitalize()
         def domainClass = getDomainClassByName(className)
         if (!domainClass) {
-            throw new IllegalAccessException("No resource named ${className} could be found")
+            throw new IllegalAccessException("No domain class ${className} could be found")
         }
         return domainClass.clazz
     }
 
     List getList(String resourceName, Map params) {
         Class domainClass = getDomainClass(resourceName)
-        if (!domainClass) {
-            throw new IllegalAccessException("Unable to locate domain ${resourceName}")
-        }
         List list = domainClass.list(params)
-
         return list
-
     }
 
     Object getObject(String resourceName, String id) {
         def domainClass = getDomainClass(resourceName)
-        if (!domainClass) {
-            throw new IllegalAccessException("Unable to locate domain ${resourceName}")
-        }
-        Object object = domainClass.get(id)
-        if (!object) {
+        Object domainObject = domainClass.get(id)
+        if (!domainObject) {
             throw new ObjectNotFoundException(id, domainClass.simpleName)
         }
-        return object
+        return domainObject
     }
+
+    Object createObject(String resourceName, JSONObject json) {
+        log.info "Create " + json.class + ": " + json
+        def domainClass = getDomainClass(resourceName)
+
+        def domainObject = domainClass.newInstance()
+        domainObject.properties = json
+        if (domainObject.hasErrors() || !domainObject.save()) {
+            throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
+        }
+        return domainObject
+    }
+
+    Object updateObject(String resourceName, String id, JSONObject json) {
+        log.info "Update " + json
+        def domainObject = getObject(resourceName, id)
+        domainObject.properties = json
+        if (domainObject.hasErrors() || !domainObject.save()) {
+            throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
+        }
+        return domainObject
+    }
+
+    boolean deleteObject(String resourceName, String id) {
+        def domainObject = getObject(resourceName, id)
+        return domainObject.delete()
+    }
+
+
 }

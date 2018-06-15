@@ -49,12 +49,12 @@ class UrlMappings {
 
         "/api/generic/${resource}/"(parseRequest: false) {
             controller = "genericApi"
-            action = [GET: "list"]
+            action = [GET: "list", POST:"create"]
         }
 
         "/api/generic/${resource}/$id"(parseRequest: false) {
             controller = "genericApi"
-            action = [GET:"read"]
+            action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
         }
 
 
