@@ -36,13 +36,14 @@ Date: Sun, 10 Jun 2018 21:21:10 GMT
 
 Authentication was successful
 ```
-Once you have authenticated, use the JSESSIONID in the "Cookie" request header and start making 
+Once you have authenticated, use the JSESSIONID in the "Cookie" request header or use `-b` to read from a cookies 
+file and start making requests against the API.
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/categories
 
 ```
-If you want to end a session, you can POST to the logout endpoint
+If you want to end your session, you can `POST` a request to the logout endpoint.
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/logout
@@ -166,10 +167,10 @@ Returns validation error (Category is a required field of Product)
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category":{"id":"ff80818163e2de8d0163eb93c5a00001"}}' \
 https://openboxes.ngrok.io/openboxes/api/products
-
 ```
 #### Response
-```HTTP/1.1 500 Internal Server Error
+```
+HTTP/1.1 500 Internal Server Error
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
@@ -186,7 +187,8 @@ $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 
 ```
 #### Response
-```HTTP/1.1 200 OK
+```
+HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
@@ -203,7 +205,8 @@ $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 
 ```
 #### Response
-```HTTP/1.1 200 OK
+```
+HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
