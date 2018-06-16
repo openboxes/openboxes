@@ -19,21 +19,21 @@ pages:
 
 - User Guide: 'user-guide/index.md'
 
-- Deployment Guide
+- Deployment Guide:
     - 'Installation': 'installation/index.md'
     - 'Install on Ubuntu 14.04': 'installation/ubuntu.md'
     - 'Install on Mac OS': 'installation/macos.md'
     - 'Install on Windows': 'installation/windows.md'
     - 'Upgrading': upgrading/index.md'
 
-- Configuration Guide
+- Configuration Guide:
     - 'configuration/configuration.md', 'Configuration Guide', 'General']
     - 'configuration/database.md', 'Configuration Guide', 'Database']
     - 'configuration/email.md', 'Configuration Guide', 'Email']
     - 'configuration/application.md', 'Configuration Guide', 'Application']
     - 'configuration/example.md', 'Configuration Guide', 'Example']
 
-- Developer Guide
+- Developer Guide:
     - 'Introduction': 'developer-guide/index.md'
     - 'Getting Started': 'developer-guide/getting-started.md'
     - 'Contributing': 'developer-guide/contributing.md'
