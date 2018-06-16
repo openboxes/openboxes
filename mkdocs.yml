@@ -11,46 +11,37 @@ google_analytics: ['UA-37396941-2', 'OpenBoxes']
 
 pages:
 
-# About:
-- ['index.md', 'About', 'Introduction']
-- ['benefits.md', 'About', 'Benefits']
-- ['considerations.md', 'About', 'Considerations']
+- Home: 'index.md'
+- About:
+    - 'Benefits': 'about/benefits.md'
+    - 'Considerations': 'about/considerations.md'
+    - 'Release Notes': 'about/release-notes.md'
 
-# Deployment
-- ['installation/index.md', 'Deployment Guide',  'Installation']
-- ['installation/ubuntu.md', 'Deployment Guide', 'Install on Ubuntu 14.04']
-- ['installation/macos.md', 'Deployment Guide', 'Install on Mac OS']
-- ['installation/windows.md', 'Deployment Guide', 'Install on Windows']
+- User Guide: 'user-guide/index.md'
 
-# Upgrade
-- ['upgrading/index.md', 'Deployment Guide', 'Upgrading']
+- Deployment Guide
+    - 'Installation': 'installation/index.md'
+    - 'Install on Ubuntu 14.04': 'installation/ubuntu.md'
+    - 'Install on Mac OS': 'installation/macos.md'
+    - 'Install on Windows': 'installation/windows.md'
+    - 'Upgrading': upgrading/index.md'
 
-# Configuration
-- ['configuration/configuration.md', 'Configuration Guide', 'General']
-- ['configuration/database.md', 'Configuration Guide', 'Database']
-- ['configuration/email.md', 'Configuration Guide', 'Email']
-- ['configuration/application.md', 'Configuration Guide', 'Application']
-- ['configuration/example.md', 'Configuration Guide', 'Example']
+- Configuration Guide
+    - 'configuration/configuration.md', 'Configuration Guide', 'General']
+    - 'configuration/database.md', 'Configuration Guide', 'Database']
+    - 'configuration/email.md', 'Configuration Guide', 'Email']
+    - 'configuration/application.md', 'Configuration Guide', 'Application']
+    - 'configuration/example.md', 'Configuration Guide', 'Example']
 
-# Developer Guide
-- ['developer-guide/index.md', 'Developer Guide', 'Introduction']
-- ['developer-guide/getting-started.md', 'Developer Guide', 'Getting Started']
-- ['developer-guide/contributing.md', 'Developer Guide', 'Contributing']
-- ['developer-guide/syncing-a-fork.md', 'Developer Guide', 'Syncing a Fork']
-- ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
+- Developer Guide
+    - 'Introduction': 'developer-guide/index.md'
+    - 'Getting Started': 'developer-guide/getting-started.md'
+    - 'Contributing': 'developer-guide/contributing.md'
+    - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
+    - 'Tagging a Release': 'developer-guide/tagging.md'
 
-# Support - add a page like https://readthedocs.org/support/
-- ['support/index.md', 'Support', 'Introduction']
+- API Guide: 'api-guide/index.md'
 
-# User Guide
-- ['user-guide/index.md', 'User Guide', 'Introduction']
-
-# Continuous Integration
-# User Guide
-# HowTo
-# Cloud
-
-# Releases:
-- ['release-notes.md', 'Releases', 'Release Notes']
+- Support: 'support/index.md'
 
 
