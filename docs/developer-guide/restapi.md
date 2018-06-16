@@ -1,9 +1,9 @@
 # REST API
 
-## Session API
+## Overview 
 
-### Authenticate
-If you try to access the API with no cookie or an invalid cookie and receive the following error, you'll need to authenticate
+### Authentication
+If you try to access the API with no cookies (or an invalid/stale cookie) you'll receive the following error and will need to (re-)authenticate
 ```
 $ curl -i -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/categories
 
@@ -17,7 +17,7 @@ Date: Sun, 10 Jun 2018 21:20:45 GMT
 
 Attempt to authenticate with a valid username and password.
 ```
-$ curl -i -X POST -H "Content-Type: application/json" \
+$ curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"username":"jmiranda","password":"password"}' https://openboxes.ngrok.io/openboxes/api/login
 
 HTTP/1.1 200 OK
@@ -31,17 +31,90 @@ Authentication was successful
 ```
 Once you have authenticated, use the JSESSIONID in the "Cookie" request header and start making 
 ```
-$ curl -i -X POST -H "Content-Type: application/json" -H "Cookie: JSESSIONID=2126704AFC99A9946C7760BB1CD6AD68" \
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/categories
 
+```
+If you want to end a session, you can 
+```
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
+https://openboxes.ngrok.io/openboxes/api/logout
+
+```
+
+### Pagination
+All API endpoints will return all objects if pagination parameters are not provided.
+```
+$ curl -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/products?offset=0&max=1 | jsonlint
+[
+  {
+    "id": "ff80818155df9de40155df9e329b0009",
+    "productCode": "00003",
+    "name": "Aspirin 20mg",
+    "category": {
+      "id": "1",
+      "name": "Medicines"
+    },
+    "description": null,
+    "dateCreated": "2016-07-12T14:58:55Z",
+    "lastUpdated": "2016-07-12T14:58:55Z"
+  }
+]
+
+```
+
+### JSON Lint
+While testing the API, I'd recommend installing jsonlint ...
+```css
+npm install jsonlint -g
+```
+
+... and piping all curl responses through it to get a pretty response.
+```
+$ curl -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/products?max=1 | jsonlint
+[
+  {
+    "id": "ff80818155df9de40155df9e329b0009",
+    "productCode": "00003",
+    "name": "Aspirin 20mg",
+    "category": {
+      "id": "1",
+      "name": "Medicines"
+    },
+    "description": null,
+    "dateCreated": "2016-07-12T14:58:55Z",
+    "lastUpdated": "2016-07-12T14:58:55Z"
+  }
+]
+
+```
+NOTE: You'll need to remove the `-i` argument from the following examples to prevent parsing errors:
+```
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   221    0   221    0     0    455      0 --:--:-- --:--:-- --:--:--   455
+Error: Parse error on line 1:
+SerP/1.1 200 OK
+^
+Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', got 'undefined'
+    at Object.parseError (/home/jmiranda/.nvm/versions/node/v6.6.0/lib/node_modules/jsonlint/lib/jsonlint.js:55:11)
+    at Object.parse (/home/jmiranda/.nvm/versions/node/v6.6.0/lib/node_modules/jsonlint/lib/jsonlint.js:132:22)
+    at parse (/home/jmiranda/.nvm/versions/node/v6.6.0/lib/node_modules/jsonlint/lib/cli.js:82:14)
+    at Socket.<anonymous> (/home/jmiranda/.nvm/versions/node/v6.6.0/lib/node_modules/jsonlint/lib/cli.js:149:41)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9) 
 ```
 
 
 ## Category API
 
-### Create a new category - Returns validation errors (Name is a required field of Category)
+### Create a new category - Exception (500)
+Returns validation errors (Name is a required field of Category)
 ```
-$ curl -i -X POST -H "Content-Type: application/json" -H "Cookie: JSESSIONID=2126704AFC99A9946C7760BB1CD6AD68" \
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{}' https://openboxes.ngrok.io/openboxes/api/categories
 
 HTTP/1.1 500 Internal Server Error
@@ -55,7 +128,7 @@ Date: Sat, 09 Jun 2018 14:30:20 GMT
 
 ### Create a new category - Success (200)
 ```
-$ curl -i -X POST -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New category"}' https://openboxes.ngrok.io/openboxes/api/categories
 
 HTTP/1.1 200 OK
@@ -73,7 +146,7 @@ Date: Sun, 10 Jun 2018 21:22:00 GMT
 ### Create a new product 
 Returns validation error (Category is a required field of Product)
 ```
-$ curl -i -X POST -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category":{"id":"ff80818163e2de8d0163eb93c5a00001"}}' \
 https://openboxes.ngrok.io/openboxes/api/products
 
@@ -88,7 +161,7 @@ Date: Sun, 10 Jun 2018 21:35:58 GMT
 
 ### Create a new product
 ```
-$ curl -i -X POST -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category.id":"ff80818163e2de8d0163eb93c5a00001"}' https://openboxes.ngrok.io/openboxes/api/products
 
 HTTP/1.1 200 OK
@@ -102,7 +175,7 @@ Date: Sun, 10 Jun 2018 21:37:12 GMT
 
 ### List all products (results paginated using offset and max)
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 -d '{ "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 
 HTTP/1.1 200 OK
@@ -125,7 +198,7 @@ Date: Sun, 10 Jun 2018 22:08:21 GMT
 
 ### Search products with Name starting with 'New product' (results paginged using offset and max)
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 -d '{ "name":"New product", "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 
 HTTP/1.1 200 OK
@@ -139,7 +212,7 @@ Date: Sun, 10 Jun 2018 22:15:08 GMT
 
 ### Get an existing product 
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/ff80818163e2de8d0163eba1b1e90002
 
 HTTP/1.1 200 OK
@@ -153,7 +226,7 @@ Date: Sun, 10 Jun 2018 21:38:27 GMT
 
 ### Product not found
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/invalididentifier
 
 HTTP/1.1 404 Not Found
