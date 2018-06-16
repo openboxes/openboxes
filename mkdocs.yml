@@ -17,6 +17,8 @@ pages:
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
 
+- API Guide: 'api-guide/index.md'
+
 - User Guide: 'user-guide/index.md'
 
 - Deployment Guide:
@@ -27,11 +29,11 @@ pages:
     - 'Upgrading': upgrading/index.md'
 
 - Configuration Guide:
-    - 'configuration/configuration.md', 'Configuration Guide', 'General']
-    - 'configuration/database.md', 'Configuration Guide', 'Database']
-    - 'configuration/email.md', 'Configuration Guide', 'Email']
-    - 'configuration/application.md', 'Configuration Guide', 'Application']
-    - 'configuration/example.md', 'Configuration Guide', 'Example']
+    - 'General': 'configuration/configuration.md', 'Configuration Guide'
+    - 'Database': 'configuration/database.md', 'Configuration Guide'
+    - 'Email': 'configuration/email.md', 'Configuration Guide'
+    - 'Application': 'configuration/application.md'
+    - 'Example': 'configuration/example.md'
 
 - Developer Guide:
     - 'Introduction': 'developer-guide/index.md'
@@ -40,7 +42,6 @@ pages:
     - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
     - 'Tagging a Release': 'developer-guide/tagging.md'
 
-- API Guide: 'api-guide/index.md'
 
 - Support: 'support/index.md'
 
