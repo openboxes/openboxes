@@ -85,12 +85,17 @@ class BootStrap {
                 containerNumber: container.containerNumber,
                 containerType: container.containerType,
                 recipient: container.recipient,
-                sortOrder: container.sortOrder
+                sortOrder: container.sortOrder,
+                shipmentItems: container.shipmentItems
         ]}
 
         JSON.registerObjectMarshaller(InventoryItem) { InventoryItem inventoryItem -> [
                 id: inventoryItem.id,
-                product: inventoryItem.product,
+                product: [
+                        id: inventoryItem?.product?.id,
+                        name: inventoryItem?.product?.name,
+                        productCode: inventoryItem?.product?.productCode
+                ],
                 lotNumber: inventoryItem.lotNumber,
                 expirationDate: inventoryItem.expirationDate
         ]}
@@ -111,7 +116,7 @@ class BootStrap {
                 productCode: product.productCode,
                 name: product.name,
                 description: product.description,
-                category: product?.category
+                category: [id: product?.category?.id, name: product?.category?.name]
         ]}
 
         JSON.registerObjectMarshaller(Receipt) { Receipt receipt -> [
@@ -134,24 +139,43 @@ class BootStrap {
                 recipient: receiptItem.recipient
         ]}
 
-        JSON.registerObjectMarshaller(Shipment) { Shipment shipment -> [
+        JSON.registerObjectMarshaller(Shipment) { Shipment shipment ->
+            def containerList = []
+            def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
+            shipmentItemsByContainer.each { container, shipmentItems ->
+                containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
+            }
+            return [
                 id: shipment.id,
                 name: shipment.name,
                 status: shipment?.status?.code?.name(),
-                origin: shipment.origin,
-                destination: shipment.destination,
+                origin: [
+                        id: shipment.origin?.id,
+                        name: shipment?.origin?.name,
+                        type: shipment?.origin?.locationType?.locationTypeCode?.name()
+                ],
+                destination: [
+                        id: shipment?.destination?.id,
+                        name: shipment?.destination?.name,
+                        type: shipment?.destination?.locationType?.locationTypeCode?.name()
+
+                ],
                 shipmentItems: shipment.shipmentItems,
-                containers: shipment.containers
+                containers: containerList
         ]}
 
-        JSON.registerObjectMarshaller(ShipmentItem) { ShipmentItem shipmentItem -> [
+        JSON.registerObjectMarshaller(ShipmentItem) { ShipmentItem shipmentItem ->
+            def container = shipmentItem?.container ? [
+                    id: shipmentItem?.container?.id,
+                    name: shipmentItem?.container?.name,
+                    type: shipmentItem?.container?.containerType?.name ] : null
+            [
                 id: shipmentItem.id,
-                product: shipmentItem.inventoryItem.product,
-                inventoryItem: shipmentItem.inventoryItem,
+                inventoryItem: shipmentItem?.inventoryItem,
                 quantity: shipmentItem.quantity,
                 recipient: shipmentItem.recipient,
-                shipment: shipmentItem.shipment,
-                container: shipmentItem.container
+                shipment: [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name],
+                container: container
         ]}
 
         JSON.registerObjectMarshaller(User) { User user -> [
