@@ -29,9 +29,9 @@ pages:
     - 'Upgrading': upgrading/index.md'
 
 - Configuration Guide:
-    - 'General': 'configuration/configuration.md', 'Configuration Guide'
-    - 'Database': 'configuration/database.md', 'Configuration Guide'
-    - 'Email': 'configuration/email.md', 'Configuration Guide'
+    - 'General': 'configuration/configuration.md'
+    - 'Database': 'configuration/database.md'
+    - 'Email': 'configuration/email.md'
     - 'Application': 'configuration/application.md'
     - 'Example': 'configuration/example.md'
 
