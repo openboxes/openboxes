@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.product.Product
@@ -66,6 +67,16 @@ class GenericApiService {
         return domainObject
     }
 
+    Object createObjects(String resourceName, JSONArray jsonArray) {
+        log.info "Create " + jsonArray.class + ": " + jsonArray
+        def domainObjects = []
+        jsonArray.each { JSONObject jsonObject ->
+            domainObjects << createObject(resourceName, jsonObject)
+        }
+        return domainObjects
+    }
+
+
     Object updateObject(String resourceName, String id, JSONObject json) {
         log.info "Update " + json
         def domainObject = getObject(resourceName, id)
@@ -75,6 +86,16 @@ class GenericApiService {
         }
         return domainObject
     }
+
+    Object updateObjects(String resourceName, JSONArray jsonArray) {
+        log.info "Update " + jsonArray.class + ": " + jsonArray
+        def domainObjects = []
+        jsonArray.each { JSONObject jsonObject ->
+            domainObjects << updateObject(resourceName, jsonObject)
+        }
+        return domainObjects
+    }
+
 
     boolean deleteObject(String resourceName, String id) {
         def domainObject = getObject(resourceName, id)

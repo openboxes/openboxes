@@ -4,9 +4,13 @@
 
 ### Authentication
 If you try to access the API with no cookies (or an invalid/stale cookie) you'll receive the following error and will need to (re-)authenticate
+#### Request
 ```
-$ curl -i -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/categories
-
+$ curl -i -X POST -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/categories
+```
+#### Response
+```
 HTTP/1.1 302 Moved Temporarily
 Server: Apache-Coyote/1.1
 Set-Cookie: JSESSIONID=27C59970DF0F4E5DC7CEC2A695A2DCC5; Path=/openboxes
@@ -16,10 +20,13 @@ Date: Sun, 10 Jun 2018 21:20:45 GMT
 ```
 
 Attempt to authenticate with a valid username and password.
+#### Request 
 ```
 $ curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"username":"jmiranda","password":"password"}' https://openboxes.ngrok.io/openboxes/api/login
-
+```
+#### Response
+```
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Set-Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531; Path=/openboxes
@@ -35,7 +42,7 @@ $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/categories
 
 ```
-If you want to end a session, you can 
+If you want to end a session, you can POST to the logout endpoint
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/logout
@@ -45,7 +52,8 @@ https://openboxes.ngrok.io/openboxes/api/logout
 ### Pagination
 All API endpoints will return all objects if pagination parameters are not provided.
 ```
-$ curl -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/products?offset=0&max=1 | jsonlint
+$ curl -X POST -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/products?offset=0&max=1 | jsonlint
 [
   {
     "id": "ff80818155df9de40155df9e329b0009",
@@ -113,10 +121,14 @@ Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', got 'undefined'
 
 ### Create a new category - Exception (500)
 Returns validation errors (Name is a required field of Category)
+#### Request
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{}' https://openboxes.ngrok.io/openboxes/api/categories
 
+```
+#### Response
+```
 HTTP/1.1 500 Internal Server Error
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -127,10 +139,14 @@ Date: Sat, 09 Jun 2018 14:30:20 GMT
 ```
 
 ### Create a new category - Success (200)
+#### Request
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New category"}' https://openboxes.ngrok.io/openboxes/api/categories
 
+```
+#### Response
+```
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -145,12 +161,15 @@ Date: Sun, 10 Jun 2018 21:22:00 GMT
 
 ### Create a new product 
 Returns validation error (Category is a required field of Product)
+#### Request
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category":{"id":"ff80818163e2de8d0163eb93c5a00001"}}' \
 https://openboxes.ngrok.io/openboxes/api/products
 
-HTTP/1.1 500 Internal Server Error
+```
+#### Response
+```HTTP/1.1 500 Internal Server Error
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
@@ -160,11 +179,14 @@ Date: Sun, 10 Jun 2018 21:35:58 GMT
 ```
 
 ### Create a new product
+#### Request
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category.id":"ff80818163e2de8d0163eb93c5a00001"}' https://openboxes.ngrok.io/openboxes/api/products
 
-HTTP/1.1 200 OK
+```
+#### Response
+```HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
@@ -174,33 +196,30 @@ Date: Sun, 10 Jun 2018 21:37:12 GMT
 ```
 
 ### List all products (results paginated using offset and max)
+#### Request
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 -d '{ "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 
-HTTP/1.1 200 OK
+```
+#### Response
+```HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 22:13:27 GMT
 
 {data:[{"id":"cab2b4f35c33cdec015c53e129ce1dea","productCode":"HS45","name":"\tExtension Set, 7\" Smllbore, Microclave, Clamp, Rotating Luer","category":{"id":"752e945e67d511e5a90eaa0009a30cce","name":"MedEquip&Supplies_IV_Supplies"},"description":null,"dateCreated":"2017-05-29T16:04:44Z","lastUpdated":"2017-05-29T16:04:44Z"}]
-
-
-HTTP/1.1 200 OK
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 22:08:21 GMT
-
-[{"id":"cab2b4f35c33cdec015c53e129ce1dea","productCode":"HS45","name":"\tExtension Set, 7\" Smllbore, Microclave, Clamp, Rotating Luer","category":{"id":"752e945e67d511e5a90eaa0009a30cce","name":"MedEquip&Supplies_IV_Supplies"},"description":null,"dateCreated":"2017-05-29T16:04:44Z","lastUpdated":"2017-05-29T16:04:44Z"},{"id":"c879370c36cd8e710136cda1e4d50025","productCode":"AD65","name":" Blade for surgical knives size 15","category":{"id":"cab2b4f34d7c909b014e030ceba04968","name":"MedEquip&Supplies_Surgical"},"description":null,"dateCreated":"2012-04-20T07:43:20Z","lastUpdated":"2016-10-21T02:28:06Z"},{"id":"cab2b4f36153318d0161d31945635eee","productCode":"QZ00","name":" Quetiapine fumarate, 100mg, Tablet","category":{"id":"cab2b4f34fdce3cc014ff7ebc74717bf","name":"Drugs_Psychiatric_&_Antiepileptic"},"description":null,"dateCreated":"2018-02-26T23:11:44Z","lastUpdated":"2018-02-26T23:11:44Z"},{"id":"cab2b4f35915dee301591802f8690495","productCode":"DM86","name":" Suture, Chromic gut, 4-0, C-13, Reverse-cutting, Braided, Absorbable, 30in","category":{"id":"cab2b4f34d7c909b014e030ceba04968","name":"MedEquip&Supplies_Surgical"},"description":null,"dateCreated":"2016-12-19T22:56:04Z","lastUpdated":"2016-12-19T22:59:00Z"},{"id":"cab2b4f35fbe36a5016022cfda3d257e","productCode":"ZP59","name":" Walker, Side Style, One Arm","category":{"id":"cab2b4f34fdce3cc014ff65d4b4b1734","name":"MedEquip&Supplies_Rehabilitation"},"description":"Lightweight design allows the hemi sidestepper to be maneuvered easily even with just one arm.\r\nHelps provide more stability and more weight-bearing ability than a quad cane.\r\nHeight-adjustable in 1\" (2.5 cm) increments.\r\nBi-level hand grip offer extra assistance for users getting in and out of chairs.\r\n250-lb. (113 kg) Weight capacity; Height adjustment, 32\"-36\" (81 cm-91 cm); Folded width, 3\" (8 cm).","dateCreated":"2017-12-05T00:35:35Z","lastUpdated":"2017-12-05T00:35:35Z"},{"id":"c879370c40a9cf710140df0d02243693","productCode":"KB27","name":"#2 blue filter, A/C split systems","category":{"id":"c879370c3bac412e013c2105979d0857","name":"Z One-off products"},"description":null,"dateCreated":"2013-09-02T19:21:46Z","lastUpdated":"2016-08-26T19:56:18Z"},{"id":"c879370c40a9cf710140df0d02503695","productCode":"YE24","name":"#3 blue filter, A/C split systems","category":{"id":"c879370c3bac412e013c2105979d0857","name":"Z One-off products"},"description":null,"dateCreated":"2013-09-02T19:21:46Z","lastUpdated":"2016-08-26T19:56:18Z"},{"id":"c879370c40a9cf710140df0d01fa3691","productCode":"MG54","name":"#4 blue filter, A/C split systems","category":{"id":"c879370c3bac412e013c2105979d0857","name":"Z One-off products"},"description":null,"dateCreated":"2013-09-02T19:21:46Z","lastUpdated":"2016-08-26T19:56:18Z"},{"id":"c879370c40a9cf710140df0d02a23697","productCode":"CE59","name":"#unknown blue filter, A/C split systems","category":{"id":"c879370c3bac412e013c2105979d0857","name":"Z One-off products"},"description":null,"dateCreated":"2013-09-02T19:21:46Z","lastUpdated":"2016-08-26T19:56:18Z"},{"id":"c879370c4564d5e50145b2ce88a02f63","productCode":"RA62","name":".33 HP VM Classic Motor Kit","category":{"id":"727efb7a67d511e5a90eaa0009a30cce","name":"Facilities_Mechanical"},"description":null,"dateCreated":"2014-04-30T18:24:11Z","lastUpdated":"2017-03-15T00:55:35Z"}]
 ```
 
 ### Search products with Name starting with 'New product' (results paginged using offset and max)
+#### Request
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 -d '{ "name":"New product", "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
-
+```
+#### Response
+```
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -211,10 +230,13 @@ Date: Sun, 10 Jun 2018 22:15:08 GMT
 ```
 
 ### Get an existing product 
+#### Request
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/ff80818163e2de8d0163eba1b1e90002
-
+```
+#### Response
+```
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -225,10 +247,14 @@ Date: Sun, 10 Jun 2018 21:38:27 GMT
 ```
 
 ### Product not found
+
+#### Request
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/invalididentifier
-
+```
+#### Response
+```
 HTTP/1.1 404 Not Found
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -236,4 +262,233 @@ Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 21:43:37 GMT
 
 {"errorCode":404,"errorMessage":"Resource not found"}
+```
+
+
+## Generic API
+After creating a few API endpoints I got a little tired of writing the same boilerplate code. So I've added 
+another endpoint to allow developers to access any of the domain objects via a more generic boilerplate-y API.
+
+### List objects
+#### Request
+```
+$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/generic/product | jsonlint
+```
+#### Response
+```
+{
+  "data": [
+    {
+      "id": "ff80818155df9de40155df9e31000001",
+      "productCode": "00001",
+      "name": "Ibuprofen 200mg",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e321c0005",
+      "productCode": "00002",
+      "name": "Tylenol 325mg",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e329b0009",
+      "productCode": "00003",
+      "name": "Aspirin 20mg",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e3312000d",
+      "productCode": "00004",
+      "name": "General Pain Reliever",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e33930011",
+      "productCode": "00005",
+      "name": "Similac Advance low iron 400g",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e34080015",
+      "productCode": "00006",
+      "name": "Similac Advance + iron 365g",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e347e0019",
+      "productCode": "00007",
+      "name": "MacBook Pro 8G",
+      "description": null,
+      "category": {
+        "id": "2",
+        "name": "Supplies"
+      }
+    },
+    {
+      "id": "ff80818155df9de40155df9e34f1001d",
+      "productCode": "00008",
+      "name": "Print Paper A4",
+      "description": null,
+      "category": {
+        "id": "2",
+        "name": "Supplies"
+      }
+    }
+  ]
+}
+```
+
+
+### Read object
+#### Request
+```
+$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/generic/product/ff80818155df9de40155df9e31000001
+```
+#### Response
+```
+{
+	"data": {
+		"id": "ff80818155df9de40155df9e31000001",
+		"productCode": "00001",
+		"name": "Ibuprofen 200mg",
+		"description": null,
+		"category": {
+			"id": "1",
+			"name": "Medicines"
+		}
+	}
+}
+```
+
+### Create an object
+
+#### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"name":"product 0", "category.id":"ROOT"}' \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+#### Response
+```
+{
+	"data": {
+		"id": "ff8081816407132d01640730bd150003",
+		"productCode": null,
+		"name": "product 0",
+		"description": null,
+		"category": {
+			"id": "ROOT",
+			"name": "ROOT"
+		}
+	}
+}
+```
+
+### Update an object
+#### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"description":"This is the penultimate product"}' \
+https://openboxes.ngrok.io/openboxes/api/generic/product/ff8081816407132d0164071eec250001 | jsonlint
+```
+#### Response
+```
+{
+  "data": {
+    "id": "ff8081816407132d0164071eec250001",
+    "productCode": "BK71",
+    "name": "product 1",
+    "description": "This is the penultimate product",
+    "category": {
+      "id": "ROOT",
+      "name": "ROOT"
+    }
+  }
+}
+```
+
+
+### Create multiple objects 
+The REST API also allows you to create multiple objects at once. 
+
+If there are no errors, both objects should be created and returned.
+#### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '[{"name":"product 1","category.id":"ROOT"},{"name":"product 2","category.id":"ROOT"}]' \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+#### Response
+```
+{
+	"data": [{
+		"id": "ff8081816407132d0164071eec250001",
+		"productCode": null,
+		"name": "product 1",
+		"description": null,
+		"category": {
+			"id": "ROOT",
+			"name": "ROOT"
+		}
+	}, {
+		"id": "ff8081816407132d0164071eec2d0002",
+		"productCode": null,
+		"name": "product 2",
+		"description": null,
+		"category": {
+			"id": "ROOT",
+			"name": "ROOT"
+		}
+	}]
+}
+```
+In the following example, you'll notice that the POST request on multiple objects is an all-or-nothing transaction, 
+so if there are any errors (i.e. validation errors) the entire request will fail. In this case, we throw an error
+for the first object that failed - not for all objects that fail.
+#### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '[{"name":"product 1"},{"name":"product 2"}]' \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+#### Response
+```{
+	"errorCode": 400,
+	"errorMessage": "Validation errors",
+	"data": {
+		"errors": [{
+			"object": "org.pih.warehouse.product.Product",
+			"field": "category",
+			"rejected-value": null,
+			"message": "Property [category] of class [Product] cannot be null"
+		}]
+	}
+}
 ```

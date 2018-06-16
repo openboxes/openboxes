@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -23,7 +24,7 @@ class GenericApiController {
 
     def list = {
         List data = genericApiService.getList(params.resource, params)
-        render (["data":data] as JSON)
+        render ([data:data] as JSON)
 	}
 
     def read = {
@@ -32,9 +33,16 @@ class GenericApiController {
     }
 
     def create = {
-        Object domainObject = genericApiService.createObject(params.resource, request.JSON)
+        Object result
+        def json = request.JSON
+        if (json instanceof JSONArray) {
+            result = genericApiService.createObjects(params.resource, json)
+        }
+        else {
+            result = genericApiService.createObject(params.resource, json)
+        }
         response.status = 201
-        render ([data:domainObject] as JSON)
+        render ([data:result] as JSON)
     }
 
     def update = {
